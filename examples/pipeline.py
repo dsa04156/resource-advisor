@@ -38,6 +38,13 @@ def observe(
         run_key=run_key,
     )
     task.set_caching_options(False)
+    kubernetes.add_node_selector(task, "kubernetes.io/arch", "amd64")
+    kubernetes.use_secret_as_volume(
+        task,
+        secret_name=token_secret,
+        mount_path="/var/run/resource-advisor",
+    )
+    task.set_env_variable("SSL_CERT_FILE", "/var/run/resource-advisor/ca.crt")
     task.set_cpu_request("100m").set_cpu_limit("1")
     task.set_memory_request("128Mi").set_memory_limit("256Mi")
     kubernetes.use_secret_as_env(

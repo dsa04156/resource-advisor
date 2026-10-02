@@ -30,5 +30,6 @@ uv run resource-advisor worker --config /run/resource-advisor/routes.json
 
 Do not use a production database for tests: `RA_TEST_DATABASE_URL` targets only
 a disposable `ra_test_*` database. Schema migration, release image build,
-object-storage credentials, production deployment manifests and live backend
-qualification remain subsequent milestones.
+production deployment manifests and complete backend qualification remain
+subsequent milestones. See [the Kubeflow launch guide](../docs/kubeflow-pipeline.md)
+for a rootless launcher build and the TLS/Secret contract.

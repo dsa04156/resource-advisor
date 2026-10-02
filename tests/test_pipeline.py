@@ -24,3 +24,18 @@ def test_compiled_launcher_does_not_request_gpu_or_cache(tmp_path):
     assert container["command"] == ["python", "-m", "resource_advisor.launcher"]
     assert "RA_API_TOKEN" in output.read_text()
     assert "secretNameParameter" in output.read_text()
+    assert "kubernetes.io/arch" in output.read_text()
+    assert "SSL_CERT_FILE" in output.read_text()
+    assert "/var/run/resource-advisor/ca.crt" in output.read_text()
+
+
+def test_server_requires_both_tls_files(monkeypatch):
+    from resource_advisor.cli import main
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["resource-advisor", "serve", "--credentials", "/unused", "--ssl-certfile", "/unused"],
+    )
+    with pytest.raises(SystemExit) as error:
+        main()
+    assert error.value.code == 2

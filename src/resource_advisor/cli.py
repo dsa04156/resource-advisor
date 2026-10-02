@@ -27,11 +27,15 @@ def main():
     )
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=18040)
+    serve.add_argument("--ssl-keyfile", help="private TLS key for direct HTTPS serving")
+    serve.add_argument("--ssl-certfile", help="TLS certificate chain for direct HTTPS serving")
     serve.add_argument("--artifacts-config", help="private S3 endpoint and project bucket map")
     worker = sub.add_parser("worker")
     worker.add_argument("--config", required=True, help="private backend routes")
     worker.add_argument("--once", action="store_true")
     args = parser.parse_args()
+    if args.action == "serve" and bool(args.ssl_keyfile) != bool(args.ssl_certfile):
+        parser.error("--ssl-keyfile and --ssl-certfile must be provided together")
     if args.database.startswith("sqlite:///."):
         Path(".state").mkdir(mode=0o700, exist_ok=True)
     store = Store(args.database)
@@ -58,6 +62,8 @@ def main():
             create_app(service, credentials, artifact_storage=artifact_storage),
             host=args.host,
             port=args.port,
+            ssl_keyfile=args.ssl_keyfile,
+            ssl_certfile=args.ssl_certfile,
         )
     elif args.action == "worker":
         config = json.loads(Path(args.config).read_text())
