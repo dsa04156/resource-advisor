@@ -1,0 +1,173 @@
+{
+  "captured_at": "2026-10-02T18:58:36.610330+00:00",
+  "scope": "actual read-only Kueue inventory under the observer service account; local console preview, no runtime service rollout",
+  "observation": {
+    "value": {
+      "ref": "ra-f0-gpu",
+      "cluster_queue": "ra-f0-gpu",
+      "scope": "cluster_queue_all_namespaces",
+      "active": true,
+      "stop_policy": "None",
+      "queueing_strategy": "BestEffortFIFO",
+      "cohort": null,
+      "conditions": [
+        {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can admit new workloads",
+          "lastTransitionTime": "2026-10-02T04:34:07Z",
+          "current_generation": true
+        }
+      ],
+      "pending_workloads": 0,
+      "reserving_workloads": 0,
+      "admitted_workloads": 0,
+      "resources": [
+        {
+          "flavor": "ra-f0-gpu",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": 2.0,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": 0.0
+        },
+        {
+          "flavor": "ra-f0-gpu",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": 2147483648.0,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": 0.0
+        },
+        {
+          "flavor": "ra-f0-gpu",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": 1.0,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": 0.0
+        }
+      ],
+      "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+    },
+    "observed_at": "2026-10-02T18:54:46.495963+00:00",
+    "source": "kueue",
+    "status": "ok",
+    "unit": null
+  },
+  "local_queues": [
+    {
+      "value": [
+        {
+          "ref": "ra-f0-gpu",
+          "cluster_queue": "ra-f0-gpu",
+          "scope": "local_queue_namespace",
+          "active": true,
+          "stop_policy": "None",
+          "queueing_strategy": null,
+          "cohort": null,
+          "conditions": [
+            {
+              "type": "Active",
+              "status": "True",
+              "reason": "Ready",
+              "message": "Can submit new workloads to localQueue",
+              "lastTransitionTime": "2026-10-02T04:34:07Z",
+              "current_generation": true
+            }
+          ],
+          "pending_workloads": 0,
+          "reserving_workloads": 0,
+          "admitted_workloads": 0,
+          "resources": [
+            {
+              "flavor": "ra-f0-gpu",
+              "resource": "cpu",
+              "unit": "cores",
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "nominal_quota": null,
+              "borrowing_limit": null,
+              "reserved": 0.0,
+              "admitted": 0.0,
+              "borrowed_reservation": null
+            },
+            {
+              "flavor": "ra-f0-gpu",
+              "resource": "memory",
+              "unit": "bytes",
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "nominal_quota": null,
+              "borrowing_limit": null,
+              "reserved": 0.0,
+              "admitted": 0.0,
+              "borrowed_reservation": null
+            },
+            {
+              "flavor": "ra-f0-gpu",
+              "resource": "nvidia.com/gpu",
+              "unit": "resource_units",
+              "device_class": "gpu",
+              "allocation_mode": "physical_device",
+              "nominal_quota": null,
+              "borrowing_limit": null,
+              "reserved": 0.0,
+              "admitted": 0.0,
+              "borrowed_reservation": null
+            }
+          ],
+          "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+        }
+      ],
+      "observed_at": "2026-10-02T18:54:46.495963+00:00",
+      "source": "kueue",
+      "status": "ok",
+      "unit": null
+    }
+  ],
+  "authorization": {
+    "named_lab_cluster_queue_get": true,
+    "other_cluster_queue_get": false,
+    "cluster_queue_list": false,
+    "project_localqueue_list": true,
+    "other_namespace_localqueue_list": false
+  },
+  "browser": {
+    "mobile_390px_screenshot_inspected": true,
+    "desktop_1440px_expired_state_inspected": true,
+    "expired_quota_numbers_hidden": true,
+    "desktop_document_width": 1440,
+    "errors": 0,
+    "warnings": 0
+  },
+  "tests": {
+    "sqlite_passed": 414,
+    "lint": "passed",
+    "format": "passed"
+  },
+  "limits": [
+    "Queue fields are observed status, not actual device utilization.",
+    "Resource reads are not an atomic scheduler snapshot.",
+    "This read check creates no pending job and does not prove new scheduling behavior.",
+    "Continuous deployed inventory and API rollout remain pending after the frozen GPU protocol."
+  ],
+  "source_sha256": {
+    "src/resource_advisor/inventory.py": "b5d8a2cc35e33b6df6b7577d79a1992260a4c5d27e47e14415de976ceecf7277",
+    "src/resource_advisor/queue_inventory.py": "81c28d36c05788fbe79b0836167dae4d119102bda9fb70b6c2fb71e91143397a",
+    "src/resource_advisor/static/console.js": "32c6e1a3d1447ee8ffb451c09dd9e2b0202c9ecc43b5c59c611660f84b527cff"
+  }
+}

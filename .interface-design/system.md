@@ -34,3 +34,9 @@ Lead with strategy and plain-language interpretation, then source provenance and
 separate historical/target costs. Individual recorded choices expand to model
 mixture weights and explicit fallback reasons. Percentages are labeled as mixture
 contributions, never confidence. Warm start must not display invented RGPE weights.
+
+Queue policy panels name their scope: LocalQueue namespace or ClusterQueue across
+namespaces. Dense flavor/resource tables separate nominal quota, reservation and
+admission; no available-GPU total is inferred from subtraction. Missing fields say
+unreported, and stale observations hide the complete table. Use expandable native
+details for controller conditions and admission-check messages.

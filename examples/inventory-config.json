@@ -4,6 +4,7 @@
   "node_refs": ["gpu-worker-a"],
   "kubeconfig": "/path/to/private/inventory-kubeconfig.json",
   "queue_namespaces": ["resource-advisor-lab"],
+  "cluster_queue_refs": ["ra-f0-gpu"],
   "stale_after_seconds": 120,
   "resource_types": {
     "nvidia.com/gpu": {"device_class": "gpu", "allocation_mode": "physical_device"},

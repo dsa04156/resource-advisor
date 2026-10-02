@@ -540,6 +540,61 @@ function compatibilityView() {
   root.append(pager("compatibility", data.compatibility));
   return root;
 }
+function queuePolicyView(q, title) {
+  const format = (value, unit) =>
+    value == null
+      ? "미보고"
+      : unit === "bytes"
+        ? fmt(value / 1024 ** 3) + " GiB"
+        : fmt(value) + (unit === "cores" ? " cores" : " units");
+  const content = add(
+    el("div", null, "evidence"),
+    el(
+      "p",
+      `대기 ${fmt(q.pending_workloads, 0)} · 예약 ${fmt(q.reserving_workloads, 0)} · 승인 ${fmt(q.admitted_workloads, 0)} 작업`,
+    ),
+    badge(
+      q.active === true
+        ? "큐 활성"
+        : q.active === false
+          ? "큐 비활성"
+          : "큐 활성 여부 미확인",
+      q.active === true ? "" : "warn",
+    ),
+    q.resources.length
+      ? table(
+          ["Flavor / 자원", "기본 한도", "예약", "승인", "빌린 예약"],
+          q.resources.map((r) => [
+            add(
+              el("div"),
+              code(r.flavor),
+              el("div", r.resource),
+              el(
+                "small",
+                r.unit === "cores"
+                  ? "호스트 CPU"
+                  : r.unit === "bytes"
+                    ? "메모리 / 저장 용량"
+                    : modes[r.allocation_mode] || "단위 미확인",
+              ),
+            ),
+            format(r.nominal_quota, r.unit),
+            format(r.reserved, r.unit),
+            format(r.admitted, r.unit),
+            format(r.borrowed_reservation, r.unit),
+          ]),
+        )
+      : empty("자원별 할당량이 보고되지 않았습니다."),
+    details("정책 · 상태 사유", q),
+  );
+  return panel(
+    title,
+    q.scope === "cluster_queue_all_namespaces"
+      ? "ClusterQueue 전체 네임스페이스의 합계입니다. 예약·승인량은 실제 사용률이나 즉시 가용량이 아닙니다."
+      : "이 네임스페이스의 LocalQueue 사용량입니다. 공유 ClusterQueue의 한도는 프로젝트 전용 한도가 아닙니다.",
+    content,
+  );
+}
 function historyView() {
   const root = el("div");
   let queues = 0;
@@ -555,20 +610,61 @@ function historyView() {
             ? empty("큐 상태 " + (labels[w.status] || "확인 불가"))
             : w.value.length
               ? table(
-                  ["Workload", "큐", "Admission", "우선순위", "생성 시각"],
+                  [
+                    "Workload",
+                    "큐",
+                    "Admission",
+                    "우선순위",
+                    "상태 사유",
+                    "생성 시각",
+                  ],
                   w.value.map((x) => [
                     code(x.ref),
                     x.queue,
                     badge(
-                      x.admitted ? "승인됨" : "미승인",
-                      x.admitted ? "good" : "warn",
+                      x.admitted === true
+                        ? "승인됨"
+                        : x.admitted === false
+                          ? "미승인"
+                          : "미확인",
+                      x.admitted === true ? "good" : "warn",
                     ),
-                    x.priority,
+                    add(
+                      el("div"),
+                      el("span", fmt(x.priority, 0)),
+                      el("small", x.priority_class || "클래스 미보고"),
+                    ),
+                    details("예약 · 승인 검사", {
+                      quota_reserved: x.quota_reserved,
+                      conditions: x.conditions,
+                      admission_checks: x.admission_checks,
+                    }),
                     stamp(x.created_at),
                   ]),
                 )
               : empty("이번 관측에서 진행 중인 Kueue Workload가 없습니다."),
         ),
+      );
+      const local = observed(q.local_queues, s);
+      if (local.status === "ok")
+        for (const item of local.value)
+          root.append(queuePolicyView(item, q.namespace + " / " + item.ref));
+      else
+        root.append(
+          empty("LocalQueue 정책 " + (labels[local.status] || "확인 불가")),
+        );
+    }
+  for (const s of data.inventory)
+    for (const q of s.cluster_queues || []) {
+      const current = observed(q.observation, s);
+      root.append(
+        current.status === "ok"
+          ? queuePolicyView(current.value, "ClusterQueue / " + q.ref)
+          : panel(
+              "ClusterQueue / " + q.ref,
+              "",
+              empty(labels[current.status] || "확인 불가"),
+            ),
       );
     }
   if (!queues)

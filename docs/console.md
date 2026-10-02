@@ -58,6 +58,25 @@ The running experiment's service deployment was not changed for this preview.
 
 ## Freshness and interaction
 
+The queue view now retains Kueue condition reasons/messages, quota reservation,
+admission checks and the reported priority class. Missing conditions and priority
+are unknown. LocalQueue resource reservations and admitted usage are read only
+within `queue_namespaces`. An explicit `cluster_queue_refs` allowlist enables
+named ClusterQueue reads; the observer role grants `get` only on those named
+objects. No cluster-wide queue listing is required.
+
+ClusterQueue quota and counters cover all contributing namespaces, not an
+individual project's exclusive allowance. Flavor/resource rows keep nominal
+quota, reservation, admitted usage and borrowed reservation separate. They never
+convert virtual units into physical GPUs or compute guaranteed availability from
+quota subtraction. Missing usage is not zero; an expired snapshot hides the
+whole queue observation. Field meanings follow the
+[Kueue API](https://kueue.sigs.k8s.io/docs/reference/kueue.v1beta2/).
+Resource reads are not an atomic scheduler snapshot. The
+[live observer check](evidence/queue-inventory-preview.json) verifies named-object
+RBAC, real quota/status reads, mobile rendering and hiding expired queue numbers.
+It used a local preview; continuous service rollout is a separate check.
+
 The default polling interval is 15 seconds. Each metric also retains its original
 source timestamp, and browser-side expiration hides bars when their source TTL
 passes, even while automatic refresh is off. Values become unknown when the

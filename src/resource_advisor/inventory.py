@@ -50,6 +50,7 @@ class InventoryConfig(Contract):
     node_refs: tuple[Ref, ...] = Field(min_length=1, max_length=1000)
     kubeconfig: str | None = None
     queue_namespaces: tuple[Ref, ...] = ()
+    cluster_queue_refs: tuple[Ref, ...] = Field(default=(), max_length=64)
     resource_types: dict[str, ResourceType] = Field(default_factory=dict)
     node_resource_types: dict[str, dict[str, ResourceType]] = Field(default_factory=dict)
     stale_after_seconds: int = Field(default=120, ge=5, le=3600)
@@ -61,6 +62,8 @@ class InventoryConfig(Contract):
     def bound_sources(self):
         if len(set(self.node_refs)) != len(self.node_refs):
             raise ValueError("duplicate inventory node")
+        if len(set(self.cluster_queue_refs)) != len(self.cluster_queue_refs):
+            raise ValueError("duplicate authorized ClusterQueue")
         if any(m.node_ref not in self.node_refs for m in self.metrics):
             raise ValueError("metric outside authorized node pool")
         keys = [(m.node_ref, m.device_ref, m.name) for m in self.metrics]
@@ -230,6 +233,8 @@ class InventoryCollector:
             return signal(source=source, status="unavailable", unit=binding.unit)
 
     def collect(self):
+        from .queue_inventory import queue_view, workload_view
+
         cfg = self.config
         observed = now().isoformat()
         snapshot = {
@@ -242,6 +247,7 @@ class InventoryCollector:
             "sources": {},
             "nodes": [],
             "queues": [],
+            "cluster_queues": [],
             "execution_qualification": "inventory never grants runtime qualification",
         }
 
@@ -374,23 +380,29 @@ class InventoryCollector:
             )
             active = []
             for w in workloads or []:
-                conditions = {
-                    c["type"]: c["status"] for c in w.get("status", {}).get("conditions", [])
-                }
-                if conditions.get("Finished") == "True":
-                    continue
-                active.append(
-                    {
-                        "ref": w["metadata"]["name"],
-                        "queue": w["spec"].get("queueName"),
-                        "admitted": conditions.get("Admitted") == "True",
-                        "created_at": w["metadata"]["creationTimestamp"],
-                        "priority": w["spec"].get("priority", 0),
-                    }
-                )
+                view = workload_view(w)
+                if view is not None:
+                    active.append(view)
+            local = get(
+                "localqueues:" + namespace,
+                "get",
+                "localqueues.kueue.x-k8s.io",
+                "-n",
+                namespace,
+                "-o",
+                "json",
+            )
             snapshot["queues"].append(
                 {
                     "namespace": namespace,
+                    "local_queues": signal(
+                        [queue_view(q, cfg.resource_types) for q in local]
+                        if local is not None
+                        else None,
+                        observed_at=observed,
+                        source="kueue",
+                        status="ok" if local is not None else "unavailable",
+                    ),
                     "workloads": signal(
                         active if workloads is not None else None,
                         observed_at=observed,
@@ -399,6 +411,20 @@ class InventoryCollector:
                     ),
                 }
             )
+        for ref in cfg.cluster_queue_refs:
+            source = "clusterqueue:" + ref
+            try:
+                raw = self.read("get", "clusterqueues.kueue.x-k8s.io", ref, "-o", "json")
+                if raw["metadata"]["name"] != ref:
+                    raise ValueError("ClusterQueue response outside authorized scope")
+                view = queue_view(raw, cfg.resource_types, cluster=True)
+                snapshot["sources"][source] = "ok"
+                observed_queue = signal(view, observed_at=observed, source="kueue")
+            except (BackendError, ValueError, KeyError, TypeError):
+                snapshot["sources"][source] = "unavailable"
+                snapshot["status"] = "partial"
+                observed_queue = signal(observed_at=observed, source="kueue", status="unavailable")
+            snapshot["cluster_queues"].append({"ref": ref, "observation": observed_queue})
         if cfg.metrics:
             token = os.environ.get(cfg.prometheus_token_env) if cfg.prometheus_token_env else None
             if cfg.prometheus_token_env and not token:
