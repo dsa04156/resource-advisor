@@ -36,7 +36,7 @@ direct evidence; conditional extensions require an explicit applicability result
 | E0–E7 scenarios | Reproducible live compatibility, execution, quota, contention/failure evidence | Pending |
 | B0–B3 / S0–S2 | Equal-budget real measurements, raw data, cost/regret/abstention and null improvements | Single-GPU S0/S1/S2 smoke with null improvement published; rigorous comparison pending |
 | S3–S6 | Applicability, paired/source data and qualified strategy comparisons | Conditional; no result claimed |
-| Deployment automation | Scoped service manifests/RBAC/secrets, lab provisioning, GitOps static services | Persistent PostgreSQL Kustomization deployed with restricted app role; full static service deployment, GitOps and provisioning pending |
+| Deployment automation | Scoped service manifests/RBAC/secrets, lab provisioning, GitOps static services | Persistent PostgreSQL plus supervised API/inventory Kustomizations deployed; Pod/collector restart and projected read-only token verified. Supervised compute worker, full GitOps/provisioning and production ingress pending |
 | Restore | Actual independent DB dump/restore with content comparison | Same-version live cutover verified: 968 records across five tables, new Pod/same PVC/content equality, 46 artifact readbacks; node-loss/off-node recovery remains open |
 | Documentation/demo | Public-safe reproduce commands, raw real measurements, support matrix, limitations | Actual Kubernetes GPU recommendation→approval→new-result demo, artifacts and console verified; full Slurm/NPU and broader experiment demo pending |
 | Final review | Requirement-by-requirement evidence and fixed defects | Ongoing; full completion unproven |

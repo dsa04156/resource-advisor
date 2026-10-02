@@ -134,9 +134,10 @@ of those writes. Simply returning to the old copy loses post-cutover changes.
   PVC deletion can destroy data under the storage class's reclaim policy. Do
   not prune/delete the claim. No HA, off-node backup, PITR or measured recovery
   objective is established here.
-- The lab API still uses a manually supervised port forward. Static app/worker/
-  collector deployments, rotating projected credentials, network policy
-  qualification and complete GitOps/provisioning remain open gates.
+- The [later service deployment](service-deployment.md) moved API/inventory to
+  Kubernetes with direct service-DNS access and projected inventory credentials.
+  Supervised compute workers, network policy qualification, production ingress
+  and complete GitOps/provisioning remain open gates.
 - This is a same-version storage cutover. Schema evolution and PostgreSQL major
   upgrades need separate migration and compatibility procedures.
 

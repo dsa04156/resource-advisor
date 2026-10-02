@@ -1,0 +1,15 @@
+[Unit]
+Description=Resource Advisor lab HTTPS access tunnel
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/resource-advisor/forward.env
+ExecStart=/usr/bin/kubectl --kubeconfig ${RA_FORWARD_KUBECONFIG} --namespace resource-advisor-lab port-forward service/ra-api ${RA_FORWARD_PORT}:8443 --address=${RA_FORWARD_ADDRESS}
+Restart=always
+RestartSec=3
+TimeoutStopSec=15
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

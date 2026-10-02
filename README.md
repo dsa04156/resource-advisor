@@ -35,6 +35,8 @@ The [uncertainty audit](docs/uncertainty.md) rechecks recommendation evidence be
 reuse and compares saved forecasts only with later, unseen measurements.
 The [persistent metadata cutover](docs/persistent-postgres.md) preserves all five
 database tables across Pod recreation and verifies existing artifact references.
+The [supervised API and inventory deployment](docs/service-deployment.md) uses
+separate permissions and verifies Pod replacement/collector termination recovery.
 
 ## Responsibility
 

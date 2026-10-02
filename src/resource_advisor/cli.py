@@ -3,8 +3,10 @@
 import argparse
 import json
 import os
+import signal
 import time
 from pathlib import Path
+from threading import Event
 
 from .api import Principal, create_app
 from .backends import KubernetesBackend, SlurmBackend
@@ -44,7 +46,17 @@ def main():
     inventory.add_argument("--config", required=True, help="private read-only inventory sources")
     inventory.add_argument("--once", action="store_true")
     inventory.add_argument("--interval-seconds", type=int, default=30)
+    inventory.add_argument(
+        "--heartbeat-path", help="private readiness timestamp after a saved snapshot"
+    )
+    heartbeat = sub.add_parser("check-heartbeat")
+    heartbeat.add_argument("--path", required=True)
+    heartbeat.add_argument("--max-age", type=float, default=120)
     args = parser.parse_args()
+    if args.action == "check-heartbeat":
+        from .health import heartbeat_fresh
+
+        raise SystemExit(0 if heartbeat_fresh(Path(args.path), args.max_age) else 1)
     if args.action == "collect-inventory" and args.interval_seconds < 5:
         parser.error("inventory polling interval must be at least 5 seconds")
     if args.action == "serve" and bool(args.ssl_keyfile) != bool(args.ssl_certfile):
@@ -74,9 +86,18 @@ def main():
 
         config = InventoryConfig.model_validate_json(Path(args.config).read_text())
         collector = InventoryCollector(config)
-        while True:
+        stopping = Event()
+        signal.signal(signal.SIGTERM, lambda *_: stopping.set())
+        signal.signal(signal.SIGINT, lambda *_: stopping.set())
+        if args.heartbeat_path:
+            Path(args.heartbeat_path).unlink(missing_ok=True)
+        while not stopping.is_set():
             snapshot = collector.collect()
             save_inventory(store, config.project_ref, snapshot)
+            if args.heartbeat_path:
+                from .health import write_heartbeat
+
+                write_heartbeat(Path(args.heartbeat_path))
             print(
                 json.dumps(
                     {
@@ -89,7 +110,7 @@ def main():
             )
             if args.once:
                 return
-            time.sleep(args.interval_seconds)
+            stopping.wait(args.interval_seconds)
     if args.action == "backfill-usage":
         print(json.dumps({"inserted": store.backfill_usage()}))
         return

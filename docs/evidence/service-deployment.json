@@ -1,0 +1,32 @@
+{
+  "schema_version": "v1",
+  "api_pod_replaced": true,
+  "collector_handled_sigterm_exit_code": 0,
+  "collector_container_automatically_restarted": true,
+  "initial_same_namespace_sigkill_was_ignored": true,
+  "unhandled_collector_crash_tested": false,
+  "automatic_access_tunnel_reconnect": true,
+  "https_certificate_and_hostname_verified": true,
+  "historical_job_count": 52,
+  "job_outbox_study_usage_unchanged": true,
+  "inventory_node_count": 10,
+  "api_service_account_token_mounted": false,
+  "inventory_uses_projected_service_account_token": true,
+  "inventory_read_secret_denied": true,
+  "inventory_create_job_denied": true,
+  "observed_combined_recovery_seconds": 6.78,
+  "sqlite_tests": 193,
+  "postgresql_tests": 193,
+  "scope": "API Pod replacement and collector handled exit; no live compute or node failure",
+  "service_image_digest": "sha256:b55db24403dd4625c1b5798b9ded51c1566462f86868334a19d134747d4a0617",
+  "dependency_lock_sha256": "9e65d6e9b2dbc7c6c5ec7c8791947497ca5cab20267227a7c76ab2508975316b",
+  "kubectl_sha256": "8791ec7c8966b61420d55103a5fb948de9f0ca3d7306d789734975ad9704bdb0",
+  "kubernetes_version": "v1.31.14",
+  "platform": "linux/amd64",
+  "python": "3.11.15",
+  "image_extras": [
+    "artifacts"
+  ],
+  "deployed_console_assets_match_source": true,
+  "invalid_token_rejected_after_recovery": true
+}
