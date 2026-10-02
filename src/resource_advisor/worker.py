@@ -9,7 +9,7 @@ from sqlalchemy import select
 from .backends import BackendError, SubmissionUnknown
 from .contracts import TERMINAL, ExecutionResult, State, now, signature
 from .policy import compatibility
-from .service import Rejected
+from .service import NotFound, Rejected, required
 from .store import Conflict, jobs
 
 
@@ -53,6 +53,18 @@ class Worker:
                         row["body"]["candidate"]["ref"],
                     )
                     errors = compatibility(*args)
+                    if row["body"]["request"].get("approval_ref"):
+                        try:
+                            approval = required(
+                                self.store,
+                                conn,
+                                "approval",
+                                row["body"]["request"]["approval_ref"],
+                                row["project"],
+                            )
+                            self.service.check_approval_evidence(conn, row["project"], approval)
+                        except (Rejected, NotFound):
+                            errors.append("RECOMMENDATION_RECHECK_REQUIRED")
                     if row["body"].get("deadline_at") and now() >= datetime.fromisoformat(
                         row["body"]["deadline_at"]
                     ):

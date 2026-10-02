@@ -116,6 +116,16 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
 
         return recommendation_evidence(service, p.project, ref)
 
+    @app.get(PREFIX + "/recommendations/{ref}/validity")
+    def recommendation_validity(ref: str, p=Depends(principal)):
+        return service.recommendation_validity(p.project, ref)
+
+    @app.get(PREFIX + "/uncertainty/shadow-report")
+    def uncertainty_report(p=Depends(principal)):
+        from .uncertainty import shadow_report
+
+        return shadow_report(service.store, p.project)
+
     @app.get("/healthz")
     def health():
         with service.store.transaction() as conn:

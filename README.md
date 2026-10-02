@@ -31,6 +31,8 @@ The [isolated training trial](docs/training-isolation.md) protects the initial
 checkpoint/input, verifies repeated GPU training and retains separate output states.
 The [failure tracking recovery](docs/failure-tracking.md) retains cancelled and
 resultless failed attempts in MLflow, including outage and response-loss checks.
+The [uncertainty audit](docs/uncertainty.md) rechecks recommendation evidence before
+reuse and compares saved forecasts only with later, unseen measurements.
 
 ## Responsibility
 

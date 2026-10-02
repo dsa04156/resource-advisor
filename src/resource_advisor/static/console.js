@@ -630,6 +630,24 @@ function historyView() {
 function evidenceView(payload) {
   const root = el("div", null, "evidence"),
     r = payload.recommendation;
+  const validity = payload.current_validity;
+  add(
+    root,
+    el("h3", "지금 다시 사용할 수 있나요?"),
+    badge(
+      validity?.reusable ? "조회 시점 검사 통과" : "재확인 필요",
+      validity?.reusable ? "" : "warn",
+    ),
+    el(
+      "p",
+      validity?.reusable
+        ? "조회한 시점의 근거 검사 결과입니다. 승인·제출 시 다시 검사하며, 실행 성능을 보장하지 않습니다."
+        : "이전 추천의 만료·근거 유효기간·후속 실행 변화를 확인해야 합니다.",
+      "muted",
+    ),
+  );
+  if (validity) root.append(el("small", `검사 시각 ${stamp(validity.assessed_at)}`));
+  if (validity) root.append(details("재사용 검사 사유 · 후속 실측 근거", validity));
   add(
     root,
     el("h3", "추천에 사용한 측정 요약"),

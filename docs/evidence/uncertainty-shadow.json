@@ -1,0 +1,239 @@
+{
+  "schema_version": "v1",
+  "scope": "Read-only audit of previously stored real GPU forecasts; no new GPU execution",
+  "shadow_report": {
+    "policy_version": "shadow-chronological-v1",
+    "generated_at": "2026-10-02T10:20:21.503924+00:00",
+    "split": "saved forecast before target submission; all training completions before forecast",
+    "evaluated": [
+      {
+        "attempt_id": "a-acb65ad0c2b94c939aa4ababe7488350",
+        "plan_ref": "plan-170750b975f641bb8a52c4737ee25d2a",
+        "workload_signature": "sha256:70cb5155179430c0a69813aa5451bab7f72e3a8d0efee39ca462d8416aa760ca",
+        "training_run_ids": [
+          "a-1b64a22f11dd4a6da6ac315c774c6293",
+          "a-1515014e40a742c2b91673d19bc51e32",
+          "a-0fcf762d4abc40caa26691009fe80b20"
+        ],
+        "forecast_at": "2026-10-02T04:49:06.167499+00:00",
+        "target_submitted_at": "2026-10-02T04:49:07.265756+00:00",
+        "predicted_seconds": 0.0002731036472536425,
+        "interval_seconds": [
+          0.00026882972441666077,
+          0.00027744551799503144
+        ],
+        "actual_seconds": 0.0002788060228340328,
+        "covered": false,
+        "interval_width_seconds": 8.615793578370672e-06,
+        "absolute_relative_error": 0.02045284216756234,
+        "constraint_violation": false
+      },
+      {
+        "attempt_id": "a-0d7cd2468810427a960bca100a24b4ad",
+        "plan_ref": "plan-26ece85f690f4f45ac82443628fa9df8",
+        "workload_signature": "sha256:70cb5155179430c0a69813aa5451bab7f72e3a8d0efee39ca462d8416aa760ca",
+        "training_run_ids": [
+          "a-737e7c9354184fa88f70a0627b06f0ab",
+          "a-540a9ad229234da9a78c3e5ce84391e5",
+          "a-eced73d4d5c548239587b65bfda84c44"
+        ],
+        "forecast_at": "2026-10-02T04:56:19.580142+00:00",
+        "target_submitted_at": "2026-10-02T04:56:20.704327+00:00",
+        "predicted_seconds": 0.0002749665876099216,
+        "interval_seconds": [
+          0.00027416532099478277,
+          0.000275770195980707
+        ],
+        "actual_seconds": 0.0002699150936678052,
+        "covered": false,
+        "interval_width_seconds": 1.6048749859242034e-06,
+        "absolute_relative_error": 0.0187151221277512,
+        "constraint_violation": false
+      }
+    ],
+    "excluded": [
+      {
+        "attempt_id": "a-1b64a22f11dd4a6da6ac315c774c6293",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-1515014e40a742c2b91673d19bc51e32",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-0fcf762d4abc40caa26691009fe80b20",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-c9e08d3b1eea4991a920ba55e9edccf6",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-ac2c0bbc101f498c838769be00117f3d",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-b04e649ce36d483dafd15f0e635cbc78",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-5156dbda96ed4d46b057238d07982c83",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-68bde47556d747dfac3894d74a194c98",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-78b8375036e245d0996e9eaa60b9609e",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-8e0e2ae89cb842b3bb468752aee457d5",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-7b5ef75d1ca247be897f0901c027a775",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-ee7242ceb64d453ba0653825a89fcf20",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-93ebd77c800e4d94a6cb5e08ef0cdd9b",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-628f93e56d5f40678d8677b1d80a7431",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-7ba2669eeeda46a3a10950503fce29d4",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-cac4e657b1e94ef69991eb4314cc4c90",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-dc7c61a1a94943f2a485e0c30135cf17",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-4f3cd50b50b1405dbdc134a93aea8c82",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-96413289a03e4b6fbf573d569667092c",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-292afb06c2254ceabd7751ebeb178538",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-a14cdbcbf8f34747bb7d2ade795bfdd6",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-f67346f1b09449f595cc740f6d74a853",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-f249f3a0a67142a5b4d01e460fca42dc",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-138f6d64e9274f7abec21746c9bded47",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-7bef2e72cfb849e09f98e55bdca7037c",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-737e7c9354184fa88f70a0627b06f0ab",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-540a9ad229234da9a78c3e5ce84391e5",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-eced73d4d5c548239587b65bfda84c44",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-0ab15e1ab8e344268165480ebd872233",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-014fe2e95ac64f0a90fa43614f961113",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-ad920dfb744c403c81912f5ad52b8dba",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-7985fceaac8d40beb214052191aa4c1f",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-d5aab56f867644efada7391d10162d1f",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-82c5684db3f34876b86f5a8ff1b48ce7",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-9a7429dc0c8f45338a17c306802f8f18",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-6e6714567e32452f8e2658bb39dc6ff7",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-8ac4d7e939e84f46aa0202b7735576ac",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-c6670def8c4f4ab2b6111920b232c8ad",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-33a34589938a49e78c7e923cd1337301",
+        "reason": "NO_SAVED_PREDICTION"
+      }
+    ],
+    "by_workload": [
+      {
+        "workload_signature": "sha256:70cb5155179430c0a69813aa5451bab7f72e3a8d0efee39ca462d8416aa760ca",
+        "count": 2,
+        "empirical_interval_coverage": 0.0,
+        "mean_interval_width_seconds": 5.110334282147438e-06,
+        "mean_absolute_relative_error": 0.01958398214765677,
+        "completed_target_constraint_violation_rate": 0.0
+      }
+    ],
+    "workload_holdout": {
+      "status": "NOT_QUALIFIED",
+      "distinct_workloads": 3,
+      "reason": "Current surrogate is workload-scoped; cross-workload transfer/holdout not implemented"
+    },
+    "semantics": "Descriptive time holdout audit; small correlated samples do not calibrate a 95% operational guarantee"
+  },
+  "api_checks": {
+    "authenticated_https_shadow_report": true,
+    "expired_recommendation_requires_recheck": true,
+    "evidence_endpoint_includes_validity": true
+  },
+  "limits": [
+    "Two held-out predictions from one logical workload; no calibrated coverage claim",
+    "Workload holdout, unseen-workload transfer and environment-load calibration remain unqualified",
+    "Drift blocking validated by synthetic regression tests, not a new hardware contention experiment"
+  ]
+}

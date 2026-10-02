@@ -194,6 +194,8 @@ def overview(
 
 
 def recommendation_evidence(service, project, ref):
+    from .uncertainty import assess_recommendation
+
     store = service.store
     with store.transaction() as conn:
         rec = owned(store, conn, project, "recommendation", ref)
@@ -276,6 +278,7 @@ def recommendation_evidence(service, project, ref):
             )
         return {
             "recommendation": rec,
+            "current_validity": assess_recommendation(service, conn, project, rec),
             "expired": datetime.fromisoformat(rec["expires_at"]) < now(),
             "evidence_runs": evidence,
             "approved_executions": comparisons,

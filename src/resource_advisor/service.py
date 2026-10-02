@@ -143,6 +143,7 @@ class Service:
                         or datetime.fromisoformat(approval["expires_at"]) < now()
                     ):
                         raise Rejected("approval expired or configuration mismatch")
+                    self.check_approval_evidence(conn, project, approval)
                 job_id, attempt_id = "j-" + uuid4().hex, "a-" + uuid4().hex
                 body = {
                     "request": request.model_dump(mode="json"),
@@ -379,7 +380,7 @@ class Service:
                 required(self.store, conn, "workload", workload_ref, project)
             )
             profiles = self.store.list(conn, "profile", project)
-            candidates, rejected = [], {}
+            candidates, rejected, drift_evidence = [], {}, {}
             for candidate in spec.candidates:
                 try:
                     _, _, variant, cap = self.bundle(conn, project, spec.ref, candidate.ref)
@@ -404,11 +405,20 @@ class Service:
                         and 0 <= age <= spec.quality.max_profile_age_seconds
                         and (result["evidence_kind"] == "hardware" or self.accept_synthetic)
                     ):
-                        matches.append((item["ref"], result["measurements"]))
+                        matches.append(
+                            (item["ref"], result["measurements"], profile["recorded_at"])
+                        )
+                from .uncertainty import recent_profile_window
+
+                matches, drift_refs = recent_profile_window(matches, spec.quality.minimum_repeats)
+                if drift_refs:
+                    rejected[candidate.ref] = ["NEEDS_RECONFIRMATION"]
+                    drift_evidence[candidate.ref] = drift_refs
+                    continue
                 if len(matches) < spec.quality.minimum_repeats:
                     rejected[candidate.ref] = ["NEEDS_PROFILE"]
                     continue
-                values = [m["elapsed_seconds"] for _, m in matches]
+                values = [m["elapsed_seconds"] for _, m, _ in matches]
                 mean = statistics.mean(values)
                 # Descriptive conservative interval, not a calibrated Bayesian posterior.
                 radius = (
@@ -422,7 +432,7 @@ class Service:
                         "mean_seconds": mean,
                         "interval_seconds": [max(0, mean - radius), mean + radius],
                         "independent_runs": len(values),
-                        "evidence_refs": [ref for ref, _ in matches],
+                        "evidence_refs": [ref for ref, _, _ in matches],
                     }
                 )
             candidates.sort(key=lambda c: c["mean_seconds"])
@@ -433,7 +443,9 @@ class Service:
             status = "MEASURED_RECOMMENDATION"
             if not chosen:
                 status = (
-                    "NEEDS_PROFILE"
+                    "NEEDS_RECONFIRMATION"
+                    if any("NEEDS_RECONFIRMATION" in e for e in rejected.values())
+                    else "NEEDS_PROFILE"
                     if any("NEEDS_PROFILE" in e for e in rejected.values())
                     else "NO_COMPATIBLE_VARIANT"
                 )
@@ -453,10 +465,14 @@ class Service:
                 "measured": bool(chosen),
                 "ranking": candidates,
                 "excluded": rejected,
+                "drift_evidence_refs": drift_evidence,
                 "approval_required": True,
                 "created_at": now().isoformat(),
                 "expires_at": (now() + timedelta(minutes=15)).isoformat(),
-                "evidence_policy": "lookup-v1; independent runs; mean +/- 3 standard errors",
+                "evidence_policy": (
+                    "lookup-v2; last 2*max(3,minimum_repeats) runs; adjacent-block drift gate; "
+                    "mean +/- 3 standard errors, not a predictive interval"
+                ),
             }
             self.store.put(conn, "recommendation", rec["ref"], project, rec)
             return dict(rec, digest=signature(rec))
@@ -471,6 +487,13 @@ class Service:
                 or datetime.fromisoformat(rec["expires_at"]) < now()
             ):
                 raise Rejected("recommendation does not match approval or has expired")
+            from .uncertainty import assess_recommendation
+
+            assessment = assess_recommendation(self, conn, project, rec)
+            if not assessment["reusable"]:
+                raise Rejected(
+                    "recommendation requires recheck: " + ",".join(assessment["reasons"])
+                )
             approval = {
                 "ref": "apr-" + uuid4().hex,
                 "recommendation_ref": ref,
@@ -481,3 +504,20 @@ class Service:
             }
             self.store.put(conn, "approval", approval["ref"], project, approval)
             return approval
+
+    def check_approval_evidence(self, conn, project, approval):
+        from .uncertainty import assess_recommendation
+
+        rec = required(self.store, conn, "recommendation", approval["recommendation_ref"], project)
+        if signature(rec) != approval["recommendation_digest"]:
+            raise Rejected("approval recommendation digest mismatch")
+        assessment = assess_recommendation(self, conn, project, rec)
+        if not assessment["reusable"]:
+            raise Rejected("recommendation requires recheck: " + ",".join(assessment["reasons"]))
+
+    def recommendation_validity(self, project, ref):
+        from .uncertainty import assess_recommendation
+
+        with self.store.transaction() as conn:
+            rec = required(self.store, conn, "recommendation", ref, project)
+            return assess_recommendation(self, conn, project, rec)

@@ -34,6 +34,11 @@ complete cancellation/cost evidence remain required.
 independent confirmation, including real GPU runs. Complete failed-run cost
 accounting and randomized equal-budget trials remain production/evaluation gates.
 The small smoke experiment does not prove BO superiority or hard physical budget bounds.
+Recommendation reuse now rechecks source age/scope and post-recommendation
+residuals before approval and submission. A historical chronological audit found
+both eligible later GPU results outside their saved posterior intervals. The
+heuristic drift gate and this two-point report are not calibrated uncertainty;
+workload holdout and live drift validation remain open.
 
 **Artifacts and environments:** bounded JSON result bundles now have conditional
 S3 writes, verified API downloads and live MLflow artifact copies. Large-model
