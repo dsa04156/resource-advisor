@@ -43,8 +43,8 @@ class S3Artifacts:
     def location(self, project, attempt, digest):
         if project not in self.buckets:
             raise ArtifactError("project has no artifact bucket")
-        if not re.fullmatch(r"[a-zA-Z0-9_-]{1,96}", project) or not re.fullmatch(
-            r"[a-zA-Z0-9_-]{1,96}", attempt
+        if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_.-]{0,95}", project) or not re.fullmatch(
+            r"[a-zA-Z0-9][a-zA-Z0-9_.-]{0,95}", attempt
         ):
             raise ArtifactError("invalid artifact owner")
         if not re.fullmatch(r"sha256:[a-f0-9]{64}", digest):

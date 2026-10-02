@@ -73,6 +73,13 @@ def test_location_change_does_not_silently_redirect_reads():
         storage.read(record)
 
 
+def test_dotted_contract_references_are_valid_object_key_segments():
+    storage = S3Artifacts(buckets={"team.a": "test-results"}, client=MemoryS3())
+    record = storage.put("team.a", "attempt.v1", "job", {})
+    assert record["key"].startswith("results/team.a/attempt.v1/")
+    assert json.loads(storage.read(record)) == {}
+
+
 def test_put_response_loss_backfills_once_without_failing_compute_job(service):
     backend, worker, job = setup(service)
     worker.submit_one()
