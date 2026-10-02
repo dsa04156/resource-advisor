@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Annotated, Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_serializer, model_validator
 
 Ref = Annotated[str, Field(pattern=r"^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,95}$")]
 Digest = Annotated[str, Field(pattern=r"^sha256:[a-f0-9]{64}$")]
@@ -67,6 +67,14 @@ class WorkloadIdentity(Contract):
     work_units: int = Field(ge=1)
     quality_contract_digest: Digest
     measurement_boundary: str = Field(min_length=1)
+    sampling_policy_digest: Digest | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_signature(self, handler):
+        value = handler(self)
+        if self.sampling_policy_digest is None:
+            value.pop("sampling_policy_digest", None)
+        return value
 
     @model_validator(mode="after")
     def positive_shape(self):

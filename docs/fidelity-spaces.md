@@ -19,8 +19,9 @@ inference or benchmark workloads, two to eight configurations, and one to three
 lower levels. Every level exposes the same candidate refs and baseline. Only
 work units can differ between workload identities: code, model, dataset, config,
 shape, precision, seed, batch/global batch, quality and measurement boundary must
-remain equal. This is appropriate for a runner whose approved sampling policy is
-fixed in its config and whose work budget selects a prefix of that policy.
+remain equal, including the sampling policy digest when present. A sampled
+runner uses the exact saved selection from its approved finite policy; shorter
+selections are not assumed to be nested prefixes.
 It is not a generic training-convergence fidelity contract.
 
 Numeric coordinates are derived from approved `host_cpu` and/or
@@ -48,9 +49,12 @@ After separately registering the workloads and variants, an operator posts to
 }
 ```
 
-For a *declared* representative-sampling axis use
+For a representative-sampling axis use
 `fidelity_axis=representative_sampling` plus `sampling_policy_digest`. The digest
-is an identity declaration only; no caller-provided boolean can mark it verified.
+must match an operator-registered [sampling policy and workload bindings](sampling.md).
+Target work units must cover the complete finite population. The collector
+requires exact input-consumption receipts; no caller-provided boolean can mark
+the space qualified.
 The response records `execution_authorized=false` and missing qualification.
 Registration replay returns the original immutable space and timestamp.
 
@@ -122,12 +126,14 @@ before Job creation; it is not GPU busy time or a complete deployment cost.
 Historical costs are labeled reused rather than charged as new study work.
 
 For repetition-only spaces, `kernel_input` is always null. For a declared
-representative-sampling space, the report provides a numerical `MFKernelInput`
-for offline `mfkg-analyze`. It retains `sampling_policy_verified=false` and
+representative-sampling space, accepted receipts are rechecked against each
+immutable result and binding before the report provides a numerical `MFKernelInput`
+for offline `mfkg-analyze`. Sampling policy/receipt verification flags describe
+that finite contract, not thermal or statistical qualification. It retains
 `execution_authorized=false`. Analysis does not override the operational MF-KG
-rejection or authorize a recommendation. General sampling receipts, thermal
-traces, paired-rank qualification and the automatic MF-KG study strategy still
-need implementation and actual hardware evidence.
+rejection or authorize a recommendation. Actual GPU sampling, thermal traces,
+paired-rank qualification and the automatic MF-KG study strategy still need
+implementation and hardware evidence.
 
 ## Verification and limits
 

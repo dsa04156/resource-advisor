@@ -73,6 +73,12 @@ class Service:
                 validate_binding(binding, spec, candidate, variant)
             except ValueError as exc:
                 raise Rejected("qualified training isolation required") from exc
+        if spec.identity.sampling_policy_digest is not None:
+            from .sampling import SamplingPolicies
+
+            if not self.store.get(conn, "sampling_binding", spec.ref):
+                raise Rejected("sampling binding required before workload execution")
+            SamplingPolicies(self).checked(conn, project, spec.ref)
         return spec, candidate, variant, cap
 
     def submit(self, project: str, request: JobRequest, key: str):
@@ -174,6 +180,19 @@ class Service:
                     if request.mode == "pilot"
                     else list(variant.command),
                 }
+                if spec.identity.sampling_policy_digest is not None:
+                    from .sampling import SamplingPolicies
+
+                    body["sampling_binding"] = SamplingPolicies(self).checked(
+                        conn, project, spec.ref
+                    )
+                    body["sampling_policy"] = required(
+                        self.store,
+                        conn,
+                        "sampling_policy",
+                        body["sampling_binding"]["plan"]["policy_ref"],
+                        project,
+                    )
                 if request.owner_lease_seconds is not None:
                     body["owner_lease_expires_at"] = (
                         now() + timedelta(seconds=request.owner_lease_seconds)
@@ -292,6 +311,7 @@ class Service:
         *,
         phase_profile=None,
         training_receipt=None,
+        sampling_receipt=None,
     ):
         """Trusted collector only. Require backend completion before result acceptance."""
         with self.store.transaction() as conn:
@@ -304,6 +324,12 @@ class Service:
             digest = signature(result)
             if row["state"] in TERMINAL:
                 if body.get("result_digest") == digest:
+                    sampling = self.store.get(conn, "sampling_receipt", result.attempt_id)
+                    if sampling_receipt is not None and (
+                        sampling is None
+                        or signature(sampling["body"]) != signature(sampling_receipt)
+                    ):
+                        raise Conflict("terminal sampling receipt is immutable")
                     training = self.store.get(conn, "training_receipt", result.attempt_id)
                     if training_receipt is not None and (
                         training is None
@@ -351,6 +377,23 @@ class Service:
                     )
             elif training_receipt is not None:
                 raise Rejected("training receipt without completed qualified training")
+            if body.get("sampling_binding") and result.outcome == "COMPLETED":
+                from .sampling import validate_receipt as validate_sampling
+
+                try:
+                    sampling = validate_sampling(sampling_receipt, result, body["sampling_binding"])
+                except ValueError as exc:
+                    raise Rejected("verified sampling receipt required") from exc
+                if not problems:
+                    self.store.put(
+                        conn,
+                        "sampling_receipt",
+                        result.attempt_id,
+                        project,
+                        sampling.model_dump(mode="json"),
+                    )
+            elif sampling_receipt is not None:
+                raise Rejected("sampling receipt without a completed sampling-bound workload")
             if phase_profile is not None:
                 from .diagnostics import validate_profile
 

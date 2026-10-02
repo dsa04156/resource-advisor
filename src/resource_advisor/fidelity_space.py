@@ -8,6 +8,7 @@ from pydantic import Field, ValidationError, model_validator
 from .contracts import Contract, Digest, ExecutionResult, Ref, now, signature
 from .mfkg import MFKernelInput, MFObservation, MFOption
 from .policy import compatibility, context_signature
+from .sampling import SamplingPolicies, validate_receipt
 from .service import NotFound, Rejected, required
 
 
@@ -93,6 +94,16 @@ class FidelitySpaces:
                 if raw["baseline_candidate_ref"] != target["baseline_candidate_ref"]:
                     raise Rejected("fidelity levels must preserve the target baseline")
                 units = raw["identity"]["work_units"]
+                sampling = None
+                if request.fidelity_axis == "representative_sampling":
+                    sampling = SamplingPolicies(self.service).checked(conn, project, workload_ref)
+                    if sampling["plan"]["policy_digest"] != request.sampling_policy_digest:
+                        raise Rejected("fidelity space differs from registered sampling policy")
+                    if (
+                        workload_ref == request.target_workload_ref
+                        and units != sampling["plan"]["population_size"]
+                    ):
+                        raise Rejected("target fidelity must cover the original finite population")
                 if units in unit_levels or (
                     workload_ref != request.target_workload_ref and units >= target_units
                 ):
@@ -165,6 +176,8 @@ class FidelitySpaces:
                             "context_signature": context_signature(candidate, variant),
                         }
                     )
+                    if sampling is not None:
+                        bindings[-1]["sampling_binding_digest"] = signature(sampling)
             body = {
                 "request": request.model_dump(mode="json"),
                 "registered_at": now().isoformat(),
@@ -198,6 +211,12 @@ class FidelitySpaces:
                 raise Rejected("immutable fidelity binding changed")
             if current and compatibility(spec, candidate, variant, cap):
                 raise Rejected("fidelity execution context is no longer compatible")
+            if space["request"]["fidelity_axis"] == "representative_sampling":
+                sampling = SamplingPolicies(self.service).checked(
+                    conn, project, binding["workload_ref"]
+                )
+                if signature(sampling) != binding.get("sampling_binding_digest"):
+                    raise Rejected("sampling binding differs from registered fidelity space")
 
     def resolve(self, project, ref, option_ref):
         """Read-only preview; a numerical choice never becomes a Job authorization."""
@@ -281,6 +300,25 @@ class FidelitySpaces:
                     or (now() - end).total_seconds() > quality["max_profile_age_seconds"]
                 ):
                     raise Rejected("stale or invalid evaluation interval")
+                sampling_digest = None
+                if space["request"]["fidelity_axis"] == "representative_sampling":
+                    receipt = self.store.get(conn, "sampling_receipt", result.attempt_id)
+                    if (
+                        not receipt
+                        or receipt["project"] != project
+                        or signature(body.get("sampling_binding"))
+                        != binding["sampling_binding_digest"]
+                    ):
+                        raise Rejected("hardware observation lacks its approved sampling receipt")
+                    try:
+                        checked = validate_receipt(
+                            receipt["body"], result, body["sampling_binding"]
+                        )
+                    except ValueError as exc:
+                        raise Rejected(
+                            "hardware observation has an invalid sampling receipt"
+                        ) from exc
+                    sampling_digest = signature(checked)
                 observations.append(
                     MFObservation(
                         attempt_id=result.attempt_id,
@@ -300,6 +338,7 @@ class FidelitySpaces:
                         "workload_digest": binding["workload_digest"],
                         "created_at": body["created_at"],
                         "finished_at": body["finished_at"],
+                        "sampling_receipt_digest": sampling_digest,
                     }
                 )
             # Use the kernel's completeness/independence checks, without fitting or authorizing it.
@@ -322,10 +361,13 @@ class FidelitySpaces:
                 "observations": [o.model_dump(mode="json") for o in observations],
                 "kernel_input": None if repetition else numerical.model_dump(mode="json"),
                 "execution_authorized": False,
-                "qualification_reasons": space["qualification_reasons"],
+                "qualification_reasons": space["qualification_reasons"]
+                if repetition
+                else ["PAIRED_RANK_AND_THERMAL_QUALIFICATION_REQUIRED"],
                 "cost_semantics": "Job creation through validated result ingestion; external compilation/data staging costs excluded",
                 "historical_cost_reused": True,
-                "sampling_policy_verified": False,
+                "sampling_policy_verified": not repetition,
+                "sampling_receipts_verified": not repetition,
             }
             report["ref"] = "mf-evidence-" + signature(report)[7:39]
             return self.store.put(conn, "mf_evidence", report["ref"], project, report)["body"]

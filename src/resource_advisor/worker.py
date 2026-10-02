@@ -321,6 +321,7 @@ class Worker:
                 envelope["digest"],
                 phase_profile=envelope.get("phase_profile"),
                 training_receipt=envelope.get("training_receipt"),
+                sampling_receipt=envelope.get("sampling_receipt"),
             )
 
 
@@ -365,6 +366,7 @@ class MLflowDelivery:
                 )
                 phases = self.store.get(conn, "phase_profile", attempt)
                 training = self.store.get(conn, "training_receipt", attempt)
+                sampling = self.store.get(conn, "sampling_receipt", attempt)
             experiment_id = self.experiments[project]
             start_time = int(
                 datetime.fromisoformat(job.get("started_at") or job["created_at"]).timestamp()
@@ -406,6 +408,14 @@ class MLflowDelivery:
             }
             if saved_result:
                 tags["result_digest"] = signature(saved_result["body"])
+            if sampling:
+                tags.update(
+                    {
+                        "sampling.receipt_digest": signature(sampling["body"]),
+                        "sampling.policy_digest": sampling["body"]["policy_digest"],
+                        "sampling.selection_digest": sampling["body"]["selection_digest"],
+                    }
+                )
             if job.get("error"):
                 tags["resource_advisor.error"] = str(job["error"])[:500]
             if job["request"].get("study_ref"):

@@ -7,7 +7,7 @@ from datetime import timedelta
 import pytest
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
-from sqlalchemy import select, update
+from sqlalchemy import delete, select, update
 from test_worker import SchedulerDouble
 
 from resource_advisor.api import Principal, create_app
@@ -15,6 +15,7 @@ from resource_advisor.backends import Observation
 from resource_advisor.contracts import ProfilingPolicy, State, StudyRequest, now, signature
 from resource_advisor.fidelity_space import FidelityEvidenceRequest, FidelitySpace, FidelitySpaces
 from resource_advisor.mfkg import MFKernelInput, ask_mfkg
+from resource_advisor.sampling import SamplingBindingRequest, SamplingPolicies, SamplingPolicy
 from resource_advisor.search import device_unit
 from resource_advisor.service import NotFound, Rejected
 from resource_advisor.store import jobs
@@ -25,8 +26,27 @@ from resource_advisor.worker import Worker
 @pytest.fixture
 def space_fixture(service, bundle):
     original, base, variant, _ = bundle
+    policy = SamplingPolicy(
+        ref="sample-policy",
+        project_ref="team-a",
+        dataset_version=original.identity.dataset_version,
+        input_shape=original.identity.input_shape,
+        precision=original.identity.precision,
+        batch_size=1,
+        population=tuple(
+            {
+                "ref": f"sample-{i}",
+                "stratum": f"class-{i % 2}",
+                "content_digest": signature(["fixture-input", i]),
+            }
+            for i in range(20)
+        ),
+    )
+    service.register("sampling_policy", policy, "team-a")
     for ref, units in [("full", 20), ("short", 10)]:
-        identity = original.identity.model_copy(update={"work_units": units})
+        identity = original.identity.model_copy(
+            update={"work_units": units, "sampling_policy_digest": signature(policy)}
+        )
         v = variant.model_copy(
             update={
                 "ref": "v-" + ref,
@@ -65,6 +85,9 @@ def space_fixture(service, bundle):
         )
         service.register("variant", v, "team-a")
         service.register("workload", spec, "team-a")
+        SamplingPolicies(service).bind(
+            "team-a", SamplingBindingRequest(workload_ref=ref, policy_ref=policy.ref)
+        )
     request = FidelitySpace(
         ref="paired-space",
         project_ref="team-a",
@@ -72,9 +95,29 @@ def space_fixture(service, bundle):
         lower_workload_refs=("short",),
         feature_names=("host_cpu",),
         fidelity_axis="representative_sampling",
-        sampling_policy_digest=signature("declaration-only"),
+        sampling_policy_digest=signature(policy),
     )
     return service, FidelitySpaces(service), request
+
+
+def with_sampling_fixture(job, result):
+    """Explicit receipt validator fixture; this does not claim actual input consumption."""
+    plan = job["body"]["sampling_binding"]["plan"]
+    return {
+        "result": result,
+        "digest": signature(result),
+        "sampling_receipt": {
+            "job_id": job["id"],
+            "attempt_id": job["body"]["attempt_id"],
+            "result_digest": signature(result),
+            "policy_digest": plan["policy_digest"],
+            "selection_digest": plan["selection_digest"],
+            "warmup_units": plan["warmup_units"],
+            "measured_samples": [
+                {"ref": s["ref"], "content_digest": s["content_digest"]} for s in plan["samples"]
+            ],
+        },
+    }
 
 
 def collect_test_envelopes(service, monkeypatch):
@@ -95,9 +138,11 @@ def collect_test_envelopes(service, monkeypatch):
         # Hardware-shaped validation fixture, not an observed hardware run.
         r["evidence_kind"] = "hardware"
         r["measurements"].update(
-            work_units=job["body"]["spec"]["identity"]["work_units"], elapsed_seconds=0.0000001
+            work_units=job["body"]["spec"]["identity"]["work_units"],
+            sample_count=job["body"]["spec"]["identity"]["work_units"],
+            elapsed_seconds=0.0000001,
         )
-        return {"result": r, "digest": signature(r)}
+        return with_sampling_fixture(job, r)
 
     backend.result = result
     worker = Worker(service, {("team-a", "lab"): backend})
@@ -204,7 +249,8 @@ def test_evidence_joins_jobs_results_and_real_kernel_but_cannot_authorize(
     answer = ask_mfkg(problem)
     assert len(answer["surrogate"]["training_run_ids"]) == 8
     assert not answer["execution_authorized"] and not report["execution_authorized"]
-    assert not report["sampling_policy_verified"]
+    assert report["sampling_policy_verified"] and report["sampling_receipts_verified"]
+    assert report["qualification_reasons"] == ["PAIRED_RANK_AND_THERMAL_QUALIFICATION_REQUIRED"]
     with service.store.transaction() as conn:
         assert len(service.store.list(conn, "mf_evidence", "team-a")) == 1
         assert not service.store.list(
@@ -222,6 +268,48 @@ def test_replication_space_never_exports_mf_kernel_input(space_fixture, monkeypa
     report = spaces.evidence("team-a", request.ref, FidelityEvidenceRequest(job_ids=tuple(ids)))
     assert report["kernel_input"] is None
     assert report["qualification_reasons"] == ["REPLICATION_ONLY_NOT_MULTI_FIDELITY"]
+
+
+@pytest.mark.parametrize("fault", ["missing", "altered", "snapshot"])
+def test_sampling_evidence_requires_immutable_consumption_receipts(
+    space_fixture, monkeypatch, fault
+):
+    from resource_advisor.store import entities
+
+    service, spaces, request = space_fixture
+    spaces.create("team-a", request)
+    ids = collect_test_envelopes(service, monkeypatch)
+    with service.store.transaction() as conn:
+        row = service.store.job(conn, ids[0])
+        attempt = row["body"]["attempt_id"]
+        if fault == "missing":
+            conn.execute(
+                delete(entities).where(
+                    entities.c.kind == "sampling_receipt", entities.c.ref == attempt
+                )
+            )
+        elif fault == "altered":
+            receipt = service.store.get(conn, "sampling_receipt", attempt)["body"]
+            receipt["measured_samples"].reverse()
+            conn.execute(
+                update(entities)
+                .where(entities.c.kind == "sampling_receipt", entities.c.ref == attempt)
+                .values(body=receipt)
+            )
+        else:
+            body = row["body"]
+            body["sampling_binding"]["plan"]["seed"] += 1
+            service.store.change_job(conn, row, row["state"], body)
+    with pytest.raises(Rejected, match="sampling receipt"):
+        spaces.evidence("team-a", request.ref, FidelityEvidenceRequest(job_ids=tuple(ids)))
+
+
+def test_representative_space_requires_registered_policy_digest(space_fixture):
+    _, spaces, request = space_fixture
+    with pytest.raises(Rejected, match="registered sampling policy"):
+        spaces.create(
+            "team-a", request.model_copy(update={"sampling_policy_digest": signature("different")})
+        )
 
 
 @pytest.mark.parametrize(
@@ -327,9 +415,9 @@ class FidelitySchedulerDouble(SchedulerDouble):
         base = job["body"]["candidate"]["ref"] == "base"
         # Deliberate low/target rank reversal tests target-only confirmation.
         seconds = (1e-7 if base else 1e-5) if units == 10 else (3e-7 if base else 2e-7)
-        value["measurements"].update(work_units=units, elapsed_seconds=seconds)
+        value["measurements"].update(work_units=units, sample_count=units, elapsed_seconds=seconds)
         value["evidence_kind"] = "hardware"  # validator fixture, not hardware evidence
-        return {"result": value, "digest": signature(value)}
+        return with_sampling_fixture(job, value)
 
 
 def start_calibration(space_fixture):

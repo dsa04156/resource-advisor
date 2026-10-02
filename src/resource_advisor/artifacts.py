@@ -140,6 +140,7 @@ class ArtifactDelivery:
                 result = self.store.get(conn, "result", body["attempt_id"])["body"]
                 phases = self.store.get(conn, "phase_profile", body["attempt_id"])
                 training = self.store.get(conn, "training_receipt", body["attempt_id"])
+                sampling = self.store.get(conn, "sampling_receipt", body["attempt_id"])
                 if (
                     row["state"] not in {State.SUCCEEDED, State.FAILED}
                     or signature(result) != body["result_digest"]
@@ -156,6 +157,10 @@ class ArtifactDelivery:
             }
             if phases:
                 payload["phase_profile"] = phases["body"]
+            if sampling:
+                payload["sampling_receipt"] = sampling["body"]
+                payload["sampling_binding"] = body["sampling_binding"]
+                payload["sampling_policy"] = body["sampling_policy"]
             if training:
                 payload["training_receipt"] = training["body"]
                 payload["training_isolation"] = body["training_isolation"]

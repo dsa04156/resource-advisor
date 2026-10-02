@@ -100,7 +100,7 @@ def result_from_log(log: str) -> dict:
 
 def identity_environment(job):
     b = job["body"]
-    return {
+    values = {
         "RA_JOB_ID": job["id"],
         "RA_ATTEMPT_ID": b["attempt_id"],
         "RA_EPOCH": str(b["epoch"]),
@@ -114,6 +114,11 @@ def identity_environment(job):
         "RA_EXECUTION_MODE": b["request"]["mode"],
         "RA_ARTIFACT_PREFIX": b.get("artifact_prefix", ""),
     }
+    if b.get("sampling_binding"):
+        values["RA_SAMPLING_PLAN_JSON"] = json.dumps(
+            b["sampling_binding"]["plan"], separators=(",", ":")
+        )
+    return values
 
 
 def priority_mapping(mapping):

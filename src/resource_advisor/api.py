@@ -210,6 +210,32 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
     def register_workload(value: WorkloadSpec, p=Depends(principal)):
         return service.register("workload", value, p.project)
 
+    from .sampling import SamplingBindingRequest, SamplingPolicies, SamplingPolicy
+
+    @app.post(PREFIX + "/sampling-policies")
+    def register_sampling_policy(value: SamplingPolicy, p=Depends(operator)):
+        return service.register("sampling_policy", value, p.project)
+
+    @app.get(PREFIX + "/sampling-policies/{policy_ref}")
+    def get_sampling_policy(policy_ref: str, p=Depends(principal)):
+        from .service import required
+
+        with service.store.transaction() as conn:
+            return required(service.store, conn, "sampling_policy", policy_ref, p.project)
+
+    @app.post(PREFIX + "/sampling-bindings")
+    def bind_sampling(value: SamplingBindingRequest, p=Depends(operator)):
+        return SamplingPolicies(service).bind(p.project, value)
+
+    @app.get(PREFIX + "/jobs/{job_id}/sampling-receipt")
+    def get_sampling_receipt(job_id: str, p=Depends(principal)):
+        job = service.get_job(p.project, job_id)
+        with service.store.transaction() as conn:
+            receipt = service.store.get(conn, "sampling_receipt", job["attempt_id"])
+        if receipt is None:
+            raise HTTPException(404, "Sampling receipt not available")
+        return receipt["body"]
+
     from .training import TrainingIsolation
 
     @app.post(PREFIX + "/training-isolation")
