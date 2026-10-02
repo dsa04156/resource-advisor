@@ -28,6 +28,17 @@ jobs:
       - run: uv sync --locked --extra pipelines --extra optimizer --extra artifacts
       - run: uv run ruff check src tests examples
       - run: uv run ruff format --check src tests examples
+      - run: node --check src/resource_advisor/static/console.js
+      - run: uv build --wheel
+      - name: Verify console assets are packaged
+        run: |
+          uv run python - <<'PY'
+          import glob, zipfile
+          with zipfile.ZipFile(glob.glob("dist/*.whl")[0]) as wheel:
+              files = set(wheel.namelist())
+              for asset in ("index.html", "console.js", "console.css", "mark.svg"):
+                  assert "resource_advisor/static/" + asset in files
+          PY
       - run: uv run pytest -q
       - run: uv run pytest -q
         env:

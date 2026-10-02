@@ -1,0 +1,42 @@
+{
+  "captured_at": "2026-10-02T08:12:09.710730+00:00",
+  "source": "actual independent lab API, PostgreSQL and Chromium",
+  "live_observation": {
+    "node_count": 10,
+    "job_records": 35,
+    "history_records": 35,
+    "workload_definitions": 3,
+    "recommendations": 4,
+    "selected_accelerator_classes": [
+      "gpu"
+    ],
+    "https_certificate_verified": true
+  },
+  "browser_fault_checks": {
+    "live_meters": 45,
+    "outage_hides_meters": true,
+    "stale_hides_meters": true,
+    "expiry_without_polling": true,
+    "untrusted_text_is_inert": true,
+    "mobile_no_page_overflow": true,
+    "logout_clears_data": true,
+    "no_persistent_credentials": true
+  },
+  "browser_widths_checked": [
+    1440,
+    390
+  ],
+  "database_tests": {
+    "full_suite_sqlite": 121,
+    "full_suite_postgresql": 121,
+    "affected_final_sqlite": 19,
+    "affected_final_postgresql": 19
+  },
+  "limits": [
+    "Browser fault responses are synthetic injections, not hardware experiments.",
+    "No approval-linked new execution existed for the four historical recommendations.",
+    "Slurm live inventory is not implemented.",
+    "No NPU model qualification or per-job telemetry attribution.",
+    "Snapshots and browser sessions remain lab-supervised, not production HA."
+  ]
+}

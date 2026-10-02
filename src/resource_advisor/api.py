@@ -3,9 +3,10 @@
 import hashlib
 import hmac
 from dataclasses import dataclass
+from pathlib import Path
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Response
-from fastapi.responses import JSONResponse
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Response
+from fastapi.responses import FileResponse, JSONResponse
 from prometheus_client import CollectorRegistry, Gauge, generate_latest
 from sqlalchemy import func, select
 
@@ -64,6 +65,56 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
     @app.exception_handler(NotFound)
     async def missing(_, exc):
         return JSONResponse({"detail": str(exc)}, status_code=404)
+
+    @app.middleware("http")
+    async def private_responses(request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith((PREFIX, "/console")):
+            response.headers["Cache-Control"] = "no-store"
+            response.headers["X-Content-Type-Options"] = "nosniff"
+            response.headers["Referrer-Policy"] = "no-referrer"
+        if request.url.path.startswith("/console"):
+            response.headers["Content-Security-Policy"] = (
+                "default-src 'none'; script-src 'self'; style-src 'self'; "
+                "connect-src 'self'; img-src 'self'; base-uri 'none'; "
+                "frame-ancestors 'none'; form-action 'self'"
+            )
+        return response
+
+    @app.get("/console", include_in_schema=False)
+    def console_shell():
+        return FileResponse(Path(__file__).parent / "static" / "index.html")
+
+    @app.get("/console/{asset}", include_in_schema=False)
+    def console_asset(asset: str):
+        if asset not in {"console.js", "console.css", "mark.svg"}:
+            raise HTTPException(404, "Asset not found")
+        return FileResponse(Path(__file__).parent / "static" / asset)
+
+    @app.get(PREFIX + "/overview")
+    def console_overview(
+        jobs_page: int = Query(default=0, ge=0, le=100000),
+        compatibility_page: int = Query(default=0, ge=0, le=100000),
+        history_page: int = Query(default=0, ge=0, le=100000),
+        recommendations_page: int = Query(default=0, ge=0, le=100000),
+        p=Depends(principal),
+    ):
+        from .console import overview
+
+        return overview(
+            service,
+            p.project,
+            jobs_page=jobs_page,
+            compatibility_page=compatibility_page,
+            history_page=history_page,
+            recommendations_page=recommendations_page,
+        )
+
+    @app.get(PREFIX + "/recommendations/{ref}/evidence")
+    def console_evidence(ref: str, p=Depends(principal)):
+        from .console import recommendation_evidence
+
+        return recommendation_evidence(service, p.project, ref)
 
     @app.get("/healthz")
     def health():

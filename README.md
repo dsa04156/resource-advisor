@@ -20,6 +20,9 @@ distinguishes observed allocation from requested resources and unknown data.
 [Read-only inventory](docs/inventory.md) now separates scheduler requests from
 measured CPU/memory/GPU/NPU telemetry and returns unknown for stale data.
 
+Open `/console` on the API origin for the [four-view research console](docs/console.md):
+resources/jobs, compatibility, queue/allocation history, and recommendation evidence.
+
 ## Responsibility
 
 The service validates workload/environment contracts, submits a selected

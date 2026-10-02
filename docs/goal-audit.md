@@ -32,7 +32,7 @@ direct evidence; conditional extensions require an explicit applicability result
 | R4 uncertainty | OOD/stale context, independent confirmation, workload/time holdouts | Confirmation implemented; holdout/stale residual analysis pending |
 | R5 interference | Qualified solo/shared pairs, per-workload slowdown, unknown-pair abstention | Conditional follow-up; not claimed implemented |
 | Usage ledger | Queue/admission/preparation/run/collection, physical/virtual units, all outcomes | Atomic terminal ledger, evidence-based allocation, unknown-aware summaries/backfill verified with real GPU collector failure; pure preflight failures now record zero; durable cancellation timing and full preparation/utilization costs pending |
-| Observability | Missing-vs-stale telemetry, CPU/GPU/NPU/queues/jobs/errors, four integrated views | Kubernetes/Prometheus inventory with source freshness and unknown handling verified; four integrated views and Slurm telemetry pending |
+| Observability | Missing-vs-stale telemetry, CPU/GPU/NPU/queues/jobs/errors, four integrated views | Four project-scoped console views connected to live inventory/jobs/compatibility/ledger/recommendation evidence; browser fault checks and responsive rendering verified; live approved-result comparison, quota reasons and Slurm telemetry pending |
 | E0–E7 scenarios | Reproducible live compatibility, execution, quota, contention/failure evidence | Pending |
 | B0–B3 / S0–S2 | Equal-budget real measurements, raw data, cost/regret/abstention and null improvements | Single-GPU S0/S1/S2 smoke with null improvement published; rigorous comparison pending |
 | S3–S6 | Applicability, paired/source data and qualified strategy comparisons | Conditional; no result claimed |

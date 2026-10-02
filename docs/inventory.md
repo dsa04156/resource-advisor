@@ -101,5 +101,6 @@ qualification is established by these observations.
 Unit/integration tests cover project isolation, lost Pod visibility, stale source
 timestamps, collector stop, unhealthy/nonfinite/range-invalid telemetry, missing
 credentials and init/sidecar accounting. Both SQLite and PostgreSQL suites passed.
-Integrated dashboards, continuous operational supervision, retention, cross-project
-quota views and Slurm inventory remain separate open acceptance gates.
+The [four-view console](console.md) consumes these snapshots. Continuous operational
+supervision, retention, cross-project quota views and Slurm inventory remain
+separate open acceptance gates.
