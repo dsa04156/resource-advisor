@@ -36,31 +36,52 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def select_paths(paths):
+EFFICIENTFORMER_ARCHIVE = "8372593b41a59f7e7d30ede776150c782bd3b7cb19073c30d9150c4826cdc8cf"
+PREVIOUS_MANIFEST = "b96a400c1dd303d76119f69af6c444d13faeccd8026998345f8d3056950c4239"
+
+
+def select_paths(paths, *, seed="20261003", excluded=()):
+    if len(set(paths)) != len(paths):
+        raise ValueError("validation paths must be distinct")
     if {Path(p).parent.name for p in paths} != LABELS.keys():
         raise ValueError("validation classes differ from the frozen plan")
+    excluded = set(excluded)
     selected = []
     for label in sorted(LABELS):
-        members = [p for p in paths if Path(p).parent.name == label]
+        members = [p for p in paths if Path(p).parent.name == label and p not in excluded]
         if len(members) < 10:
             raise ValueError("class lacks ten distinct images")
-        selected.extend(sorted(members, key=lambda p: digest(("20261003:" + p).encode()))[:10])
+        selected.extend(sorted(members, key=lambda p: digest((seed + ":" + p).encode()))[:10])
     return sorted(selected)
 
 
-def prepare(model_archive, data_archive, output):
+def prepare(model_archive, data_archive, output, recipe="resnet18", exclude_manifest=None):
     import numpy as np
     import onnxruntime as ort
     from PIL import Image
     from PIL import __version__ as pillow_version
 
     start = time.perf_counter()
+    archives = dict(ARCHIVES)
+    member, seed, interpolation = "resnet_v1_18.onnx", "20261003", Image.Resampling.BILINEAR
+    excluded = []
+    if recipe == "efficientformer-l1":
+        if exclude_manifest is None or digest(exclude_manifest.read_bytes()) != PREVIOUS_MANIFEST:
+            raise ValueError("the frozen previous manifest is required to exclude inspected images")
+        excluded = [r["path"] for r in json.loads(exclude_manifest.read_text())["samples"]]
+        if len(excluded) != 100 or len(set(excluded)) != 100:
+            raise ValueError("exactly 100 previous distinct images required")
+        archives["model"] = EFFICIENTFORMER_ARCHIVE
+        member, seed = "efficientformer_l1.onnx", "20261003-efficientformer-l1"
+        interpolation = Image.Resampling.BICUBIC
+    elif recipe != "resnet18" or exclude_manifest is not None:
+        raise ValueError("unqualified fixture recipe")
     for key, path in [("model", model_archive), ("data", data_archive)]:
-        if digest(path.read_bytes()) != ARCHIVES[key]:
+        if digest(path.read_bytes()) != archives[key]:
             raise ValueError("source archive digest mismatch: " + key)
     output.mkdir(parents=True, exist_ok=False)
     with ZipFile(model_archive) as archive:
-        model = archive.read("resnet_v1_18.onnx")
+        model = archive.read(member)
     (output / "model.onnx").write_bytes(model)
     rows, tensors = [], []
     with tar_open(data_archive, "r:gz") as archive:
@@ -71,14 +92,16 @@ def prepare(model_archive, data_archive, output):
         ]
         if len(paths) != 3925 or len(set(paths)) != len(paths):
             raise ValueError("unexpected validation population")
-        selected = select_paths(paths)
+        if not set(excluded).issubset(paths):
+            raise ValueError("excluded images do not belong to the frozen validation population")
+        selected = select_paths(paths, seed=seed, excluded=excluded)
         for path in selected:
             raw = archive.extractfile(path).read()
             with Image.open(io.BytesIO(raw)) as image:
                 image = image.convert("RGB")
                 w, h = image.size
                 w, h = int(w * 256 / min(w, h)), int(h * 256 / min(w, h))
-                image = image.resize((w, h), Image.Resampling.BILINEAR)
+                image = image.resize((w, h), interpolation)
                 x, y = (w - 224) // 2, (h - 224) // 2
                 tensor = np.asarray(image.crop((x, y, x + 224, y + 224)), dtype=np.uint8)
             assert tensor.shape == (224, 224, 3)
@@ -114,9 +137,9 @@ def prepare(model_archive, data_archive, output):
     np.save(output / "reference.npy", np.stack(scores), allow_pickle=False)
     report = {
         "schema_version": "v1",
-        "kind": "imagenette100-resnet18-qualification",
-        "seed": 20261003,
-        "archives": ARCHIVES,
+        "kind": f"imagenette100-{recipe}-qualification",
+        "seed": 20261003 if recipe == "resnet18" else seed,
+        "archives": archives,
         "model_sha256": digest(model),
         "inputs_sha256": digest((output / "inputs.npy").read_bytes()),
         "reference_sha256": digest((output / "reference.npy").read_bytes()),
@@ -130,6 +153,10 @@ def prepare(model_archive, data_archive, output):
         "reference_seconds": reference_seconds,
         "preparation_seconds": time.perf_counter() - start,
     }
+    if recipe == "efficientformer-l1":
+        report["excluded_manifest_sha256"] = PREVIOUS_MANIFEST
+        report["excluded_images"] = len(excluded)
+        report["resize"] = "Pillow bicubic shortest-side-256 center-crop-224"
     (output / "manifest.json").write_text(json.dumps(report, indent=2) + "\n")
     return report
 
@@ -139,6 +166,10 @@ if __name__ == "__main__":
     parser.add_argument("--model-archive", type=Path, required=True)
     parser.add_argument("--data-archive", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--recipe", choices=["resnet18", "efficientformer-l1"], default="resnet18")
+    parser.add_argument("--exclude-manifest", type=Path)
     args = parser.parse_args()
-    result = prepare(args.model_archive, args.data_archive, args.output)
+    result = prepare(
+        args.model_archive, args.data_archive, args.output, args.recipe, args.exclude_manifest
+    )
     print(json.dumps({k: v for k, v in result.items() if k != "samples"}))

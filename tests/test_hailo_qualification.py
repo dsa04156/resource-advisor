@@ -62,3 +62,22 @@ def test_selection_is_output_independent_balanced_and_order_invariant():
     assert all(sum(Path(p).parent.name == c for p in selected) == 10 for c in module.LABELS)
     with pytest.raises(ValueError, match="classes"):
         module.select_paths(paths + ["dataset/val/foreign/image.JPEG"])
+
+
+def test_new_recipe_excludes_all_previously_inspected_inputs():
+    path = Path(__file__).parents[1] / "examples/prepare_hailo_fixture.py"
+    spec = importlib.util.spec_from_file_location("hailo_fixture", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    paths = [f"dataset/val/{c}/image-{i}.JPEG" for c in module.LABELS for i in range(30)]
+    previous = module.select_paths(paths)
+    selected = module.select_paths(paths, seed="20261003-efficientformer-l1", excluded=previous)
+    assert len(selected) == 100 and not set(previous) & set(selected)
+    assert all(sum(Path(p).parent.name == c for p in selected) == 10 for c in module.LABELS)
+    assert selected == module.select_paths(
+        list(reversed(paths)), seed="20261003-efficientformer-l1", excluded=reversed(previous)
+    )
+    with pytest.raises(ValueError, match="ten distinct"):
+        module.select_paths(paths, excluded=paths[:25])
+    with pytest.raises(ValueError, match="distinct"):
+        module.select_paths(paths + paths[:1])
