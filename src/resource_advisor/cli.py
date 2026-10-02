@@ -56,12 +56,16 @@ def main():
                 raise ValueError("duplicate route")
             backends[key] = cls(**route["options"])
         runner = Worker(service, backends)
+        from .study import Studies
+
+        study_runner = Studies(service)
         delivery = (
             MLflowDelivery(store, config["mlflow_url"], token=os.getenv("RA_MLFLOW_TOKEN"))
             if config.get("mlflow_url")
             else None
         )
         while True:
+            study_runner.tick_all()
             runner.submit_one()
             runner.cancel_one()
             runner.reconcile_all()

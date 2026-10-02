@@ -71,6 +71,18 @@ usage = Table(
     Column("queue_seconds", Float),
     Column("body", JSON, nullable=False),
 )
+studies = Table(
+    "ra_studies",
+    metadata,
+    Column("id", String(96), primary_key=True),
+    Column("project", String(96), nullable=False),
+    Column("idempotency_key", String(128), nullable=False),
+    Column("request_digest", String(80), nullable=False),
+    Column("version", Integer, nullable=False),
+    Column("state", String(32), nullable=False),
+    Column("body", JSON, nullable=False),
+    UniqueConstraint("project", "idempotency_key"),
+)
 
 
 class Conflict(ValueError):
@@ -137,6 +149,18 @@ class Store:
         )
         if result.rowcount != 1:
             raise Conflict("concurrent job transition; retry")
+
+    def study(self, conn, study_id):
+        return conn.execute(select(studies).where(studies.c.id == study_id)).mappings().first()
+
+    def change_study(self, conn, row, state, body):
+        result = conn.execute(
+            update(studies)
+            .where(studies.c.id == row["id"], studies.c.version == row["version"])
+            .values(state=state, body=body, version=row["version"] + 1)
+        )
+        if result.rowcount != 1:
+            raise Conflict("concurrent study transition; retry")
 
     def enqueue(self, conn, event_id, kind, body):
         if conn.execute(select(outbox.c.id).where(outbox.c.id == event_id)).first():

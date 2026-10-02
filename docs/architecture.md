@@ -66,8 +66,9 @@ failures and canceled jobs still need reconciliation into the ledger.
   compilation are verified in the initial suite. Multi-worker contention,
   process-crash recovery, Slurm accounting, GPU/NPU model execution and real
   quota/priority scenarios require additional verification.
-- No pilot/BO, MF-KG, RGPE, interference optimization or custom dashboard is
-  presented as working in this release.
+- Pilot and qLogNEI coordination are tested with synthetic execution. Live GPU
+  qualification, MF-KG, RGPE, interference optimization and custom dashboards
+  remain incomplete; see the full completion audit.
 
 Use separate service accounts, namespaces, LocalQueues, allowlisted node pools,
 Slurm accounts/QOS and an independent database. Runtime jobs stay outside GitOps.

@@ -16,6 +16,7 @@ from .contracts import (
     JobRequest,
     RecommendationRequest,
     RuntimeVariant,
+    StudyRequest,
     WorkloadSpec,
 )
 from .service import NotFound, Rejected, Service
@@ -34,6 +35,9 @@ def create_app(service: Service, credentials: dict[str, Principal]):
     if not credentials:
         raise ValueError("at least one external credential hash is required")
     app = FastAPI(title="Resource Advisor", version="0.1.0")
+    from .study import Studies
+
+    study_service = Studies(service)
 
     def principal(authorization: str = Header(default="")):
         if not authorization.startswith("Bearer "):
@@ -66,6 +70,18 @@ def create_app(service: Service, credentials: dict[str, Principal]):
         with service.store.transaction() as conn:
             conn.execute(select(1))
         return {"status": "ok", "execution_enabled": "worker configuration required"}
+
+    @app.post(PREFIX + "/profiling-runs")
+    def create_study(value: StudyRequest, idempotency_key: str = Header(), p=Depends(principal)):
+        return study_service.create(p.project, value, idempotency_key)
+
+    @app.get(PREFIX + "/profiling-runs/{ref}")
+    def get_study(ref: str, p=Depends(principal)):
+        return study_service.get(p.project, ref)
+
+    @app.post(PREFIX + "/profiling-runs/{ref}/cancel")
+    def cancel_study(ref: str, p=Depends(principal)):
+        return study_service.cancel(p.project, ref)
 
     @app.post(PREFIX + "/capabilities")
     def register_capability(value: CapabilitySnapshot, p=Depends(operator)):

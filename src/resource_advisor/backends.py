@@ -69,6 +69,8 @@ def identity_environment(job):
         "RA_INPUT_SHAPE": json.dumps(b["spec"]["identity"]["input_shape"]),
         "RA_PRECISION": b["spec"]["identity"]["precision"],
         "RA_SEED": str(b["spec"]["identity"]["seed"]),
+        "RA_EXECUTION_MODE": b["request"]["mode"],
+        "RA_ARTIFACT_PREFIX": b.get("artifact_prefix", ""),
     }
 
 
@@ -120,7 +122,9 @@ class KubernetesBackend:
             "spec": {
                 "suspend": True,
                 "backoffLimit": 0,
-                "activeDeadlineSeconds": b["spec"]["execution"]["max_run_seconds"],
+                "activeDeadlineSeconds": b.get("execution_limits", b["spec"]["execution"])[
+                    "max_run_seconds"
+                ],
                 "template": {
                     "spec": {
                         "restartPolicy": "Never",
@@ -131,7 +135,7 @@ class KubernetesBackend:
                             {
                                 "name": "workload",
                                 "image": b["variant"]["image"],
-                                "command": b["variant"]["command"],
+                                "command": b.get("effective_command", b["variant"]["command"]),
                                 "env": [
                                     {"name": k, "value": v}
                                     for k, v in identity_environment(job).items()
@@ -297,7 +301,7 @@ class SlurmBackend:
         node = b["capability"]["node_ref"]
         if not re.fullmatch(r"[A-Za-z0-9_.-]+", node):
             raise BackendError("invalid qualified node reference")
-        seconds = b["spec"]["execution"]["max_run_seconds"]
+        seconds = b.get("execution_limits", b["spec"]["execution"])["max_run_seconds"]
         directives = [
             f"--job-name={b['attempt_id']}",
             f"--comment=resource-advisor:{job['id']}",
@@ -325,7 +329,9 @@ class SlurmBackend:
             + "\nset -euo pipefail\n"
             + "\n".join(f"export {k}={shlex.quote(v)}" for k, v in env.items())
             + "\nexec "
-            + shlex.join(["srun", "--export=ALL", *b["variant"]["command"]])
+            + shlex.join(
+                ["srun", "--export=ALL", *b.get("effective_command", b["variant"]["command"])]
+            )
             + "\n"
         )
 

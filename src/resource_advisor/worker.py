@@ -52,6 +52,10 @@ class Worker:
                         row["body"]["candidate"]["ref"],
                     )
                     errors = compatibility(*args)
+                    if row["body"].get("deadline_at") and now() >= datetime.fromisoformat(
+                        row["body"]["deadline_at"]
+                    ):
+                        errors.append("PROBE_DEADLINE")
                     if errors:
                         self.store.change_job(
                             conn,
@@ -153,12 +157,13 @@ class Worker:
                         if value:
                             body[key] = value
                     state = observation.state
+                    limits = body.get("execution_limits", body["spec"]["execution"])
                     if state == State.COLLECTING:
                         body.setdefault("collecting_since", now().isoformat())
                         collection_age = (
                             now() - datetime.fromisoformat(body["collecting_since"])
                         ).total_seconds()
-                        if collection_age > body["spec"]["execution"]["max_collection_seconds"]:
+                        if collection_age > limits["max_collection_seconds"]:
                             state, body["error"] = (
                                 State.RESULT_INVALID,
                                 "RESULT_COLLECTION_DEADLINE",
@@ -167,7 +172,7 @@ class Worker:
                         state = State.CANCEL_REQUESTED
                     if state == State.QUEUED and body.get("queued_at"):
                         wait = (now() - datetime.fromisoformat(body["queued_at"])).total_seconds()
-                        if wait > body["spec"]["execution"]["max_queue_seconds"]:
+                        if wait > limits["max_queue_seconds"]:
                             state, body["error"] = State.CANCEL_REQUESTED, "QUEUE_DEADLINE_EXCEEDED"
                             self.store.enqueue(
                                 conn,
@@ -175,6 +180,15 @@ class Worker:
                                 "cancel",
                                 {"job_id": row["id"]},
                             )
+                    if (
+                        body.get("deadline_at")
+                        and now() >= datetime.fromisoformat(body["deadline_at"])
+                        and state not in TERMINAL
+                    ):
+                        state, body["error"] = State.CANCEL_REQUESTED, "PROBE_WALL_DEADLINE"
+                        self.store.enqueue(
+                            conn, "cancel-" + body["attempt_id"], "cancel", {"job_id": row["id"]}
+                        )
                     self.store.change_job(conn, latest, state, body)
                 if state == State.COLLECTING:
                     envelope = backend.result(row)

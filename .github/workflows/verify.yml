@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: "3.13"
       - uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff
-      - run: uv sync --locked --extra pipelines
+      - run: uv sync --locked --extra pipelines --extra optimizer
       - run: uv run ruff check src tests examples
       - run: uv run ruff format --check src tests examples
       - run: uv run pytest -q

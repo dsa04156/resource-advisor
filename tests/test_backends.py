@@ -34,6 +34,7 @@ def test_slurm_is_not_wrapped_in_kueue_and_quotes_payload(service):
     job = row(service)
     job["body"]["capability"]["resource_key"] = "gpu:test"
     job["body"]["variant"]["command"] = ["python", "runner.py", "$(touch /tmp/not-executed)"]
+    job["body"]["effective_command"] = job["body"]["variant"]["command"]
     backend = SlurmBackend(partition="gpu", account="team-a", qos="lab", output_dir="/tmp/ra-test")
     script = backend.script(job)
     assert "#SBATCH --gres=gpu:test:1" in script

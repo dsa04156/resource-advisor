@@ -89,11 +89,33 @@ class Service:
                 errors = compatibility(spec, candidate, variant, cap)
                 if errors:
                     raise Rejected(",".join(errors))
-                if request.study_ref:
-                    raise Rejected("study execution is not enabled in this release")
+                plan = None
                 if request.mode in {"pilot", "confirmation"}:
-                    raise Rejected("budgeted profiling worker is not enabled in this release")
-                if candidate.ref != spec.baseline_candidate_ref:
+                    if not request.study_ref or not request.probe_plan_ref:
+                        raise Rejected(
+                            "pilot execution is not enabled without a reserved study plan"
+                        )
+                    study = self.store.study(conn, request.study_ref)
+                    if not study or study["project"] != project:
+                        raise NotFound("study not found")
+                    plan = required(self.store, conn, "probe_plan", request.probe_plan_ref, project)
+                    if (
+                        study["state"] not in {"EXPLORING", "CONFIRMING"}
+                        or study["body"]["active_plan"] != request.probe_plan_ref
+                        or plan["study_ref"] != request.study_ref
+                        or plan["mode"] != request.mode
+                        or plan["candidate_ref"] != candidate.ref
+                        or plan["workload_digest"] != signature(spec)
+                        or key != "probe-" + request.probe_plan_ref
+                        or now() >= datetime.fromisoformat(plan["deadline_at"])
+                    ):
+                        raise Rejected(
+                            "probe does not match an active, unexpired budget reservation"
+                        )
+                    self.store.change_study(conn, study, study["state"], study["body"])
+                elif request.study_ref or request.probe_plan_ref:
+                    raise Rejected("study references require pilot or confirmation mode")
+                if candidate.ref != spec.baseline_candidate_ref and plan is None:
                     if not request.approval_ref:
                         raise Rejected("non-baseline execution requires an immutable approval")
                     approval = required(self.store, conn, "approval", request.approval_ref, project)
@@ -117,6 +139,16 @@ class Service:
                     "created_at": now().isoformat(),
                     "external_id": None,
                     "backend_cluster_id": cap.backend_cluster_id,
+                    "execution_limits": plan["execution_limits"]
+                    if plan
+                    else spec.execution.model_dump(),
+                    "deadline_at": plan["deadline_at"] if plan else None,
+                    "artifact_prefix": plan["artifact_prefix"]
+                    if plan
+                    else f"jobs/{job_id}/{attempt_id}/",
+                    "effective_command": list(variant.pilot_command)
+                    if request.mode == "pilot"
+                    else list(variant.command),
                 }
                 conn.execute(
                     insert(jobs).values(
@@ -239,7 +271,11 @@ class Service:
             )
             self.store.change_job(conn, row, state, body)
             if not problems:
-                if result.outcome == "COMPLETED" and body["quality_passed"]:
+                if (
+                    result.outcome == "COMPLETED"
+                    and body["quality_passed"]
+                    and body["request"]["mode"] != "pilot"
+                ):
                     self.store.put(
                         conn,
                         "profile",

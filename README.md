@@ -74,11 +74,14 @@ schema upgrades and an operational migration process are not yet implemented.
 - Prometheus job/outbox metrics; compiled CPU-only KFP launcher with caching off.
 - Cooperative CUDA matmul runner provided for subsequent hardware qualification.
 
-Pilot execution and BO search are deliberately rejected until the budgeted
-worker and independent confirmation are implemented. NPU readiness requires
+Consent-bound pilot studies, seeded random search and constrained qLogNEI now
+use the durable worker with reserved confirmation budgets. They have synthetic
+execution tests; the real GPU optimization loop remains unverified. NPU readiness requires
 actual model validation; hardware detection alone is insufficient.
 
 See [implementation ledger](docs/implementation.md) and
 [architecture and operational limits](docs/architecture.md).
 For the current evidence see [verification](docs/verification.md); for an easy
 Korean explanation see [the walkthrough](docs/walkthrough.ko.md).
+See [optimization contracts](docs/optimization.md) and the
+[full completion audit](docs/goal-audit.md) for the complete remaining scope.

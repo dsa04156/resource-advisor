@@ -40,3 +40,20 @@ versions. GitHub Actions repeats the SQLite and PostgreSQL suite for each push.
 Not yet verified: live GPU/NPU benchmark, Slurm QOS enforcement, live Kueue
 admission/priority, live KFP→API→GPU execution, MLflow artifact upload, pilot/BO
 optimization, workload migration, or production hardening.
+
+## Optimization increment
+
+The suite now has **54 passing tests on both SQLite and isolated PostgreSQL**.
+This includes the real BoTorch acquisition implementation and a durable
+qLogNEI→synthetic executor→observation→next probe→independent confirmation loop.
+It is not a real GPU performance experiment. Numerical GP diagnostics are
+retained in the surrogate snapshot instead of being presented as guarantees.
+
+A populated PostgreSQL study, its probe/result records and outbox were backed
+up and restored into a new database. Contents of all five service tables,
+including `ra_studies`, matched. Test dependency lock: PyTorch 2.8.0+cpu,
+BoTorch 0.16.1, GPyTorch 1.15.2. CI installs the optimizer extra so these tests
+are executed rather than silently skipped.
+
+The live optimization, budget-overrun/termination behavior on both schedulers,
+checkpoint isolation and complete failure accounting are still open gates.

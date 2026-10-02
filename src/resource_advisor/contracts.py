@@ -171,6 +171,14 @@ class ProfilingPolicy(Contract):
     final_validation_seconds: int = Field(default=180, ge=1, le=3600)
     mutable_parameters: tuple[str, ...] = ()
     checkpoint_digest: Digest | None = None
+    max_probes: int = Field(default=8, ge=1, le=128)
+    device_seconds: dict[str, float] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def positive_device_budgets(self):
+        if any(not key or value <= 0 for key, value in self.device_seconds.items()):
+            raise ValueError("device budgets require nonempty units and positive seconds")
+        return self
 
 
 class QualityPolicy(Contract):
@@ -263,6 +271,7 @@ class JobRequest(Contract):
     approval_ref: Ref | None = None
     study_ref: Ref | None = None
     parent_run_ref: Ref | None = None
+    probe_plan_ref: Ref | None = None
 
 
 class RecommendationRequest(Contract):

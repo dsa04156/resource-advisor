@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-optimizer = ["botorch>=0.15,<0.17", "torch>=2.6,<3"]
+optimizer = ["botorch>=0.15,<0.17", "torch>=2.8,<2.9"]
 pipelines = [
     "kfp>=2.5,<3",
     "kfp-kubernetes>=1.3,<2",
@@ -38,3 +38,11 @@ select = ["E4", "E7", "E9", "F", "I", "B", "BLE"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/resource_advisor/api.py" = ["B008"] # FastAPI's documented dependency declarations
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", extra = "optimizer", marker = "sys_platform == 'linux'" }]

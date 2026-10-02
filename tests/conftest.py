@@ -106,7 +106,7 @@ def bundle():
 
 
 @pytest.fixture
-def service(bundle):
+def database_store():
     url = os.getenv("RA_TEST_DATABASE_URL", "sqlite://")
     store = Store(url)
     if url != "sqlite://":
@@ -116,9 +116,15 @@ def service(bundle):
             )
         metadata.drop_all(store.engine)
     store.initialize()
+    yield store
+    store.engine.dispose()
+
+
+@pytest.fixture
+def service(bundle, database_store):
+    store = database_store
     svc = Service(store, accept_synthetic=True)
     spec, _, variant, cap = bundle
     for kind, model in [("workload", spec), ("variant", variant), ("capability", cap)]:
         svc.register(kind, model, "team-a")
     yield svc
-    store.engine.dispose()
