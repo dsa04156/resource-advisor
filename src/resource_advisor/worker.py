@@ -154,6 +154,9 @@ class Worker:
                         ("started_at", observation.started_at),
                         ("backend_finished_at", observation.finished_at),
                         ("error", observation.error),
+                        ("allocation", observation.allocation),
+                        ("scheduler_submitted_at", observation.submitted_at),
+                        ("execution_started_at", observation.execution_started_at),
                     ]:
                         if value:
                             body[key] = value

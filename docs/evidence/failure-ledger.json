@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-02",
+  "scope": "Live GPU Job with intentional collector failure, pre-submit cancellation, legacy backfill and read-only Slurm accounting",
+  "records": [
+    {
+      "outcome": "RESULT_INVALID",
+      "allocated_device_seconds": 2.0,
+      "measured_compute_seconds": null,
+      "queue_seconds": null,
+      "allocation_mode": "physical_device",
+      "observed_allocation": {
+        "source": "kubernetes:scheduled workload container requests",
+        "accelerator_count": 1.0,
+        "cpu": 1.0,
+        "memory_mib": 2048.0
+      },
+      "never_submitted": false,
+      "preparation_seconds": 1.0,
+      "container_runtime_seconds": 1.0,
+      "uncertainty": [
+        "QUEUE_INTERVAL_UNKNOWN"
+      ]
+    },
+    {
+      "outcome": "CANCELED",
+      "allocated_device_seconds": 0.0,
+      "measured_compute_seconds": null,
+      "queue_seconds": null,
+      "allocation_mode": "physical_device",
+      "observed_allocation": null,
+      "never_submitted": true,
+      "preparation_seconds": null,
+      "container_runtime_seconds": null,
+      "uncertainty": []
+    }
+  ],
+  "gpu_work_completed": "COMPLETED",
+  "profile_created": false,
+  "backfilled_missing_terminal_attempts": 4,
+  "second_backfill_inserted": 0,
+  "slurm_actual_reads": {
+    "failed": {
+      "state": "FAILED",
+      "started_at": "2026-10-02T05:31:52+0000",
+      "finished_at": "2026-10-02T05:31:53+0000",
+      "error": "FAILED",
+      "allocation": {
+        "source": "slurm:sacct AllocTRES",
+        "accelerator_count": 1.0,
+        "cpu": 1.0,
+        "memory_mib": 1024.0
+      },
+      "submitted_at": "2026-10-02T05:31:52+0000",
+      "execution_started_at": null
+    },
+    "cancelled": {
+      "state": "CANCELED",
+      "started_at": "2026-10-02T05:48:33+0000",
+      "finished_at": "2026-10-02T05:48:36+0000",
+      "error": null,
+      "allocation": {
+        "source": "slurm:sacct AllocTRES",
+        "accelerator_count": 1.0,
+        "cpu": 1.0,
+        "memory_mib": 512.0
+      },
+      "submitted_at": "2026-10-02T05:48:32+0000",
+      "execution_started_at": null
+    }
+  },
+  "limitations": [
+    "Collector failure is injected; not a naturally occurring GPU fault",
+    "Deleted-Pod cancellation without terminal timestamps remains unknown",
+    "Legacy request-derived allocation values excluded from verified totals",
+    "No power/utilization billing or complete transfer/model preparation accounting"
+  ]
+}

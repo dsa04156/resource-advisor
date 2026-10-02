@@ -134,3 +134,15 @@ Releasing the holder admitted the later high job first; both jobs then verified
 state are retained in [the Kueue policy report](kueue-policy.md). Kubernetes remained
 v1.31.14 and Kueue v0.19.5; no runtime upgrade or preemption change was made.
 This is direct scheduler acceptance evidence, not a completed KFP/API integration.
+
+## Terminal accounting increment
+
+The full suite passes **80 tests on SQLite and isolated PostgreSQL**. Accounting
+records now commit atomically with every terminal attempt, and summaries expose
+unknown/legacy data without merging accelerator units. A real API-submitted GPU
+benchmark with an injected collector outage produced RESULT_INVALID and 2 observed
+GPU allocation seconds without a profile; pre-submit cancellation recorded zero.
+Four missing terminal records were backfilled idempotently. Read-only Slurm checks
+recovered actual failed/cancelled AllocTRES after fixing purged-ID lookup. The live
+database was backed up and restored with all five table contents matching.
+See [accounting evidence and its remaining gaps](accounting.md).

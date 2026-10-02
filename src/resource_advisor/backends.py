@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Protocol
 
+from .accounting import number
 from .contracts import State
 
 
@@ -25,6 +26,46 @@ class Observation:
     started_at: str | None = None
     finished_at: str | None = None
     error: str | None = None
+    allocation: dict | None = None
+    submitted_at: str | None = None
+    execution_started_at: str | None = None
+
+
+def memory_mib(value, *, slurm=False):
+    match = re.fullmatch(r"(\d+(?:\.\d+)?)([KMGT]i?|[kMGT])?", str(value))
+    if not match:
+        return None
+    amount, unit = match.groups()
+    unit = unit or ""
+    if slurm:
+        factors = {"": 1, "K": 1 / 1024, "M": 1, "G": 1024, "T": 1024**2}
+    else:
+        factors = {
+            "": 1 / 1024**2,
+            "Ki": 1 / 1024,
+            "Mi": 1,
+            "Gi": 1024,
+            "Ti": 1024**2,
+            "k": 1000 / 1024**2,
+            "M": 1000**2 / 1024**2,
+            "G": 1000**3 / 1024**2,
+            "T": 1000**4 / 1024**2,
+        }
+    return float(amount) * factors[unit] if unit in factors else None
+
+
+def slurm_allocation(text, resource_key):
+    if not text or "..." in text:
+        return None
+    tres = dict(part.split("=", 1) for part in text.split(",") if "=" in part)
+    generic = "gres/" + (resource_key or "gpu").split(":")[0]
+    count = tres.get(generic, tres.get("gres/" + (resource_key or "gpu")))
+    return {
+        "source": "slurm:sacct AllocTRES",
+        "accelerator_count": number(count),
+        "cpu": number(tres.get("cpu")),
+        "memory_mib": memory_mib(tres.get("mem"), slurm=True),
+    }
 
 
 class SchedulerBackend(Protocol):
@@ -300,17 +341,58 @@ class KubernetesBackend:
             {},
         )
         finished = container.get("terminated", {}).get("finishedAt")
+        allocation = None
+        if scheduled:
+            main = next(
+                (
+                    c
+                    for c in pods[0].get("spec", {}).get("containers", [])
+                    if c["name"] == "workload"
+                ),
+                {},
+            )
+            requests = main.get("resources", {}).get("requests", {})
+            cpu = requests.get("cpu")
+            cpu = (
+                number(cpu[:-1]) / 1000
+                if isinstance(cpu, str) and cpu.endswith("m") and number(cpu[:-1]) is not None
+                else number(cpu)
+            )
+            allocation = {
+                "source": "kubernetes:scheduled workload container requests",
+                "accelerator_count": number(
+                    requests.get(job["body"]["capability"]["resource_key"])
+                ),
+                "cpu": cpu,
+                "memory_mib": memory_mib(requests.get("memory")),
+            }
+        execution_started = container.get("terminated", container.get("running", {})).get(
+            "startedAt"
+        )
         for condition in status.get("conditions", []):
             if condition["type"] == "Complete" and condition["status"] == "True":
-                return Observation(State.COLLECTING, scheduled, finished)
+                return Observation(
+                    State.COLLECTING,
+                    scheduled,
+                    finished,
+                    allocation=allocation,
+                    execution_started_at=execution_started,
+                )
             if condition["type"] == "Failed" and condition["status"] == "True":
                 return Observation(
                     State.FAILED,
                     scheduled,
                     finished,
                     condition.get("reason", "BACKEND_FAILED"),
+                    allocation=allocation,
+                    execution_started_at=execution_started,
                 )
-        return Observation(State.RUNNING if "running" in container else State.QUEUED, scheduled)
+        return Observation(
+            State.RUNNING if "running" in container else State.QUEUED,
+            scheduled,
+            allocation=allocation,
+            execution_started_at=execution_started,
+        )
 
     def cancel(self, job):
         self.execute(
@@ -463,8 +545,15 @@ class SlurmBackend:
         jid = job["body"]["external_id"]
         if not re.fullmatch(r"\d+", jid):
             raise BackendError("invalid Slurm external ID")
-        queued = self.call(["squeue", "--noheader", "--jobs", jid, "--format=%T"])
-        states = queued.strip().splitlines()
+        # squeue --jobs exits nonzero after Slurm purges a completed ID from its
+        # live cache. A successful account-scoped listing proves it is absent
+        # there; sacct still decides completion. Transport errors still propagate.
+        queued = self.call(["squeue", "--noheader", "--account", self.account, "--format=%i|%T"])
+        states = [
+            line.split("|", 1)[1]
+            for line in queued.splitlines()
+            if "|" in line and line.split("|", 1)[0] == jid
+        ]
         if states:
             return Observation(
                 State.RUNNING if states[0] in {"RUNNING", "COMPLETING"} else State.QUEUED
@@ -476,7 +565,7 @@ class SlurmBackend:
                 "--parsable2",
                 "--jobs",
                 jid,
-                "--format=JobIDRaw,State,ExitCode,Start,End",
+                "--format=JobIDRaw,State,ExitCode,Start,End,AllocTRES%200,Submit",
             ]
         )
         for line in output.splitlines():
@@ -484,13 +573,23 @@ class SlurmBackend:
             if len(parts) < 5 or parts[0] != jid:
                 continue
             _, state, exitcode, start, end = parts[:5]
-            # Slurm timestamps lack an offset. Do not invent UTC or duration.
+            # The command requests UTC offsets. Unsupported/missing values stay unknown.
             start = start if _aware(start) else None
             end = end if _aware(end) else None
+            allocation = (
+                slurm_allocation(parts[5], job["body"]["capability"].get("resource_key"))
+                if len(parts) >= 6
+                else None
+            )
+            submitted = parts[6] if len(parts) >= 7 and _aware(parts[6]) else None
             if state == "COMPLETED" and exitcode == "0:0":
-                return Observation(State.COLLECTING, start, end)
+                return Observation(
+                    State.COLLECTING, start, end, allocation=allocation, submitted_at=submitted
+                )
             if state.startswith("CANCELLED"):
-                return Observation(State.CANCELED, start, end)
+                return Observation(
+                    State.CANCELED, start, end, allocation=allocation, submitted_at=submitted
+                )
             if state in {
                 "FAILED",
                 "TIMEOUT",
@@ -499,7 +598,9 @@ class SlurmBackend:
                 "PREEMPTED",
                 "BOOT_FAIL",
             }:
-                return Observation(State.FAILED, start, end, state)
+                return Observation(
+                    State.FAILED, start, end, state, allocation=allocation, submitted_at=submitted
+                )
         raise BackendError("accounting has not confirmed a terminal state")
 
     def cancel(self, job):

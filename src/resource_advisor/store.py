@@ -20,7 +20,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.pool import StaticPool
 
-from .contracts import now, signature
+from .contracts import TERMINAL, now, signature
 
 metadata = MetaData()
 entities = Table(
@@ -142,6 +142,9 @@ class Store:
         return conn.execute(select(jobs).where(jobs.c.id == job_id)).mappings().first()
 
     def change_job(self, conn, row, state, body):
+        if state in TERMINAL:
+            body = dict(body)
+            body.setdefault("finished_at", now().isoformat())
         result = conn.execute(
             update(jobs)
             .where(jobs.c.id == row["id"], jobs.c.version == row["version"])
@@ -149,6 +152,33 @@ class Store:
         )
         if result.rowcount != 1:
             raise Conflict("concurrent job transition; retry")
+        if state in TERMINAL:
+            self.record_usage(conn, row, state, body)
+
+    def record_usage(self, conn, row, state, body):
+        from .accounting import ledger_record
+
+        attempt = body["attempt_id"]
+        if conn.execute(select(usage.c.attempt_id).where(usage.c.attempt_id == attempt)).first():
+            return False
+        result = self.get(conn, "result", attempt)
+        conn.execute(
+            insert(usage).values(
+                **ledger_record(row, state, body, result["body"] if result else None)
+            )
+        )
+        return True
+
+    def backfill_usage(self):
+        """Record missing terminal attempts only; never rewrite historical evidence."""
+        with self.transaction() as conn:
+            query = select(jobs).where(jobs.c.state.in_(list(TERMINAL)))
+            if self.engine.dialect.name == "postgresql":
+                query = query.with_for_update()
+            return sum(
+                self.record_usage(conn, row, row["state"], row["body"])
+                for row in conn.execute(query).mappings()
+            )
 
     def study(self, conn, study_id):
         return conn.execute(select(studies).where(studies.c.id == study_id)).mappings().first()

@@ -177,6 +177,17 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
                 for r in conn.execute(select(usage).where(usage.c.project == p.project)).mappings()
             ]
 
+    @app.get(PREFIX + "/usage/summary")
+    def accounting_summary(p=Depends(principal)):
+        from .accounting import summarize
+
+        with service.store.transaction() as conn:
+            records = conn.execute(select(usage).where(usage.c.project == p.project)).mappings()
+            return {
+                "groups": summarize(records),
+                "semantics": "Known reservations only; unknown and legacy counts are explicit. Units from different device classes/modes are not combined.",
+            }
+
     @app.get("/metrics")
     def metrics(p=Depends(operator)):
         registry = CollectorRegistry()

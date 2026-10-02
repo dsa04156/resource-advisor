@@ -12,6 +12,8 @@ and [quota/priority enforcement](docs/slurm-policy.md) now have live evidence;
 its model/API path and NPU qualification remain open.
 The [Kueue policy trial](docs/kueue-policy.md) also verifies real GPU queueing,
 oversized admission refusal and high-before-normal execution.
+[Terminal accounting](docs/accounting.md) retains failed/cancelled attempts and
+distinguishes observed allocation from requested resources and unknown data.
 
 ## Responsibility
 

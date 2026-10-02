@@ -31,7 +31,7 @@ direct evidence; conditional extensions require an explicit applicability result
 | R3 transfer | Explicit warm start vs RGPE, independent sources, target validation/fallback | Disabled with reason; implementation/source data pending |
 | R4 uncertainty | OOD/stale context, independent confirmation, workload/time holdouts | Confirmation implemented; holdout/stale residual analysis pending |
 | R5 interference | Qualified solo/shared pairs, per-workload slowdown, unknown-pair abstention | Conditional follow-up; not claimed implemented |
-| Usage ledger | Queue/admission/preparation/run/collection, physical/virtual units, all outcomes | Collected results implemented; cancellation/backend-only failures pending |
+| Usage ledger | Queue/admission/preparation/run/collection, physical/virtual units, all outcomes | Atomic terminal ledger, evidence-based allocation, unknown-aware summaries/backfill verified with real GPU collector failure; durable cancellation timing and full preparation/utilization costs pending |
 | Observability | Missing-vs-stale telemetry, CPU/GPU/NPU/queues/jobs/errors, four integrated views | Initial API metrics; collectors/views pending |
 | E0–E7 scenarios | Reproducible live compatibility, execution, quota, contention/failure evidence | Pending |
 | B0–B3 / S0–S2 | Equal-budget real measurements, raw data, cost/regret/abstention and null improvements | Single-GPU S0/S1/S2 smoke with null improvement published; rigorous comparison pending |

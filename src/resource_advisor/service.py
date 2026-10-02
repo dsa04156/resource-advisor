@@ -21,7 +21,7 @@ from .contracts import (
     signature,
 )
 from .policy import compatibility, context_signature
-from .store import Conflict, jobs, usage
+from .store import Conflict, jobs
 
 
 class NotFound(ValueError):
@@ -308,46 +308,6 @@ class Service:
                         "parent_run_ref": body["request"]["parent_run_ref"],
                     },
                 )
-            # Wall allocation comes from scheduler timestamps, never from benchmark time.
-            start, end = body.get("started_at"), body.get("backend_finished_at")
-            allocated = (
-                max(
-                    0, (datetime.fromisoformat(end) - datetime.fromisoformat(start)).total_seconds()
-                )
-                if start and end
-                else None
-            )
-            queued = body.get("queued_at")
-            wait = (
-                max(
-                    0,
-                    (
-                        datetime.fromisoformat(start) - datetime.fromisoformat(queued)
-                    ).total_seconds(),
-                )
-                if start and queued
-                else None
-            )
-            count = body["candidate"]["context"]["resources"]["accelerator_count"]
-            conn.execute(
-                insert(usage).values(
-                    attempt_id=result.attempt_id,
-                    project=project,
-                    backend=body["candidate"]["backend"],
-                    device_class=body["variant"]["device_class"],
-                    allocation_mode=body["candidate"]["context"]["allocation_mode"],
-                    allocated_device_seconds=allocated * count if allocated is not None else None,
-                    measured_compute_seconds=result.measurements.elapsed_seconds
-                    if result.measurements and not problems
-                    else None,
-                    queue_seconds=wait,
-                    body={
-                        "job_id": row["id"],
-                        "result_valid": not problems,
-                        "source": "scheduler timestamps; null means unknown",
-                    },
-                )
-            )
             return self.public_job(self.store.job(conn, row["id"]))
 
     def recommend(self, project, workload_ref):

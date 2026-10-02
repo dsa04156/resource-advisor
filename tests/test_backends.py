@@ -71,6 +71,8 @@ def test_slurm_accounting_requests_explicit_timezone(service):
 
     def execute(args, **_):
         if args[0] == "squeue":
+            assert "--jobs" not in args  # Purged completed IDs must reach sacct.
+            assert args[args.index("--account") + 1] == "team-a"
             return ""
         assert args[:4] == ["env", "TZ=UTC", "SLURM_TIME_FORMAT=%Y-%m-%dT%H:%M:%S%z", "sacct"]
         return "15|COMPLETED|0:0|2026-10-02T05:00:00+0000|2026-10-02T05:00:02+0000"

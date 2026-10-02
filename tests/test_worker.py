@@ -130,7 +130,10 @@ def test_end_to_end_synthetic_result_and_usage(service):
     backend, worker, job = setup(service)
     worker.submit_one()
     backend.observation = Observation(
-        State.COLLECTING, (now() - timedelta(seconds=3)).isoformat(), now().isoformat()
+        State.COLLECTING,
+        (now() - timedelta(seconds=3)).isoformat(),
+        now().isoformat(),
+        allocation={"source": "test fixture", "accelerator_count": 1},
     )
     worker.reconcile_all()
     assert service.get_job("team-a", job["job_id"])["state"] == "SUCCEEDED"
