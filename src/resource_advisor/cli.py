@@ -22,6 +22,11 @@ def main():
     sub.add_parser("init-db")
     sub.add_parser("backfill-usage")
     sub.add_parser("backfill-tracking")
+    snapshot_check = sub.add_parser(
+        "verify-db-snapshot", help="compare a restored DB with its saved backup snapshot"
+    )
+    snapshot_check.add_argument("--manifest", type=Path, required=True)
+    snapshot_check.add_argument("--archive", type=Path, required=True)
     config_check = sub.add_parser(
         "check-config", help="local deployment checks without network or DB"
     )
@@ -123,6 +128,15 @@ def main():
         print("Independent Resource Advisor schema initialized.")
         return
     service = Service(store)
+    if args.action == "verify-db-snapshot":
+        from .backup import verify_snapshot
+
+        try:
+            report = verify_snapshot(store, json.loads(args.manifest.read_text()), args.archive)
+            print(json.dumps(report, indent=2))
+        finally:
+            store.engine.dispose()
+        raise SystemExit(0 if report["matches"] else 1)
     if args.action == "verify-db-copy":
         from .backup import compare
 
