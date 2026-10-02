@@ -136,3 +136,28 @@ forward intervals and does not authorize MF-KG. An actual qualified GPU
 ask→execute→observe trial and equal-budget S3 comparison remain open. Missing
 external preparation costs, lost-process planning cost, sustained thermal
 validation and calibrated rank/uncertainty coverage are also not solved here.
+
+## Live admission verification
+
+[The live gate report](evidence/qualified-mfkg-gates.json) records the deployed
+API/worker source and authenticated responses. An ordinary user could not
+register a qualification plan (403); operator registration and identical replay
+succeeded. A plan with no bound completed calibration could not be assessed or
+used for MF-KG (404). A request with no qualification returned its explicit
+disabled reason (422). Compute Job and study counts did not change; there were
+152 existing Jobs before and after these checks. Running API, worker and
+inventory Pod source trees matched the fixed source build.
+
+The previous GPU report was also passed through the paired evaluator strictly
+as a **post-hoc diagnostic**. It failed on short target measurements, unresolved
+or unstable ordering and excessive bias. Its measurements predate the plan, so
+even a favorable diagnostic would not qualify them. The report records both
+these methodological limits and the actual rejection reasons.
+
+PostgreSQL CI exposed two initial record-kind names exceeding the existing
+32-character storage contract. They were shortened without a schema migration;
+the affected 13 tests subsequently passed against a dedicated PostgreSQL test
+database. Live lab plan registration used a valid shorter kind and created no
+assessment or compute execution before the correction. Tests also verify cost
+against this study's actual observations rather than assuming two studies must
+have numerically different totals.

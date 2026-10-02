@@ -1,0 +1,137 @@
+{
+  "scope": "live API qualification gates and post-hoc diagnostic, not a qualified GPU MF-KG execution trial",
+  "application_source_commit": "4531cc24801de969f48b0a03f5b6542a50af63d6",
+  "captured_at": "2026-10-02T17:06:22.561590+00:00",
+  "source_tree_sha256": "ec5f6333c73fc5979fc83d8ee3afe321f56eea30be1f4ef5eb139b6bc72e01a7",
+  "source_layer_bytes": 481280,
+  "http_status": {
+    "health": 200,
+    "user_cannot_register": 403,
+    "operator_register": 200,
+    "assessment_without_bound_calibration": 404,
+    "mfkg_without_qualification": 422,
+    "mfkg_with_unassessed_plan": 404
+  },
+  "registration_replay_identical": true,
+  "registration": {
+    "request": {
+      "ref": "prospective-mfkg-thermal-space-161844",
+      "project_ref": "ra-lab",
+      "space_ref": "thermal-space-161844",
+      "blocks": 3,
+      "tie_fraction": 0.05,
+      "maximum_relative_bias": 0.2,
+      "minimum_target_elapsed_seconds": 0.05,
+      "maximum_age_seconds": 3600
+    },
+    "space_digest": "sha256:b4ebc5e462a57662c42b989ac2494f53993793f8f7f7315bae0b7d27607f2b15",
+    "registered_at": "2026-10-02T17:01:13.667329+00:00",
+    "execution_authorized": false
+  },
+  "historical_report": "thermal-gpu-calibration.json",
+  "historical_report_digest": "sha256:c26f1f15df60614edf035ad7c9980c13121655bef84b15b04f318c4e16c9d736",
+  "historical_report_predates_preregistration": true,
+  "exploratory_historical_diagnostic": {
+    "status": "REJECTED",
+    "reasons": [
+      "NO_RESOLVED_CONFIGURATION_ORDERING",
+      "PAIRED_BIAS_EXCEEDS_LIMIT",
+      "PAIRED_RANK_UNRESOLVED",
+      "RANK_UNSTABLE_ACROSS_BLOCKS",
+      "TARGET_MEASUREMENT_TOO_SHORT"
+    ],
+    "paired_bias": [
+      {
+        "block": 0,
+        "candidate_ref": "cpu1",
+        "fidelity": 0.5,
+        "low_to_target_ratio": 1.1107750214860426
+      },
+      {
+        "block": 0,
+        "candidate_ref": "cpu2",
+        "fidelity": 0.5,
+        "low_to_target_ratio": 1.2064201798624785
+      },
+      {
+        "block": 1,
+        "candidate_ref": "cpu1",
+        "fidelity": 0.5,
+        "low_to_target_ratio": 1.1142716735579203
+      },
+      {
+        "block": 1,
+        "candidate_ref": "cpu2",
+        "fidelity": 0.5,
+        "low_to_target_ratio": 1.1082953824096422
+      },
+      {
+        "block": 2,
+        "candidate_ref": "cpu1",
+        "fidelity": 0.5,
+        "low_to_target_ratio": 1.0966101690365933
+      },
+      {
+        "block": 2,
+        "candidate_ref": "cpu2",
+        "fidelity": 0.5,
+        "low_to_target_ratio": 1.0943466921825749
+      }
+    ],
+    "paired_ranks": [
+      {
+        "block": 0,
+        "candidates": [
+          "cpu1",
+          "cpu2"
+        ],
+        "fidelity": 0.5,
+        "low_log_ratio": -0.05350722394721721,
+        "target_log_ratio": 0.0290922322852629,
+        "low_order": -1,
+        "target_order": 0
+      },
+      {
+        "block": 1,
+        "candidates": [
+          "cpu1",
+          "cpu2"
+        ],
+        "fidelity": 0.5,
+        "low_log_ratio": -0.006285391060952124,
+        "target_log_ratio": -0.01166323155010045,
+        "low_order": 0,
+        "target_order": 0
+      },
+      {
+        "block": 2,
+        "candidates": [
+          "cpu1",
+          "cpu2"
+        ],
+        "fidelity": 0.5,
+        "low_log_ratio": 0.042968239950523304,
+        "target_log_ratio": 0.04090203983554231,
+        "low_order": 0,
+        "target_order": 0
+      }
+    ],
+    "resolved_pairs": 0,
+    "experimental_unit": "independent Job within preregistered randomized block",
+    "scope": "observed finite pairs and bracketed temperatures only; no calibrated confidence or continuous/sustained thermal guarantee",
+    "early_pruning_authorized": false
+  },
+  "jobs_before_and_after": 152,
+  "studies_before_and_after": 13,
+  "no_new_compute_jobs_or_studies": true,
+  "limits": [
+    "Post-hoc diagnostics cannot qualify historical measurements",
+    "No physical MF-KG submission is authorized by a plan alone",
+    "Paired acceptance criteria are operational, not statistically powered or sustained thermal qualification"
+  ],
+  "running_pod_source_verified": {
+    "ra-api": "ec5f6333c73fc5979fc83d8ee3afe321f56eea30be1f4ef5eb139b6bc72e01a7",
+    "ra-worker": "ec5f6333c73fc5979fc83d8ee3afe321f56eea30be1f4ef5eb139b6bc72e01a7",
+    "ra-inventory": "ec5f6333c73fc5979fc83d8ee3afe321f56eea30be1f4ef5eb139b6bc72e01a7"
+  }
+}
