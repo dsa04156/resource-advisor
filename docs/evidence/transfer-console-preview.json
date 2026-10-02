@@ -1,0 +1,34 @@
+{
+  "captured_at": "2026-10-02T18:42:58.896833+00:00",
+  "scope": "local read-only console preview against actual lab PostgreSQL records; running worker/API deployment unchanged during frozen experiment",
+  "study_ref": "study-9c70cd0a26114020ae45d22b74d7e9c0",
+  "recommendation_ref": "rec-8a888d8b2b364d9cab1785c1f3305b3b",
+  "checks": {
+    "actual_hardware_study_completed": true,
+    "source_workloads": 2,
+    "source_confirmation_attempts": 18,
+    "stored_rgpe_choices": 2,
+    "displayed_weights_percent": [
+      14.06,
+      85.94,
+      0
+    ],
+    "desktop_screenshot_inspected": true,
+    "mobile_screenshot_inspected": true,
+    "mobile_viewport_px": 390,
+    "mobile_document_width_px": 390,
+    "automatic_refresh_paused_on_detail": true,
+    "browser_console_errors": 0,
+    "browser_console_warnings": 0,
+    "new_work_submitted_by_preview": false
+  },
+  "source_sha256": {
+    "src/resource_advisor/console.py": "6d680444f5413cf2fc84e60942454ddccd27c54f2b100ed20ccce2732511eb4e",
+    "src/resource_advisor/static/console.js": "5604aee8f619316dff3f561acd6837e8878d444ef191afc32fa347027d34de79"
+  },
+  "limitations": [
+    "A mixture weight is not confidence or a speedup estimate.",
+    "Preview verification does not establish deployed service rollout.",
+    "The full bounded comparison remains in progress; this verifies the completed first RGPE study display."
+  ]
+}

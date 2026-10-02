@@ -155,6 +155,13 @@ def test_rejects_cherry_picked_sources(report):
         module.summarize(report)
 
 
+def test_rejects_hidden_warm_start_leakage(report):
+    plan = next(p for p in report["plans"] if p["choice"].get("surrogate"))
+    plan["choice"]["warm_start"] = {"target_run_ids": ["oracle-attempt-0"]}
+    with pytest.raises(ValueError, match="unauthorized source evidence"):
+        module.summarize(report)
+
+
 def test_rejects_missing_optimizer_plan(report):
     report["plans"].pop()
     with pytest.raises(ValueError, match="plans do not cover"):

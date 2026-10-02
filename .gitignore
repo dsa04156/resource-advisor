@@ -9,3 +9,5 @@ dist/
 .env
 *.sqlite*
 artifacts/
+.playwright-cli/
+output/playwright/

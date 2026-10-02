@@ -41,6 +41,21 @@ runs cannot be counted again as new validation. No new approved result means no
 comparison, not zero error or a claimed improvement. At most the first 200 linked
 executions are shown, with an explicit truncation flag.
 
+For history-guided or RGPE recommendations, the same panel shows the frozen
+source workloads and attempt IDs, independent target training IDs, initial
+candidate order, stored mixture weights and fallback reasons. Warm start is
+labeled separately from an ensemble fit. Weights are contributions to a model,
+not accuracy or confidence. The source time covers only selected historical
+Jobs; the panel keeps it separate from the new study's wall/planning cost and
+does not imply that it includes the whole upstream search. These are stored
+decisions: opening the panel never fits a GP or submits work. Up to 200 recent
+plans are inspected, with a truncation flag when needed.
+The [transfer preview check](evidence/transfer-console-preview.json) used the actual
+completed first RGPE GPU study through a local read-only API, including two source
+cohorts, 18 confirmation IDs and the recorded mixture weights. Desktop and 390px
+mobile screenshots were inspected; no page overflow or browser errors occurred.
+The running experiment's service deployment was not changed for this preview.
+
 ## Freshness and interaction
 
 The default polling interval is 15 seconds. Each metric also retains its original

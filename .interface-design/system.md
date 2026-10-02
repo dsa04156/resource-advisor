@@ -28,3 +28,9 @@ Native controls: links for navigation, buttons for actions, details for provenan
 labeled password input for project token, no custom keyboard widget.
 Responsive: navigation becomes horizontal; tables keep local overflow wrappers;
 page itself must fit a 390px viewport. No animated data transitions.
+
+Transfer evidence reuses the recommendation panel's tables and native details.
+Lead with strategy and plain-language interpretation, then source provenance and
+separate historical/target costs. Individual recorded choices expand to model
+mixture weights and explicit fallback reasons. Percentages are labeled as mixture
+contributions, never confidence. Warm start must not display invented RGPE weights.

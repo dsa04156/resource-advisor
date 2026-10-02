@@ -104,11 +104,15 @@ def summarize(report):
             and datetime.fromisoformat(o["recorded_at"])
             < datetime.fromisoformat(plan["created_at"])
         }
-        training = set(choice.get("surrogate", {}).get("training_run_ids", [])) | set(
-            choice.get("target_run_ids", [])
+        training = (
+            set(choice.get("surrogate", {}).get("training_run_ids", []))
+            | set(choice.get("target_run_ids", []))
+            | set(choice.get("warm_start", {}).get("target_run_ids", []))
         )
-        transferred = set(choice.get("surrogate", {}).get("source_run_ids", [])) | set(
-            choice.get("source_run_ids", [])
+        transferred = (
+            set(choice.get("surrogate", {}).get("source_run_ids", []))
+            | set(choice.get("source_run_ids", []))
+            | set(choice.get("warm_start", {}).get("source_run_ids", []))
         )
         if not training <= allowed or (transferred and transferred != source_ids):
             raise ValueError(

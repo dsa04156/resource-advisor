@@ -193,6 +193,76 @@ def overview(
     }
 
 
+def transfer_evidence(store, conn, project, rec):
+    """Expose recorded choices, never refit a model during a console read."""
+    row = store.study(conn, rec["study_ref"]) if rec.get("study_ref") else None
+    if row is None or row["project"] != project:
+        return None
+    body = row["body"]
+    if body.get("recommendation_ref") != rec["ref"] or "transfer_evidence" not in body:
+        return None
+    evidence = body["transfer_evidence"]
+    sources = []
+    for source in evidence["sources"]:
+        provenance = [
+            p
+            for p in evidence["provenance"]
+            if p["attempt_id"] in {o["attempt_id"] for o in source["observations"]}
+        ]
+        sources.append(
+            {
+                "workload_signature": source["workload_signature"],
+                "workload_refs": sorted({p["workload_ref"] for p in provenance}),
+                "attempt_ids": [p["attempt_id"] for p in provenance],
+            }
+        )
+    choices = []
+    for ref in body["plans"][-200:]:
+        plan = owned(store, conn, project, "probe_plan", ref)
+        if plan is None or plan["study_ref"] != row["id"]:
+            continue
+        choice = plan["choice"]
+        if plan["mode"] != "pilot":
+            continue
+        warm = choice.get("warm_start", {})
+        surrogate = choice.get("surrogate", {})
+        choices.append(
+            {
+                "plan_ref": ref,
+                "candidate_ref": plan["candidate_ref"],
+                "created_at": plan["created_at"],
+                "method": choice.get("method"),
+                "reason": choice.get("reason"),
+                "phase": choice.get("transfer_phase"),
+                "weights": choice.get("weights"),
+                "rank_diagnostics": choice.get("rank_diagnostics"),
+                "fallback_reason": choice.get("transfer_fallback") or choice.get("fallback_reason"),
+                "source_run_ids": surrogate.get(
+                    "source_run_ids", choice.get("source_run_ids", warm.get("source_run_ids", []))
+                ),
+                "target_run_ids": surrogate.get(
+                    "training_run_ids", choice.get("target_run_ids", warm.get("target_run_ids", []))
+                ),
+                "warm_start_order": choice.get("candidate_order", warm.get("candidate_order")),
+            }
+        )
+    return {
+        "study_ref": row["id"],
+        "strategy": body["request"]["strategy"],
+        "state": row["state"],
+        "source_snapshot_at": evidence["recorded_at"],
+        "source_evidence_ref": body["request"]["transfer_evidence_ref"],
+        "sources": sources,
+        "choices": choices,
+        "plans_truncated": len(body["plans"]) > 200,
+        "historical_source_wall_seconds": evidence["historical_source_wall_seconds"],
+        "historical_source_cost_recharged": body["historical_source_cost_recharged"],
+        "source_cost_scope": evidence["source_cost_scope"],
+        "target_cost": rec.get("cost"),
+        "scope": "Recorded model choices; weights are mixture contributions, not accuracy or confidence.",
+    }
+
+
 def recommendation_evidence(service, project, ref):
     from .uncertainty import assess_recommendation
 
@@ -284,4 +354,5 @@ def recommendation_evidence(service, project, ref):
             "approved_executions": comparisons,
             "approved_executions_truncated": len(rows) > 200,
             "estimate_kind": "historical measured summary, not a calibrated predictive guarantee",
+            "transfer": transfer_evidence(store, conn, project, rec),
         }

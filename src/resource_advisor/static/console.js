@@ -627,6 +627,110 @@ function historyView() {
   root.append(box);
   return root;
 }
+function transferEvidenceView(transfer) {
+  const root = el("div", null, "evidence");
+  const rgpe = transfer.strategy === "rgpe";
+  add(
+    root,
+    el("h3", "이전 작업의 이력을 어떻게 사용했나요?"),
+    badge(
+      rgpe ? "RGPE · 모델 가중 결합" : "이력 기반 시작 · 이후 현재 작업 BO",
+    ),
+    el(
+      "p",
+      rgpe
+        ? "현재 작업에서 다시 측정한 순위로 이전 모델의 가중치를 정합니다. 가중치는 혼합 비중이며 정확도나 성공 확률이 아닙니다."
+        : "이전 작업의 순위로 처음 시험할 후보를 정하고, 이후에는 현재 작업의 측정값으로만 BO를 수행합니다.",
+      "muted",
+    ),
+    el(
+      "small",
+      `이력 고정 ${stamp(transfer.source_snapshot_at)} · ${transfer.study_ref}`,
+    ),
+    table(
+      ["이전 작업", "독립 근거 실행", "실행 ID"],
+      transfer.sources.map((s) => [
+        s.workload_refs.join(", "),
+        s.attempt_ids.length,
+        details("근거 확인", s.attempt_ids),
+      ]),
+    ),
+    table(
+      ["비용 구분", "시간"],
+      [
+        [
+          "선택된 이전 근거 작업의 시간",
+          duration(transfer.historical_source_wall_seconds),
+        ],
+        [
+          "이번 탐색 · 검증의 경과 시간",
+          duration(transfer.target_cost?.wall_seconds),
+        ],
+        [
+          "이번 모델 계획 시간 (경과 시간에 포함)",
+          duration(transfer.target_cost?.planning_seconds),
+        ],
+      ],
+    ),
+    el(
+      "p",
+      "이전 근거 시간에는 전체 이력 구축 비용이 포함되지 않습니다. 이번 작업 비용과 따로 해석하세요.",
+      "muted",
+    ),
+    badge(
+      transfer.historical_source_cost_recharged
+        ? "이전 비용 재청구됨"
+        : "이전 비용 별도 기록",
+      transfer.historical_source_cost_recharged ? "warn" : "",
+    ),
+  );
+  const choices = transfer.choices || [];
+  if (!choices.length) root.append(empty("저장된 탐색 선택이 없습니다."));
+  for (const [index, choice] of choices.entries()) {
+    const section = el("details");
+    add(
+      section,
+      el(
+        "summary",
+        `${index + 1}. ${choice.candidate_ref} · ${choice.fallback_reason ? "현재 작업 모델로 전환" : choice.weights ? "모델 가중치 계산" : choice.warm_start_order ? "이전 순위 참고" : "현재 작업 사전 검증"}`,
+      ),
+    );
+    if (choice.weights)
+      section.append(
+        table(
+          ["모델", "혼합 비중"],
+          Object.entries(choice.weights).map(([ref, weight]) => [
+            ref === "target"
+              ? "현재 작업"
+              : transfer.sources
+                  .find((s) => s.workload_signature === ref)
+                  ?.workload_refs.join(", ") || ref,
+            typeof weight === "number"
+              ? fmt(weight * 100, 2) + "%"
+              : "확인 불가",
+          ]),
+        ),
+      );
+    if (choice.fallback_reason)
+      add(section, badge("전환 사유", "warn"), code(choice.fallback_reason));
+    if (choice.warm_start_order)
+      section.append(
+        el("p", "시작 순서: " + choice.warm_start_order.join(" → ")),
+      );
+    add(
+      section,
+      el(
+        "p",
+        `이전 실행 ${choice.source_run_ids.length}개 · 현재 탐색 실행 ${choice.target_run_ids.length}개`,
+      ),
+      details("실행 ID · 순위 진단 · 선택 근거", choice),
+    );
+    root.append(section);
+  }
+  if (transfer.plans_truncated)
+    root.append(el("p", "최근 200개 계획의 탐색 선택만 표시합니다.", "muted"));
+  return root;
+}
 function evidenceView(payload) {
   const root = el("div", null, "evidence"),
     r = payload.recommendation;
@@ -646,8 +750,11 @@ function evidenceView(payload) {
       "muted",
     ),
   );
-  if (validity) root.append(el("small", `검사 시각 ${stamp(validity.assessed_at)}`));
-  if (validity) root.append(details("재사용 검사 사유 · 후속 실측 근거", validity));
+  if (validity)
+    root.append(el("small", `검사 시각 ${stamp(validity.assessed_at)}`));
+  if (validity)
+    root.append(details("재사용 검사 사유 · 후속 실측 근거", validity));
+  if (payload.transfer) root.append(transferEvidenceView(payload.transfer));
   add(
     root,
     el("h3", "추천에 사용한 측정 요약"),

@@ -238,6 +238,26 @@ def test_real_kernel_durable_loop_holds_out_target_confirmations(transfer_fixtur
         sum(o["device_seconds"] for o in current["observations"])
     )
     assert current["planning_seconds"] > 0
+    from resource_advisor.console import recommendation_evidence, transfer_evidence
+
+    shown = recommendation_evidence(service, "team-a", current["recommendation_ref"])["transfer"]
+    assert shown["strategy"] == strategy and len(shown["choices"]) == 7
+    assert shown["historical_source_cost_recharged"] is False
+    assert {a for s in shown["sources"] for a in s["attempt_ids"]} == source_ids
+    assert shown["target_cost"] == current["recommendation"]["cost"]
+    assert all(confirm_ids.isdisjoint(c["target_run_ids"]) for c in shown["choices"])
+    if strategy == "rgpe":
+        assert shown["choices"][-1]["weights"] == choices[-1]["weights"]
+        assert shown["choices"][-1]["rank_diagnostics"] == choices[-1]["rank_diagnostics"]
+    else:
+        assert all(c["weights"] is None for c in shown["choices"])
+        assert (
+            shown["choices"][-1]["warm_start_order"] == choices[-1]["warm_start"]["candidate_order"]
+        )
+    with service.store.transaction() as conn:
+        assert transfer_evidence(service.store, conn, "team-b", current["recommendation"]) is None
+        forged = dict(current["recommendation"], ref="other-recommendation")
+        assert transfer_evidence(service.store, conn, "team-a", forged) is None
 
 
 @pytest.mark.parametrize(
