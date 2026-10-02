@@ -159,3 +159,18 @@ The uncached KFP → API → Kueue → RTX 5080 → validated result chain succe
 S3/API byte readback, a FINISHED MLflow run and its artifact were verified.
 An earlier disk-pressure eviction is retained as a failed infrastructure attempt.
 See [the workflow report and measured limitations](kubeflow-pipeline.md).
+
+## Slurm execution-boundary increment
+
+The suite now passes **96 tests** with SQLite and isolated PostgreSQL (see current
+CI for both supported Python versions). Native Slurm execution requires an
+operator-pinned guard, manifest, environment and command binding; declared
+container images are rejected until their executor is implemented. Preflight
+rejection records a terminal failure and zero allocation before any scheduler call.
+Foreign-account reconciliation and node-local result ownership are tested.
+
+The guard also ran on a real ARM worker: the qualified command succeeded, while
+source modification was rejected before execution. This is runtime-integrity
+verification, not a Slurm GPU benchmark. The controller was unreachable during
+this increment; the complete live API/model/result path remains unverified.
+See [the runtime and transport contract](slurm-runtime.md).

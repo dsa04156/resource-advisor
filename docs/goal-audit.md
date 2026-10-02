@@ -16,7 +16,7 @@ direct evidence; conditional extensions require an explicit applicability result
 | Bottleneck diagnosis | CPU/data-loader/IO/accelerator evidence and uncertainty | Pending |
 | KFP launch | Real uncached workflow → API → Kueue admission → GPU job → result | Actual uncached KFP → HTTPS API → Kueue → RTX 5080 → validated result → S3/MLflow completed; prior eviction retained |
 | Kueue policy | Real project LocalQueue/ClusterQueue/flavor/priority and over-quota tests | Live GPU quota pending/no-Pod, concurrent queueing, later-high-first CUDA execution and KFP/API admission verified; cross-project chain remains open |
-| Slurm execution | Actual sbatch/squeue/sacct/scancel, image/env lock, accelerator reservation | Live GPU F0 and adapter accounting read verified; full API/model/result path pending |
+| Slurm execution | Actual sbatch/squeue/sacct/scancel, image/env lock, accelerator reservation | Live GPU F0/accounting historical evidence; pinned native guard and verified node-local result transport implemented; controller currently unreachable, full API/model/result path pending |
 | Slurm policy | Accounting DB/association/QOS enforcement, priority and oversize rejection | Lab enforcement, four rejection cases, account queue limit and real GPU priority order verified; cross-user and API execution gates remain open |
 | Results/artifacts | Schema/digest/attempt/work units, artifact ownership and durable storage | 28 result bundles verified in S3/API; large models/checkpoints/retention pending |
 | MLflow | Actual parameters/metrics/artifacts/model links, outage recovery | 28 live runs and corresponding result artifacts verified; model registration/failure tracking pending |
@@ -31,7 +31,7 @@ direct evidence; conditional extensions require an explicit applicability result
 | R3 transfer | Explicit warm start vs RGPE, independent sources, target validation/fallback | Disabled with reason; implementation/source data pending |
 | R4 uncertainty | OOD/stale context, independent confirmation, workload/time holdouts | Confirmation implemented; holdout/stale residual analysis pending |
 | R5 interference | Qualified solo/shared pairs, per-workload slowdown, unknown-pair abstention | Conditional follow-up; not claimed implemented |
-| Usage ledger | Queue/admission/preparation/run/collection, physical/virtual units, all outcomes | Atomic terminal ledger, evidence-based allocation, unknown-aware summaries/backfill verified with real GPU collector failure; durable cancellation timing and full preparation/utilization costs pending |
+| Usage ledger | Queue/admission/preparation/run/collection, physical/virtual units, all outcomes | Atomic terminal ledger, evidence-based allocation, unknown-aware summaries/backfill verified with real GPU collector failure; pure preflight failures now record zero; durable cancellation timing and full preparation/utilization costs pending |
 | Observability | Missing-vs-stale telemetry, CPU/GPU/NPU/queues/jobs/errors, four integrated views | Initial API metrics; collectors/views pending |
 | E0–E7 scenarios | Reproducible live compatibility, execution, quota, contention/failure evidence | Pending |
 | B0–B3 / S0–S2 | Equal-budget real measurements, raw data, cost/regret/abstention and null improvements | Single-GPU S0/S1/S2 smoke with null improvement published; rigorous comparison pending |

@@ -1,0 +1,11 @@
+{
+  "platform": "aarch64",
+  "python": "3.12.3",
+  "guard_sha256": "sha256:0cfed7b43e803c97331f75afb45e1cf01e46b6c89a37b4b2f4991b78d38f38c4",
+  "qualified_command_exit": 0,
+  "changed_source_exit": 1,
+  "changed_source_executed": false,
+  "manifest_probe_checked": true,
+  "scope": "real ARM host runtime guard; no Slurm submission or GPU benchmark claimed",
+  "verified_on": "2026-10-02"
+}

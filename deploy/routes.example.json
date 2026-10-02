@@ -7,8 +7,13 @@
       "options": {
         "namespace": "resource-advisor-team-a",
         "local_queue": "research",
-        "priority_classes": {"normal": "research-normal", "high": "research-high"},
-        "node_selector": {"resource-advisor/pool": "qualified-lab"},
+        "priority_classes": {
+          "normal": "research-normal",
+          "high": "research-high"
+        },
+        "node_selector": {
+          "resource-advisor/pool": "qualified-lab"
+        },
         "kubeconfig": "/run/resource-advisor/kubeconfig"
       }
     },
@@ -20,9 +25,31 @@
         "partition": "gpu",
         "account": "team-a",
         "qos": "research",
-        "qos_by_priority": {"normal": "research", "high": "research-high"},
+        "qos_by_priority": {
+          "normal": "research",
+          "high": "research-high"
+        },
         "output_dir": "/var/lib/resource-advisor/results",
-        "ssh_target": "resource-advisor-slurm"
+        "ssh_target": "resource-advisor-slurm",
+        "result_ssh_targets": {
+          "qualified-gpu-node": "resource-advisor-gpu-results"
+        },
+        "native_runtimes": {
+          "qualified-native-variant": {
+            "environment_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "guard_path": "/opt/resource-advisor/runtime_guard.py",
+            "guard_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "manifest_path": "/opt/resource-advisor/runtime.json",
+            "manifest_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "commands": [
+              [
+                "/opt/research/bin/python",
+                "-I",
+                "/opt/research/workload.py"
+              ]
+            ]
+          }
+        }
       }
     }
   ]

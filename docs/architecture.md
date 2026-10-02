@@ -42,33 +42,34 @@ profile. A prediction is never a result. Production rejects synthetic evidence.
 Compute duration comes from the workload. Allocated device time comes from
 scheduler timestamps. They have different boundaries and must not be substituted.
 Unknown timestamps remain null. Physical devices and virtual slots remain
-separate units. This initial ledger covers collected outcomes; scheduler-only
-failures and canceled jobs still need reconciliation into the ledger.
+separate units. Terminal state and ledger writes are atomic, including failed
+collection, cancellation and preflight rejection. Unknown or legacy accounting
+remains explicitly unqualified; preparation, energy and utilization coverage is incomplete.
 
 ## Current operational limits
 
-- Live scheduler adapters have not yet been validated against a deployment of
-  this independent service. Tests do not prove device isolation or quota enforcement.
-- Slurm requires explicitly configured account/QOS and a writable shared output
-  directory reachable by the controller and worker. It does not assume the
-  application host shares that filesystem. Timestamp offsets must be known
-  before accounting durations can be computed.
-- Model/runtime qualification is operator-attested; no automatic signed
-  attestation or artifact/image supply-chain verification is implemented.
-- Kubernetes pod security may need device-specific runtime qualification.
-  No privileged pod, host mount or service-account token is supplied.
-- Result JSON is retained in SQL. Large models, dataset transfer, isolated
-  checkpoint copies and object-store artifact upload are not implemented yet.
-- MLflow metadata delivery is retryable, not globally exactly-once: a crash
-  during external run creation can require duplicate reconciliation. Artifact
-  upload and per-project MLflow access segregation remain deployment work.
-- PostgreSQL persistence and backup/restore, bounded result collection, and KFP
-  compilation are verified in the initial suite. Multi-worker contention,
-  process-crash recovery, Slurm accounting, GPU/NPU model execution and real
-  quota/priority scenarios require additional verification.
-- Pilot and qLogNEI coordination are tested with synthetic execution. Live GPU
-  qualification, MF-KG, RGPE, interference optimization and custom dashboards
-  remain incomplete; see the full completion audit.
+- The independent Kubernetes/Kueue GPU path and uncached KFP/API launch/replay
+  have real hardware evidence. Bounded Kueue and Slurm quota/priority trials also
+  passed; none establishes comprehensive cross-user/device isolation.
+- Slurm supports explicitly bound, hash-checked native runtimes. Container
+  variants fail preflight until an actual container executor exists. Results
+  use shared storage or a verified node-to-SSH mapping; see [the runtime boundary](slurm-runtime.md).
+  Its controller is currently unreachable and the complete model/API path is open.
+- Model/runtime qualification remains operator-attested. The native guard checks
+  listed files/probes, not the completeness of that manifest or signed supply-chain
+  provenance. GPU/NPU runtimes must be qualified independently.
+- Compute Pods use scoped credentials and operator-qualified read-only runtime
+  mounts. This is not a device-isolation or Pod-security certification.
+- Bounded JSON results have conditional S3 storage, authenticated API readback
+  and MLflow artifacts. Large models, dataset transfer, checkpoint isolation,
+  retention, object backup and production storage availability remain open.
+- MLflow delivery is retryable, not globally exactly-once. Server-side project
+  authorization and failure-run tracking remain deployment/implementation work.
+- PostgreSQL backup/restore and fault tests pass. Multi-worker contention,
+  real process-crash recovery, disconnects and the complete E0–E7 evaluation
+  require further live evidence.
+- A small actual GPU random/qLogNEI experiment retained the baseline. Wider
+  equal-budget comparisons, MF-KG, RGPE, interference and dashboards remain open.
 
 Use separate service accounts, namespaces, LocalQueues, allowlisted node pools,
 Slurm accounts/QOS and an independent database. Runtime jobs stay outside GitOps.
@@ -84,8 +85,7 @@ are also enforced. See the [official KFP caching contract](https://www.kubeflow.
 
 `gpu_benchmark.py` is a bounded cooperative PyTorch CUDA matrix-multiplication
 runner. It refuses CPU fallback, checks device/runtime identity, synchronizes
-the GPU, checks numerical agreement, and emits the result envelope. It is **not
-yet hardware-validated**. Memory means PyTorch peak allocated device memory;
+the GPU, checks numerical agreement, and emits the result envelope. It has been hardware-validated on one qualified RTX 5080 runtime. Memory means PyTorch peak allocated device memory;
 it is not total board memory. Power, temperature and utilization remain null
 until a qualified telemetry source supplies them. It does not implement CNN,
 transformer or NPU model benchmarks yet.

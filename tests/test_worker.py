@@ -34,6 +34,9 @@ class SchedulerDouble:
             raise SubmissionUnknown("response lost after acceptance")
         return self.external_id
 
+    def validate(self, job):
+        pass
+
     def reconcile(self, job):
         return self.external_id
 
@@ -62,6 +65,30 @@ class SchedulerDouble:
             ),
         )
         return {"result": result.model_dump(mode="json"), "digest": signature(result)}
+
+
+def test_preflight_rejection_is_terminal_and_records_zero_allocation(service):
+    from resource_advisor.store import usage
+
+    backend = SchedulerDouble()
+
+    def reject(_job):
+        raise BackendError("unqualified runtime")
+
+    backend.validate = reject
+    worker = Worker(service, {("team-a", "lab"): backend})
+    job = service.submit(
+        "team-a", JobRequest(workload_ref="workload-1", candidate_ref="base"), "preflight"
+    )
+    worker.submit_one()
+    current = service.get_job("team-a", job["job_id"])
+    assert current["state"] == "FAILED"
+    assert current["error"] == "PRE_SUBMISSION_BACKEND"
+    assert backend.submissions == 0
+    with service.store.transaction() as conn:
+        record = conn.execute(select(usage)).mappings().one()
+    assert record["allocated_device_seconds"] == 0
+    assert record["body"]["never_submitted"] is True
 
 
 def setup(service, **kwargs):

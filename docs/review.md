@@ -25,8 +25,10 @@ This review records scope and remaining gaps, not production certification.
 ## Open implementation gates
 
 **Live execution:** scoped Kubernetes/Kueue CUDA and PyTorch jobs now have actual
-hardware evidence. Live KFP submission, Slurm execution through this service,
-disconnection recovery, full cancellation accounting and Slurm policy tests remain.
+hardware evidence, including actual uncached KFP launch and replay. Historical
+Slurm CUDA/accounting/QOS trials passed, but its full service/model path remains
+open and the controller is currently unreachable. Disconnection recovery and
+complete cancellation/cost evidence remain required.
 
 **Optimization:** consented lab pilot/BO execution has durable reservation and
 independent confirmation, including real GPU runs. Complete failed-run cost
@@ -38,12 +40,12 @@ S3 writes, verified API downloads and live MLflow artifact copies. Large-model
 transfer, storage retention/backup, image attestation, checkpoint isolation and
 runtime qualification on each GPU/NPU are still required.
 
-**Accounting:** collected outcomes have a unit-separated ledger. Reconcile
-backend-only failures and cancellation into accounting before reporting complete
-project costs. Do not claim Slurm quota enforcement without accounting/QOS
-configuration and an actual rejection test.
+**Accounting:** terminal outcomes now have an atomic, unit-separated ledger,
+including collector failures, pre-submit cancellation and preflight rejection.
+Unknown allocation remains null. Complete preparation, utilization and energy
+costs and durable cancellation timing remain open.
 
-**MLflow and observability:** 28 real hardware results were delivered to a
+**MLflow and observability:** real hardware results were delivered to a
 dedicated experiment, with project-to-experiment routing and durable run links.
 Result-bundle artifact upload is verified. Server-side multi-tenant authorization, circuit breakers,
 comprehensive event metrics and dashboards remain to implement. Experiment routing
@@ -56,3 +58,17 @@ audit. CI uses disposable databases; no real cluster access is required.
 **Hardware:** an unresolved NPU PCIe link blocks model/runtime qualification on
 that device. It is not registered as an executable candidate based only on an
 installed driver or device plugin.
+
+## Execution-boundary fixes
+
+- Slurm previously ignored a declared container image. It now rejects that
+  unsupported execution mode before submission; native execution requires an
+  explicit qualified binding and file/probe guard.
+- Node-local logs no longer require an assumed shared filesystem. Reads require
+  matching accounting ownership and an operator-selected SSH alias.
+- Pure configuration rejection no longer becomes uncertain remote submission:
+  preflight runs before intent and records zero allocation on rejection.
+- Same-name jobs in another Slurm account cannot satisfy response-loss recovery.
+
+These fixes have regression tests and real ARM guard evidence. They do not prove
+an end-to-end Slurm model execution while its controller is unavailable.

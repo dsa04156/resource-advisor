@@ -10,6 +10,8 @@ in PostgreSQL and MLflow. See the [hardware report](docs/gpu-experiment.md) for
 failures, raw measurements and limits. Separate [Slurm CUDA qualification](docs/slurm-verification.md)
 and [quota/priority enforcement](docs/slurm-policy.md) now have live evidence;
 its model/API path and NPU qualification remain open.
+The [uncached Kubeflow workflow](docs/kubeflow-pipeline.md) has also completed
+the API → Kueue → GPU → result path and a duplicate-free replay.
 The [Kueue policy trial](docs/kueue-policy.md) also verifies real GPU queueing,
 oversized admission refusal and high-before-normal execution.
 [Terminal accounting](docs/accounting.md) retains failed/cancelled attempts and
@@ -62,7 +64,7 @@ uv run resource-advisor serve --credentials /path/to/private/credentials.json
 API documentation: <http://127.0.0.1:18040/docs>. Authenticated API prefix:
 `/api/v1/compute`. Serving the API does not enable backend execution. A worker
 needs explicit project-to-cluster routes and externally provisioned permissions.
-Use TLS via a reverse proxy for access beyond localhost.
+Use TLS via a reverse proxy or the server certificate/key options beyond localhost.
 
 Set `RA_DATABASE_URL` to an independent PostgreSQL database for deployment.
 SQLite is a local development option. `init-db` creates the initial schema;
@@ -74,13 +76,15 @@ schema upgrades and an operational migration process are not yet implemented.
   workload and execution-context signatures.
 - Project-derived authorization; stable idempotency keys; durable submit and
   MLflow outboxes; conservative response-loss reconciliation.
-- Kubernetes suspended Job builder and Slurm script/command adapters.
+- Kubernetes suspended Job builder and Slurm adapters with explicit native
+  runtime qualification and verified node-local result transport.
 - Digest/schema/attempt validation; quality-gated historical profiles.
 - Lookup recommendations with independent-run counts, uncertainty and approval.
 - Device allocation units stay separate; missing scheduler times remain null.
 - S3 result bundles with verified read-back, project-authorized downloads and
   separate MLflow artifact delivery; see [artifact setup](docs/artifacts.md).
-- Prometheus job/outbox metrics; compiled CPU-only KFP launcher with caching off.
+- Prometheus job/outbox metrics; hardware-verified CPU-only KFP launcher with
+  caching off, HTTPS verification and Secret-supplied project credentials.
 - Cooperative CUDA matmul runner qualified on one physical GPU/runtime combination.
 
 Consent-bound pilot studies, seeded random search and constrained qLogNEI now

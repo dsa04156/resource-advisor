@@ -69,6 +69,7 @@ def slurm_allocation(text, resource_key):
 
 
 class SchedulerBackend(Protocol):
+    def validate(self, job: dict) -> None: ...
     def submit(self, job: dict) -> str: ...
     def reconcile(self, job: dict) -> str | None: ...
     def status(self, job: dict) -> Observation: ...
@@ -163,6 +164,9 @@ class KubernetesBackend:
         if context:
             self.prefix += ["--context", context]
         self.prefix += ["--namespace", namespace]
+
+    def validate(self, job):
+        self.manifest(job)
 
     def manifest(self, job):
         b = job["body"]
@@ -427,6 +431,8 @@ class SlurmBackend:
         output_dir,
         ssh_target=None,
         qos_by_priority=None,
+        native_runtimes=None,
+        result_ssh_targets=None,
         execute=run,
     ):
         for value in [partition, account, qos]:
@@ -441,13 +447,21 @@ class SlurmBackend:
         self.partition, self.account, self.qos = partition, account, qos
         self.qos_by_priority = priority_mapping(qos_by_priority)
         self.output_dir, self.ssh_target, self.execute = output_dir, ssh_target, execute
+        self.native_runtimes = dict(native_runtimes or {})
+        self.result_ssh_targets = dict(result_ssh_targets or {})
+        for node, target in self.result_ssh_targets.items():
+            if not re.fullmatch(r"[A-Za-z0-9_.-]+", node) or not re.fullmatch(
+                r"[A-Za-z0-9_][A-Za-z0-9_@.-]*", target
+            ):
+                raise ValueError("invalid result node/SSH alias")
 
-    def call(self, argv, **kwargs):
+    def call(self, argv, *, target=None, **kwargs):
         if argv[0] == "sacct":
             # Format database epochs in an explicit zone, independent of the SSH
             # host's locale/timezone. Unqualified timestamps still remain unknown.
             argv = ["env", "TZ=UTC", "SLURM_TIME_FORMAT=%Y-%m-%dT%H:%M:%S%z", *argv]
-        if self.ssh_target:
+        target = target or self.ssh_target
+        if target:
             argv = [
                 "ssh",
                 "-o",
@@ -456,13 +470,57 @@ class SlurmBackend:
                 "StrictHostKeyChecking=yes",
                 "-o",
                 "ConnectTimeout=5",
-                self.ssh_target,
+                target,
                 shlex.join(argv),
             ]
         return self.execute(argv, **kwargs)
 
+    def validate(self, job):
+        self.script(job)
+
+    def runtime_command(self, job):
+        b = job["body"]
+        variant = b["variant"]
+        # Never silently run a container-qualified command on the host.
+        if variant.get("image") is not None:
+            raise BackendError("Slurm container execution is not configured")
+        binding = self.native_runtimes.get(variant["ref"])
+        if not binding or binding.get("environment_digest") != variant["environment_digest"]:
+            raise BackendError("Slurm requires a qualified native runtime binding")
+        for key in ("guard_path", "manifest_path"):
+            path = binding.get(key, "")
+            if not re.fullmatch(r"/[A-Za-z0-9_/.-]+", path) or ".." in path.split("/"):
+                raise BackendError("invalid native runtime path")
+        for key in ("guard_digest", "manifest_digest"):
+            if not re.fullmatch(r"sha256:[a-f0-9]{64}", binding.get(key, "")):
+                raise BackendError("pinned runtime guard and manifest digests required")
+        command = b.get("effective_command", variant["command"])
+        if list(command) not in binding.get("commands", []):
+            raise BackendError("command is not qualified by the Slurm route")
+        check = (
+            "printf '%s  %s\\n' "
+            + shlex.join([binding["guard_digest"][7:], binding["guard_path"]])
+            + " | sha256sum --check --status\n"
+        )
+        guarded = [
+            "/usr/bin/python3",
+            "-I",
+            binding["guard_path"],
+            "--manifest",
+            binding["manifest_path"],
+            "--manifest-digest",
+            binding["manifest_digest"],
+            "--environment-digest",
+            binding["environment_digest"],
+            "--",
+            *command,
+        ]
+        return check, guarded
+
     def script(self, job):
         b = job["body"]
+        qos = policy_priority(job, self.qos_by_priority, self.qos)
+        check, command = self.runtime_command(job)
         r = b["candidate"]["context"]["resources"]
         if r["host_cpu"] != int(r["host_cpu"]):
             raise BackendError("Slurm CPU count must be an integer")
@@ -475,10 +533,11 @@ class SlurmBackend:
             f"--comment=resource-advisor:{job['id']}",
             f"--partition={self.partition}",
             f"--account={self.account}",
-            f"--qos={policy_priority(job, self.qos_by_priority, self.qos)}",
+            f"--qos={qos}",
             f"--nodelist={node}",
             "--nodes=1",
             "--ntasks=1",
+            "--chdir=/",
             f"--cpus-per-task={int(r['host_cpu'])}",
             f"--mem={r['host_memory_mib']}M",
             f"--time={max(1, (seconds + 59) // 60)}",
@@ -496,10 +555,10 @@ class SlurmBackend:
             + "\n".join("#SBATCH " + d for d in directives)
             + "\nset -euo pipefail\n"
             + "\n".join(f"export {k}={shlex.quote(v)}" for k, v in env.items())
-            + "\nexec "
-            + shlex.join(
-                ["srun", "--export=ALL", *b.get("effective_command", b["variant"]["command"])]
-            )
+            + "\n"
+            + check
+            + "exec "
+            + shlex.join(["srun", "--export=ALL", *command])
             + "\n"
         )
 
@@ -517,7 +576,17 @@ class SlurmBackend:
         name = job["body"]["attempt_id"]
         # sacct failure is UNKNOWN, never proof of absence. No SlurmDBD means this
         # backend cannot safely recover every response-loss case.
-        queued = self.call(["squeue", "--noheader", "--name", name, "--format=%i|%j"])
+        queued = self.call(
+            [
+                "squeue",
+                "--noheader",
+                "--account",
+                self.account,
+                "--name",
+                name,
+                "--format=%i|%j|%a",
+            ]
+        )
         accounted = self.call(
             [
                 "sacct",
@@ -525,16 +594,19 @@ class SlurmBackend:
                 "--parsable2",
                 "--name",
                 name,
+                "--accounts",
+                self.account,
                 "--starttime",
                 job["body"]["created_at"][:19],
-                "--format=JobIDRaw,JobName%100",
+                "--format=JobIDRaw,JobName%100,Account%100",
             ]
         )
         ids = {
             line.split("|")[0]
             for line in (queued + "\n" + accounted).splitlines()
-            if len(line.split("|")) >= 2
+            if len(line.split("|")) == 3
             and line.split("|")[1] == name
+            and line.split("|")[2] == self.account
             and re.fullmatch(r"\d+", line.split("|")[0])
         }
         if len(ids) > 1:
@@ -607,8 +679,39 @@ class SlurmBackend:
         self.call(["scancel", job["body"]["external_id"]])
 
     def result(self, job):
+        # Check ownership even when the controller can read a shared filesystem.
+        jid = job["body"]["external_id"]
+        if not re.fullmatch(r"\d+", jid):
+            raise BackendError("invalid Slurm external ID")
+        output = self.call(
+            [
+                "sacct",
+                "--noheader",
+                "--parsable2",
+                "--jobs",
+                jid,
+                "--format=JobIDRaw,JobName%100,Account%100,NodeList%100,State,ExitCode",
+            ]
+        )
+        matches = [line.split("|") for line in output.splitlines() if line.split("|")[0] == jid]
+        if len(matches) != 1 or len(matches[0]) != 6:
+            raise BackendError("unambiguous result allocation required")
+        _, name, account, node, state, exitcode = matches[0]
+        if (
+            name != job["body"]["attempt_id"]
+            or account != self.account
+            or node != job["body"]["capability"]["node_ref"]
+            or state != "COMPLETED"
+            or exitcode != "0:0"
+        ):
+            raise BackendError("result allocation does not match the completed attempt")
+        target = None
+        if self.result_ssh_targets:
+            target = self.result_ssh_targets.get(node)
+            if not target:
+                raise BackendError("result node has no authorized transport")
         path = f"{self.output_dir}/{job['body']['attempt_id']}.log"
-        return result_from_log(self.call(["tail", "-n", "100", "--", path]))
+        return result_from_log(self.call(["tail", "-c", "65537", "--", path], target=target))
 
 
 def _aware(value):

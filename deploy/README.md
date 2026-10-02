@@ -14,9 +14,12 @@ Before enabling a route:
 3. Slurm: verify the account, QOS, partition, GRES reservation and device
    isolation independently. Configure key-based SSH with a pinned known host;
    the adapter never disables host-key checking or stores an SSH password.
-4. Slurm output must be on storage writable by batch jobs and readable from the
-   controller. Images/environments must match the qualified variant. The API
-   host does not need a filesystem mount from the Slurm cluster.
+4. Slurm output must be writable by batch jobs. Use controller-readable shared
+   storage, or configure `result_ssh_targets` for verified node-local log reads.
+   Native variants require explicit `native_runtimes` bindings; container variants
+   are rejected until a container executor is implemented. See
+   [Slurm runtime qualification](../docs/slurm-runtime.md). The API host does not
+   need a filesystem mount from the Slurm cluster.
 5. Keep site addresses, tokens, SSH configuration and private device identities
    outside the repository. Runtime job submission belongs to the worker, not
    ArgoCD. Use TLS before exposing the API beyond localhost.

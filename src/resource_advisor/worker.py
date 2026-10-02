@@ -67,6 +67,23 @@ class Worker:
                 if errors:
                     self.store.finish(event)
                     return True
+                try:
+                    backend.validate(row)
+                except (BackendError, ValueError):
+                    # Pure local preparation has not contacted the scheduler.
+                    # Do not turn a known configuration rejection into an
+                    # ambiguous submission or leave it outside the usage ledger.
+                    with self.store.transaction() as conn:
+                        latest = self.store.job(conn, row["id"])
+                        if latest["state"] == State.VALIDATED:
+                            self.store.change_job(
+                                conn,
+                                latest,
+                                State.FAILED,
+                                dict(latest["body"], error="PRE_SUBMISSION_BACKEND"),
+                            )
+                    self.store.finish(event)
+                    return True
                 # Commit intent before the remote call. A crash now must reconcile.
                 with self.store.transaction() as conn:
                     self.store.change_job(conn, row, State.SUBMITTING, row["body"])

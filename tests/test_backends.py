@@ -14,6 +14,20 @@ def row(service):
         return dict(service.store.job(conn, job["job_id"]))
 
 
+def native_runtime(job):
+    job["body"]["variant"]["image"] = None
+    return {
+        job["body"]["variant"]["ref"]: {
+            "environment_digest": job["body"]["variant"]["environment_digest"],
+            "guard_path": "/opt/ra/runtime_guard.py",
+            "guard_digest": "sha256:" + "1" * 64,
+            "manifest_path": "/opt/ra/runtime.json",
+            "manifest_digest": "sha256:" + "2" * 64,
+            "commands": [job["body"]["effective_command"]],
+        }
+    }
+
+
 def test_kubernetes_submission_suspended_and_bounded(service):
     job = row(service)
     obj = KubernetesBackend(
@@ -57,7 +71,13 @@ def test_slurm_is_not_wrapped_in_kueue_and_quotes_payload(service):
     job["body"]["capability"]["resource_key"] = "gpu:test"
     job["body"]["variant"]["command"] = ["python", "runner.py", "$(touch /tmp/not-executed)"]
     job["body"]["effective_command"] = job["body"]["variant"]["command"]
-    backend = SlurmBackend(partition="gpu", account="team-a", qos="lab", output_dir="/tmp/ra-test")
+    backend = SlurmBackend(
+        partition="gpu",
+        account="team-a",
+        qos="lab",
+        output_dir="/tmp/ra-test",
+        native_runtimes=native_runtime(job),
+    )
     script = backend.script(job)
     assert "#SBATCH --gres=gpu:test:1" in script
     assert "#SBATCH --account=team-a" in script
@@ -105,6 +125,7 @@ def test_priority_grade_maps_to_distinct_backend_policies(service):
         qos="standard",
         output_dir="/tmp/ra-test",
         qos_by_priority={"high": "lab-expedited"},
+        native_runtimes=native_runtime(job),
     )
     assert "#SBATCH --qos=lab-expedited" in slurm.script(job)
     assert "--priority=" not in slurm.script(job)
@@ -181,3 +202,67 @@ def test_deleted_job_with_running_pod_is_not_confirmed_cancel(service):
         namespace="research-a", local_queue="batch", node_selector={"pool": "lab"}, execute=execute
     )
     assert backend.status(job).state == "CANCEL_REQUESTED"
+
+
+def test_slurm_cannot_silently_ignore_a_container_image(service):
+    job = row(service)
+    backend = SlurmBackend(partition="gpu", account="a", qos="normal", output_dir="/tmp/ra")
+    with pytest.raises(BackendError, match="container execution"):
+        backend.validate(job)
+    job["body"]["variant"]["image"] = None
+    with pytest.raises(BackendError, match="native runtime binding"):
+        backend.validate(job)
+
+
+@pytest.mark.parametrize("wrong", [None, "account", "node", "attempt", "duplicate"])
+def test_slurm_reads_node_local_result_only_after_accounting_match(service, wrong):
+    job = row(service)
+    job["body"]["external_id"] = "42"
+    job["body"]["capability"]["node_ref"] = "qualified-node"
+    attempt = job["body"]["attempt_id"]
+    fields = ["42", attempt, "team-a", "qualified-node", "COMPLETED", "0:0"]
+    if wrong in {"account", "node", "attempt"}:
+        fields[{"attempt": 1, "account": 2, "node": 3}[wrong]] = "foreign"
+    commands = []
+
+    def execute(args, **kwargs):
+        commands.append(args)
+        if "sacct" in args[-1]:
+            record = "|".join(fields) + "\n"
+            return record * (2 if wrong == "duplicate" else 1)
+        assert args[-2] == "lab-worker-results"
+        assert "StrictHostKeyChecking=yes" in args
+        assert args[-1] == f"tail -c 65537 -- /tmp/ra/{attempt}.log"
+        return 'RESOURCE_ADVISOR_RESULT {"result": "test-envelope"}\n'
+
+    backend = SlurmBackend(
+        partition="gpu",
+        account="team-a",
+        qos="normal",
+        output_dir="/tmp/ra",
+        ssh_target="lab-controller",
+        result_ssh_targets={"qualified-node": "lab-worker-results"},
+        execute=execute,
+    )
+    if wrong:
+        with pytest.raises(BackendError):
+            backend.result(job)
+        assert len(commands) == 1  # No log read on any unverified node.
+    else:
+        assert backend.result(job) == {"result": "test-envelope"}
+        assert commands[0][-2] == "lab-controller"
+
+
+def test_slurm_response_loss_reconciliation_does_not_attach_other_account(service):
+    job = row(service)
+    attempt = job["body"]["attempt_id"]
+
+    def execute(args, **kwargs):
+        assert "team-a" in args
+        # Deliberately include another account despite the requested filter.
+        return f"42|{attempt}|foreign\n43|{attempt}|team-a\n"
+
+    backend = SlurmBackend(
+        partition="gpu", account="team-a", qos="normal", output_dir="/tmp/ra", execute=execute
+    )
+    assert backend.reconcile(job) == "43"
