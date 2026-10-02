@@ -1,0 +1,104 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "name": "hailo-qualification",
+    "namespace": "research-lab",
+    "labels": {
+      "kueue.x-k8s.io/queue-name": "hailo-lab"
+    }
+  },
+  "spec": {
+    "suspend": true,
+    "backoffLimit": 0,
+    "activeDeadlineSeconds": 180,
+    "template": {
+      "spec": {
+        "restartPolicy": "Never",
+        "automountServiceAccountToken": false,
+        "securityContext": {
+          "runAsUser": 10001,
+          "runAsGroup": 10001,
+          "runAsNonRoot": true,
+          "fsGroup": 10001,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "volumes": [
+          {
+            "name": "tmp",
+            "emptyDir": {
+              "sizeLimit": "128Mi"
+            }
+          },
+          {
+            "name": "home",
+            "emptyDir": {
+              "sizeLimit": "64Mi"
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "qualification",
+            "command": [
+              "python",
+              "/opt/qualification/hailo_qualification.py",
+              "--fixture",
+              "/opt/fixture",
+              "--hef",
+              "/opt/fixture/model.hef",
+              "--hef-sha256",
+              "d5a76ed6f116fc9b9ef502df914a298917091724ed88cfccab36bfb716f61b22",
+              "--manifest-sha256",
+              "b96a400c1dd303d76119f69af6c444d13faeccd8026998345f8d3056950c4239"
+            ],
+            "env": [
+              {
+                "name": "HAILORT_LOGGER_PATH",
+                "value": "/tmp"
+              },
+              {
+                "name": "HOME",
+                "value": "/home/research"
+              }
+            ],
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "readOnlyRootFilesystem": true,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "resources": {
+              "requests": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "hailo.ai/h8": "1"
+              },
+              "limits": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "hailo.ai/h8": "1"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "tmp",
+                "mountPath": "/tmp"
+              },
+              {
+                "name": "home",
+                "mountPath": "/home/research"
+              }
+            ],
+            "image": "registry.example.org/research/hailo-qualification@sha256:REPLACE_WITH_BUILT_DIGEST"
+          }
+        ]
+      }
+    }
+  }
+}

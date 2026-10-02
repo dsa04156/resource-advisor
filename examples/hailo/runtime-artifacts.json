@@ -1,0 +1,44 @@
+{
+  "platform": "linux/arm64",
+  "base_image": "python@sha256:af7e5047e10ef70882ab774f03310df7151118fe77b8e63bac5e0766c4f5cc8c",
+  "debs": [
+    {
+      "package": "hailort",
+      "version": "4.23.0",
+      "url": "https://archive.raspberrypi.com/debian/pool/main/h/hailort/hailort_4.23.0_arm64.deb",
+      "sha256": "b4cb173bb7fe3696c8b0783e4fb7790d4226b2c466291d89229e7500ca96884d"
+    },
+    {
+      "package": "python3-hailort",
+      "version": "4.23.0-1",
+      "url": "https://archive.raspberrypi.com/debian/pool/main/p/pyhailort/python3-hailort_4.23.0-1_arm64.deb",
+      "sha256": "12b25386279345477763f6007e380b6a3b4673eb710a1ffd33917dd5a9ce024b"
+    },
+    {
+      "package": "libgcc-s1",
+      "version": "14.2.0-19",
+      "url": "https://deb.debian.org/debian/pool/main/g/gcc-14/libgcc-s1_14.2.0-19_arm64.deb",
+      "sha256": "1108bc87879833d6d9a145f22a4a15cddb34e065b4b5f4b97bee586adbac2851"
+    },
+    {
+      "package": "libgomp1",
+      "version": "14.2.0-19",
+      "url": "https://deb.debian.org/debian/pool/main/g/gcc-14/libgomp1_14.2.0-19_arm64.deb",
+      "sha256": "43e84cb7971d8a4d8870cab6204e998ea4f23ee1339bb0ff556dd881bac82d25"
+    },
+    {
+      "package": "libstdc++6",
+      "version": "14.2.0-19",
+      "url": "https://deb.debian.org/debian/pool/main/g/gcc-14/libstdc++6_14.2.0-19_arm64.deb",
+      "sha256": "6669b0c52a2e7c6af9adfdabce3ff6e286065cdfbc7b85280862b5f799daebee"
+    },
+    {
+      "package": "python3-netifaces",
+      "version": "0.11.0-2+b6",
+      "url": "https://deb.debian.org/debian/pool/main/n/netifaces/python3-netifaces_0.11.0-2+b6_arm64.deb",
+      "sha256": "17ea7c4378a6d3c82766e627e634bd536c78c3c4c2828ddd1d67882c58ec77a9"
+    }
+  ],
+  "runtime_image_digest": "sha256:0ceac4d04999bdb836f9f540955b26c9a4fd61bfd855cbee0cf95d7908cc4fa3",
+  "qualification_image_digest": "sha256:4c524b12874382a3cdafe8c7c381a117df2ac91e48215b7b42bae0a531d3fcfd"
+}
