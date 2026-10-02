@@ -1,0 +1,516 @@
+{
+  "evidence_kind": "offline_numerical_analysis_of_hardware_measurements",
+  "hardware_report": "sampled-gpu-calibration.json",
+  "hardware_report_digest": "sha256:c0bd64177419521826a15a638da7e6b7b4c46302d19514922bc05e5e210f6ad6",
+  "input": {
+    "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+    "fidelity_axis": "representative_sampling",
+    "options": [
+      {
+        "ref": "option-bb0c4df597163335b26d2cb8f1660da9",
+        "candidate_ref": "cpu1",
+        "coordinates": [
+          0.0
+        ],
+        "fidelity": 1.0
+      },
+      {
+        "ref": "option-a2df87eced1802b3706ac8909bfe17b6",
+        "candidate_ref": "cpu2",
+        "coordinates": [
+          1.0
+        ],
+        "fidelity": 1.0
+      },
+      {
+        "ref": "option-62945fc59cf43ee770b1bd5aca4ec5ed",
+        "candidate_ref": "cpu1",
+        "coordinates": [
+          0.0
+        ],
+        "fidelity": 0.5
+      },
+      {
+        "ref": "option-b21120f7799372fb9d22dd5c59c9540f",
+        "candidate_ref": "cpu2",
+        "coordinates": [
+          1.0
+        ],
+        "fidelity": 0.5
+      }
+    ],
+    "observations": [
+      {
+        "attempt_id": "a-93e04ce958064365aa331b484fbd77c3",
+        "option_ref": "option-bb0c4df597163335b26d2cb8f1660da9",
+        "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+        "seconds_per_work_unit": 1.8584374629426748e-05,
+        "evaluation_wall_seconds": 5.625044,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-6319c94e96ad46a79a9bc980906fdce9",
+        "option_ref": "option-a2df87eced1802b3706ac8909bfe17b6",
+        "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+        "seconds_per_work_unit": 1.9790750229731202e-05,
+        "evaluation_wall_seconds": 5.518858,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-102db85e0b984254b17ddf51b7b80f26",
+        "option_ref": "option-b21120f7799372fb9d22dd5c59c9540f",
+        "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+        "seconds_per_work_unit": 1.993199111893773e-05,
+        "evaluation_wall_seconds": 5.430298,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-f9518d8ce1e846e8b3635761af22315a",
+        "option_ref": "option-bb0c4df597163335b26d2cb8f1660da9",
+        "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+        "seconds_per_work_unit": 1.9622872059699148e-05,
+        "evaluation_wall_seconds": 5.383791,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-93df822c099c48cfa4ee4a75a51aca7b",
+        "option_ref": "option-62945fc59cf43ee770b1bd5aca4ec5ed",
+        "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+        "seconds_per_work_unit": 1.9583763787522912e-05,
+        "evaluation_wall_seconds": 5.480378,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-df4c32a8546544e38a9683f54341fae2",
+        "option_ref": "option-b21120f7799372fb9d22dd5c59c9540f",
+        "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+        "seconds_per_work_unit": 2.018299710471183e-05,
+        "evaluation_wall_seconds": 5.633775,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-ad6d7ca2b27848fd8c230a5cd7efa0a2",
+        "option_ref": "option-a2df87eced1802b3706ac8909bfe17b6",
+        "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+        "seconds_per_work_unit": 1.8537633877713233e-05,
+        "evaluation_wall_seconds": 10.590451,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-591f55cca8164a398dfcb32188626f64",
+        "option_ref": "option-62945fc59cf43ee770b1bd5aca4ec5ed",
+        "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+        "seconds_per_work_unit": 1.9511760910972953e-05,
+        "evaluation_wall_seconds": 5.510402,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-fe38bda85293491789928ffacb57bd01",
+        "option_ref": "option-62945fc59cf43ee770b1bd5aca4ec5ed",
+        "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+        "seconds_per_work_unit": 2.0534498617053032e-05,
+        "evaluation_wall_seconds": 5.420321,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-ad42158ff93e442587a84a463dab9d9c",
+        "option_ref": "option-bb0c4df597163335b26d2cb8f1660da9",
+        "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+        "seconds_per_work_unit": 1.9055492884945124e-05,
+        "evaluation_wall_seconds": 10.493777,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-5b53f5c179a84d09af45e2f9bbe38992",
+        "option_ref": "option-a2df87eced1802b3706ac8909bfe17b6",
+        "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+        "seconds_per_work_unit": 1.8413746147416532e-05,
+        "evaluation_wall_seconds": 5.315849,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-db1e992a4dbd4885b71505cb30ee8cc6",
+        "option_ref": "option-b21120f7799372fb9d22dd5c59c9540f",
+        "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+        "seconds_per_work_unit": 1.9462022464722395e-05,
+        "evaluation_wall_seconds": 5.471611,
+        "quality_passed": true,
+        "memory_passed": true
+      }
+    ],
+    "feature_names": [
+      "host_cpu"
+    ],
+    "seed": 20261003,
+    "num_fantasies": 16
+  },
+  "analysis": {
+    "method": "finite_space_cost_aware_qMultiFidelityKnowledgeGradient",
+    "option_ref": "option-62945fc59cf43ee770b1bd5aca4ec5ed",
+    "candidate_ref": "cpu1",
+    "fidelity": 0.5,
+    "reason": "MF_KG_NUMERICAL_SUGGESTION",
+    "execution_authorized": false,
+    "measured": false,
+    "input_digest": "sha256:fd1aa8c9457adf5139befa85c163bc38207155282b0c515af667c7925a70d275",
+    "runtime_group_signature": "sha256:f402cb97cb2a69c6c0a0a546c5b64543935c9042ef2b01bfff469919c395f4c3",
+    "scores": [
+      {
+        "option_ref": "option-62945fc59cf43ee770b1bd5aca4ec5ed",
+        "candidate_ref": "cpu1",
+        "fidelity": 0.5,
+        "acquisition_value": 0.002614532502603551,
+        "estimated_evaluation_wall_seconds": 5.470367,
+        "normalized_cost": 0.7645913589268672,
+        "fantasy_gains": [
+          0.0028412246871472036,
+          0.0007670715094327818,
+          0.005169035733468164,
+          -0.0004735488281752964,
+          5.777024547626297e-07,
+          0.00345831571921984,
+          0.0020855191832023223,
+          0.000993983533355447,
+          0.0017155511056188288,
+          0.0014248584094502803,
+          0.0027543072322817608,
+          0.00044418014763358826,
+          -0.0003443605084871848,
+          0.004264233733534795,
+          5.575477417352204e-05,
+          0.006488319629177397
+        ],
+        "fantasy_target_options": [
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6"
+        ]
+      },
+      {
+        "option_ref": "option-a2df87eced1802b3706ac8909bfe17b6",
+        "candidate_ref": "cpu2",
+        "fidelity": 1.0,
+        "acquisition_value": 0.002267477028412128,
+        "estimated_evaluation_wall_seconds": 7.1417193333333335,
+        "normalized_cost": 0.9981957134041671,
+        "fantasy_gains": [
+          -0.0031091666919405014,
+          0.001227491417216342,
+          0.014371494183093247,
+          -0.00033959035820174677,
+          -0.0008469545793996502,
+          0.009263386198899326,
+          0.005164297576627064,
+          -0.0016380753048697017,
+          -0.002212711615113605,
+          0.0031916038890926757,
+          0.007161258823806804,
+          -0.001200227207094784,
+          -0.0005722553988700696,
+          0.011669809347774063,
+          3.9982748571532056e-05,
+          -0.006013611488464576
+        ],
+        "fantasy_target_options": [
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9"
+        ]
+      },
+      {
+        "option_ref": "option-b21120f7799372fb9d22dd5c59c9540f",
+        "candidate_ref": "cpu2",
+        "fidelity": 0.5,
+        "acquisition_value": 0.001192665260117777,
+        "estimated_evaluation_wall_seconds": 5.511894666666667,
+        "normalized_cost": 0.7703956669540486,
+        "fantasy_gains": [
+          0.0009431839357212368,
+          -0.00016687021519956602,
+          0.003349355101823548,
+          0.00010301672516099813,
+          0.00025692863481729944,
+          0.0018890829807247655,
+          0.0007172626402880411,
+          0.00049691974285615,
+          0.0006712390349381536,
+          0.00015332201799012068,
+          0.0012881407120133304,
+          0.00036409595660558125,
+          0.0001735970286649291,
+          0.002577015312370534,
+          -1.2129001078164947e-05,
+          0.0018242642847958734
+        ],
+        "fantasy_target_options": [
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9"
+        ]
+      },
+      {
+        "option_ref": "option-bb0c4df597163335b26d2cb8f1660da9",
+        "candidate_ref": "cpu1",
+        "fidelity": 1.0,
+        "acquisition_value": 0.0013657518669382687,
+        "estimated_evaluation_wall_seconds": 7.167537333333334,
+        "normalized_cost": 1.001804286595833,
+        "fantasy_gains": [
+          -0.00435869957422419,
+          0.0018070774968546033,
+          0.012177284698378088,
+          -0.001115592771382623,
+          -0.0019607223591702194,
+          0.008147147216867268,
+          0.004913094462349221,
+          -0.0027993216503308105,
+          -0.0034084443631261507,
+          0.003356700824181047,
+          0.00648863444629022,
+          -0.0023351964004056924,
+          -0.0016695372964381505,
+          0.010045739838375312,
+          0.00013134785546320416,
+          -0.00743745262564488
+        ],
+        "fantasy_target_options": [
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-a2df87eced1802b3706ac8909bfe17b6",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-bb0c4df597163335b26d2cb8f1660da9",
+          "option-a2df87eced1802b3706ac8909bfe17b6"
+        ]
+      }
+    ],
+    "predictions": [
+      {
+        "candidate_ref": "cpu2",
+        "fidelity": 1.0,
+        "measured": false,
+        "median_seconds_per_work_unit": 1.920611226214886e-05,
+        "posterior_interval_seconds_per_work_unit": [
+          1.8656870989925016e-05,
+          1.977152269667634e-05
+        ]
+      },
+      {
+        "candidate_ref": "cpu1",
+        "fidelity": 1.0,
+        "measured": false,
+        "median_seconds_per_work_unit": 1.918570819427693e-05,
+        "posterior_interval_seconds_per_work_unit": [
+          1.8711426317755062e-05,
+          1.967201177852846e-05
+        ]
+      }
+    ],
+    "current_target_value": 10.861344920989042,
+    "cost_reference_seconds": 7.154628333333333,
+    "cost_method": "per-option observed mean evaluation wall time; dimensionless target normalization",
+    "cost_uncertainty": "not modeled; no unit conversion to GPU-hours or energy",
+    "planning_seconds": 0.20662444102345034,
+    "fit_seconds": 0.1502127239946276,
+    "acquisition_seconds": 0.05641171702882275,
+    "surrogate": {
+      "class": "SingleTaskMultiFidelityGP",
+      "fidelity_dimension": 1,
+      "feature_names": [
+        "host_cpu",
+        "fidelity"
+      ],
+      "training_run_ids": [
+        "a-591f55cca8164a398dfcb32188626f64",
+        "a-93df822c099c48cfa4ee4a75a51aca7b",
+        "a-fe38bda85293491789928ffacb57bd01",
+        "a-5b53f5c179a84d09af45e2f9bbe38992",
+        "a-6319c94e96ad46a79a9bc980906fdce9",
+        "a-ad6d7ca2b27848fd8c230a5cd7efa0a2",
+        "a-102db85e0b984254b17ddf51b7b80f26",
+        "a-db1e992a4dbd4885b71505cb30ee8cc6",
+        "a-df4c32a8546544e38a9683f54341fae2",
+        "a-93e04ce958064365aa331b484fbd77c3",
+        "a-ad42158ff93e442587a84a463dab9d9c",
+        "a-f9518d8ce1e846e8b3635761af22315a"
+      ],
+      "independent_runs_per_option": {
+        "option-62945fc59cf43ee770b1bd5aca4ec5ed": 3,
+        "option-a2df87eced1802b3706ac8909bfe17b6": 3,
+        "option-b21120f7799372fb9d22dd5c59c9540f": 3,
+        "option-bb0c4df597163335b26d2cb8f1660da9": 3
+      },
+      "train_x": [
+        [
+          0.0,
+          0.5
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.5
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "train_y_negative_log_seconds_per_work_unit": [
+        [
+          10.826235696881263
+        ],
+        [
+          10.876138872368152
+        ],
+        [
+          10.826966705296702
+        ],
+        [
+          10.866719763927298
+        ]
+      ],
+      "train_variance_of_mean": [
+        [
+          0.00027060699829094666
+        ],
+        [
+          0.0005291417133981901
+        ],
+        [
+          0.00011384110758471056
+        ],
+        [
+          0.0002468988507102153
+        ]
+      ],
+      "variance_floor": 1e-06,
+      "state_dict": {
+        "mean_module.raw_constant": 0.45097114390638565,
+        "covar_module.raw_outputscale": 2.984965892030074,
+        "covar_module.base_kernel.kernels.0.raw_power": [
+          -0.0156801911663173
+        ],
+        "covar_module.base_kernel.kernels.0.raw_power_constraint.lower_bound": 0.0,
+        "covar_module.base_kernel.kernels.0.raw_power_constraint.upper_bound": "+infinity",
+        "covar_module.base_kernel.kernels.0.power_prior.concentration": 3.0,
+        "covar_module.base_kernel.kernels.0.power_prior.rate": 3.0,
+        "covar_module.base_kernel.kernels.0.covar_module_unbiased.raw_lengthscale": [
+          [
+            -0.9232290231672066
+          ]
+        ],
+        "covar_module.base_kernel.kernels.0.covar_module_unbiased.lengthscale_prior.concentration": 3.0,
+        "covar_module.base_kernel.kernels.0.covar_module_unbiased.lengthscale_prior.rate": 6.0,
+        "covar_module.base_kernel.kernels.0.covar_module_unbiased.raw_lengthscale_constraint.lower_bound": 0.0,
+        "covar_module.base_kernel.kernels.0.covar_module_unbiased.raw_lengthscale_constraint.upper_bound": "+infinity",
+        "covar_module.base_kernel.kernels.0.covar_module_biased.raw_lengthscale": [
+          [
+            2.492908392022036
+          ]
+        ],
+        "covar_module.base_kernel.kernels.0.covar_module_biased.lengthscale_prior.concentration": 6.0,
+        "covar_module.base_kernel.kernels.0.covar_module_biased.lengthscale_prior.rate": 2.0,
+        "covar_module.base_kernel.kernels.0.covar_module_biased.raw_lengthscale_constraint.lower_bound": 0.0,
+        "covar_module.base_kernel.kernels.0.covar_module_biased.raw_lengthscale_constraint.upper_bound": "+infinity",
+        "covar_module.outputscale_prior.concentration": 2.0,
+        "covar_module.outputscale_prior.rate": 0.15000000596046448,
+        "covar_module.raw_outputscale_constraint.lower_bound": 0.0,
+        "covar_module.raw_outputscale_constraint.upper_bound": "+infinity",
+        "outcome_transform.means": [
+          [
+            10.849015259618353
+          ]
+        ],
+        "outcome_transform.stdvs": [
+          [
+            0.02616732738610225
+          ]
+        ],
+        "outcome_transform._stdvs_sq": [
+          [
+            0.0006847290225314569
+          ]
+        ],
+        "outcome_transform._is_trained": true
+      },
+      "state_dict_encoding": "JSON numbers; infinite constraint bounds encoded as signed strings",
+      "snapshot_digest": "sha256:fd8e4a19434f32a5a86a376a0fa182e133c2055a42853ecab21cb2b4deaac078",
+      "botorch_version": "0.16.1",
+      "torch_version": "2.8.0+cpu",
+      "num_fantasies": 16,
+      "seed": 20261003,
+      "numerical_diagnostics": [],
+      "validation_status": "uncalibrated posterior; numerical kernel is not hardware qualification"
+    }
+  },
+  "job_count_unchanged": true,
+  "limitations": [
+    "No automatic MF-KG job execution",
+    "Declared finite generated input population only",
+    "Thermal and paired-rank qualification remain incomplete",
+    "Posterior intervals uncalibrated; not a strategy superiority claim",
+    "Planning time measured locally and separate from historical study cost"
+  ]
+}

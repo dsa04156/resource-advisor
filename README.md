@@ -141,4 +141,9 @@ qualification and automatic MF-KG job selection remain open gates.
 to separate workloads and execute preregistered mixed-workload calibration through
 the durable study/Job path. The new path completed 12 actual GPU probes and six
 independent target confirmations, with matching S3/API/MLflow results.
-Representative-sampling qualification and automatic MF-KG selection remain open.
+[Approved input sampling](docs/sampling.md) additionally completed 18 actual GPU
+runs over a finite generated input population, with verified byte-consumption
+receipts and matching result bundles. Offline MF-GP/MF-KG analysis uses the 12
+probes without submitting jobs; independent confirmations retained the baseline
+because improvement was uncertain. Real-dataset fidelity, thermal/rank
+qualification and automatic MF-KG selection remain open.

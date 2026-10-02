@@ -7,6 +7,10 @@ automatic mixed-fidelity MF-KG study-to-Job integration.
 [Immutable fidelity spaces](fidelity-spaces.md) now provide workload/result
 bindings and durable preregistered calibration through the existing worker. The existing matmul repetition experiment
 cannot be relabeled as multi-fidelity training data.
+The later [finite sampled-input GPU trial](sampling.md#live-verification--2026-10-02-utc)
+adds actual distinct-input receipts and an offline MF-GP/MF-KG fit from 12
+independent probes. Its generated dense-matrix fixture and unqualified thermal
+context still do not authorize automatic MF-KG execution.
 
 The implementation uses the installed **BoTorch 0.16.1**
 `SingleTaskMultiFidelityGP`, `qMultiFidelityKnowledgeGradient`, target-fidelity

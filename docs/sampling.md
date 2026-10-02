@@ -130,10 +130,11 @@ silently enlarged.
 injection, identity compatibility, permissions, collector acceptance, MLflow
 tags and artifact contents using labeled scheduler/storage/HTTP doubles.
 `tests/test_fidelity_space.py` rejects missing/altered receipts in analysis.
-This increment has **no new live GPU sampling results**. Existing published
-GPU trials repeat identical inputs and remain labeled repetition-only.
-Paired rank validation, thermal evidence, qualified GPU runner integration,
-automatic MF-KG coordination and equal-budget comparisons remain open.
+The initial contract tests alone were not GPU evidence. The subsequent live
+trial below verifies one qualified GPU runner and finite generated population.
+Earlier published GPU trials still remain labeled repetition-only.
+Paired rank qualification, thermal evidence, automatic MF-KG coordination and
+equal-budget comparisons remain open.
 
 ## Concrete CUDA runner
 
@@ -161,3 +162,72 @@ the timed CUDA-forward-plus-synchronization interval; Job wall cost includes the
 the collector's aggregate result and receipt. No power/thermal qualification is
 implied. Slurm's native runtime guard preserves the sampling-plan environment
 variable; the new runner still needs independent qualification on each backend.
+
+## Live verification — 2026-10-02 UTC
+
+[Raw JSON](evidence/sampled-gpu-calibration.json),
+[CSV](evidence/sampled-gpu-calibration.csv) and
+[offline MF-GP/MF-KG analysis](evidence/sampled-mfkg-analysis.json) retain the
+actual results. Application source was `77d294ca25a1208e1ef50f1252148d5f01fd929d`.
+The API, inventory and worker source-tree hashes were checked inside their
+running Pods against the image build reports. Existing dependencies, CUDA,
+Kubernetes and KubeEdge were retained.
+
+The trial used Python 3.11.15, PyTorch 2.8.0+cu128 and CUDA 12.8 on one RTX 5080
+with exclusive GPU allocation, CPU requests of 1 or
+2, and the eight-file 64×64 fp32 fixture. Lower fidelity selected four distinct
+inputs (two per stratum); target fidelity consumed all eight. Shape, precision,
+batch, seed, operation, input policy and timing boundary remained unchanged.
+Three seeded randomized complete blocks produced 12 independent probe Jobs,
+then six new full-population confirmation Jobs. All 18 succeeded, with numerical
+agreement 1.0 for every measured input. Inner input samples are subsamples, not
+independent experiment replications.
+
+| Mode | Inputs per Job | CPU | Independent Jobs | Mean timed forward total (ms) |
+|---|---:|---:|---:|---:|
+| Probe | 4 | 1 | 3 | 0.079507 |
+| Probe | 4 | 2 | 3 | 0.079436 |
+| Probe | 8 | 1 | 3 | 0.152701 |
+| Probe | 8 | 2 | 3 | 0.151312 |
+| New confirmation | 8 | 1 | 3 | 0.148809 |
+| New confirmation | 8 | 2 | 3 | 0.147856 |
+
+These tiny forward-plus-synchronization intervals exclude input preparation,
+CPU reference calculation and transfers. They are not total Job duration or
+GPU kernel busy time. The decision was `PRESERVE_BASELINE_UNCERTAINTY`: retain
+CPU 1, because the independent confirmation does not establish a reliable
+improvement. A lower arithmetic mean is not treated as proven superiority.
+
+Every Job's Kueue Workload was joined by owner UID and showed quota reservation,
+admission and completion. Every successful Pod requested/limited one GPU and
+the expected CPU allocation. Only the six confirmations entered measured
+recommendation history. All 18 receipts were validated from PostgreSQL and read
+back through the authenticated API. Policy/binding/receipt/result bundles matched
+byte-for-byte across S3, API and MLflow, with one FINISHED MLflow run per attempt.
+Per-input log times summed exactly to each result's timed interval.
+
+The study used **403.536461 seconds wall time and 38 GPU reservation seconds**.
+Four separate F0 qualification Jobs cost another 8 reservation seconds. A fifth,
+deliberately corrupted-input qualification Job failed before measurement with
+the expected digest error and no result envelope; it cost 2 reservation seconds.
+It used the same queue during the study, without concurrent GPU measurement,
+and is not a controlled queue-contention comparison. The immutable original
+input ConfigMap remained byte-identical. Final queues/outboxes were empty; all
+ten cluster nodes were Ready with no pressure signal.
+
+The analysis used only the 12 probes, rejecting confirmation leakage. Actual
+`SingleTaskMultiFidelityGP` and `qMultiFidelityKnowledgeGradient` suggested another
+CPU-1/fidelity-0.5 measurement, with `measured=false` and
+`execution_authorized=false`. Local numerical planning took about 0.207 seconds
+and is recorded separately from historical study costs. Database Job count did
+not change. A live `strategy=mfkg` request still returned HTTP 422:
+`MF_KG_DISABLED: no qualified paired-fidelity group`.
+
+This proves the finite input-consumption and execution/provenance path. Dense
+Gram matrices with different values do not establish a useful fidelity axis for
+real model workloads. The declared two-stratum population is not a real dataset
+distribution; thermal/load evidence and ranking stability remain unqualified.
+No strategy, energy, utilization or cost superiority is claimed. Independent
+Slurm/NPU qualification and the full v0.3 completion audit remain open. The
+qualified package manifest and pinned image are recorded; this runner did not
+capture a host-driver version, so its report does not establish driver parity.
