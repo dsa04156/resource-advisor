@@ -1,0 +1,160 @@
+{
+  "evidence_kind": "real_hardware",
+  "accelerator": "NVIDIA GeForce RTX 5080",
+  "runtime": "PyTorch 2.8.0+cu128 / CUDA 12.8",
+  "preparation_wait_seconds": 30,
+  "trials": [
+    {
+      "scenario": "running",
+      "job_id": "j-5d608229dbfa4e8b8405b71941d837c5",
+      "attempt_id": "a-661ec4135bab4c36abcea0cf9b9fad5d",
+      "cuda_context_initialized": true,
+      "cancel_api_responses": [
+        "CANCEL_REQUESTED",
+        "CANCEL_REQUESTED"
+      ],
+      "repeated_request_timestamp_equal": true,
+      "terminal_state": "CANCELED",
+      "ledger_records": 1,
+      "allocated_device_seconds": null,
+      "queue_seconds": 0.0,
+      "cancellation_evidence": {
+        "outcome": "CANCELED",
+        "started_at": "2026-10-02T11:57:44Z",
+        "backend_finished_at": null,
+        "terminal_observed_at": "2026-10-02T11:57:59.988076+00:00",
+        "cancel_requested_at": "2026-10-02T11:57:46.618420+00:00",
+        "cancel_dispatch_started_at": "2026-10-02T11:57:49.610268+00:00",
+        "cancel_acknowledged_at": "2026-10-02T11:57:49.655834+00:00",
+        "cancel_confirmed_at": "2026-10-02T11:57:59.988076+00:00",
+        "cancel_dispatch_wait_seconds": 2.991848,
+        "cancel_confirmation_seconds": 13.369656,
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 2048.0
+        },
+        "uncertainty": [
+          "ALLOCATION_INTERVAL_UNKNOWN",
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ]
+      },
+      "result_records": 0,
+      "mlflow_run_count": 1,
+      "mlflow_status": "KILLED",
+      "outbox": [
+        {
+          "kind": "submit",
+          "status": "DONE",
+          "tries": 1
+        },
+        {
+          "kind": "cancel",
+          "status": "DONE",
+          "tries": 1
+        },
+        {
+          "kind": "mlflow",
+          "status": "DONE",
+          "tries": 1
+        }
+      ],
+      "job_and_pods_absent": true
+    },
+    {
+      "scenario": "completed",
+      "job_id": "j-fa10712ad18149c1907194ab3202bb0d",
+      "attempt_id": "a-0fc7e79953c4465f92f055665a3f7281",
+      "cuda_context_initialized": true,
+      "cancel_api_responses": [
+        "CANCEL_REQUESTED",
+        "CANCEL_REQUESTED"
+      ],
+      "repeated_request_timestamp_equal": true,
+      "terminal_state": "SUCCEEDED",
+      "ledger_records": 1,
+      "allocated_device_seconds": 32.0,
+      "queue_seconds": 0.0,
+      "cancellation_evidence": {
+        "outcome": "SUCCEEDED",
+        "started_at": "2026-10-02T11:58:10Z",
+        "backend_finished_at": "2026-10-02T11:58:42Z",
+        "terminal_observed_at": "2026-10-02T12:00:22.338695+00:00",
+        "cancel_requested_at": "2026-10-02T11:58:45.129893+00:00",
+        "cancel_dispatch_started_at": null,
+        "cancel_acknowledged_at": null,
+        "cancel_confirmed_at": null,
+        "cancel_dispatch_wait_seconds": null,
+        "cancel_confirmation_seconds": null,
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 2048.0
+        },
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ]
+      },
+      "result_records": 1,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED",
+      "outbox": [
+        {
+          "kind": "submit",
+          "status": "DONE",
+          "tries": 1
+        },
+        {
+          "kind": "cancel",
+          "status": "DONE",
+          "tries": 1
+        },
+        {
+          "kind": "mlflow",
+          "status": "DONE",
+          "tries": 1
+        },
+        {
+          "kind": "artifact",
+          "status": "DONE",
+          "tries": 1
+        },
+        {
+          "kind": "mlflow_artifact",
+          "status": "DONE",
+          "tries": 1
+        }
+      ],
+      "scheduler_completed_before_cancel": true,
+      "worker_scaled_down_at": "2026-10-02T11:58:12.318310+00:00",
+      "measurements": {
+        "elapsed_seconds": 0.0002659119782038033,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 20,
+        "work_units": 20,
+        "latency_p50_ms": 0.012983509805053473,
+        "latency_p95_ms": 0.013970013242214918,
+        "latency_p99_ms": 0.013970013242214918,
+        "throughput": 75212.85853723886,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "artifact_tracking_present": true,
+      "artifact_api_s3_mlflow_bytes_equal": true,
+      "artifact_sha256": "sha256:bd244d0c6b935996e7949c7d7a33775dac33599c23ce1d3efa52965cb2b3e8a4",
+      "same_completed_compute_pod_retained": true
+    }
+  ],
+  "final_cluster": {
+    "nodes": 10,
+    "ready": 10,
+    "pressure_nodes": 0
+  },
+  "worker_restart_note": "Restart was delayed by a scheduler-reported disk-pressure taint. No taint or pressure protection was bypassed. DiskPressure was already false at the follow-up filesystem check; generated build staging was then removed. This does not establish the cause of pressure or its recovery.",
+  "worker_image_digest": "sha256:b96f07a0ffed2b5b69e3ea45c085f468ab4b15799046ea9f853281936354dd80",
+  "worker_restored_ready_replicas": 1
+}

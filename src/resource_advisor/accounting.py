@@ -67,6 +67,18 @@ def ledger_record(row, state, body, result=None):
             "started_at": start,
             "backend_finished_at": end,
             "terminal_observed_at": body.get("finished_at"),
+            "cancel_requested_at": body.get("cancel_requested_at"),
+            "cancel_dispatch_started_at": body.get("cancel_dispatch_started_at"),
+            "cancel_acknowledged_at": body.get("cancel_acknowledged_at"),
+            "cancel_confirmed_at": body.get("finished_at") if state == "CANCELED" else None,
+            "cancel_dispatch_wait_seconds": interval(
+                body.get("cancel_requested_at"), body.get("cancel_dispatch_started_at")
+            ),
+            "cancel_confirmation_seconds": interval(
+                body.get("cancel_requested_at"), body.get("finished_at")
+            )
+            if state == "CANCELED"
+            else None,
             "submitted_at": queued,
             "submission_time_source": "scheduler"
             if body.get("scheduler_submitted_at")

@@ -221,6 +221,9 @@ class Service:
                     "result_digest",
                     "last_observation_error",
                     "last_observation_error_at",
+                    "cancel_requested_at",
+                    "cancel_dispatch_started_at",
+                    "cancel_acknowledged_at",
                 ]
             },
         }

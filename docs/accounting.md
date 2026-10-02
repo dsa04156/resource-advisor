@@ -24,6 +24,10 @@ Uncertain submissions remain unresolved, not falsely terminal or free.
 - A confirmed cancellation before submission proves zero allocation. Cancellation
   after possible submission does not. If a deleted Kubernetes Pod's termination
   timestamps were not captured, the record explicitly retains null duration.
+- Cancellation request, first dispatch intent, acknowledged response and terminal
+  confirmation have separate timestamps. They describe control-plane observations,
+  not GPU execution or the instant at which hardware became free. Request and
+  dispatch timestamps survive retries; a lost acknowledgement stays unknown.
 - Valid benchmark compute time is distinct from reservation time. Invalid results
   cannot supply measured compute time or a recommendation profile. Container
   runtime and scheduled-to-container-start preparation intervals are separately
@@ -77,9 +81,33 @@ reconciliation, resultless terminal states, unknown cancellation times, zero
 pre-submit allocation, backfill, project isolation and device-unit separation.
 
 Remaining work includes durable Pod termination capture, Slurm step utilization,
-MLflow records for attempts without results, transfer/model preparation costs,
-energy measurements and complete pre-execution rejection accounting. This increment
-does not mark the full usage-accounting milestone complete.
+transfer/model preparation costs, energy measurements and full rejection coverage.
+MLflow delivery for resultless terminal attempts and pure preflight rejection
+accounting have since been implemented. This does not mark the full
+usage-accounting milestone complete.
+
+## Cancellation evidence and completion ordering
+
+Before destructive cancellation, the worker reads scheduler status and persists
+available start/allocation evidence. If status is unavailable, the durable cancel
+event retries; it does not claim that execution stopped. If the scheduler reports
+execution complete, the worker collects the result instead of deleting its source.
+The collection deadline still applies; the probe execution deadline no longer
+interrupts collection after execution completion has been observed.
+
+The Job API exposes `cancel_requested_at`, `cancel_dispatch_started_at` and
+`cancel_acknowledged_at`. The terminal ledger also records `cancel_confirmed_at`,
+`cancel_dispatch_wait_seconds` and `cancel_confirmation_seconds`. Confirmation
+means the backend was observed canceled (or submission never occurred). A
+successful cancel command alone does not set it. If execution completed before
+the cancellation observation, its actual terminal outcome remains authoritative
+and cancellation confirmation is null. Historical records are not rewritten.
+
+Pre-cancel observation does **not** atomically fence scheduler completion against
+deletion. A workload can finish between the status read and delete; complete
+result/termination retention across that boundary still requires durable backend
+evidence capture. Disappeared Pods therefore retain unknown allocation duration.
+This worker remains qualified for a single replica, not concurrent-worker fencing.
 
 References: [Slurm sacct](https://slurm.schedmd.com/sacct.html) and
 [Kubernetes Pod lifecycle](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/).

@@ -20,7 +20,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.pool import StaticPool
 
-from .contracts import TERMINAL, now, signature
+from .contracts import TERMINAL, State, now, signature
 
 metadata = MetaData()
 entities = Table(
@@ -142,6 +142,9 @@ class Store:
         return conn.execute(select(jobs).where(jobs.c.id == job_id)).mappings().first()
 
     def change_job(self, conn, row, state, body):
+        if state == State.CANCEL_REQUESTED and row["state"] != State.CANCEL_REQUESTED:
+            body = dict(body)
+            body.setdefault("cancel_requested_at", now().isoformat())
         if state in TERMINAL:
             body = dict(body)
             body.setdefault("finished_at", now().isoformat())

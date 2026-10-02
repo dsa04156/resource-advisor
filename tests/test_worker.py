@@ -151,6 +151,85 @@ def test_cancel_ack_is_not_terminal_until_confirmed(service):
     assert service.get_job("team-a", job["job_id"])["state"] == "CANCELED"
 
 
+def test_completed_execution_wins_cancel_race_and_preserves_result(service):
+    backend, worker, job = setup(service)
+    worker.submit_one()
+    service.cancel("team-a", job["job_id"])
+    backend.observation = Observation(State.COLLECTING)
+    worker.cancel_one()
+    assert backend.cancel_calls == 0
+    assert service.get_job("team-a", job["job_id"])["state"] == "SUCCEEDED"
+
+
+def test_reconcile_completed_execution_does_not_stick_in_cancel_requested(service):
+    backend, worker, job = setup(service)
+    worker.submit_one()
+    service.cancel("team-a", job["job_id"])
+    backend.observation = Observation(State.COLLECTING)
+    worker.reconcile_all()
+    assert service.get_job("team-a", job["job_id"])["state"] == "SUCCEEDED"
+
+
+def test_cancel_does_not_destroy_completed_job_when_collector_temporarily_fails(service):
+    backend, worker, job = setup(service)
+    worker.submit_one()
+    service.cancel("team-a", job["job_id"])
+    backend.observation = Observation(State.COLLECTING)
+    collect = backend.result
+
+    def unavailable(_):
+        raise BackendError("collector unavailable")
+
+    backend.result = unavailable
+    worker.cancel_one()
+    assert service.get_job("team-a", job["job_id"])["state"] == "COLLECTING"
+    assert backend.cancel_calls == 0
+    backend.result = collect
+    worker.reconcile_all()
+    expire_retry(service)
+    worker.cancel_one()
+    assert service.get_job("team-a", job["job_id"])["state"] == "SUCCEEDED"
+    assert backend.cancel_calls == 0
+
+
+def test_completed_execution_uses_collection_deadline_not_expired_probe_deadline(service):
+    backend, worker, job = setup(service)
+    worker.submit_one()
+    with service.store.transaction() as conn:
+        row = service.store.job(conn, job["job_id"])
+        service.store.change_job(
+            conn,
+            row,
+            row["state"],
+            dict(row["body"], deadline_at=(now() - timedelta(seconds=1)).isoformat()),
+        )
+    backend.observation = Observation(State.COLLECTING)
+    worker.reconcile_all()
+    assert service.get_job("team-a", job["job_id"])["state"] == "SUCCEEDED"
+
+
+def test_automatic_queue_cancel_has_durable_request_timestamp(service):
+    backend, worker, job = setup(service)
+    worker.submit_one()
+    with service.store.transaction() as conn:
+        row = service.store.job(conn, job["job_id"])
+        service.store.change_job(
+            conn,
+            row,
+            row["state"],
+            dict(row["body"], queued_at=(now() - timedelta(days=1)).isoformat()),
+        )
+    worker.reconcile_all()
+    current = service.get_job("team-a", job["job_id"])
+    assert current["state"] == "CANCEL_REQUESTED"
+    assert current["cancel_requested_at"]
+    worker.reconcile_all()
+    assert (
+        service.get_job("team-a", job["job_id"])["cancel_requested_at"]
+        == current["cancel_requested_at"]
+    )
+
+
 def test_end_to_end_synthetic_result_and_usage(service):
     from resource_advisor.store import usage
 

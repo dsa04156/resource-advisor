@@ -39,6 +39,8 @@ The [supervised API and inventory deployment](docs/service-deployment.md) uses
 separate permissions and verifies Pod replacement/collector termination recovery.
 The [supervised worker crash trial](docs/worker-recovery.md) kills the controller
 after accepted GPU submission and verifies recovery without another Job creation.
+The [GPU cancellation trials](docs/cancellation-verification.md) separate request
+from confirmed cancellation and preserve completed results across worker restart.
 
 ## Responsibility
 

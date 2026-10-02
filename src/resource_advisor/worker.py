@@ -151,9 +151,32 @@ class Worker:
                         conn, row, State.CANCEL_REQUESTED, dict(row["body"], external_id=external)
                     )
                 row = self._row(row["id"])
-            self.backend(row).cancel(row)
+            backend = self.backend(row)
+            # Capture allocation evidence before a destructive scheduler cancel.
+            # A completed execution must retain its result, even if cancel raced it.
+            observation = backend.status(row)
+            if observation.state in TERMINAL or observation.state == State.COLLECTING:
+                self._reconcile_observation(row, backend, observation)
+                self.store.finish(event)
+                return True
+            with self.store.transaction() as conn:
+                latest = self.store.job(conn, row["id"])
+                if latest["state"] in TERMINAL or latest["state"] == State.COLLECTING:
+                    raise Conflict("execution completed while cancellation was observing")
+                body = self.observed_body(latest, observation)
+                body.setdefault("cancel_dispatch_started_at", now().isoformat())
+                self.store.change_job(conn, latest, State.CANCEL_REQUESTED, body)
+            # Committed intent survives response loss. An acknowledgement is not
+            # evidence that Pods/processes have stopped; reconciliation confirms it.
+            backend.cancel(self._row(row["id"]))
+            with self.store.transaction() as conn:
+                latest = self.store.job(conn, row["id"])
+                if latest["state"] not in TERMINAL:
+                    body = dict(latest["body"])
+                    body.setdefault("cancel_acknowledged_at", now().isoformat())
+                    self.store.change_job(conn, latest, latest["state"], body)
             self.store.finish(event)
-        except (BackendError, Conflict, ValueError) as exc:
+        except (BackendError, Conflict, Rejected, ValueError, KeyError) as exc:
             self.store.finish(event, type(exc).__name__)
         return True
 
@@ -174,66 +197,7 @@ class Worker:
                     continue
                 backend = self.backend(row)
                 observation = backend.status(row)
-                with self.store.transaction() as conn:
-                    latest = self.store.job(conn, row["id"])
-                    if latest["state"] in TERMINAL:
-                        continue
-                    body = dict(latest["body"])
-                    body["backend_observed_at"] = now().isoformat()
-                    for key, value in [
-                        ("started_at", observation.started_at),
-                        ("backend_finished_at", observation.finished_at),
-                        ("error", observation.error),
-                        ("allocation", observation.allocation),
-                        ("scheduler_submitted_at", observation.submitted_at),
-                        ("execution_started_at", observation.execution_started_at),
-                    ]:
-                        if value:
-                            body[key] = value
-                    state = observation.state
-                    limits = body.get("execution_limits", body["spec"]["execution"])
-                    if state == State.COLLECTING:
-                        body.setdefault("collecting_since", now().isoformat())
-                        collection_age = (
-                            now() - datetime.fromisoformat(body["collecting_since"])
-                        ).total_seconds()
-                        if collection_age > limits["max_collection_seconds"]:
-                            state, body["error"] = (
-                                State.RESULT_INVALID,
-                                "RESULT_COLLECTION_DEADLINE",
-                            )
-                    if latest["state"] == State.CANCEL_REQUESTED and state not in TERMINAL:
-                        state = State.CANCEL_REQUESTED
-                    if state == State.QUEUED and body.get("queued_at"):
-                        wait = (now() - datetime.fromisoformat(body["queued_at"])).total_seconds()
-                        if wait > limits["max_queue_seconds"]:
-                            state, body["error"] = State.CANCEL_REQUESTED, "QUEUE_DEADLINE_EXCEEDED"
-                            self.store.enqueue(
-                                conn,
-                                "cancel-" + body["attempt_id"],
-                                "cancel",
-                                {"job_id": row["id"]},
-                            )
-                    if (
-                        body.get("deadline_at")
-                        and now() >= datetime.fromisoformat(body["deadline_at"])
-                        and state not in TERMINAL
-                    ):
-                        state, body["error"] = State.CANCEL_REQUESTED, "PROBE_WALL_DEADLINE"
-                        self.store.enqueue(
-                            conn, "cancel-" + body["attempt_id"], "cancel", {"job_id": row["id"]}
-                        )
-                    self.store.change_job(conn, latest, state, body)
-                if state == State.COLLECTING:
-                    envelope = backend.result(row)
-                    result = ExecutionResult.model_validate(envelope["result"])
-                    self.service.ingest(
-                        row["project"],
-                        result,
-                        envelope["digest"],
-                        phase_profile=envelope.get("phase_profile"),
-                        training_receipt=envelope.get("training_receipt"),
-                    )
+                self._reconcile_observation(row, backend, observation)
             except (BackendError, Conflict, Rejected, ValueError, KeyError) as exc:
                 # Transport errors are observable without falsely failing a running workload.
                 try:
@@ -252,6 +216,78 @@ class Worker:
                             )
                 except Conflict:
                     pass  # Another worker already changed this version.
+
+    @staticmethod
+    def observed_body(latest, observation):
+        body = dict(latest["body"])
+        body["backend_observed_at"] = now().isoformat()
+        for key, value in [
+            ("started_at", observation.started_at),
+            ("backend_finished_at", observation.finished_at),
+            ("error", observation.error),
+            ("allocation", observation.allocation),
+            ("scheduler_submitted_at", observation.submitted_at),
+            ("execution_started_at", observation.execution_started_at),
+        ]:
+            if value:
+                body[key] = value
+        return body
+
+    def _reconcile_observation(self, row, backend, observation):
+        with self.store.transaction() as conn:
+            latest = self.store.job(conn, row["id"])
+            if latest["state"] in TERMINAL:
+                return
+            body = self.observed_body(latest, observation)
+            state = observation.state
+            limits = body.get("execution_limits", body["spec"]["execution"])
+            if state == State.COLLECTING:
+                body.setdefault("collecting_since", now().isoformat())
+                collection_age = (
+                    now() - datetime.fromisoformat(body["collecting_since"])
+                ).total_seconds()
+                if collection_age > limits["max_collection_seconds"]:
+                    state, body["error"] = (
+                        State.RESULT_INVALID,
+                        "RESULT_COLLECTION_DEADLINE",
+                    )
+            if (
+                latest["state"] == State.CANCEL_REQUESTED
+                and state not in TERMINAL
+                and state != State.COLLECTING
+            ):
+                state = State.CANCEL_REQUESTED
+            if state == State.QUEUED and body.get("queued_at"):
+                wait = (now() - datetime.fromisoformat(body["queued_at"])).total_seconds()
+                if wait > limits["max_queue_seconds"]:
+                    state, body["error"] = State.CANCEL_REQUESTED, "QUEUE_DEADLINE_EXCEEDED"
+                    self.store.enqueue(
+                        conn,
+                        "cancel-" + body["attempt_id"],
+                        "cancel",
+                        {"job_id": row["id"]},
+                    )
+            if (
+                body.get("deadline_at")
+                and now() >= datetime.fromisoformat(body["deadline_at"])
+                and state not in TERMINAL
+                and state != State.COLLECTING
+            ):
+                state, body["error"] = State.CANCEL_REQUESTED, "PROBE_WALL_DEADLINE"
+                self.store.enqueue(
+                    conn, "cancel-" + body["attempt_id"], "cancel", {"job_id": row["id"]}
+                )
+            self.store.change_job(conn, latest, state, body)
+        if state == State.COLLECTING:
+            envelope = backend.result(row)
+            result = ExecutionResult.model_validate(envelope["result"])
+            self.service.ingest(
+                row["project"],
+                result,
+                envelope["digest"],
+                phase_profile=envelope.get("phase_profile"),
+                training_receipt=envelope.get("training_receipt"),
+            )
 
 
 class MLflowDelivery:
