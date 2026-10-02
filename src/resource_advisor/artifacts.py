@@ -139,6 +139,7 @@ class ArtifactDelivery:
                 body = row["body"]
                 result = self.store.get(conn, "result", body["attempt_id"])["body"]
                 phases = self.store.get(conn, "phase_profile", body["attempt_id"])
+                training = self.store.get(conn, "training_receipt", body["attempt_id"])
                 if (
                     row["state"] not in {State.SUCCEEDED, State.FAILED}
                     or signature(result) != body["result_digest"]
@@ -155,6 +156,9 @@ class ArtifactDelivery:
             }
             if phases:
                 payload["phase_profile"] = phases["body"]
+            if training:
+                payload["training_receipt"] = training["body"]
+                payload["training_isolation"] = body["training_isolation"]
             record = self.storage.put(row["project"], body["attempt_id"], row["id"], payload)
             with self.store.transaction() as conn:
                 self.store.put(conn, "artifact", record["ref"], row["project"], record)

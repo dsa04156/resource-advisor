@@ -149,6 +149,7 @@ class KubernetesBackend:
         kubeconfig=None,
         context=None,
         runtime_bundles=None,
+        training_sources=None,
         priority_classes=None,
         execute=run,
     ):
@@ -157,6 +158,12 @@ class KubernetesBackend:
         self.namespace, self.local_queue, self.node_selector = namespace, local_queue, node_selector
         self.execute = execute
         self.runtime_bundles = runtime_bundles or {}
+        self.training_sources = training_sources or {}
+        if not isinstance(self.training_sources, dict) or any(
+            not isinstance(route, dict) or not isinstance(route.get("source"), dict)
+            for route in self.training_sources.values()
+        ):
+            raise ValueError("training sources require mappings with a source mapping")
         self.priority_classes = priority_mapping(priority_classes)
         self.prefix = ["kubectl"]
         if kubeconfig:
@@ -266,6 +273,15 @@ class KubernetesBackend:
                 {"name": "PYTHONPATH", "value": "/opt/resource-advisor:/opt/qualified-runtime/site"}
             )
             container["env"].append({"name": "PYTHONDONTWRITEBYTECODE", "value": "1"})
+        if b["spec"]["identity"]["task_type"] == "training":
+            from .training import isolate_manifest
+
+            if not b.get("training_isolation"):
+                raise BackendError("training isolation binding required")
+            try:
+                isolate_manifest(manifest, job, self.training_sources)
+            except ValueError as exc:
+                raise BackendError("invalid training source binding") from exc
         return manifest
 
     def submit(self, job):
@@ -523,6 +539,8 @@ class SlurmBackend:
 
     def script(self, job):
         b = job["body"]
+        if b["spec"]["identity"]["task_type"] == "training":
+            raise BackendError("Slurm checkpoint isolation is not qualified")
         qos = policy_priority(job, self.qos_by_priority, self.qos)
         check, command = self.runtime_command(job)
         r = b["candidate"]["context"]["resources"]

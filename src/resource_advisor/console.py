@@ -8,7 +8,7 @@ from .contracts import WorkloadSpec, now, signature
 from .diagnostics import diagnose
 from .inventory import fresh_view
 from .policy import compatibility
-from .service import NotFound
+from .service import NotFound, Rejected
 from .store import entities, jobs, usage
 
 PAGE_SIZE = 25
@@ -152,6 +152,8 @@ def overview(
                     )
                 except NotFound:
                     base["reasons"] = ["REGISTRY_ENTRY_MISSING"]
+                except Rejected:
+                    base["reasons"] = ["QUALIFICATION_REJECTED"]
                 base["contract_compatible_now"] = not base["reasons"]
                 candidates.append(base)
             compat_page["items"].append(

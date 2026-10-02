@@ -1,0 +1,662 @@
+{
+  "schema_version": "v1",
+  "evidence_kind": "hardware",
+  "scope": "qualified deterministic ten-step SGD GPU training fixture; not general training or convergence evidence",
+  "kubernetes_version": "v1.31.14",
+  "gpu": "NVIDIA GeForce RTX 5080",
+  "runtime_versions": {
+    "pytorch": "2.8.0+cu128",
+    "cuda": "12.8"
+  },
+  "image": "ghcr.io/mlflow/mlflow:v3.16.1@sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984",
+  "source_bundle_digest": "sha256:80088871657f1d3da0210f9723db870ad403d5106ddd47e9cabb04b34f5a11bc",
+  "environment_digest": "sha256:64fa97796cd73283ab03bc9af80393aa4e46ff11f4b876e968f9647f8761fb89",
+  "workload_identity": {
+    "code_digest": "sha256:80088871657f1d3da0210f9723db870ad403d5106ddd47e9cabb04b34f5a11bc",
+    "model_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+    "dataset_version": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+    "config_digest": "sha256:207ea067b9e58bde3f67b43ea3ffa4b750db2bff3ce78ad0b28ecd4216f2d51c",
+    "task_type": "training",
+    "input_shape": [
+      8,
+      2
+    ],
+    "batch_size": 8,
+    "global_batch_size": 8,
+    "gradient_accumulation": 1,
+    "precision": "fp32",
+    "seed": 0,
+    "work_units": 10,
+    "quality_contract_digest": "sha256:a9f0bd7d40be67709a2fcc7ca47d00eccac388f46be97234dc9fb0825dcc9496",
+    "measurement_boundary": "linear-sgd-ten-step-synchronized-v1"
+  },
+  "profiling_policy": {
+    "consent": true,
+    "max_candidates": 1,
+    "max_wall_seconds_per_candidate": 60,
+    "max_queue_seconds": 120,
+    "total_wall_seconds": 480,
+    "final_validation_seconds": 180,
+    "mutable_parameters": [],
+    "checkpoint_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+    "max_probes": 1,
+    "device_seconds": {
+      "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 600.0
+    }
+  },
+  "quality_policy": {
+    "metric": "numerical_agreement",
+    "minimum": 1.0,
+    "minimum_repeats": 3,
+    "maximum_peak_memory_mib": 1024.0,
+    "max_profile_age_seconds": 86400
+  },
+  "isolation_binding": {
+    "ref": "training-isolated-092617",
+    "project_ref": "ra-lab",
+    "workload_ref": "training-isolated-092617",
+    "workload_digest": "sha256:3ef65e4616891f641a7f8ce0d3d9c992443837ad66385c82a6d4e5abe51fefbc",
+    "checkpoint_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+    "input_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+    "checkpoint_size_bytes": 133,
+    "input_size_bytes": 337,
+    "validation_refs": [
+      "ra-train-qualify-092617"
+    ],
+    "backend": "kubernetes",
+    "output_format": "bounded-json-v1",
+    "auto_promote": false
+  },
+  "source_fixture": {
+    "checkpoint.json": {
+      "bias": [
+        0.05
+      ],
+      "lr": 0.05,
+      "momentum": 0.9,
+      "momentum_bias": [
+        0.005
+      ],
+      "momentum_weights": [
+        [
+          0.01
+        ],
+        [
+          0.02
+        ]
+      ],
+      "step": 0,
+      "weights": [
+        [
+          0.1
+        ],
+        [
+          -0.2
+        ]
+      ]
+    },
+    "input.json": {
+      "x": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.125,
+          0.42857142857142855
+        ],
+        [
+          0.25,
+          0.8571428571428571
+        ],
+        [
+          0.375,
+          0.2857142857142857
+        ],
+        [
+          0.5,
+          0.7142857142857143
+        ],
+        [
+          0.625,
+          0.14285714285714285
+        ],
+        [
+          0.75,
+          0.5714285714285714
+        ],
+        [
+          0.875,
+          0.0
+        ]
+      ],
+      "y": [
+        [
+          0.5
+        ],
+        [
+          -0.5357142857142856
+        ],
+        [
+          -1.5714285714285712
+        ],
+        [
+          0.3928571428571429
+        ],
+        [
+          -0.6428571428571428
+        ],
+        [
+          1.3214285714285714
+        ],
+        [
+          0.2857142857142858
+        ],
+        [
+          2.25
+        ]
+      ]
+    }
+  },
+  "original_source_unchanged_after_all_runs": true,
+  "all_attempts_started_from_same_checkpoint": true,
+  "all_output_checkpoint_digests_equal": true,
+  "shared_output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+  "qualification": {
+    "job_completion": "2026-10-02T09:26:24Z",
+    "result": {
+      "result": {
+        "schema_version": "v1",
+        "job_id": "ra-train-qualify-092617",
+        "attempt_id": "ra-train-qualify-092617",
+        "epoch": 1,
+        "workload_signature": "sha256:36b1aef1d466f4f21d98c225831a7b9d080d872a6e121eabfcb3af810a9a9260",
+        "context_signature": "sha256:3765e20428be8d06b8d861fae3fb33ad15d8c87404a97a930c7e3495ffc8098a",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.004398652876261622,
+          "peak_memory_mib": 64.00732421875,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 0.4269589844625443,
+          "latency_p95_ms": null,
+          "latency_p99_ms": null,
+          "throughput": 2273.4233142077164,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "digest": "sha256:a8136ac8afceceec369ca76878c338788da4dae73a4c7a78f33f6c1318763f98",
+      "training_receipt": {
+        "job_id": "ra-train-qualify-092617",
+        "attempt_id": "ra-train-qualify-092617",
+        "result_digest": "sha256:a8136ac8afceceec369ca76878c338788da4dae73a4c7a78f33f6c1318763f98",
+        "initial_checkpoint_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_after_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_after_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_readonly": true,
+        "input_readonly": true,
+        "source_not_mounted": true,
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+        "output_checkpoint": {
+          "weights": [
+            [
+              0.8953979015350342
+            ],
+            [
+              -1.133054256439209
+            ]
+          ],
+          "bias": [
+            0.365276038646698
+          ],
+          "momentum_weights": [
+            [
+              -1.8070837259292603
+            ],
+            [
+              3.1165616512298584
+            ]
+          ],
+          "momentum_bias": [
+            0.14817176759243011
+          ],
+          "step": 10,
+          "lr": 0.05,
+          "momentum": 0.9
+        }
+      }
+    },
+    "original_unchanged": true
+  },
+  "negative_test": {
+    "job_id": "ra-train-qualify-092617-bad",
+    "mutation": "one byte appended to a separate test source; original source preserved",
+    "init_exit_code": 1,
+    "job_failed": true,
+    "workload_never_started": true,
+    "reason": "checkpoint/input size or digest mismatch"
+  },
+  "study": {
+    "ref": "study-77e3280c3a7a46abbc34a7423ae29d1f",
+    "state": "COMPLETED",
+    "strategy": "random",
+    "confirmation_runs": 3,
+    "confirmation_mean_seconds": 0.004049632329648982,
+    "confirmation_stdev_seconds": 0.0015278350511042215,
+    "charged_device_seconds": {
+      "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 12.0
+    }
+  },
+  "application_attempts": [
+    {
+      "job_id": "j-3ad2ff72019e4656ae2186b5b5753c53",
+      "attempt_id": "a-f67346f1b09449f595cc740f6d74a853",
+      "state": "SUCCEEDED",
+      "mode": "pilot",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-3ad2ff72019e4656ae2186b5b5753c53",
+        "attempt_id": "a-f67346f1b09449f595cc740f6d74a853",
+        "epoch": 1,
+        "workload_signature": "sha256:36b1aef1d466f4f21d98c225831a7b9d080d872a6e121eabfcb3af810a9a9260",
+        "context_signature": "sha256:3765e20428be8d06b8d861fae3fb33ad15d8c87404a97a930c7e3495ffc8098a",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.005121646914631128,
+          "peak_memory_mib": 64.00732421875,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 0.5359445058275014,
+          "latency_p95_ms": null,
+          "latency_p99_ms": null,
+          "throughput": 1952.4969539451786,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "training_receipt": {
+        "job_id": "j-3ad2ff72019e4656ae2186b5b5753c53",
+        "attempt_id": "a-f67346f1b09449f595cc740f6d74a853",
+        "result_digest": "sha256:74b4c2c4e38f047057697b3c084927d8bac144191fc5ec4b203af88eaeb62663",
+        "initial_checkpoint_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_after_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_after_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_readonly": true,
+        "input_readonly": true,
+        "source_not_mounted": true,
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+        "output_checkpoint": {
+          "weights": [
+            [
+              0.8953979015350342
+            ],
+            [
+              -1.133054256439209
+            ]
+          ],
+          "bias": [
+            0.365276038646698
+          ],
+          "momentum_weights": [
+            [
+              -1.8070837259292603
+            ],
+            [
+              3.1165616512298584
+            ]
+          ],
+          "momentum_bias": [
+            0.14817176759243011
+          ],
+          "step": 10,
+          "lr": 0.05,
+          "momentum": 0.9
+        }
+      },
+      "quality_passed": true,
+      "kueue_admitted": true,
+      "pod_isolation": {
+        "non_root": true,
+        "read_only_root": true,
+        "original_not_mounted": true,
+        "input_copies_read_only": true,
+        "copy_init_completed": true,
+        "per_pod_emptydir": true
+      },
+      "queue_seconds": 1.0,
+      "allocated_device_seconds": 3.0,
+      "allocation_mode": "physical_device",
+      "queue_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    },
+    {
+      "job_id": "j-8605de39670b42e1bb43900b433c0238",
+      "attempt_id": "a-f249f3a0a67142a5b4d01e460fca42dc",
+      "state": "SUCCEEDED",
+      "mode": "confirmation",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-8605de39670b42e1bb43900b433c0238",
+        "attempt_id": "a-f249f3a0a67142a5b4d01e460fca42dc",
+        "epoch": 1,
+        "workload_signature": "sha256:36b1aef1d466f4f21d98c225831a7b9d080d872a6e121eabfcb3af810a9a9260",
+        "context_signature": "sha256:3765e20428be8d06b8d861fae3fb33ad15d8c87404a97a930c7e3495ffc8098a",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.004186946956906468,
+          "peak_memory_mib": 64.00732421875,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 0.4208759928587824,
+          "latency_p95_ms": null,
+          "latency_p99_ms": null,
+          "throughput": 2388.3751341785605,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "training_receipt": {
+        "job_id": "j-8605de39670b42e1bb43900b433c0238",
+        "attempt_id": "a-f249f3a0a67142a5b4d01e460fca42dc",
+        "result_digest": "sha256:9162f2138fc53c7610bf922d28a52ba5f5207a890dabf102953f3bc992dc3dc9",
+        "initial_checkpoint_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_after_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_after_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_readonly": true,
+        "input_readonly": true,
+        "source_not_mounted": true,
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+        "output_checkpoint": {
+          "weights": [
+            [
+              0.8953979015350342
+            ],
+            [
+              -1.133054256439209
+            ]
+          ],
+          "bias": [
+            0.365276038646698
+          ],
+          "momentum_weights": [
+            [
+              -1.8070837259292603
+            ],
+            [
+              3.1165616512298584
+            ]
+          ],
+          "momentum_bias": [
+            0.14817176759243011
+          ],
+          "step": 10,
+          "lr": 0.05,
+          "momentum": 0.9
+        }
+      },
+      "quality_passed": true,
+      "kueue_admitted": true,
+      "pod_isolation": {
+        "non_root": true,
+        "read_only_root": true,
+        "original_not_mounted": true,
+        "input_copies_read_only": true,
+        "copy_init_completed": true,
+        "per_pod_emptydir": true
+      },
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 3.0,
+      "allocation_mode": "physical_device",
+      "queue_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    },
+    {
+      "job_id": "j-e4717a4d76dc4d39aea141ecee639d8f",
+      "attempt_id": "a-138f6d64e9274f7abec21746c9bded47",
+      "state": "SUCCEEDED",
+      "mode": "confirmation",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-e4717a4d76dc4d39aea141ecee639d8f",
+        "attempt_id": "a-138f6d64e9274f7abec21746c9bded47",
+        "epoch": 1,
+        "workload_signature": "sha256:36b1aef1d466f4f21d98c225831a7b9d080d872a6e121eabfcb3af810a9a9260",
+        "context_signature": "sha256:3765e20428be8d06b8d861fae3fb33ad15d8c87404a97a930c7e3495ffc8098a",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.005504175089299679,
+          "peak_memory_mib": 64.00732421875,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 0.5735695012845099,
+          "latency_p95_ms": null,
+          "latency_p99_ms": null,
+          "throughput": 1816.802670293024,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "training_receipt": {
+        "job_id": "j-e4717a4d76dc4d39aea141ecee639d8f",
+        "attempt_id": "a-138f6d64e9274f7abec21746c9bded47",
+        "result_digest": "sha256:7580232ee128d1ee76e889e08c081f5b78e450820a2beec509eeeb502a80c8b1",
+        "initial_checkpoint_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_after_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_after_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_readonly": true,
+        "input_readonly": true,
+        "source_not_mounted": true,
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+        "output_checkpoint": {
+          "weights": [
+            [
+              0.8953979015350342
+            ],
+            [
+              -1.133054256439209
+            ]
+          ],
+          "bias": [
+            0.365276038646698
+          ],
+          "momentum_weights": [
+            [
+              -1.8070837259292603
+            ],
+            [
+              3.1165616512298584
+            ]
+          ],
+          "momentum_bias": [
+            0.14817176759243011
+          ],
+          "step": 10,
+          "lr": 0.05,
+          "momentum": 0.9
+        }
+      },
+      "quality_passed": true,
+      "kueue_admitted": true,
+      "pod_isolation": {
+        "non_root": true,
+        "read_only_root": true,
+        "original_not_mounted": true,
+        "input_copies_read_only": true,
+        "copy_init_completed": true,
+        "per_pod_emptydir": true
+      },
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 3.0,
+      "allocation_mode": "physical_device",
+      "queue_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    },
+    {
+      "job_id": "j-e2206dd4431349439f9cc928e4538ec4",
+      "attempt_id": "a-7bef2e72cfb849e09f98e55bdca7037c",
+      "state": "SUCCEEDED",
+      "mode": "confirmation",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-e2206dd4431349439f9cc928e4538ec4",
+        "attempt_id": "a-7bef2e72cfb849e09f98e55bdca7037c",
+        "epoch": 1,
+        "workload_signature": "sha256:36b1aef1d466f4f21d98c225831a7b9d080d872a6e121eabfcb3af810a9a9260",
+        "context_signature": "sha256:3765e20428be8d06b8d861fae3fb33ad15d8c87404a97a930c7e3495ffc8098a",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.002457774942740798,
+          "peak_memory_mib": 64.00732421875,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 0.21739749354310334,
+          "latency_p95_ms": null,
+          "latency_p99_ms": null,
+          "throughput": 4068.7207872859417,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "training_receipt": {
+        "job_id": "j-e2206dd4431349439f9cc928e4538ec4",
+        "attempt_id": "a-7bef2e72cfb849e09f98e55bdca7037c",
+        "result_digest": "sha256:3b5beca20420f5c4ff91dd13dd53bbd35a23707c0c19669042a75029819b5477",
+        "initial_checkpoint_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_after_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_after_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_readonly": true,
+        "input_readonly": true,
+        "source_not_mounted": true,
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+        "output_checkpoint": {
+          "weights": [
+            [
+              0.8953979015350342
+            ],
+            [
+              -1.133054256439209
+            ]
+          ],
+          "bias": [
+            0.365276038646698
+          ],
+          "momentum_weights": [
+            [
+              -1.8070837259292603
+            ],
+            [
+              3.1165616512298584
+            ]
+          ],
+          "momentum_bias": [
+            0.14817176759243011
+          ],
+          "step": 10,
+          "lr": 0.05,
+          "momentum": 0.9
+        }
+      },
+      "quality_passed": true,
+      "kueue_admitted": true,
+      "pod_isolation": {
+        "non_root": true,
+        "read_only_root": true,
+        "original_not_mounted": true,
+        "input_copies_read_only": true,
+        "copy_init_completed": true,
+        "per_pod_emptydir": true
+      },
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 3.0,
+      "allocation_mode": "physical_device",
+      "queue_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    }
+  ],
+  "artifact_delivery": [
+    {
+      "attempt_id": "a-f67346f1b09449f595cc740f6d74a853",
+      "mlflow_run_id": "0ef4a7b4ddee4c5ea3832d41d8e167e0",
+      "artifact_digest": "sha256:40aea8009c2a8f7394da7dc201521c25ac4aa60a4182a073555ce4ced5acef05",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-f249f3a0a67142a5b4d01e460fca42dc",
+      "mlflow_run_id": "04a0756ac7354b76b8434a9116c0187d",
+      "artifact_digest": "sha256:c2befcfee1250c1da3f3afdc442aad2be4681a41d1c46b327cf62c46f093e255",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-138f6d64e9274f7abec21746c9bded47",
+      "mlflow_run_id": "fc554341f9464042abe60cb4fd11cc9e",
+      "artifact_digest": "sha256:dde1c447e158f375f2f38f90e727a58a2c73dcf01494cff6bdef7b6e5e8d1864",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-7bef2e72cfb849e09f98e55bdca7037c",
+      "mlflow_run_id": "e2eb98e3882542f9a05cbfab19d9dc0a",
+      "artifact_digest": "sha256:0f2018e2751bceef8c474ec1c1b0a979b168c028a5f3aa0562f5356809417feb",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    }
+  ],
+  "limits": [
+    "One qualified JSON checkpoint fixture on Kubernetes; Slurm training isolation stays rejected.",
+    "Nonzero initial optimizer momentum is restored; all ten measured steps start from the same initial checkpoint. Warmup uses separate state.",
+    "No automatic promotion of pilot state into real training; output is retained only as an evidence artifact.",
+    "Numerical CPU-reference agreement is not convergence, general model quality, or full-training memory safety.",
+    "Preparation/model loading, warmup, CPU reference and artifact transfer are outside the synchronized ten-step timing boundary.",
+    "One successful qualification and one negative preparation job are outside the four application-attempt usage rows; total experiment cost is not claimed to equal those rows.",
+    "ConfigMap source tested live. Large/binary checkpoints, stochastic RNG/data-loader state, distributed training, PVC live source qualification and storage retention remain open."
+  ]
+}

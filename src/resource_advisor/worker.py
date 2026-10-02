@@ -220,6 +220,7 @@ class Worker:
                         result,
                         envelope["digest"],
                         phase_profile=envelope.get("phase_profile"),
+                        training_receipt=envelope.get("training_receipt"),
                     )
             except (BackendError, Conflict, Rejected, ValueError, KeyError) as exc:
                 # Transport errors are observable without falsely failing a running workload.
@@ -275,6 +276,7 @@ class MLflowDelivery:
             with self.store.transaction() as conn:
                 job = self.store.job(conn, b["job_id"])["body"]
                 phases = self.store.get(conn, "phase_profile", attempt)
+                training = self.store.get(conn, "training_receipt", attempt)
             start_time = int(
                 datetime.fromisoformat(job.get("started_at") or job["created_at"]).timestamp()
                 * 1000
@@ -304,6 +306,19 @@ class MLflowDelivery:
             }
             if job["request"].get("study_ref"):
                 tags["resource_advisor.study_id"] = job["request"]["study_ref"]
+            if training:
+                tags.update(
+                    {
+                        "training.isolated": "true",
+                        "training.initial_checkpoint_digest": training["body"][
+                            "initial_checkpoint_digest"
+                        ],
+                        "training.output_checkpoint_digest": training["body"][
+                            "output_checkpoint_digest"
+                        ],
+                        "training.auto_promote": "false",
+                    }
+                )
             if b.get("parent_run_ref"):
                 tags["mlflow.parentRunId"] = b["parent_run_ref"]
             run = (

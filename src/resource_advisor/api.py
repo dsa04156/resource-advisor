@@ -160,6 +160,21 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
     def register_workload(value: WorkloadSpec, p=Depends(principal)):
         return service.register("workload", value, p.project)
 
+    from .training import TrainingIsolation
+
+    @app.post(PREFIX + "/training-isolation")
+    def register_training_isolation(value: TrainingIsolation, p=Depends(operator)):
+        return service.register("training_isolation", value, p.project)
+
+    @app.get(PREFIX + "/jobs/{job_id}/training-receipt")
+    def training_receipt(job_id: str, p=Depends(principal)):
+        job = service.get_job(p.project, job_id)
+        with service.store.transaction() as conn:
+            row = service.store.get(conn, "training_receipt", job["attempt_id"])
+        if row is None:
+            raise HTTPException(404, "Training receipt not available")
+        return row["body"]
+
     @app.post(PREFIX + "/jobs")
     def submit(value: JobRequest, idempotency_key: str = Header(), p=Depends(principal)):
         return service.submit(p.project, value, idempotency_key)

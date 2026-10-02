@@ -65,6 +65,14 @@ class Service:
         cap = CapabilitySnapshot.model_validate(
             required(self.store, conn, "capability", candidate.capability_ref, project)
         )
+        if spec.identity.task_type == "training":
+            from .training import validate_binding
+
+            binding = required(self.store, conn, "training_isolation", spec.ref, project)
+            try:
+                validate_binding(binding, spec, candidate, variant)
+            except ValueError as exc:
+                raise Rejected("qualified training isolation required") from exc
         return spec, candidate, variant, cap
 
     def submit(self, project: str, request: JobRequest, key: str):
@@ -160,6 +168,10 @@ class Service:
                     if request.mode == "pilot"
                     else list(variant.command),
                 }
+                if spec.identity.task_type == "training":
+                    body["training_isolation"] = required(
+                        self.store, conn, "training_isolation", spec.ref, project
+                    )
                 conn.execute(
                     insert(jobs).values(
                         id=job_id,
@@ -233,7 +245,15 @@ class Service:
                 )
             return self.public_job(self.store.job(conn, job_id))
 
-    def ingest(self, project, result: ExecutionResult, artifact_digest: str, *, phase_profile=None):
+    def ingest(
+        self,
+        project,
+        result: ExecutionResult,
+        artifact_digest: str,
+        *,
+        phase_profile=None,
+        training_receipt=None,
+    ):
         """Trusted collector only. Require backend completion before result acceptance."""
         with self.store.transaction() as conn:
             row = self.store.job(conn, result.job_id)
@@ -245,6 +265,12 @@ class Service:
             digest = signature(result)
             if row["state"] in TERMINAL:
                 if body.get("result_digest") == digest:
+                    training = self.store.get(conn, "training_receipt", result.attempt_id)
+                    if training_receipt is not None and (
+                        training is None
+                        or signature(training["body"]) != signature(training_receipt)
+                    ):
+                        raise Conflict("terminal training receipt is immutable")
                     stored = self.store.get(conn, "phase_profile", result.attempt_id)
                     if phase_profile is not None and (
                         stored is None or signature(stored["body"]) != signature(phase_profile)
@@ -267,6 +293,25 @@ class Service:
                 problems.append("SYNTHETIC_EVIDENCE_DISABLED")
             if result.measurements and result.measurements.work_units != spec.identity.work_units:
                 problems.append("WORK_UNITS_MISMATCH")
+            if body.get("training_isolation") and result.outcome == "COMPLETED":
+                from .training import validate_receipt
+
+                try:
+                    training = validate_receipt(
+                        training_receipt, result, body["training_isolation"]
+                    )
+                except ValueError as exc:
+                    raise Rejected("training protection evidence required") from exc
+                if not problems:
+                    self.store.put(
+                        conn,
+                        "training_receipt",
+                        result.attempt_id,
+                        project,
+                        training.model_dump(mode="json"),
+                    )
+            elif training_receipt is not None:
+                raise Rejected("training receipt without completed qualified training")
             if phase_profile is not None:
                 from .diagnostics import validate_profile
 
@@ -355,6 +400,8 @@ class Service:
                     errors = compatibility(spec, candidate, variant, cap)
                 except NotFound:
                     errors = ["REGISTRY_ENTRY_MISSING"]
+                except Rejected:
+                    errors = ["QUALIFICATION_REJECTED"]
                 if errors:
                     rejected[candidate.ref] = errors
                     continue

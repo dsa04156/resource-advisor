@@ -27,6 +27,8 @@ The [approved GPU demo](docs/approved-gpu-demo.md) now connects fresh qualificat
 three observations, recommendation, approval and independent measured comparison.
 The [CNN diagnostic trial](docs/bottleneck-diagnostics.md) connects serial phase
 measurements to cautious bottleneck hypotheses and a controlled input-reuse test.
+The [isolated training trial](docs/training-isolation.md) protects the initial
+checkpoint/input, verifies repeated GPU training and retains separate output states.
 
 ## Responsibility
 

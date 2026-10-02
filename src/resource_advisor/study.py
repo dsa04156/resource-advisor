@@ -51,8 +51,6 @@ class Studies:
             policy = spec.profiling
             if not policy.consent:
                 raise Rejected("explicit profiling consent is required")
-            if spec.identity.task_type == "training":
-                raise Rejected("stateful training pilot requires qualified checkpoint isolation")
             if policy.final_validation_seconds < spec.quality.minimum_repeats * 2 * 3:
                 raise Rejected(
                     "final budget must cover independent baseline and finalist confirmation"
