@@ -23,6 +23,11 @@ def main():
     sub.add_parser("init-db")
     sub.add_parser("backfill-usage")
     sub.add_parser("backfill-tracking")
+    mfkg = sub.add_parser(
+        "mfkg-analyze", help="numerical analysis only; cannot authorize execution"
+    )
+    mfkg.add_argument("--input", type=Path, required=True)
+    mfkg.add_argument("--output", type=Path, required=True)
     verify_copy = sub.add_parser("verify-db-copy")
     verify_copy.add_argument(
         "--target-env",
@@ -55,6 +60,18 @@ def main():
     heartbeat.add_argument("--path", required=True)
     heartbeat.add_argument("--max-age", type=float, default=120)
     args = parser.parse_args()
+    if args.action == "mfkg-analyze":
+        from .mfkg import MFKernelInput, ask_mfkg
+
+        if args.output.exists():
+            parser.error("output already exists; choose a new report path")
+        problem = MFKernelInput.model_validate_json(args.input.read_text())
+        report = ask_mfkg(problem)
+        with args.output.open("x") as stream:
+            json.dump(report, stream, indent=2, allow_nan=False)
+            stream.write("\n")
+        print(json.dumps({"reason": report["reason"], "execution_authorized": False}))
+        return
     if args.action == "check-heartbeat":
         from .health import heartbeat_fresh
 

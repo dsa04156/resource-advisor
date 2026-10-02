@@ -79,8 +79,8 @@ The runner repeats identical inputs. Rank agreement, if observed, would still
 not establish a fidelity-bias model. Every such assessment therefore includes
 `REPLICATION_ONLY_NOT_MULTI_FIDELITY`, with `multi_fidelity_eligible=false` and
 `early_pruning_allowed=false`. Missing thermal evidence is also reported; the
-absence of a temperature measurement is not proof of no throttling. The next
-MF-KG implementation needs a qualified meaningful fidelity axis, explicit
+absence of a temperature measurement is not proof of no throttling. Operational
+integration of the [MF-KG numerical kernel](mfkg-kernel.md) needs a qualified meaningful fidelity axis, explicit
 measurement cost model, target-level validation and independent confirmation.
 
 See [raw plan and observations](evidence/fidelity-calibration.json) and the

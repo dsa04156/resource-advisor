@@ -32,7 +32,9 @@ Strategies:
   per-candidate caps, protected final confirmation and explicit stopping reasons;
   see [adaptive replication](adaptive-replication.md). This is not MFBO.
 - `mfkg` / `rgpe`: currently rejected with explicit missing-qualification reasons;
-  not aliases for qLogNEI. Their implementation and paired/source-data gates
+  not aliases for qLogNEI. The [MF-GP/MF-KG numerical kernel](mfkg-kernel.md) is
+  implemented with an analysis CLI; hardware qualification and mixed-fidelity
+  execution integration remain open. RGPE implementation/source-data gates also
   remain open in the full completion audit.
 
 [Paired calibration](fidelity-calibration.md) now preregisters a bounded,

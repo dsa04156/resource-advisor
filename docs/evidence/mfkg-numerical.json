@@ -1,0 +1,2167 @@
+{
+  "evidence_kind": "synthetic_numerical_fixture",
+  "execution_authorized": false,
+  "hardware_jobs_submitted": 0,
+  "trace": [
+    {
+      "input": {
+        "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+        "fidelity_axis": "representative_sampling",
+        "options": [
+          {
+            "ref": "x0-s0",
+            "candidate_ref": "x0",
+            "coordinates": [
+              0.0
+            ],
+            "fidelity": 0.25
+          },
+          {
+            "ref": "x0-s1",
+            "candidate_ref": "x0",
+            "coordinates": [
+              0.0
+            ],
+            "fidelity": 1.0
+          },
+          {
+            "ref": "x1-s0",
+            "candidate_ref": "x1",
+            "coordinates": [
+              0.5
+            ],
+            "fidelity": 0.25
+          },
+          {
+            "ref": "x1-s1",
+            "candidate_ref": "x1",
+            "coordinates": [
+              0.5
+            ],
+            "fidelity": 1.0
+          },
+          {
+            "ref": "x2-s0",
+            "candidate_ref": "x2",
+            "coordinates": [
+              1.0
+            ],
+            "fidelity": 0.25
+          },
+          {
+            "ref": "x2-s1",
+            "candidate_ref": "x2",
+            "coordinates": [
+              1.0
+            ],
+            "fidelity": 1.0
+          }
+        ],
+        "observations": [
+          {
+            "attempt_id": "synthetic-x0-s0-0",
+            "option_ref": "x0-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.267249999999999,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s0-1",
+            "option_ref": "x0-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.370835123997864,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s0-2",
+            "option_ref": "x0-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.162660907310368,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s1-0",
+            "option_ref": "x0-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.04225,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s1-1",
+            "option_ref": "x0-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.145835123997864,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s1-2",
+            "option_ref": "x0-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 9.937660907310368,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s0-0",
+            "option_ref": "x1-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.359781064632505,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s0-1",
+            "option_ref": "x1-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.364110164618577,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s0-2",
+            "option_ref": "x1-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.182259209092308,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s1-0",
+            "option_ref": "x1-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.059781064632505,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s1-1",
+            "option_ref": "x1-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.064110164618576,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s1-2",
+            "option_ref": "x1-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 9.882259209092307,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s0-0",
+            "option_ref": "x2-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.488226518176948,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s0-1",
+            "option_ref": "x2-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.392239679491995,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s0-2",
+            "option_ref": "x2-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.281235441313582,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s1-0",
+            "option_ref": "x2-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.113226518176948,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s1-1",
+            "option_ref": "x2-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.017239679491995,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s1-2",
+            "option_ref": "x2-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 9.906235441313582,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          }
+        ],
+        "feature_names": [
+          "normalized_numeric_setting"
+        ],
+        "seed": 17,
+        "num_fantasies": 16
+      },
+      "choice": {
+        "method": "finite_space_cost_aware_qMultiFidelityKnowledgeGradient",
+        "option_ref": "x1-s0",
+        "candidate_ref": "x1",
+        "fidelity": 0.25,
+        "reason": "MF_KG_NUMERICAL_SUGGESTION",
+        "execution_authorized": false,
+        "measured": false,
+        "input_digest": "sha256:306e0ec6f6ee44492ccbf1e279e8f82f7df94bb98a65628b84e2cbdc8f5ec9f4",
+        "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+        "scores": [
+          {
+            "option_ref": "x0-s0",
+            "candidate_ref": "x0",
+            "fidelity": 0.25,
+            "acquisition_value": 0.0006480636888538977,
+            "estimated_evaluation_wall_seconds": 4.0,
+            "normalized_cost": 0.4,
+            "fantasy_gains": [
+              -0.00019686225164283755,
+              0.0011659851997962711,
+              0.00032395042082988823,
+              -0.0003054167094607152,
+              -0.0001941418835835762,
+              4.300888221564492e-06,
+              0.0004936289463528531,
+              -0.0005619841241819579,
+              -0.0005524431890782111,
+              0.0005958820626870143,
+              0.00015130594544299214,
+              -6.498431042567532e-05,
+              -0.00039639562353599445,
+              0.0002582442473375579,
+              0.0007746608507175345,
+              0.0007432055419847039
+            ],
+            "fantasy_target_options": [
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1"
+            ]
+          },
+          {
+            "option_ref": "x0-s1",
+            "candidate_ref": "x0",
+            "fidelity": 1.0,
+            "acquisition_value": 0.0004888123553501988,
+            "estimated_evaluation_wall_seconds": 10.0,
+            "normalized_cost": 1.0,
+            "fantasy_gains": [
+              0.0027726572017061635,
+              -0.001316988370918093,
+              -0.00036590424737958926,
+              0.0003449702918305597,
+              0.00021928460415443496,
+              -4.8578830789125504e-06,
+              -0.0005575573189169347,
+              0.001704085265157751,
+              0.0009909280829800693,
+              -0.0006730529230858373,
+              -0.00017090111489759252,
+              7.34002293834024e-05,
+              0.0004477316063451475,
+              -0.00029168866865569854,
+              -0.0008749848042488573,
+              0.005523875735227168
+            ],
+            "fantasy_target_options": [
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1"
+            ]
+          },
+          {
+            "option_ref": "x1-s0",
+            "candidate_ref": "x1",
+            "fidelity": 0.25,
+            "acquisition_value": 0.0014616700723904502,
+            "estimated_evaluation_wall_seconds": 4.0,
+            "normalized_cost": 0.4,
+            "fantasy_gains": [
+              0.0020334997936473087,
+              -0.0005934197615307113,
+              -0.0007214368490235934,
+              0.0006801623160357373,
+              0.00043235353236203977,
+              -9.578068269178175e-06,
+              -0.0010993105387275826,
+              0.0015517836161724752,
+              0.001230289723260558,
+              -0.0011531425725670452,
+              -0.0003369579957306357,
+              0.0001447199112423192,
+              0.0008827721503736896,
+              -0.0005751093503771898,
+              -0.0009776189536343516,
+              0.0032737592745823996
+            ],
+            "fantasy_target_options": [
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1"
+            ]
+          },
+          {
+            "option_ref": "x1-s1",
+            "candidate_ref": "x1",
+            "fidelity": 1.0,
+            "acquisition_value": 0.0004472405003291269,
+            "estimated_evaluation_wall_seconds": 10.0,
+            "normalized_cost": 1.0,
+            "fantasy_gains": [
+              0.00415448762028392,
+              -0.003083024324206818,
+              -0.001473912349265305,
+              0.0013895875134006808,
+              0.0008833083747514792,
+              -1.9568217402898824e-05,
+              -0.0022459171317641413,
+              0.0031703302075012374,
+              0.0025135106679705643,
+              -0.0024254663570730806,
+              -0.0006884130631301666,
+              0.000295666162123176,
+              0.0018035241418346004,
+              -0.0011749618484917512,
+              -0.0026316701275352905,
+              0.006688366736269824
+            ],
+            "fantasy_target_options": [
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1"
+            ]
+          },
+          {
+            "option_ref": "x2-s0",
+            "candidate_ref": "x2",
+            "fidelity": 0.25,
+            "acquisition_value": 0.00047335410436884494,
+            "estimated_evaluation_wall_seconds": 4.0,
+            "normalized_cost": 0.4,
+            "fantasy_gains": [
+              -0.0008987827707955809,
+              0.0011476868786814975,
+              0.000318866523687511,
+              -0.0003006236700429099,
+              -0.00019109512919257554,
+              4.233392481456377e-06,
+              0.00048588220911005564,
+              -0.0006858699384064693,
+              -0.0005437734539279759,
+              0.0005865306220931288,
+              0.00014893143436278677,
+              -6.396448291878798e-05,
+              -0.00039017481180625424,
+              0.00025419150621841524,
+              0.0007625037555816228,
+              -0.0011717160820086114
+            ],
+            "fantasy_target_options": [
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x2-s1"
+            ]
+          },
+          {
+            "option_ref": "x2-s1",
+            "candidate_ref": "x2",
+            "fidelity": 1.0,
+            "acquisition_value": 0.00018133595872313335,
+            "estimated_evaluation_wall_seconds": 10.0,
+            "normalized_cost": 1.0,
+            "fantasy_gains": [
+              0.0010397363991407893,
+              -0.0013276754532420831,
+              -0.000368873483024057,
+              0.00034776965284954997,
+              0.00022106405237831694,
+              -4.897303773621076e-06,
+              -0.0005620817787370669,
+              0.0007934330332193262,
+              0.0006290519481533252,
+              -0.0006785146053269742,
+              -0.0001722879413303957,
+              7.399585673395492e-05,
+              0.00045136485371610746,
+              -0.0002940556605621758,
+              -0.0008820851210336045,
+              0.003635430890408742
+            ],
+            "fantasy_target_options": [
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x2-s1"
+            ]
+          }
+        ],
+        "predictions": [
+          {
+            "candidate_ref": "x0",
+            "fidelity": 1.0,
+            "measured": false,
+            "median_seconds_per_work_unit": 10.028337745498613,
+            "posterior_interval_seconds_per_work_unit": [
+              9.930471291374353,
+              10.127168689883385
+            ]
+          },
+          {
+            "candidate_ref": "x1",
+            "fidelity": 1.0,
+            "measured": false,
+            "median_seconds_per_work_unit": 10.010921880518916,
+            "posterior_interval_seconds_per_work_unit": [
+              9.918117073036687,
+              10.104595071811138
+            ]
+          },
+          {
+            "candidate_ref": "x2",
+            "fidelity": 1.0,
+            "measured": false,
+            "median_seconds_per_work_unit": 10.047026644424307,
+            "posterior_interval_seconds_per_work_unit": [
+              9.949203545424291,
+              10.145811565006753
+            ]
+          }
+        ],
+        "current_target_value": -2.303676685042493,
+        "cost_reference_seconds": 10.0,
+        "cost_method": "per-option observed mean evaluation wall time; dimensionless target normalization",
+        "cost_uncertainty": "not modeled; no unit conversion to GPU-hours or energy",
+        "planning_seconds": 0.2331233989680186,
+        "fit_seconds": 0.14818413596367463,
+        "acquisition_seconds": 0.08493926300434396,
+        "surrogate": {
+          "class": "SingleTaskMultiFidelityGP",
+          "fidelity_dimension": 1,
+          "feature_names": [
+            "normalized_numeric_setting",
+            "fidelity"
+          ],
+          "training_run_ids": [
+            "synthetic-x0-s0-0",
+            "synthetic-x0-s0-1",
+            "synthetic-x0-s0-2",
+            "synthetic-x0-s1-0",
+            "synthetic-x0-s1-1",
+            "synthetic-x0-s1-2",
+            "synthetic-x1-s0-0",
+            "synthetic-x1-s0-1",
+            "synthetic-x1-s0-2",
+            "synthetic-x1-s1-0",
+            "synthetic-x1-s1-1",
+            "synthetic-x1-s1-2",
+            "synthetic-x2-s0-0",
+            "synthetic-x2-s0-1",
+            "synthetic-x2-s0-2",
+            "synthetic-x2-s1-0",
+            "synthetic-x2-s1-1",
+            "synthetic-x2-s1-2"
+          ],
+          "independent_runs_per_option": {
+            "x0-s0": 3,
+            "x0-s1": 3,
+            "x1-s0": 3,
+            "x1-s1": 3,
+            "x2-s0": 3,
+            "x2-s1": 3
+          },
+          "train_x": [
+            [
+              0.0,
+              0.25
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.5,
+              0.25
+            ],
+            [
+              0.5,
+              1.0
+            ],
+            [
+              1.0,
+              0.25
+            ],
+            [
+              1.0,
+              1.0
+            ]
+          ],
+          "train_y_negative_log_seconds_per_work_unit": [
+            [
+              -2.3288923592515007
+            ],
+            [
+              -2.3067320510630114
+            ],
+            [
+              -2.3323089695925514
+            ],
+            [
+              -2.3027540660955506
+            ],
+            [
+              -2.340544372980691
+            ],
+            [
+              -2.3037720338091794
+            ]
+          ],
+          "train_variance_of_mean": [
+            [
+              3.426500119182579e-05
+            ],
+            [
+              3.581785670648818e-05
+            ],
+            [
+              3.4015438114806734e-05
+            ],
+            [
+              3.6092961113700304e-05
+            ],
+            [
+              3.317638074508861e-05
+            ],
+            [
+              3.57092765239463e-05
+            ]
+          ],
+          "variance_floor": 1e-06,
+          "state_dict": {
+            "mean_module.raw_constant": 0.793767979735601,
+            "covar_module.raw_outputscale": 1.894181188017004,
+            "covar_module.base_kernel.kernels.0.raw_power": [
+              -0.03364322281920809
+            ],
+            "covar_module.base_kernel.kernels.0.raw_power_constraint.lower_bound": 0.0,
+            "covar_module.base_kernel.kernels.0.raw_power_constraint.upper_bound": "+infinity",
+            "covar_module.base_kernel.kernels.0.power_prior.concentration": 3.0,
+            "covar_module.base_kernel.kernels.0.power_prior.rate": 3.0,
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.raw_lengthscale": [
+              [
+                -0.5838557587338995
+              ]
+            ],
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.lengthscale_prior.concentration": 3.0,
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.lengthscale_prior.rate": 6.0,
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.raw_lengthscale_constraint.lower_bound": 0.0,
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.raw_lengthscale_constraint.upper_bound": "+infinity",
+            "covar_module.base_kernel.kernels.0.covar_module_biased.raw_lengthscale": [
+              [
+                2.465914847361517
+              ]
+            ],
+            "covar_module.base_kernel.kernels.0.covar_module_biased.lengthscale_prior.concentration": 6.0,
+            "covar_module.base_kernel.kernels.0.covar_module_biased.lengthscale_prior.rate": 2.0,
+            "covar_module.base_kernel.kernels.0.covar_module_biased.raw_lengthscale_constraint.lower_bound": 0.0,
+            "covar_module.base_kernel.kernels.0.covar_module_biased.raw_lengthscale_constraint.upper_bound": "+infinity",
+            "covar_module.outputscale_prior.concentration": 2.0,
+            "covar_module.outputscale_prior.rate": 0.15000000596046448,
+            "covar_module.raw_outputscale_constraint.lower_bound": 0.0,
+            "covar_module.raw_outputscale_constraint.upper_bound": "+infinity",
+            "outcome_transform.means": [
+              [
+                -2.3191673087987477
+              ]
+            ],
+            "outcome_transform.stdvs": [
+              [
+                0.01664513977567982
+              ]
+            ],
+            "outcome_transform._stdvs_sq": [
+              [
+                0.0002770606781519184
+              ]
+            ],
+            "outcome_transform._is_trained": true
+          },
+          "state_dict_encoding": "JSON numbers; infinite constraint bounds encoded as signed strings",
+          "snapshot_digest": "sha256:8feb7d83f6952df1812af504338b49aaaa86d37a7e8a3acb44074f9d75408522",
+          "botorch_version": "0.16.1",
+          "torch_version": "2.8.0+cpu",
+          "num_fantasies": 16,
+          "seed": 17,
+          "numerical_diagnostics": [],
+          "validation_status": "uncalibrated posterior; numerical kernel is not hardware qualification"
+        }
+      },
+      "observation": {
+        "attempt_id": "synthetic-x1-s0-3",
+        "option_ref": "x1-s0",
+        "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+        "seconds_per_work_unit": 10.361543602136633,
+        "evaluation_wall_seconds": 4.0,
+        "quality_passed": true,
+        "memory_passed": true
+      }
+    },
+    {
+      "input": {
+        "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+        "fidelity_axis": "representative_sampling",
+        "options": [
+          {
+            "ref": "x0-s0",
+            "candidate_ref": "x0",
+            "coordinates": [
+              0.0
+            ],
+            "fidelity": 0.25
+          },
+          {
+            "ref": "x0-s1",
+            "candidate_ref": "x0",
+            "coordinates": [
+              0.0
+            ],
+            "fidelity": 1.0
+          },
+          {
+            "ref": "x1-s0",
+            "candidate_ref": "x1",
+            "coordinates": [
+              0.5
+            ],
+            "fidelity": 0.25
+          },
+          {
+            "ref": "x1-s1",
+            "candidate_ref": "x1",
+            "coordinates": [
+              0.5
+            ],
+            "fidelity": 1.0
+          },
+          {
+            "ref": "x2-s0",
+            "candidate_ref": "x2",
+            "coordinates": [
+              1.0
+            ],
+            "fidelity": 0.25
+          },
+          {
+            "ref": "x2-s1",
+            "candidate_ref": "x2",
+            "coordinates": [
+              1.0
+            ],
+            "fidelity": 1.0
+          }
+        ],
+        "observations": [
+          {
+            "attempt_id": "synthetic-x0-s0-0",
+            "option_ref": "x0-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.267249999999999,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s0-1",
+            "option_ref": "x0-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.370835123997864,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s0-2",
+            "option_ref": "x0-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.162660907310368,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s1-0",
+            "option_ref": "x0-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.04225,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s1-1",
+            "option_ref": "x0-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.145835123997864,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s1-2",
+            "option_ref": "x0-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 9.937660907310368,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s0-0",
+            "option_ref": "x1-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.359781064632505,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s0-1",
+            "option_ref": "x1-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.364110164618577,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s0-2",
+            "option_ref": "x1-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.182259209092308,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s1-0",
+            "option_ref": "x1-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.059781064632505,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s1-1",
+            "option_ref": "x1-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.064110164618576,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s1-2",
+            "option_ref": "x1-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 9.882259209092307,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s0-0",
+            "option_ref": "x2-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.488226518176948,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s0-1",
+            "option_ref": "x2-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.392239679491995,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s0-2",
+            "option_ref": "x2-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.281235441313582,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s1-0",
+            "option_ref": "x2-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.113226518176948,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s1-1",
+            "option_ref": "x2-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.017239679491995,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s1-2",
+            "option_ref": "x2-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 9.906235441313582,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s0-3",
+            "option_ref": "x1-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.361543602136633,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          }
+        ],
+        "feature_names": [
+          "normalized_numeric_setting"
+        ],
+        "seed": 17,
+        "num_fantasies": 16
+      },
+      "choice": {
+        "method": "finite_space_cost_aware_qMultiFidelityKnowledgeGradient",
+        "option_ref": "x0-s0",
+        "candidate_ref": "x0",
+        "fidelity": 0.25,
+        "reason": "MF_KG_NUMERICAL_SUGGESTION",
+        "execution_authorized": false,
+        "measured": false,
+        "input_digest": "sha256:d078417bfb917fd1501fec1b449d2d4d2b2b0e4394ee97d7106f0ee8b57283fe",
+        "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+        "scores": [
+          {
+            "option_ref": "x0-s0",
+            "candidate_ref": "x0",
+            "fidelity": 0.25,
+            "acquisition_value": 0.0011974568490874943,
+            "estimated_evaluation_wall_seconds": 4.0,
+            "normalized_cost": 0.4,
+            "fantasy_gains": [
+              0.0008105249857472963,
+              0.0014147601385872122,
+              0.00039306857612686485,
+              -0.0002814915493485337,
+              -0.000235564051903836,
+              5.21852697410452e-06,
+              0.0005989497608331895,
+              0.00042182516790578717,
+              0.0001624097206871511,
+              0.0007230196315837212,
+              0.00018358862563738754,
+              -7.884938165592104e-05,
+              -0.0001180043978212808,
+              0.000313343314492176,
+              0.0009399427134333393,
+              0.0018112981730684652
+            ],
+            "fantasy_target_options": [
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1"
+            ]
+          },
+          {
+            "option_ref": "x0-s1",
+            "candidate_ref": "x0",
+            "fidelity": 1.0,
+            "acquisition_value": 0.0007543621513382004,
+            "estimated_evaluation_wall_seconds": 10.0,
+            "normalized_cost": 1.0,
+            "fantasy_gains": [
+              0.0037415040878543415,
+              -0.0015448745632129501,
+              -0.0004292187970906802,
+              0.0006988584563756284,
+              0.0002572287003772544,
+              -5.698470970205705e-06,
+              -0.000654034719325125,
+              0.0026584840376053798,
+              0.0019356842888380577,
+              -0.000789515202663793,
+              -0.00020047313329429883,
+              8.610109991291637e-05,
+              0.001154376712199312,
+              -0.00034216126317732076,
+              -0.0010263885370069836,
+              0.0065299217249896735
+            ],
+            "fantasy_target_options": [
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1"
+            ]
+          },
+          {
+            "option_ref": "x1-s0",
+            "candidate_ref": "x1",
+            "fidelity": 0.25,
+            "acquisition_value": 0.0011061967001368077,
+            "estimated_evaluation_wall_seconds": 4.0,
+            "normalized_cost": 0.4,
+            "fantasy_gains": [
+              0.0014808732896449683,
+              6.256997379328055e-06,
+              -0.000525378248486863,
+              0.0004953205353586121,
+              0.0003148565835902062,
+              -6.975120189434136e-06,
+              -0.00047614790212335834,
+              0.0011300689164945865,
+              0.0008959446149900963,
+              -0.00040278292030571095,
+              -0.0002453858599684722,
+              0.0001053906431209839,
+              0.0006428688620547796,
+              -0.0004188168979704088,
+              -0.0002745119882936464,
+              0.002384078268216072
+            ],
+            "fantasy_target_options": [
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1"
+            ]
+          },
+          {
+            "option_ref": "x1-s1",
+            "candidate_ref": "x1",
+            "fidelity": 1.0,
+            "acquisition_value": 0.0005895349364935243,
+            "estimated_evaluation_wall_seconds": 10.0,
+            "normalized_cost": 1.0,
+            "fantasy_gains": [
+              0.00397464961375027,
+              -0.0024323792193303717,
+              -0.0012754257811953273,
+              0.001329435535309731,
+              0.0008450720308772475,
+              -1.8721155254475264e-05,
+              -0.0015085636020848447,
+              0.0030330940627147918,
+              0.002404706697603398,
+              -0.0016490590987769949,
+              -0.0006586132793153787,
+              0.0002828674687447297,
+              0.0017254538198003821,
+              -0.0011241005110900204,
+              -0.001894700654974546,
+              0.006398843057117798
+            ],
+            "fantasy_target_options": [
+              "x1-s1",
+              "x0-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1"
+            ]
+          },
+          {
+            "option_ref": "x2-s0",
+            "candidate_ref": "x2",
+            "fidelity": 0.25,
+            "acquisition_value": 0.0006104279267580892,
+            "estimated_evaluation_wall_seconds": 4.0,
+            "normalized_cost": 0.4,
+            "fantasy_gains": [
+              -0.0010237273532909263,
+              0.0013924615618834402,
+              0.0003868732716680867,
+              -0.0003647396453705376,
+              -0.000231851236609959,
+              5.136275770478704e-06,
+              0.0005895094841248394,
+              -0.0008321499037950986,
+              -0.0006597475731680014,
+              0.0007116238420969978,
+              0.00018069501495432405,
+              -7.760660633504557e-05,
+              -0.0004733899445454881,
+              0.00030840459043446344,
+              0.0009251279161253123,
+              -4.362039817351615e-05
+            ],
+            "fantasy_target_options": [
+              "x2-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x2-s1"
+            ]
+          },
+          {
+            "option_ref": "x2-s1",
+            "candidate_ref": "x2",
+            "fidelity": 1.0,
+            "acquisition_value": 0.00030227864367363133,
+            "estimated_evaluation_wall_seconds": 10.0,
+            "normalized_cost": 1.0,
+            "fantasy_gains": [
+              0.0019234771046408028,
+              -0.0012646880462625631,
+              -0.00043282145961942575,
+              0.0004080590654651495,
+              0.0002593877581964499,
+              -5.746301279252464e-06,
+              -0.0006595243819202956,
+              0.0009309827335188814,
+              0.000738104512539195,
+              -0.0007961420252904361,
+              -0.00020215581133653515,
+              8.682379241475857e-05,
+              0.0005296135498946697,
+              -0.0003450332053427374,
+              -0.0010350035639978827,
+              0.004701124577157323
+            ],
+            "fantasy_target_options": [
+              "x2-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x2-s1"
+            ]
+          }
+        ],
+        "predictions": [
+          {
+            "candidate_ref": "x0",
+            "fidelity": 1.0,
+            "measured": false,
+            "median_seconds_per_work_unit": 10.02538961211676,
+            "posterior_interval_seconds_per_work_unit": [
+              9.928033669877541,
+              10.123700242847624
+            ]
+          },
+          {
+            "candidate_ref": "x1",
+            "fidelity": 1.0,
+            "measured": false,
+            "median_seconds_per_work_unit": 10.01706879752312,
+            "posterior_interval_seconds_per_work_unit": [
+              9.927965804541492,
+              10.106971485378258
+            ]
+          },
+          {
+            "candidate_ref": "x2",
+            "fidelity": 1.0,
+            "measured": false,
+            "median_seconds_per_work_unit": 10.043455265098386,
+            "posterior_interval_seconds_per_work_unit": [
+              9.946163311855269,
+              10.141698914374341
+            ]
+          }
+        ],
+        "current_target_value": -2.304290517682624,
+        "cost_reference_seconds": 10.0,
+        "cost_method": "per-option observed mean evaluation wall time; dimensionless target normalization",
+        "cost_uncertainty": "not modeled; no unit conversion to GPU-hours or energy",
+        "planning_seconds": 0.10294815798988566,
+        "fit_seconds": 0.021973374008666724,
+        "acquisition_seconds": 0.08097478398121893,
+        "surrogate": {
+          "class": "SingleTaskMultiFidelityGP",
+          "fidelity_dimension": 1,
+          "feature_names": [
+            "normalized_numeric_setting",
+            "fidelity"
+          ],
+          "training_run_ids": [
+            "synthetic-x0-s0-0",
+            "synthetic-x0-s0-1",
+            "synthetic-x0-s0-2",
+            "synthetic-x0-s1-0",
+            "synthetic-x0-s1-1",
+            "synthetic-x0-s1-2",
+            "synthetic-x1-s0-0",
+            "synthetic-x1-s0-1",
+            "synthetic-x1-s0-2",
+            "synthetic-x1-s0-3",
+            "synthetic-x1-s1-0",
+            "synthetic-x1-s1-1",
+            "synthetic-x1-s1-2",
+            "synthetic-x2-s0-0",
+            "synthetic-x2-s0-1",
+            "synthetic-x2-s0-2",
+            "synthetic-x2-s1-0",
+            "synthetic-x2-s1-1",
+            "synthetic-x2-s1-2"
+          ],
+          "independent_runs_per_option": {
+            "x0-s0": 3,
+            "x0-s1": 3,
+            "x1-s0": 4,
+            "x1-s1": 3,
+            "x2-s0": 3,
+            "x2-s1": 3
+          },
+          "train_x": [
+            [
+              0.0,
+              0.25
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.5,
+              0.25
+            ],
+            [
+              0.5,
+              1.0
+            ],
+            [
+              1.0,
+              0.25
+            ],
+            [
+              1.0,
+              1.0
+            ]
+          ],
+          "train_y_negative_log_seconds_per_work_unit": [
+            [
+              -2.3288923592515007
+            ],
+            [
+              -2.3067320510630114
+            ],
+            [
+              -2.3337570327138435
+            ],
+            [
+              -2.3027540660955506
+            ],
+            [
+              -2.340544372980691
+            ],
+            [
+              -2.3037720338091794
+            ]
+          ],
+          "train_variance_of_mean": [
+            [
+              3.426500119182579e-05
+            ],
+            [
+              3.581785670648818e-05
+            ],
+            [
+              1.91046058606488e-05
+            ],
+            [
+              3.6092961113700304e-05
+            ],
+            [
+              3.317638074508861e-05
+            ],
+            [
+              3.57092765239463e-05
+            ]
+          ],
+          "variance_floor": 1e-06,
+          "state_dict": {
+            "mean_module.raw_constant": 0.8073352287171919,
+            "covar_module.raw_outputscale": 1.9025430342976635,
+            "covar_module.base_kernel.kernels.0.raw_power": [
+              -0.033247522539561966
+            ],
+            "covar_module.base_kernel.kernels.0.raw_power_constraint.lower_bound": 0.0,
+            "covar_module.base_kernel.kernels.0.raw_power_constraint.upper_bound": "+infinity",
+            "covar_module.base_kernel.kernels.0.power_prior.concentration": 3.0,
+            "covar_module.base_kernel.kernels.0.power_prior.rate": 3.0,
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.raw_lengthscale": [
+              [
+                -0.5660947287903872
+              ]
+            ],
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.lengthscale_prior.concentration": 3.0,
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.lengthscale_prior.rate": 6.0,
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.raw_lengthscale_constraint.lower_bound": 0.0,
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.raw_lengthscale_constraint.upper_bound": "+infinity",
+            "covar_module.base_kernel.kernels.0.covar_module_biased.raw_lengthscale": [
+              [
+                2.4587114351903514
+              ]
+            ],
+            "covar_module.base_kernel.kernels.0.covar_module_biased.lengthscale_prior.concentration": 6.0,
+            "covar_module.base_kernel.kernels.0.covar_module_biased.lengthscale_prior.rate": 2.0,
+            "covar_module.base_kernel.kernels.0.covar_module_biased.raw_lengthscale_constraint.lower_bound": 0.0,
+            "covar_module.base_kernel.kernels.0.covar_module_biased.raw_lengthscale_constraint.upper_bound": "+infinity",
+            "covar_module.outputscale_prior.concentration": 2.0,
+            "covar_module.outputscale_prior.rate": 0.15000000596046448,
+            "covar_module.raw_outputscale_constraint.lower_bound": 0.0,
+            "covar_module.raw_outputscale_constraint.upper_bound": "+infinity",
+            "outcome_transform.means": [
+              [
+                -2.3194086526522963
+              ]
+            ],
+            "outcome_transform.stdvs": [
+              [
+                0.01688259876396427
+              ]
+            ],
+            "outcome_transform._stdvs_sq": [
+              [
+                0.00028502214102500787
+              ]
+            ],
+            "outcome_transform._is_trained": true
+          },
+          "state_dict_encoding": "JSON numbers; infinite constraint bounds encoded as signed strings",
+          "snapshot_digest": "sha256:9f30dcbcc21ea0f966c53a50ee3fab281635984ae8f91434e116000ecfe40005",
+          "botorch_version": "0.16.1",
+          "torch_version": "2.8.0+cpu",
+          "num_fantasies": 16,
+          "seed": 17,
+          "numerical_diagnostics": [],
+          "validation_status": "uncalibrated posterior; numerical kernel is not hardware qualification"
+        }
+      },
+      "observation": {
+        "attempt_id": "synthetic-x0-s0-3",
+        "option_ref": "x0-s0",
+        "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+        "seconds_per_work_unit": 10.26926766805812,
+        "evaluation_wall_seconds": 4.0,
+        "quality_passed": true,
+        "memory_passed": true
+      }
+    },
+    {
+      "input": {
+        "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+        "fidelity_axis": "representative_sampling",
+        "options": [
+          {
+            "ref": "x0-s0",
+            "candidate_ref": "x0",
+            "coordinates": [
+              0.0
+            ],
+            "fidelity": 0.25
+          },
+          {
+            "ref": "x0-s1",
+            "candidate_ref": "x0",
+            "coordinates": [
+              0.0
+            ],
+            "fidelity": 1.0
+          },
+          {
+            "ref": "x1-s0",
+            "candidate_ref": "x1",
+            "coordinates": [
+              0.5
+            ],
+            "fidelity": 0.25
+          },
+          {
+            "ref": "x1-s1",
+            "candidate_ref": "x1",
+            "coordinates": [
+              0.5
+            ],
+            "fidelity": 1.0
+          },
+          {
+            "ref": "x2-s0",
+            "candidate_ref": "x2",
+            "coordinates": [
+              1.0
+            ],
+            "fidelity": 0.25
+          },
+          {
+            "ref": "x2-s1",
+            "candidate_ref": "x2",
+            "coordinates": [
+              1.0
+            ],
+            "fidelity": 1.0
+          }
+        ],
+        "observations": [
+          {
+            "attempt_id": "synthetic-x0-s0-0",
+            "option_ref": "x0-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.267249999999999,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s0-1",
+            "option_ref": "x0-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.370835123997864,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s0-2",
+            "option_ref": "x0-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.162660907310368,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s1-0",
+            "option_ref": "x0-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.04225,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s1-1",
+            "option_ref": "x0-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.145835123997864,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s1-2",
+            "option_ref": "x0-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 9.937660907310368,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s0-0",
+            "option_ref": "x1-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.359781064632505,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s0-1",
+            "option_ref": "x1-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.364110164618577,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s0-2",
+            "option_ref": "x1-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.182259209092308,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s1-0",
+            "option_ref": "x1-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.059781064632505,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s1-1",
+            "option_ref": "x1-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.064110164618576,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s1-2",
+            "option_ref": "x1-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 9.882259209092307,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s0-0",
+            "option_ref": "x2-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.488226518176948,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s0-1",
+            "option_ref": "x2-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.392239679491995,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s0-2",
+            "option_ref": "x2-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.281235441313582,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s1-0",
+            "option_ref": "x2-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.113226518176948,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s1-1",
+            "option_ref": "x2-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.017239679491995,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x2-s1-2",
+            "option_ref": "x2-s1",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 9.906235441313582,
+            "evaluation_wall_seconds": 10.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x1-s0-3",
+            "option_ref": "x1-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.361543602136633,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          },
+          {
+            "attempt_id": "synthetic-x0-s0-3",
+            "option_ref": "x0-s0",
+            "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+            "seconds_per_work_unit": 10.26926766805812,
+            "evaluation_wall_seconds": 4.0,
+            "quality_passed": true,
+            "memory_passed": true
+          }
+        ],
+        "feature_names": [
+          "normalized_numeric_setting"
+        ],
+        "seed": 17,
+        "num_fantasies": 16
+      },
+      "choice": {
+        "method": "finite_space_cost_aware_qMultiFidelityKnowledgeGradient",
+        "option_ref": "x1-s0",
+        "candidate_ref": "x1",
+        "fidelity": 0.25,
+        "reason": "MF_KG_NUMERICAL_SUGGESTION",
+        "execution_authorized": false,
+        "measured": false,
+        "input_digest": "sha256:2d53f47b402541c559aca83e0a3c145a0237cdd491d5ae267ec61f0c0c65bade",
+        "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+        "scores": [
+          {
+            "option_ref": "x0-s0",
+            "candidate_ref": "x0",
+            "fidelity": 0.25,
+            "acquisition_value": 0.0008472114185374219,
+            "estimated_evaluation_wall_seconds": 4.0,
+            "normalized_cost": 0.4,
+            "fantasy_gains": [
+              0.0006181134482181605,
+              0.0009350332279320916,
+              0.0002597840930840256,
+              -0.00010621403272326191,
+              -0.00015568732100179616,
+              3.4489918032676314e-06,
+              0.0003958536242052446,
+              0.000360291381563016,
+              0.0001882227989344898,
+              0.0004778530024553973,
+              0.000121336091227775,
+              -5.211257360127064e-05,
+              2.22593391274728e-06,
+              0.00020709263910489994,
+              0.0006212202658542054,
+              0.0012819198087163919
+            ],
+            "fantasy_target_options": [
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1"
+            ]
+          },
+          {
+            "option_ref": "x0-s1",
+            "candidate_ref": "x0",
+            "fidelity": 1.0,
+            "acquisition_value": 0.0008221497387866927,
+            "estimated_evaluation_wall_seconds": 10.0,
+            "normalized_cost": 1.0,
+            "fantasy_gains": [
+              0.004015523861834236,
+              -0.0018262621173943394,
+              -0.0005073978482568187,
+              0.0010301472999252326,
+              0.00048349685474491366,
+              -6.7364056008933915e-06,
+              -0.0007731623393940623,
+              0.002952888555034061,
+              0.002243693436614791,
+              -0.0009333195976335418,
+              -0.00023698784199632783,
+              0.00010178378282699185,
+              0.0014770917322275423,
+              -0.00040448342400134507,
+              -0.001213337669930592,
+              0.006751457541587236
+            ],
+            "fantasy_target_options": [
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1"
+            ]
+          },
+          {
+            "option_ref": "x1-s0",
+            "candidate_ref": "x1",
+            "fidelity": 0.25,
+            "acquisition_value": 0.001369714855214002,
+            "estimated_evaluation_wall_seconds": 4.0,
+            "normalized_cost": 0.4,
+            "fantasy_gains": [
+              0.0016094924103873254,
+              0.0005413952983190917,
+              -0.00018917872314094808,
+              0.0005383408884087615,
+              0.000342202999535246,
+              -7.5809342265920066e-06,
+              -4.196066773154428e-05,
+              0.001228219427705568,
+              0.0009737605965591811,
+              4.675712905433116e-05,
+              -0.0002666984960817409,
+              0.0001145441959247151,
+              0.0006987043129123016,
+              -0.00024618732255055065,
+              0.00020187083859024568,
+              0.002591143958969866
+            ],
+            "fantasy_target_options": [
+              "x1-s1",
+              "x0-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x0-s1",
+              "x1-s1"
+            ]
+          },
+          {
+            "option_ref": "x1-s1",
+            "candidate_ref": "x1",
+            "fidelity": 1.0,
+            "acquisition_value": 0.0006697634582424616,
+            "estimated_evaluation_wall_seconds": 10.0,
+            "normalized_cost": 1.0,
+            "fantasy_gains": [
+              0.0039872182783211585,
+              -0.0023553222075851643,
+              -0.000993985555360677,
+              0.0013336394855785194,
+              0.0008477443235133109,
+              -1.8780355421466055e-05,
+              -0.001268308661317441,
+              0.0030426853337934823,
+              0.0024123108777982516,
+              -0.0014336235848184664,
+              -0.0006606959507942101,
+              0.00028376195421619954,
+              0.0017309100618345674,
+              -0.0008877569001004559,
+              -0.0017226592907846339,
+              0.006419077523006411
+            ],
+            "fantasy_target_options": [
+              "x1-s1",
+              "x0-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x0-s1",
+              "x1-s1"
+            ]
+          },
+          {
+            "option_ref": "x2-s0",
+            "candidate_ref": "x2",
+            "fidelity": 0.25,
+            "acquisition_value": 0.000636101985498147,
+            "estimated_evaluation_wall_seconds": 4.0,
+            "normalized_cost": 0.4,
+            "fantasy_gains": [
+              -0.0008725111932355034,
+              0.0013878635837318853,
+              0.0003855957966560908,
+              -0.00036353525670662634,
+              -0.00023108565215901322,
+              5.119315529267254e-06,
+              0.0005875628941418576,
+              -0.0007772188870371899,
+              -0.0006575690534806888,
+              0.0007092740243588302,
+              0.00018009835092192006,
+              -7.735034541589414e-05,
+              -0.000471826787125984,
+              0.0003073862229565627,
+              0.0009220730971901681,
+              0.00013825496972730278
+            ],
+            "fantasy_target_options": [
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x2-s1"
+            ]
+          },
+          {
+            "option_ref": "x2-s1",
+            "candidate_ref": "x2",
+            "fidelity": 1.0,
+            "acquisition_value": 0.0003704869962851687,
+            "estimated_evaluation_wall_seconds": 10.0,
+            "normalized_cost": 1.0,
+            "fantasy_gains": [
+              0.0021185510942416386,
+              -0.0009895271576034759,
+              -0.0004311254452260549,
+              0.0004064600827136111,
+              0.00025837134516581983,
+              -5.723784351374661e-06,
+              -0.0006569400302907091,
+              0.0010152646957646283,
+              0.0007352122440313913,
+              -0.000735627785443782,
+              -0.00020136366215339763,
+              8.648357268103979e-05,
+              0.0005275382549116969,
+              -0.0003436811899346637,
+              -0.0008152481542538226,
+              0.0049591478603101535
+            ],
+            "fantasy_target_options": [
+              "x2-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x2-s1",
+              "x1-s1",
+              "x0-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x1-s1",
+              "x0-s1",
+              "x2-s1"
+            ]
+          }
+        ],
+        "predictions": [
+          {
+            "candidate_ref": "x0",
+            "fidelity": 1.0,
+            "measured": false,
+            "median_seconds_per_work_unit": 10.023337832601658,
+            "posterior_interval_seconds_per_work_unit": [
+              9.92874997106506,
+              10.118826800881415
+            ]
+          },
+          {
+            "candidate_ref": "x1",
+            "fidelity": 1.0,
+            "measured": false,
+            "median_seconds_per_work_unit": 10.018625490206604,
+            "posterior_interval_seconds_per_work_unit": [
+              9.930862184051588,
+              10.10716439849611
+            ]
+          },
+          {
+            "candidate_ref": "x2",
+            "fidelity": 1.0,
+            "measured": false,
+            "median_seconds_per_work_unit": 10.044093327052183,
+            "posterior_interval_seconds_per_work_unit": [
+              9.946999737070092,
+              10.142134656600453
+            ]
+          }
+        ],
+        "current_target_value": -2.3044459096210574,
+        "cost_reference_seconds": 10.0,
+        "cost_method": "per-option observed mean evaluation wall time; dimensionless target normalization",
+        "cost_uncertainty": "not modeled; no unit conversion to GPU-hours or energy",
+        "planning_seconds": 0.10123940196353942,
+        "fit_seconds": 0.019164774974342436,
+        "acquisition_seconds": 0.08207462698919699,
+        "surrogate": {
+          "class": "SingleTaskMultiFidelityGP",
+          "fidelity_dimension": 1,
+          "feature_names": [
+            "normalized_numeric_setting",
+            "fidelity"
+          ],
+          "training_run_ids": [
+            "synthetic-x0-s0-0",
+            "synthetic-x0-s0-1",
+            "synthetic-x0-s0-2",
+            "synthetic-x0-s0-3",
+            "synthetic-x0-s1-0",
+            "synthetic-x0-s1-1",
+            "synthetic-x0-s1-2",
+            "synthetic-x1-s0-0",
+            "synthetic-x1-s0-1",
+            "synthetic-x1-s0-2",
+            "synthetic-x1-s0-3",
+            "synthetic-x1-s1-0",
+            "synthetic-x1-s1-1",
+            "synthetic-x1-s1-2",
+            "synthetic-x2-s0-0",
+            "synthetic-x2-s0-1",
+            "synthetic-x2-s0-2",
+            "synthetic-x2-s1-0",
+            "synthetic-x2-s1-1",
+            "synthetic-x2-s1-2"
+          ],
+          "independent_runs_per_option": {
+            "x0-s0": 4,
+            "x0-s1": 3,
+            "x1-s0": 4,
+            "x1-s1": 3,
+            "x2-s0": 3,
+            "x2-s1": 3
+          },
+          "train_x": [
+            [
+              0.0,
+              0.25
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.5,
+              0.25
+            ],
+            [
+              0.5,
+              1.0
+            ],
+            [
+              1.0,
+              0.25
+            ],
+            [
+              1.0,
+              1.0
+            ]
+          ],
+          "train_y_negative_log_seconds_per_work_unit": [
+            [
+              -2.3289581978177627
+            ],
+            [
+              -2.3067320510630114
+            ],
+            [
+              -2.3337570327138435
+            ],
+            [
+              -2.3027540660955506
+            ],
+            [
+              -2.340544372980691
+            ],
+            [
+              -2.3037720338091794
+            ]
+          ],
+          "train_variance_of_mean": [
+            [
+              1.7136835312720333e-05
+            ],
+            [
+              3.581785670648818e-05
+            ],
+            [
+              1.91046058606488e-05
+            ],
+            [
+              3.6092961113700304e-05
+            ],
+            [
+              3.317638074508861e-05
+            ],
+            [
+              3.57092765239463e-05
+            ]
+          ],
+          "variance_floor": 1e-06,
+          "state_dict": {
+            "mean_module.raw_constant": 0.809796975315952,
+            "covar_module.raw_outputscale": 1.8664438463405395,
+            "covar_module.base_kernel.kernels.0.raw_power": [
+              -0.03331267930513126
+            ],
+            "covar_module.base_kernel.kernels.0.raw_power_constraint.lower_bound": 0.0,
+            "covar_module.base_kernel.kernels.0.raw_power_constraint.upper_bound": "+infinity",
+            "covar_module.base_kernel.kernels.0.power_prior.concentration": 3.0,
+            "covar_module.base_kernel.kernels.0.power_prior.rate": 3.0,
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.raw_lengthscale": [
+              [
+                -0.5617622690480331
+              ]
+            ],
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.lengthscale_prior.concentration": 3.0,
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.lengthscale_prior.rate": 6.0,
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.raw_lengthscale_constraint.lower_bound": 0.0,
+            "covar_module.base_kernel.kernels.0.covar_module_unbiased.raw_lengthscale_constraint.upper_bound": "+infinity",
+            "covar_module.base_kernel.kernels.0.covar_module_biased.raw_lengthscale": [
+              [
+                2.4509635308929
+              ]
+            ],
+            "covar_module.base_kernel.kernels.0.covar_module_biased.lengthscale_prior.concentration": 6.0,
+            "covar_module.base_kernel.kernels.0.covar_module_biased.lengthscale_prior.rate": 2.0,
+            "covar_module.base_kernel.kernels.0.covar_module_biased.raw_lengthscale_constraint.lower_bound": 0.0,
+            "covar_module.base_kernel.kernels.0.covar_module_biased.raw_lengthscale_constraint.upper_bound": "+infinity",
+            "covar_module.outputscale_prior.concentration": 2.0,
+            "covar_module.outputscale_prior.rate": 0.15000000596046448,
+            "covar_module.raw_outputscale_constraint.lower_bound": 0.0,
+            "covar_module.raw_outputscale_constraint.upper_bound": "+infinity",
+            "outcome_transform.means": [
+              [
+                -2.319419625746673
+              ]
+            ],
+            "outcome_transform.stdvs": [
+              [
+                0.016890015421424143
+              ]
+            ],
+            "outcome_transform._stdvs_sq": [
+              [
+                0.0002852726209359454
+              ]
+            ],
+            "outcome_transform._is_trained": true
+          },
+          "state_dict_encoding": "JSON numbers; infinite constraint bounds encoded as signed strings",
+          "snapshot_digest": "sha256:c09065161f343c537a0b82f50c9c9b58129d4635656209abdfac5491bf0e1927",
+          "botorch_version": "0.16.1",
+          "torch_version": "2.8.0+cpu",
+          "num_fantasies": 16,
+          "seed": 17,
+          "numerical_diagnostics": [],
+          "validation_status": "uncalibrated posterior; numerical kernel is not hardware qualification"
+        }
+      },
+      "observation": {
+        "attempt_id": "synthetic-x1-s0-4",
+        "option_ref": "x1-s0",
+        "runtime_group_signature": "sha256:e1b2a5bea69b7c0e891e32bdcebf98f6a3ba4b97f088130c6111d1cdc792c454",
+        "seconds_per_work_unit": 10.362372502774948,
+        "evaluation_wall_seconds": 4.0,
+        "quality_passed": true,
+        "memory_passed": true
+      }
+    }
+  ]
+}

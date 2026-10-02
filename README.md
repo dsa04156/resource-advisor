@@ -133,3 +133,7 @@ See [optimization contracts](docs/optimization.md) and the
 Noise-aware [adaptive replication](docs/adaptive-replication.md) adds independent
 probes when descriptive measurement precision is unresolved, with explicit caps
 and separate final confirmation. It is distinct from multi-fidelity BO.
+
+The [MF-GP/MF-KG numerical kernel](docs/mfkg-kernel.md) now supports finite-space
+configuration/fidelity analysis and a synthetic ask/observe demo. Hardware
+qualification and mixed-fidelity job execution remain separate open gates.
