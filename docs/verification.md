@@ -97,9 +97,10 @@ remain open. Response-loss tests verify reuse of the external run and timestamp.
 The current suite passes **58 tests on SQLite and 58 on isolated PostgreSQL**;
 lint and format checks pass. The live database containing the GPU studies and
 tracking links was also dumped and restored into a fresh DB: all five service
-tables matched by count and deterministic content hash. The lab database uses
-ephemeral storage; a private backup was retained. This is recovery verification,
-not persistent production deployment.
+tables matched by count and deterministic content hash. At that revision the lab
+database used ephemeral storage; a private backup was retained. The later
+[persistent storage cutover](persistent-postgres.md) supersedes that storage state,
+without claiming a production HA deployment.
 
 ## Result-artifact increment
 

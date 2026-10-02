@@ -63,9 +63,12 @@ including connection refusal and a discarded accepted-create response. Invalid
 results cannot be published as valid performance metrics. Unknown legacy end
 times remain unknown. These checks do not prove global exactly-once creation.
 
-**Deployment:** real PostgreSQL tests and a restore check pass. This is not an
-HA deployment, migration strategy, key rotation system or workload isolation
-audit. CI uses disposable databases; no real cluster access is required.
+**Deployment:** the ephemeral lab DB has been replaced by same-version PostgreSQL
+on a PVC with a restricted app role. All five tables matched before/after new-Pod
+recreation, and 46 existing artifact objects matched restored metadata. The source
+and private backup were retained. This establishes Pod-replacement persistence,
+not node-loss recovery, HA, schema migration, key rotation or full app supervision.
+CI uses disposable databases; no real cluster access is required.
 
 **Hardware:** an unresolved NPU PCIe link blocks model/runtime qualification on
 that device. It is not registered as an executable candidate based only on an

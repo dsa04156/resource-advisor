@@ -1,0 +1,82 @@
+{
+  "schema_version": "v1",
+  "matches": true,
+  "source": {
+    "ra_entities": {
+      "rows": 655,
+      "sha256": "4e4b0f7655a0b72dee702366718266705122e9e1cd2553d5318482ba366dae6a"
+    },
+    "ra_jobs": {
+      "rows": 52,
+      "sha256": "2221a7598ea939bb040378f662f91e71ec2fd2ae74de236e5d085584d97a0d74"
+    },
+    "ra_outbox": {
+      "rows": 201,
+      "sha256": "1f54fd786cc34472f0e7fb1bf45bf3f6827205882d537a6d553d77a07b5bbdb5"
+    },
+    "ra_studies": {
+      "rows": 8,
+      "sha256": "f220ada6effba536d929d03b815c98d7bbcedff39964a257c5ef064cf8d4fdfb"
+    },
+    "ra_usage": {
+      "rows": 52,
+      "sha256": "88fa341acb4a55510862e1eae37bc9f24a9304adce21ca44ccd8cd38f44de2c6"
+    }
+  },
+  "restored": {
+    "ra_entities": {
+      "rows": 655,
+      "sha256": "4e4b0f7655a0b72dee702366718266705122e9e1cd2553d5318482ba366dae6a"
+    },
+    "ra_jobs": {
+      "rows": 52,
+      "sha256": "2221a7598ea939bb040378f662f91e71ec2fd2ae74de236e5d085584d97a0d74"
+    },
+    "ra_outbox": {
+      "rows": 201,
+      "sha256": "1f54fd786cc34472f0e7fb1bf45bf3f6827205882d537a6d553d77a07b5bbdb5"
+    },
+    "ra_studies": {
+      "rows": 8,
+      "sha256": "f220ada6effba536d929d03b815c98d7bbcedff39964a257c5ef064cf8d4fdfb"
+    },
+    "ra_usage": {
+      "rows": 52,
+      "sha256": "88fa341acb4a55510862e1eae37bc9f24a9304adce21ca44ccd8cd38f44de2c6"
+    }
+  },
+  "mismatched_tables": [],
+  "scope": "All five platform tables, exact canonical contents; writers must be quiesced",
+  "dump_sha256": "720fd5d76539415921e6c386c24d4820cff19a494935b211d5d28e61fa873ba5",
+  "dump_bytes": 819850,
+  "source_version": "17.6",
+  "target_version": "17.6",
+  "writers_quiesced": true,
+  "before_pod_recreation": true,
+  "source_untouched": true,
+  "after_pod_recreation_matches": true,
+  "pod_uid_changed": true,
+  "pvc_uid_retained": true,
+  "artifact_objects_verified": 46,
+  "app_role_superuser": false,
+  "app_role_create_database_denied": true,
+  "app_role_create_role_denied": true,
+  "all_platform_tables_owned_by_app": true,
+  "cli_comparison_exit_code": 0,
+  "api_health_after_cutover": true,
+  "authenticated_overview_after_cutover": true,
+  "invalid_token_rejected": true,
+  "tls_certificate_verified_api_healthy": true,
+  "jobs_visible_after_cutover": 52,
+  "inventory_collector_restarted": true,
+  "inventory_node_count_after_cutover": 10,
+  "kubernetes_server_version": "v1.31.14",
+  "pvc_requested_gib": 5,
+  "storage_class_kind": "node-local-dynamic",
+  "initial_target_port_forward_failed": true,
+  "target_placement_changed_before_data_copy": true,
+  "local_sqlite_tests_passed": 190,
+  "local_postgres_tests_passed": 190,
+  "tracking_links_verified_after_cutover": 52,
+  "existing_mlflow_runs_read_back": 52
+}

@@ -1,0 +1,89 @@
+# Static metadata service only. No runtime compute Jobs or real secrets in Git.
+apiVersion: v1
+kind: Service
+metadata:
+  name: ra-postgres
+  labels: {app.kubernetes.io/part-of: resource-advisor}
+spec:
+  clusterIP: None
+  selector: {app.kubernetes.io/name: ra-postgres}
+  ports:
+    - {name: postgres, port: 5432, targetPort: postgres}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ra-postgres
+  labels: {app.kubernetes.io/part-of: resource-advisor}
+spec:
+  serviceName: ra-postgres
+  replicas: 1
+  selector:
+    matchLabels: {app.kubernetes.io/name: ra-postgres}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ra-postgres
+        app.kubernetes.io/part-of: resource-advisor
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 60
+      # Select a qualified metadata pool, or replace this in a private site overlay.
+      # An unconfigured installation must stay Pending instead of choosing any edge node.
+      nodeSelector:
+        resource-advisor.io/metadata: "true"
+      securityContext:
+        runAsNonRoot: true
+        # Verified postgres UID/GID in this pinned Alpine image.
+        runAsUser: 70
+        runAsGroup: 70
+        fsGroup: 70
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: postgres
+          # Same immutable image as the qualified lab source; no automatic upgrade.
+          image: public.ecr.aws/docker/library/postgres@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+          imagePullPolicy: IfNotPresent
+          ports: [{name: postgres, containerPort: 5432}]
+          env:
+            - {name: POSTGRES_USER, value: ra_admin}
+            - {name: POSTGRES_DB, value: postgres}
+            - {name: PGDATA, value: /var/lib/postgresql/data/pgdata}
+            - {name: POSTGRES_INITDB_ARGS, value: "--auth-host=scram-sha-256"}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: ra-postgres-admin, key: password}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi, ephemeral-storage: 64Mi}
+            limits: {cpu: "1", memory: 1Gi, ephemeral-storage: 256Mi}
+          startupProbe:
+            exec:
+              command: [pg_isready, -h, "127.0.0.1", -U, ra_admin, -d, postgres]
+            periodSeconds: 2
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command: [pg_isready, -h, "127.0.0.1", -U, ra_admin, -d, postgres]
+            periodSeconds: 5
+          # No dependency-sensitive liveness probe that would restart on an outage.
+          volumeMounts:
+            - {name: data, mountPath: /var/lib/postgresql/data}
+            - {name: socket, mountPath: /var/run/postgresql}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - {name: socket, emptyDir: {sizeLimit: 16Mi}}
+        - {name: tmp, emptyDir: {sizeLimit: 64Mi}}
+  # Default StatefulSet PVC retention is Retain. Never GitOps-prune this claim.
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        annotations:
+          argocd.argoproj.io/sync-options: Prune=false
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests: {storage: 5Gi}

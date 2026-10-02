@@ -33,6 +33,8 @@ The [failure tracking recovery](docs/failure-tracking.md) retains cancelled and
 resultless failed attempts in MLflow, including outage and response-loss checks.
 The [uncertainty audit](docs/uncertainty.md) rechecks recommendation evidence before
 reuse and compares saved forecasts only with later, unseen measurements.
+The [persistent metadata cutover](docs/persistent-postgres.md) preserves all five
+database tables across Pod recreation and verifies existing artifact references.
 
 ## Responsibility
 

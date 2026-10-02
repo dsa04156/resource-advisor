@@ -22,6 +22,12 @@ def main():
     sub.add_parser("init-db")
     sub.add_parser("backfill-usage")
     sub.add_parser("backfill-tracking")
+    verify_copy = sub.add_parser("verify-db-copy")
+    verify_copy.add_argument(
+        "--target-env",
+        default="RA_RESTORED_DATABASE_URL",
+        help="environment variable containing the restored database URL",
+    )
     serve = sub.add_parser("serve")
     serve.add_argument(
         "--credentials", required=True, help="private JSON file of token SHA-256 hashes"
@@ -51,6 +57,18 @@ def main():
         print("Independent Resource Advisor schema initialized.")
         return
     service = Service(store)
+    if args.action == "verify-db-copy":
+        from .backup import compare
+
+        if not os.environ.get(args.target_env):
+            parser.error("restored database environment variable is missing")
+        target = Store(os.environ[args.target_env])
+        try:
+            report = compare(store, target)
+            print(json.dumps(report, indent=2))
+        finally:
+            target.engine.dispose()
+        raise SystemExit(0 if report["matches"] else 1)
     if args.action == "collect-inventory":
         from .inventory import InventoryCollector, InventoryConfig, save_inventory
 
