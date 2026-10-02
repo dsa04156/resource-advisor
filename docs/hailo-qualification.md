@@ -62,8 +62,9 @@ uses a writable `/home/research` emptyDir as its container HOME.
 
 After collection, the Hailo node was Ready with no memory/disk/PID pressure;
 the dedicated queue had zero pending, admitted or reserving workloads. Existing
-GPU quota and the host PCIe driver were unchanged. Actual device visibility
-denial without allocation and over-quota NPU negative tests remain open.
+GPU quota and the host PCIe driver were unchanged. Subsequent actual device access denial without allocation and over-quota NPU
+negative checks passed; see [reservation evidence](hailo-reservation.md). These
+checks do not change the failed model quality verdict.
 
 ## Reproduction
 

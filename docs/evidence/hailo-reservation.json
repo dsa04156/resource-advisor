@@ -1,0 +1,130 @@
+{
+  "schema_version": "v1",
+  "evidence_kind": "hardware",
+  "source_sha256": "ea847685b5d6ba060b278985f20de07dd4812965cc97a8a7ec8ade21401b6cf3",
+  "queue_capacity": {
+    "cpu": 1,
+    "memory_gib": 1,
+    "hailo.ai/h8": 1
+  },
+  "cases": {
+    "control": {
+      "node_alias": "hailo-node-a",
+      "probe": {
+        "kind": "hailo-device-access",
+        "expect": "allowed",
+        "hailort": "4.23.0",
+        "driver": "4.23.0",
+        "effective_uid": 10001,
+        "opened": [
+          "/dev/hailo0"
+        ],
+        "errors": [],
+        "architecture": "HAILO8",
+        "model_inference_performed": false,
+        "passed": true
+      },
+      "image_digest": "sha256:4c524b12874382a3cdafe8c7c381a117df2ac91e48215b7b42bae0a531d3fcfd",
+      "requests": {
+        "cpu": "1",
+        "hailo.ai/h8": "1",
+        "memory": "512Mi"
+      },
+      "limits": {
+        "cpu": "1",
+        "hailo.ai/h8": "1",
+        "memory": "512Mi"
+      },
+      "container_exit_code": 0,
+      "pod_scheduled_to_container_finished_seconds": 2.0,
+      "admission_to_workload_finished_seconds": 4.0,
+      "timestamps": {
+        "admitted": "2026-10-02T20:31:59Z",
+        "scheduled": "2026-10-02T20:31:59Z",
+        "container_started": "2026-10-02T20:31:59Z",
+        "container_finished": "2026-10-02T20:32:01Z",
+        "workload_finished": "2026-10-02T20:32:03Z"
+      }
+    },
+    "unallocated": {
+      "node_alias": "hailo-node-a",
+      "probe": {
+        "kind": "hailo-device-access",
+        "expect": "denied",
+        "hailort": "4.23.0",
+        "driver": "4.23.0",
+        "effective_uid": 10001,
+        "opened": [],
+        "errors": [
+          {
+            "device": "/dev/hailo0",
+            "errno": 2
+          }
+        ],
+        "architecture": null,
+        "model_inference_performed": false,
+        "passed": true
+      },
+      "image_digest": "sha256:4c524b12874382a3cdafe8c7c381a117df2ac91e48215b7b42bae0a531d3fcfd",
+      "requests": {
+        "cpu": "1",
+        "memory": "512Mi"
+      },
+      "limits": {
+        "cpu": "1",
+        "memory": "512Mi"
+      },
+      "container_exit_code": 0,
+      "pod_scheduled_to_container_finished_seconds": 2.0,
+      "admission_to_workload_finished_seconds": 5.0,
+      "timestamps": {
+        "admitted": "2026-10-02T20:32:22Z",
+        "scheduled": "2026-10-02T20:32:22Z",
+        "container_started": "2026-10-02T20:32:23Z",
+        "container_finished": "2026-10-02T20:32:24Z",
+        "workload_finished": "2026-10-02T20:32:27Z"
+      }
+    },
+    "oversize": {
+      "observations": [
+        {
+          "observed_at": "2026-10-02T20:33:22.214753+00:00",
+          "suspended": true,
+          "pod_count": 0,
+          "quota_reserved": false,
+          "reason": "Pending",
+          "requested_npus": 2,
+          "quota_npus": 1
+        },
+        {
+          "observed_at": "2026-10-02T20:34:27.153287+00:00",
+          "suspended": true,
+          "pod_count": 0,
+          "quota_reserved": false,
+          "reason": "Pending",
+          "requested_npus": 2,
+          "quota_npus": 1
+        }
+      ],
+      "interval_seconds": 64.938534,
+      "allocation_seconds": 0,
+      "model_executed": false
+    }
+  },
+  "cleanup": {
+    "three_owned_jobs_deleted": true,
+    "queue_pending": 0,
+    "queue_admitted": 0,
+    "queue_reserving": 0,
+    "queue_policy_unchanged": true
+  },
+  "checks": {
+    "same_node": true,
+    "same_image": true,
+    "allocated_control_opens_hailo8": true,
+    "unallocated_device_open_denied": true,
+    "oversize_pending_without_pods": true,
+    "bounded_unprivileged_probe": true
+  },
+  "scope": "Device injection and queue admission for these non-root Pods; not adversarial multi-tenant isolation, time slicing, utilization, model quality or platform API integration."
+}
