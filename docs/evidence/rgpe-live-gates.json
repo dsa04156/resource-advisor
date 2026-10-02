@@ -1,0 +1,34 @@
+{
+  "scope": "live HTTPS authorization and missing-source gates; no physical RGPE trial",
+  "application_source_commit": "fbd6df7c7313873bf0f99f6c86517fce6a6da272",
+  "captured_at": "2026-10-02T17:49:25.278793+00:00",
+  "http_status": {
+    "health": 200,
+    "anonymous_read": 401,
+    "unknown_family": 404,
+    "user_cannot_register": 403,
+    "two_candidate_family_rejected": 422,
+    "posted_source_measurements_rejected": 422,
+    "rgpe_missing_binding_rejected": 422,
+    "history_warm_start_missing_binding_rejected": 422
+  },
+  "running_source_hashes": {
+    "api": "37d9c72294dcf7030dd3990a28a02ca36bd1a341197e37d7c139521740b73d58",
+    "inventory": "37d9c72294dcf7030dd3990a28a02ca36bd1a341197e37d7c139521740b73d58",
+    "worker": "37d9c72294dcf7030dd3990a28a02ca36bd1a341197e37d7c139521740b73d58"
+  },
+  "worker_numerical_versions": {
+    "botorch": "0.16.1",
+    "torch": "2.8.0+cpu"
+  },
+  "jobs_before_and_after": 152,
+  "studies_before_and_after": 13,
+  "no_new_compute_jobs_or_studies": true,
+  "ready_nodes": 10,
+  "pressure_nodes": 0,
+  "limits": [
+    "Positive durable RGPE execution is tested with scheduler doubles, not a physical GPU transfer trial",
+    "No existing workload family was reclassified as transfer-qualified",
+    "Equal-budget cold-start comparison and complete upstream source costs remain open"
+  ]
+}

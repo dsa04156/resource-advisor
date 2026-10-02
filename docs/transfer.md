@@ -123,3 +123,11 @@ transfer diagnostics, complete upstream source costs, and equal-budget compariso
 against cold-start BO.
 New hardware, SDKs, model families or training workloads are not implicitly
 qualified by a numerical result. No cross-workload speedup is currently claimed.
+
+The [live HTTPS gate report](evidence/rgpe-live-gates.json) verifies deployed
+API/inventory/worker source hashes and the existing locked numerical dependencies.
+Anonymous reads, ordinary-user family registration, posted source measurements,
+incomplete family registration and unbound strategy requests were rejected as
+specified. Health returned 200; all ten nodes remained Ready without pressure.
+Existing counts remained 152 compute Jobs and 13 studies. This live check did not
+create a transfer family, submit GPU work or establish a transfer-performance result.
