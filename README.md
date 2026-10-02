@@ -139,5 +139,6 @@ configuration/fidelity analysis and a synthetic ask/observe demo. Hardware
 qualification and automatic MF-KG job selection remain open gates.
 [Immutable fidelity spaces](docs/fidelity-spaces.md) now bind measurement levels
 to separate workloads and execute preregistered mixed-workload calibration through
-the durable study/Job path; the new path is covered by scheduler-double tests
-and still awaits a live trial.
+the durable study/Job path. The new path completed 12 actual GPU probes and six
+independent target confirmations, with matching S3/API/MLflow results.
+Representative-sampling qualification and automatic MF-KG selection remain open.

@@ -137,6 +137,47 @@ calibration control flow, coordinator reconstruction, profile isolation,
 independent target confirmation, deliberate rank reversal, cancellation,
 failed cells, stale capabilities and reservation substitution rejection.
 These tests use an explicitly labeled scheduler double and hand-built result
-envelopes; they are **not GPU measurements**. Existing historical GPU calibration
-and adaptive-replication evidence does not certify this new execution path.
-The new mixed-workload coordinator still requires a live deployment trial.
+envelopes; they are **not GPU measurements**. The separate live trial below
+verifies this execution path without reusing prior calibration measurements.
+
+## Live path verification — 2026-10-02
+
+[Raw JSON](evidence/mixed-fidelity-calibration.json) and
+[CSV](evidence/mixed-fidelity-calibration.csv) record one actual RTX 5080 study:
+
+- Two CPU allocations (1 and 2), each with 10- and 100-iteration CUDA matmul
+  workloads. Both use the same 256×256 fp32 inputs, seed, image, runtime, GPU
+  reservation, quality contract and three warmup iterations.
+- Three randomized complete blocks: **12 independent probe Jobs**, followed by
+  **6 new 100-iteration confirmation Jobs**. All 18 succeeded. Four fresh F0
+  runtime/shape/budget checks were performed separately before registration.
+- Every Job had one successful Pod requesting/limiting one physical GPU. Its
+  owned Kueue Workload recorded quota reservation, admission and completion.
+- Workload and space digests matched all 18 ProbePlans. Only the six target
+  confirmations entered measured profile history. Attempt IDs were independent.
+- All 18 result records matched PostgreSQL metadata; each bundle matched
+  byte-for-byte across S3, the authenticated API and MLflow artifact readback.
+  Each attempt had exactly one FINISHED MLflow run with the correct metric.
+- The evidence endpoint accepted the 12 probes and rejected a request including
+  final confirmation Jobs. The repetition-only report returned no MF kernel
+  input and `execution_authorized=false`.
+- Main-study wall time was **381.918 seconds**; observed GPU reservation time
+  was **38 seconds**. The four F0 Jobs used another **9 reservation seconds**.
+  These boundaries differ from the sub-millisecond/millisecond timed loop.
+- The recommendation retained the existing CPU=1 baseline. The two target
+  confirmation intervals overlap; there is no demonstrated configuration gain.
+- Final state: empty Kueue queue, no unfinished outbox deliveries, and all ten
+  nodes Ready without pressure conditions.
+
+| Phase | Iterations | Independent Jobs per CPU allocation | Mean measured loop, CPU=1 | Mean measured loop, CPU=2 |
+|---|---:|---:|---:|---:|
+| Short probe | 10 | 3 | 0.139816 ms | 0.140494 ms |
+| Target probe | 100 | 3 | 1.322765 ms | 1.324608 ms |
+| Independent target confirmation | 100 | 3 | 1.315204 ms | 1.320136 ms |
+
+The table reports the total timed loop per Job, including Python/CUDA launch
+and synchronization overhead; it is not per-kernel device time or end-to-end
+Job latency. Independent n is three per cell, not the number of inner iterations.
+This is a functional integration trial, not a powered policy comparison.
+Representative sampling, thermal attribution, complete external preparation
+costs, automatic MF-KG execution and equal-budget policy experiments remain open.

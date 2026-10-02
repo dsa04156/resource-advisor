@@ -125,7 +125,7 @@ evidence** and not an equal-budget strategy comparison.
 - Verified cost intervals and their uncertainty; finite-space group selection.
 - Automatic MF-KG selection through the durable mixed-workload ProbePlans. The
   calibration strategy now implements bindings, budget accounting, cancellation
-  and independent target confirmation; its new path still needs a live trial.
+  and independent target confirmation, verified in an 18-Job GPU trial.
 - Held-out calibration and real equal-budget comparison with fixed-level qLogNEI.
 
 Until those gates have direct evidence, `Studies.create(strategy="mfkg")` keeps

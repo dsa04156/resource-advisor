@@ -1,0 +1,2577 @@
+{
+  "evidence_kind": "hardware",
+  "scope": "one RTX 5080 mixed-workload calibration execution trial; repetition-only, not MFBO or a strategy comparison",
+  "application_source_commit": "41d5682c43025977edd43046bf307b3f3c2e4e16",
+  "source_tree_sha256": "bfa44c563825ef0cff0cd8df8ff84e0c16ce23b78a4334bde8a6f9ef8d3e073e",
+  "source_layer_sha256": "32dd1175618975a58797aa6528cbc24f3c48b5fd2773db15e1f047d9d044bb90",
+  "source_layer_bytes": 399360,
+  "captured_at": "2026-10-02T14:42:29.091335+00:00",
+  "study": {
+    "ref": "study-0bfa36ea7edd4a209c207d0224b88efa",
+    "request": {
+      "workload_ref": "mixed-142740-full",
+      "strategy": "fidelity_calibration",
+      "seed": 20261002,
+      "fidelity_space_ref": "mixed-space-142740"
+    },
+    "state": "COMPLETED",
+    "created_at": "2026-10-02T14:31:47.328243+00:00",
+    "deadline_at": "2026-10-02T14:51:47.328248+00:00",
+    "fidelity_schedule": [
+      {
+        "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+        "block": 0
+      },
+      {
+        "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+        "block": 0
+      },
+      {
+        "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+        "block": 0
+      },
+      {
+        "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+        "block": 0
+      },
+      {
+        "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+        "block": 1
+      },
+      {
+        "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+        "block": 1
+      },
+      {
+        "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+        "block": 1
+      },
+      {
+        "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+        "block": 1
+      },
+      {
+        "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+        "block": 2
+      },
+      {
+        "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+        "block": 2
+      },
+      {
+        "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+        "block": 2
+      },
+      {
+        "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+        "block": 2
+      }
+    ],
+    "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6",
+    "planning_seconds": 0.0,
+    "charged_device_seconds": {
+      "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 38.0
+    },
+    "recommendation": {
+      "ref": "rec-bc0fd7349006477a9e174ca851cd011b",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "status": "CONFIRMED_RECOMMENDATION",
+      "candidate_ref": "cpu1",
+      "confirmed_candidate": "cpu1",
+      "predicted_candidate": "cpu1",
+      "study_ref": "study-0bfa36ea7edd4a209c207d0224b88efa",
+      "measured": true,
+      "ranking": [
+        {
+          "candidate_ref": "cpu1",
+          "mean_seconds": 0.001315204193815589,
+          "interval_seconds": [
+            0.0012942108188713256,
+            0.0013361975687598523
+          ],
+          "evidence_refs": [
+            "a-953e9d87a6334a46b6afddcf550d5990",
+            "a-e2ea148cab804fcd966df76286ba6256",
+            "a-d6aa342a1c5a4ea08ee7bd4d22738761"
+          ],
+          "independent_runs": 3
+        },
+        {
+          "candidate_ref": "cpu2",
+          "mean_seconds": 0.001320135702068607,
+          "interval_seconds": [
+            0.0012895868530526124,
+            0.0013506845510846018
+          ],
+          "evidence_refs": [
+            "a-0493953352834e1dbc02544e2465d2d4",
+            "a-ffa7907430ac4b80acec726e961e34df",
+            "a-2b0b752b45ec48fea4eabf7b8a5b470e"
+          ],
+          "independent_runs": 3
+        }
+      ],
+      "approval_required": true,
+      "created_at": "2026-10-02T14:38:09.245771+00:00",
+      "expires_at": "2026-10-02T14:53:09.245797+00:00",
+      "confirmation_run_ids": [
+        "a-953e9d87a6334a46b6afddcf550d5990",
+        "a-0493953352834e1dbc02544e2465d2d4",
+        "a-e2ea148cab804fcd966df76286ba6256",
+        "a-d6aa342a1c5a4ea08ee7bd4d22738761",
+        "a-ffa7907430ac4b80acec726e961e34df",
+        "a-2b0b752b45ec48fea4eabf7b8a5b470e"
+      ],
+      "cost": {
+        "wall_seconds": 381.917576,
+        "planning_seconds": 0.0,
+        "device_seconds": {
+          "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 38.0
+        }
+      }
+    }
+  },
+  "space": {
+    "request": {
+      "ref": "mixed-space-142740",
+      "project_ref": "ra-lab",
+      "target_workload_ref": "mixed-142740-full",
+      "lower_workload_refs": [
+        "mixed-142740-short"
+      ],
+      "feature_names": [
+        "host_cpu"
+      ],
+      "fidelity_axis": "identical_input_repetition",
+      "sampling_policy_digest": null
+    },
+    "registered_at": "2026-10-02T14:31:14.504856+00:00",
+    "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+    "feature_bounds": {
+      "host_cpu": [
+        1.0,
+        2.0
+      ]
+    },
+    "options": [
+      {
+        "ref": "option-e89c935fa9929f2298f2910aa35f443b",
+        "candidate_ref": "cpu1",
+        "coordinates": [
+          0.0
+        ],
+        "fidelity": 1.0
+      },
+      {
+        "ref": "option-0646b80940c06f0809df859b2cc717be",
+        "candidate_ref": "cpu2",
+        "coordinates": [
+          1.0
+        ],
+        "fidelity": 1.0
+      },
+      {
+        "ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+        "candidate_ref": "cpu1",
+        "coordinates": [
+          0.0
+        ],
+        "fidelity": 0.1
+      },
+      {
+        "ref": "option-ddd038b738d9a606e075e98e57087ee3",
+        "candidate_ref": "cpu2",
+        "coordinates": [
+          1.0
+        ],
+        "fidelity": 0.1
+      }
+    ],
+    "bindings": [
+      {
+        "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+        "workload_ref": "mixed-142740-full",
+        "candidate_ref": "cpu1",
+        "work_units": 100,
+        "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+        "variant_digest": "sha256:3896226f395e6421c8e8ef01b55a54bf921d5c275e7b60329c30a0011eeb6bbd",
+        "capability_digest": "sha256:79f3009503d047929ff324783caecb520afdf88e682e03ab413d75653052c858",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8"
+      },
+      {
+        "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+        "workload_ref": "mixed-142740-full",
+        "candidate_ref": "cpu2",
+        "work_units": 100,
+        "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+        "variant_digest": "sha256:757bc39e00ecaeaa562d4a373ce700bd0846b5efab30ac2d91fc53fb3033758e",
+        "capability_digest": "sha256:79f3009503d047929ff324783caecb520afdf88e682e03ab413d75653052c858",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf"
+      },
+      {
+        "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+        "workload_ref": "mixed-142740-short",
+        "candidate_ref": "cpu1",
+        "work_units": 10,
+        "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+        "variant_digest": "sha256:5aae7c00dedac79daee8599cde47b83ecb8439b6c3461bb4c6d3db8be502e22c",
+        "capability_digest": "sha256:79f3009503d047929ff324783caecb520afdf88e682e03ab413d75653052c858",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8"
+      },
+      {
+        "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+        "workload_ref": "mixed-142740-short",
+        "candidate_ref": "cpu2",
+        "work_units": 10,
+        "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+        "variant_digest": "sha256:5ebf4c3674d61a07b61b3a258fdea40795f4114db8795eb156f4aef918a12e56",
+        "capability_digest": "sha256:79f3009503d047929ff324783caecb520afdf88e682e03ab413d75653052c858",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf"
+      }
+    ],
+    "execution_authorized": false,
+    "qualification_reasons": [
+      "REPLICATION_ONLY_NOT_MULTI_FIDELITY"
+    ]
+  },
+  "workload_identities": {
+    "mixed-142740-short": {
+      "code_digest": "sha256:ab9a255bfe9134d984527e8d6690e1dd4024e0bce2be121f8742161947d8b470",
+      "model_digest": "sha256:07d2b7a9750a7c473868c22e215d1ad3db7626c193238fd907dc2713ac437ee0",
+      "dataset_version": "generated-torch-randn-seed-0",
+      "config_digest": "sha256:c7dbd1e1a27c1b5c3df300676d0fc112345e7ceb1288df485fd915dd13c3dc5a",
+      "task_type": "benchmark",
+      "input_shape": [
+        256,
+        256
+      ],
+      "batch_size": 1,
+      "global_batch_size": null,
+      "gradient_accumulation": 1,
+      "precision": "fp32",
+      "seed": 0,
+      "work_units": 10,
+      "quality_contract_digest": "sha256:a9f0bd7d40be67709a2fcc7ca47d00eccac388f46be97234dc9fb0825dcc9496",
+      "measurement_boundary": "CUDA synchronized forward-only; excludes setup/reference"
+    },
+    "mixed-142740-full": {
+      "code_digest": "sha256:ab9a255bfe9134d984527e8d6690e1dd4024e0bce2be121f8742161947d8b470",
+      "model_digest": "sha256:07d2b7a9750a7c473868c22e215d1ad3db7626c193238fd907dc2713ac437ee0",
+      "dataset_version": "generated-torch-randn-seed-0",
+      "config_digest": "sha256:c7dbd1e1a27c1b5c3df300676d0fc112345e7ceb1288df485fd915dd13c3dc5a",
+      "task_type": "benchmark",
+      "input_shape": [
+        256,
+        256
+      ],
+      "batch_size": 1,
+      "global_batch_size": null,
+      "gradient_accumulation": 1,
+      "precision": "fp32",
+      "seed": 0,
+      "work_units": 100,
+      "quality_contract_digest": "sha256:a9f0bd7d40be67709a2fcc7ca47d00eccac388f46be97234dc9fb0825dcc9496",
+      "measurement_boundary": "CUDA synchronized forward-only; excludes setup/reference"
+    }
+  },
+  "registered_budgets": {
+    "consent": true,
+    "max_candidates": 2,
+    "max_wall_seconds_per_candidate": 30,
+    "max_queue_seconds": 60,
+    "total_wall_seconds": 1200,
+    "final_validation_seconds": 360,
+    "mutable_parameters": [
+      "host_cpu"
+    ],
+    "checkpoint_digest": null,
+    "max_probes": 12,
+    "device_seconds": {
+      "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 1200.0
+    }
+  },
+  "plans": [
+    {
+      "ref": "plan-28d9478603f547b6b6f6d67eaf53a214",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+        "fidelity": 1.0,
+        "block": 0,
+        "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+        "planning_seconds": 0
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T14:31:47.873201+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 33,
+        "max_collection_seconds": 6
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+      "fidelity": 1.0,
+      "block": 0,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-7f63a0751819459c8c1b9d65d90a6027",
+      "candidate_ref": "cpu2",
+      "choice": {
+        "candidate_ref": "cpu2",
+        "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+        "fidelity": 1.0,
+        "block": 0,
+        "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+        "planning_seconds": 0
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T14:32:08.870254+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 37,
+        "max_collection_seconds": 7
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+      "fidelity": 1.0,
+      "block": 0,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-738601a2b7be4cb1ad4950428aa87c18",
+      "candidate_ref": "cpu2",
+      "choice": {
+        "candidate_ref": "cpu2",
+        "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+        "fidelity": 0.1,
+        "block": 0,
+        "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+        "planning_seconds": 0
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T14:32:29.776047+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 42,
+        "max_collection_seconds": 7
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-short",
+      "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+      "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+      "fidelity": 0.1,
+      "block": 0,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-9560b326f0824f55ba210706bc170f00",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+        "fidelity": 0.1,
+        "block": 0,
+        "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+        "planning_seconds": 0
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T14:32:50.654878+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 48,
+        "max_collection_seconds": 8
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-short",
+      "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+      "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+      "fidelity": 0.1,
+      "block": 0,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-6bde9a91a52a4ef0a91e092aabf69cc5",
+      "candidate_ref": "cpu2",
+      "choice": {
+        "candidate_ref": "cpu2",
+        "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+        "fidelity": 1.0,
+        "block": 1,
+        "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+        "planning_seconds": 0
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T14:33:11.373462+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 55,
+        "max_collection_seconds": 9
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+      "fidelity": 1.0,
+      "block": 1,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-152f79a2276549fabefd111799dbc69a",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+        "fidelity": 1.0,
+        "block": 1,
+        "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+        "planning_seconds": 0
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T14:33:32.103618+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+      "fidelity": 1.0,
+      "block": 1,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-cfac609e34db4d7586040abea976380f",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+        "fidelity": 0.1,
+        "block": 1,
+        "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+        "planning_seconds": 0
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T14:33:53.224186+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-short",
+      "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+      "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+      "fidelity": 0.1,
+      "block": 1,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-fea96a9454594dbeb58a966f3dc1b207",
+      "candidate_ref": "cpu2",
+      "choice": {
+        "candidate_ref": "cpu2",
+        "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+        "fidelity": 0.1,
+        "block": 1,
+        "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+        "planning_seconds": 0
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T14:34:14.047036+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-short",
+      "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+      "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+      "fidelity": 0.1,
+      "block": 1,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-3f45dcfbe4924d6db916d20687a30599",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+        "fidelity": 1.0,
+        "block": 2,
+        "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+        "planning_seconds": 0
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T14:34:34.896939+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+      "fidelity": 1.0,
+      "block": 2,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-d14c4eb42b2c4cf4b0927472b1ab1876",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+        "fidelity": 0.1,
+        "block": 2,
+        "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+        "planning_seconds": 0
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T14:34:55.946405+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-short",
+      "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+      "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+      "fidelity": 0.1,
+      "block": 2,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-1ead1826dcac441f9ad4f35e2fd70979",
+      "candidate_ref": "cpu2",
+      "choice": {
+        "candidate_ref": "cpu2",
+        "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+        "fidelity": 0.1,
+        "block": 2,
+        "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+        "planning_seconds": 0
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T14:35:16.801974+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-short",
+      "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+      "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+      "fidelity": 0.1,
+      "block": 2,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-1b3233562a7545d491ffd5e13c75290b",
+      "candidate_ref": "cpu2",
+      "choice": {
+        "candidate_ref": "cpu2",
+        "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+        "fidelity": 1.0,
+        "block": 2,
+        "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+        "planning_seconds": 0
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T14:35:37.769529+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+      "fidelity": 1.0,
+      "block": 2,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-7bb9d860bce74f70bd0286404cf64316",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "reason": "INDEPENDENT_FINAL_CONFIRMATION",
+        "planning_seconds": 0
+      },
+      "mode": "confirmation",
+      "created_at": "2026-10-02T14:35:58.608728+00:00",
+      "reserved_device_seconds": 27,
+      "execution_limits": {
+        "max_run_seconds": 27,
+        "max_queue_seconds": 27,
+        "max_collection_seconds": 5
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+      "fidelity": 1.0,
+      "block": null,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-50a5f8faba7d43b3b73a6f5c7554ee2d",
+      "candidate_ref": "cpu2",
+      "choice": {
+        "candidate_ref": "cpu2",
+        "reason": "INDEPENDENT_FINAL_CONFIRMATION",
+        "planning_seconds": 0
+      },
+      "mode": "confirmation",
+      "created_at": "2026-10-02T14:36:19.487157+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 31,
+        "max_collection_seconds": 6
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+      "fidelity": 1.0,
+      "block": null,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-29a13a0edfa74b29ae5d477f2389ac1f",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "reason": "INDEPENDENT_FINAL_CONFIRMATION",
+        "planning_seconds": 0
+      },
+      "mode": "confirmation",
+      "created_at": "2026-10-02T14:36:45.533673+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 41,
+        "max_collection_seconds": 7
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+      "fidelity": 1.0,
+      "block": null,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-d555dbcf8ebc4517b006320fdb6e2fd8",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "reason": "INDEPENDENT_FINAL_CONFIRMATION",
+        "planning_seconds": 0
+      },
+      "mode": "confirmation",
+      "created_at": "2026-10-02T14:37:06.353031+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 58,
+        "max_collection_seconds": 9
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+      "fidelity": 1.0,
+      "block": null,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-d5d8ff5d3495456da644bba64c652789",
+      "candidate_ref": "cpu2",
+      "choice": {
+        "candidate_ref": "cpu2",
+        "reason": "INDEPENDENT_FINAL_CONFIRMATION",
+        "planning_seconds": 0
+      },
+      "mode": "confirmation",
+      "created_at": "2026-10-02T14:37:27.370749+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+      "fidelity": 1.0,
+      "block": null,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    },
+    {
+      "ref": "plan-9e58167d0a664024841048b53941aa0a",
+      "candidate_ref": "cpu2",
+      "choice": {
+        "candidate_ref": "cpu2",
+        "reason": "INDEPENDENT_FINAL_CONFIRMATION",
+        "planning_seconds": 0
+      },
+      "mode": "confirmation",
+      "created_at": "2026-10-02T14:37:48.278622+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+      "fidelity": 1.0,
+      "block": null,
+      "fidelity_space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6"
+    }
+  ],
+  "observations": [
+    {
+      "plan_ref": "plan-28d9478603f547b6b6f6d67eaf53a214",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-265816b661db4133933ef13cc66723bc",
+      "job_id": "j-0ae9d99419b3458d9478afcbbc6f9beb",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.001318588969297707,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013113545719534159,
+        "latency_p95_ms": 0.013804994523525238,
+        "latency_p99_ms": 0.014953024219721556,
+        "throughput": 75838.64443615128,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:32:03.731091+00:00",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+      "fidelity": 1.0,
+      "block": 0,
+      "evaluation_wall_seconds": 5.521818,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-0ae9d99419b3458d9478afcbbc6f9beb",
+        "attempt_id": "a-265816b661db4133933ef13cc66723bc",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.001318588969297707,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013113545719534159,
+          "latency_p95_ms": 0.013804994523525238,
+          "latency_p99_ms": 0.014953024219721556,
+          "throughput": 75838.64443615128,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:05b07962417cbfa10c528a0d6747aa377c676444fe3ade0b725d20a96efc5bb7",
+      "backend_job_id": "a-265816b661db4133933ef13cc66723bc",
+      "submitted_at": "2026-10-02T14:31:53Z",
+      "started_at": "2026-10-02T14:31:53Z",
+      "finished_at": "2026-10-02T14:31:55Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.107466,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-265816b661db4133933ef13cc66723bc-e834b",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 1.0
+      },
+      "delivery": {
+        "mlflow_run_id": "72607331fef84ab6b44178ec00b315ff",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:f5475cf802a4a9a1998c3309293321b44bed0433361d7f847d6e6b4f6b8a8fc3",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-7f63a0751819459c8c1b9d65d90a6027",
+      "candidate_ref": "cpu2",
+      "attempt_id": "a-6d4e1257d925495f8f5d46db82b8fc13",
+      "job_id": "j-6128948203144db3a30f7f1a8953335e",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013061497011221945,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.012956035789102316,
+        "latency_p95_ms": 0.013515993487089872,
+        "latency_p99_ms": 0.014076998922973871,
+        "throughput": 76560.90256276427,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:32:24.684603+00:00",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+      "fidelity": 1.0,
+      "block": 0,
+      "evaluation_wall_seconds": 5.455523,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-6128948203144db3a30f7f1a8953335e",
+        "attempt_id": "a-6d4e1257d925495f8f5d46db82b8fc13",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013061497011221945,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.012956035789102316,
+          "latency_p95_ms": 0.013515993487089872,
+          "latency_p99_ms": 0.014076998922973871,
+          "throughput": 76560.90256276427,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:ac9d993eb5e894c5c2f156fa4b362f1d8b6c72335b14c6d79df83dc7054271fc",
+      "backend_job_id": "a-6d4e1257d925495f8f5d46db82b8fc13",
+      "submitted_at": "2026-10-02T14:32:14Z",
+      "started_at": "2026-10-02T14:32:14Z",
+      "finished_at": "2026-10-02T14:32:16Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 0.0,
+      "collection_seconds": 0.113932,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-6d4e1257d925495f8f5d46db82b8fc13-ef585",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 2.0
+      },
+      "delivery": {
+        "mlflow_run_id": "f55c075aa0eb4011a21a68ef9af551c9",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:1b8147021bca5037eb494a09ba7785968ca79175d049a136e000fd22627a8fbf",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-738601a2b7be4cb1ad4950428aa87c18",
+      "candidate_ref": "cpu2",
+      "attempt_id": "a-7c22c7abca5549a59118aba610558d78",
+      "job_id": "j-8f91b37a4acc42dfb2b48615f734199a",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.00013837689766660333,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 0.01341497409157455,
+        "latency_p95_ms": 0.013982993550598621,
+        "latency_p99_ms": 0.013982993550598621,
+        "throughput": 72266.39828342861,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:32:45.543093+00:00",
+      "workload_ref": "mixed-142740-short",
+      "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+      "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+      "fidelity": 0.1,
+      "block": 0,
+      "evaluation_wall_seconds": 5.443773,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-8f91b37a4acc42dfb2b48615f734199a",
+        "attempt_id": "a-7c22c7abca5549a59118aba610558d78",
+        "epoch": 1,
+        "workload_signature": "sha256:a4d1c8988692f16345936e6d3c9fb0c2e454f60c41747b3729da1ee7f2cb9020",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.00013837689766660333,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 0.01341497409157455,
+          "latency_p95_ms": 0.013982993550598621,
+          "latency_p99_ms": 0.013982993550598621,
+          "throughput": 72266.39828342861,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:ee86d82d9db501344565b681113692fb15dc7e68077b7d6f01b7e372ae28fa60",
+      "backend_job_id": "a-7c22c7abca5549a59118aba610558d78",
+      "submitted_at": "2026-10-02T14:32:34Z",
+      "started_at": "2026-10-02T14:32:35Z",
+      "finished_at": "2026-10-02T14:32:37Z",
+      "queue_seconds": 1.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 0.0,
+      "collection_seconds": 0.041028,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-7c22c7abca5549a59118aba610558d78-91c97",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 2.0
+      },
+      "delivery": {
+        "mlflow_run_id": "c49735a03f0b4a18811205639baa1303",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:539a8a0ad283d3ecb9a3a076b630eee7597f9e948c9d3750264f4460f0b208a6",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-9560b326f0824f55ba210706bc170f00",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-023c889696c8487d9feb9a04af3f5142",
+      "job_id": "j-0e5ea18bf8f94a6284ccb878e0385f46",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.00014098500832915306,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 0.013600976672023535,
+        "latency_p95_ms": 0.01377699663862586,
+        "latency_p99_ms": 0.01377699663862586,
+        "throughput": 70929.52732004902,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 3.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:33:06.260319+00:00",
+      "workload_ref": "mixed-142740-short",
+      "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+      "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+      "fidelity": 0.1,
+      "block": 0,
+      "evaluation_wall_seconds": 5.31628,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-0e5ea18bf8f94a6284ccb878e0385f46",
+        "attempt_id": "a-023c889696c8487d9feb9a04af3f5142",
+        "epoch": 1,
+        "workload_signature": "sha256:a4d1c8988692f16345936e6d3c9fb0c2e454f60c41747b3729da1ee7f2cb9020",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.00014098500832915306,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 0.013600976672023535,
+          "latency_p95_ms": 0.01377699663862586,
+          "latency_p99_ms": 0.01377699663862586,
+          "throughput": 70929.52732004902,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:d597d87585be33fdefd766de17fc023d952cf7cc434f4c78572894923f89c6d2",
+      "backend_job_id": "a-023c889696c8487d9feb9a04af3f5142",
+      "submitted_at": "2026-10-02T14:32:55Z",
+      "started_at": "2026-10-02T14:32:55Z",
+      "finished_at": "2026-10-02T14:32:58Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 3.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.050201,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-023c889696c8487d9feb9a04af3f5142-ac3f5",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 1.0
+      },
+      "delivery": {
+        "mlflow_run_id": "45008fc3ba684bbc81cdb1977c4dce29",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:382cc2613173e475324d70e7bcdbef513eec143354b053079951e5ab0ab54ff7",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-6bde9a91a52a4ef0a91e092aabf69cc5",
+      "candidate_ref": "cpu2",
+      "attempt_id": "a-6e1c2233331043b09e8f755370787cbf",
+      "job_id": "j-7506895d1a04400abc71c58b5ba160c7",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013496943283826113,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.01334297121502459,
+        "latency_p95_ms": 0.014296034350991249,
+        "latency_p99_ms": 0.016025034710764885,
+        "throughput": 74090.84997773808,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:33:27.003471+00:00",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+      "fidelity": 1.0,
+      "block": 1,
+      "evaluation_wall_seconds": 5.344492,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-7506895d1a04400abc71c58b5ba160c7",
+        "attempt_id": "a-6e1c2233331043b09e8f755370787cbf",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013496943283826113,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.01334297121502459,
+          "latency_p95_ms": 0.014296034350991249,
+          "latency_p99_ms": 0.016025034710764885,
+          "throughput": 74090.84997773808,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:4062f3a1ae11e98cda0177cd4da227707f1a268041ec4440c7f96cba6e932329",
+      "backend_job_id": "a-6e1c2233331043b09e8f755370787cbf",
+      "submitted_at": "2026-10-02T14:33:16Z",
+      "started_at": "2026-10-02T14:33:16Z",
+      "finished_at": "2026-10-02T14:33:18Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.039785,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-6e1c2233331043b09e8f755370787cbf-cffdc",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 2.0
+      },
+      "delivery": {
+        "mlflow_run_id": "829e7204d6bb4e6aabea3849e7d8cd85",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:07147225ef452cd753e02b407414c34cf2f084c6d4fbc862b2f22fa092390ba5",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-152f79a2276549fabefd111799dbc69a",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-9b4cde3bdece46938d7fea492f09edad",
+      "job_id": "j-7d7eecb47756439cac720a95081a179e",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013143682735972106,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013048003893345594,
+        "latency_p95_ms": 0.013802957255393267,
+        "latency_p99_ms": 0.014624034520238638,
+        "throughput": 76082.17727769431,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:33:48.104499+00:00",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+      "fidelity": 1.0,
+      "block": 1,
+      "evaluation_wall_seconds": 5.467557,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-7d7eecb47756439cac720a95081a179e",
+        "attempt_id": "a-9b4cde3bdece46938d7fea492f09edad",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013143682735972106,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013048003893345594,
+          "latency_p95_ms": 0.013802957255393267,
+          "latency_p99_ms": 0.014624034520238638,
+          "throughput": 76082.17727769431,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:a9d1d00f41b011a5f27cdc56403ad8051fbca7bab71f4e43fd96edccfe23a45d",
+      "backend_job_id": "a-9b4cde3bdece46938d7fea492f09edad",
+      "submitted_at": "2026-10-02T14:33:37Z",
+      "started_at": "2026-10-02T14:33:37Z",
+      "finished_at": "2026-10-02T14:33:39Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.060671,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-9b4cde3bdece46938d7fea492f09edad-0849d",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 1.0
+      },
+      "delivery": {
+        "mlflow_run_id": "5b3e453552f84ada92fe9a50b6f03797",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:ac24a6a11c790b5c13167f96acedad5a0f855de3ca43fda425a25248c0694657",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-cfac609e34db4d7586040abea976380f",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-315b0c581f474ccabd0165af85de4c93",
+      "job_id": "j-39e7162279e14acc93d6904eb689ae83",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.00014089391333982348,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 0.013717013644054532,
+        "latency_p95_ms": 0.014115998055785894,
+        "latency_p99_ms": 0.014115998055785894,
+        "throughput": 70975.38682086923,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:34:08.931892+00:00",
+      "workload_ref": "mixed-142740-short",
+      "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+      "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+      "fidelity": 0.1,
+      "block": 1,
+      "evaluation_wall_seconds": 5.406764,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-39e7162279e14acc93d6904eb689ae83",
+        "attempt_id": "a-315b0c581f474ccabd0165af85de4c93",
+        "epoch": 1,
+        "workload_signature": "sha256:a4d1c8988692f16345936e6d3c9fb0c2e454f60c41747b3729da1ee7f2cb9020",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.00014089391333982348,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 0.013717013644054532,
+          "latency_p95_ms": 0.014115998055785894,
+          "latency_p99_ms": 0.014115998055785894,
+          "throughput": 70975.38682086923,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:e4c74db5bcd2799144ca9db6b2bad1b9cb65da5406b23e461b09825b9a5486c8",
+      "backend_job_id": "a-315b0c581f474ccabd0165af85de4c93",
+      "submitted_at": "2026-10-02T14:33:58Z",
+      "started_at": "2026-10-02T14:33:58Z",
+      "finished_at": "2026-10-02T14:34:00Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.054202,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-315b0c581f474ccabd0165af85de4c93-63971",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 1.0
+      },
+      "delivery": {
+        "mlflow_run_id": "eefad672a1aa42e8a9e035c988fceb57",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:4fc63fd994b3e1ec30abbf405be2845ba55fa9e3458b08231fbf000d34fdcd4e",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-fea96a9454594dbeb58a966f3dc1b207",
+      "candidate_ref": "cpu2",
+      "attempt_id": "a-4bff3b5ddca94b45bc153a17b83db80a",
+      "job_id": "j-13f7f0db0bc64114a66f6387d23cb020",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.00013987498823553324,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 0.01338199945166707,
+        "latency_p95_ms": 0.014017976354807615,
+        "latency_p99_ms": 0.014017976354807615,
+        "throughput": 71492.4099450944,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:34:29.816907+00:00",
+      "workload_ref": "mixed-142740-short",
+      "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+      "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+      "fidelity": 0.1,
+      "block": 1,
+      "evaluation_wall_seconds": 5.444879,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-13f7f0db0bc64114a66f6387d23cb020",
+        "attempt_id": "a-4bff3b5ddca94b45bc153a17b83db80a",
+        "epoch": 1,
+        "workload_signature": "sha256:a4d1c8988692f16345936e6d3c9fb0c2e454f60c41747b3729da1ee7f2cb9020",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.00013987498823553324,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 0.01338199945166707,
+          "latency_p95_ms": 0.014017976354807615,
+          "latency_p99_ms": 0.014017976354807615,
+          "throughput": 71492.4099450944,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:b10a3cefbae7bae994558cbade58d98858775d23d75a37c487c6d209250502bc",
+      "backend_job_id": "a-4bff3b5ddca94b45bc153a17b83db80a",
+      "submitted_at": "2026-10-02T14:34:19Z",
+      "started_at": "2026-10-02T14:34:19Z",
+      "finished_at": "2026-10-02T14:34:21Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.106967,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-4bff3b5ddca94b45bc153a17b83db80a-08e81",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 2.0
+      },
+      "delivery": {
+        "mlflow_run_id": "803066ff08fa48fab0bd33974bb43be5",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:8b2d231136bf9582c37fd03491b0079ff8e6d613c966b16c3bace86f486a61d4",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-3f45dcfbe4924d6db916d20687a30599",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-990cba16b52a419f9bf73491e84501c3",
+      "job_id": "j-d0fd68adc313449381d1998873656157",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013353371759876609,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013156008208170533,
+        "latency_p95_ms": 0.014193006791174412,
+        "latency_p99_ms": 0.01675297971814871,
+        "throughput": 74887.45299556016,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:34:50.778583+00:00",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+      "fidelity": 1.0,
+      "block": 2,
+      "evaluation_wall_seconds": 5.509015,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-d0fd68adc313449381d1998873656157",
+        "attempt_id": "a-990cba16b52a419f9bf73491e84501c3",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013353371759876609,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013156008208170533,
+          "latency_p95_ms": 0.014193006791174412,
+          "latency_p99_ms": 0.01675297971814871,
+          "throughput": 74887.45299556016,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:64121e583c42e02b4e92fdf8b9d0fc3f7b4086eed3ebea5e0d2b6c98c5a009fb",
+      "backend_job_id": "a-990cba16b52a419f9bf73491e84501c3",
+      "submitted_at": "2026-10-02T14:34:40Z",
+      "started_at": "2026-10-02T14:34:40Z",
+      "finished_at": "2026-10-02T14:34:42Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.110782,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-990cba16b52a419f9bf73491e84501c3-4f125",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 1.0
+      },
+      "delivery": {
+        "mlflow_run_id": "ed59d063d783478bb207e07d1e973d78",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:287b936b9be8abfb6a8ec4b0e2489c460a186ceccd4efd13a77e33fe5fb556db",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-d14c4eb42b2c4cf4b0927472b1ab1876",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-b67e53e999384a878f72ac09008877c2",
+      "job_id": "j-c1a67dafb8a744e48758eaa5ada2856d",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.00013756914995610714,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 0.01323301694355905,
+        "latency_p95_ms": 0.01399102620780468,
+        "latency_p99_ms": 0.01399102620780468,
+        "throughput": 72690.71592861193,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:35:11.690255+00:00",
+      "workload_ref": "mixed-142740-short",
+      "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+      "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+      "fidelity": 0.1,
+      "block": 2,
+      "evaluation_wall_seconds": 5.423825,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-c1a67dafb8a744e48758eaa5ada2856d",
+        "attempt_id": "a-b67e53e999384a878f72ac09008877c2",
+        "epoch": 1,
+        "workload_signature": "sha256:a4d1c8988692f16345936e6d3c9fb0c2e454f60c41747b3729da1ee7f2cb9020",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.00013756914995610714,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 0.01323301694355905,
+          "latency_p95_ms": 0.01399102620780468,
+          "latency_p99_ms": 0.01399102620780468,
+          "throughput": 72690.71592861193,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:d854e92f10d956a10e8b040e59ea72461d3c948289a8105190e580211b094a74",
+      "backend_job_id": "a-b67e53e999384a878f72ac09008877c2",
+      "submitted_at": "2026-10-02T14:35:01Z",
+      "started_at": "2026-10-02T14:35:01Z",
+      "finished_at": "2026-10-02T14:35:03Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.077506,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-b67e53e999384a878f72ac09008877c2-44b0b",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 1.0
+      },
+      "delivery": {
+        "mlflow_run_id": "892cfce26bda4d129f13649c8bee19a8",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:e2f23bd5a3a42f931ab5451e6c440b8323474588856d0b7d190f9cb1dfb521c5",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-1ead1826dcac441f9ad4f35e2fd70979",
+      "candidate_ref": "cpu2",
+      "attempt_id": "a-7e8c5e009dee4b08b6cc053e14a05dd8",
+      "job_id": "j-76110fc8d16048b192e23e2106794538",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.00014323106734082103,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 0.013889512047171593,
+        "latency_p95_ms": 0.014430028386414051,
+        "latency_p99_ms": 0.014430028386414051,
+        "throughput": 69817.25533193725,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:35:32.679726+00:00",
+      "workload_ref": "mixed-142740-short",
+      "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+      "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+      "fidelity": 0.1,
+      "block": 2,
+      "evaluation_wall_seconds": 5.557417,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-76110fc8d16048b192e23e2106794538",
+        "attempt_id": "a-7e8c5e009dee4b08b6cc053e14a05dd8",
+        "epoch": 1,
+        "workload_signature": "sha256:a4d1c8988692f16345936e6d3c9fb0c2e454f60c41747b3729da1ee7f2cb9020",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.00014323106734082103,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 0.013889512047171593,
+          "latency_p95_ms": 0.014430028386414051,
+          "latency_p99_ms": 0.014430028386414051,
+          "throughput": 69817.25533193725,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:d64f1c7a7b8103484bf9f6ce862de8a63061857b1fb247255c197aabdba66cb2",
+      "backend_job_id": "a-7e8c5e009dee4b08b6cc053e14a05dd8",
+      "submitted_at": "2026-10-02T14:35:22Z",
+      "started_at": "2026-10-02T14:35:22Z",
+      "finished_at": "2026-10-02T14:35:24Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 0.0,
+      "collection_seconds": 0.098084,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-7e8c5e009dee4b08b6cc053e14a05dd8-34bf5",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 2.0
+      },
+      "delivery": {
+        "mlflow_run_id": "41734bb4db1b4fb1a1d870974a791792",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:27e05ca195746fe5c6e4e124c2c0b275906002049fc340a2dceb5f4d55170840",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-1b3233562a7545d491ffd5e13c75290b",
+      "candidate_ref": "cpu2",
+      "attempt_id": "a-2fb6a0b04b1a4639acc73d9714408abb",
+      "job_id": "j-440b9151226449ed837896b04515e88d",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013179798843339086,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013123004464432597,
+        "latency_p95_ms": 0.013504002708941698,
+        "latency_p99_ms": 0.014088989701122046,
+        "throughput": 75873.69214708373,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:35:53.475680+00:00",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+      "fidelity": 1.0,
+      "block": 2,
+      "evaluation_wall_seconds": 5.346828,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-440b9151226449ed837896b04515e88d",
+        "attempt_id": "a-2fb6a0b04b1a4639acc73d9714408abb",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013179798843339086,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013123004464432597,
+          "latency_p95_ms": 0.013504002708941698,
+          "latency_p99_ms": 0.014088989701122046,
+          "throughput": 75873.69214708373,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:63fe507c7be71c2c60d3fb0a40a5955199a6dc1a2d94280cf5c7bf959e23e403",
+      "backend_job_id": "a-2fb6a0b04b1a4639acc73d9714408abb",
+      "submitted_at": "2026-10-02T14:35:42Z",
+      "started_at": "2026-10-02T14:35:43Z",
+      "finished_at": "2026-10-02T14:35:45Z",
+      "queue_seconds": 1.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 0.0,
+      "collection_seconds": 0.049804,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-2fb6a0b04b1a4639acc73d9714408abb-487e2",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 2.0
+      },
+      "delivery": {
+        "mlflow_run_id": "05598908331242519d1bbe2157100372",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:9bd7122fd60dafaa371e4ccd39aa737d822cc16fc8390db7064509c9fe1b6403",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-7bb9d860bce74f70bd0286404cf64316",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-953e9d87a6334a46b6afddcf550d5990",
+      "job_id": "j-c509a384fbcc49eb8eb08790fd7b3b49",
+      "mode": "confirmation",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013042754144407809,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.012984004570171237,
+        "latency_p95_ms": 0.013366981875151396,
+        "latency_p99_ms": 0.013832002878189087,
+        "throughput": 76670.92309861246,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 3.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:36:14.346765+00:00",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+      "fidelity": 1.0,
+      "block": null,
+      "evaluation_wall_seconds": 5.456641,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-c509a384fbcc49eb8eb08790fd7b3b49",
+        "attempt_id": "a-953e9d87a6334a46b6afddcf550d5990",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013042754144407809,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.012984004570171237,
+          "latency_p95_ms": 0.013366981875151396,
+          "latency_p99_ms": 0.013832002878189087,
+          "throughput": 76670.92309861246,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:e87fd4e366cf6edd5edd6fad7d8c1859f7eb5db8bff951a99b6898fdbba2bf74",
+      "backend_job_id": "a-953e9d87a6334a46b6afddcf550d5990",
+      "submitted_at": "2026-10-02T14:36:03Z",
+      "started_at": "2026-10-02T14:36:03Z",
+      "finished_at": "2026-10-02T14:36:06Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 3.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.111765,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-953e9d87a6334a46b6afddcf550d5990-0e2e5",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 1.0
+      },
+      "delivery": {
+        "mlflow_run_id": "70a53948b8704e2f807b36b208e7d069",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:1194243e577d574e24a999f323727914bc4de0954ed7db5d3be3ce0104e6f5fe",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-50a5f8faba7d43b3b73a6f5c7554ee2d",
+      "candidate_ref": "cpu2",
+      "attempt_id": "a-0493953352834e1dbc02544e2465d2d4",
+      "job_id": "j-7a35ae0489734edd845f8a54b29ca510",
+      "mode": "confirmation",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013233094941824675,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013103504898026586,
+        "latency_p95_ms": 0.014019024092704058,
+        "latency_p99_ms": 0.01675001112744212,
+        "throughput": 75568.11194933607,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:36:40.432548+00:00",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+      "fidelity": 1.0,
+      "block": null,
+      "evaluation_wall_seconds": 10.634062,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-7a35ae0489734edd845f8a54b29ca510",
+        "attempt_id": "a-0493953352834e1dbc02544e2465d2d4",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013233094941824675,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013103504898026586,
+          "latency_p95_ms": 0.014019024092704058,
+          "latency_p99_ms": 0.01675001112744212,
+          "throughput": 75568.11194933607,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:85b01a073a6ba348efa0c2eea30594d3789cf770d0f06b5f3bdb3da98ee1a41c",
+      "backend_job_id": "a-0493953352834e1dbc02544e2465d2d4",
+      "submitted_at": "2026-10-02T14:36:24Z",
+      "started_at": "2026-10-02T14:36:24Z",
+      "finished_at": "2026-10-02T14:36:26Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.086687,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-0493953352834e1dbc02544e2465d2d4-fc05f",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 2.0
+      },
+      "delivery": {
+        "mlflow_run_id": "f6a45f4a5eb94d8bb71f3bd50d273e1b",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:4ab14e557a328ccd4d67374847354c842f37aa0d8866d62da8f1572d26087b6b",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-29a13a0edfa74b29ae5d477f2389ac1f",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-e2ea148cab804fcd966df76286ba6256",
+      "job_id": "j-aa7b6c5551a6467e943a13c6b41b3164",
+      "mode": "confirmation",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013130970182828605,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013050506822764874,
+        "latency_p95_ms": 0.013584038242697716,
+        "latency_p99_ms": 0.013932993169873953,
+        "throughput": 76155.83510407341,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:37:01.244181+00:00",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+      "fidelity": 1.0,
+      "block": null,
+      "evaluation_wall_seconds": 5.398194,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-aa7b6c5551a6467e943a13c6b41b3164",
+        "attempt_id": "a-e2ea148cab804fcd966df76286ba6256",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013130970182828605,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013050506822764874,
+          "latency_p95_ms": 0.013584038242697716,
+          "latency_p99_ms": 0.013932993169873953,
+          "throughput": 76155.83510407341,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:df61a6350293ce2da47541acac2f191a0303b39dd7f1da276cc51d61d583c998",
+      "backend_job_id": "a-e2ea148cab804fcd966df76286ba6256",
+      "submitted_at": "2026-10-02T14:36:50Z",
+      "started_at": "2026-10-02T14:36:50Z",
+      "finished_at": "2026-10-02T14:36:52Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.095226,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-e2ea148cab804fcd966df76286ba6256-977f7",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 1.0
+      },
+      "delivery": {
+        "mlflow_run_id": "4226bcc3ee8f4a89a2c917e3742fa142",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:1b4c2e763a4e6d5f78a348094c6aa6b7b489cf0ac5e7160fb15cc1c613a6de34",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-d555dbcf8ebc4517b006320fdb6e2fd8",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-d6aa342a1c5a4ea08ee7bd4d22738761",
+      "job_id": "j-f43d47c126ee4369939c30ec5f23e32a",
+      "mode": "confirmation",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013282401487231255,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013192504411563277,
+        "latency_p95_ms": 0.01387501833960414,
+        "latency_p99_ms": 0.015798956155776978,
+        "throughput": 75287.59019679748,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:37:22.220939+00:00",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+      "fidelity": 1.0,
+      "block": null,
+      "evaluation_wall_seconds": 5.439715,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-f43d47c126ee4369939c30ec5f23e32a",
+        "attempt_id": "a-d6aa342a1c5a4ea08ee7bd4d22738761",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013282401487231255,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013192504411563277,
+          "latency_p95_ms": 0.01387501833960414,
+          "latency_p99_ms": 0.015798956155776978,
+          "throughput": 75287.59019679748,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:16ecac84d0baa17e9b62e3280aa81ef9678745b54ebfb383df6913e7544fa955",
+      "backend_job_id": "a-d6aa342a1c5a4ea08ee7bd4d22738761",
+      "submitted_at": "2026-10-02T14:37:11Z",
+      "started_at": "2026-10-02T14:37:11Z",
+      "finished_at": "2026-10-02T14:37:13Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.057592,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-d6aa342a1c5a4ea08ee7bd4d22738761-b6073",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 1.0
+      },
+      "delivery": {
+        "mlflow_run_id": "82034f9ed21349b890c528d40eea5728",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:94a739843a0dde8c19547fc550396e73b7e75a8d1a60912d46e385671b57ba2e",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-d5d8ff5d3495456da644bba64c652789",
+      "candidate_ref": "cpu2",
+      "attempt_id": "a-ffa7907430ac4b80acec726e961e34df",
+      "job_id": "j-4ec066ceae574223912f6b568ee39a96",
+      "mode": "confirmation",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013011269038543105,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.012925476767122746,
+        "latency_p95_ms": 0.013506971299648285,
+        "latency_p99_ms": 0.014008954167366028,
+        "throughput": 76856.4539736834,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:37:43.172516+00:00",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+      "fidelity": 1.0,
+      "block": null,
+      "evaluation_wall_seconds": 5.349624,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-4ec066ceae574223912f6b568ee39a96",
+        "attempt_id": "a-ffa7907430ac4b80acec726e961e34df",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013011269038543105,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.012925476767122746,
+          "latency_p95_ms": 0.013506971299648285,
+          "latency_p99_ms": 0.014008954167366028,
+          "throughput": 76856.4539736834,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:abe68d83d1ed0384c352df5e2e75a41a25581d9df9e5bf2d1dc070e15ac4c045",
+      "backend_job_id": "a-ffa7907430ac4b80acec726e961e34df",
+      "submitted_at": "2026-10-02T14:37:32Z",
+      "started_at": "2026-10-02T14:37:32Z",
+      "finished_at": "2026-10-02T14:37:34Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.060602,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-ffa7907430ac4b80acec726e961e34df-3df74",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 2.0
+      },
+      "delivery": {
+        "mlflow_run_id": "2906e11fcedf4cbc974f40ff513b6a4f",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:b6d4ce46907cb0deb65b8fdf7585b9ea5a4ff20d007f20c7dd854a9d21eaddae",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-9e58167d0a664024841048b53941aa0a",
+      "candidate_ref": "cpu2",
+      "attempt_id": "a-2b0b752b45ec48fea4eabf7b8a5b470e",
+      "job_id": "j-6ab222fc7f654a45b492b24b02c1fd38",
+      "mode": "confirmation",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.001335970708169043,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013101001968607306,
+        "latency_p95_ms": 0.013739976566284895,
+        "latency_p99_ms": 0.0175940222106874,
+        "throughput": 74851.94053172818,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T14:38:04.118506+00:00",
+      "workload_ref": "mixed-142740-full",
+      "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+      "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+      "fidelity": 1.0,
+      "block": null,
+      "evaluation_wall_seconds": 5.524245,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-6ab222fc7f654a45b492b24b02c1fd38",
+        "attempt_id": "a-2b0b752b45ec48fea4eabf7b8a5b470e",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.001335970708169043,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013101001968607306,
+          "latency_p95_ms": 0.013739976566284895,
+          "latency_p99_ms": 0.0175940222106874,
+          "throughput": 74851.94053172818,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:da801453bdfdd705ff3bc5a74a534b51d78a9a2588f696f9f91055fe1998ac1c",
+      "backend_job_id": "a-2b0b752b45ec48fea4eabf7b8a5b470e",
+      "submitted_at": "2026-10-02T14:37:53Z",
+      "started_at": "2026-10-02T14:37:53Z",
+      "finished_at": "2026-10-02T14:37:55Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.118975,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "backend_verification": {
+        "kueue_workload_ref": "job-a-2b0b752b45ec48fea4eabf7b8a5b470e-a7824",
+        "quota_reserved": true,
+        "kueue_admitted": true,
+        "single_successful_pod": true,
+        "gpu_request": 1,
+        "gpu_limit": 1,
+        "requested_host_cpu": 2.0
+      },
+      "delivery": {
+        "mlflow_run_id": "aff70e7edd264f02a43bda7d9215584b",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:83a512c5a8ef3d1eff09c5db2911e39eeb24d3223ad0b0f6637403d2faef3204",
+        "s3_api_mlflow_bytes_match": true
+      }
+    }
+  ],
+  "bound_evidence": {
+    "space_ref": "mixed-space-142740",
+    "space_digest": "sha256:c3acfe910198424135812c44e21d28f8355e6e0fb98434e722e02210102e45a6",
+    "provenance": [
+      {
+        "job_id": "j-0ae9d99419b3458d9478afcbbc6f9beb",
+        "attempt_id": "a-265816b661db4133933ef13cc66723bc",
+        "result_digest": "sha256:05b07962417cbfa10c528a0d6747aa377c676444fe3ade0b725d20a96efc5bb7",
+        "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+        "created_at": "2026-10-02T14:31:52.970305+00:00",
+        "finished_at": "2026-10-02T14:31:58.492123+00:00"
+      },
+      {
+        "job_id": "j-0e5ea18bf8f94a6284ccb878e0385f46",
+        "attempt_id": "a-023c889696c8487d9feb9a04af3f5142",
+        "result_digest": "sha256:d597d87585be33fdefd766de17fc023d952cf7cc434f4c78572894923f89c6d2",
+        "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+        "created_at": "2026-10-02T14:32:55.729037+00:00",
+        "finished_at": "2026-10-02T14:33:01.045317+00:00"
+      },
+      {
+        "job_id": "j-13f7f0db0bc64114a66f6387d23cb020",
+        "attempt_id": "a-4bff3b5ddca94b45bc153a17b83db80a",
+        "result_digest": "sha256:b10a3cefbae7bae994558cbade58d98858775d23d75a37c487c6d209250502bc",
+        "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+        "created_at": "2026-10-02T14:34:19.134337+00:00",
+        "finished_at": "2026-10-02T14:34:24.579216+00:00"
+      },
+      {
+        "job_id": "j-39e7162279e14acc93d6904eb689ae83",
+        "attempt_id": "a-315b0c581f474ccabd0165af85de4c93",
+        "result_digest": "sha256:e4c74db5bcd2799144ca9db6b2bad1b9cb65da5406b23e461b09825b9a5486c8",
+        "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+        "created_at": "2026-10-02T14:33:58.341023+00:00",
+        "finished_at": "2026-10-02T14:34:03.747787+00:00"
+      },
+      {
+        "job_id": "j-440b9151226449ed837896b04515e88d",
+        "attempt_id": "a-2fb6a0b04b1a4639acc73d9714408abb",
+        "result_digest": "sha256:63fe507c7be71c2c60d3fb0a40a5955199a6dc1a2d94280cf5c7bf959e23e403",
+        "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+        "created_at": "2026-10-02T14:35:42.839768+00:00",
+        "finished_at": "2026-10-02T14:35:48.186596+00:00"
+      },
+      {
+        "job_id": "j-6128948203144db3a30f7f1a8953335e",
+        "attempt_id": "a-6d4e1257d925495f8f5d46db82b8fc13",
+        "result_digest": "sha256:ac9d993eb5e894c5c2f156fa4b362f1d8b6c72335b14c6d79df83dc7054271fc",
+        "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+        "created_at": "2026-10-02T14:32:13.963775+00:00",
+        "finished_at": "2026-10-02T14:32:19.419298+00:00"
+      },
+      {
+        "job_id": "j-7506895d1a04400abc71c58b5ba160c7",
+        "attempt_id": "a-6e1c2233331043b09e8f755370787cbf",
+        "result_digest": "sha256:4062f3a1ae11e98cda0177cd4da227707f1a268041ec4440c7f96cba6e932329",
+        "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+        "created_at": "2026-10-02T14:33:16.452873+00:00",
+        "finished_at": "2026-10-02T14:33:21.797365+00:00"
+      },
+      {
+        "job_id": "j-76110fc8d16048b192e23e2106794538",
+        "attempt_id": "a-7e8c5e009dee4b08b6cc053e14a05dd8",
+        "result_digest": "sha256:d64f1c7a7b8103484bf9f6ce862de8a63061857b1fb247255c197aabdba66cb2",
+        "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+        "created_at": "2026-10-02T14:35:21.894369+00:00",
+        "finished_at": "2026-10-02T14:35:27.451786+00:00"
+      },
+      {
+        "job_id": "j-7d7eecb47756439cac720a95081a179e",
+        "attempt_id": "a-9b4cde3bdece46938d7fea492f09edad",
+        "result_digest": "sha256:a9d1d00f41b011a5f27cdc56403ad8051fbca7bab71f4e43fd96edccfe23a45d",
+        "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+        "created_at": "2026-10-02T14:33:37.174586+00:00",
+        "finished_at": "2026-10-02T14:33:42.642143+00:00"
+      },
+      {
+        "job_id": "j-8f91b37a4acc42dfb2b48615f734199a",
+        "attempt_id": "a-7c22c7abca5549a59118aba610558d78",
+        "result_digest": "sha256:ee86d82d9db501344565b681113692fb15dc7e68077b7d6f01b7e372ae28fa60",
+        "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+        "created_at": "2026-10-02T14:32:34.860985+00:00",
+        "finished_at": "2026-10-02T14:32:40.304758+00:00"
+      },
+      {
+        "job_id": "j-c1a67dafb8a744e48758eaa5ada2856d",
+        "attempt_id": "a-b67e53e999384a878f72ac09008877c2",
+        "result_digest": "sha256:d854e92f10d956a10e8b040e59ea72461d3c948289a8105190e580211b094a74",
+        "workload_digest": "sha256:dddbc0fa00313db37bd76be35cfbe2b59694cdde689b07bf6843f1290789c37f",
+        "created_at": "2026-10-02T14:35:01.012785+00:00",
+        "finished_at": "2026-10-02T14:35:06.436610+00:00"
+      },
+      {
+        "job_id": "j-d0fd68adc313449381d1998873656157",
+        "attempt_id": "a-990cba16b52a419f9bf73491e84501c3",
+        "result_digest": "sha256:64121e583c42e02b4e92fdf8b9d0fc3f7b4086eed3ebea5e0d2b6c98c5a009fb",
+        "workload_digest": "sha256:63b9ff875e68aaf0a05a06a6290bd1d3d3a5a9ec12cf51842a0d32a8d441fd09",
+        "created_at": "2026-10-02T14:34:39.971914+00:00",
+        "finished_at": "2026-10-02T14:34:45.480929+00:00"
+      }
+    ],
+    "observations": [
+      {
+        "attempt_id": "a-265816b661db4133933ef13cc66723bc",
+        "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+        "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+        "seconds_per_work_unit": 1.318588969297707e-05,
+        "evaluation_wall_seconds": 5.521818,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-023c889696c8487d9feb9a04af3f5142",
+        "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+        "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+        "seconds_per_work_unit": 1.4098500832915306e-05,
+        "evaluation_wall_seconds": 5.31628,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-4bff3b5ddca94b45bc153a17b83db80a",
+        "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+        "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+        "seconds_per_work_unit": 1.3987498823553323e-05,
+        "evaluation_wall_seconds": 5.444879,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-315b0c581f474ccabd0165af85de4c93",
+        "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+        "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+        "seconds_per_work_unit": 1.4089391333982348e-05,
+        "evaluation_wall_seconds": 5.406764,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-2fb6a0b04b1a4639acc73d9714408abb",
+        "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+        "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+        "seconds_per_work_unit": 1.3179798843339086e-05,
+        "evaluation_wall_seconds": 5.346828,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-6d4e1257d925495f8f5d46db82b8fc13",
+        "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+        "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+        "seconds_per_work_unit": 1.3061497011221945e-05,
+        "evaluation_wall_seconds": 5.455523,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-6e1c2233331043b09e8f755370787cbf",
+        "option_ref": "option-0646b80940c06f0809df859b2cc717be",
+        "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+        "seconds_per_work_unit": 1.3496943283826113e-05,
+        "evaluation_wall_seconds": 5.344492,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-7e8c5e009dee4b08b6cc053e14a05dd8",
+        "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+        "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+        "seconds_per_work_unit": 1.4323106734082103e-05,
+        "evaluation_wall_seconds": 5.557417,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-9b4cde3bdece46938d7fea492f09edad",
+        "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+        "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+        "seconds_per_work_unit": 1.3143682735972106e-05,
+        "evaluation_wall_seconds": 5.467557,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-7c22c7abca5549a59118aba610558d78",
+        "option_ref": "option-ddd038b738d9a606e075e98e57087ee3",
+        "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+        "seconds_per_work_unit": 1.3837689766660333e-05,
+        "evaluation_wall_seconds": 5.443773,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-b67e53e999384a878f72ac09008877c2",
+        "option_ref": "option-5a3583921e6ad824ac28571f510f5f0e",
+        "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+        "seconds_per_work_unit": 1.3756914995610714e-05,
+        "evaluation_wall_seconds": 5.423825,
+        "quality_passed": true,
+        "memory_passed": true
+      },
+      {
+        "attempt_id": "a-990cba16b52a419f9bf73491e84501c3",
+        "option_ref": "option-e89c935fa9929f2298f2910aa35f443b",
+        "runtime_group_signature": "sha256:5917da708e8c69340affd5bc68a866d33d746b79bb43d5ade3531d5e6c90185d",
+        "seconds_per_work_unit": 1.3353371759876608e-05,
+        "evaluation_wall_seconds": 5.509015,
+        "quality_passed": true,
+        "memory_passed": true
+      }
+    ],
+    "kernel_input": null,
+    "execution_authorized": false,
+    "qualification_reasons": [
+      "REPLICATION_ONLY_NOT_MULTI_FIDELITY"
+    ],
+    "cost_semantics": "Job creation through validated result ingestion; external compilation/data staging costs excluded",
+    "historical_cost_reused": true,
+    "sampling_policy_verified": false,
+    "ref": "mf-evidence-a92b833b16b0a2ce17dc76a17ebd5505"
+  },
+  "confirmation_leakage_rejected": true,
+  "ledger_device_seconds": 38.0,
+  "separate_f0_qualification": [
+    {
+      "job_ref": "ra-mixed-f0-142740-1-10",
+      "host_cpu": 1,
+      "work_units": 10,
+      "outcome": "COMPLETED",
+      "quality_passed": true,
+      "gpu_reservation_seconds": 2.0,
+      "cost_boundary": "PodScheduled through container completion"
+    },
+    {
+      "job_ref": "ra-mixed-f0-142740-1-100",
+      "host_cpu": 1,
+      "work_units": 100,
+      "outcome": "COMPLETED",
+      "quality_passed": true,
+      "gpu_reservation_seconds": 3.0,
+      "cost_boundary": "PodScheduled through container completion"
+    },
+    {
+      "job_ref": "ra-mixed-f0-142740-2-10",
+      "host_cpu": 2,
+      "work_units": 10,
+      "outcome": "COMPLETED",
+      "quality_passed": true,
+      "gpu_reservation_seconds": 2.0,
+      "cost_boundary": "PodScheduled through container completion"
+    },
+    {
+      "job_ref": "ra-mixed-f0-142740-2-100",
+      "host_cpu": 2,
+      "work_units": 100,
+      "outcome": "COMPLETED",
+      "quality_passed": true,
+      "gpu_reservation_seconds": 2.0,
+      "cost_boundary": "PodScheduled through container completion"
+    }
+  ],
+  "unfinished_outbox": 0,
+  "final_queue": {
+    "pendingWorkloads": 0,
+    "admittedWorkloads": 0,
+    "reservingWorkloads": 0
+  },
+  "final_nodes": {
+    "count": 10,
+    "ready": 10,
+    "pressure": 0
+  },
+  "limitations": [
+    "single numerical matmul fixture; not trained-model accuracy",
+    "work budgets vary repetitions only; no representative sampling policy qualification",
+    "thermal/load context not measured",
+    "historical prior GPU results were not mixed into this study",
+    "no equal-budget strategy superiority claim",
+    "GPU reservation is not GPU utilization or energy",
+    "external compilation and pre-Job data staging costs excluded"
+  ]
+}
