@@ -8,8 +8,17 @@ from uuid import uuid4
 
 from sqlalchemy import insert, select
 
-from .contracts import TERMINAL, JobRequest, StudyRequest, WorkloadSpec, now, signature
+from .contracts import (
+    TERMINAL,
+    JobRequest,
+    ReplicationPolicy,
+    StudyRequest,
+    WorkloadSpec,
+    now,
+    signature,
+)
 from .policy import compatibility
+from .replication import ask_replication
 from .search import ask, device_unit
 from .service import NotFound, Rejected, required
 from .store import Conflict, jobs, studies
@@ -24,6 +33,11 @@ class Studies:
     def create(self, project, request: StudyRequest, key: str):
         if not key or len(key) > 128:
             raise Rejected("study requires a stable 1–128 character Idempotency-Key")
+        # Preserve idempotency digests for studies created before replication options.
+        request_body = request.model_dump(mode="json")
+        if request.replication is None:
+            request_body.pop("replication")
+        request_digest = signature(request_body)
         if request.strategy in {"mfkg", "rgpe"}:
             raise Rejected(
                 {
@@ -42,7 +56,7 @@ class Studies:
                 .first()
             )
             if row:
-                if row["request_digest"] != signature(request):
+                if row["request_digest"] != request_digest:
                     raise Conflict("study idempotency key reused with different request")
                 return self.public(row)
             spec = WorkloadSpec.model_validate(
@@ -78,9 +92,13 @@ class Studies:
             if spec.baseline_candidate_ref not in eligible:
                 raise Rejected("baseline is not a qualified consented pilot: " + str(excluded))
             eligible = eligible[: policy.max_candidates]
+            if request.replication and policy.max_probes < (
+                len(eligible) * request.replication.minimum_runs
+            ):
+                raise Rejected("probe budget must cover the replication initial design")
             ref = "study-" + uuid4().hex
             body = {
-                "request": request.model_dump(mode="json"),
+                "request": request_body,
                 "spec": spec.model_dump(mode="json"),
                 "search_space_version": signature(
                     [c.model_dump(mode="json") for c in spec.candidates if c.ref in eligible]
@@ -104,7 +122,7 @@ class Studies:
                     id=ref,
                     project=project,
                     idempotency_key=key,
-                    request_digest=signature(request),
+                    request_digest=request_digest,
                     version=1,
                     state="EXPLORING",
                     body=body,
@@ -312,6 +330,21 @@ class Studies:
         remaining = (datetime.fromisoformat(body["deadline_at"]) - now()).total_seconds()
         probes = [o for o in body["observations"] if o["mode"] == "pilot"]
         strategy = body["request"]["strategy"]
+        replication_choice = None
+        if strategy == "adaptive_replication" and body["confirmation_schedule"] is None:
+            if {c.ref for c in qualified} != set(body["eligible"]):
+                return self._abstain(ref, token, body, "REPLICATION_EXECUTION_CONTEXT_CHANGED")
+            replication_choice = ask_replication(
+                qualified,
+                probes,
+                spec.quality,
+                ReplicationPolicy.model_validate(body["request"]["replication"]),
+                body["request"]["seed"],
+            )
+            body["replication_assessment"] = replication_choice
+            body["planning_seconds"] += replication_choice["planning_seconds"]
+            if spec.baseline_candidate_ref in replication_choice["excluded"]:
+                return self._abstain(ref, token, body, "REPLICATION_BASELINE_INFEASIBLE")
         device_probe_budget_exhausted = not any(
             policy.device_seconds[body["units"][c.ref]["unit"]]
             - body["charged_device_seconds"].get(body["units"][c.ref]["unit"], 0)
@@ -323,8 +356,16 @@ class Studies:
             or remaining <= policy.final_validation_seconds + 3
             or strategy == "lookup"
             or device_probe_budget_exhausted
+            or (replication_choice and replication_choice["stop_exploration"])
         ):
             good = [o for o in probes if self._feasible(o, spec)]
+            if replication_choice:
+                good = [o for o in good if o["candidate_ref"] not in replication_choice["excluded"]]
+                body["exploration_stop_reason"] = (
+                    replication_choice["reason"]
+                    if replication_choice["stop_exploration"]
+                    else "REPLICATION_TOTAL_BUDGET_LIMIT"
+                )
             if strategy == "lookup":
                 rec = self.service.recommend(row["project"], spec.ref)
                 finalist = rec["candidate_ref"]
@@ -380,11 +421,14 @@ class Studies:
                 min(remaining, policy.final_validation_seconds - final_elapsed) / remaining_steps
             )
         else:
-            choice = ask(strategy, allowed, probes, spec.quality, body["request"]["seed"])
+            choice = replication_choice or ask(
+                strategy, allowed, probes, spec.quality, body["request"]["seed"]
+            )
             available_wall = (
                 remaining - policy.final_validation_seconds - choice["planning_seconds"]
             )
-        body["planning_seconds"] += choice["planning_seconds"]
+        if choice is not replication_choice:
+            body["planning_seconds"] += choice["planning_seconds"]
         candidate = next((c for c in allowed if c.ref == choice["candidate_ref"]), None)
         if not candidate or available_wall < 3:
             return self._abstain(ref, token, body, "NO_BUDGET_OR_CURRENT_COMPATIBLE_CANDIDATE")

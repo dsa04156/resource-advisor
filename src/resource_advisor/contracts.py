@@ -285,7 +285,26 @@ class ApprovalRequest(Contract):
     candidate_ref: Ref
 
 
+class ReplicationPolicy(Contract):
+    minimum_runs: int = Field(default=3, ge=3, le=32)
+    maximum_runs: int = Field(default=8, ge=3, le=32)
+    target_relative_standard_error: float = Field(default=0.05, gt=0, le=0.5)
+
+    @model_validator(mode="after")
+    def ordered_limits(self):
+        if self.maximum_runs < self.minimum_runs:
+            raise ValueError("maximum_runs must cover minimum_runs")
+        return self
+
+
 class StudyRequest(Contract):
     workload_ref: Ref
-    strategy: Literal["lookup", "random", "qlognei", "mfkg", "rgpe"]
+    strategy: Literal["lookup", "random", "qlognei", "adaptive_replication", "mfkg", "rgpe"]
     seed: int = 0
+    replication: ReplicationPolicy | None = None
+
+    @model_validator(mode="after")
+    def strategy_options(self):
+        if (self.strategy == "adaptive_replication") != (self.replication is not None):
+            raise ValueError("replication options are required only for adaptive_replication")
+        return self

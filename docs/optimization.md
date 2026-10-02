@@ -27,6 +27,10 @@ Strategies:
   normalize numeric features and one-hot unordered runtime categories. Independent
   repeats estimate noise. Store training run IDs, posterior intervals, versions
   and numerical diagnostics separately from measured profiles.
+- `adaptive_replication`: balanced independent initial runs, then additional
+  repeats for candidates with unresolved descriptive precision. Fixed work units,
+  per-candidate caps, protected final confirmation and explicit stopping reasons;
+  see [adaptive replication](adaptive-replication.md). This is not MFBO.
 - `mfkg` / `rgpe`: currently rejected with explicit missing-qualification reasons;
   not aliases for qLogNEI. Their implementation and paired/source-data gates
   remain open in the full completion audit.
@@ -36,7 +40,8 @@ randomized F1/F2/F3 measurement schedule and submits its cells through the same
 Compute API. It checks independent attempt IDs, workload/runtime invariants,
 quality, rank reversal and known-vs-unknown costs. Its identical-input repetition
 fixture cannot establish a fidelity-bias model; it does not enable `mfkg` or
-claim that fixed replication is adaptive profiling.
+claim that fixed replication is adaptive profiling. Adaptive replication is a
+separate study strategy with its own request options and trace.
 
 OOM/timeouts never become zero-time successful observations. A model failure
 falls back explicitly to seeded random selection. Only independent confirmation

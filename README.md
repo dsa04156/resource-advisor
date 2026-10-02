@@ -129,3 +129,7 @@ For the current evidence see [verification](docs/verification.md); for an easy
 Korean explanation see [the walkthrough](docs/walkthrough.ko.md).
 See [optimization contracts](docs/optimization.md) and the
 [full completion audit](docs/goal-audit.md) for the complete remaining scope.
+
+Noise-aware [adaptive replication](docs/adaptive-replication.md) adds independent
+probes when descriptive measurement precision is unresolved, with explicit caps
+and separate final confirmation. It is distinct from multi-fidelity BO.
