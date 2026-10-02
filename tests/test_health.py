@@ -66,3 +66,60 @@ def test_collector_sigterm_finishes_snapshot_and_exits_without_sleep(tmp_path, m
             signal.signal(sig, handler)
     assert calls == [snapshot]
     assert heartbeat_fresh(heartbeat)
+
+
+def test_worker_finishes_cycle_before_graceful_shutdown(tmp_path, monkeypatch):
+    import json
+    import signal
+    import sys
+    from types import SimpleNamespace
+
+    from resource_advisor import cli, study
+
+    config = tmp_path / "worker.json"
+    config.write_text(json.dumps({"routes": []}))
+    heartbeat = tmp_path / "heartbeat"
+    calls = []
+
+    def submit():
+        calls.append("submit")
+        signal.raise_signal(signal.SIGTERM)
+
+    monkeypatch.setattr(
+        cli,
+        "Worker",
+        lambda *_: SimpleNamespace(
+            submit_one=submit,
+            cancel_one=lambda: calls.append("cancel"),
+            reconcile_all=lambda: calls.append("reconcile"),
+        ),
+    )
+    monkeypatch.setattr(
+        study,
+        "Studies",
+        lambda *_: SimpleNamespace(
+            tick_all=lambda: calls.append("studies"),
+        ),
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "resource-advisor",
+            "--database",
+            "sqlite://",
+            "worker",
+            "--config",
+            str(config),
+            "--heartbeat-path",
+            str(heartbeat),
+        ],
+    )
+    handlers = {s: signal.getsignal(s) for s in (signal.SIGTERM, signal.SIGINT)}
+    try:
+        cli.main()
+    finally:
+        for sig, handler in handlers.items():
+            signal.signal(sig, handler)
+    assert calls == ["studies", "submit", "cancel", "reconcile"]
+    assert heartbeat_fresh(heartbeat)

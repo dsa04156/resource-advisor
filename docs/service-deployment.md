@@ -6,9 +6,9 @@ in-cluster Services, without host port-forward dependencies. The old local API
 and collector processes were retired. Runtime compute Jobs remain outside this
 static Kustomization and retain Kueue admission.
 
-This increment deploys **API and inventory**, not the submission/optimization
-worker. That worker's routing, optimizer image, leases and live compute recovery
-need a separate qualification before continuous supervised execution is enabled.
+This increment deployed API and inventory. The later [worker qualification](worker-recovery.md)
+added its separate optimizer image, scoped Deployment and an actual GPU submission
+crash-recovery trial before enabling continuous execution.
 
 ## Deployment contract
 

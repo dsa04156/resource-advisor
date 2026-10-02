@@ -22,7 +22,7 @@ direct evidence; conditional extensions require an explicit applicability result
 | MLflow | Actual parameters/metrics/artifacts/model links, outage recovery | Real result/artifact delivery and six historical resultless terminal attempts verified; connection refusal and accepted-create response loss recovered without duplicate runs. Model registration and full tenant authorization pending |
 | Lookup recommendation | Comparable measured evidence, repeats, quality/memory gates, abstention | Tested |
 | Recommendation approval | Immutable configuration/version, expiry, permission recheck | Real GPU history → immutable approval → independent execution/comparison verified; baseline references now validated, missing/cross-project/expired cases covered |
-| Idempotency/recovery | Response loss, restart, duplicate create/cancel, stale result and epoch | Fault tests pass; real process-crash/backend trials pending |
+| Idempotency/recovery | Response loss, restart, duplicate create/cancel, stale result and epoch | Real worker SIGKILL after accepted Kubernetes GPU submission recovered same Job/Pod with one create, ledger and MLflow run; Slurm, cancellation, concurrent-worker and node-failure trials pending |
 | R1 BO loop | qLogNEI ask→real GPU execution→observe→next→independent confirmation | Actual qLogNEI GPU loop and independent confirmation completed; wider evaluation pending |
 | Search representation | Approved finite conditional space, normalized numeric and unordered categories | Implemented/tested |
 | Prediction separation | Model snapshot/run IDs, predictions distinct from measurements | Implemented/tested |
@@ -36,7 +36,7 @@ direct evidence; conditional extensions require an explicit applicability result
 | E0–E7 scenarios | Reproducible live compatibility, execution, quota, contention/failure evidence | Pending |
 | B0–B3 / S0–S2 | Equal-budget real measurements, raw data, cost/regret/abstention and null improvements | Single-GPU S0/S1/S2 smoke with null improvement published; rigorous comparison pending |
 | S3–S6 | Applicability, paired/source data and qualified strategy comparisons | Conditional; no result claimed |
-| Deployment automation | Scoped service manifests/RBAC/secrets, lab provisioning, GitOps static services | Persistent PostgreSQL plus supervised API/inventory Kustomizations deployed; Pod/collector restart and projected read-only token verified. Supervised compute worker, full GitOps/provisioning and production ingress pending |
+| Deployment automation | Scoped service manifests/RBAC/secrets, lab provisioning, GitOps static services | Persistent PostgreSQL, API, inventory and single Kubernetes worker Kustomizations deployed with scoped projected accounts; live restart/submit-response crash recovery verified. Full GitOps/provisioning, HA and production ingress pending |
 | Restore | Actual independent DB dump/restore with content comparison | Same-version live cutover verified: 968 records across five tables, new Pod/same PVC/content equality, 46 artifact readbacks; node-loss/off-node recovery remains open |
 | Documentation/demo | Public-safe reproduce commands, raw real measurements, support matrix, limitations | Actual Kubernetes GPU recommendation→approval→new-result demo, artifacts and console verified; full Slurm/NPU and broader experiment demo pending |
 | Final review | Requirement-by-requirement evidence and fixed defects | Ongoing; full completion unproven |

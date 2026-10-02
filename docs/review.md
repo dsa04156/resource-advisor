@@ -69,6 +69,12 @@ recreation, and 46 existing artifact objects matched restored metadata. The sour
 and private backup were retained. This establishes Pod-replacement persistence,
 not node-loss recovery, HA, schema migration, key rotation or full app supervision.
 CI uses disposable databases; no real cluster access is required.
+The API, inventory and single Kubernetes worker now run as scoped Deployments.
+An actual worker SIGKILL between GPU Job acceptance and external-ID persistence
+recovered without another create call; Job/Pod UIDs, ledger and MLflow identities
+were retained. This closes that one crash window, not concurrent-worker fencing,
+Slurm recovery, node loss or production ingress. The namespace Job-creation role
+also remains a trusted controller permission, not hostile-tenant sandboxing.
 
 **Hardware:** an unresolved NPU PCIe link blocks model/runtime qualification on
 that device. It is not registered as an executable candidate based only on an

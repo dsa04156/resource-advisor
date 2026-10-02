@@ -1,0 +1,89 @@
+{
+  "schema_version": "v1",
+  "application_job_id": "j-fbabd27c40c048988fad8dd7a4828fd7",
+  "backend_job_id": "a-43da6399cd2a4491b24204fdb1d09a2a",
+  "backend_job_uid": "0ad0d2b2-e4a3-4a41-ac8a-b2af998152aa",
+  "state_at_crash": "SUBMITTING",
+  "external_id_persisted_at_crash": false,
+  "worker_exit_code": 137,
+  "worker_restart_count": 1,
+  "backend_job_uid_preserved": true,
+  "gpu_pod_uid_preserved": true,
+  "actual_create_invocations": 1,
+  "gpu_pod_count": 1,
+  "api_idempotent_replay_same_job": true,
+  "outbox": [
+    {
+      "kind": "submit",
+      "status": "DONE",
+      "tries": 2
+    },
+    {
+      "kind": "artifact",
+      "status": "DONE",
+      "tries": 1
+    },
+    {
+      "kind": "mlflow",
+      "status": "DONE",
+      "tries": 1
+    },
+    {
+      "kind": "mlflow_artifact",
+      "status": "DONE",
+      "tries": 1
+    }
+  ],
+  "terminal_state": "SUCCEEDED",
+  "quality_value": 1.0,
+  "evidence_kind": "hardware",
+  "gpu_model": "NVIDIA GeForce RTX 5080",
+  "gpu_runtime": {
+    "pytorch": "2.8.0+cu128",
+    "cuda": "12.8"
+  },
+  "measurements": {
+    "elapsed_seconds": 0.00027678103651851416,
+    "peak_memory_mib": 9.125,
+    "quality_value": 1.0,
+    "sample_count": 20,
+    "work_units": 20,
+    "latency_p50_ms": 0.013627519365400076,
+    "latency_p95_ms": 0.016000005416572094,
+    "latency_p99_ms": 0.016000005416572094,
+    "throughput": 72259.28572119564,
+    "gpu_utilization": null,
+    "power_watts": null,
+    "temperature_celsius": null
+  },
+  "job_started_at": "2026-10-02T11:28:49Z",
+  "job_completed_at": "2026-10-02T11:29:30Z",
+  "mlflow_run_count": 1,
+  "mlflow_state": "FINISHED",
+  "mlflow_run_id": "24b6940e42f4496090d9e005aba4232f",
+  "api_artifact_digest_verified": true,
+  "mlflow_artifact_bytes_match": true,
+  "usage_records": 1,
+  "allocated_device_seconds": 32.0,
+  "allocation_mode": "physical_device",
+  "preparation_delay_seconds_excluded_from_kernel_measurements": 30,
+  "submission_lease_seconds": 120,
+  "worker_deployment_to_result_observation_seconds": 160.19,
+  "worker_image_digest": "sha256:021658445418288a56842b13ac2b89365818b44c7ccd3627aaecc3517dabc716",
+  "worker_extras": [
+    "artifacts",
+    "optimizer"
+  ],
+  "worker_torch": "2.8.0+cpu",
+  "worker_botorch": "0.16.1",
+  "direct_secret_read_denied": true,
+  "node_list_denied": true,
+  "other_namespace_job_create_denied": true,
+  "scope": "One actual GPU Job under worker SIGKILL after scheduler acceptance and before external ID commit; no node/GPU failure or throughput improvement claimed",
+  "fault_configuration_removed": true,
+  "normal_worker_replicas": 1,
+  "normal_worker_available": true,
+  "kubernetes_version": "v1.31.14",
+  "sqlite_tests": 194,
+  "postgresql_tests": 194
+}

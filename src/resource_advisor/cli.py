@@ -4,7 +4,6 @@ import argparse
 import json
 import os
 import signal
-import time
 from pathlib import Path
 from threading import Event
 
@@ -42,6 +41,9 @@ def main():
     worker = sub.add_parser("worker")
     worker.add_argument("--config", required=True, help="private backend routes")
     worker.add_argument("--once", action="store_true")
+    worker.add_argument(
+        "--heartbeat-path", help="readiness timestamp after a complete worker cycle"
+    )
     inventory = sub.add_parser("collect-inventory")
     inventory.add_argument("--config", required=True, help="private read-only inventory sources")
     inventory.add_argument("--once", action="store_true")
@@ -165,7 +167,12 @@ def main():
             if config.get("mlflow_url")
             else None
         )
-        while True:
+        stopping = Event()
+        signal.signal(signal.SIGTERM, lambda *_: stopping.set())
+        signal.signal(signal.SIGINT, lambda *_: stopping.set())
+        if args.heartbeat_path:
+            Path(args.heartbeat_path).unlink(missing_ok=True)
+        while not stopping.is_set():
             study_runner.tick_all()
             runner.submit_one()
             runner.cancel_one()
@@ -175,9 +182,13 @@ def main():
             if delivery:
                 delivery.deliver_one()
                 delivery.deliver_artifact_one()
+            if args.heartbeat_path:
+                from .health import write_heartbeat
+
+                write_heartbeat(Path(args.heartbeat_path))
             if args.once:
                 break
-            time.sleep(5)
+            stopping.wait(5)
 
 
 if __name__ == "__main__":

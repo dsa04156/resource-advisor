@@ -37,6 +37,8 @@ The [persistent metadata cutover](docs/persistent-postgres.md) preserves all fiv
 database tables across Pod recreation and verifies existing artifact references.
 The [supervised API and inventory deployment](docs/service-deployment.md) uses
 separate permissions and verifies Pod replacement/collector termination recovery.
+The [supervised worker crash trial](docs/worker-recovery.md) kills the controller
+after accepted GPU submission and verifies recovery without another Job creation.
 
 ## Responsibility
 
