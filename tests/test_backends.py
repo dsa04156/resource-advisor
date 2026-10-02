@@ -95,7 +95,10 @@ def test_slurm_accounting_requests_explicit_timezone(service):
             assert args[args.index("--account") + 1] == "team-a"
             return ""
         assert args[:4] == ["env", "TZ=UTC", "SLURM_TIME_FORMAT=%Y-%m-%dT%H:%M:%S%z", "sacct"]
-        return "15|COMPLETED|0:0|2026-10-02T05:00:00+0000|2026-10-02T05:00:02+0000"
+        return (
+            f"15|{job['body']['attempt_id']}|team-a|gpu|COMPLETED|0:0|"
+            "2026-10-02T05:00:00+0000|2026-10-02T05:00:02+0000||Unknown"
+        )
 
     backend = SlurmBackend(
         partition="gpu", account="team-a", qos="lab", output_dir="/tmp/ra-test", execute=execute
@@ -214,15 +217,15 @@ def test_slurm_cannot_silently_ignore_a_container_image(service):
         backend.validate(job)
 
 
-@pytest.mark.parametrize("wrong", [None, "account", "node", "attempt", "duplicate"])
+@pytest.mark.parametrize("wrong", [None, "account", "node", "attempt", "partition", "duplicate"])
 def test_slurm_reads_node_local_result_only_after_accounting_match(service, wrong):
     job = row(service)
     job["body"]["external_id"] = "42"
     job["body"]["capability"]["node_ref"] = "qualified-node"
     attempt = job["body"]["attempt_id"]
-    fields = ["42", attempt, "team-a", "qualified-node", "COMPLETED", "0:0"]
-    if wrong in {"account", "node", "attempt"}:
-        fields[{"attempt": 1, "account": 2, "node": 3}[wrong]] = "foreign"
+    fields = ["42", attempt, "team-a", "gpu", "qualified-node", "COMPLETED", "0:0"]
+    if wrong in {"account", "node", "attempt", "partition"}:
+        fields[{"attempt": 1, "account": 2, "partition": 3, "node": 4}[wrong]] = "foreign"
     commands = []
 
     def execute(args, **kwargs):
@@ -260,7 +263,7 @@ def test_slurm_response_loss_reconciliation_does_not_attach_other_account(servic
     def execute(args, **kwargs):
         assert "team-a" in args
         # Deliberately include another account despite the requested filter.
-        return f"42|{attempt}|foreign\n43|{attempt}|team-a\n"
+        return f"42|{attempt}|foreign|gpu\n43|{attempt}|team-a|gpu\n44|{attempt}|team-a|foreign\n"
 
     backend = SlurmBackend(
         partition="gpu", account="team-a", qos="normal", output_dir="/tmp/ra", execute=execute

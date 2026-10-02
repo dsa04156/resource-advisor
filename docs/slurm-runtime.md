@@ -79,6 +79,11 @@ same-name job in another account from being attached. This is not a claim of
 cross-user device isolation. Scheduler/accounting outages remain errors and never
 become evidence of absent work.
 
+The [ownership update](slurm-ownership.md) extends this boundary to live status,
+terminal accounting and cancellation: account/partition/attempt are checked,
+ambiguous accounting IDs are rejected, and controller-side cancellation filters
+limit the requested operation. Live multi-user verification remains open.
+
 ## Evidence and open gate
 
 A real ARM worker ran the installed guard successfully, then rejected a changed

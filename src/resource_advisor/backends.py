@@ -613,9 +613,11 @@ class SlurmBackend:
                 "--noheader",
                 "--account",
                 self.account,
+                "--partition",
+                self.partition,
                 "--name",
                 name,
-                "--format=%i|%j|%a",
+                "--format=%i|%j|%a|%P",
             ]
         )
         accounted = self.call(
@@ -627,111 +629,148 @@ class SlurmBackend:
                 name,
                 "--accounts",
                 self.account,
+                "--partition",
+                self.partition,
                 "--starttime",
                 job["body"]["created_at"][:19],
-                "--format=JobIDRaw,JobName%100,Account%100",
+                "--format=JobIDRaw,JobName%100,Account%100,Partition%100",
             ]
         )
         ids = {
             line.split("|")[0]
             for line in (queued + "\n" + accounted).splitlines()
-            if len(line.split("|")) == 3
+            if len(line.split("|")) == 4
             and line.split("|")[1] == name
             and line.split("|")[2] == self.account
+            and line.split("|")[3] == self.partition
             and re.fullmatch(r"\d+", line.split("|")[0])
         }
         if len(ids) > 1:
             raise BackendError("multiple external jobs match one attempt")
         return next(iter(ids), None)
 
-    def status(self, job):
-        jid = job["body"]["external_id"]
-        if not re.fullmatch(r"\d+", jid):
+    @staticmethod
+    def external_id(job):
+        jid = job["body"].get("external_id")
+        if not isinstance(jid, str) or not re.fullmatch(r"[1-9][0-9]*", jid):
             raise BackendError("invalid Slurm external ID")
+        return jid
+
+    def owned_record(self, output, job, *, width, required=True):
+        jid = self.external_id(job)
+        records = [line.split("|") for line in output.splitlines() if line.split("|")[0] == jid]
+        if not records and not required:
+            return None
+        if len(records) != 1 or len(records[0]) != width:
+            raise BackendError("unambiguous Slurm allocation required")
+        record = records[0]
+        if record[1:4] != [job["body"]["attempt_id"], self.account, self.partition]:
+            raise BackendError("Slurm allocation does not match the attempt owner")
+        return record
+
+    def status(self, job):
+        jid = self.external_id(job)
         # squeue --jobs exits nonzero after Slurm purges a completed ID from its
         # live cache. A successful account-scoped listing proves it is absent
         # there; sacct still decides completion. Transport errors still propagate.
-        queued = self.call(["squeue", "--noheader", "--account", self.account, "--format=%i|%T"])
-        states = [
-            line.split("|", 1)[1]
-            for line in queued.splitlines()
-            if "|" in line and line.split("|", 1)[0] == jid
-        ]
-        if states:
+        queued = self.call(
+            [
+                "squeue",
+                "--noheader",
+                "--account",
+                self.account,
+                "--partition",
+                self.partition,
+                "--format=%i|%j|%a|%P|%T",
+            ]
+        )
+        record = self.owned_record(queued, job, width=5, required=False)
+        if record:
             return Observation(
-                State.RUNNING if states[0] in {"RUNNING", "COMPLETING"} else State.QUEUED
+                State.RUNNING if record[4] in {"RUNNING", "COMPLETING"} else State.QUEUED
             )
         output = self.call(
             [
                 "sacct",
                 "--noheader",
                 "--parsable2",
+                "--duplicates",
+                "--accounts",
+                self.account,
+                "--partition",
+                self.partition,
                 "--jobs",
                 jid,
-                "--format=JobIDRaw,State,ExitCode,Start,End,AllocTRES%200,Submit",
+                "--format=JobIDRaw,JobName%100,Account%100,Partition%100,State%64,ExitCode,Start,End,AllocTRES%200,Submit",
             ]
         )
-        for line in output.splitlines():
-            parts = line.split("|")
-            if len(parts) < 5 or parts[0] != jid:
-                continue
-            _, state, exitcode, start, end = parts[:5]
-            # The command requests UTC offsets. Unsupported/missing values stay unknown.
-            start = start if _aware(start) else None
-            end = end if _aware(end) else None
-            allocation = (
-                slurm_allocation(parts[5], job["body"]["capability"].get("resource_key"))
-                if len(parts) >= 6
-                else None
+        parts = self.owned_record(output, job, width=10)
+        state, exitcode, start, end, tres, submitted = parts[4:]
+        # The command requests UTC offsets. Unsupported/missing values stay unknown.
+        start = start if _aware(start) else None
+        end = end if _aware(end) else None
+        allocation = slurm_allocation(tres, job["body"]["capability"].get("resource_key"))
+        submitted = submitted if _aware(submitted) else None
+        if state == "COMPLETED" and exitcode == "0:0":
+            return Observation(
+                State.COLLECTING, start, end, allocation=allocation, submitted_at=submitted
             )
-            submitted = parts[6] if len(parts) >= 7 and _aware(parts[6]) else None
-            if state == "COMPLETED" and exitcode == "0:0":
-                return Observation(
-                    State.COLLECTING, start, end, allocation=allocation, submitted_at=submitted
-                )
-            if state.startswith("CANCELLED"):
-                return Observation(
-                    State.CANCELED, start, end, allocation=allocation, submitted_at=submitted
-                )
-            if state in {
-                "FAILED",
-                "TIMEOUT",
-                "OUT_OF_MEMORY",
-                "NODE_FAIL",
-                "PREEMPTED",
-                "BOOT_FAIL",
-            }:
-                return Observation(
-                    State.FAILED, start, end, state, allocation=allocation, submitted_at=submitted
-                )
+        if state.startswith("CANCELLED"):
+            return Observation(
+                State.CANCELED, start, end, allocation=allocation, submitted_at=submitted
+            )
+        if state in {
+            "FAILED",
+            "TIMEOUT",
+            "OUT_OF_MEMORY",
+            "NODE_FAIL",
+            "PREEMPTED",
+            "BOOT_FAIL",
+        }:
+            return Observation(
+                State.FAILED, start, end, state, allocation=allocation, submitted_at=submitted
+            )
         raise BackendError("accounting has not confirmed a terminal state")
 
     def cancel(self, job):
-        self.call(["scancel", job["body"]["external_id"]])
+        jid = self.external_id(job)
+        # Ask the controller to apply all filters at cancellation, rather than
+        # relying only on the worker's earlier ownership observation.
+        self.call(
+            [
+                "scancel",
+                "--ctld",
+                "--account",
+                self.account,
+                "--partition",
+                self.partition,
+                "--name",
+                job["body"]["attempt_id"],
+                jid,
+            ]
+        )
 
     def result(self, job):
         # Check ownership even when the controller can read a shared filesystem.
-        jid = job["body"]["external_id"]
-        if not re.fullmatch(r"\d+", jid):
-            raise BackendError("invalid Slurm external ID")
+        jid = self.external_id(job)
         output = self.call(
             [
                 "sacct",
                 "--noheader",
                 "--parsable2",
+                "--duplicates",
+                "--accounts",
+                self.account,
+                "--partition",
+                self.partition,
                 "--jobs",
                 jid,
-                "--format=JobIDRaw,JobName%100,Account%100,NodeList%100,State,ExitCode",
+                "--format=JobIDRaw,JobName%100,Account%100,Partition%100,NodeList%100,State%64,ExitCode",
             ]
         )
-        matches = [line.split("|") for line in output.splitlines() if line.split("|")[0] == jid]
-        if len(matches) != 1 or len(matches[0]) != 6:
-            raise BackendError("unambiguous result allocation required")
-        _, name, account, node, state, exitcode = matches[0]
+        _, _, _, _, node, state, exitcode = self.owned_record(output, job, width=7)
         if (
-            name != job["body"]["attempt_id"]
-            or account != self.account
-            or node != job["body"]["capability"]["node_ref"]
+            node != job["body"]["capability"]["node_ref"]
             or state != "COMPLETED"
             or exitcode != "0:0"
         ):
