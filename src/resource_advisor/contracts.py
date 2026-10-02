@@ -101,6 +101,15 @@ class ExecutionContext(Contract):
     parameters: dict[str, int | float | str] = Field(default_factory=dict)
 
 
+class ThermalPolicy(Contract):
+    provider: Literal["nvml-brackets-v1"] = "nvml-brackets-v1"
+    driver_version: str = Field(min_length=1, max_length=64)
+    device_uuid_digest: Digest
+    maximum_temperature_c: float = Field(gt=0, le=100)
+    maximum_gap_seconds: float = Field(gt=0, le=5)
+    maximum_query_seconds: float = Field(gt=0, le=1)
+
+
 class RuntimeVariant(Contract):
     ref: Ref
     workload_ref: Ref
@@ -120,9 +129,23 @@ class RuntimeVariant(Contract):
     validation_refs: tuple[Ref, ...] = ()
     supported_shapes: tuple[tuple[int, ...], ...]
     runtime_versions: dict[str, str]
+    thermal_policy: ThermalPolicy | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_signature(self, handler):
+        value = handler(self)
+        if self.thermal_policy is None:
+            value.pop("thermal_policy", None)
+        return value
 
     @model_validator(mode="after")
     def immutable_environment(self):
+        if self.thermal_policy and (
+            self.accelerator_vendor != "nvidia"
+            or self.device_class != "gpu"
+            or self.runtime_versions.get("driver") != self.thermal_policy.driver_version
+        ):
+            raise ValueError("thermal policy requires an NVIDIA GPU and qualified driver")
         if self.image is not None:
             if "@sha256:" not in self.image:
                 raise ValueError("container images must be pinned by digest")

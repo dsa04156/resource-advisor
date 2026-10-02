@@ -344,6 +344,8 @@ class Studies:
                 ).total_seconds(),
             )
         body["observations"].append(obs)
+        if jb.get("thermal_assessment"):
+            obs["thermal_assessment"] = jb["thermal_assessment"]
         body["active_plan"] = None
         state = "CONFIRMING" if body["confirmation_schedule"] is not None else "EXPLORING"
         if row["state"] == "CANCEL_REQUESTED":
@@ -352,6 +354,11 @@ class Studies:
             obs, WorkloadSpec.model_validate(body["spec"])
         ):
             state, body["stop_reason"] = "ABSTAINED", "INDEPENDENT_CONFIRMATION_FAILED"
+        if (
+            row["state"] != "CANCEL_REQUESTED"
+            and jb.get("thermal_assessment", {}).get("status", "ELIGIBLE_TRACE") != "ELIGIBLE_TRACE"
+        ):
+            state, body["stop_reason"] = "ABSTAINED", "THERMAL_OBSERVATION_INELIGIBLE"
         self.store.change_study(conn, row, state, body)
 
     @staticmethod
@@ -359,6 +366,8 @@ class Studies:
         m = obs.get("measurements")
         return bool(
             obs["outcome"] == "COMPLETED"
+            and obs.get("thermal_assessment", {}).get("status", "ELIGIBLE_TRACE")
+            == "ELIGIBLE_TRACE"
             and m
             and m["quality_value"] >= spec.quality.minimum
             and m["peak_memory_mib"] <= spec.quality.maximum_peak_memory_mib

@@ -6,16 +6,17 @@ from .contracts import Candidate, CapabilitySnapshot, RuntimeVariant, WorkloadSp
 
 
 def context_signature(candidate: Candidate, variant: RuntimeVariant) -> str:
-    return signature(
-        {
-            "context": candidate.context.model_dump(mode="json"),
-            "image": variant.image,
-            "compiled_artifact_digest": variant.compiled_artifact_digest,
-            "command": variant.command,
-            "pilot_command": variant.pilot_command,
-            "backend": candidate.backend,
-        }
-    )
+    value = {
+        "context": candidate.context.model_dump(mode="json"),
+        "image": variant.image,
+        "compiled_artifact_digest": variant.compiled_artifact_digest,
+        "command": variant.command,
+        "pilot_command": variant.pilot_command,
+        "backend": candidate.backend,
+    }
+    if variant.thermal_policy is not None:
+        value["thermal_policy"] = variant.thermal_policy.model_dump(mode="json")
+    return signature(value)
 
 
 def compatibility(

@@ -236,6 +236,16 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
             raise HTTPException(404, "Sampling receipt not available")
         return receipt["body"]
 
+    @app.get(PREFIX + "/jobs/{job_id}/thermal-trace")
+    def get_thermal_trace(job_id: str, p=Depends(principal)):
+        job = service.get_job(p.project, job_id)
+        with service.store.transaction() as conn:
+            trace = service.store.get(conn, "thermal_trace", job["attempt_id"])
+            row = service.store.job(conn, job_id)
+        if trace is None:
+            raise HTTPException(404, "Thermal trace not available")
+        return {"trace": trace["body"], "assessment": row["body"]["thermal_assessment"]}
+
     from .training import TrainingIsolation
 
     @app.post(PREFIX + "/training-isolation")

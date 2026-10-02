@@ -67,6 +67,7 @@ def verify(manifest_path, expected_manifest, expected_environment, command):
             "RA_EXECUTION_MODE",
             "RA_ARTIFACT_PREFIX",
             "RA_SAMPLING_PLAN_JSON",
+            "RA_THERMAL_POLICY_JSON",
         }
         or k in {"CUDA_VISIBLE_DEVICES", "ROCR_VISIBLE_DEVICES", "HIP_VISIBLE_DEVICES"}
     }

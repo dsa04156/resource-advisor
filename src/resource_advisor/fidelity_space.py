@@ -148,6 +148,9 @@ class FidelitySpaces:
                         "vendor": variant.accelerator_vendor,
                     }
                     current = signature(invariant)
+                    if variant.thermal_policy:
+                        invariant["thermal_policy"] = variant.thermal_policy.model_dump(mode="json")
+                        current = signature(invariant)
                     if common is not None and common != current:
                         raise Rejected(
                             "mixed runtime, input, quality or unmodeled configuration change"
@@ -319,6 +322,19 @@ class FidelitySpaces:
                             "hardware observation has an invalid sampling receipt"
                         ) from exc
                     sampling_digest = signature(checked)
+                thermal_digest = None
+                if body["variant"].get("thermal_policy"):
+                    from .thermal import assess, validate_trace
+
+                    trace = required(self.store, conn, "thermal_trace", result.attempt_id, project)
+                    try:
+                        checked_trace = validate_trace(trace, result, body)
+                        thermal = assess(checked_trace, body["variant"]["thermal_policy"])
+                    except ValueError as exc:
+                        raise Rejected("invalid thermal observation evidence") from exc
+                    if thermal["status"] != "ELIGIBLE_TRACE":
+                        raise Rejected("ineligible thermal observation evidence")
+                    thermal_digest = signature(checked_trace)
                 observations.append(
                     MFObservation(
                         attempt_id=result.attempt_id,
@@ -339,6 +355,7 @@ class FidelitySpaces:
                         "created_at": body["created_at"],
                         "finished_at": body["finished_at"],
                         "sampling_receipt_digest": sampling_digest,
+                        "thermal_trace_digest": thermal_digest,
                     }
                 )
             # Use the kernel's completeness/independence checks, without fitting or authorizing it.
@@ -368,6 +385,9 @@ class FidelitySpaces:
                 "historical_cost_reused": True,
                 "sampling_policy_verified": not repetition,
                 "sampling_receipts_verified": not repetition,
+                "thermal_brackets_verified": all(
+                    p["thermal_trace_digest"] is not None for p in provenance
+                ),
             }
             report["ref"] = "mf-evidence-" + signature(report)[7:39]
             return self.store.put(conn, "mf_evidence", report["ref"], project, report)["body"]

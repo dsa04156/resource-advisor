@@ -147,3 +147,9 @@ receipts and matching result bundles. Offline MF-GP/MF-KG analysis uses the 12
 probes without submitting jobs; independent confirmations retained the baseline
 because improvement was uncertain. Real-dataset fidelity, thermal/rank
 qualification and automatic MF-KG selection remain open.
+
+[Execution-bound thermal observations](docs/thermal-evidence.md) add read-only
+NVML measurements around each sampled GPU forward. Missing or ineligible
+observations exclude a result from recommendation history and stop the study.
+Unit coverage and an actual GPU sensor probe are verified; measured-workload
+trace collection and sustained thermal qualification remain separate gates.

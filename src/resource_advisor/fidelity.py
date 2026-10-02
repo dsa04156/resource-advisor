@@ -111,6 +111,9 @@ class FidelityCalibration:
                     "compiled_artifact": variant.compiled_artifact_digest,
                 }
                 current = signature(invariant)
+                if variant.thermal_policy:
+                    invariant["thermal_policy"] = variant.thermal_policy.model_dump(mode="json")
+                    current = signature(invariant)
                 if group is not None and group != current:
                     raise Rejected("paired cells differ beyond repetition count and CPU allocation")
                 group = current

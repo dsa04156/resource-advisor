@@ -79,6 +79,13 @@ class Service:
             if not self.store.get(conn, "sampling_binding", spec.ref):
                 raise Rejected("sampling binding required before workload execution")
             SamplingPolicies(self).checked(conn, project, spec.ref)
+        if variant.thermal_policy and (
+            spec.identity.sampling_policy_digest is None
+            or spec.identity.work_units > 32
+            or candidate.context.allocation_mode != "physical_device"
+            or candidate.context.resources.accelerator_count != 1
+        ):
+            raise Rejected("thermal brackets require 1–32 sampled inputs on one physical GPU")
         return spec, candidate, variant, cap
 
     def submit(self, project: str, request: JobRequest, key: str):
@@ -312,6 +319,7 @@ class Service:
         phase_profile=None,
         training_receipt=None,
         sampling_receipt=None,
+        thermal_trace=None,
     ):
         """Trusted collector only. Require backend completion before result acceptance."""
         with self.store.transaction() as conn:
@@ -324,6 +332,11 @@ class Service:
             digest = signature(result)
             if row["state"] in TERMINAL:
                 if body.get("result_digest") == digest:
+                    thermal = self.store.get(conn, "thermal_trace", result.attempt_id)
+                    if thermal_trace is not None and (
+                        thermal is None or signature(thermal["body"]) != signature(thermal_trace)
+                    ):
+                        raise Conflict("terminal thermal trace is immutable")
                     sampling = self.store.get(conn, "sampling_receipt", result.attempt_id)
                     if sampling_receipt is not None and (
                         sampling is None
@@ -394,6 +407,24 @@ class Service:
                     )
             elif sampling_receipt is not None:
                 raise Rejected("sampling receipt without a completed sampling-bound workload")
+            if body["variant"].get("thermal_policy") and result.outcome == "COMPLETED":
+                from .thermal import assess, validate_trace
+
+                try:
+                    thermal = validate_trace(thermal_trace, result, body)
+                except ValueError as exc:
+                    raise Rejected("verified thermal trace required") from exc
+                if not problems:
+                    self.store.put(
+                        conn,
+                        "thermal_trace",
+                        result.attempt_id,
+                        project,
+                        thermal.model_dump(mode="json"),
+                    )
+                    body["thermal_assessment"] = assess(thermal, body["variant"]["thermal_policy"])
+            elif thermal_trace is not None:
+                raise Rejected("thermal trace without completed qualified telemetry workload")
             if phase_profile is not None:
                 from .diagnostics import validate_profile
 
@@ -433,6 +464,8 @@ class Service:
                 if (
                     result.outcome == "COMPLETED"
                     and body["quality_passed"]
+                    and body.get("thermal_assessment", {}).get("status", "ELIGIBLE_TRACE")
+                    == "ELIGIBLE_TRACE"
                     and body["request"]["mode"] != "pilot"
                 ):
                     self.store.put(

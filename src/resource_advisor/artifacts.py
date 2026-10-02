@@ -141,6 +141,7 @@ class ArtifactDelivery:
                 phases = self.store.get(conn, "phase_profile", body["attempt_id"])
                 training = self.store.get(conn, "training_receipt", body["attempt_id"])
                 sampling = self.store.get(conn, "sampling_receipt", body["attempt_id"])
+                thermal = self.store.get(conn, "thermal_trace", body["attempt_id"])
                 if (
                     row["state"] not in {State.SUCCEEDED, State.FAILED}
                     or signature(result) != body["result_digest"]
@@ -161,6 +162,10 @@ class ArtifactDelivery:
                 payload["sampling_receipt"] = sampling["body"]
                 payload["sampling_binding"] = body["sampling_binding"]
                 payload["sampling_policy"] = body["sampling_policy"]
+            if thermal:
+                payload["thermal_trace"] = thermal["body"]
+                payload["thermal_assessment"] = body["thermal_assessment"]
+                payload["thermal_policy"] = body["variant"]["thermal_policy"]
             if training:
                 payload["training_receipt"] = training["body"]
                 payload["training_isolation"] = body["training_isolation"]

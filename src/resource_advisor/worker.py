@@ -322,6 +322,7 @@ class Worker:
                 phase_profile=envelope.get("phase_profile"),
                 training_receipt=envelope.get("training_receipt"),
                 sampling_receipt=envelope.get("sampling_receipt"),
+                thermal_trace=envelope.get("thermal_trace"),
             )
 
 
@@ -418,6 +419,11 @@ class MLflowDelivery:
                 )
             if job.get("error"):
                 tags["resource_advisor.error"] = str(job["error"])[:500]
+            if job.get("thermal_assessment"):
+                thermal = job["thermal_assessment"]
+                tags["thermal.status"] = thermal["status"]
+                tags["thermal.trace_digest"] = thermal["trace_digest"]
+                tags["thermal.reasons"] = ",".join(thermal["reasons"])
             if job["request"].get("study_ref"):
                 tags["resource_advisor.study_id"] = job["request"]["study_ref"]
             if training:
@@ -480,6 +486,21 @@ class MLflowDelivery:
                 for k, v in ((result or {}).get("measurements") or {}).items()
                 if v is not None
             ]
+            if job.get("thermal_assessment"):
+                metrics.extend(
+                    {
+                        "key": "thermal." + k,
+                        "value": job["thermal_assessment"][k],
+                        "timestamp": timestamp,
+                        "step": 0,
+                    }
+                    for k in (
+                        "maximum_observed_temperature_c",
+                        "sensor_query_seconds",
+                        "maximum_unobserved_gap_seconds",
+                    )
+                    if job["thermal_assessment"].get(k) is not None
+                )
             if phases and result:
                 from .diagnostics import diagnose
 

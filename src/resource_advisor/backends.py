@@ -118,6 +118,10 @@ def identity_environment(job):
         values["RA_SAMPLING_PLAN_JSON"] = json.dumps(
             b["sampling_binding"]["plan"], separators=(",", ":")
         )
+    if b["variant"].get("thermal_policy"):
+        values["RA_THERMAL_POLICY_JSON"] = json.dumps(
+            b["variant"]["thermal_policy"], separators=(",", ":")
+        )
     return values
 
 
