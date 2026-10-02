@@ -92,6 +92,7 @@ def test_worker_finishes_cycle_before_graceful_shutdown(tmp_path, monkeypatch):
             submit_one=submit,
             cancel_one=lambda: calls.append("cancel"),
             reconcile_all=lambda: calls.append("reconcile"),
+            release_one=lambda: calls.append("release"),
         ),
     )
     monkeypatch.setattr(
@@ -121,5 +122,5 @@ def test_worker_finishes_cycle_before_graceful_shutdown(tmp_path, monkeypatch):
     finally:
         for sig, handler in handlers.items():
             signal.signal(sig, handler)
-    assert calls == ["studies", "submit", "cancel", "reconcile"]
+    assert calls == ["studies", "submit", "cancel", "reconcile", "release"]
     assert heartbeat_fresh(heartbeat)

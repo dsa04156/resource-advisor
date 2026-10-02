@@ -62,6 +62,7 @@ def ledger_record(row, state, body, result=None):
             "result_valid": valid,
             "requested_resources": context["resources"],
             "observed_allocation": allocation or None,
+            "termination_receipt_ref": body["attempt_id"] if body.get("termination") else None,
             "never_submitted": never_submitted,
             "allocation_interval_seconds": duration,
             "started_at": start,

@@ -142,6 +142,8 @@ class Store:
         return conn.execute(select(jobs).where(jobs.c.id == job_id)).mappings().first()
 
     def change_job(self, conn, row, state, body):
+        if body.get("termination"):
+            self.put(conn, "termination", body["attempt_id"], row["project"], body["termination"])
         if state == State.CANCEL_REQUESTED and row["state"] != State.CANCEL_REQUESTED:
             body = dict(body)
             body.setdefault("cancel_requested_at", now().isoformat())
@@ -158,6 +160,13 @@ class Store:
         if state in TERMINAL:
             self.record_usage(conn, row, state, body)
             self.enqueue_tracking(conn, row, body)
+            if body.get("termination", {}).get("retention_finalizer"):
+                self.enqueue(
+                    conn,
+                    "release-" + body["attempt_id"],
+                    "release_termination",
+                    {"job_id": row["id"]},
+                )
 
     def enqueue_tracking(self, conn, row, body):
         event_id = "mlflow-" + body["attempt_id"]

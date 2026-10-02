@@ -1,0 +1,25 @@
+# Optional: apply only with a qualified retain_termination_evidence route.
+# Namespace is explicit; no node, secret, exec or cross-namespace permission.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ra-termination-evidence
+  namespace: resource-advisor-lab
+rules:
+- apiGroups: ['']
+  resources: [pods]
+  verbs: [patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ra-termination-evidence
+  namespace: resource-advisor-lab
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ra-termination-evidence
+subjects:
+- kind: ServiceAccount
+  name: ra-worker
+  namespace: resource-advisor-lab

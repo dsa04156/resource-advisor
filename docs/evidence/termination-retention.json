@@ -1,0 +1,92 @@
+{
+  "verified_at": "2026-10-02T21:53:26.980960+00:00",
+  "scope": "Real single-GPU Kubernetes cancellation/recovery and completed-before-cancel retention; no Slurm or node-loss claim",
+  "kubernetes_version": "1.31.14",
+  "kubelet_version": "1.31.14",
+  "accelerator_model": "NVIDIA GeForce RTX 5080",
+  "service_image_digest": "sha256:95bac1af8e56b1e023eac5e86416c72c60ed9ef9d46e642f110b3244bffa622b",
+  "source_tree_sha256": "10f0303316e6e1ccd23c6eb71307615882c280c4bb05ad9c58b9b28ca80616f0",
+  "qualification": {
+    "job_ref": "ra-retention-qual-01",
+    "result_digest": "sha256:0f1405cdcc719e97ca7cd416bb992e14a91695524957ab4bc30619d0a89884ff",
+    "allocated_gpu_seconds": 32.0,
+    "boundary": "scheduled to container finished, includes fixed 30-second preparation wait"
+  },
+  "trials": [
+    {
+      "job_id": "j-85a0d11e81f341769b87168d2a9224fd",
+      "attempt_id": "a-c4325d16c4c347648da4a429465e944c",
+      "mlflow_run_id": "b6a5a6bcd69f41a98890a2a9ac2147c7",
+      "state": "CANCELED",
+      "mlflow_status": "KILLED",
+      "termination_receipt_digest": "sha256:c451476868b4e9efdc0034c7109bcf5b509b47fc498a903cc596afd8357cf690",
+      "container": {
+        "startedAt": "2026-10-02T21:47:56Z",
+        "finishedAt": "2026-10-02T21:48:03Z",
+        "exitCode": 137,
+        "signal": null,
+        "reason": "Error"
+      },
+      "scheduled_at": "2026-10-02T21:47:55Z",
+      "allocated_gpu_seconds": 8.0,
+      "queue_seconds": 0.0,
+      "usage_rows": 1,
+      "release_event_status": "DONE",
+      "mlflow_run_count": 1,
+      "result_and_measurements_absent": true,
+      "worker_stopped_before_cancel": true,
+      "accepted_delete_response_fault_injected": true,
+      "terminal_pod_retained_without_worker": true,
+      "no_ledger_before_recovery": true,
+      "pod_deleted_after_commit": true,
+      "raw_pod_receipt_ledger_boundaries_match": true
+    },
+    {
+      "job_id": "j-6dc1a1777e664d678e403fa95d8bc3a8",
+      "attempt_id": "a-c1f43ce7418e46a3a57ca68945f6c379",
+      "mlflow_run_id": "a8667166ed7b421b9653eaa12543c4c1",
+      "state": "SUCCEEDED",
+      "mlflow_status": "FINISHED",
+      "termination_receipt_digest": "sha256:4768323d2fc9e9161834fbb965b750492b8aed97fa2873cc363958b3c9320374",
+      "container": {
+        "startedAt": "2026-10-02T21:48:48Z",
+        "finishedAt": "2026-10-02T21:49:19Z",
+        "exitCode": 0,
+        "signal": null,
+        "reason": "Completed"
+      },
+      "scheduled_at": "2026-10-02T21:48:47Z",
+      "allocated_gpu_seconds": 32.0,
+      "queue_seconds": 0.0,
+      "usage_rows": 1,
+      "release_event_status": "DONE",
+      "mlflow_run_count": 1,
+      "result_digest": "sha256:3b39990c59d93151fcf1fb9e6213269f8bb0958123b9928458af3417a5054094",
+      "s3_api_mlflow_bytes_identical": true,
+      "completed_pod_log_preserved": true,
+      "retention_finalizer_released": true,
+      "raw_pod_receipt_ledger_boundaries_match": true
+    }
+  ],
+  "test_evidence": {
+    "full_suite_before_extra_commit_fault_test": 484,
+    "retention_suite_including_commit_fault": 10
+  },
+  "limits": [
+    "Accepted-delete response loss was an explicit adapter fault injection after real scheduler deletion, not a network outage.",
+    "No GPU reset, node drain, driver change or production workload interruption.",
+    "Reservation seconds are not GPU utilization, useful compute time or energy.",
+    "Whole-second kubelet timestamps limit interval precision.",
+    "Legacy missing timestamps remain unknown and are not rewritten.",
+    "Force deletion, disconnected nodes, multiple replacement Pods and general multi-worker fencing remain unverified."
+  ],
+  "final_state": {
+    "https_health": 200,
+    "api_worker_inventory_ready": true,
+    "active_platform_jobs": 0,
+    "unfinished_outbox_events": 0,
+    "remaining_retention_finalizers": 0,
+    "api_ledger_matches_sql": true
+  },
+  "total_measured_gpu_reservation_seconds_including_qualification": 72.0
+}

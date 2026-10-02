@@ -29,6 +29,8 @@ class Observation:
     allocation: dict | None = None
     submitted_at: str | None = None
     execution_started_at: str | None = None
+    backend_uid: str | None = None
+    termination: dict | None = None
 
 
 def memory_mib(value, *, slurm=False):
@@ -160,6 +162,7 @@ class KubernetesBackend:
         runtime_bundles=None,
         training_sources=None,
         priority_classes=None,
+        retain_termination_evidence=False,
         execute=run,
     ):
         if not namespace or not local_queue or not node_selector:
@@ -174,6 +177,9 @@ class KubernetesBackend:
         ):
             raise ValueError("training sources require mappings with a source mapping")
         self.priority_classes = priority_mapping(priority_classes)
+        if not isinstance(retain_termination_evidence, bool):
+            raise ValueError("termination retention must be an explicit boolean")
+        self.retain_termination_evidence = retain_termination_evidence
         self.prefix = ["kubectl"]
         if kubeconfig:
             self.prefix += ["--kubeconfig", kubeconfig]
@@ -254,6 +260,10 @@ class KubernetesBackend:
             },
         }
         bundle = self.runtime_bundles.get(b["variant"]["ref"])
+        if self.retain_termination_evidence:
+            from .kubernetes_retention import FINALIZER
+
+            manifest["spec"]["template"]["metadata"]["finalizers"] = [FINALIZER]
         if bundle:
             if bundle["environment_digest"] != b["variant"]["environment_digest"]:
                 raise BackendError("configured runtime bundle does not match qualified environment")
@@ -333,6 +343,15 @@ class KubernetesBackend:
                 + ["get", "pods", "-l", "job-name=" + job["body"]["external_id"], "-o", "json"]
             )
         )["items"]
+        retained = {}
+        if self.retain_termination_evidence:
+            from .kubernetes_retention import observe
+
+            retained, terminal = observe(
+                self.namespace, job, json.loads(raw) if raw.strip() else None, pods
+            )
+            if terminal is not None:
+                return Observation(**terminal, **retained)
         if not raw.strip():
             if job["state"] == State.CANCEL_REQUESTED:
                 active = any(
@@ -408,6 +427,7 @@ class KubernetesBackend:
                     allocation=allocation,
                     execution_started_at=execution_started,
                     submitted_at=submitted,
+                    **retained,
                 )
             if condition["type"] == "Failed" and condition["status"] == "True":
                 return Observation(
@@ -418,6 +438,7 @@ class KubernetesBackend:
                     allocation=allocation,
                     execution_started_at=execution_started,
                     submitted_at=submitted,
+                    **retained,
                 )
         return Observation(
             State.RUNNING if "running" in container else State.QUEUED,
@@ -425,13 +446,20 @@ class KubernetesBackend:
             allocation=allocation,
             execution_started_at=execution_started,
             submitted_at=submitted,
+            **retained,
         )
 
     def cancel(self, job):
         self.execute(
             self.prefix
             + ["delete", "job", job["body"]["external_id"], "--ignore-not-found", "--wait=false"]
+            + (["--cascade=foreground"] if self.retain_termination_evidence else [])
         )
+
+    def release_termination(self, receipt):
+        from .kubernetes_retention import release
+
+        release(self, receipt)
 
     def result(self, job):
         return result_from_log(
@@ -439,7 +467,9 @@ class KubernetesBackend:
                 self.prefix
                 + [
                     "logs",
-                    "job/" + job["body"]["external_id"],
+                    "pod/" + job["body"]["termination"]["pod_name"]
+                    if job["body"].get("termination")
+                    else "job/" + job["body"]["external_id"],
                     "--container",
                     "workload",
                     "--tail=100",

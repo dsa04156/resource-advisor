@@ -194,6 +194,7 @@ def main():
             runner.submit_one()
             runner.cancel_one()
             runner.reconcile_all()
+            runner.release_one()
             if artifacts:
                 artifacts.deliver_one()
             if delivery:

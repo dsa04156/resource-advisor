@@ -276,10 +276,30 @@ class Worker:
             ("allocation", observation.allocation),
             ("scheduler_submitted_at", observation.submitted_at),
             ("execution_started_at", observation.execution_started_at),
+            ("backend_uid", observation.backend_uid),
+            ("termination", observation.termination),
         ]:
             if value:
                 body[key] = value
         return body
+
+    def release_one(self):
+        event = self.store.claim("release_termination")
+        if not event:
+            return False
+        try:
+            row = self._row(event["body"]["job_id"])
+            if row["state"] not in TERMINAL:
+                raise BackendError("terminal commit required before evidence release")
+            with self.store.transaction() as conn:
+                receipt = self.store.get(conn, "termination", row["body"]["attempt_id"])
+                if not receipt or receipt["project"] != row["project"]:
+                    raise BackendError("durable termination receipt required")
+            self.backend(row).release_termination(receipt["body"])
+            self.store.finish(event)
+        except (BackendError, Conflict, ValueError, KeyError) as exc:
+            self.store.finish(event, type(exc).__name__)
+        return True
 
     def _reconcile_observation(self, row, backend, observation):
         with self.store.transaction() as conn:
@@ -327,7 +347,7 @@ class Worker:
                 )
             self.store.change_job(conn, latest, state, body)
         if state == State.COLLECTING:
-            envelope = backend.result(row)
+            envelope = backend.result(self._row(row["id"]))
             result = ExecutionResult.model_validate(envelope["result"])
             self.service.ingest(
                 row["project"],

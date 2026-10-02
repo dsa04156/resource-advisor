@@ -41,6 +41,9 @@ The [supervised worker crash trial](docs/worker-recovery.md) kills the controlle
 after accepted GPU submission and verifies recovery without another Job creation.
 The [GPU cancellation trials](docs/cancellation-verification.md) separate request
 from confirmed cancellation and preserve completed results across worker restart.
+The [termination-retention trial](docs/termination-retention.md) commits kubelet
+termination evidence before deleting the Pod record, preserving cancellation
+reservation time across worker interruption without estimating unknown intervals.
 The [Kubeflow cancellation trials](docs/kubeflow-cancellation.md) confirm external
 GPU cleanup after workflow termination and uncatchable launcher process loss.
 The [paired calibration protocol](docs/fidelity-calibration.md) preregisters
