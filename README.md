@@ -136,4 +136,8 @@ and separate final confirmation. It is distinct from multi-fidelity BO.
 
 The [MF-GP/MF-KG numerical kernel](docs/mfkg-kernel.md) now supports finite-space
 configuration/fidelity analysis and a synthetic ask/observe demo. Hardware
-qualification and mixed-fidelity job execution remain separate open gates.
+qualification and automatic MF-KG job selection remain open gates.
+[Immutable fidelity spaces](docs/fidelity-spaces.md) now bind measurement levels
+to separate workloads and execute preregistered mixed-workload calibration through
+the durable study/Job path; the new path is covered by scheduler-double tests
+and still awaits a live trial.

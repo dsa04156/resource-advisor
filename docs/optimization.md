@@ -31,9 +31,13 @@ Strategies:
   repeats for candidates with unresolved descriptive precision. Fixed work units,
   per-candidate caps, protected final confirmation and explicit stopping reasons;
   see [adaptive replication](adaptive-replication.md). This is not MFBO.
+- `fidelity_calibration`: three preregistered randomized blocks of immutable
+  workload/fidelity options, then independent target-only confirmation of every
+  configuration. See [fidelity spaces](fidelity-spaces.md). This is a calibration
+  experiment, not adaptive MF-KG.
 - `mfkg` / `rgpe`: currently rejected with explicit missing-qualification reasons;
   not aliases for qLogNEI. The [MF-GP/MF-KG numerical kernel](mfkg-kernel.md) is
-  implemented with an analysis CLI; hardware qualification and mixed-fidelity
+  implemented with an analysis CLI; hardware qualification and automatic MF-KG
   execution integration remain open. RGPE implementation/source-data gates also
   remain open in the full completion audit.
 

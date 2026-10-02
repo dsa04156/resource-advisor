@@ -3,7 +3,9 @@
 The `mfkg` execution strategy is still disabled. This increment implements and
 tests its numerical model/acquisition kernel and a runnable analysis CLI. It
 does **not** establish a qualified hardware fidelity axis or complete the
-mixed-fidelity study-to-Job integration. The existing matmul repetition experiment
+automatic mixed-fidelity MF-KG study-to-Job integration.
+[Immutable fidelity spaces](fidelity-spaces.md) now provide workload/result
+bindings and durable preregistered calibration through the existing worker. The existing matmul repetition experiment
 cannot be relabeled as multi-fidelity training data.
 
 The implementation uses the installed **BoTorch 0.16.1**
@@ -121,8 +123,9 @@ evidence** and not an equal-budget strategy comparison.
 - Qualification of ranking/bias, quality, memory, thermal behavior and context
   stability; repetition-only or rank-reversing groups remain ineligible.
 - Verified cost intervals and their uncertainty; finite-space group selection.
-- Durable mixed-fidelity ProbePlans, workload/result bindings, per-device budget
-  accounting, cancellation/recovery and independent target confirmation.
+- Automatic MF-KG selection through the durable mixed-workload ProbePlans. The
+  calibration strategy now implements bindings, budget accounting, cancellation
+  and independent target confirmation; its new path still needs a live trial.
 - Held-out calibration and real equal-budget comparison with fixed-level qLogNEI.
 
 Until those gates have direct evidence, `Studies.create(strategy="mfkg")` keeps

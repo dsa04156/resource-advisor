@@ -164,6 +164,26 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
     def fidelity_assessment(ref: str, p=Depends(principal)):
         return fidelity.assess(p.project, ref)
 
+    from .fidelity_space import FidelityEvidenceRequest, FidelitySpace, FidelitySpaces
+
+    fidelity_spaces = FidelitySpaces(service)
+
+    @app.post(PREFIX + "/fidelity-spaces")
+    def create_fidelity_space(value: FidelitySpace, p=Depends(operator)):
+        return fidelity_spaces.create(p.project, value)
+
+    @app.get(PREFIX + "/fidelity-spaces/{ref}")
+    def get_fidelity_space(ref: str, p=Depends(principal)):
+        return fidelity_spaces.get(p.project, ref)
+
+    @app.get(PREFIX + "/fidelity-spaces/{ref}/options/{option_ref}")
+    def resolve_fidelity_option(ref: str, option_ref: str, p=Depends(principal)):
+        return fidelity_spaces.resolve(p.project, ref, option_ref)
+
+    @app.post(PREFIX + "/fidelity-spaces/{ref}/evidence")
+    def bind_fidelity_evidence(ref: str, value: FidelityEvidenceRequest, p=Depends(principal)):
+        return fidelity_spaces.evidence(p.project, ref, value)
+
     @app.post(PREFIX + "/capabilities")
     def register_capability(value: CapabilitySnapshot, p=Depends(operator)):
         return service.register("capability", value, p.project)

@@ -299,12 +299,23 @@ class ReplicationPolicy(Contract):
 
 class StudyRequest(Contract):
     workload_ref: Ref
-    strategy: Literal["lookup", "random", "qlognei", "adaptive_replication", "mfkg", "rgpe"]
+    strategy: Literal[
+        "lookup",
+        "random",
+        "qlognei",
+        "adaptive_replication",
+        "fidelity_calibration",
+        "mfkg",
+        "rgpe",
+    ]
     seed: int = 0
     replication: ReplicationPolicy | None = None
+    fidelity_space_ref: Ref | None = None
 
     @model_validator(mode="after")
     def strategy_options(self):
         if (self.strategy == "adaptive_replication") != (self.replication is not None):
             raise ValueError("replication options are required only for adaptive_replication")
+        if (self.strategy == "fidelity_calibration") != (self.fidelity_space_ref is not None):
+            raise ValueError("fidelity space is required only for fidelity_calibration")
         return self

@@ -37,6 +37,8 @@ class Studies:
         request_body = request.model_dump(mode="json")
         if request.replication is None:
             request_body.pop("replication")
+        if request.fidelity_space_ref is None:
+            request_body.pop("fidelity_space_ref")
         request_digest = signature(request_body)
         if request.strategy in {"mfkg", "rgpe"}:
             raise Rejected(
@@ -96,6 +98,35 @@ class Studies:
                 len(eligible) * request.replication.minimum_runs
             ):
                 raise Rejected("probe budget must cover the replication initial design")
+            fidelity = None
+            fidelity_schedule = None
+            if request.strategy == "fidelity_calibration":
+                from .fidelity_space import FidelitySpaces
+
+                fidelity = required(
+                    self.store, conn, "fidelity_space", request.fidelity_space_ref, project
+                )
+                FidelitySpaces(self.service)._check_bindings(conn, project, fidelity, current=True)
+                if fidelity["request"]["target_workload_ref"] != spec.ref:
+                    raise Rejected("fidelity space target differs from study workload")
+                if set(eligible) != {o["candidate_ref"] for o in fidelity["options"]}:
+                    raise Rejected(
+                        "all calibration configurations must fit the eligible candidate budget"
+                    )
+                if policy.max_probes < 3 * len(fidelity["options"]):
+                    raise Rejected("calibration requires three independent blocks for every option")
+                if (
+                    policy.final_validation_seconds
+                    < len(eligible) * spec.quality.minimum_repeats * 3
+                ):
+                    raise Rejected("final budget must cover every calibration configuration")
+                rng, fidelity_schedule = random.Random(request.seed), []
+                for block in range(3):
+                    order = sorted(o["ref"] for o in fidelity["options"])
+                    rng.shuffle(order)
+                    fidelity_schedule.extend(
+                        {"option_ref": option, "block": block} for option in order
+                    )
             ref = "study-" + uuid4().hex
             body = {
                 "request": request_body,
@@ -117,6 +148,12 @@ class Studies:
                 "recommendation_ref": None,
                 "final_validation_reserved_seconds": policy.final_validation_seconds,
             }
+            if fidelity is not None:
+                body.update(
+                    fidelity_space=fidelity,
+                    fidelity_space_digest=signature(fidelity),
+                    fidelity_schedule=fidelity_schedule,
+                )
             conn.execute(
                 insert(studies).values(
                     id=ref,
@@ -233,7 +270,7 @@ class Studies:
                 self.service.submit(
                     project,
                     JobRequest(
-                        workload_ref=body["spec"]["ref"],
+                        workload_ref=plan.get("workload_ref", body["spec"]["ref"]),
                         candidate_ref=plan["candidate_ref"],
                         mode=plan["mode"],
                         study_ref=ref,
@@ -294,6 +331,18 @@ class Studies:
             "cost_source": source,
             "recorded_at": now().isoformat(),
         }
+        if "fidelity_space" in body:
+            obs.update(
+                workload_ref=plan["workload_ref"],
+                workload_digest=plan["workload_digest"],
+                option_ref=plan["option_ref"],
+                fidelity=plan["fidelity"],
+                block=plan.get("block"),
+                evaluation_wall_seconds=(
+                    datetime.fromisoformat(jb["finished_at"])
+                    - datetime.fromisoformat(jb["created_at"])
+                ).total_seconds(),
+            )
         body["observations"].append(obs)
         body["active_plan"] = None
         state = "CONFIRMING" if body["confirmation_schedule"] is not None else "EXPLORING"
@@ -318,6 +367,8 @@ class Studies:
     def _plan(self, ref, token):
         with self.store.transaction() as conn:
             row = self.store.study(conn, ref)
+            if row["state"] != "PLANNING" or row["body"].get("planning_token") != token:
+                raise Conflict("study planning lease changed")
             body = copy.deepcopy(row["body"])
             spec = WorkloadSpec.model_validate(body["spec"])
             candidates = [c for c in spec.candidates if c.ref in body["eligible"]]
@@ -326,10 +377,29 @@ class Studies:
                 args = self.service.bundle(conn, row["project"], spec.ref, c.ref)
                 if not compatibility(*args):
                     qualified.append(c)
+            if "fidelity_space" in body:
+                from .fidelity_space import FidelitySpaces
+
+                try:
+                    FidelitySpaces(self.service)._check_bindings(
+                        conn, row["project"], body["fidelity_space"], current=True
+                    )
+                except Rejected:
+                    self.store.change_study(
+                        conn,
+                        row,
+                        "ABSTAINED",
+                        dict(body, stop_reason="FIDELITY_EXECUTION_CONTEXT_CHANGED"),
+                    )
+                    return
         policy = spec.profiling
         remaining = (datetime.fromisoformat(body["deadline_at"]) - now()).total_seconds()
         probes = [o for o in body["observations"] if o["mode"] == "pilot"]
         strategy = body["request"]["strategy"]
+        calibrating = strategy == "fidelity_calibration"
+        calibration_complete = calibrating and len(probes) == len(body["fidelity_schedule"])
+        if calibrating and any(not self._feasible(o, spec) for o in probes):
+            return self._abstain(ref, token, body, "FIDELITY_CALIBRATION_CELL_FAILED")
         replication_choice = None
         if strategy == "adaptive_replication" and body["confirmation_schedule"] is None:
             if {c.ref for c in qualified} != set(body["eligible"]):
@@ -357,8 +427,14 @@ class Studies:
             or strategy == "lookup"
             or device_probe_budget_exhausted
             or (replication_choice and replication_choice["stop_exploration"])
+            or calibration_complete
         ):
+            if calibrating and not calibration_complete:
+                return self._abstain(ref, token, body, "INCOMPLETE_FIDELITY_CALIBRATION_BUDGET")
             good = [o for o in probes if self._feasible(o, spec)]
+            if calibrating:
+                # Never compare raw short-run latency with the target workload.
+                good = [o for o in good if o["fidelity"] == 1]
             if replication_choice:
                 good = [o for o in good if o["candidate_ref"] not in replication_choice["excluded"]]
                 body["exploration_stop_reason"] = (
@@ -387,7 +463,11 @@ class Studies:
                 finalist = None
             if finalist is None:
                 return self._abstain(ref, token, body, "NO_MEASURED_FEASIBLE_CONFIG")
-            selected = list(dict.fromkeys([spec.baseline_candidate_ref, finalist]))
+            selected = (
+                body["eligible"]
+                if calibrating
+                else list(dict.fromkeys([spec.baseline_candidate_ref, finalist]))
+            )
             schedule = selected * spec.quality.minimum_repeats
             random.Random(body["request"]["seed"]).shuffle(schedule)
             body["confirmation_schedule"] = schedule
@@ -419,6 +499,22 @@ class Studies:
             ).total_seconds()
             available_wall = (
                 min(remaining, policy.final_validation_seconds - final_elapsed) / remaining_steps
+            )
+        elif calibrating:
+            slot = body["fidelity_schedule"][len(probes)]
+            option = next(
+                o for o in body["fidelity_space"]["options"] if o["ref"] == slot["option_ref"]
+            )
+            choice = {
+                "candidate_ref": option["candidate_ref"],
+                "option_ref": option["ref"],
+                "fidelity": option["fidelity"],
+                "block": slot["block"],
+                "reason": "PREREGISTERED_FIDELITY_CALIBRATION",
+                "planning_seconds": 0,
+            }
+            available_wall = (remaining - policy.final_validation_seconds) / (
+                len(body["fidelity_schedule"]) - len(probes)
             )
         else:
             choice = replication_choice or ask(
@@ -453,11 +549,39 @@ class Studies:
         if run_limit < 1 or queue_limit < 1:
             return self._abstain(ref, token, body, "RESERVED_CONFIRMATION_BUDGET_PROTECTED")
         plan_ref = "plan-" + uuid4().hex
+        execution_spec = spec
+        binding = None
+        if calibrating:
+            option = next(
+                o
+                for o in body["fidelity_space"]["options"]
+                if o["candidate_ref"] == candidate.ref
+                and (o["fidelity"] == 1 if confirming else o["ref"] == choice["option_ref"])
+            )
+            binding = next(
+                b for b in body["fidelity_space"]["bindings"] if b["option_ref"] == option["ref"]
+            )
+            with self.store.transaction() as conn:
+                execution_spec = WorkloadSpec.model_validate(
+                    required(self.store, conn, "workload", binding["workload_ref"], row["project"])
+                )
+            run_limit = min(
+                run_limit,
+                execution_spec.profiling.max_wall_seconds_per_candidate,
+                execution_spec.execution.max_run_seconds,
+            )
+            queue_limit = min(
+                queue_limit,
+                execution_spec.profiling.max_queue_seconds,
+                execution_spec.execution.max_queue_seconds,
+            )
+            collection = min(collection, execution_spec.execution.max_collection_seconds)
         plan = {
             "ref": plan_ref,
             "study_ref": ref,
             "candidate_ref": candidate.ref,
-            "workload_digest": signature(spec),
+            "workload_digest": signature(execution_spec),
+            "workload_ref": execution_spec.ref,
             "mode": "confirmation" if confirming else "pilot",
             "choice": choice,
             "device_unit": unit["unit"],
@@ -476,6 +600,13 @@ class Studies:
             "checkpoint_digest": policy.checkpoint_digest,
             "created_at": now().isoformat(),
         }
+        if binding is not None:
+            plan.update(
+                option_ref=binding["option_ref"],
+                fidelity=option["fidelity"],
+                block=choice.get("block"),
+                fidelity_space_digest=body["fidelity_space_digest"],
+            )
         with self.store.transaction() as conn:
             current = self.store.study(conn, ref)
             if current["state"] != "PLANNING" or current["body"].get("planning_token") != token:
