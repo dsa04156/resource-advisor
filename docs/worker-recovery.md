@@ -135,8 +135,10 @@ are not a global distributed leader election mechanism.
 If the preparation/acceptance boundary is not observed, record an invalid test
 attempt; do not report a process crash or silently create replacement work.
 This trial proves one Kubernetes submission-response crash boundary. Slurm
-crash recovery, node disconnection, concurrent workers, cancellation crashes and
-an optimization loop interrupted between suggestions remain distinct open gates.
+crash recovery, node disconnection, cancellation crashes and an optimization loop
+interrupted between suggestions remain distinct open gates. A subsequent
+[two-worker trial](concurrent-workers.md) verifies one cooperating Kubernetes
+execution; live expired-lease external-service fencing remains unqualified.
 
 The worker also handles SIGTERM after completing its current cycle and writes
 readiness only after that cycle. A hung cycle becomes unready without automatic

@@ -1,0 +1,298 @@
+{
+  "schema_version": "concurrent-workers-v1",
+  "implementation_commit": "89b44c15ffb9142b02f10666eeda1d9b1dea172b",
+  "software_regressions": [
+    "late submit acknowledgement cannot reopen completed or canceled work",
+    "late acknowledgement cannot reset RUNNING to QUEUED",
+    "stale backend observation cannot regress newer state",
+    "concurrent PostgreSQL result insertion preserves immutable evidence",
+    "eight simultaneous PostgreSQL outbox claims produce one owner; old lease completion cannot finish its successor"
+  ],
+  "software_tests": {
+    "sqlite_passed": 517,
+    "sqlite_postgres_only_skipped": 2,
+    "postgres_passed": 519,
+    "exact_implementation_ci": {
+      "run_id": 37078858526,
+      "status": "success",
+      "python": [
+        "3.11",
+        "3.13"
+      ]
+    }
+  },
+  "live": {
+    "job_id": "j-e9874e47045a41fb9b86967f565a6200",
+    "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+    "mlflow_run_id": "5b51bdddb5634991ab3faddf1de35c2d",
+    "state": "SUCCEEDED",
+    "gpu_model": "NVIDIA GeForce RTX 5080",
+    "gpu_job_count": 1,
+    "gpu_pod_count": 1,
+    "worker_count": 2,
+    "worker_restarts": [
+      0,
+      0
+    ],
+    "events": [
+      {
+        "kind": "submit",
+        "status": "DONE",
+        "tries": 1
+      },
+      {
+        "kind": "release_termination",
+        "status": "DONE",
+        "tries": 1
+      },
+      {
+        "kind": "artifact",
+        "status": "DONE",
+        "tries": 1
+      },
+      {
+        "kind": "mlflow",
+        "status": "DONE",
+        "tries": 1
+      },
+      {
+        "kind": "mlflow_artifact",
+        "status": "DONE",
+        "tries": 2
+      }
+    ],
+    "trace": [
+      {
+        "action": "started",
+        "worker": "a",
+        "at": "2026-10-02T23:43:12.079906+00:00",
+        "pid": 1
+      },
+      {
+        "action": "started",
+        "worker": "b",
+        "at": "2026-10-02T23:43:12.127262+00:00",
+        "pid": 1
+      },
+      {
+        "action": "claim",
+        "worker": "b",
+        "at": "2026-10-02T23:43:53.141941+00:00",
+        "kind": "submit",
+        "event_id": "submit-a-eb13c5771d3d441584b793fcaef73fbd",
+        "tries": 1
+      },
+      {
+        "action": "submit_started",
+        "worker": "b",
+        "at": "2026-10-02T23:43:53.181898+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd"
+      },
+      {
+        "action": "submit_returned",
+        "worker": "b",
+        "at": "2026-10-02T23:43:53.352801+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "external_id": "a-eb13c5771d3d441584b793fcaef73fbd"
+      },
+      {
+        "action": "observed",
+        "worker": "b",
+        "at": "2026-10-02T23:43:53.520956+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "QUEUED"
+      },
+      {
+        "action": "observed",
+        "worker": "a",
+        "at": "2026-10-02T23:43:58.371355+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "RUNNING"
+      },
+      {
+        "action": "observed",
+        "worker": "b",
+        "at": "2026-10-02T23:43:58.820370+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "RUNNING"
+      },
+      {
+        "action": "observed",
+        "worker": "a",
+        "at": "2026-10-02T23:44:03.517206+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "RUNNING"
+      },
+      {
+        "action": "observed",
+        "worker": "b",
+        "at": "2026-10-02T23:44:03.935958+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "RUNNING"
+      },
+      {
+        "action": "observed",
+        "worker": "a",
+        "at": "2026-10-02T23:44:08.656884+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "RUNNING"
+      },
+      {
+        "action": "observed",
+        "worker": "b",
+        "at": "2026-10-02T23:44:09.058795+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "RUNNING"
+      },
+      {
+        "action": "observed",
+        "worker": "a",
+        "at": "2026-10-02T23:44:13.789184+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "RUNNING"
+      },
+      {
+        "action": "observed",
+        "worker": "b",
+        "at": "2026-10-02T23:44:14.210025+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "RUNNING"
+      },
+      {
+        "action": "observed",
+        "worker": "a",
+        "at": "2026-10-02T23:44:18.946731+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "RUNNING"
+      },
+      {
+        "action": "observed",
+        "worker": "b",
+        "at": "2026-10-02T23:44:19.317445+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "RUNNING"
+      },
+      {
+        "action": "observed",
+        "worker": "a",
+        "at": "2026-10-02T23:44:24.138724+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "RUNNING"
+      },
+      {
+        "action": "observed",
+        "worker": "b",
+        "at": "2026-10-02T23:44:24.434738+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "RUNNING"
+      },
+      {
+        "action": "observed",
+        "worker": "a",
+        "at": "2026-10-02T23:44:29.274652+00:00",
+        "attempt_id": "a-eb13c5771d3d441584b793fcaef73fbd",
+        "state": "COLLECTING"
+      },
+      {
+        "action": "claim",
+        "worker": "a",
+        "at": "2026-10-02T23:44:29.379998+00:00",
+        "kind": "release_termination",
+        "event_id": "release-a-eb13c5771d3d441584b793fcaef73fbd",
+        "tries": 1
+      },
+      {
+        "action": "claim",
+        "worker": "a",
+        "at": "2026-10-02T23:44:29.472598+00:00",
+        "kind": "artifact",
+        "event_id": "artifact-a-eb13c5771d3d441584b793fcaef73fbd",
+        "tries": 1
+      },
+      {
+        "action": "claim",
+        "worker": "b",
+        "at": "2026-10-02T23:44:29.488710+00:00",
+        "kind": "mlflow",
+        "event_id": "mlflow-a-eb13c5771d3d441584b793fcaef73fbd",
+        "tries": 1
+      },
+      {
+        "action": "claim",
+        "worker": "a",
+        "at": "2026-10-02T23:44:29.524284+00:00",
+        "kind": "mlflow_artifact",
+        "event_id": "mlflow-artifact-a-eb13c5771d3d441584b793fcaef73fbd",
+        "tries": 1
+      },
+      {
+        "action": "claim",
+        "worker": "a",
+        "at": "2026-10-02T23:44:34.579212+00:00",
+        "kind": "mlflow_artifact",
+        "event_id": "mlflow-artifact-a-eb13c5771d3d441584b793fcaef73fbd",
+        "tries": 2
+      }
+    ],
+    "measurements": {
+      "elapsed_seconds": 0.0002704929793253541,
+      "peak_memory_mib": 9.125,
+      "quality_value": 1.0,
+      "sample_count": 20,
+      "work_units": 20,
+      "latency_p50_ms": 0.013201497495174408,
+      "latency_p95_ms": 0.014605990145355463,
+      "latency_p99_ms": 0.014605990145355463,
+      "throughput": 73939.07246643773,
+      "gpu_utilization": null,
+      "power_watts": null,
+      "temperature_celsius": null
+    },
+    "application_gpu_reservation_seconds": 32.0,
+    "qualification_gpu_reservation_seconds": 31.0,
+    "total_gpu_reservation_seconds": 63.0,
+    "qualification_exit_code": 0,
+    "preparation_wait_seconds_per_attempt": 30,
+    "allocation_mode": "physical_device",
+    "usage_rows": 1,
+    "mlflow_runs": 1,
+    "artifact_digest": "sha256:64f857caee798a286056ced4ab09ca954c95b691eca1081bcb0ba2550b588670",
+    "artifact_bytes_equal": [
+      "S3",
+      "HTTPS API",
+      "MLflow"
+    ],
+    "kueue_conditions": {
+      "QuotaReserved": "True",
+      "Admitted": "True",
+      "Finished": "True",
+      "PodsReady": "True"
+    },
+    "checks": {
+      "two_workers_observed_running": true,
+      "sole_submit": true,
+      "sole_job_and_pod": true,
+      "idempotent_replay": true,
+      "sole_ledger_and_mlflow": true,
+      "artifact_bytes_match": true,
+      "quota_unchanged": true
+    }
+  },
+  "deployment": {
+    "image_digest": "sha256:24c32aced0f6970d95ad7198ad699738d11cbd628a15863e64a0c4534ec01618",
+    "source_tree_sha256": "5f4f4c1cd4d8759c89c9777422d27b7cc5be5f1cfe78e6dcd221fd1e3973a951",
+    "api_and_worker_source_hashes_verified": true,
+    "normal_worker_replicas": 1,
+    "health_http": 200,
+    "cleanup": {
+      "temporary_workers_removed": true,
+      "temporary_trace_config_removed": true,
+      "normal_single_worker_restored": true,
+      "api_and_worker_source_verified": true,
+      "no_active_jobs_or_pending_outbox": true,
+      "quota_unchanged_and_idle": true,
+      "result_still_terminal_and_bytes_match": true
+    }
+  },
+  "scope": "One real GPU attempt with two cooperating Kubernetes workers; no live lease expiry, process crash, disconnected node, Slurm or HA qualification. Synthetic adversarial interleavings and real concurrent PostgreSQL tests are reported separately."
+}
