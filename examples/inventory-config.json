@@ -1,0 +1,23 @@
+{
+  "project_ref": "team-a",
+  "cluster_ref": "lab-kubernetes",
+  "node_refs": ["gpu-worker-a"],
+  "kubeconfig": "/path/to/private/inventory-kubeconfig.json",
+  "queue_namespaces": ["resource-advisor-lab"],
+  "stale_after_seconds": 120,
+  "resource_types": {
+    "nvidia.com/gpu": {"device_class": "gpu", "allocation_mode": "physical_device"},
+    "nvidia.com/gpu.shared": {"device_class": "gpu", "allocation_mode": "virtual_slot"},
+    "hailo.ai/h8": {"device_class": "npu", "allocation_mode": "physical_device"}
+  },
+  "prometheus_url": "http://127.0.0.1:9090",
+  "metrics": [{
+    "node_ref": "gpu-worker-a",
+    "device_ref": "node",
+    "name": "memory_available_bytes",
+    "unit": "bytes",
+    "query": "node_memory_MemAvailable_bytes{job=\"node-exporter\",instance=\"gpu-worker-a:9100\"}",
+    "timestamp_query": "timestamp(node_memory_MemAvailable_bytes{job=\"node-exporter\",instance=\"gpu-worker-a:9100\"})",
+    "health_query": "up{job=\"node-exporter\",instance=\"gpu-worker-a:9100\"}"
+  }]
+}

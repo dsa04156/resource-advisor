@@ -33,7 +33,13 @@ def main():
     worker = sub.add_parser("worker")
     worker.add_argument("--config", required=True, help="private backend routes")
     worker.add_argument("--once", action="store_true")
+    inventory = sub.add_parser("collect-inventory")
+    inventory.add_argument("--config", required=True, help="private read-only inventory sources")
+    inventory.add_argument("--once", action="store_true")
+    inventory.add_argument("--interval-seconds", type=int, default=30)
     args = parser.parse_args()
+    if args.action == "collect-inventory" and args.interval_seconds < 5:
+        parser.error("inventory polling interval must be at least 5 seconds")
     if args.action == "serve" and bool(args.ssl_keyfile) != bool(args.ssl_certfile):
         parser.error("--ssl-keyfile and --ssl-certfile must be provided together")
     if args.database.startswith("sqlite:///."):
@@ -44,6 +50,27 @@ def main():
         print("Independent Resource Advisor schema initialized.")
         return
     service = Service(store)
+    if args.action == "collect-inventory":
+        from .inventory import InventoryCollector, InventoryConfig, save_inventory
+
+        config = InventoryConfig.model_validate_json(Path(args.config).read_text())
+        collector = InventoryCollector(config)
+        while True:
+            snapshot = collector.collect()
+            save_inventory(store, config.project_ref, snapshot)
+            print(
+                json.dumps(
+                    {
+                        "ref": snapshot["ref"],
+                        "status": snapshot["status"],
+                        "node_count": len(snapshot["nodes"]),
+                    }
+                ),
+                flush=True,
+            )
+            if args.once:
+                return
+            time.sleep(args.interval_seconds)
     if args.action == "backfill-usage":
         print(json.dumps({"inserted": store.backfill_usage()}))
         return

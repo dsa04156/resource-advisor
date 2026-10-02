@@ -1,0 +1,2025 @@
+{
+  "kind": "actual_lab_observation",
+  "captured_at": "2026-10-02T07:41:11.859879+00:00",
+  "snapshot_status": "ok",
+  "verification": {
+    "postgresql_roundtrip": true,
+    "http_authenticated": true,
+    "https_certificate_verified": true,
+    "unauthenticated_status": 401
+  },
+  "limitations": [
+    "Device telemetry does not qualify an executable model.",
+    "Reported zero is exporter evidence, not sensor calibration.",
+    "Absent metric means unknown.",
+    "No per-job utilization attribution.",
+    "No Slurm inventory in this trial."
+  ],
+  "nodes": [
+    {
+      "node_alias": "node-01",
+      "architecture": "arm64",
+      "ready": {
+        "value": true,
+        "observed_at": "2026-10-02T07:41:11.859879+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+      },
+      "resources": {
+        "cpu": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 6.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 6.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.755,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 5.245,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "ephemeral-storage": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 502085459968.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 451876913224.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 451876913224.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "memory": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 7990005760.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 7885148160.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 406847488.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 7478300672.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "nvidia.com/gpu.shared": {
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "capacity": {
+            "value": 2.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 2.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 2.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "pods": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 9.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 101.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        }
+      },
+      "telemetry": {
+        "cpu_usage_cores": {
+          "value": 0.285917969,
+          "observed_at": "2026-10-02T07:40:15Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "cores"
+        },
+        "memory_working_set_bytes": {
+          "value": 1619247104.0,
+          "observed_at": "2026-10-02T07:40:15Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "node:memory_available_bytes": {
+          "value": 6639206400.0,
+          "observed_at": "2026-10-02T07:40:46.651000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "gpu-0:utilization": {
+          "value": 0.0,
+          "observed_at": "2026-10-02T07:41:05.739000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "percent"
+        }
+      }
+    },
+    {
+      "node_alias": "node-02",
+      "architecture": "arm64",
+      "ready": {
+        "value": true,
+        "observed_at": "2026-10-02T07:41:11.859879+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+      },
+      "resources": {
+        "cpu": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 4.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 4.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.72,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 3.28,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "ephemeral-storage": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 503208910848.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 452888019014.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 452888019014.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "hailo.ai/h8": {
+          "device_class": "npu",
+          "allocation_mode": "physical_device",
+          "capacity": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "memory": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 17002577920.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 16897720320.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 314572800.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 16583147520.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "pods": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 7.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 103.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        }
+      },
+      "telemetry": {
+        "cpu_usage_cores": {
+          "value": 0.041885321,
+          "observed_at": "2026-10-02T07:40:15Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "cores"
+        },
+        "memory_working_set_bytes": {
+          "value": 1114341376.0,
+          "observed_at": "2026-10-02T07:40:15Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "node:memory_available_bytes": {
+          "value": 16091447296.0,
+          "observed_at": "2026-10-02T07:40:55.642000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "node_alias": "node-03",
+      "architecture": "arm64",
+      "ready": {
+        "value": true,
+        "observed_at": "2026-10-02T07:41:11.859879+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+      },
+      "resources": {
+        "cpu": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 4.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 4.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.765,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 3.235,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "ephemeral-storage": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 251763482624.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 226587133987.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 226587133987.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "memory": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 8454602752.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 8349745152.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 402653184.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 7947091968.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "pods": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 8.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 102.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        }
+      },
+      "telemetry": {
+        "cpu_usage_cores": {
+          "value": 0.024330918,
+          "observed_at": "2026-10-02T07:40:14Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "cores"
+        },
+        "memory_working_set_bytes": {
+          "value": 1048526848.0,
+          "observed_at": "2026-10-02T07:40:14Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "node:memory_available_bytes": {
+          "value": 7635517440.0,
+          "observed_at": "2026-10-02T07:40:46.776000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "node_alias": "node-04",
+      "architecture": "arm64",
+      "ready": {
+        "value": true,
+        "observed_at": "2026-10-02T07:41:11.859879+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+      },
+      "resources": {
+        "cpu": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 6.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 6.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.705,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 5.295,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "ephemeral-storage": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 127596531712.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 114836878351.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 114836878351.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "memory": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 4032139264.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 3927281664.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 260046848.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 3667234816.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "pods": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 5.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 105.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        }
+      },
+      "telemetry": {
+        "cpu_usage_cores": {
+          "value": 0.346241478,
+          "observed_at": "2026-10-02T07:40:11Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "cores"
+        },
+        "memory_working_set_bytes": {
+          "value": 1740853248.0,
+          "observed_at": "2026-10-02T07:40:11Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "node:memory_available_bytes": {
+          "value": 3044720640.0,
+          "observed_at": "2026-10-02T07:41:00.968000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "node_alias": "node-05",
+      "architecture": "arm64",
+      "ready": {
+        "value": true,
+        "observed_at": "2026-10-02T07:41:11.859879+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+      },
+      "resources": {
+        "cpu": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 12.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 12.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.725,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 11.275,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "ephemeral-storage": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 57806061568.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 52025455326.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 52025455326.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "memory": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 65932689408.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 65827831808.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 318767104.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 65509064704.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "nvidia.com/gpu.shared": {
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "capacity": {
+            "value": 2.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 2.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 2.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "pods": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 7.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 103.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        }
+      },
+      "telemetry": {
+        "cpu_usage_cores": {
+          "value": 0.223163065,
+          "observed_at": "2026-10-02T07:40:17Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "cores"
+        },
+        "memory_working_set_bytes": {
+          "value": 1873633280.0,
+          "observed_at": "2026-10-02T07:40:17Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "node:memory_available_bytes": {
+          "value": 63323611136.0,
+          "observed_at": "2026-10-02T07:41:10.255000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "gpu-0:utilization": {
+          "value": 0.0,
+          "observed_at": "2026-10-02T07:41:09.232000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "percent"
+        }
+      }
+    },
+    {
+      "node_alias": "node-06",
+      "architecture": "arm64",
+      "ready": {
+        "value": true,
+        "observed_at": "2026-10-02T07:41:11.859879+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+      },
+      "resources": {
+        "cpu": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 4.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 4.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.715,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 3.285,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "ephemeral-storage": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 30800633856.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 27720570425.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 27720570425.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "hailo.ai/h8": {
+          "device_class": "npu",
+          "allocation_mode": "physical_device",
+          "capacity": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "memory": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 4245831680.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 4140974080.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 293601280.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 3847372800.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "pods": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 6.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 104.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        }
+      },
+      "telemetry": {
+        "cpu_usage_cores": {
+          "value": 0.033916815,
+          "observed_at": "2026-10-02T07:40:14Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "cores"
+        },
+        "memory_working_set_bytes": {
+          "value": 946487296.0,
+          "observed_at": "2026-10-02T07:40:14Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "node:memory_available_bytes": {
+          "value": 3520135168.0,
+          "observed_at": "2026-10-02T07:40:50.169000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "node_alias": "node-07",
+      "architecture": "amd64",
+      "ready": {
+        "value": true,
+        "observed_at": "2026-10-02T07:41:11.859879+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+      },
+      "resources": {
+        "cpu": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 24.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 24.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 8.925,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 15.075,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "ephemeral-storage": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 501809635328.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 451628671048.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 451628671048.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "memory": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 134757564416.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 134652706816.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 17430478848.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 117222227968.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "nvidia.com/gpu": {
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "capacity": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "pods": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 76.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 34.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        }
+      },
+      "telemetry": {
+        "cpu_usage_cores": {
+          "value": 1.88033108,
+          "observed_at": "2026-10-02T07:40:16Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "cores"
+        },
+        "memory_working_set_bytes": {
+          "value": 28317691904.0,
+          "observed_at": "2026-10-02T07:40:16Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "node:memory_available_bytes": {
+          "value": 110613901312.0,
+          "observed_at": "2026-10-02T07:40:51.796000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "gpu-0:utilization": {
+          "value": 0.0,
+          "observed_at": "2026-10-02T07:41:06.782000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "percent"
+        },
+        "gpu-0:memory_used_bytes": {
+          "value": 330301440.0,
+          "observed_at": "2026-10-02T07:41:06.782000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "gpu-0:memory_free_bytes": {
+          "value": 7726956544.0,
+          "observed_at": "2026-10-02T07:41:06.782000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "gpu-0:power": {
+          "value": 4.103,
+          "observed_at": "2026-10-02T07:41:06.782000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "watts"
+        },
+        "gpu-0:temperature": {
+          "value": 38.0,
+          "observed_at": "2026-10-02T07:41:06.782000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "celsius"
+        }
+      }
+    },
+    {
+      "node_alias": "node-08",
+      "architecture": "amd64",
+      "ready": {
+        "value": true,
+        "observed_at": "2026-10-02T07:41:11.859879+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+      },
+      "resources": {
+        "cpu": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 24.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 24.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 1.615,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 22.385,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "ephemeral-storage": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 1030967009280.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 927870306816.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 927870306816.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "memory": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 32873136128.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 32768278528.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 1643118592.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 31125159936.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "nvidia.com/gpu": {
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "capacity": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "pods": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 36.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 74.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        }
+      },
+      "telemetry": {
+        "cpu_usage_cores": {
+          "value": 0.473158462,
+          "observed_at": "2026-10-02T07:40:12Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "cores"
+        },
+        "memory_working_set_bytes": {
+          "value": 7216840704.0,
+          "observed_at": "2026-10-02T07:40:12Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "node:memory_available_bytes": {
+          "value": 27425443840.0,
+          "observed_at": "2026-10-02T07:40:48.075000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "gpu-0:utilization": {
+          "value": 0.0,
+          "observed_at": "2026-10-02T07:41:09.358000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "percent"
+        },
+        "gpu-0:memory_used_bytes": {
+          "value": 14680064.0,
+          "observed_at": "2026-10-02T07:41:09.358000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "gpu-0:memory_free_bytes": {
+          "value": 16594763776.0,
+          "observed_at": "2026-10-02T07:41:09.358000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "gpu-0:power": {
+          "value": 3.803,
+          "observed_at": "2026-10-02T07:41:09.358000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "watts"
+        },
+        "gpu-0:temperature": {
+          "value": 30.0,
+          "observed_at": "2026-10-02T07:41:09.358000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "celsius"
+        }
+      }
+    },
+    {
+      "node_alias": "node-09",
+      "architecture": "arm64",
+      "ready": {
+        "value": true,
+        "observed_at": "2026-10-02T07:41:11.859879+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+      },
+      "resources": {
+        "cpu": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 20.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 20.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 1.385,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 18.615,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "ephemeral-storage": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 4031871553536.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 3628684392175.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 3628684392175.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "memory": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 130663170048.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 130558312448.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 1164967936.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 129393344512.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "nvidia.com/gpu": {
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "capacity": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "pods": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 17.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 93.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        }
+      },
+      "telemetry": {
+        "cpu_usage_cores": {
+          "value": 0.259323302,
+          "observed_at": "2026-10-02T07:40:16Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "cores"
+        },
+        "memory_working_set_bytes": {
+          "value": 2691407872.0,
+          "observed_at": "2026-10-02T07:40:16Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "node:memory_available_bytes": {
+          "value": 126582788096.0,
+          "observed_at": "2026-10-02T07:40:51.347000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "node_alias": "node-10",
+      "architecture": "amd64",
+      "ready": {
+        "value": true,
+        "observed_at": "2026-10-02T07:41:11.859879+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+      },
+      "resources": {
+        "cpu": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 16.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 16.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 1.805,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 14.195,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "ephemeral-storage": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 470307422208.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 423276679287.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 423276679287.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "memory": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 33418375168.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 33313517568.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 2213543936.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 31099973632.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "mobilint.com/npu": {
+          "device_class": "npu",
+          "allocation_mode": "physical_device",
+          "capacity": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 0.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 1.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        },
+        "pods": {
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "capacity": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "allocatable": {
+            "value": 110.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "requested": {
+            "value": 16.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          },
+          "request_headroom": {
+            "value": 94.0,
+            "observed_at": "2026-10-02T07:41:11.859879+00:00",
+            "source": "kubernetes",
+            "status": "ok",
+            "unit": null
+          }
+        }
+      },
+      "telemetry": {
+        "cpu_usage_cores": {
+          "value": 0.661931639,
+          "observed_at": "2026-10-02T07:40:11Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "cores"
+        },
+        "memory_working_set_bytes": {
+          "value": 5629067264.0,
+          "observed_at": "2026-10-02T07:40:11Z",
+          "source": "metrics_api",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "node:memory_available_bytes": {
+          "value": 29025726464.0,
+          "observed_at": "2026-10-02T07:41:04.800000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "npu-0:utilization": {
+          "value": 0.0,
+          "observed_at": "2026-10-02T07:41:12.553000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "percent"
+        },
+        "npu-0:memory_used_bytes": {
+          "value": 0.0,
+          "observed_at": "2026-10-02T07:41:12.553000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "bytes"
+        },
+        "npu-0:temperature": {
+          "value": 59.0,
+          "observed_at": "2026-10-02T07:41:12.553000+00:00",
+          "source": "prometheus",
+          "status": "ok",
+          "unit": "celsius"
+        }
+      }
+    }
+  ],
+  "queue": {
+    "active_count": 0,
+    "status": "ok"
+  }
+}

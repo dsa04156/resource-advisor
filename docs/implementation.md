@@ -9,7 +9,7 @@ No private design document or site configuration belongs in this repository.
 
 | Milestone | Required evidence | Current evidence |
 |---|---|---|
-| M0 | Read-only inventory, versions, allowlists, separate backend pools | Versions and bounded hardware checks verified; automated inventory pending |
+| M0 | Read-only inventory, versions, allowlists, separate backend pools | Read-only Kubernetes/Prometheus inventory and project API verified; Slurm inventory/full hardware discovery pending |
 | M1 | KFP launcher → API → suspended Kubernetes Job → result + MLflow | Actual uncached KFP → API → Kueue → RTX 5080 → S3/MLflow verified, including replay |
 | M2 | Slurm submission/status/cancel/results on qualified GPU/NPU | GPU F0/accounting historical proof; native guard and result transport implemented; controller unreachable, full model/API path pending |
 | M3 | Actual Kueue and Slurm quota/account enforcement, unit-separated ledger | Bounded live quota/priority trials and terminal ledger verified; cross-project isolation and full costs pending |

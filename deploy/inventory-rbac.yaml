@@ -1,0 +1,59 @@
+# Lab observer only. The API never receives this credential.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ra-inventory
+  namespace: resource-advisor-lab
+  labels: {app.kubernetes.io/part-of: resource-advisor}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: resource-advisor-inventory
+  labels: {app.kubernetes.io/part-of: resource-advisor}
+rules:
+  - apiGroups: [""]
+    resources: [nodes, pods]
+    verbs: [get, list]
+  - apiGroups: [metrics.k8s.io]
+    resources: [nodes]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: resource-advisor-inventory
+  labels: {app.kubernetes.io/part-of: resource-advisor}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: resource-advisor-inventory
+subjects:
+  - kind: ServiceAccount
+    name: ra-inventory
+    namespace: resource-advisor-lab
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ra-inventory-queues
+  namespace: resource-advisor-lab
+  labels: {app.kubernetes.io/part-of: resource-advisor}
+rules:
+  - apiGroups: [kueue.x-k8s.io]
+    resources: [workloads]
+    verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ra-inventory-queues
+  namespace: resource-advisor-lab
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ra-inventory-queues
+subjects:
+  - kind: ServiceAccount
+    name: ra-inventory
+    namespace: resource-advisor-lab

@@ -92,6 +92,15 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
         with service.store.transaction() as conn:
             return [r["body"] for r in service.store.list(conn, "capability", p.project)]
 
+    @app.get(PREFIX + "/inventory/{cluster_ref}")
+    def inventory(cluster_ref: str, p=Depends(principal)):
+        from .inventory import latest_inventory
+
+        snapshot = latest_inventory(service.store, p.project, cluster_ref)
+        if snapshot is None:
+            raise HTTPException(404, "Inventory not found")
+        return snapshot
+
     @app.post(PREFIX + "/variants")
     def register_variant(value: RuntimeVariant, p=Depends(operator)):
         return service.register("variant", value, p.project)

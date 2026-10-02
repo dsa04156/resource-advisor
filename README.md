@@ -17,6 +17,9 @@ oversized admission refusal and high-before-normal execution.
 [Terminal accounting](docs/accounting.md) retains failed/cancelled attempts and
 distinguishes observed allocation from requested resources and unknown data.
 
+[Read-only inventory](docs/inventory.md) now separates scheduler requests from
+measured CPU/memory/GPU/NPU telemetry and returns unknown for stale data.
+
 ## Responsibility
 
 The service validates workload/environment contracts, submits a selected
