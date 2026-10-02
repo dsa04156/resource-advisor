@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-02",
+  "evidence_kind": "live_slurm_gpu_qualification",
+  "slurm_version": "24.11.5",
+  "slurmdbd_version": "24.11.5",
+  "database": "MariaDB 10.11.14",
+  "scope": "CUDA F0 runtime verification; not a model or performance benchmark",
+  "source_sha256": "132102d06e779523fa80ec56bbae5227d684bceb9ba92322860202ddd8ab1235",
+  "job_state": "COMPLETED",
+  "exit_code": "0:0",
+  "allocated_tres": "billing=1,cpu=1,gres/gpu=1,mem=512M,node=1",
+  "start": "2026-10-02T05:34:47+0000",
+  "end": "2026-10-02T05:34:47+0000",
+  "timestamp_resolution": "one second; equal timestamps do not prove zero resource consumption",
+  "gpu_result": {
+    "phase": "F0",
+    "performance_measurement": false,
+    "cuda_devices": 1,
+    "driver_api": 13020,
+    "verified_elements": 4096,
+    "result": "PASS"
+  },
+  "adapter_status": {
+    "state": "COLLECTING",
+    "started_at": "2026-10-02T05:34:47+0000",
+    "finished_at": "2026-10-02T05:34:47+0000",
+    "error": null
+  },
+  "earlier_attempt": {
+    "state": "FAILED",
+    "exit_code": "127:0",
+    "cause": "CUDA toolkit compiler was not installed; retained in accounting history"
+  },
+  "policy_enforcement": "none; quota/priority acceptance tests remain pending",
+  "isolation_verified": false,
+  "site_identifiers": "omitted"
+}

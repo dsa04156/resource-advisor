@@ -65,6 +65,25 @@ def test_slurm_is_not_wrapped_in_kueue_and_quotes_payload(service):
     assert "kueue" not in script
 
 
+def test_slurm_accounting_requests_explicit_timezone(service):
+    job = row(service)
+    job["body"]["external_id"] = "15"
+
+    def execute(args, **_):
+        if args[0] == "squeue":
+            return ""
+        assert args[:4] == ["env", "TZ=UTC", "SLURM_TIME_FORMAT=%Y-%m-%dT%H:%M:%S%z", "sacct"]
+        return "15|COMPLETED|0:0|2026-10-02T05:00:00+0000|2026-10-02T05:00:02+0000"
+
+    backend = SlurmBackend(
+        partition="gpu", account="team-a", qos="lab", output_dir="/tmp/ra-test", execute=execute
+    )
+    result = backend.status(job)
+    assert result.state == "COLLECTING"
+    assert result.started_at.endswith("+0000")
+    assert result.finished_at.endswith("+0000")
+
+
 @pytest.mark.parametrize("text", ["", "RESOURCE_ADVISOR_RESULT {}\nRESOURCE_ADVISOR_RESULT {}"])
 def test_missing_or_duplicate_envelope_rejected(text):
     with pytest.raises(BackendError):

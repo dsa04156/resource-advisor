@@ -323,6 +323,10 @@ class SlurmBackend:
         self.output_dir, self.ssh_target, self.execute = output_dir, ssh_target, execute
 
     def call(self, argv, **kwargs):
+        if argv[0] == "sacct":
+            # Format database epochs in an explicit zone, independent of the SSH
+            # host's locale/timezone. Unqualified timestamps still remain unknown.
+            argv = ["env", "TZ=UTC", "SLURM_TIME_FORMAT=%Y-%m-%dT%H:%M:%S%z", *argv]
         if self.ssh_target:
             argv = [
                 "ssh",

@@ -16,8 +16,8 @@ direct evidence; conditional extensions require an explicit applicability result
 | Bottleneck diagnosis | CPU/data-loader/IO/accelerator evidence and uncertainty | Pending |
 | KFP launch | Real uncached workflow → API → Kueue admission → GPU job → result | Compilation verified; live chain blocked by existing storage image-pull failure |
 | Kueue policy | Real project LocalQueue/ClusterQueue/flavor/priority and over-quota tests | Pending |
-| Slurm execution | Actual sbatch/squeue/sacct/scancel, image/env lock, accelerator reservation | Adapter implemented; new service live validation pending |
-| Slurm policy | Accounting DB/association/QOS enforcement, priority and oversize rejection | Pending |
+| Slurm execution | Actual sbatch/squeue/sacct/scancel, image/env lock, accelerator reservation | Live GPU F0 and adapter accounting read verified; full API/model/result path pending |
+| Slurm policy | Accounting DB/association/QOS enforcement, priority and oversize rejection | SlurmDBD and lab association active; enforcement/priority tests pending |
 | Results/artifacts | Schema/digest/attempt/work units, artifact ownership and durable storage | 28 result bundles verified in S3/API; large models/checkpoints/retention pending |
 | MLflow | Actual parameters/metrics/artifacts/model links, outage recovery | 28 live runs and corresponding result artifacts verified; model registration/failure tracking pending |
 | Lookup recommendation | Comparable measured evidence, repeats, quality/memory gates, abstention | Tested |

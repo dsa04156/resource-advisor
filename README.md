@@ -7,7 +7,8 @@ for heterogeneous Kubernetes/KubeEdge and Slurm compute pools.
 Unit-test performance fixtures use explicitly synthetic data. A separate live
 experiment has run on a physical RTX 5080 through Kueue, with measured results
 in PostgreSQL and MLflow. See the [hardware report](docs/gpu-experiment.md) for
-failures, raw measurements and limits. NPU/Slurm qualification remains open.
+failures, raw measurements and limits. Separate [Slurm CUDA qualification](docs/slurm-verification.md)
+and accounting now have live evidence; its model/API path and NPU qualification remain open.
 
 ## Responsibility
 
