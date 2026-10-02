@@ -27,7 +27,9 @@
         "temperature_celsius": null
       },
       "gpu_reservation_seconds": 2.0,
-      "result_digest": "sha256:c3376485f4e8f983d464999630398eaf81d6357151827265a5e59eb47f192b20"
+      "result_digest": "sha256:c3376485f4e8f983d464999630398eaf81d6357151827265a5e59eb47f192b20",
+      "container_execution_seconds": 2.0,
+      "cost_boundary": "PodScheduled through container completion"
     },
     {
       "shape": 128,
@@ -47,8 +49,10 @@
         "power_watts": null,
         "temperature_celsius": null
       },
-      "gpu_reservation_seconds": 1.0,
-      "result_digest": "sha256:e8fe328c88766e09d3f37ffb9e2889e358ad0a54b7d608827963ba1c0b201426"
+      "gpu_reservation_seconds": 2.0,
+      "result_digest": "sha256:e8fe328c88766e09d3f37ffb9e2889e358ad0a54b7d608827963ba1c0b201426",
+      "container_execution_seconds": 1.0,
+      "cost_boundary": "PodScheduled through container completion"
     },
     {
       "shape": 128,
@@ -74,8 +78,10 @@
         "power_watts": null,
         "temperature_celsius": null
       },
-      "gpu_reservation_seconds": 1.0,
-      "result_digest": "sha256:0d6c182aeb2f8546526508e6832f0c66f2ad6e4414b03f707261ba04d896afa9"
+      "gpu_reservation_seconds": 2.0,
+      "result_digest": "sha256:0d6c182aeb2f8546526508e6832f0c66f2ad6e4414b03f707261ba04d896afa9",
+      "container_execution_seconds": 1.0,
+      "cost_boundary": "PodScheduled through container completion"
     },
     {
       "shape": 192,
@@ -95,8 +101,10 @@
         "power_watts": null,
         "temperature_celsius": null
       },
-      "gpu_reservation_seconds": 1.0,
-      "result_digest": "sha256:f7e2a42868f2a3c23ad354e80762ac73cfb2550c00c38e26751dab8ea9db7a1d"
+      "gpu_reservation_seconds": 2.0,
+      "result_digest": "sha256:f7e2a42868f2a3c23ad354e80762ac73cfb2550c00c38e26751dab8ea9db7a1d",
+      "container_execution_seconds": 1.0,
+      "cost_boundary": "PodScheduled through container completion"
     },
     {
       "shape": 192,
@@ -122,8 +130,10 @@
         "power_watts": null,
         "temperature_celsius": null
       },
-      "gpu_reservation_seconds": 2.0,
-      "result_digest": "sha256:7a67c522b89229351d506fc77ccb0e6c8b2dbbf914082e3365acafdf13fc3ce7"
+      "gpu_reservation_seconds": 3.0,
+      "result_digest": "sha256:7a67c522b89229351d506fc77ccb0e6c8b2dbbf914082e3365acafdf13fc3ce7",
+      "container_execution_seconds": 2.0,
+      "cost_boundary": "PodScheduled through container completion"
     },
     {
       "shape": 256,
@@ -143,8 +153,10 @@
         "power_watts": null,
         "temperature_celsius": null
       },
-      "gpu_reservation_seconds": 2.0,
-      "result_digest": "sha256:c0f5abc6def5dc673661c62552c807475f8debb48964d58fb351c37c625ca36f"
+      "gpu_reservation_seconds": 3.0,
+      "result_digest": "sha256:c0f5abc6def5dc673661c62552c807475f8debb48964d58fb351c37c625ca36f",
+      "container_execution_seconds": 2.0,
+      "cost_boundary": "PodScheduled through container completion"
     },
     {
       "shape": 256,
@@ -154,6 +166,8 @@
     }
   ],
   "no_source_or_target_study_submitted": true,
-  "total_f0_gpu_reservation_seconds": 9.0,
-  "next_protocol": "separate preregistered 0.5/1/2 CPU envelope; no reuse of these results as source observations"
+  "total_f0_gpu_reservation_seconds": 14.0,
+  "next_protocol": "separate preregistered 0.5/1/2 CPU envelope; no reuse of these results as source observations",
+  "total_f0_container_execution_seconds": 9.0,
+  "accounting_correction": "Initial report counted container execution time as reservation time. Preserved both fields; GPU reservation now begins at PodScheduled."
 }

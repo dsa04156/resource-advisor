@@ -164,3 +164,12 @@ The separate [second plan](evidence/transfer-gpu-plan-v2.json) uses CPU 0.5/1/2
 within that verified quota. The runner sets `max(1, int(requested_cpu))` PyTorch
 threads; fractional CPU remains enforced by the container CPU quota. Its source
 cohort is measured anew rather than importing favorable F0 timings.
+
+`examples/evaluate_transfer.py` audits a captured protocol offline before producing
+descriptive cost and post-hoc selection-regret summaries. It requires all declared
+study plans and accounting attempts, the frozen strategy order/seeds/budgets, the
+entire source confirmation cohort, and a feasible oracle measured after tuning.
+It rejects source, confirmation, future or oracle attempts in target GP training,
+and unknown GPU reservation costs. Source characterization, incremental target
+work and the post-hoc oracle remain separate. The synthetic report tests verify
+these checks; they are not hardware performance evidence.
