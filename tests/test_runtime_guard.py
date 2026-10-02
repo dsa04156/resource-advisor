@@ -34,9 +34,11 @@ def test_guard_executes_qualified_command_and_strips_credentials(tmp_path, monke
     monkeypatch.setenv("SLURM_JWT", "private-test-token")
     monkeypatch.setenv("PYTHONPATH", "/unqualified")
     monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "0")
+    monkeypatch.setenv("RA_SAMPLING_PLAN_JSON", '{"policy_ref":"qualified"}')
     env = verify(path, checksum, manifest["environment_digest"], command)
     assert "RA_API_TOKEN" not in env and "SLURM_JWT" not in env and "PYTHONPATH" not in env
     assert env["CUDA_VISIBLE_DEVICES"] == "0"
+    assert env["RA_SAMPLING_PLAN_JSON"] == '{"policy_ref":"qualified"}'
     guard = Path(__file__).parents[1] / "src/resource_advisor/runtime_guard.py"
     result = subprocess.run(
         [

@@ -134,3 +134,30 @@ This increment has **no new live GPU sampling results**. Existing published
 GPU trials repeat identical inputs and remain labeled repetition-only.
 Paired rank validation, thermal evidence, qualified GPU runner integration,
 automatic MF-KG coordination and equal-budget comparisons remain open.
+
+## Concrete CUDA runner
+
+`examples/sampled_fixture.py --project example-project --ref example-inputs
+--output /tmp/new-sampled-inputs` creates eight different 64×64 fp32 tensor files
+and their finite-population policy. Four have negative values and four positive
+values. This is an explicitly generated functional fixture, not a representative
+real research dataset. A four-input lower level samples two files per stratum;
+the eight-input target consumes all files. Each file represents one matrix.
+
+`python -m resource_advisor.sampled_gpu_benchmark --inputs /approved-inputs`
+consumes the backend-provided plan and computes `A @ A.T` on exactly one physical
+CUDA device. It refuses CPU fallback, incompatible hardware/runtime/identity,
+and shared-device contexts. Every measured input is checked against an fp64 CPU
+reference; the result quality value is the worst per-input fraction of numerically
+matching outputs. This is numerical agreement, not model accuracy.
+
+The runner copies only approved bounded input bytes into a fresh private temporary
+directory, validating each hash. This staging step deliberately supports projected
+ConfigMap symlinks from an operator-owned source volume. It never writes back to
+the original files. The sampling session then checks the regular copies again.
+CPU reference computation, input creation/copy and result checking are outside
+the timed CUDA-forward-plus-synchronization interval; Job wall cost includes them.
+`RA_SAMPLED_METRICS` logs per-input times and numerical agreement separately from
+the collector's aggregate result and receipt. No power/thermal qualification is
+implied. Slurm's native runtime guard preserves the sampling-plan environment
+variable; the new runner still needs independent qualification on each backend.

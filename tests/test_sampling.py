@@ -407,3 +407,36 @@ def test_bounded_tensor_and_maximum_receipt_fit_transport(sampled):
     raw = json.dumps(envelope)
     assert len(raw) < 60000  # Leave room for the bounded ExecutionResult.
     assert result_from_log("RESOURCE_ADVISOR_RESULT " + raw) == envelope
+
+
+def test_projected_input_staging_verifies_copies_and_preserves_originals(sampled, tmp_path):
+    from resource_advisor.sampled_gpu_benchmark import stage_inputs
+
+    policy, spec, source = sampled
+    plan = bind(policy, spec).plan
+    projected = tmp_path / "projected"
+    projected.mkdir()
+    before = {}
+    for sample in plan.samples:
+        path = source / (sample.ref + ".json")
+        before[sample.ref] = path.read_bytes()
+        (projected / path.name).symlink_to(path)
+    reader = stage_inputs(plan, projected, tmp_path / "staged")
+    for sample in plan.samples:
+        assert reader(sample) == before[sample.ref]
+        assert (source / (sample.ref + ".json")).read_bytes() == before[sample.ref]
+    with pytest.raises(FileExistsError):
+        stage_inputs(plan, projected, tmp_path / "staged")
+    (source / (plan.samples[0].ref + ".json")).write_bytes(b"corrupted")
+    with pytest.raises(ValueError, match="approved bounded content"):
+        stage_inputs(plan, projected, tmp_path / "rejected")
+
+
+def test_sampled_gpu_runner_refuses_cpu_fallback(sampled):
+    from types import SimpleNamespace
+
+    from resource_advisor.sampled_gpu_benchmark import validate_context
+
+    torch_without_cuda = SimpleNamespace(cuda=SimpleNamespace(is_available=lambda: False))
+    with pytest.raises(RuntimeError, match="refusing CPU fallback"):
+        validate_context(torch_without_cuda, {}, bind(sampled[0], sampled[1]).plan, {})
