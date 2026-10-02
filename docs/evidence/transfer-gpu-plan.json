@@ -1,0 +1,84 @@
+{
+  "scope": "bounded functional S1/S2/S4 GPU comparison; not a powered superiority study",
+  "created_at": "2026-10-02T18:04:57.401335+00:00",
+  "seed": 20261003,
+  "sources": [
+    128,
+    192
+  ],
+  "target": 256,
+  "cpu_candidates": [
+    1,
+    2,
+    4
+  ],
+  "gpu_count": 1,
+  "work_units": 12,
+  "forwards_per_unit": 32,
+  "source_design": "two balanced probe blocks plus three independent confirmation Jobs per configuration, per source",
+  "target_schedule": [
+    {
+      "block": 0,
+      "strategy": "qlognei",
+      "seed": 20261003
+    },
+    {
+      "block": 0,
+      "strategy": "rgpe",
+      "seed": 20261003
+    },
+    {
+      "block": 0,
+      "strategy": "history_warm_start",
+      "seed": 20261003
+    },
+    {
+      "block": 0,
+      "strategy": "random",
+      "seed": 20261003
+    },
+    {
+      "block": 1,
+      "strategy": "rgpe",
+      "seed": 20261004
+    },
+    {
+      "block": 1,
+      "strategy": "qlognei",
+      "seed": 20261004
+    },
+    {
+      "block": 1,
+      "strategy": "random",
+      "seed": 20261004
+    },
+    {
+      "block": 1,
+      "strategy": "history_warm_start",
+      "seed": 20261004
+    }
+  ],
+  "per_target_study": {
+    "max_probes": 8,
+    "total_wall_seconds": 1200,
+    "final_validation_seconds": 360,
+    "device_seconds": 900,
+    "minimum_confirmation_repeats": 3
+  },
+  "oracle": "target grid_characterization after all tuning studies; results unavailable to tuners",
+  "independent_unit": "study for method comparison; Job for within-configuration repeats; forward blocks are subsamples",
+  "maximum_planned_jobs": {
+    "qualification": 9,
+    "sources": 30,
+    "target_tuning": 112,
+    "posthoc_oracle": 15
+  },
+  "failure_policy": "preserve failed attempts; stop on unqualified context, pressure or ineligible thermal trace; no budget or policy relaxation",
+  "source_cost_policy": "report full source characterization, selected source profile cost, and F0 separately; never recharge prior source time as target work",
+  "limits": [
+    "two study blocks do not establish statistically powered superiority",
+    "generated fixed-weight CNN is a numerical fixture, not task accuracy",
+    "three configurations may favor exhaustive measurement; report null improvement without enlarging space",
+    "only CPU request/thread count varies; GPU count and runtime remain fixed"
+  ]
+}

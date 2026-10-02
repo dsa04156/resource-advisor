@@ -48,6 +48,10 @@ Strategies:
   remain rejected; actual GPU transfer effectiveness is not yet demonstrated.
 - `history_warm_start`: uses the same source provenance but only orders initial
   candidates by prior ranks, then uses target-only BO. It is separate from RGPE.
+- `grid_characterization`: two seeded balanced probe blocks followed by fresh
+  confirmation of every configuration. It creates complete measured source
+  profiles or a post-hoc finite-space reference without fitting an optimizer.
+  Post-hoc target results must remain unavailable to an earlier tuning study.
 
 [Paired calibration](fidelity-calibration.md) now preregisters a bounded,
 randomized F1/F2/F3 measurement schedule and submits its cells through the same

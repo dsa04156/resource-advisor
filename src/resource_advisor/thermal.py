@@ -91,7 +91,14 @@ class ThermalTrace(Contract):
 def validate_trace(value, result, body):
     trace = ThermalTrace.model_validate(value)
     policy = ThermalPolicy.model_validate(body["variant"]["thermal_policy"])
-    samples = body["sampling_binding"]["plan"]["samples"]
+    # Fixed-workload traces identify every work unit by ordinal. A sampling
+    # binding, when present, retains its immutable content-specific sample IDs.
+    binding = body.get("sampling_binding")
+    expected_refs = (
+        [s["ref"] for s in binding["plan"]["samples"]]
+        if binding is not None
+        else [f"iteration-{i:04d}" for i in range(body["spec"]["identity"]["work_units"])]
+    )
     if (
         result.outcome != "COMPLETED"
         or result.measurements is None
@@ -102,7 +109,7 @@ def validate_trace(value, result, body):
         or trace.driver_version != policy.driver_version
         or trace.device_uuid_digest != policy.device_uuid_digest
         or body["candidate"]["context"]["runtime_versions"].get("driver") != trace.driver_version
-        or [w.sample_ref for w in trace.windows] != [s["ref"] for s in samples]
+        or [w.sample_ref for w in trace.windows] != expected_refs
         or len(trace.windows) != result.measurements.work_units
         or len(trace.windows) != result.measurements.sample_count
         or not math.isclose(

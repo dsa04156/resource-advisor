@@ -131,3 +131,25 @@ incomplete family registration and unbound strategy requests were rejected as
 specified. Health returned 200; all ten nodes remained Ready without pressure.
 Existing counts remained 152 compute Jobs and 13 studies. This live check did not
 create a transfer family, submit GPU work or establish a transfer-performance result.
+
+## Prospective GPU comparison
+
+The [fixed GPU experiment plan](evidence/transfer-gpu-plan.json) defines two source
+input sizes, one target size, three CPU request/thread counts, two randomized
+method blocks, identical target budgets and a post-hoc target grid. Source and
+oracle measurements use `grid_characterization`: two balanced probe blocks and
+three independent confirmation Jobs for every configuration. All source
+confirmation profiles are retained, without selecting only favorable repeats.
+
+`transfer_gpu_benchmark` runs the same fixed-weight CNN on one exclusive CUDA GPU.
+Each measured block includes CPU preprocessing, transfer, 32 forwards and final
+synchronization. Phase intervals and NVML brackets cover each block. Ordinal
+thermal IDs cover every fixed-workload unit; sampled workloads retain their
+content-specific IDs. The fixture reports block throughput, not individual
+inference latency or trained-model accuracy. Preparation, CPU reference and
+per-block output validation are outside the objective but inside Job wall cost.
+
+This is a bounded functional comparison. Two independent study blocks cannot
+establish statistical superiority. The plan preserves null improvement and the
+possibility that exhaustive measurement is cheaper with only three candidates.
+Recorded plans and running qualification Jobs are not successful experiment results.

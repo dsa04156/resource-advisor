@@ -436,3 +436,74 @@ def test_thermal_policy_changes_execution_context_signature(service, thermal_sam
     assert context_signature(spec.candidates[0], variant) != context_signature(
         spec.candidates[0], modified
     )
+
+
+def test_fixed_workload_thermal_trace_ingests_without_sampling_binding(service, thermal_sampled):
+    original = thermal_sampled[1]
+    identity = original.identity.model_copy(update={"sampling_policy_digest": None})
+    with service.store.transaction() as conn:
+        variant = RuntimeVariant.model_validate(
+            service.store.get(conn, "variant", original.candidates[0].variant_ref)["body"]
+        )
+    variant = variant.model_copy(
+        update={
+            "ref": "fixed-thermal-variant",
+            "workload_ref": "fixed-thermal",
+            "workload_signature": signature(identity),
+        }
+    )
+    spec = original.model_copy(
+        update={
+            "ref": "fixed-thermal",
+            "identity": identity,
+            "candidates": (original.candidates[0].model_copy(update={"variant_ref": variant.ref}),),
+        }
+    )
+    service.register("variant", variant, "team-a")
+    service.register("workload", spec, "team-a")
+    job = service.submit(
+        "team-a", JobRequest(workload_ref=spec.ref, candidate_ref="base"), "fixed-thermal-job"
+    )
+    backend = SchedulerDouble()
+    worker = Worker(service, {("team-a", "lab"): backend})
+    worker.submit_one()
+    with service.store.transaction() as conn:
+        row = service.store.job(conn, job["job_id"])
+    e = backend.result(row)
+    e["result"]["measurements"].update(
+        elapsed_seconds=identity.work_units * 0.1,
+        sample_count=identity.work_units,
+        work_units=identity.work_units,
+    )
+    e["digest"] = signature(e["result"])
+    e["thermal_trace"] = ThermalTrace(
+        job_id=row["id"],
+        attempt_id=row["body"]["attempt_id"],
+        result_digest=e["digest"],
+        policy_digest=signature(variant.thermal_policy),
+        driver_version=variant.thermal_policy.driver_version,
+        device_uuid_digest=variant.thermal_policy.device_uuid_digest,
+        windows=tuple(
+            Window(
+                sample_ref=f"iteration-{i:04d}",
+                before=reading(i * 0.11),
+                forward_started=i * 0.11 + 0.002,
+                forward_finished=i * 0.11 + 0.102,
+                after=reading(i * 0.11 + 0.103),
+            )
+            for i in range(identity.work_units)
+        ),
+    ).model_dump(mode="json")
+    backend.result = lambda _: e
+    backend.observation = Observation(State.COLLECTING)
+    worker.reconcile_all()
+    with service.store.transaction() as conn:
+        saved = service.store.job(conn, job["job_id"])
+        assert saved["state"] == "SUCCEEDED"
+        assert saved["body"]["thermal_assessment"]["status"] == "ELIGIBLE_TRACE"
+        assert not saved["body"].get("sampling_binding")
+    from resource_advisor.thermal import validate_trace
+
+    changed = {**e["thermal_trace"], "windows": list(reversed(e["thermal_trace"]["windows"]))}
+    with pytest.raises(ValueError):
+        validate_trace(changed, ExecutionResult.model_validate(e["result"]), saved["body"])

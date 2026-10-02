@@ -339,6 +339,7 @@ class StudyRequest(Contract):
         "mfkg",
         "rgpe",
         "history_warm_start",
+        "grid_characterization",
     ]
     seed: int = 0
     replication: ReplicationPolicy | None = None

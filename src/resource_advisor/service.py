@@ -80,12 +80,14 @@ class Service:
                 raise Rejected("sampling binding required before workload execution")
             SamplingPolicies(self).checked(conn, project, spec.ref)
         if variant.thermal_policy and (
-            spec.identity.sampling_policy_digest is None
+            spec.identity.task_type not in {"inference", "benchmark"}
             or spec.identity.work_units > 32
             or candidate.context.allocation_mode != "physical_device"
             or candidate.context.resources.accelerator_count != 1
         ):
-            raise Rejected("thermal brackets require 1–32 sampled inputs on one physical GPU")
+            raise Rejected(
+                "thermal brackets require 1–32 inference/benchmark units on one physical GPU"
+            )
         return spec, candidate, variant, cap
 
     def submit(self, project: str, request: JobRequest, key: str):

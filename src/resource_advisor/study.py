@@ -103,6 +103,20 @@ class Studies:
             if spec.baseline_candidate_ref not in eligible:
                 raise Rejected("baseline is not a qualified consented pilot: " + str(excluded))
             eligible = eligible[: policy.max_candidates]
+            grid_schedule = None
+            if request.strategy == "grid_characterization":
+                if policy.max_probes < 2 * len(eligible):
+                    raise Rejected("grid characterization requires two probes per configuration")
+                if (
+                    policy.final_validation_seconds
+                    < len(eligible) * spec.quality.minimum_repeats * 3
+                ):
+                    raise Rejected("grid confirmation must cover every configuration")
+                grid_schedule, rng = [], random.Random(request.seed)
+                for block in range(2):
+                    order = sorted(eligible)
+                    rng.shuffle(order)
+                    grid_schedule.extend({"candidate_ref": c, "block": block} for c in order)
             transfer_space = transfer_evidence = None
             if request.strategy in {"rgpe", "history_warm_start"}:
                 from .transfer import TransferSpaces
@@ -210,6 +224,8 @@ class Studies:
                     fidelity_space_digest=signature(fidelity),
                     fidelity_schedule=fidelity_schedule,
                 )
+            if grid_schedule is not None:
+                body["grid_schedule"] = grid_schedule
             if transfer_space is not None:
                 body.update(
                     transfer_space=transfer_space,
@@ -619,6 +635,10 @@ class Studies:
         probes = [o for o in body["observations"] if o["mode"] == "pilot"]
         strategy = body["request"]["strategy"]
         calibrating = strategy == "fidelity_calibration"
+        characterizing = strategy == "grid_characterization"
+        grid_complete = characterizing and len(probes) == len(body["grid_schedule"])
+        if characterizing and any(not self._feasible(o, spec) for o in probes):
+            return self._abstain(ref, token, body, "GRID_CHARACTERIZATION_CELL_FAILED")
         mixed = calibrating or strategy == "mfkg"
         calibration_complete = calibrating and len(probes) == len(body["fidelity_schedule"])
         if calibrating and any(not self._feasible(o, spec) for o in probes):
@@ -694,10 +714,13 @@ class Studies:
             or device_probe_budget_exhausted
             or (replication_choice and replication_choice["stop_exploration"])
             or calibration_complete
+            or grid_complete
             or mf_stop
         ):
             if calibrating and not calibration_complete:
                 return self._abstain(ref, token, body, "INCOMPLETE_FIDELITY_CALIBRATION_BUDGET")
+            if characterizing and not grid_complete:
+                return self._abstain(ref, token, body, "INCOMPLETE_GRID_CHARACTERIZATION_BUDGET")
             good = [o for o in probes if self._feasible(o, spec)]
             if mixed:
                 # Never compare raw short-run latency with the target workload.
@@ -749,7 +772,7 @@ class Studies:
                 return self._abstain(ref, token, body, "NO_MEASURED_FEASIBLE_CONFIG")
             selected = (
                 body["eligible"]
-                if mixed
+                if mixed or characterizing
                 else list(dict.fromkeys([spec.baseline_candidate_ref, finalist]))
             )
             schedule = selected * spec.quality.minimum_repeats
@@ -783,6 +806,12 @@ class Studies:
             ).total_seconds()
             available_wall = (
                 min(remaining, policy.final_validation_seconds - final_elapsed) / remaining_steps
+            )
+        elif characterizing:
+            slot = body["grid_schedule"][len(probes)]
+            choice = dict(slot, reason="PREREGISTERED_GRID_CHARACTERIZATION", planning_seconds=0)
+            available_wall = (remaining - policy.final_validation_seconds) / (
+                len(body["grid_schedule"]) - len(probes)
             )
         elif calibrating:
             slot = body["fidelity_schedule"][len(probes)]
