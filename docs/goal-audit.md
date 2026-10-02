@@ -21,7 +21,7 @@ direct evidence; conditional extensions require an explicit applicability result
 | Results/artifacts | Schema/digest/attempt/work units, artifact ownership and durable storage | 28 result bundles verified in S3/API; large models/checkpoints/retention pending |
 | MLflow | Actual parameters/metrics/artifacts/model links, outage recovery | 28 live runs and corresponding result artifacts verified; model registration/failure tracking pending |
 | Lookup recommendation | Comparable measured evidence, repeats, quality/memory gates, abstention | Tested |
-| Recommendation approval | Immutable configuration/version, expiry, permission recheck | Tested |
+| Recommendation approval | Immutable configuration/version, expiry, permission recheck | Real GPU history → immutable approval → independent execution/comparison verified; baseline references now validated, missing/cross-project/expired cases covered |
 | Idempotency/recovery | Response loss, restart, duplicate create/cancel, stale result and epoch | Fault tests pass; real process-crash/backend trials pending |
 | R1 BO loop | qLogNEI ask→real GPU execution→observe→next→independent confirmation | Actual qLogNEI GPU loop and independent confirmation completed; wider evaluation pending |
 | Search representation | Approved finite conditional space, normalized numeric and unordered categories | Implemented/tested |
@@ -32,13 +32,13 @@ direct evidence; conditional extensions require an explicit applicability result
 | R4 uncertainty | OOD/stale context, independent confirmation, workload/time holdouts | Confirmation implemented; holdout/stale residual analysis pending |
 | R5 interference | Qualified solo/shared pairs, per-workload slowdown, unknown-pair abstention | Conditional follow-up; not claimed implemented |
 | Usage ledger | Queue/admission/preparation/run/collection, physical/virtual units, all outcomes | Atomic terminal ledger, evidence-based allocation, unknown-aware summaries/backfill verified with real GPU collector failure; pure preflight failures now record zero; durable cancellation timing and full preparation/utilization costs pending |
-| Observability | Missing-vs-stale telemetry, CPU/GPU/NPU/queues/jobs/errors, four integrated views | Four project-scoped console views connected to live inventory/jobs/compatibility/ledger/recommendation evidence; browser fault checks and responsive rendering verified; live approved-result comparison, quota reasons and Slurm telemetry pending |
+| Observability | Missing-vs-stale telemetry, CPU/GPU/NPU/queues/jobs/errors, four integrated views | Four project-scoped console views connected to live inventory/jobs/compatibility/ledger/recommendation evidence; browser fault checks and responsive rendering verified; live approved-result comparison verified; quota reasons and Slurm telemetry pending |
 | E0–E7 scenarios | Reproducible live compatibility, execution, quota, contention/failure evidence | Pending |
 | B0–B3 / S0–S2 | Equal-budget real measurements, raw data, cost/regret/abstention and null improvements | Single-GPU S0/S1/S2 smoke with null improvement published; rigorous comparison pending |
 | S3–S6 | Applicability, paired/source data and qualified strategy comparisons | Conditional; no result claimed |
 | Deployment automation | Scoped service manifests/RBAC/secrets, lab provisioning, GitOps static services | Example routes only; full deployment pending |
 | Restore | Actual independent DB dump/restore with content comparison | Populated study + all five service tables verified |
-| Documentation/demo | Public-safe reproduce commands, raw real measurements, support matrix, limitations | Partial docs and synthetic demo; complete hardware demo pending |
+| Documentation/demo | Public-safe reproduce commands, raw real measurements, support matrix, limitations | Actual Kubernetes GPU recommendation→approval→new-result demo, artifacts and console verified; full Slurm/NPU and broader experiment demo pending |
 | Final review | Requirement-by-requirement evidence and fixed defects | Ongoing; full completion unproven |
 
 The initial NPU PCIe problem blocks that device's qualification, not independent

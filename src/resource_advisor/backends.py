@@ -317,6 +317,7 @@ class KubernetesBackend:
             raise BackendError("Job missing; disappearance is not successful completion")
         obj = json.loads(raw)
         status = obj.get("status", {})
+        submitted = obj["metadata"].get("creationTimestamp")
         pods = [
             p
             for p in pods
@@ -381,6 +382,7 @@ class KubernetesBackend:
                     finished,
                     allocation=allocation,
                     execution_started_at=execution_started,
+                    submitted_at=submitted,
                 )
             if condition["type"] == "Failed" and condition["status"] == "True":
                 return Observation(
@@ -390,12 +392,14 @@ class KubernetesBackend:
                     condition.get("reason", "BACKEND_FAILED"),
                     allocation=allocation,
                     execution_started_at=execution_started,
+                    submitted_at=submitted,
                 )
         return Observation(
             State.RUNNING if "running" in container else State.QUEUED,
             scheduled,
             allocation=allocation,
             execution_started_at=execution_started,
+            submitted_at=submitted,
         )
 
     def cancel(self, job):

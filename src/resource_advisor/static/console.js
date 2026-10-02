@@ -73,6 +73,16 @@ function fmt(v, digits = 2) {
     ? v.toLocaleString("ko-KR", { maximumFractionDigits: digits })
     : "—";
 }
+function duration(v) {
+  if (typeof v !== "number" || !Number.isFinite(v)) return "—";
+  if (v === 0) return "0 s";
+  const magnitude = Math.abs(v);
+  if (magnitude < 1e-12) return v.toExponential(3) + " s";
+  if (magnitude < 1e-6) return fmt(v * 1e9, 3) + " ns";
+  if (magnitude < 1e-3) return fmt(v * 1e6, 3) + " μs";
+  if (magnitude < 1) return fmt(v * 1e3, 3) + " ms";
+  return fmt(v, 3) + " s";
+}
 function stamp(v) {
   return v && Number.isFinite(Date.parse(v))
     ? new Date(v).toLocaleString("ko-KR", {
@@ -370,7 +380,7 @@ function jobRows() {
     j.result?.measurements
       ? add(
           el("div"),
-          el("span", fmt(j.result.measurements.elapsed_seconds, 5) + " s"),
+          el("span", duration(j.result.measurements.elapsed_seconds)),
           badge(
             j.result.evidence_kind === "hardware" ? "실장비" : "합성 데이터",
             j.result.evidence_kind === "hardware" ? "" : "warn",
@@ -551,7 +561,7 @@ function historyView() {
       ),
       fmt(r.queue_seconds) + " s",
       known ? fmt(r.allocated_device_seconds) + " 장치·s" : "과거 미검증 값",
-      fmt(r.measured_compute_seconds, 5) + " s",
+      duration(r.measured_compute_seconds),
       add(
         el("div"),
         el("span", stamp(b.terminal_observed_at)),
@@ -600,8 +610,8 @@ function evidenceView(payload) {
           ["후보", "평균", "기술 통계 구간", "독립 실행"],
           ranks.map((x) => [
             x.candidate_ref,
-            fmt(x.mean_seconds, 5) + " s",
-            x.interval_seconds.map((v) => fmt(v, 5)).join(" – ") + " s",
+            duration(x.mean_seconds),
+            x.interval_seconds.map(duration).join(" – "),
             x.independent_runs,
           ]),
         )
@@ -618,7 +628,7 @@ function evidenceView(payload) {
             e.result
               ? e.result.outcome + " / " + e.result.evidence_kind
               : "근거 레코드 없음",
-            fmt(e.result?.measurements?.elapsed_seconds, 5) + " s",
+            duration(e.result?.measurements?.elapsed_seconds),
             code(e.tracking?.run_id),
           ]),
         )
@@ -635,9 +645,9 @@ function evidenceView(payload) {
             c.comparison_status === "independent_measured"
               ? "독립 실장비 측정"
               : "비교 불가 / 대기",
-            fmt(c.historical_mean_seconds, 5) + " s",
-            fmt(c.actual_seconds, 5) + " s",
-            fmt(c.signed_error_seconds, 5) + " s",
+            duration(c.historical_mean_seconds),
+            duration(c.actual_seconds),
+            duration(c.signed_error_seconds),
           ]),
         )
       : empty(

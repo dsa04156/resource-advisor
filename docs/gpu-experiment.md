@@ -6,7 +6,9 @@ scientific comparison of optimization methods or a production certification.
 The path was authenticated Compute API → independent PostgreSQL → durable
 worker → suspended Kubernetes Job → Kueue admission → RTX 5080 CUDA execution
 → result schema/signature/quality validation → profile/confirmation → MLflow.
-KFP was not involved in this experiment; its live acceptance gate remains open.
+KFP was not involved in this historical experiment. The subsequent
+[KFP trial](kubeflow-pipeline.md) completed its live path, and the
+[approval demo](approved-gpu-demo.md) verified independent post-approval execution.
 
 ## Fixed workload and allowed change
 
@@ -66,8 +68,9 @@ The failure was retained rather than converted to a successful measurement.
 MLflow parameters include image, environment digest, runtime versions, logical
 workload identity, resource requests and allocation mode. Metrics exclude null
 telemetry. Attempt, job, study, evidence kind, quality and signatures are tags.
-Actual start/collection timestamps are reused across retries. Artifact upload is
-not yet verified. No site address, hostname, credential or private dashboard is
+Actual start/collection timestamps are reused across retries. Subsequent
+[artifact verification](artifacts.md) and the [approval demo](approved-gpu-demo.md)
+verified object storage/API/MLflow read-back. No site address, hostname, credential or private dashboard is
 included in these public files.
 
 ## Reproduction prerequisites

@@ -39,6 +39,10 @@ def ledger_record(row, state, body, result=None):
     valid = result is not None and state != "RESULT_INVALID"
     measurements = result.get("measurements") if valid else None
     queued = body.get("scheduler_submitted_at") or body.get("queued_at")
+    queue_seconds = interval(queued, start)
+    queue_whole_seconds = queue_seconds is not None and all(
+        "." not in stamp for stamp in (queued, start)
+    )
     return {
         "attempt_id": body["attempt_id"],
         "project": row["project"],
@@ -47,7 +51,7 @@ def ledger_record(row, state, body, result=None):
         "allocation_mode": context["allocation_mode"],
         "allocated_device_seconds": allocated,
         "measured_compute_seconds": measurements.get("elapsed_seconds") if measurements else None,
-        "queue_seconds": interval(queued, start),
+        "queue_seconds": queue_seconds,
         "body": {
             "schema_version": "v2",
             "accelerator_model": context["accelerator_model"],
@@ -82,8 +86,9 @@ def ledger_record(row, state, body, result=None):
                 for reason, missing in [
                     ("ALLOCATION_INTERVAL_UNKNOWN", duration is None),
                     ("ACCELERATOR_ALLOCATION_UNKNOWN", count is None),
-                    ("QUEUE_INTERVAL_UNKNOWN", interval(queued, start) is None),
+                    ("QUEUE_INTERVAL_UNKNOWN", queue_seconds is None),
                     ("WHOLE_SECOND_RESOLUTION", duration == 0),
+                    ("QUEUE_WHOLE_SECOND_RESOLUTION", queue_whole_seconds),
                 ]
                 if missing
             ],

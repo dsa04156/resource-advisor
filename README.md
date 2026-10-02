@@ -23,6 +23,9 @@ measured CPU/memory/GPU/NPU telemetry and returns unknown for stale data.
 Open `/console` on the API origin for the [four-view research console](docs/console.md):
 resources/jobs, compatibility, queue/allocation history, and recommendation evidence.
 
+The [approved GPU demo](docs/approved-gpu-demo.md) now connects fresh qualification,
+three observations, recommendation, approval and independent measured comparison.
+
 ## Responsibility
 
 The service validates workload/environment contracts, submits a selected

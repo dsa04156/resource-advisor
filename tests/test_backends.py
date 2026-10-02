@@ -266,3 +266,48 @@ def test_slurm_response_loss_reconciliation_does_not_attach_other_account(servic
         partition="gpu", account="team-a", qos="normal", output_dir="/tmp/ra", execute=execute
     )
     assert backend.reconcile(job) == "43"
+
+
+def test_kubernetes_queue_time_uses_server_creation_not_submit_response(service):
+    from resource_advisor.accounting import ledger_record
+
+    job = row(service)
+    job["body"]["external_id"] = "attempt"
+    job["body"]["queued_at"] = "2026-10-02T08:00:00.800000+00:00"
+
+    def execute(args, **kwargs):
+        if "pods" in args:
+            return json.dumps(
+                {
+                    "items": [
+                        {
+                            "metadata": {"ownerReferences": [{"uid": "u1"}]},
+                            "status": {
+                                "conditions": [
+                                    {
+                                        "type": "PodScheduled",
+                                        "status": "True",
+                                        "lastTransitionTime": "2026-10-02T08:00:00Z",
+                                    }
+                                ]
+                            },
+                        }
+                    ]
+                }
+            )
+        return json.dumps({"metadata": {"uid": "u1", "creationTimestamp": "2026-10-02T07:59:59Z"}})
+
+    backend = KubernetesBackend(
+        namespace="research-a", local_queue="batch", node_selector={"pool": "lab"}, execute=execute
+    )
+    observation = backend.status(job)
+    assert observation.submitted_at == "2026-10-02T07:59:59Z"
+    body = dict(
+        job["body"],
+        scheduler_submitted_at=observation.submitted_at,
+        started_at=observation.started_at,
+    )
+    record = ledger_record(job, "FAILED", body)
+    assert record["queue_seconds"] == 1
+    assert record["body"]["submission_time_source"] == "scheduler"
+    assert "QUEUE_WHOLE_SECOND_RESOLUTION" in record["body"]["uncertainty"]

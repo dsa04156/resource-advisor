@@ -115,9 +115,19 @@ class Service:
                     self.store.change_study(conn, study, study["state"], study["body"])
                 elif request.study_ref or request.probe_plan_ref:
                     raise Rejected("study references require pilot or confirmation mode")
-                if candidate.ref != spec.baseline_candidate_ref and plan is None:
-                    if not request.approval_ref:
-                        raise Rejected("non-baseline execution requires an immutable approval")
+                if request.approval_ref and plan is not None:
+                    raise Rejected(
+                        "study probes use their reserved plan, not a recommendation approval"
+                    )
+                if (
+                    candidate.ref != spec.baseline_candidate_ref
+                    and plan is None
+                    and not request.approval_ref
+                ):
+                    raise Rejected("non-baseline execution requires an immutable approval")
+                # Baseline runs need no approval, but a supplied reference must be
+                # genuine: otherwise arbitrary runs can falsely claim recommendation provenance.
+                if request.approval_ref:
                     approval = required(self.store, conn, "approval", request.approval_ref, project)
                     if (
                         approval["candidate_ref"] != candidate.ref

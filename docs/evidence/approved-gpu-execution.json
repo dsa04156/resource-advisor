@@ -1,0 +1,612 @@
+{
+  "kind": "actual_gpu_approval_demo",
+  "captured_at": "2026-10-02T08:39:40.582863+00:00",
+  "workload": {
+    "identity": {
+      "code_digest": "sha256:ae576be1e38924920a2c84b487ab2eace326f908fb781b310d122bccef3205c3",
+      "model_digest": "sha256:07d2b7a9750a7c473868c22e215d1ad3db7626c193238fd907dc2713ac437ee0",
+      "dataset_version": "generated-torch-randn-seed-0",
+      "config_digest": "sha256:dc813fb5946e9273db79eb91b598d33805cab9c7cddb5dc63dfad4304c95b6f4",
+      "task_type": "benchmark",
+      "input_shape": [
+        256,
+        256
+      ],
+      "batch_size": 1,
+      "global_batch_size": null,
+      "gradient_accumulation": 1,
+      "precision": "fp32",
+      "seed": 0,
+      "work_units": 20,
+      "quality_contract_digest": "sha256:a9f0bd7d40be67709a2fcc7ca47d00eccac388f46be97234dc9fb0825dcc9496",
+      "measurement_boundary": "CUDA synchronized forward-only; excludes setup/reference"
+    },
+    "quality_policy": {
+      "metric": "numerical_agreement",
+      "minimum": 1.0,
+      "minimum_repeats": 3,
+      "maximum_peak_memory_mib": 1024.0,
+      "max_profile_age_seconds": 86400
+    },
+    "image": "ghcr.io/mlflow/mlflow:v3.16.1@sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984",
+    "environment_digest": "sha256:5dbd8b984a480abb28386371d63bd46d475db9fe81f5047719d31c13a5f8081e",
+    "runtime_source_digest": "sha256:f2cf4edf6189e4ff11d08d6286a6eb9bf5691f6f271d9aadeeae23e2e76babec",
+    "gpu_model": "NVIDIA GeForce RTX 5080",
+    "runtime_versions": {
+      "pytorch": "2.8.0+cu128",
+      "cuda": "12.8"
+    },
+    "requested_resources": {
+      "host_cpu": 1.0,
+      "host_memory_mib": 2048,
+      "accelerator_count": 1
+    }
+  },
+  "qualification": {
+    "completed_at": "2026-10-02T08:21:43Z",
+    "result": {
+      "schema_version": "v1",
+      "job_id": "ra-approval-qualify-082138",
+      "attempt_id": "ra-approval-qualify-082138-attempt",
+      "epoch": 1,
+      "workload_signature": "sha256:769c36df16914f3e7630b5dcd310c575399bfe479d8ab45780c43997ebdcd42a",
+      "context_signature": "sha256:aae55114a149459d91912a3364969f38ee376bf00e68e7cfdb500df3ff021c1a",
+      "outcome": "COMPLETED",
+      "measured": true,
+      "evidence_kind": "hardware",
+      "measurements": {
+        "elapsed_seconds": 0.0002704691723920405,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 20,
+        "work_units": 20,
+        "latency_p50_ms": 0.013122509699314833,
+        "latency_p95_ms": 0.013955985195934772,
+        "latency_p99_ms": 0.013955985195934772,
+        "throughput": 73945.58064832001,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "error_code": null
+    }
+  },
+  "stages": [
+    "abstained_without_profile",
+    "three_independent_gpu_observations",
+    "measured_recommendation",
+    "immutable_approval",
+    "new_gpu_execution",
+    "independent_comparison"
+  ],
+  "initial_status": "NEEDS_PROFILE",
+  "recommendation": {
+    "ref": "rec-09ea8e8f0a3140d1bd025068dea35d28",
+    "workload_ref": "matmul-approval-082138",
+    "workload_digest": "sha256:ab1cc6735e19192fd11927374c96b6ea342c5ae9e4d25a657079fe2c2811f695",
+    "status": "MEASURED_RECOMMENDATION",
+    "candidate_ref": "cpu1",
+    "measured": true,
+    "ranking": [
+      {
+        "candidate_ref": "cpu1",
+        "mean_seconds": 0.0002717473350154857,
+        "interval_seconds": [
+          0.00026549887009412937,
+          0.00027799579993684204
+        ],
+        "independent_runs": 3,
+        "evidence_refs": [
+          "a-d2e274b5cd0146adb0606f0155175e59",
+          "a-bd6d37a1f2884dd595fac080595daa02",
+          "a-edb0337b23c840099dba7d9d8ad3aecd"
+        ]
+      }
+    ],
+    "excluded": {},
+    "approval_required": true,
+    "created_at": "2026-10-02T08:29:04.389153+00:00",
+    "expires_at": "2026-10-02T08:44:04.389160+00:00",
+    "evidence_policy": "lookup-v1; independent runs; mean +/- 3 standard errors"
+  },
+  "approval": {
+    "ref": "apr-3b6051dac97a4950a5fd50c72538dc6c",
+    "recommendation_ref": "rec-09ea8e8f0a3140d1bd025068dea35d28",
+    "recommendation_digest": "sha256:47757fbb3ca25216770a0c0afb2d4e30cf52a29852d8ec03370c6c50542dfc4a",
+    "candidate_ref": "cpu1",
+    "workload_digest": "sha256:ab1cc6735e19192fd11927374c96b6ea342c5ae9e4d25a657079fe2c2811f695",
+    "expires_at": "2026-10-02T08:44:04.389160+00:00"
+  },
+  "evidence_runs": [
+    {
+      "attempt_id": "a-bd6d37a1f2884dd595fac080595daa02",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-ac9e9de9591d4ae9bb2066590c998230",
+        "attempt_id": "a-bd6d37a1f2884dd595fac080595daa02",
+        "epoch": 1,
+        "workload_signature": "sha256:70cb5155179430c0a69813aa5451bab7f72e3a8d0efee39ca462d8416aa760ca",
+        "context_signature": "sha256:a9fa70efd7300d6146f072b4f5ec4231241a1ddfe804589047d71c4f0ad4b2e2",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.00027391803450882435,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.01343697658739984,
+          "latency_p95_ms": 0.014393008314073086,
+          "latency_p99_ms": 0.014393008314073086,
+          "throughput": 73014.54260163251,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "tracking": {
+        "job_id": "j-ac9e9de9591d4ae9bb2066590c998230",
+        "experiment_id": "3",
+        "run_id": "48943943a72941e3b4912721b05d39d6"
+      }
+    },
+    {
+      "attempt_id": "a-d2e274b5cd0146adb0606f0155175e59",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-f3056740879e46c880f034bef3ddc034",
+        "attempt_id": "a-d2e274b5cd0146adb0606f0155175e59",
+        "epoch": 1,
+        "workload_signature": "sha256:70cb5155179430c0a69813aa5451bab7f72e3a8d0efee39ca462d8416aa760ca",
+        "context_signature": "sha256:a9fa70efd7300d6146f072b4f5ec4231241a1ddfe804589047d71c4f0ad4b2e2",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0002675829455256462,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.013062497600913048,
+          "latency_p95_ms": 0.01380703179165721,
+          "latency_p99_ms": 0.01380703179165721,
+          "throughput": 74743.17901954301,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "tracking": {
+        "job_id": "j-f3056740879e46c880f034bef3ddc034",
+        "experiment_id": "3",
+        "run_id": "44161584fabe4397931492d2b7aa2054"
+      }
+    },
+    {
+      "attempt_id": "a-edb0337b23c840099dba7d9d8ad3aecd",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-c6cb92406065449c91f9caa42624db4d",
+        "attempt_id": "a-edb0337b23c840099dba7d9d8ad3aecd",
+        "epoch": 1,
+        "workload_signature": "sha256:70cb5155179430c0a69813aa5451bab7f72e3a8d0efee39ca462d8416aa760ca",
+        "context_signature": "sha256:a9fa70efd7300d6146f072b4f5ec4231241a1ddfe804589047d71c4f0ad4b2e2",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0002737410250119865,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.013393000699579716,
+          "latency_p95_ms": 0.014026009012013674,
+          "latency_p99_ms": 0.014026009012013674,
+          "throughput": 73061.75608542506,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "tracking": {
+        "job_id": "j-c6cb92406065449c91f9caa42624db4d",
+        "experiment_id": "3",
+        "run_id": "ee386ff63cfc4d58b2c8f17c8b48d891"
+      }
+    }
+  ],
+  "approved_executions": [
+    {
+      "historical_mean_seconds": 0.0002717473350154857,
+      "actual_seconds": 0.0002758060581982136,
+      "signed_error_seconds": 4.058723182727875e-06,
+      "comparison_status": "independent_measured",
+      "job": {
+        "job_id": "j-4d4db86121f24e5ab4e29c9a7a11058e",
+        "attempt_id": "a-ded5754f07024cad9e11ef2a0869b988",
+        "backend": "kubernetes",
+        "node_alias": "gpu-worker-a",
+        "mode": "fixed",
+        "state": "SUCCEEDED",
+        "backend_observed_at": "2026-10-02T08:29:09.644060+00:00",
+        "result": {
+          "schema_version": "v1",
+          "job_id": "j-4d4db86121f24e5ab4e29c9a7a11058e",
+          "attempt_id": "a-ded5754f07024cad9e11ef2a0869b988",
+          "epoch": 1,
+          "workload_signature": "sha256:70cb5155179430c0a69813aa5451bab7f72e3a8d0efee39ca462d8416aa760ca",
+          "context_signature": "sha256:a9fa70efd7300d6146f072b4f5ec4231241a1ddfe804589047d71c4f0ad4b2e2",
+          "outcome": "COMPLETED",
+          "measured": true,
+          "evidence_kind": "hardware",
+          "measurements": {
+            "elapsed_seconds": 0.0002758060581982136,
+            "peak_memory_mib": 9.125,
+            "quality_value": 1.0,
+            "sample_count": 20,
+            "work_units": 20,
+            "latency_p50_ms": 0.013430020771920681,
+            "latency_p95_ms": 0.015210011042654514,
+            "latency_p99_ms": 0.015210011042654514,
+            "throughput": 72514.72331919047,
+            "gpu_utilization": null,
+            "power_watts": null,
+            "temperature_celsius": null
+          },
+          "error_code": null
+        },
+        "tracking": {
+          "job_id": "j-4d4db86121f24e5ab4e29c9a7a11058e",
+          "experiment_id": "3",
+          "run_id": "73a73b8ddeb547da833e33b61b2ccb8a"
+        }
+      }
+    },
+    {
+      "historical_mean_seconds": 0.0002717473350154857,
+      "actual_seconds": 0.0002705552033148706,
+      "signed_error_seconds": -1.1921317006151062e-06,
+      "comparison_status": "independent_measured",
+      "job": {
+        "job_id": "j-6451ff7ed12e47c59d0d1492db92b641",
+        "attempt_id": "a-b5fe291b4a6c49e88a9c45d3c5c0e69f",
+        "backend": "kubernetes",
+        "node_alias": "gpu-worker-a",
+        "mode": "fixed",
+        "state": "SUCCEEDED",
+        "backend_observed_at": "2026-10-02T08:34:14.212273+00:00",
+        "result": {
+          "schema_version": "v1",
+          "job_id": "j-6451ff7ed12e47c59d0d1492db92b641",
+          "attempt_id": "a-b5fe291b4a6c49e88a9c45d3c5c0e69f",
+          "epoch": 1,
+          "workload_signature": "sha256:70cb5155179430c0a69813aa5451bab7f72e3a8d0efee39ca462d8416aa760ca",
+          "context_signature": "sha256:a9fa70efd7300d6146f072b4f5ec4231241a1ddfe804589047d71c4f0ad4b2e2",
+          "outcome": "COMPLETED",
+          "measured": true,
+          "evidence_kind": "hardware",
+          "measurements": {
+            "elapsed_seconds": 0.0002705552033148706,
+            "peak_memory_mib": 9.125,
+            "quality_value": 1.0,
+            "sample_count": 20,
+            "work_units": 20,
+            "latency_p50_ms": 0.013214012142270803,
+            "latency_p95_ms": 0.014096032828092575,
+            "latency_p99_ms": 0.014096032828092575,
+            "throughput": 73922.06749291054,
+            "gpu_utilization": null,
+            "power_watts": null,
+            "temperature_celsius": null
+          },
+          "error_code": null
+        },
+        "tracking": {
+          "job_id": "j-6451ff7ed12e47c59d0d1492db92b641",
+          "experiment_id": "3",
+          "run_id": "014b92be30f445c79fa76c3eec2f73fa"
+        }
+      }
+    }
+  ],
+  "ledger": [
+    {
+      "attempt_id": "a-d2e274b5cd0146adb0606f0155175e59",
+      "backend": "kubernetes",
+      "device_class": "gpu",
+      "allocation_mode": "physical_device",
+      "allocated_device_seconds": 2.0,
+      "measured_compute_seconds": 0.0002675829455256462,
+      "queue_seconds": null,
+      "outcome": "SUCCEEDED",
+      "submission_time_source": "submit_response",
+      "submitted_at": "2026-10-02T08:28:46.656929+00:00",
+      "started_at": "2026-10-02T08:28:46Z",
+      "uncertainty": [
+        "QUEUE_INTERVAL_UNKNOWN"
+      ]
+    },
+    {
+      "attempt_id": "a-bd6d37a1f2884dd595fac080595daa02",
+      "backend": "kubernetes",
+      "device_class": "gpu",
+      "allocation_mode": "physical_device",
+      "allocated_device_seconds": 2.0,
+      "measured_compute_seconds": 0.00027391803450882435,
+      "queue_seconds": null,
+      "outcome": "SUCCEEDED",
+      "submission_time_source": "submit_response",
+      "submitted_at": "2026-10-02T08:28:52.721951+00:00",
+      "started_at": "2026-10-02T08:28:52Z",
+      "uncertainty": [
+        "QUEUE_INTERVAL_UNKNOWN"
+      ]
+    },
+    {
+      "attempt_id": "a-edb0337b23c840099dba7d9d8ad3aecd",
+      "backend": "kubernetes",
+      "device_class": "gpu",
+      "allocation_mode": "physical_device",
+      "allocated_device_seconds": 2.0,
+      "measured_compute_seconds": 0.0002737410250119865,
+      "queue_seconds": null,
+      "outcome": "SUCCEEDED",
+      "submission_time_source": "submit_response",
+      "submitted_at": "2026-10-02T08:28:58.789826+00:00",
+      "started_at": "2026-10-02T08:28:58Z",
+      "uncertainty": [
+        "QUEUE_INTERVAL_UNKNOWN"
+      ]
+    },
+    {
+      "attempt_id": "a-ded5754f07024cad9e11ef2a0869b988",
+      "backend": "kubernetes",
+      "device_class": "gpu",
+      "allocation_mode": "physical_device",
+      "allocated_device_seconds": 2.0,
+      "measured_compute_seconds": 0.0002758060581982136,
+      "queue_seconds": null,
+      "outcome": "SUCCEEDED",
+      "submission_time_source": "submit_response",
+      "submitted_at": "2026-10-02T08:29:04.791600+00:00",
+      "started_at": "2026-10-02T08:29:04Z",
+      "uncertainty": [
+        "QUEUE_INTERVAL_UNKNOWN"
+      ]
+    },
+    {
+      "attempt_id": "a-b5fe291b4a6c49e88a9c45d3c5c0e69f",
+      "backend": "kubernetes",
+      "device_class": "gpu",
+      "allocation_mode": "physical_device",
+      "allocated_device_seconds": 2.0,
+      "measured_compute_seconds": 0.0002705552033148706,
+      "queue_seconds": 0.0,
+      "outcome": "SUCCEEDED",
+      "submission_time_source": "scheduler",
+      "submitted_at": "2026-10-02T08:34:08Z",
+      "started_at": "2026-10-02T08:34:08Z",
+      "uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    }
+  ],
+  "kueue": [
+    {
+      "workload_ref": "job-a-d2e274b5cd0146adb0606f0155175e59-5a77f",
+      "conditions": [
+        {
+          "type": "QuotaReserved",
+          "status": "True",
+          "transition_at": "2026-10-02T08:28:46Z"
+        },
+        {
+          "type": "Admitted",
+          "status": "True",
+          "transition_at": "2026-10-02T08:28:46Z"
+        },
+        {
+          "type": "PodsReady",
+          "status": "False",
+          "transition_at": "2026-10-02T08:28:46Z"
+        }
+      ],
+      "pod_set_resources": [
+        {
+          "cpu": "1",
+          "memory": "2Gi",
+          "nvidia.com/gpu": "1"
+        }
+      ]
+    },
+    {
+      "workload_ref": "job-a-bd6d37a1f2884dd595fac080595daa02-b3536",
+      "conditions": [
+        {
+          "type": "QuotaReserved",
+          "status": "True",
+          "transition_at": "2026-10-02T08:28:52Z"
+        },
+        {
+          "type": "Admitted",
+          "status": "True",
+          "transition_at": "2026-10-02T08:28:52Z"
+        },
+        {
+          "type": "PodsReady",
+          "status": "False",
+          "transition_at": "2026-10-02T08:28:52Z"
+        }
+      ],
+      "pod_set_resources": [
+        {
+          "cpu": "1",
+          "memory": "2Gi",
+          "nvidia.com/gpu": "1"
+        }
+      ]
+    },
+    {
+      "workload_ref": "job-a-edb0337b23c840099dba7d9d8ad3aecd-3ef5a",
+      "conditions": [
+        {
+          "type": "PodsReady",
+          "status": "False",
+          "transition_at": "2026-10-02T08:28:58Z"
+        },
+        {
+          "type": "QuotaReserved",
+          "status": "True",
+          "transition_at": "2026-10-02T08:28:58Z"
+        },
+        {
+          "type": "Admitted",
+          "status": "True",
+          "transition_at": "2026-10-02T08:28:58Z"
+        }
+      ],
+      "pod_set_resources": [
+        {
+          "cpu": "1",
+          "memory": "2Gi",
+          "nvidia.com/gpu": "1"
+        }
+      ]
+    },
+    {
+      "workload_ref": "job-a-ded5754f07024cad9e11ef2a0869b988-14f2d",
+      "conditions": [
+        {
+          "type": "QuotaReserved",
+          "status": "True",
+          "transition_at": "2026-10-02T08:29:04Z"
+        },
+        {
+          "type": "Admitted",
+          "status": "True",
+          "transition_at": "2026-10-02T08:29:04Z"
+        },
+        {
+          "type": "PodsReady",
+          "status": "False",
+          "transition_at": "2026-10-02T08:29:04Z"
+        }
+      ],
+      "pod_set_resources": [
+        {
+          "cpu": "1",
+          "memory": "2Gi",
+          "nvidia.com/gpu": "1"
+        }
+      ]
+    },
+    {
+      "workload_ref": "job-a-b5fe291b4a6c49e88a9c45d3c5c0e69f-17ecd",
+      "conditions": [
+        {
+          "type": "QuotaReserved",
+          "status": "True",
+          "transition_at": "2026-10-02T08:34:08Z"
+        },
+        {
+          "type": "Admitted",
+          "status": "True",
+          "transition_at": "2026-10-02T08:34:08Z"
+        },
+        {
+          "type": "Finished",
+          "status": "True",
+          "transition_at": "2026-10-02T08:34:13Z"
+        },
+        {
+          "type": "PodsReady",
+          "status": "True",
+          "transition_at": "2026-10-02T08:34:13Z"
+        }
+      ],
+      "pod_set_resources": [
+        {
+          "cpu": "1",
+          "memory": "2Gi",
+          "nvidia.com/gpu": "1"
+        }
+      ]
+    }
+  ],
+  "delivery": [
+    {
+      "attempt_id": "a-d2e274b5cd0146adb0606f0155175e59",
+      "mlflow_run_id": "44161584fabe4397931492d2b7aa2054",
+      "artifact_digest": "sha256:94caf28dfaaf24b1cffaeebb26b6a49d4d4299153e41dd7e637bb5c2fa97db84",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-bd6d37a1f2884dd595fac080595daa02",
+      "mlflow_run_id": "48943943a72941e3b4912721b05d39d6",
+      "artifact_digest": "sha256:a8544925d60f60c2a83569dafe35bc67edc6f440a77b4d62fb19f9ffd7dc60be",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-edb0337b23c840099dba7d9d8ad3aecd",
+      "mlflow_run_id": "ee386ff63cfc4d58b2c8f17c8b48d891",
+      "artifact_digest": "sha256:4d5f974ede33d1b747d4493d907adf8d7fbdbc20744f67e9a9a4d4de9e3ebba5",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-ded5754f07024cad9e11ef2a0869b988",
+      "mlflow_run_id": "73a73b8ddeb547da833e33b61b2ccb8a",
+      "artifact_digest": "sha256:6124abb18434fb9f32c4b250b86205107489ea34f4b98f1dfba45a31c6238e6f",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-b5fe291b4a6c49e88a9c45d3c5c0e69f",
+      "mlflow_run_id": "014b92be30f445c79fa76c3eec2f73fa",
+      "artifact_digest": "sha256:2b87be31596e3186171fb129ae60d1ef6911a45a8672ce4fa9ff600aa0e6795b",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    }
+  ],
+  "negative_checks": {
+    "missing_baseline_approval": {
+      "http_status": 404,
+      "job_created": false
+    },
+    "idempotency": {
+      "same_job_on_replay": true,
+      "changed_request_http_status": 409
+    }
+  },
+  "limits": [
+    "One physical GPU, small matmul, uncontrolled power mode; no speedup claim.",
+    "First four queue durations were unknown and were not rewritten.",
+    "Follow-up queue timing uses whole-second server timestamps; reported zero is not exact zero wait.",
+    "Per-job utilization, power and temperature remain unmeasured.",
+    "Qualification execution is separate from the five application attempt ledger records."
+  ],
+  "followup_server_job_creation": "2026-10-02T08:34:08Z"
+}

@@ -86,6 +86,7 @@ responses only within that browser, and end by disconnecting the UI.
 
 The console is not proof that all platform acceptance gates are complete. Slurm
 live inventory, integrated quota utilization/priority reasons, pipeline service
-health, durable supervision/token rotation, inventory retention and a full live
-approval→new-result comparison remain open. There is no invented GPU/NPU
+health, durable supervision/token rotation and inventory retention remain open.
+The [subsequent approved GPU demo](approved-gpu-demo.md) verified the live
+approval→new-result comparison with independent hardware results. There is no invented GPU/NPU
 normalization, per-job utilization attribution or NPU model qualification.

@@ -128,3 +128,44 @@ def test_immutable_registry(service, bundle):
     variant = bundle[2].model_copy(update={"command": ("different",)})
     with pytest.raises(Conflict):
         service.register("variant", variant, "team-a")
+
+
+def test_baseline_cannot_claim_missing_or_expired_approval(service, bundle):
+    from datetime import timedelta
+
+    from resource_advisor.contracts import now
+
+    request = JobRequest(workload_ref="workload-1", candidate_ref="base", approval_ref="missing")
+    with pytest.raises(NotFound):
+        service.submit("team-a", request, "missing-approval")
+    with service.store.transaction() as conn:
+        service.store.put(
+            conn,
+            "approval",
+            "expired",
+            "team-a",
+            {
+                "candidate_ref": "base",
+                "workload_digest": signature(bundle[0]),
+                "expires_at": (now() - timedelta(seconds=1)).isoformat(),
+            },
+        )
+    with pytest.raises(Rejected, match="expired or configuration mismatch"):
+        service.submit(
+            "team-a", request.model_copy(update={"approval_ref": "expired"}), "expired-approval"
+        )
+    with service.store.transaction() as conn:
+        assert not conn.execute(select(jobs)).first()
+
+
+def test_baseline_cannot_claim_another_projects_approval(service):
+    with service.store.transaction() as conn:
+        service.store.put(conn, "approval", "foreign-approval", "team-b", {})
+    with pytest.raises(NotFound):
+        service.submit(
+            "team-a",
+            JobRequest(
+                workload_ref="workload-1", candidate_ref="base", approval_ref="foreign-approval"
+            ),
+            "foreign-approval",
+        )

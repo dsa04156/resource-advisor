@@ -83,3 +83,13 @@ does not mark the full usage-accounting milestone complete.
 
 References: [Slurm sacct](https://slurm.schedmd.com/sacct.html) and
 [Kubernetes Pod lifecycle](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/).
+
+## Kubernetes submission timestamp correction
+
+Kubernetes observations now supply the API server's Job creation timestamp as
+`scheduler_submitted_at`. Mixing a subsecond client submit response with a
+whole-second PodScheduled timestamp could otherwise produce a negative interval
+and an unknown queue duration. A new GPU follow-up verified the corrected path;
+old records remain immutable. Whole-second queue timestamp pairs carry
+`QUEUE_WHOLE_SECOND_RESOLUTION`, including a reported interval of zero. See the
+[actual approval demo](approved-gpu-demo.md) for the raw before/after evidence.
