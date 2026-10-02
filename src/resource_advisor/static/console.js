@@ -857,8 +857,9 @@ $("logout").onclick = () => {
   $("token").focus();
 };
 $("refresh").onclick = () => load();
-function navigate() {
-  const view = location.hash.slice(1);
+function navigate(event) {
+  const view = new URL(event?.newURL || location.href).hash.slice(1);
+  if (view === "main") return; // The skip link must not change the selected view.
   active = views[view] ? view : "execution";
   document.querySelectorAll("nav a").forEach((a) => {
     if (a.dataset.view === active) a.setAttribute("aria-current", "page");

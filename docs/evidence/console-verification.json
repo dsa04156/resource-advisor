@@ -38,5 +38,9 @@
     "Slurm live inventory is not implemented.",
     "No NPU model qualification or per-job telemetry attribution.",
     "Snapshots and browser sessions remain lab-supervised, not production HA."
-  ]
+  ],
+  "keyboard_check": {
+    "skip_link_preserves_selected_view": true,
+    "focus_moves_to_main": true
+  }
 }
