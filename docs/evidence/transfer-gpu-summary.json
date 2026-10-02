@@ -1,0 +1,362 @@
+{
+  "scope": "descriptive bounded GPU comparison; no powered superiority conclusion",
+  "target_studies": [
+    {
+      "label": "target-0-qlognei",
+      "strategy": "qlognei",
+      "seed": 20261003,
+      "state": "COMPLETED",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "selected_candidate": "cpu2",
+      "independent_confirmation_mean_seconds": 0.26105095938934636,
+      "posthoc_selection_regret_fraction": 0.0,
+      "allocated_gpu_seconds": 38.0,
+      "queue_seconds": 1.0,
+      "unknown_queue_intervals": 0,
+      "study_wall_seconds": 342.407244,
+      "planning_seconds": 3.6055961399688385,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_or_incomplete_jobs": 0,
+      "stop_reason": null
+    },
+    {
+      "label": "target-0-rgpe",
+      "strategy": "rgpe",
+      "seed": 20261003,
+      "state": "COMPLETED",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "selected_candidate": "cpu2",
+      "independent_confirmation_mean_seconds": 0.26114611795249704,
+      "posthoc_selection_regret_fraction": 0.0,
+      "allocated_gpu_seconds": 37.0,
+      "queue_seconds": 3.0,
+      "unknown_queue_intervals": 0,
+      "study_wall_seconds": 345.615364,
+      "planning_seconds": 2.936268061050214,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_or_incomplete_jobs": 0,
+      "stop_reason": null
+    },
+    {
+      "label": "target-0-history_warm_start",
+      "strategy": "history_warm_start",
+      "seed": 20261003,
+      "state": "COMPLETED",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "selected_candidate": "cpu2",
+      "independent_confirmation_mean_seconds": 0.2606532045950492,
+      "posthoc_selection_regret_fraction": 0.0,
+      "allocated_gpu_seconds": 39.0,
+      "queue_seconds": 0.0,
+      "unknown_queue_intervals": 0,
+      "study_wall_seconds": 339.907397,
+      "planning_seconds": 2.5830889520584606,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_or_incomplete_jobs": 0,
+      "stop_reason": null
+    },
+    {
+      "label": "target-0-random",
+      "strategy": "random",
+      "seed": 20261003,
+      "state": "COMPLETED",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "selected_candidate": "cpu2",
+      "independent_confirmation_mean_seconds": 0.26067108133186895,
+      "posthoc_selection_regret_fraction": 0.0,
+      "allocated_gpu_seconds": 36.0,
+      "queue_seconds": 0.0,
+      "unknown_queue_intervals": 0,
+      "study_wall_seconds": 338.034963,
+      "planning_seconds": 0.00040205399272963405,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_or_incomplete_jobs": 0,
+      "stop_reason": null
+    },
+    {
+      "label": "target-1-rgpe",
+      "strategy": "rgpe",
+      "seed": 20261004,
+      "state": "COMPLETED",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "selected_candidate": "cpu2",
+      "independent_confirmation_mean_seconds": 0.26075461202223477,
+      "posthoc_selection_regret_fraction": 0.0,
+      "allocated_gpu_seconds": 37.0,
+      "queue_seconds": 0.0,
+      "unknown_queue_intervals": 0,
+      "study_wall_seconds": 341.567798,
+      "planning_seconds": 2.29652550292667,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_or_incomplete_jobs": 0,
+      "stop_reason": null
+    },
+    {
+      "label": "target-1-qlognei",
+      "strategy": "qlognei",
+      "seed": 20261004,
+      "state": "COMPLETED",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "selected_candidate": "cpu2",
+      "independent_confirmation_mean_seconds": 0.2610876399946089,
+      "posthoc_selection_regret_fraction": 0.0,
+      "allocated_gpu_seconds": 43.0,
+      "queue_seconds": 0.0,
+      "unknown_queue_intervals": 0,
+      "study_wall_seconds": 353.028385,
+      "planning_seconds": 0.19067985995206982,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_or_incomplete_jobs": 0,
+      "stop_reason": null
+    },
+    {
+      "label": "target-1-random",
+      "strategy": "random",
+      "seed": 20261004,
+      "state": "COMPLETED",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "selected_candidate": "cpu2",
+      "independent_confirmation_mean_seconds": 0.2608833872751954,
+      "posthoc_selection_regret_fraction": 0.0,
+      "allocated_gpu_seconds": 41.0,
+      "queue_seconds": 0.0,
+      "unknown_queue_intervals": 0,
+      "study_wall_seconds": 336.473963,
+      "planning_seconds": 0.00025224004639312625,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_or_incomplete_jobs": 0,
+      "stop_reason": null
+    },
+    {
+      "label": "target-1-history_warm_start",
+      "strategy": "history_warm_start",
+      "seed": 20261004,
+      "state": "COMPLETED",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "selected_candidate": "cpu2",
+      "independent_confirmation_mean_seconds": 0.2608699374056111,
+      "posthoc_selection_regret_fraction": 0.0,
+      "allocated_gpu_seconds": 39.0,
+      "queue_seconds": 1.0,
+      "unknown_queue_intervals": 0,
+      "study_wall_seconds": 359.887848,
+      "planning_seconds": 2.445471504004672,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_or_incomplete_jobs": 0,
+      "stop_reason": null
+    }
+  ],
+  "oracle_confirmation_mean_seconds": {
+    "cpu0-5": 0.3977740130503662,
+    "cpu1": 0.2636238133806425,
+    "cpu2": 0.26123514796684805
+  },
+  "source_characterization_cost": {
+    "all_jobs": 30,
+    "gpu_reservation_seconds": 82.0,
+    "study_wall_seconds": 729.91209,
+    "selected_profile_job_wall_seconds": 150.03092999999998,
+    "selected_profile_jobs": 18
+  },
+  "oracle_gpu_reservation_seconds": 45.0,
+  "rgpe_updates": [
+    {
+      "plan_ref": "plan-b3c7129362384bf58fe01c0e8ab254b8",
+      "study_ref": "study-9c70cd0a26114020ae45d22b74d7e9c0",
+      "source_count": 18,
+      "target_count": 6,
+      "weights": {
+        "target": 0.140625,
+        "sha256:6a000686347cede44a92c54913cbb492f87d967138a07be0f6d6c7ea3401326c": 0.859375,
+        "sha256:dca651b71224f7185c26beedc141cdfdfabbc4bdb001397910e15539c26738bd": 0.0
+      },
+      "rank_diagnostics": {
+        "informative_ordered_pairs": 4,
+        "tie_fraction": 0.05,
+        "maximum_source_rank_loss": 0.25,
+        "target_loo_mean_loss": 0.3515625,
+        "source_mean_losses": [
+          0.0,
+          0.0
+        ],
+        "eligible_sources": [
+          true,
+          true
+        ],
+        "tie_rule": "target wins equal posterior ranking losses"
+      },
+      "fallback_reason": null
+    },
+    {
+      "plan_ref": "plan-0ecd1adda1b140a5979eb0625e6ed452",
+      "study_ref": "study-9c70cd0a26114020ae45d22b74d7e9c0",
+      "source_count": 18,
+      "target_count": 7,
+      "weights": {
+        "target": 0.140625,
+        "sha256:6a000686347cede44a92c54913cbb492f87d967138a07be0f6d6c7ea3401326c": 0.859375,
+        "sha256:dca651b71224f7185c26beedc141cdfdfabbc4bdb001397910e15539c26738bd": 0.0
+      },
+      "rank_diagnostics": {
+        "informative_ordered_pairs": 4,
+        "tie_fraction": 0.05,
+        "maximum_source_rank_loss": 0.25,
+        "target_loo_mean_loss": 0.3515625,
+        "source_mean_losses": [
+          0.0,
+          0.0
+        ],
+        "eligible_sources": [
+          true,
+          true
+        ],
+        "tie_rule": "target wins equal posterior ranking losses"
+      },
+      "fallback_reason": null
+    },
+    {
+      "plan_ref": "plan-f49f34afc60f4dc0a4881ef75bb9736c",
+      "study_ref": "study-5428e2cd18a64bd888af5a40d484385f",
+      "source_count": 18,
+      "target_count": 6,
+      "weights": {
+        "target": 0.15625,
+        "sha256:6a000686347cede44a92c54913cbb492f87d967138a07be0f6d6c7ea3401326c": 0.84375,
+        "sha256:dca651b71224f7185c26beedc141cdfdfabbc4bdb001397910e15539c26738bd": 0.0
+      },
+      "rank_diagnostics": {
+        "informative_ordered_pairs": 4,
+        "tie_fraction": 0.05,
+        "maximum_source_rank_loss": 0.25,
+        "target_loo_mean_loss": 0.3515625,
+        "source_mean_losses": [
+          0.0,
+          0.0
+        ],
+        "eligible_sources": [
+          true,
+          true
+        ],
+        "tie_rule": "target wins equal posterior ranking losses"
+      },
+      "fallback_reason": null
+    },
+    {
+      "plan_ref": "plan-63b9fe7827204f3db5e6bb904e0f71e7",
+      "study_ref": "study-5428e2cd18a64bd888af5a40d484385f",
+      "source_count": 18,
+      "target_count": 7,
+      "weights": {
+        "target": 0.15625,
+        "sha256:6a000686347cede44a92c54913cbb492f87d967138a07be0f6d6c7ea3401326c": 0.84375,
+        "sha256:dca651b71224f7185c26beedc141cdfdfabbc4bdb001397910e15539c26738bd": 0.0
+      },
+      "rank_diagnostics": {
+        "informative_ordered_pairs": 4,
+        "tie_fraction": 0.05,
+        "maximum_source_rank_loss": 0.25,
+        "target_loo_mean_loss": 0.3515625,
+        "source_mean_losses": [
+          0.0,
+          0.0
+        ],
+        "eligible_sources": [
+          true,
+          true
+        ],
+        "tie_rule": "target wins equal posterior ranking losses"
+      },
+      "fallback_reason": null
+    }
+  ],
+  "source_target_confirmation_and_oracle_leakage_audit_passed": true,
+  "same_target_workload_and_approved_budgets": true,
+  "limitations": [
+    "Two study blocks provide functional replication, not a powered method comparison.",
+    "Post-hoc regret describes configuration selection against later measurements; time drift remains possible.",
+    "Block time includes 32 forwards; it is not individual request latency.",
+    "Source costs are separate from incremental target costs; qualify any amortization assumption.",
+    "GPU reservation is not utilization or energy; preparation and external setup remain separate."
+  ],
+  "f0_costs": {
+    "quota-stopped-v1": 14.0,
+    "executed-v2": 24.0
+  },
+  "target_gpu_reservation_seconds": 310.0,
+  "total_gpu_reservation_seconds": 475.0,
+  "thermal_summary": {
+    "all_traces_eligible": true,
+    "maximum_observed_temperature_c": 54.0,
+    "sensor_query_seconds": 0.4392039710073732,
+    "maximum_query_seconds": 0.01803596696117893,
+    "maximum_unobserved_gap_seconds": 0.07209903799230233,
+    "power_min_w": 4.207,
+    "power_max_w": 102.957,
+    "scope": "Point samples bracketing measured blocks; not continuous utilization or integrated energy"
+  },
+  "all_quality_values": [
+    1.0
+  ],
+  "method_descriptive_means": {
+    "random": {
+      "studies": 2,
+      "mean_allocated_gpu_seconds": 38.5,
+      "mean_wall_seconds": 337.254463,
+      "selected_candidates": [
+        "cpu2",
+        "cpu2"
+      ],
+      "regret_fractions": [
+        0.0,
+        0.0
+      ]
+    },
+    "qlognei": {
+      "studies": 2,
+      "mean_allocated_gpu_seconds": 40.5,
+      "mean_wall_seconds": 347.71781450000003,
+      "selected_candidates": [
+        "cpu2",
+        "cpu2"
+      ],
+      "regret_fractions": [
+        0.0,
+        0.0
+      ]
+    },
+    "history_warm_start": {
+      "studies": 2,
+      "mean_allocated_gpu_seconds": 39.0,
+      "mean_wall_seconds": 349.8976225,
+      "selected_candidates": [
+        "cpu2",
+        "cpu2"
+      ],
+      "regret_fractions": [
+        0.0,
+        0.0
+      ]
+    },
+    "rgpe": {
+      "studies": 2,
+      "mean_allocated_gpu_seconds": 37.0,
+      "mean_wall_seconds": 343.591581,
+      "selected_candidates": [
+        "cpu2",
+        "cpu2"
+      ],
+      "regret_fractions": [
+        0.0,
+        0.0
+      ]
+    }
+  }
+}

@@ -175,6 +175,18 @@ def test_rejects_consistently_increased_budgets(report):
         module.summarize(report)
 
 
+@pytest.mark.parametrize("case", ["device", "wall"])
+def test_rejects_actual_cost_overrun_despite_identical_declared_budgets(report, case):
+    if case == "device":
+        next(r for r in report["observations"] if r["study_ref"] == "target-0-rgpe")[
+            "allocated_device_seconds"
+        ] = 901
+    else:
+        report["studies"]["target-0-rgpe"]["recommendation"]["cost"]["wall_seconds"] = 1201
+    with pytest.raises(ValueError, match="exceeded its approved"):
+        module.summarize(report)
+
+
 def test_rejects_wrong_accounting_owner(report):
     report["observations"][0]["study_ref"] = "oracle"
     with pytest.raises(ValueError, match="wrong study"):

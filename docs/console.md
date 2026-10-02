@@ -75,7 +75,12 @@ whole queue observation. Field meanings follow the
 Resource reads are not an atomic scheduler snapshot. The
 [live observer check](evidence/queue-inventory-preview.json) verifies named-object
 RBAC, real quota/status reads, mobile rendering and hiding expired queue numbers.
-It used a local preview; continuous service rollout is a separate check.
+It used a local preview. After the GPU protocol completed, the
+[service rollout check](evidence/transfer-console-deployment.json) verified
+API/inventory/worker source hashes, HTTPS, anonymous-read rejection, identical
+served assets, live quota reads and all four transfer recommendation panels.
+All ten nodes remained Ready without pressure; no GPU work was submitted by
+these verification reads.
 
 The default polling interval is 15 seconds. Each metric also retains its original
 source timestamp, and browser-side expiration hides bars when their source TTL

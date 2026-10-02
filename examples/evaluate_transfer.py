@@ -66,6 +66,17 @@ def summarize(report):
     for slot, study in zip(design["target_schedule"], target_studies, strict=True):
         if any(study["request"][k] != slot[k] for k in ("strategy", "seed")):
             raise ValueError("target strategy or seed differs from the frozen protocol")
+        pilots = [o for o in study["observations"] if o["mode"] == "pilot"]
+        spent = sum(
+            by_attempt[o["attempt_id"]]["allocated_device_seconds"] for o in study["observations"]
+        )
+        if len(pilots) > approved["max_probes"] or spent > approved["device_seconds"]:
+            raise ValueError("target execution exceeded its approved profiling budget")
+        if (
+            study.get("recommendation")
+            and study["recommendation"]["cost"]["wall_seconds"] > approved["total_wall_seconds"]
+        ):
+            raise ValueError("target completion exceeded its approved wall budget")
     if any(
         datetime.fromisoformat(left["created_at"]) >= datetime.fromisoformat(right["created_at"])
         for left, right in zip(target_studies, target_studies[1:], strict=False)

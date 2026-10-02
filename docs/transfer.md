@@ -118,9 +118,13 @@ reserved Jobs and independent confirmation using an explicit scheduler double.
 It tests project/operator access, invalid source provenance, source expiry,
 model-failure fallback, and separate source/target accounting.
 
-Still required: real independent GPU source/target trials, browser exposure of
-transfer diagnostics, complete upstream source costs, and equal-budget comparison
-against cold-start BO.
+The [completed GPU comparison](transfer-gpu.md) now provides independent source
+and target Jobs, full source characterization costs, and equal target budgets
+against random search and cold-start BO. All eight target studies selected the
+same configuration; no transfer selection advantage was demonstrated. The
+[deployed console check](evidence/transfer-console-deployment.json) verifies
+stored source IDs, weights and cost boundaries for all four transfer studies.
+Broader effectiveness and live harmful-transfer injection remain unverified.
 New hardware, SDKs, model families or training workloads are not implicitly
 qualified by a numerical result. No cross-workload speedup is currently claimed.
 
@@ -132,7 +136,7 @@ specified. Health returned 200; all ten nodes remained Ready without pressure.
 Existing counts remained 152 compute Jobs and 13 studies. This live check did not
 create a transfer family, submit GPU work or establish a transfer-performance result.
 
-## Prospective GPU comparison
+## Preregistered GPU comparison
 
 The [fixed GPU experiment plan](evidence/transfer-gpu-plan.json) defines two source
 input sizes, one target size, three CPU request/thread counts, two randomized
@@ -170,6 +174,7 @@ descriptive cost and post-hoc selection-regret summaries. It requires all declar
 study plans and accounting attempts, the frozen strategy order/seeds/budgets, the
 entire source confirmation cohort, and a feasible oracle measured after tuning.
 It rejects source, confirmation, future or oracle attempts in target GP training,
-and unknown GPU reservation costs. Source characterization, incremental target
+unknown GPU reservation costs, and actual probe/GPU/wall budget overruns.
+Source characterization, incremental target
 work and the post-hoc oracle remain separate. The synthetic report tests verify
 these checks; they are not hardware performance evidence.

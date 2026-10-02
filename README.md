@@ -165,5 +165,8 @@ open. Existing unqualified reports do not authorize this strategy.
 start from actual RGPE. Operator-approved families and immutable source Job/profile
 evidence enable a durable target-check → model → reserved Job → observation loop,
 with source-expiry/negative-transfer fallback and independent target confirmation.
-Real BoTorch tests use explicitly labeled scheduler doubles; physical GPU transfer
-effectiveness and equal-budget comparison remain open.
+The [completed physical GPU comparison](docs/transfer-gpu.md) records 157 API Jobs,
+two method blocks, full source costs and equal target budgets. All four methods
+selected the same configuration: this fixture demonstrates no selection advantage
+for transfer. Numerical failure tests remain explicitly synthetic; broader
+effectiveness and live harmful-transfer injection remain unverified.

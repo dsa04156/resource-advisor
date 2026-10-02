@@ -1,0 +1,118 @@
+{
+  "verified_at": "2026-10-02T19:26:41.204537+00:00",
+  "source_commit": "c56e7e514d2e29ccc8e55bfbf406c8d7f8158681",
+  "running_source_hashes": {
+    "api": "cb49d62b6638c9f429f99ba162b596ed0aaf198e174b20ba003d0f9a1ae8a726",
+    "inventory": "cb49d62b6638c9f429f99ba162b596ed0aaf198e174b20ba003d0f9a1ae8a726",
+    "worker": "cb49d62b6638c9f429f99ba162b596ed0aaf198e174b20ba003d0f9a1ae8a726"
+  },
+  "https_certificate_verified": true,
+  "anonymous_overview_status": 401,
+  "static_assets_byte_identical": true,
+  "live_queue_observation": {
+    "value": {
+      "ref": "ra-f0-gpu",
+      "cluster_queue": "ra-f0-gpu",
+      "scope": "cluster_queue_all_namespaces",
+      "active": true,
+      "stop_policy": "None",
+      "queueing_strategy": "BestEffortFIFO",
+      "cohort": null,
+      "conditions": [
+        {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can admit new workloads",
+          "lastTransitionTime": "2026-10-02T04:34:07Z",
+          "current_generation": true
+        }
+      ],
+      "pending_workloads": 0,
+      "reserving_workloads": 0,
+      "admitted_workloads": 0,
+      "resources": [
+        {
+          "flavor": "ra-f0-gpu",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": 2.0,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": 0.0
+        },
+        {
+          "flavor": "ra-f0-gpu",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": 2147483648.0,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": 0.0
+        },
+        {
+          "flavor": "ra-f0-gpu",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": 1.0,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": 0.0
+        }
+      ],
+      "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+    },
+    "observed_at": "2026-10-02T19:26:07.812528+00:00",
+    "source": "kueue",
+    "status": "ok",
+    "unit": null
+  },
+  "transfer_panels": [
+    {
+      "study_ref": "study-9c70cd0a26114020ae45d22b74d7e9c0",
+      "strategy": "rgpe",
+      "source_attempts": 18,
+      "choices": 8,
+      "weighted_choices": 2
+    },
+    {
+      "study_ref": "study-5428e2cd18a64bd888af5a40d484385f",
+      "strategy": "rgpe",
+      "source_attempts": 18,
+      "choices": 8,
+      "weighted_choices": 2
+    },
+    {
+      "study_ref": "study-60a0dda85cfa48ff815882e66114e0de",
+      "strategy": "history_warm_start",
+      "source_attempts": 18,
+      "choices": 8,
+      "weighted_choices": 0
+    },
+    {
+      "study_ref": "study-7238b4307aa747afac5442ad2c2ef988",
+      "strategy": "history_warm_start",
+      "source_attempts": 18,
+      "choices": 8,
+      "weighted_choices": 0
+    }
+  ],
+  "job_counts": {
+    "CANCELED": 8,
+    "FAILED": 1,
+    "SUCCEEDED": 299,
+    "RESULT_INVALID": 1
+  },
+  "ready_nodes": 10,
+  "pressure_nodes": 0,
+  "scope": "actual post-experiment service rollout; no new GPU work submitted by these reads"
+}
