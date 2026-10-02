@@ -38,8 +38,8 @@ def build_model(torch, seed):
 def validate(context, shape, units, precision):
     if tuple(shape) not in SHAPES or not 3 <= units <= 16 or precision != "fp32":
         raise ValueError("transfer fixture requires an approved fp32 shape and 3–16 blocks")
-    if context["parameters"] or context["resources"]["host_cpu"] not in (1, 2, 4):
-        raise ValueError("only fixed 1/2/4 CPU requests without extra parameters are supported")
+    if context["parameters"] or context["resources"]["host_cpu"] not in (0.5, 1, 2, 4):
+        raise ValueError("only fixed 0.5/1/2/4 CPU requests without extra parameters are supported")
     if (
         context["allocation_mode"] != "physical_device"
         or context["resources"]["accelerator_count"] != 1
@@ -71,7 +71,7 @@ def run():
             or reader.device_uuid_digest != policy.device_uuid_digest
         ):
             raise RuntimeError("runtime or physical GPU differs from qualification")
-        torch.set_num_threads(int(context["resources"]["host_cpu"]))
+        torch.set_num_threads(max(1, int(context["resources"]["host_cpu"])))
         torch.manual_seed(int(os.environ["RA_SEED"]))
         torch.backends.cuda.matmul.allow_tf32 = False
         torch.backends.cudnn.allow_tf32 = False

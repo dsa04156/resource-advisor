@@ -72,3 +72,10 @@ def test_fixed_gpu_benchmark_refuses_unsupported_work(bundle, case):
         context["resources"]["host_cpu"] = 3
     with pytest.raises(ValueError):
         validate(context, shape, blocks, precision)
+
+
+def test_fractional_cpu_budget_keeps_one_physical_gpu(bundle):
+    context = bundle[1].context.model_dump(mode="json")
+    context["resources"]["host_cpu"] = 0.5
+    validate(context, [1, 3, 128, 128], 12, "fp32")
+    assert context["resources"]["accelerator_count"] == 1

@@ -1,0 +1,159 @@
+{
+  "scope": "first transfer qualification plan stopped before source/tuning studies",
+  "plan_digest": "sha256:d96e8bf18a0ba079fa09b9aeba153163169875fa7f2c8fa7e43e8ed2e55d3383",
+  "captured_at": "2026-10-02T18:09:03.995569+00:00",
+  "reason": "CPU 4 exceeds the existing verification ClusterQueue CPU quota 2",
+  "quota_unchanged": {
+    "cpu": 2,
+    "physical_gpu": 1
+  },
+  "records": [
+    {
+      "shape": 128,
+      "cpu": 1,
+      "outcome": "COMPLETED_F0_ONLY",
+      "measurements": {
+        "elapsed_seconds": 0.09715567587409168,
+        "peak_memory_mib": 8.66748046875,
+        "quality_value": 1.0,
+        "sample_count": 12,
+        "work_units": 12,
+        "latency_p50_ms": null,
+        "latency_p95_ms": null,
+        "latency_p99_ms": null,
+        "throughput": 123.51311327967424,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "gpu_reservation_seconds": 2.0,
+      "result_digest": "sha256:c3376485f4e8f983d464999630398eaf81d6357151827265a5e59eb47f192b20"
+    },
+    {
+      "shape": 128,
+      "cpu": 2,
+      "outcome": "COMPLETED_F0_ONLY",
+      "measurements": {
+        "elapsed_seconds": 0.09830860386136919,
+        "peak_memory_mib": 8.66748046875,
+        "quality_value": 1.0,
+        "sample_count": 12,
+        "work_units": 12,
+        "latency_p50_ms": null,
+        "latency_p95_ms": null,
+        "latency_p99_ms": null,
+        "throughput": 122.06459586102874,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "gpu_reservation_seconds": 1.0,
+      "result_digest": "sha256:e8fe328c88766e09d3f37ffb9e2889e358ad0a54b7d608827963ba1c0b201426"
+    },
+    {
+      "shape": 128,
+      "cpu": 4,
+      "outcome": "QUOTA_UNADMITTED_NO_POD",
+      "gpu_reservation_seconds": 0
+    },
+    {
+      "shape": 192,
+      "cpu": 1,
+      "outcome": "COMPLETED_F0_ONLY",
+      "measurements": {
+        "elapsed_seconds": 0.16397088387748227,
+        "peak_memory_mib": 19.13623046875,
+        "quality_value": 1.0,
+        "sample_count": 12,
+        "work_units": 12,
+        "latency_p50_ms": null,
+        "latency_p95_ms": null,
+        "latency_p99_ms": null,
+        "throughput": 73.18372455055072,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "gpu_reservation_seconds": 1.0,
+      "result_digest": "sha256:0d6c182aeb2f8546526508e6832f0c66f2ad6e4414b03f707261ba04d896afa9"
+    },
+    {
+      "shape": 192,
+      "cpu": 2,
+      "outcome": "COMPLETED_F0_ONLY",
+      "measurements": {
+        "elapsed_seconds": 0.16278543893713504,
+        "peak_memory_mib": 19.13623046875,
+        "quality_value": 1.0,
+        "sample_count": 12,
+        "work_units": 12,
+        "latency_p50_ms": null,
+        "latency_p95_ms": null,
+        "latency_p99_ms": null,
+        "throughput": 73.71666703330999,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "gpu_reservation_seconds": 1.0,
+      "result_digest": "sha256:f7e2a42868f2a3c23ad354e80762ac73cfb2550c00c38e26751dab8ea9db7a1d"
+    },
+    {
+      "shape": 192,
+      "cpu": 4,
+      "outcome": "QUOTA_UNADMITTED_NO_POD",
+      "gpu_reservation_seconds": 0
+    },
+    {
+      "shape": 256,
+      "cpu": 1,
+      "outcome": "COMPLETED_F0_ONLY",
+      "measurements": {
+        "elapsed_seconds": 0.2632266840082593,
+        "peak_memory_mib": 33.79248046875,
+        "quality_value": 1.0,
+        "sample_count": 12,
+        "work_units": 12,
+        "latency_p50_ms": null,
+        "latency_p95_ms": null,
+        "latency_p99_ms": null,
+        "throughput": 45.588083310062416,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "gpu_reservation_seconds": 2.0,
+      "result_digest": "sha256:7a67c522b89229351d506fc77ccb0e6c8b2dbbf914082e3365acafdf13fc3ce7"
+    },
+    {
+      "shape": 256,
+      "cpu": 2,
+      "outcome": "COMPLETED_F0_ONLY",
+      "measurements": {
+        "elapsed_seconds": 0.2593089221045375,
+        "peak_memory_mib": 33.79248046875,
+        "quality_value": 1.0,
+        "sample_count": 12,
+        "work_units": 12,
+        "latency_p50_ms": null,
+        "latency_p95_ms": null,
+        "latency_p99_ms": null,
+        "throughput": 46.27684964562204,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "gpu_reservation_seconds": 2.0,
+      "result_digest": "sha256:c0f5abc6def5dc673661c62552c807475f8debb48964d58fb351c37c625ca36f"
+    },
+    {
+      "shape": 256,
+      "cpu": 4,
+      "outcome": "QUOTA_UNADMITTED_NO_POD",
+      "gpu_reservation_seconds": 0
+    }
+  ],
+  "no_source_or_target_study_submitted": true,
+  "total_f0_gpu_reservation_seconds": 9.0,
+  "next_protocol": "separate preregistered 0.5/1/2 CPU envelope; no reuse of these results as source observations"
+}

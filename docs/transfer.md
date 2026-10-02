@@ -153,3 +153,14 @@ This is a bounded functional comparison. Two independent study blocks cannot
 establish statistical superiority. The plan preserves null improvement and the
 possibility that exhaustive measurement is cheaper with only three candidates.
 Recorded plans and running qualification Jobs are not successful experiment results.
+
+The [first plan stopped at qualification](evidence/transfer-gpu-quota-stop.json):
+CPU 4 exceeded the existing CPU 2 ClusterQueue ceiling. Six CPU 1/2 F0 Jobs
+completed, while three CPU 4 Jobs had no Pod and were canceled without GPU
+allocation. Their measured costs remain reported. No source or tuning study was
+submitted under that plan and queue policy was unchanged.
+
+The separate [second plan](evidence/transfer-gpu-plan-v2.json) uses CPU 0.5/1/2
+within that verified quota. The runner sets `max(1, int(requested_cpu))` PyTorch
+threads; fractional CPU remains enforced by the container CPU quota. Its source
+cohort is measured anew rather than importing favorable F0 timings.
