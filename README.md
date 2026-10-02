@@ -151,5 +151,6 @@ qualification and automatic MF-KG selection remain open.
 [Execution-bound thermal observations](docs/thermal-evidence.md) add read-only
 NVML measurements around each sampled GPU forward. Missing or ineligible
 observations exclude a result from recommendation history and stop the study.
-Unit coverage and an actual GPU sensor probe are verified; measured-workload
-trace collection and sustained thermal qualification remain separate gates.
+An actual 18-Job GPU trial verified all 240 sensor reads and matching
+S3/API/MLflow bundles. Measurement overhead is reported; sustained thermal and
+paired-rank qualification remain open.

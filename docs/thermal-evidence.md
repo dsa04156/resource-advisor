@@ -78,6 +78,36 @@ query time and maximum unobserved gap metrics; unknown values remain absent.
 Both backend adapters transport the policy, and the native Slurm guard preserves
 its environment variable. That code path alone is not Slurm hardware validation.
 
+## Reproducing the bounded path
+
+1. Use the existing qualified sampled CUDA runtime and an operator-approved
+   sampling policy; the workload must bind 1–32 distinct inputs. Read the
+   allocated CUDA device UUID through NVML and retain only its digest and
+   the actual driver version. A historical driver's version is not evidence
+   about the current runtime.
+2. Register a new capability/context and immutable runtime variant containing
+   the same `runtime_versions.driver`. Add `thermal_policy` with the observed
+   driver/device digest and temperature, query and gap limits chosen before
+   measured execution. The measured lab example uses 80°C, 50 ms per complete
+   sensor read and 250 ms maximum unobserved gap. These are study criteria,
+   not device safety limits.
+3. Register the sampled workload and sampling binding. Use
+   `python -m resource_advisor.sampled_gpu_benchmark --inputs <approved-directory>`
+   as the qualified command and pilot command. The backend sets the identity,
+   input plan and `RA_THERMAL_POLICY_JSON` from the approved job; users should
+   not replace these variables inside notebook code.
+4. Submit through the ordinary Job API or preregistered fidelity-calibration
+   study. Keep each independent Job as one experimental unit. CPU/thread
+   settings, measurement level, selection seed and confirmation reserve must
+   be fixed in the registered study; observations within a Job are subsamples.
+5. Read `/api/v1/compute/jobs/{job_id}/thermal-trace` and the result bundle.
+   Compare stored trace digests and MLflow tags/metrics, then verify the
+   retrieved S3/API/MLflow artifact bytes agree. An ineligible trace is retained
+   with its cost and does not justify adjusting the threshold after seeing it.
+
+Prior variants remain unchanged. Adding telemetry creates a new execution
+context, so earlier uninstrumented timings are not silently pooled into it.
+
 ## Verification boundaries
 
 `tests/test_thermal.py` covers serialization compatibility, context isolation,
@@ -87,6 +117,53 @@ bounded envelopes and NVML ABI fault doubles. Test sensor readings are synthetic
 
 An actual RTX 5080 discovery probe verified CUDA/NVML UUID resolution after
 exposing the missing-prefix difference. Its NVML query returned driver `595.84`
-and supported thermal-reason bits. That probe is not a measured-workload trace
-or full thermal qualification. Full run/collector readback evidence is recorded
-separately when verified; earlier GPU sampling reports remain unchanged.
+and supported thermal-reason bits. The failed prefix probe, format diagnostic
+and successful probe each reserved two GPU-seconds; all three remain accounted.
+
+## Actual GPU execution and delivery
+
+The [raw report](evidence/thermal-gpu-calibration.json) and
+[per-Job CSV](evidence/thermal-gpu-calibration.csv) record a new, separately
+registered trial on application source `813dc6216eed5b3bd79581ddace670134dd5deea`.
+API, inventory and worker source files were checked inside their running Pods
+against source-tree digest
+`24a2b42a07a083a9c839b86aef9b66950ea9d2ddf150c125fc163841b8d0970c`.
+The existing Python/PyTorch/CUDA dependencies and host driver were retained.
+
+Four fresh F0 Jobs passed before workload registration, costing nine GPU
+reservation seconds. The subsequent durable study completed 12 calibration
+probes and six independent target confirmations: 18 unique successful Jobs,
+40 GPU reservation seconds and 383.234 seconds of study wall time. Every Job
+passed numerical quality and trace eligibility. Only the six confirmations
+entered measured profile history. The study used two host CPU settings and
+four/eight distinct generated matrix inputs; it was a bounded integration trial.
+
+The 240 recorded sensor reads observed 32–33°C, 4.201–6.616 W and 180–690 MHz;
+recorded clock-event masks were zero. These are NVML point values around tiny
+kernels, not average active-kernel power or proof of no throttling between reads.
+The largest unobserved gap was 0.525 ms and the largest complete sensor read
+was 2.338 ms. Total sensor-query time was 41.066 ms versus 3.188 ms of timed
+forward execution: about 12.9 times as much. Instrumentation overhead is material
+for this workload and remains inside Job wall cost.
+
+Backend-emitted result/trace, collector DB records and the project-owned trace
+API agreed for every Job. All 18 S3/API/MLflow result bundles matched byte for
+byte; MLflow temperature/query/gap metrics and trace tags matched the stored
+assessment. Each attempt had one finished MLflow run. Kueue owner UIDs,
+admission, physical GPU reservation and successful Pods were verified. The
+final queue and delivery outbox were empty; all ten nodes were Ready without
+pressure conditions at capture time.
+
+The independent confirmation selected baseline `cpu1`; its interval overlapped
+`cpu2`. The stored API status is `CONFIRMED_RECOMMENDATION`, which here confirms
+the selected baseline's executable result, not a statistically established
+improvement. The earlier probe prediction was `cpu2`; neither historical
+uninstrumented results nor these confirmations entered the MF evidence input.
+The evidence endpoint verified thermal brackets for the 12 probes but retained
+`PAIRED_RANK_AND_THERMAL_QUALIFICATION_REQUIRED` and `execution_authorized=false`.
+A correctly shaped live MF-KG request returned HTTP 422 with
+`MF_KG_DISABLED: no qualified paired-fidelity group`.
+
+This trial does not establish sustained thermal behavior, real-dataset fidelity,
+calibrated intervals, candidate ranking stability or strategy superiority.
+Earlier reports retain their original missing-thermal qualification status.
