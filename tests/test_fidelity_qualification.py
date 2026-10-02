@@ -236,7 +236,9 @@ def test_real_kernel_drives_mixed_jobs_and_independent_confirmation(qualified_sp
     assert all(ids.isdisjoint(held_out) for ids in seen)
     assert result["historical_calibration_cost"] == calibration["recommendation"]["cost"]
     assert result["historical_calibration_recharged"] is False and result["planning_seconds"] > 0
-    assert result["charged_device_seconds"] != calibration["charged_device_seconds"]
+    assert sum(result["charged_device_seconds"].values()) == sum(
+        o["device_seconds"] for o in result["observations"]
+    )
     assert {o["workload_ref"] for o in confirms} == {"qualified-full"}
     assert result["recommendation"]["confirmation_run_ids"] == [o["attempt_id"] for o in confirms]
     with service.store.transaction() as conn:

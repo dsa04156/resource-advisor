@@ -453,12 +453,10 @@ class Studies:
                 reason = "MF_OBSERVATION_INFEASIBLE"
             if reason:
                 qualification_ref = body["request"]["fidelity_qualification_ref"]
-                if not self.store.get(
-                    conn, "fidelity_qualification_invalidation", qualification_ref
-                ):
+                if not self.store.get(conn, "fidelity_invalidation", qualification_ref):
                     self.store.put(
                         conn,
-                        "fidelity_qualification_invalidation",
+                        "fidelity_invalidation",
                         qualification_ref,
                         row["project"],
                         {

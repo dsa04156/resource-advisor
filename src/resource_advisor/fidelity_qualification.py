@@ -166,10 +166,8 @@ class FidelityQualifications:
     def status(self, project, ref):
         with self.store.transaction() as conn:
             plan = required(self.store, conn, "fidelity_qualification", ref, project)
-            assessment = required(
-                self.store, conn, "fidelity_qualification_assessment", ref, project
-            )
-            invalidation = self.store.get(conn, "fidelity_qualification_invalidation", ref)
+            assessment = required(self.store, conn, "fidelity_assessment", ref, project)
+            invalidation = self.store.get(conn, "fidelity_invalidation", ref)
             space = required(
                 self.store, conn, "fidelity_space", plan["request"]["space_ref"], project
             )
@@ -187,9 +185,9 @@ class FidelityQualifications:
 
     def assess(self, project, ref):
         with self.store.transaction() as conn:
-            old = self.store.get(conn, "fidelity_qualification_assessment", ref)
+            old = self.store.get(conn, "fidelity_assessment", ref)
             if old:
-                return required(self.store, conn, "fidelity_qualification_assessment", ref, project)
+                return required(self.store, conn, "fidelity_assessment", ref, project)
             plan = required(self.store, conn, "fidelity_qualification", ref, project)
             binding = required(self.store, conn, "fidelity_qualification_study", ref, project)
             row = self.store.study(conn, binding["study_ref"])
@@ -290,14 +288,12 @@ class FidelityQualifications:
             },
         }
         with self.store.transaction() as conn:
-            return self.store.put(conn, "fidelity_qualification_assessment", ref, project, body)[
-                "body"
-            ]
+            return self.store.put(conn, "fidelity_assessment", ref, project, body)["body"]
 
     def checked(self, conn, project, ref, space):
         plan = required(self.store, conn, "fidelity_qualification", ref, project)
-        result = required(self.store, conn, "fidelity_qualification_assessment", ref, project)
-        if self.store.get(conn, "fidelity_qualification_invalidation", ref):
+        result = required(self.store, conn, "fidelity_assessment", ref, project)
+        if self.store.get(conn, "fidelity_invalidation", ref):
             raise Rejected("MF_KG_DISABLED: qualification invalidated by a later observation")
         if (
             result["status"] != "QUALIFIED"
