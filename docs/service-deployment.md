@@ -48,6 +48,33 @@ are mounted later, not copied into layers. Its optional optimizer extra has a
 separate CPU Torch index; dependency hashes stay mandatory. The live image here
 includes artifacts only and is not qualified as an optimizer worker image.
 
+For later source changes with an **unchanged dependency lock**, reuse the
+qualified service build report:
+
+```sh
+python examples/update_service.py \
+  --runtime-report /secure/path/qualified-build-report.json \
+  --destination '<authorized registry>/resource-advisor/services:<new-version>' \
+  --workdir /scratch/new-source-build
+```
+
+This appends only the application package; dependencies and verified kubectl are
+inherited from the digest-pinned runtime. A changed lock, unpinned image or wrong
+platform is rejected before building. The source layer uses an
+[OCI opaque whiteout](https://github.com/opencontainers/image-spec/blob/main/layer.md#opaque-whiteout)
+to replace old package contents, including deleted source/bytecode, while leaving
+sibling dependencies intact. Symlinks are rejected. Deterministic file digests,
+layer digest/size and inherited runtime properties are retained in the report.
+The report is an operator-supplied record of a qualified runtime, not proof that
+an arbitrary third-party image is trustworthy. Rebuild with `build_launcher.py`
+when dependencies or runtime tooling change.
+
+The mixed-workload calibration rollout used a **399,360-byte** source layer for
+both the minimal API/collector and the optimizer worker. Each running container's
+33-file source digest matched the build report. No Kubernetes, GPU driver,
+runtime-library or database version changed. Site build reports stay private
+because image repositories can contain internal addresses.
+
 Create the dedicated Secrets from protected files, then apply a **private** site
 overlay that replaces the placeholder image and node selector:
 
