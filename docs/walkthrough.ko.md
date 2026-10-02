@@ -38,3 +38,36 @@ uv run pytest tests/test_api_flow.py -q -s
 초기 구현이다. 파일럿 예산 예약과 BO 탐색→별도 확인 실행 루프도 추가했고,
 지금은 합성 실행으로 검증한 상태다. 실제 클러스터 연결과 GPU 최적화 실험,
 NPU 모델 실행, 통합 관리 화면은 계속 구현·검증해야 한다.
+
+
+## 실제 Kubeflow에서 GPU 작업 실행하기
+
+2026-10-02에는 다음 연결을 실제 장비에서 확인했다.
+
+`Kubeflow 파이프라인 → HTTPS 작업 API → Kueue 입장 → RTX 5080 작업 → 결과 검증 → S3·MLflow`
+
+파이프라인 Pod는 CPU로 API 호출과 진행 확인을 맡는다. GPU 1개는 별도
+작업 Pod가 Kueue의 허가를 받은 뒤 사용한다. 따라서 파이프라인 Pod에
+GPU를 또 요청하면 이중으로 자원을 잡게 된다.
+
+1. 관리자는 [실행 준비 가이드](kubeflow-pipeline.md)에 따라 이미지, HTTPS,
+   프로젝트 Secret, 작업 명세와 worker를 준비한다.
+2. `uv run --extra pipelines python examples/pipeline.py --output /scratch/observe.yaml`
+   명령으로 파이프라인 파일을 만든다.
+3. Kubeflow의 Pipelines에서 파일을 올리고 실행을 만든다. `api_url`,
+   `launcher_image`, `workload`, `candidate`, `token_secret`, `run_key`를
+   관리자가 준비한 값으로 입력한다. `token_secret`에는 비밀번호가 아니라
+   Kubernetes Secret의 이름만 넣는다.
+4. 실행 화면에서 `launch` 단계를 연다. 완료되면 로그의 `job_id`, `state`,
+   `result_digest`로 실제 작업과 결과를 확인한다. GPU 자원 요청과 입장은
+   별도 작업 Pod 및 Kueue Workload에서 확인한다.
+5. 같은 측정 요청을 재시도할 때는 **같은 `run_key`**를 쓴다. 이미 성공한
+   요청을 이 키로 다시 실행하면 기존 결과를 돌려준다. 새로운 측정이
+   필요할 때만 새 키를 정한다.
+
+검증에서는 첫 시도가 디스크 부족으로 실패했고, 복구 후 실제 GPU 실행이
+성공했다. 이후 캐시를 끈 파이프라인을 같은 키로 재실행해도 GPU 작업은
+총 1개였다. 사용량은 GPU 예약 2초였으며, 계산 커널 측정 시간과는 다른
+값이다. 자세한 측정치와 한계는 [실행 증거](evidence/kubeflow-pipeline.json)에
+남겼다. 단일 행렬곱 연결 시험이므로 모델 성능 비교나 전체 플랫폼 완성을
+뜻하지 않는다.

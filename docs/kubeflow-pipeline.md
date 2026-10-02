@@ -57,3 +57,32 @@ failure; it is not a GPU benchmark or a successful execution.
 The existing Kubeflow storage repair is documented separately in
 [kubeflow-recovery.md](kubeflow-recovery.md). Service readiness, pipeline
 compilation, and complete live execution are separate acceptance gates.
+
+## Live verification — 2026-10-02
+
+The [sanitized evidence](evidence/kubeflow-pipeline.json) records a successful
+uncached KFP 2.5.0 workflow through HTTPS, the independent API, Kueue and an actual
+RTX 5080 PyTorch job. The launcher requested 100m CPU/128Mi and **no GPU**;
+the backend workload reserved one physical GPU, one CPU and 2Gi memory.
+The validated result had numerical agreement 1.0. The usage ledger recorded
+2 GPU reservation seconds; the much shorter synchronized kernel measurement is
+kept separately. Queue time is unknown in this trial because timestamps with
+different precision overlap, rather than being reported as zero.
+
+The result bundle was uploaded to the separate Resource Advisor S3 service,
+read back byte-for-byte through S3 and the authenticated API, and linked to a
+FINISHED MLflow run with its artifact. Final Kueue pending/admitted/reserving
+counts were all zero. The workload was a 256×256 fp32 matrix multiplication
+with 20 timed repetitions: this verifies execution wiring, not general model
+performance, saturation, or optimization gains.
+
+The first KFP attempt was evicted for ephemeral-storage pressure **before** an
+API job existed. That failure was retained. Disposable Go cache cleanup restored
+headroom; Kubernetes cleared DiskPressure naturally. The subsequent run succeeded
+without changing eviction thresholds, scheduler protections or cluster versions.
+
+A second successful **uncached** workflow reused the same `run_key`. Its launcher
+returned the same job ID, attempt ID and result digest. The database still held
+exactly one compute job for this workload, demonstrating workflow retry without
+another GPU execution. This does not replace process-crash or network-partition
+acceptance tests.

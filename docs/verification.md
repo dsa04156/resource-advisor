@@ -146,3 +146,16 @@ Four missing terminal records were backfilled idempotently. Read-only Slurm chec
 recovered actual failed/cancelled AllocTRES after fixing purged-ID lookup. The live
 database was backed up and restored with all five table contents matching.
 See [accounting evidence and its remaining gaps](accounting.md).
+
+## Live Kubeflow increment
+
+The suite passes **81 tests on SQLite and isolated PostgreSQL**. Direct TLS
+serving requires both key and certificate; the pipeline trusts an explicit CA
+bundle from a namespace Secret and sends the project token without embedding it
+in workflow parameters. An unprivileged, digest-pinned launcher image was built
+with hash-checked locked dependencies and verified in an actual Pod.
+
+The uncached KFP → API → Kueue → RTX 5080 → validated result chain succeeded.
+S3/API byte readback, a FINISHED MLflow run and its artifact were verified.
+An earlier disk-pressure eviction is retained as a failed infrastructure attempt.
+See [the workflow report and measured limitations](kubeflow-pipeline.md).

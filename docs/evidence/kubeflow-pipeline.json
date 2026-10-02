@@ -1,0 +1,139 @@
+{
+  "verified_on": "2026-10-02",
+  "evidence_kind": "hardware",
+  "scope": "one bounded Kubeflow-to-Kubernetes GPU observation",
+  "versions": {
+    "kubernetes": "1.31.14",
+    "kfp_server": "2.5.0",
+    "kfp_sdk": "2.13.0",
+    "kfp_kubernetes": "1.5.0",
+    "pytorch": "2.8.0+cu128"
+  },
+  "workflow": {
+    "state": "Succeeded",
+    "started_at": "2026-10-02T06:47:22Z",
+    "finished_at": "2026-10-02T06:49:46Z",
+    "cache_enabled": false,
+    "main_container_resources": {
+      "limits": {
+        "cpu": "1",
+        "memory": "256Mi"
+      },
+      "requests": {
+        "cpu": "100m",
+        "memory": "128Mi"
+      }
+    },
+    "launcher_image_digest": "sha256:bc1af569b27b291a6351349fc8bb1fe6419563b3599dd57f2209d48c3ec74b58",
+    "api_tls_verified": true,
+    "credential_source": "namespace Secret"
+  },
+  "compute": {
+    "state": "SUCCEEDED",
+    "accelerator_model": "NVIDIA GeForce RTX 5080",
+    "resources": {
+      "limits": {
+        "cpu": "1",
+        "memory": "2Gi",
+        "nvidia.com/gpu": "1"
+      },
+      "requests": {
+        "cpu": "1",
+        "memory": "2Gi",
+        "nvidia.com/gpu": "1"
+      }
+    },
+    "quality_passed": true,
+    "result": {
+      "schema_version": "v1",
+      "epoch": 1,
+      "workload_signature": "sha256:70cb5155179430c0a69813aa5451bab7f72e3a8d0efee39ca462d8416aa760ca",
+      "context_signature": "sha256:400079769425e15f28c0dffd2bbdd4a042ef032626abe10ae821b5353383ebdf",
+      "outcome": "COMPLETED",
+      "measured": true,
+      "evidence_kind": "hardware",
+      "measurements": {
+        "elapsed_seconds": 0.00027052086079493165,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 20,
+        "work_units": 20,
+        "latency_p50_ms": 0.013270502677187324,
+        "latency_p95_ms": 0.013941957149654627,
+        "latency_p99_ms": 0.013941957149654627,
+        "throughput": 73931.45187114054,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "error_code": null
+    },
+    "kueue_conditions": [
+      {
+        "type": "QuotaReserved",
+        "status": "True",
+        "reason": "QuotaReserved",
+        "lastTransitionTime": "2026-10-02T06:49:27Z"
+      },
+      {
+        "type": "Admitted",
+        "status": "True",
+        "reason": "Admitted",
+        "lastTransitionTime": "2026-10-02T06:49:27Z"
+      },
+      {
+        "type": "Finished",
+        "status": "True",
+        "reason": "Succeeded",
+        "lastTransitionTime": "2026-10-02T06:49:32Z"
+      },
+      {
+        "type": "PodsReady",
+        "status": "True",
+        "reason": "Recovered",
+        "lastTransitionTime": "2026-10-02T06:49:32Z"
+      }
+    ],
+    "queue_after": {
+      "pending": 0,
+      "admitted": 0,
+      "reserving": 0
+    }
+  },
+  "accounting": {
+    "allocation_mode": "physical_device",
+    "allocated_device_seconds": 2.0,
+    "measured_compute_seconds": 0.00027052086079493165,
+    "queue_seconds": null
+  },
+  "accounting_uncertainty": [
+    "QUEUE_INTERVAL_UNKNOWN"
+  ],
+  "delivery": {
+    "result_sha256": "f4a76eca90e76554a358e3f95b087c036d03c936b2fbb897623a6b9785a0aefc",
+    "s3_readback": true,
+    "api_readback": true,
+    "mlflow_run_state": "FINISHED",
+    "mlflow_artifact_listed": true
+  },
+  "unsuccessful_attempts": [
+    {
+      "phase": "Failed",
+      "reason": "ephemeral-storage eviction before API submission",
+      "compute_jobs": 0
+    }
+  ],
+  "limitations": [
+    "Single-node matrix-multiplication smoke, not a throughput comparison",
+    "Queue interval remains unknown because scheduler seconds and submit-response precision overlap",
+    "Lab GPU runtime uses read-only qualified package PVC/source bundle",
+    "No cross-project isolation, node-loss recovery, training checkpoints or Slurm model path certified"
+  ],
+  "uncached_workflow_replay": {
+    "workflow_state": "Succeeded",
+    "same_job": true,
+    "same_attempt": true,
+    "same_result_digest": true,
+    "total_compute_jobs": 1
+  }
+}
