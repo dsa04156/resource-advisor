@@ -3,6 +3,7 @@
 import copy
 import random
 import statistics
+import time
 from datetime import datetime, timedelta
 from uuid import uuid4
 
@@ -39,8 +40,12 @@ class Studies:
             request_body.pop("replication")
         if request.fidelity_space_ref is None:
             request_body.pop("fidelity_space_ref")
+        if request.fidelity_qualification_ref is None:
+            request_body.pop("fidelity_qualification_ref")
         request_digest = signature(request_body)
-        if request.strategy in {"mfkg", "rgpe"}:
+        if request.strategy == "rgpe" or (
+            request.strategy == "mfkg" and not request.fidelity_qualification_ref
+        ):
             raise Rejected(
                 {
                     "mfkg": "MF_KG_DISABLED: no qualified paired-fidelity group",
@@ -100,9 +105,13 @@ class Studies:
                 raise Rejected("probe budget must cover the replication initial design")
             fidelity = None
             fidelity_schedule = None
-            if request.strategy == "fidelity_calibration":
+            qualification = seed_evidence = qualification_plan = None
+            blocks = 3
+            if request.strategy in {"fidelity_calibration", "mfkg"}:
                 from .fidelity_space import FidelitySpaces
 
+                if request.fidelity_space_ref is None:
+                    raise Rejected("qualified MF-KG requires its explicit fidelity space")
                 fidelity = required(
                     self.store, conn, "fidelity_space", request.fidelity_space_ref, project
                 )
@@ -113,20 +122,49 @@ class Studies:
                     raise Rejected(
                         "all calibration configurations must fit the eligible candidate budget"
                     )
-                if policy.max_probes < 3 * len(fidelity["options"]):
-                    raise Rejected("calibration requires three independent blocks for every option")
+                if request.fidelity_qualification_ref:
+                    from .fidelity_qualification import FidelityQualifications
+
+                    qualification_plan = required(
+                        self.store,
+                        conn,
+                        "fidelity_qualification",
+                        request.fidelity_qualification_ref,
+                        project,
+                    )
+                    if qualification_plan["space_digest"] != signature(fidelity):
+                        raise Rejected("qualification plan differs from study space")
+                    if request.strategy == "mfkg":
+                        qualification, seed_evidence = FidelityQualifications(self.service).checked(
+                            conn, project, request.fidelity_qualification_ref, fidelity
+                        )
+                        if len(seed_evidence["observations"]) + policy.max_probes > 192:
+                            raise Rejected("MF-KG total observations exceed bounded model capacity")
+                    else:
+                        blocks = qualification_plan["request"]["blocks"]
+                        if self.store.get(
+                            conn, "fidelity_qualification_study", request.fidelity_qualification_ref
+                        ):
+                            raise Rejected(
+                                "qualification plan already bound to a single calibration"
+                            )
+                if request.strategy == "fidelity_calibration" and policy.max_probes < blocks * len(
+                    fidelity["options"]
+                ):
+                    raise Rejected("calibration requires independent blocks for every option")
                 if (
                     policy.final_validation_seconds
                     < len(eligible) * spec.quality.minimum_repeats * 3
                 ):
                     raise Rejected("final budget must cover every calibration configuration")
-                rng, fidelity_schedule = random.Random(request.seed), []
-                for block in range(3):
-                    order = sorted(o["ref"] for o in fidelity["options"])
-                    rng.shuffle(order)
-                    fidelity_schedule.extend(
-                        {"option_ref": option, "block": block} for option in order
-                    )
+                if request.strategy == "fidelity_calibration":
+                    rng, fidelity_schedule = random.Random(request.seed), []
+                    for block in range(blocks):
+                        order = sorted(o["ref"] for o in fidelity["options"])
+                        rng.shuffle(order)
+                        fidelity_schedule.extend(
+                            {"option_ref": option, "block": block} for option in order
+                        )
             ref = "study-" + uuid4().hex
             body = {
                 "request": request_body,
@@ -153,6 +191,22 @@ class Studies:
                     fidelity_space=fidelity,
                     fidelity_space_digest=signature(fidelity),
                     fidelity_schedule=fidelity_schedule,
+                )
+            if qualification is not None:
+                body.update(
+                    mf_qualification=qualification,
+                    mf_seed_evidence=seed_evidence,
+                    mf_calibration_policy=qualification_plan["request"],
+                    historical_calibration_cost=qualification["calibration_cost"],
+                    historical_calibration_recharged=False,
+                )
+            elif qualification_plan is not None:
+                self.store.put(
+                    conn,
+                    "fidelity_qualification_study",
+                    request.fidelity_qualification_ref,
+                    project,
+                    {"study_ref": ref},
                 )
             conn.execute(
                 insert(studies).values(
@@ -359,6 +413,62 @@ class Studies:
             and jb.get("thermal_assessment", {}).get("status", "ELIGIBLE_TRACE") != "ELIGIBLE_TRACE"
         ):
             state, body["stop_reason"] = "ABSTAINED", "THERMAL_OBSERVATION_INELIGIBLE"
+        if (
+            row["state"] != "CANCEL_REQUESTED"
+            and body["request"]["strategy"] == "mfkg"
+            and self._feasible(obs, WorkloadSpec.model_validate(body["spec"]))
+        ):
+            values = [
+                o["seconds_per_work_unit"]
+                for o in body["mf_seed_evidence"]["observations"]
+                if o["option_ref"] == obs["option_ref"]
+            ]
+            measured = obs["measurements"]["elapsed_seconds"] / obs["measurements"]["work_units"]
+            tolerance = 1 + body["mf_calibration_policy"]["maximum_relative_bias"]
+            if not min(values) / tolerance <= measured <= max(values) * tolerance:
+                state, body["stop_reason"] = "ABSTAINED", "MF_OBSERVATION_OUTSIDE_QUALIFIED_RANGE"
+            else:
+                from .fidelity_qualification import adaptive_ranks_unchanged
+
+                if not adaptive_ranks_unchanged(
+                    body["fidelity_space"],
+                    body["mf_qualification"],
+                    body["mf_seed_evidence"],
+                    body["observations"],
+                    body["mf_calibration_policy"],
+                ):
+                    state, body["stop_reason"] = "ABSTAINED", "MF_RANK_RELATION_CHANGED"
+        if body["request"]["strategy"] == "mfkg" and row["state"] != "CANCEL_REQUESTED":
+            reason = None
+            if state == "ABSTAINED" and body.get("stop_reason") in {
+                "THERMAL_OBSERVATION_INELIGIBLE",
+                "MF_OBSERVATION_OUTSIDE_QUALIFIED_RANGE",
+                "INDEPENDENT_CONFIRMATION_FAILED",
+                "MF_RANK_RELATION_CHANGED",
+            }:
+                reason = body["stop_reason"]
+            elif obs["outcome"] == "COMPLETED" and not self._feasible(
+                obs, WorkloadSpec.model_validate(body["spec"])
+            ):
+                reason = "MF_OBSERVATION_INFEASIBLE"
+            if reason:
+                qualification_ref = body["request"]["fidelity_qualification_ref"]
+                if not self.store.get(
+                    conn, "fidelity_qualification_invalidation", qualification_ref
+                ):
+                    self.store.put(
+                        conn,
+                        "fidelity_qualification_invalidation",
+                        qualification_ref,
+                        row["project"],
+                        {
+                            "study_ref": row["id"],
+                            "job_id": obs["job_id"],
+                            "attempt_id": obs["attempt_id"],
+                            "reason": reason,
+                            "invalidated_at": now().isoformat(),
+                        },
+                    )
         self.store.change_study(conn, row, state, body)
 
     @staticmethod
@@ -393,6 +503,15 @@ class Studies:
                     FidelitySpaces(self.service)._check_bindings(
                         conn, row["project"], body["fidelity_space"], current=True
                     )
+                    if body["request"]["strategy"] == "mfkg":
+                        from .fidelity_qualification import FidelityQualifications
+
+                        FidelityQualifications(self.service).checked(
+                            conn,
+                            row["project"],
+                            body["request"]["fidelity_qualification_ref"],
+                            body["fidelity_space"],
+                        )
                 except Rejected:
                     self.store.change_study(
                         conn,
@@ -406,6 +525,7 @@ class Studies:
         probes = [o for o in body["observations"] if o["mode"] == "pilot"]
         strategy = body["request"]["strategy"]
         calibrating = strategy == "fidelity_calibration"
+        mixed = calibrating or strategy == "mfkg"
         calibration_complete = calibrating and len(probes) == len(body["fidelity_schedule"])
         if calibrating and any(not self._feasible(o, spec) for o in probes):
             return self._abstain(ref, token, body, "FIDELITY_CALIBRATION_CELL_FAILED")
@@ -430,6 +550,49 @@ class Studies:
             > (policy.final_validation_seconds + 1) * body["units"][c.ref]["count"]
             for c in qualified
         )
+        mf_choice, mf_stop = None, None
+        if strategy == "mfkg":
+            if any(not self._feasible(o, spec) for o in probes):
+                return self._abstain(ref, token, body, "MF_OBSERVATION_INFEASIBLE")
+            if (
+                body["confirmation_schedule"] is None
+                and len(probes) < policy.max_probes
+                and remaining > policy.final_validation_seconds + 3
+                and not device_probe_budget_exhausted
+            ):
+                from .fidelity_space import FidelityEvidenceRequest, FidelitySpaces
+                from .mfkg import MFKernelInput, ask_mfkg
+
+                seed = body["mf_seed_evidence"]
+                try:
+                    evidence = FidelitySpaces(self.service).evidence(
+                        row["project"],
+                        body["fidelity_space"]["request"]["ref"],
+                        FidelityEvidenceRequest(
+                            job_ids=tuple(p["job_id"] for p in seed["provenance"])
+                            + tuple(o["job_id"] for o in probes),
+                            seed=body["request"]["seed"],
+                        ),
+                    )
+                except (Rejected, ValueError):
+                    return self._abstain(ref, token, body, "MF_EVIDENCE_NO_LONGER_VALID")
+                started = time.monotonic()
+                try:
+                    mf_choice = ask_mfkg(MFKernelInput.model_validate(evidence["kernel_input"]))
+                    mf_stop = None if mf_choice["option_ref"] else "MF_KG_NO_POSITIVE_GAIN"
+                except (ArithmeticError, RuntimeError, ValueError, ImportError) as exc:
+                    mf_stop = "MF_KG_MODEL_FAILED:" + type(exc).__name__
+                planning = time.monotonic() - started
+                body["planning_seconds"] += planning
+                body["last_mf_analysis"] = {
+                    "evidence_ref": evidence["ref"],
+                    "analysis": mf_choice,
+                    "failure": mf_stop,
+                    "planning_seconds": planning,
+                }
+                if mf_choice:
+                    mf_choice["planning_seconds"] = planning
+                remaining = (datetime.fromisoformat(body["deadline_at"]) - now()).total_seconds()
         if body["confirmation_schedule"] is None and (
             len(probes) >= policy.max_probes
             or remaining <= policy.final_validation_seconds + 3
@@ -437,13 +600,31 @@ class Studies:
             or device_probe_budget_exhausted
             or (replication_choice and replication_choice["stop_exploration"])
             or calibration_complete
+            or mf_stop
         ):
             if calibrating and not calibration_complete:
                 return self._abstain(ref, token, body, "INCOMPLETE_FIDELITY_CALIBRATION_BUDGET")
             good = [o for o in probes if self._feasible(o, spec)]
-            if calibrating:
+            if mixed:
                 # Never compare raw short-run latency with the target workload.
                 good = [o for o in good if o["fidelity"] == 1]
+            if strategy == "mfkg":
+                target_options = {
+                    o["ref"]: o["candidate_ref"]
+                    for o in body["fidelity_space"]["options"]
+                    if o["fidelity"] == 1
+                }
+                good.extend(
+                    {
+                        "candidate_ref": target_options[o["option_ref"]],
+                        "measurements": {
+                            "elapsed_seconds": o["seconds_per_work_unit"] * spec.identity.work_units
+                        },
+                    }
+                    for o in body["mf_seed_evidence"]["observations"]
+                    if o["option_ref"] in target_options
+                )
+                body["exploration_stop_reason"] = mf_stop or "MF_KG_TOTAL_BUDGET_LIMIT"
             if replication_choice:
                 good = [o for o in good if o["candidate_ref"] not in replication_choice["excluded"]]
                 body["exploration_stop_reason"] = (
@@ -474,7 +655,7 @@ class Studies:
                 return self._abstain(ref, token, body, "NO_MEASURED_FEASIBLE_CONFIG")
             selected = (
                 body["eligible"]
-                if calibrating
+                if mixed
                 else list(dict.fromkeys([spec.baseline_candidate_ref, finalist]))
             )
             schedule = selected * spec.quality.minimum_repeats
@@ -525,6 +706,15 @@ class Studies:
             available_wall = (remaining - policy.final_validation_seconds) / (
                 len(body["fidelity_schedule"]) - len(probes)
             )
+        elif strategy == "mfkg":
+            choice = {
+                **mf_choice,
+                "reason": "QUALIFIED_COST_AWARE_MF_KG",
+                "qualification_ref": body["request"]["fidelity_qualification_ref"],
+                "qualification_digest": signature(body["mf_qualification"]),
+                "evidence_ref": body["last_mf_analysis"]["evidence_ref"],
+            }
+            available_wall = remaining - policy.final_validation_seconds
         else:
             choice = replication_choice or ask(
                 strategy, allowed, probes, spec.quality, body["request"]["seed"]
@@ -532,7 +722,7 @@ class Studies:
             available_wall = (
                 remaining - policy.final_validation_seconds - choice["planning_seconds"]
             )
-        if choice is not replication_choice:
+        if choice is not replication_choice and strategy != "mfkg":
             body["planning_seconds"] += choice["planning_seconds"]
         candidate = next((c for c in allowed if c.ref == choice["candidate_ref"]), None)
         if not candidate or available_wall < 3:
@@ -560,7 +750,7 @@ class Studies:
         plan_ref = "plan-" + uuid4().hex
         execution_spec = spec
         binding = None
-        if calibrating:
+        if mixed:
             option = next(
                 o
                 for o in body["fidelity_space"]["options"]

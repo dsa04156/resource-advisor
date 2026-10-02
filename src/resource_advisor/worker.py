@@ -54,6 +54,20 @@ class Worker:
                         row["body"]["candidate"]["ref"],
                     )
                     errors = compatibility(*args)
+                    if row["body"]["request"].get("study_ref"):
+                        study = self.store.study(conn, row["body"]["request"]["study_ref"])
+                        if study and study["body"]["request"]["strategy"] == "mfkg":
+                            from .fidelity_qualification import FidelityQualifications
+
+                            try:
+                                FidelityQualifications(self.service).checked(
+                                    conn,
+                                    row["project"],
+                                    study["body"]["request"]["fidelity_qualification_ref"],
+                                    study["body"]["fidelity_space"],
+                                )
+                            except (Rejected, NotFound):
+                                errors.append("MF_QUALIFICATION_RECHECK_REQUIRED")
                     if row["body"]["request"].get("approval_ref"):
                         try:
                             approval = required(

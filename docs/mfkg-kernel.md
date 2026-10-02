@@ -1,9 +1,11 @@
 # Multi-fidelity GP and cost-aware KG: numerical implementation
 
-The `mfkg` execution strategy is still disabled. This increment implements and
-tests its numerical model/acquisition kernel and a runnable analysis CLI. It
-does **not** establish a qualified hardware fidelity axis or complete the
-automatic mixed-fidelity MF-KG study-to-Job integration.
+The numerical kernel remains callable for analysis without execution authority.
+The [qualified MF-KG executor](qualified-mfkg.md) now connects its choices to
+reserved mixed-workload Jobs only for a separately preregistered and accepted
+fidelity group. Unqualified requests remain disabled. The executor is tested
+with actual BoTorch and scheduler doubles; a qualified physical GPU MF-KG
+execution trial remains open.
 [Immutable fidelity spaces](fidelity-spaces.md) now provide workload/result
 bindings and durable preregistered calibration through the existing worker. The existing matmul repetition experiment
 cannot be relabeled as multi-fidelity training data.

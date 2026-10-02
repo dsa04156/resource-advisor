@@ -138,6 +138,15 @@ class Service:
                         raise Rejected(
                             "probe does not match an active, unexpired budget reservation"
                         )
+                    if study["body"]["request"]["strategy"] == "mfkg":
+                        from .fidelity_qualification import FidelityQualifications
+
+                        FidelityQualifications(self).checked(
+                            conn,
+                            project,
+                            study["body"]["request"]["fidelity_qualification_ref"],
+                            study["body"]["fidelity_space"],
+                        )
                     self.store.change_study(conn, study, study["state"], study["body"])
                 elif request.study_ref or request.probe_plan_ref:
                     raise Rejected("study references require pilot or confirmation mode")

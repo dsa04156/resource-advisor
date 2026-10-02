@@ -342,11 +342,22 @@ class StudyRequest(Contract):
     seed: int = 0
     replication: ReplicationPolicy | None = None
     fidelity_space_ref: Ref | None = None
+    fidelity_qualification_ref: Ref | None = None
 
     @model_validator(mode="after")
     def strategy_options(self):
         if (self.strategy == "adaptive_replication") != (self.replication is not None):
             raise ValueError("replication options are required only for adaptive_replication")
-        if (self.strategy == "fidelity_calibration") != (self.fidelity_space_ref is not None):
-            raise ValueError("fidelity space is required only for fidelity_calibration")
+        if self.strategy == "fidelity_calibration" and self.fidelity_space_ref is None:
+            raise ValueError("fidelity space is required for fidelity_calibration")
+        if self.fidelity_space_ref is not None and self.strategy not in {
+            "fidelity_calibration",
+            "mfkg",
+        }:
+            raise ValueError("fidelity space is only available for calibration or mfkg")
+        if self.fidelity_qualification_ref is not None and self.strategy not in {
+            "fidelity_calibration",
+            "mfkg",
+        }:
+            raise ValueError("fidelity qualification is only available for calibration or mfkg")
         return self

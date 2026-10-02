@@ -136,7 +136,7 @@ and separate final confirmation. It is distinct from multi-fidelity BO.
 
 The [MF-GP/MF-KG numerical kernel](docs/mfkg-kernel.md) now supports finite-space
 configuration/fidelity analysis and a synthetic ask/observe demo. Hardware
-qualification and automatic MF-KG job selection remain open gates.
+qualification and live qualified MF-KG execution remain open gates.
 [Immutable fidelity spaces](docs/fidelity-spaces.md) now bind measurement levels
 to separate workloads and execute preregistered mixed-workload calibration through
 the durable study/Job path. The new path completed 12 actual GPU probes and six
@@ -146,7 +146,7 @@ runs over a finite generated input population, with verified byte-consumption
 receipts and matching result bundles. Offline MF-GP/MF-KG analysis uses the 12
 probes without submitting jobs; independent confirmations retained the baseline
 because improvement was uncertain. Real-dataset fidelity, thermal/rank
-qualification and automatic MF-KG selection remain open.
+qualification and live qualified MF-KG execution remain open.
 
 [Execution-bound thermal observations](docs/thermal-evidence.md) add read-only
 NVML measurements around each sampled GPU forward. Missing or ineligible
@@ -154,3 +154,9 @@ observations exclude a result from recommendation history and stop the study.
 An actual 18-Job GPU trial verified all 240 sensor reads and matching
 S3/API/MLflow bundles. Measurement overhead is reported; sustained thermal and
 paired-rank qualification remain open.
+
+[Preregistered MF-KG execution](docs/qualified-mfkg.md) now connects accepted
+fidelity groups to mixed-workload ask/execute/observe and independent target
+confirmation. Qualification, expiry, rank drift and failure fallback are tested
+with actual BoTorch and scheduler doubles; a qualified physical GPU trial remains
+open. Existing unqualified reports do not authorize this strategy.

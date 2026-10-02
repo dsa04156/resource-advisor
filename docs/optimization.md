@@ -31,15 +31,18 @@ Strategies:
   repeats for candidates with unresolved descriptive precision. Fixed work units,
   per-candidate caps, protected final confirmation and explicit stopping reasons;
   see [adaptive replication](adaptive-replication.md). This is not MFBO.
-- `fidelity_calibration`: three preregistered randomized blocks of immutable
+- `fidelity_calibration`: preregistered randomized blocks (three by default) of immutable
   workload/fidelity options, then independent target-only confirmation of every
   configuration. See [fidelity spaces](fidelity-spaces.md). This is a calibration
   experiment, not adaptive MF-KG.
-- `mfkg` / `rgpe`: currently rejected with explicit missing-qualification reasons;
-  not aliases for qLogNEI. The [MF-GP/MF-KG numerical kernel](mfkg-kernel.md) is
-  implemented with an analysis CLI; hardware qualification and automatic MF-KG
-  execution integration remain open. RGPE implementation/source-data gates also
-  remain open in the full completion audit.
+- `mfkg`: [preregistered qualification](qualified-mfkg.md) authorizes a bounded
+  homogeneous sampled space. The actual MF-GP/MF-KG chooses configuration and
+  fidelity together; a reserved Job executes the option and updates the next
+  model. Invalid/missing/expired qualifications are rejected. Numerical failure
+  stops exploration and uses new target confirmations. The complete path is
+  tested with scheduler doubles; a qualified physical GPU trial remains open.
+- `rgpe`: rejected with its missing-source-model reason; implementation and
+  independent source-data gates remain open. It is not an alias for qLogNEI.
 
 [Paired calibration](fidelity-calibration.md) now preregisters a bounded,
 randomized F1/F2/F3 measurement schedule and submits its cells through the same
@@ -49,8 +52,9 @@ fixture cannot establish a fidelity-bias model; it does not enable `mfkg` or
 claim that fixed replication is adaptive profiling. Adaptive replication is a
 separate study strategy with its own request options and trace.
 
-OOM/timeouts never become zero-time successful observations. A model failure
-falls back explicitly to seeded random selection. Only independent confirmation
+OOM/timeouts never become zero-time successful observations. A qLogNEI model
+failure falls back explicitly to seeded random selection; MF-KG instead stops
+exploration and attempts protected target confirmation. Only independent confirmation
 runs can create the study's final recommendation; overlap preserves the baseline.
 Pilot measurements do not enter the general lookup profile table.
 

@@ -168,6 +168,26 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
 
     fidelity_spaces = FidelitySpaces(service)
 
+    from .fidelity_qualification import FidelityQualificationPlan, FidelityQualifications
+
+    qualifications = FidelityQualifications(service)
+
+    @app.post(PREFIX + "/fidelity-qualifications")
+    def create_fidelity_qualification(value: FidelityQualificationPlan, p=Depends(operator)):
+        return qualifications.create(p.project, value)
+
+    @app.get(PREFIX + "/fidelity-qualifications/{ref}")
+    def get_fidelity_qualification(ref: str, p=Depends(principal)):
+        return qualifications.get(p.project, ref)
+
+    @app.post(PREFIX + "/fidelity-qualifications/{ref}/assessment")
+    def assess_fidelity_qualification(ref: str, p=Depends(principal)):
+        return qualifications.assess(p.project, ref)
+
+    @app.get(PREFIX + "/fidelity-qualifications/{ref}/assessment")
+    def fidelity_qualification_status(ref: str, p=Depends(principal)):
+        return qualifications.status(p.project, ref)
+
     @app.post(PREFIX + "/fidelity-spaces")
     def create_fidelity_space(value: FidelitySpace, p=Depends(operator)):
         return fidelity_spaces.create(p.project, value)

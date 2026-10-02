@@ -2,9 +2,10 @@
 
 This adds a usable prerequisite to R2: a durable calibration study can execute
 registered short and target workloads through the existing Job/worker path.
-It does not enable `strategy=mfkg`. A space declaration, policy digest, model
-output or successful calibration is not evidence that representative sampling
-or thermal behavior is qualified.
+Registering a space alone does not enable `strategy=mfkg`. The separate
+[preregistered qualification protocol](qualified-mfkg.md) connects accepted
+groups to that strategy. A declaration, model output or successful unregistered
+calibration is not qualification evidence.
 
 ## Why each level is a separate workload
 
@@ -131,9 +132,9 @@ immutable result and binding before the report provides a numerical `MFKernelInp
 for offline `mfkg-analyze`. Sampling policy/receipt verification flags describe
 that finite contract, not thermal or statistical qualification. It retains
 `execution_authorized=false`. Analysis does not override the operational MF-KG
-rejection or authorize a recommendation. Actual GPU sampling, thermal traces,
-paired-rank qualification and the automatic MF-KG study strategy still need
-implementation and hardware evidence.
+rejection or authorize a recommendation. Actual GPU sampling and thermal traces now have separate live evidence.
+Paired qualification and the conditional MF-KG study path are implemented;
+qualified physical GPU execution remains an open acceptance gate.
 
 ## Verification and limits
 
