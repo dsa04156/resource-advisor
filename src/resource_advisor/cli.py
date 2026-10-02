@@ -21,6 +21,7 @@ def main():
     sub = parser.add_subparsers(dest="action", required=True)
     sub.add_parser("init-db")
     sub.add_parser("backfill-usage")
+    sub.add_parser("backfill-tracking")
     serve = sub.add_parser("serve")
     serve.add_argument(
         "--credentials", required=True, help="private JSON file of token SHA-256 hashes"
@@ -73,6 +74,9 @@ def main():
             time.sleep(args.interval_seconds)
     if args.action == "backfill-usage":
         print(json.dumps({"inserted": store.backfill_usage()}))
+        return
+    if args.action == "backfill-tracking":
+        print(json.dumps({"enqueued": store.backfill_tracking()}))
         return
     if args.action == "serve":
         import uvicorn

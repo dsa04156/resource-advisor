@@ -271,7 +271,12 @@ def test_mlflow_response_loss_reuses_run_and_measurement_timestamp(service):
         if request.url.path.endswith("runs/search"):
             return httpx.Response(200, json={"runs": runs})
         if request.url.path.endswith("runs/create"):
-            runs.append({"info": {"run_id": "external-run-1"}})
+            runs.append(
+                {
+                    "info": {"run_id": "external-run-1", "experiment_id": body["experiment_id"]},
+                    "data": {"tags": body["tags"]},
+                }
+            )
             return httpx.Response(200, json={"run": runs[-1]})
         if request.url.path.endswith("runs/log-batch"):
             batches.append(body)

@@ -371,20 +371,6 @@ class Service:
                     "artifact",
                     {"job_id": row["id"]},
                 )
-                self.store.enqueue(
-                    conn,
-                    "mlflow-" + result.attempt_id,
-                    "mlflow",
-                    {
-                        "project": project,
-                        "job_id": row["id"],
-                        "result": result.model_dump(mode="json"),
-                        "variant": body["variant"],
-                        "candidate": body["candidate"],
-                        "quality_passed": body["quality_passed"],
-                        "parent_run_ref": body["request"]["parent_run_ref"],
-                    },
-                )
             return self.public_job(self.store.job(conn, row["id"]))
 
     def recommend(self, project, workload_ref):

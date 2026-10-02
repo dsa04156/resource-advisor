@@ -154,6 +154,24 @@ class Store:
             raise Conflict("concurrent job transition; retry")
         if state in TERMINAL:
             self.record_usage(conn, row, state, body)
+            self.enqueue_tracking(conn, row, body)
+
+    def enqueue_tracking(self, conn, row, body):
+        event_id = "mlflow-" + body["attempt_id"]
+        exists = conn.execute(select(outbox.c.id).where(outbox.c.id == event_id)).first()
+        self.enqueue(conn, event_id, "mlflow", {"job_id": row["id"]})
+        return not bool(exists)
+
+    def backfill_tracking(self):
+        """Queue missing terminal-attempt metadata, without inventing execution results."""
+        with self.transaction() as conn:
+            query = select(jobs).where(jobs.c.state.in_(list(TERMINAL)))
+            if self.engine.dialect.name == "postgresql":
+                query = query.with_for_update()
+            return sum(
+                self.enqueue_tracking(conn, row, row["body"])
+                for row in conn.execute(query).mappings()
+            )
 
     def record_usage(self, conn, row, state, body):
         from .accounting import ledger_record

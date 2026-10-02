@@ -37,8 +37,10 @@ The small smoke experiment does not prove BO superiority or hard physical budget
 
 **Artifacts and environments:** bounded JSON result bundles now have conditional
 S3 writes, verified API downloads and live MLflow artifact copies. Large-model
-transfer, storage retention/backup, image attestation, checkpoint isolation and
+transfer, storage retention/backup, image attestation, general checkpoint isolation and
 runtime qualification on each GPU/NPU are still required.
+The bounded deterministic training fixture now has real GPU isolation evidence;
+this does not qualify arbitrary training programs or larger checkpoint formats.
 
 **Accounting:** terminal outcomes now have an atomic, unit-separated ledger,
 including collector failures, pre-submit cancellation and preflight rejection.
@@ -50,6 +52,11 @@ dedicated experiment, with project-to-experiment routing and durable run links.
 Result-bundle artifact upload is verified. Server-side multi-tenant authorization, circuit breakers,
 comprehensive event metrics and dashboards remain to implement. Experiment routing
 alone is not an MLflow authorization boundary.
+Terminal tracking now includes resultless failures/cancellations atomically with
+the usage ledger. Six historical live attempts recovered through real MLflow,
+including connection refusal and a discarded accepted-create response. Invalid
+results cannot be published as valid performance metrics. Unknown legacy end
+times remain unknown. These checks do not prove global exactly-once creation.
 
 **Deployment:** real PostgreSQL tests and a restore check pass. This is not an
 HA deployment, migration strategy, key rotation system or workload isolation

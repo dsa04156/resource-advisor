@@ -270,18 +270,31 @@ class MLflowDelivery:
             return False
         try:
             b = event["body"]
-            result = b["result"]
-            experiment_id = self.experiments[b["project"]]
-            attempt = result["attempt_id"]
             with self.store.transaction() as conn:
-                job = self.store.job(conn, b["job_id"])["body"]
+                row = self.store.job(conn, b["job_id"])
+                if row is None or row["state"] not in TERMINAL:
+                    raise ValueError("tracking requires a durable terminal attempt")
+                job, project, state = row["body"], row["project"], row["state"]
+                attempt = job["attempt_id"]
+                saved_result = self.store.get(conn, "result", attempt)
+                # Invalid envelopes remain audit evidence, never performance observations.
+                result = (
+                    saved_result["body"] if saved_result and state != State.RESULT_INVALID else None
+                )
                 phases = self.store.get(conn, "phase_profile", attempt)
                 training = self.store.get(conn, "training_receipt", attempt)
+            experiment_id = self.experiments[project]
             start_time = int(
                 datetime.fromisoformat(job.get("started_at") or job["created_at"]).timestamp()
                 * 1000
             )
-            timestamp = int(datetime.fromisoformat(job["finished_at"]).timestamp() * 1000)
+            timestamp = (
+                int(datetime.fromisoformat(job["finished_at"]).timestamp() * 1000)
+                if job.get("finished_at")
+                else None
+            )
+            if result is not None and timestamp is None:
+                raise ValueError("validated result requires recorded terminal observation time")
             search = self.post(
                 "runs/search",
                 {
@@ -296,14 +309,23 @@ class MLflowDelivery:
             tags = {
                 "resource_advisor.attempt_id": attempt,
                 "resource_advisor.job_id": b["job_id"],
-                "project": b["project"],
-                "evidence_kind": result["evidence_kind"],
-                "workload_signature": result["workload_signature"],
-                "context_signature": result["context_signature"],
-                "result_digest": signature(result),
-                "quality_passed": str(b["quality_passed"]).lower(),
+                "project": project,
+                "resource_advisor.state": state,
+                "resource_advisor.result_present": str(saved_result is not None).lower(),
+                "resource_advisor.result_valid": str(result is not None).lower(),
+                "evidence_kind": result["evidence_kind"] if result else "unavailable",
+                "workload_signature": job["workload_signature"],
+                "context_signature": job["context_signature"],
+                "quality_passed": str(job.get("quality_passed", False)).lower(),
                 "execution_mode": job["request"]["mode"],
+                "resource_advisor.end_time_source": (
+                    "terminal_observed_at" if timestamp is not None else "unknown_legacy"
+                ),
             }
+            if saved_result:
+                tags["result_digest"] = signature(saved_result["body"])
+            if job.get("error"):
+                tags["resource_advisor.error"] = str(job["error"])[:500]
             if job["request"].get("study_ref"):
                 tags["resource_advisor.study_id"] = job["request"]["study_ref"]
             if training:
@@ -319,8 +341,15 @@ class MLflowDelivery:
                         "training.auto_promote": "false",
                     }
                 )
-            if b.get("parent_run_ref"):
-                tags["mlflow.parentRunId"] = b["parent_run_ref"]
+            if job["request"].get("parent_run_ref"):
+                tags["mlflow.parentRunId"] = job["request"]["parent_run_ref"]
+            if found:
+                owner = {t["key"]: t["value"] for t in found[0]["data"]["tags"]}
+                if found[0]["info"]["experiment_id"] != experiment_id or any(
+                    owner.get(key) != tags[key]
+                    for key in ("project", "resource_advisor.attempt_id", "resource_advisor.job_id")
+                ):
+                    raise ValueError("external MLflow run ownership mismatch")
             run = (
                 found[0]
                 if found
@@ -339,14 +368,14 @@ class MLflowDelivery:
                     conn,
                     "tracking",
                     attempt,
-                    b["project"],
+                    project,
                     {"job_id": b["job_id"], "experiment_id": experiment_id, "run_id": run_id},
                 )
-            context = b["candidate"]["context"]
+            context = job["candidate"]["context"]
             params = {
-                "backend": b["candidate"]["backend"],
-                "variant": b["variant"]["ref"],
-                "image": b["variant"]["image"],
+                "backend": job["candidate"]["backend"],
+                "variant": job["variant"]["ref"],
+                "image": job["variant"]["image"],
                 "environment_digest": context["environment_digest"],
                 "accelerator_model": context["accelerator_model"],
                 "allocation_mode": context["allocation_mode"],
@@ -356,10 +385,10 @@ class MLflowDelivery:
             }
             metrics = [
                 {"key": k, "value": v, "timestamp": timestamp, "step": 0}
-                for k, v in (result.get("measurements") or {}).items()
+                for k, v in ((result or {}).get("measurements") or {}).items()
                 if v is not None
             ]
-            if phases:
+            if phases and result:
                 from .diagnostics import diagnose
 
                 diagnosis = diagnose(phases["body"], evidence_kind=result["evidence_kind"])
@@ -391,8 +420,14 @@ class MLflowDelivery:
                 "runs/update",
                 {
                     "run_id": run_id,
-                    "status": "FINISHED" if result["outcome"] == "COMPLETED" else "FAILED",
-                    "end_time": timestamp,
+                    "status": (
+                        "FINISHED"
+                        if state == State.SUCCEEDED
+                        else "KILLED"
+                        if state == State.CANCELED
+                        else "FAILED"
+                    ),
+                    **({"end_time": timestamp} if timestamp is not None else {}),
                 },
             )
             self.store.finish(event)
