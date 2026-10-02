@@ -1,0 +1,233 @@
+{
+  "schema_version": "v1",
+  "scope": "E6 two-project Kubernetes GPU acceptance; assistant-executed",
+  "date_kst": "2026-10-03",
+  "status": "PASS",
+  "verifier_commit": "314bcf108ebf8c2480f5b16224bf960c59d0f1c3",
+  "hardware": {
+    "model": "NVIDIA GeForce RTX 5080",
+    "count": 1,
+    "allocation_mode": "physical_device"
+  },
+  "shared_quota": {
+    "cpu": 2,
+    "memory_mib": 2048,
+    "gpu": 1,
+    "strategy": "BestEffortFIFO",
+    "preemption": false,
+    "unchanged": true
+  },
+  "priority_values": {
+    "normal": 100,
+    "high": 1000
+  },
+  "trials": [
+    {
+      "trial": "a-oversized-cpu",
+      "project": "A",
+      "outcome": "CANCELED",
+      "queue_seconds": null,
+      "gpu_reservation_seconds": null,
+      "ledger_rows": 1,
+      "mlflow_runs": 1,
+      "mlflow_status": "KILLED",
+      "started_at": null,
+      "finished_at": null,
+      "uncertainty": [
+        "ALLOCATION_INTERVAL_UNKNOWN",
+        "ACCELERATOR_ALLOCATION_UNKNOWN",
+        "QUEUE_INTERVAL_UNKNOWN"
+      ]
+    },
+    {
+      "trial": "b-oversized-cpu",
+      "project": "B",
+      "outcome": "CANCELED",
+      "queue_seconds": null,
+      "gpu_reservation_seconds": null,
+      "ledger_rows": 1,
+      "mlflow_runs": 1,
+      "mlflow_status": "KILLED",
+      "started_at": null,
+      "finished_at": null,
+      "uncertainty": [
+        "ALLOCATION_INTERVAL_UNKNOWN",
+        "ACCELERATOR_ALLOCATION_UNKNOWN",
+        "QUEUE_INTERVAL_UNKNOWN"
+      ]
+    },
+    {
+      "trial": "round-1-holder",
+      "project": "A",
+      "outcome": "SUCCEEDED",
+      "queue_seconds": 0.0,
+      "gpu_reservation_seconds": 32.0,
+      "ledger_rows": 1,
+      "mlflow_runs": 1,
+      "mlflow_status": "FINISHED",
+      "started_at": "2026-10-02T22:22:22Z",
+      "finished_at": "2026-10-02T22:22:54Z",
+      "uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "artifact_digest": "sha256:7b9e5d0fde2793afb0c6d0b452473e70a108fe165f8ac34efd29c7e92b77c7ff",
+      "artifact_bytes_match": true,
+      "foreign_artifact_http": 404,
+      "quality_value": 1.0
+    },
+    {
+      "trial": "round-1-normal",
+      "project": "B",
+      "outcome": "SUCCEEDED",
+      "queue_seconds": 66.0,
+      "gpu_reservation_seconds": 32.0,
+      "ledger_rows": 1,
+      "mlflow_runs": 1,
+      "mlflow_status": "FINISHED",
+      "started_at": "2026-10-02T22:23:33Z",
+      "finished_at": "2026-10-02T22:24:05Z",
+      "uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "artifact_digest": "sha256:f02f3c1e8954161d1ef94b0794f4c7b6ba4ce147a6579ba891e322729eeefc95",
+      "artifact_bytes_match": true,
+      "foreign_artifact_http": 404,
+      "quality_value": 1.0
+    },
+    {
+      "trial": "round-1-high",
+      "project": "A",
+      "outcome": "SUCCEEDED",
+      "queue_seconds": 25.0,
+      "gpu_reservation_seconds": 32.0,
+      "ledger_rows": 1,
+      "mlflow_runs": 1,
+      "mlflow_status": "FINISHED",
+      "started_at": "2026-10-02T22:22:57Z",
+      "finished_at": "2026-10-02T22:23:29Z",
+      "uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "artifact_digest": "sha256:49bf67e9dbdb128abdaa51fcdcfd07816f542dbb43ee167176def39f52a0c686",
+      "artifact_bytes_match": true,
+      "foreign_artifact_http": 404,
+      "quality_value": 1.0
+    },
+    {
+      "trial": "round-2-holder",
+      "project": "B",
+      "outcome": "SUCCEEDED",
+      "queue_seconds": 0.0,
+      "gpu_reservation_seconds": 32.0,
+      "ledger_rows": 1,
+      "mlflow_runs": 1,
+      "mlflow_status": "FINISHED",
+      "started_at": "2026-10-02T22:24:13Z",
+      "finished_at": "2026-10-02T22:24:45Z",
+      "uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "artifact_digest": "sha256:d9b879c64a4c602005e9dafc215702af48c85d204a7aae83bc86c4c29e8b6ab9",
+      "artifact_bytes_match": true,
+      "foreign_artifact_http": 404,
+      "quality_value": 1.0
+    },
+    {
+      "trial": "round-2-normal",
+      "project": "A",
+      "outcome": "SUCCEEDED",
+      "queue_seconds": 66.0,
+      "gpu_reservation_seconds": 32.0,
+      "ledger_rows": 1,
+      "mlflow_runs": 1,
+      "mlflow_status": "FINISHED",
+      "started_at": "2026-10-02T22:25:24Z",
+      "finished_at": "2026-10-02T22:25:56Z",
+      "uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "artifact_digest": "sha256:0e2bacf84620e65657abc210c6cfb065179aca9112160121d92f27f69dadb29e",
+      "artifact_bytes_match": true,
+      "foreign_artifact_http": 404,
+      "quality_value": 1.0
+    },
+    {
+      "trial": "round-2-high",
+      "project": "B",
+      "outcome": "SUCCEEDED",
+      "queue_seconds": 25.0,
+      "gpu_reservation_seconds": 33.0,
+      "ledger_rows": 1,
+      "mlflow_runs": 1,
+      "mlflow_status": "FINISHED",
+      "started_at": "2026-10-02T22:24:48Z",
+      "finished_at": "2026-10-02T22:25:21Z",
+      "uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "artifact_digest": "sha256:194341b5695e9fd1bb8c0d1761dc74a7d699d513ec870db60880708c3091d8ab",
+      "artifact_bytes_match": true,
+      "foreign_artifact_http": 404,
+      "quality_value": 1.0
+    }
+  ],
+  "priority_rounds": [
+    {
+      "round": 1,
+      "high_project": "A",
+      "ordinary_project": "B",
+      "ordinary_created_at": "2026-10-02T22:22:27Z",
+      "high_created_at": "2026-10-02T22:22:32Z",
+      "high_admitted_at": "2026-10-02T22:22:57Z",
+      "ordinary_still_unadmitted": true
+    },
+    {
+      "round": 2,
+      "high_project": "B",
+      "ordinary_project": "A",
+      "ordinary_created_at": "2026-10-02T22:24:18Z",
+      "high_created_at": "2026-10-02T22:24:23Z",
+      "high_admitted_at": "2026-10-02T22:24:48Z",
+      "ordinary_still_unadmitted": true
+    }
+  ],
+  "checks": {
+    "request_scope_and_quota_negatives": true,
+    "project_lists_scoped": true,
+    "priority_order_both_projects": true,
+    "same_key_distinct_projects": true,
+    "retries_idempotent": true,
+    "a-no-retained-finalizers": true,
+    "b-no-retained-finalizers": true,
+    "artifact_bytes_match": true,
+    "foreign_artifacts_denied": true,
+    "unique_ledger_and_mlflow": true,
+    "no_overlapping_gpu_reservations": true,
+    "no_pending_outbox": true,
+    "shared_quota_unchanged": true
+  },
+  "costs": {
+    "application_gpu_reservation_seconds": 193,
+    "new_namespace_qualification_gpu_reservation_seconds": 33,
+    "total_measured_gpu_reservation_seconds": 226,
+    "unadmitted_cancellations_with_unknown_intervals": 2,
+    "semantics": "reservations, not useful computation, utilization or energy"
+  },
+  "qualification": {
+    "outcome": "SUCCEEDED",
+    "pod_start": "2026-10-02T22:18:01Z",
+    "container_end": "2026-10-02T22:18:34Z",
+    "quality_value": 1.0
+  },
+  "incidents": [
+    "New namespace lacked installed Kueue opt-in label; corrected same qualification Job without replacement.",
+    "New-project artifact mapping omitted initially; durable delivery recovered existing results after config correction without GPU resubmission.",
+    "Supervised lab port-forward reconnected after API rollouts."
+  ],
+  "limits": [
+    "One GPU, two roles swapped, no fairness/performance inference.",
+    "Trusted shared worker; no direct MLflow/S3 tenant authorization or network isolation claim.",
+    "No Slurm multi-user acceptance.",
+    "Only deterministic CUDA fixture qualified."
+  ]
+}
