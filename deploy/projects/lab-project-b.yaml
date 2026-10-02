@@ -5,6 +5,8 @@ metadata:
   name: resource-advisor-team-b
   labels:
     app.kubernetes.io/managed-by: resource-advisor-verification
+    # A site overlay must also supply labels required by the installed Kueue
+    # managedJobsNamespaceSelector and webhook namespaceSelector, if configured.
 ---
 apiVersion: kueue.x-k8s.io/v1beta2
 kind: LocalQueue
@@ -22,7 +24,6 @@ metadata:
 spec:
   hard:
     requests.nvidia.com/gpu: '1'
-    limits.nvidia.com/gpu: '1'
 ---
 # The trusted platform controller can manage this route. Researchers use the
 # scoped API; ordinary compute Pods receive no service-account token.

@@ -14,7 +14,7 @@ worker services both routes, with explicit namespace RoleBindings.
 
 Both LocalQueues use the existing idle one-GPU ClusterQueue: CPU quota 2,
 memory quota 2 GiB, GPU quota 1, BestEffortFIFO and no preemption. Those settings
-must not change. Each namespace additionally caps requested/limited physical
+must not change. Each namespace additionally caps requested physical
 GPUs at one. These are per-project ceilings sharing one aggregate pool, not
 independent one-GPU entitlements or a fairness guarantee.
 
@@ -70,6 +70,61 @@ before application trials. No node, driver or existing application changes.
 The verifier may cancel only its recorded unfinished attempts through their own
 project APIs. It must not delete namespaces, change quota or clear pressure
 taints to obtain a pass. Submitted Jobs and terminal records remain audit evidence.
+
+## Reproduction contract
+
+`examples/verify_project_isolation.py` executes the bounded API/Kueue scenarios.
+It does not provision credentials, qualify hardware or expand quota. Prepare both
+routes, immutable project-owned workload/variant/capability registrations,
+normal/high priority mappings, MLflow experiment mappings and artifact bucket
+mappings before invoking it. Shared storage requires project-prefixed keys and
+API ownership checks; this is not direct storage-service tenant authorization.
+
+The optional `deploy/projects/lab-project-b.yaml` assumes the existing shared
+ClusterQueue. Its namespace must also match the installed controller's
+`managedJobsNamespaceSelector` and webhook namespace selectors. Supply those
+site-specific labels in a private overlay; matching the ClusterQueue selector
+alone is insufficient. Kubernetes extended-resource quotas use only
+`requests.nvidia.com/gpu` (not `limits.nvidia.com/gpu`).
+
+Create a private JSON configuration, outside the public checkout, with this
+shape; supply both `a` and `b` project entries with independently scoped tokens:
+
+```json
+{
+  "api_url": "https://advisor.example.invalid",
+  "ca_file": "/private/ca.crt",
+  "run_ref": "unique-predeclared-trial-id",
+  "cluster_queue": "shared-gpu-pool",
+  "projects": {
+    "a": {
+      "project_ref": "project-a",
+      "token": "<private researcher token>",
+      "namespace": "project-a",
+      "local_queue": "research",
+      "candidate_ref": "gpu-one",
+      "workloads": {
+        "normal": "qualified-a-normal",
+        "high": "qualified-a-high",
+        "oversized_cpu": "qualified-a-cpu-over-quota",
+        "oversized_gpu": "qualified-a-gpu-over-capacity"
+      }
+    }
+  }
+}
+```
+
+```sh
+python examples/verify_project_isolation.py \
+  --config /private/e6-config.json --report /private/e6-trial.json
+```
+
+The report must not exist. It is private and records submitted identifiers before
+dependent checks. On failure, inspect those same attempts and retained scheduler
+evidence; do not rerun with a new report to erase a failed trial. The verifier's
+PASS covers its scenarios only. Artifact byte comparison, ledger uniqueness,
+MLflow run uniqueness, RBAC/quota dry-runs and final cleanup need separate recorded
+verification before claiming the full acceptance gate.
 
 ## Limits
 
