@@ -233,7 +233,7 @@ class Service:
                 )
             return self.public_job(self.store.job(conn, job_id))
 
-    def ingest(self, project, result: ExecutionResult, artifact_digest: str):
+    def ingest(self, project, result: ExecutionResult, artifact_digest: str, *, phase_profile=None):
         """Trusted collector only. Require backend completion before result acceptance."""
         with self.store.transaction() as conn:
             row = self.store.job(conn, result.job_id)
@@ -245,6 +245,11 @@ class Service:
             digest = signature(result)
             if row["state"] in TERMINAL:
                 if body.get("result_digest") == digest:
+                    stored = self.store.get(conn, "phase_profile", result.attempt_id)
+                    if phase_profile is not None and (
+                        stored is None or signature(stored["body"]) != signature(phase_profile)
+                    ):
+                        raise Conflict("terminal phase profile is immutable")
                     return self.public_job(row)
                 raise Conflict("terminal result is immutable")
             if row["state"] != State.COLLECTING:
@@ -262,6 +267,23 @@ class Service:
                 problems.append("SYNTHETIC_EVIDENCE_DISABLED")
             if result.measurements and result.measurements.work_units != spec.identity.work_units:
                 problems.append("WORK_UNITS_MISMATCH")
+            if phase_profile is not None:
+                from .diagnostics import validate_profile
+
+                try:
+                    phases = validate_profile(
+                        phase_profile, result, spec.identity.measurement_boundary
+                    )
+                except ValueError as exc:
+                    raise Rejected("invalid phase profile") from exc
+                if not problems:
+                    self.store.put(
+                        conn,
+                        "phase_profile",
+                        result.attempt_id,
+                        project,
+                        phases.model_dump(mode="json"),
+                    )
             body["result_digest"] = digest
             body["finished_at"] = now().isoformat()
             body["error"] = ",".join(problems) if problems else result.error_code

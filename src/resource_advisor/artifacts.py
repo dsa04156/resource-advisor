@@ -138,6 +138,7 @@ class ArtifactDelivery:
                 row = self.store.job(conn, event["body"]["job_id"])
                 body = row["body"]
                 result = self.store.get(conn, "result", body["attempt_id"])["body"]
+                phases = self.store.get(conn, "phase_profile", body["attempt_id"])
                 if (
                     row["state"] not in {State.SUCCEEDED, State.FAILED}
                     or signature(result) != body["result_digest"]
@@ -152,6 +153,8 @@ class ArtifactDelivery:
                 "variant": body["variant"],
                 "mode": body["request"]["mode"],
             }
+            if phases:
+                payload["phase_profile"] = phases["body"]
             record = self.storage.put(row["project"], body["attempt_id"], row["id"], payload)
             with self.store.transaction() as conn:
                 self.store.put(conn, "artifact", record["ref"], row["project"], record)

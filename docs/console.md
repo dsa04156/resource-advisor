@@ -90,3 +90,8 @@ health, durable supervision/token rotation and inventory retention remain open.
 The [subsequent approved GPU demo](approved-gpu-demo.md) verified the live
 approval→new-result comparison with independent hardware results. There is no invented GPU/NPU
 normalization, per-job utilization attribution or NPU model qualification.
+
+Execution results now include expandable [phase diagnostics](bottleneck-diagnostics.md).
+These show possible bottlenecks and measured wall-time shares, with explicit missing
+instrumentation and abstention states. They are not GPU utilization and do not
+automatically change resource requests.

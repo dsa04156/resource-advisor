@@ -5,6 +5,7 @@ from datetime import datetime
 from sqlalchemy import func, select
 
 from .contracts import WorkloadSpec, now, signature
+from .diagnostics import diagnose
 from .inventory import fresh_view
 from .policy import compatibility
 from .service import NotFound
@@ -43,6 +44,7 @@ def job_view(service, conn, row):
     body = row["body"]
     result = owned(service.store, conn, row["project"], "result", body["attempt_id"])
     tracking = owned(service.store, conn, row["project"], "tracking", body["attempt_id"])
+    phases = owned(service.store, conn, row["project"], "phase_profile", body["attempt_id"])
     return {
         **service.public_job(row),
         "workload_ref": body["request"]["workload_ref"],
@@ -57,6 +59,7 @@ def job_view(service, conn, row):
         "quality_passed": body.get("quality_passed"),
         "result": result,
         "tracking": tracking,
+        "diagnostics": diagnose(phases, evidence_kind=result["evidence_kind"] if result else None),
         **{k: body.get(k) for k in ("started_at", "finished_at", "backend_observed_at")},
     }
 

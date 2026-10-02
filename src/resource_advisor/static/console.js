@@ -394,9 +394,45 @@ function jobRows() {
                   ? "미통과"
                   : "미확인"),
           ),
+          diagnosticView(j.diagnostics),
         )
       : "유효 측정 없음",
   ]);
+}
+function diagnosticView(d) {
+  if (!d || d.reasons?.includes("NO_PHASE_PROFILE"))
+    return el("small", "병목 진단: 구간 계측 없음");
+  const names = {
+    POSSIBLE_INPUT_SUPPLY_BOUND: "입력 공급 병목 가능성",
+    POSSIBLE_IO_BOUND: "파일 읽기 병목 가능성",
+    POSSIBLE_TRANSFER_BOUND: "데이터 전송 병목 가능성",
+    POSSIBLE_ACCELERATOR_PATH_BOUND: "GPU 계산 경로 병목 가능성",
+    POSSIBLE_SYNCHRONIZATION_BOUND: "동기화 대기 병목 가능성",
+  };
+  const phases = {
+    input_wait: "입력 대기",
+    cpu_processing: "CPU 처리",
+    file_read: "파일 읽기",
+    host_to_device: "GPU로 전송",
+    accelerator_compute: "GPU 계산 경로",
+    device_to_host: "CPU로 전송",
+    synchronization: "동기화 대기",
+  };
+  const box = el("details", null, "phase-diagnostic");
+  box.append(el("summary", names[d.hypothesis] || "병목 진단 보류"));
+  for (const [key, share] of Object.entries(d.phase_shares || {}))
+    box.append(el("small", `${phases[key] || key}: ${fmt(share * 100, 1)}%`));
+  box.append(
+    el("small", "이번 실행의 구간별 경과시간입니다. GPU 사용률이 아닙니다."),
+  );
+  box.append(
+    el(
+      "small",
+      "원인 확정에는 한 변수씩 바꾼 재시험이 필요합니다. 자원은 자동 변경하지 않습니다.",
+    ),
+  );
+  box.append(details("진단 근거 · 한계", d));
+  return box;
 }
 function execution() {
   const root = el("div"),

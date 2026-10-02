@@ -176,6 +176,19 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
             ).mappings()
             return [service.public_job(row) for row in rows]
 
+    @app.get(PREFIX + "/jobs/{job_id}/diagnostics")
+    def diagnostics(job_id: str, p=Depends(principal)):
+        from .diagnostics import diagnose
+
+        job = service.get_job(p.project, job_id)
+        with service.store.transaction() as conn:
+            phases = service.store.get(conn, "phase_profile", job["attempt_id"])
+            result = service.store.get(conn, "result", job["attempt_id"])
+        return diagnose(
+            phases["body"] if phases else None,
+            evidence_kind=result["body"]["evidence_kind"] if result else None,
+        )
+
     @app.get(PREFIX + "/jobs/{job_id}/artifacts")
     def artifacts(job_id: str, p=Depends(principal)):
         service.get_job(p.project, job_id)

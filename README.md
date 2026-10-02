@@ -25,6 +25,8 @@ resources/jobs, compatibility, queue/allocation history, and recommendation evid
 
 The [approved GPU demo](docs/approved-gpu-demo.md) now connects fresh qualification,
 three observations, recommendation, approval and independent measured comparison.
+The [CNN diagnostic trial](docs/bottleneck-diagnostics.md) connects serial phase
+measurements to cautious bottleneck hypotheses and a controlled input-reuse test.
 
 ## Responsibility
 

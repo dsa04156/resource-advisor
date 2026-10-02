@@ -1,0 +1,2359 @@
+{
+  "schema_version": "v1",
+  "evidence_kind": "hardware",
+  "scope": "same-input CUDA CNN cooperative serial diagnostic smoke; not trained classification accuracy or broad optimization evidence",
+  "gpu": "NVIDIA GeForce RTX 5080",
+  "runtime_versions": {
+    "pytorch": "2.8.0+cu128",
+    "cuda": "12.8"
+  },
+  "source_bundle_digest": "sha256:f8da3eacb4f40c0811ba209e164658791909fbd9803d458943f23557766d22b4",
+  "environment_digest": "sha256:1552dfae4b9fc1141633cf82105b2b635ea44b319a52a50911ea88e89fb3d41a",
+  "image": "ghcr.io/mlflow/mlflow:v3.16.1@sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984",
+  "workload_identity": {
+    "code_digest": "sha256:f8da3eacb4f40c0811ba209e164658791909fbd9803d458943f23557766d22b4",
+    "model_digest": "sha256:6444bfb84104d55fd19427bfc8c6f718e3a5985ed9bfcd8b2fa7e70667da0f82",
+    "dataset_version": "sha256:ca4b78f33dfa12aa73b82b89623c9c0efb9a028e24b9f13e6fe95a6ac56e60bc",
+    "config_digest": "sha256:c23bf558abb45a4101946f217cff89a2afa2b68c293edfccbce8c8d5f91b3e24",
+    "task_type": "inference",
+    "input_shape": [
+      1,
+      3,
+      128,
+      128
+    ],
+    "batch_size": 1,
+    "global_batch_size": null,
+    "gradient_accumulation": 1,
+    "precision": "fp32",
+    "seed": 0,
+    "work_units": 20,
+    "quality_contract_digest": "sha256:a9f0bd7d40be67709a2fcc7ca47d00eccac388f46be97234dc9fb0825dcc9496",
+    "measurement_boundary": "cnn-serial-input-transfer-forward-v1"
+  },
+  "quality_policy": {
+    "metric": "numerical_agreement",
+    "minimum": 1.0,
+    "minimum_repeats": 3,
+    "maximum_peak_memory_mib": 1024.0,
+    "max_profile_age_seconds": 86400
+  },
+  "qualification": {
+    "completed_at": "2026-10-02T08:57:03Z",
+    "fixture_digests": {
+      "model_weights_digest": "sha256:6444bfb84104d55fd19427bfc8c6f718e3a5985ed9bfcd8b2fa7e70667da0f82",
+      "input_digest": "sha256:ca4b78f33dfa12aa73b82b89623c9c0efb9a028e24b9f13e6fe95a6ac56e60bc",
+      "prepared_input_digest": "sha256:b1d4a8ad35dcbff186c3e9713f27b20a7fbbb2a07b761d8dbdebd33edbb947f6"
+    },
+    "result": {
+      "result": {
+        "schema_version": "v1",
+        "job_id": "ra-cnn-v2-qualify-085658",
+        "attempt_id": "ra-cnn-v2-qualify-085658-attempt",
+        "epoch": 1,
+        "workload_signature": "sha256:6557ef8b5bda18589d30558af6c08008ff47f41459943e53120ef4404062655b",
+        "context_signature": "sha256:aae55114a149459d91912a3364969f38ee376bf00e68e7cfdb500df3ff021c1a",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.007017337076831609,
+          "peak_memory_mib": 4.26318359375,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.34003297332674265,
+          "latency_p95_ms": 0.3894850378856063,
+          "latency_p99_ms": 0.3894850378856063,
+          "throughput": 2850.083982146427,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "digest": "sha256:1cd8b7c7f23677d0806ff0c9d962bc5e975f30516527c1c0c9fd5896d4ab6dfa",
+      "phase_profile": {
+        "schema_version": "v1",
+        "job_id": "ra-cnn-v2-qualify-085658",
+        "attempt_id": "ra-cnn-v2-qualify-085658-attempt",
+        "result_digest": "sha256:1cd8b7c7f23677d0806ff0c9d962bc5e975f30516527c1c0c9fd5896d4ab6dfa",
+        "measurement_boundary": "cnn-serial-input-transfer-forward-v1",
+        "instrumentation": "cooperative_serial",
+        "samples": [
+          {
+            "wall_seconds": 0.00035315699642524123,
+            "phases_seconds": {
+              "cpu_processing": 0.00023831799626350403,
+              "host_to_device": 2.4573993869125843e-05,
+              "accelerator_compute": 9.026500629261136e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003894850378856063,
+            "phases_seconds": {
+              "cpu_processing": 0.0002741049975156784,
+              "host_to_device": 2.548599150031805e-05,
+              "accelerator_compute": 8.989404886960983e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00037818599957972765,
+            "phases_seconds": {
+              "cpu_processing": 0.0002699229517020285,
+              "host_to_device": 2.1103012841194868e-05,
+              "accelerator_compute": 8.716003503650427e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00038103002589195967,
+            "phases_seconds": {
+              "cpu_processing": 0.000272396020591259,
+              "host_to_device": 2.2644991986453533e-05,
+              "accelerator_compute": 8.598901331424713e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003405030001886189,
+            "phases_seconds": {
+              "cpu_processing": 0.00023719400633126497,
+              "host_to_device": 1.882098149508238e-05,
+              "accelerator_compute": 8.448801236227155e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003397249965928495,
+            "phases_seconds": {
+              "cpu_processing": 0.00023764598881825805,
+              "host_to_device": 1.8944963812828064e-05,
+              "accelerator_compute": 8.313404396176338e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003387040342204273,
+            "phases_seconds": {
+              "cpu_processing": 0.00023754104040563107,
+              "host_to_device": 1.7952988855540752e-05,
+              "accelerator_compute": 8.321000495925546e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003403409500606358,
+            "phases_seconds": {
+              "cpu_processing": 0.00023732095723971725,
+              "host_to_device": 1.801201142370701e-05,
+              "accelerator_compute": 8.500798139721155e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034507905365899205,
+            "phases_seconds": {
+              "cpu_processing": 0.0002434880007058382,
+              "host_to_device": 1.7914047930389643e-05,
+              "accelerator_compute": 8.36770050227642e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034370901994407177,
+            "phases_seconds": {
+              "cpu_processing": 0.0002431240282021463,
+              "host_to_device": 1.7601996660232544e-05,
+              "accelerator_compute": 8.298299508169293e-05
+            }
+          },
+          {
+            "wall_seconds": 0.000334232987370342,
+            "phases_seconds": {
+              "cpu_processing": 0.0002341630170121789,
+              "host_to_device": 1.7180980648845434e-05,
+              "accelerator_compute": 8.288898970931768e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033506599720567465,
+            "phases_seconds": {
+              "cpu_processing": 0.00023379398044198751,
+              "host_to_device": 1.8044025637209415e-05,
+              "accelerator_compute": 8.322799112647772e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003351419582031667,
+            "phases_seconds": {
+              "cpu_processing": 0.0002358939964324236,
+              "host_to_device": 1.6877951566129923e-05,
+              "accelerator_compute": 8.237001020461321e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003312900080345571,
+            "phases_seconds": {
+              "cpu_processing": 0.00023211800726130605,
+              "host_to_device": 1.7305021174252033e-05,
+              "accelerator_compute": 8.186697959899902e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033244898077100515,
+            "phases_seconds": {
+              "cpu_processing": 0.0002334999735467136,
+              "host_to_device": 1.6866018995642662e-05,
+              "accelerator_compute": 8.20829882286489e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003355590160936117,
+            "phases_seconds": {
+              "cpu_processing": 0.00023599201813340187,
+              "host_to_device": 1.765898196026683e-05,
+              "accelerator_compute": 8.190801599994302e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033169600646942854,
+            "phases_seconds": {
+              "cpu_processing": 0.0002318779588676989,
+              "host_to_device": 1.7509039025753736e-05,
+              "accelerator_compute": 8.23090085759759e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033196998992934823,
+            "phases_seconds": {
+              "cpu_processing": 0.0002323940279893577,
+              "host_to_device": 1.7293961718678474e-05,
+              "accelerator_compute": 8.228200022131205e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003480300074443221,
+            "phases_seconds": {
+              "cpu_processing": 0.0002482720301486552,
+              "host_to_device": 1.7013982869684696e-05,
+              "accelerator_compute": 8.274399442598224e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00045198301086202264,
+            "phases_seconds": {
+              "cpu_processing": 0.00023558299290016294,
+              "host_to_device": 1.7429993022233248e-05,
+              "accelerator_compute": 0.00019897002493962646
+            }
+          }
+        ]
+      }
+    }
+  },
+  "only_changed_parameter": "input_strategy",
+  "resource_requests": {
+    "host_cpu": 1.0,
+    "host_memory_mib": 2048,
+    "accelerator_count": 1
+  },
+  "study": {
+    "ref": "study-f3da77cc099a49938576823356974d53",
+    "state": "COMPLETED",
+    "strategy": "random",
+    "seed": 7,
+    "confirmation_schedule": [
+      "recompute",
+      "recompute",
+      "cache",
+      "cache",
+      "cache",
+      "recompute"
+    ],
+    "charged_device_seconds": {
+      "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 17.0
+    },
+    "planning_seconds": 8.498894749209285e-05,
+    "total_wall_budget_seconds": 600
+  },
+  "confirmation_summary": {
+    "recompute": {
+      "independent_confirmation_runs": 3,
+      "mean_seconds": 0.006992996379267424,
+      "stdev_seconds": 0.0001707892909905883,
+      "min_seconds": 0.00684346113121137,
+      "max_seconds": 0.007179112057201564,
+      "hypotheses": [
+        "POSSIBLE_INPUT_SUPPLY_BOUND",
+        "POSSIBLE_INPUT_SUPPLY_BOUND",
+        "POSSIBLE_INPUT_SUPPLY_BOUND"
+      ]
+    },
+    "cache": {
+      "independent_confirmation_runs": 3,
+      "mean_seconds": 0.002283628098666668,
+      "stdev_seconds": 5.633183145831509e-06,
+      "min_seconds": 0.0022773201926611364,
+      "max_seconds": 0.002288157003931701,
+      "hypotheses": [
+        "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "POSSIBLE_ACCELERATOR_PATH_BOUND"
+      ]
+    }
+  },
+  "application_attempts": [
+    {
+      "job_id": "j-a80baea725d647b6bfa184d0cdca5a66",
+      "attempt_id": "a-7985fceaac8d40beb214052191aa4c1f",
+      "mode": "pilot",
+      "input_strategy": "cache",
+      "state": "SUCCEEDED",
+      "quality_passed": true,
+      "node_alias": "gpu-worker-a",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-a80baea725d647b6bfa184d0cdca5a66",
+        "attempt_id": "a-7985fceaac8d40beb214052191aa4c1f",
+        "epoch": 1,
+        "workload_signature": "sha256:7d37a37a7722465e7608d79d07176b227c2880a97d29982c9682b7489ff54487",
+        "context_signature": "sha256:25e12a33dfef853537cbb485dadfc4e98e86b4d9ca036f462bf67bcacd6f0fc0",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0023103179410099983,
+          "peak_memory_mib": 4.26318359375,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.10055649909190834,
+          "latency_p95_ms": 0.11139200069010258,
+          "latency_p99_ms": 0.11139200069010258,
+          "throughput": 8656.81716138889,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "phase_profile": {
+        "schema_version": "v1",
+        "job_id": "j-a80baea725d647b6bfa184d0cdca5a66",
+        "attempt_id": "a-7985fceaac8d40beb214052191aa4c1f",
+        "result_digest": "sha256:2c7793dde078931f7ee6df89afaf46d06027f35610862bc22610c0c2cb0ca511",
+        "measurement_boundary": "cnn-serial-input-transfer-forward-v1",
+        "instrumentation": "cooperative_serial",
+        "samples": [
+          {
+            "wall_seconds": 0.0003732439945451915,
+            "phases_seconds": {
+              "cpu_processing": 0.0002532780054025352,
+              "host_to_device": 2.7707952540367842e-05,
+              "accelerator_compute": 9.225803660228848e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00011139200069010258,
+            "phases_seconds": {
+              "cpu_processing": 2.619926817715168e-07,
+              "host_to_device": 2.4061999283730984e-05,
+              "accelerator_compute": 8.706800872460008e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010595296043902636,
+            "phases_seconds": {
+              "cpu_processing": 1.319567672908306e-07,
+              "host_to_device": 2.0606035832315683e-05,
+              "accelerator_compute": 8.521496783941984e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010566296987235546,
+            "phases_seconds": {
+              "cpu_processing": 1.0099029168486595e-07,
+              "host_to_device": 2.1371000912040472e-05,
+              "accelerator_compute": 8.419097866863012e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010441301856189966,
+            "phases_seconds": {
+              "cpu_processing": 2.2299354895949364e-07,
+              "host_to_device": 1.9557017367333174e-05,
+              "accelerator_compute": 8.4633007645607e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010235398076474667,
+            "phases_seconds": {
+              "cpu_processing": 8.003553375601768e-08,
+              "host_to_device": 1.8449965864419937e-05,
+              "accelerator_compute": 8.382397936657071e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010113901225849986,
+            "phases_seconds": {
+              "cpu_processing": 7.200287654995918e-08,
+              "host_to_device": 1.8598977476358414e-05,
+              "accelerator_compute": 8.246803190559149e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010058097541332245,
+            "phases_seconds": {
+              "cpu_processing": 6.996560841798782e-08,
+              "host_to_device": 1.817202428355813e-05,
+              "accelerator_compute": 8.233898552134633e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010468799155205488,
+            "phases_seconds": {
+              "cpu_processing": 8.096685633063316e-08,
+              "host_to_device": 2.1923042368143797e-05,
+              "accelerator_compute": 8.268398232758045e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010093097807839513,
+            "phases_seconds": {
+              "cpu_processing": 7.200287654995918e-08,
+              "host_to_device": 1.8268998246639967e-05,
+              "accelerator_compute": 8.25899769552052e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010036700405180454,
+            "phases_seconds": {
+              "cpu_processing": 6.699701771140099e-08,
+              "host_to_device": 1.844600774347782e-05,
+              "accelerator_compute": 8.185399929061532e-05
+            }
+          },
+          {
+            "wall_seconds": 9.880599100142717e-05,
+            "phases_seconds": {
+              "cpu_processing": 5.698530003428459e-08,
+              "host_to_device": 1.712300581857562e-05,
+              "accelerator_compute": 8.162599988281727e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010003900388255715,
+            "phases_seconds": {
+              "cpu_processing": 6.798654794692993e-08,
+              "host_to_device": 1.7826969269663095e-05,
+              "accelerator_compute": 8.214404806494713e-05
+            }
+          },
+          {
+            "wall_seconds": 9.911099914461374e-05,
+            "phases_seconds": {
+              "cpu_processing": 4.598405212163925e-08,
+              "host_to_device": 1.7315964214503765e-05,
+              "accelerator_compute": 8.174905087798834e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0001002250355668366,
+            "phases_seconds": {
+              "cpu_processing": 6.600748747587204e-08,
+              "host_to_device": 1.7828017007559538e-05,
+              "accelerator_compute": 8.233101107180119e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010016700252890587,
+            "phases_seconds": {
+              "cpu_processing": 5.902256816625595e-08,
+              "host_to_device": 1.739896833896637e-05,
+              "accelerator_compute": 8.270901162177324e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010051799472421408,
+            "phases_seconds": {
+              "cpu_processing": 5.098991096019745e-08,
+              "host_to_device": 1.8366030417382717e-05,
+              "accelerator_compute": 8.210097439587116e-05
+            }
+          },
+          {
+            "wall_seconds": 9.975500870496035e-05,
+            "phases_seconds": {
+              "cpu_processing": 7.299240678548813e-08,
+              "host_to_device": 1.7381971701979637e-05,
+              "accelerator_compute": 8.230004459619522e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010053202277049422,
+            "phases_seconds": {
+              "cpu_processing": 4.0978193283081055e-08,
+              "host_to_device": 1.791503746062517e-05,
+              "accelerator_compute": 8.257600711658597e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010043999645859003,
+            "phases_seconds": {
+              "cpu_processing": 3.899913281202316e-08,
+              "host_to_device": 1.7470039892941713e-05,
+              "accelerator_compute": 8.29309574328363e-05
+            }
+          }
+        ]
+      },
+      "diagnosis": {
+        "policy_version": "serial-phases-v1",
+        "status": "HYPOTHESIS",
+        "hypothesis": "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "auto_apply": false,
+        "resource_change": null,
+        "reasons": [
+          "SERIAL_PHASE_SHARE_GE_60_PERCENT",
+          "DOMINANT_IN_GE_80_PERCENT_STEPS"
+        ],
+        "phase_shares": {
+          "cpu_processing": 0.1103475199390491,
+          "host_to_device": 0.16698525306518158,
+          "accelerator_compute": 0.7226672269957694
+        },
+        "coverage": 1.0,
+        "limitations": [
+          "Phase wall time includes software/launch/wait overhead; it is not kernel busy time.",
+          "One run suggests a hypothesis; independent one-variable trials are required.",
+          "Missing phases are unknown, not zero; overlapping pipelines need separate analysis."
+        ],
+        "attempt_id": "a-7985fceaac8d40beb214052191aa4c1f",
+        "result_digest": "sha256:2c7793dde078931f7ee6df89afaf46d06027f35610862bc22610c0c2cb0ca511",
+        "profile_digest": "sha256:a1601009b463e33aca6382c957b71f303ce13fa121a635f0d9e87ef9a992c108",
+        "sample_count": 20,
+        "unclassified_share": 0.0,
+        "dominant_share": 0.7226672269957694,
+        "next_action": "Request an approved one-variable trial; preserve GPU count."
+      },
+      "fixture_digests": {
+        "model_weights_digest": "sha256:6444bfb84104d55fd19427bfc8c6f718e3a5985ed9bfcd8b2fa7e70667da0f82",
+        "input_digest": "sha256:ca4b78f33dfa12aa73b82b89623c9c0efb9a028e24b9f13e6fe95a6ac56e60bc",
+        "prepared_input_digest": "sha256:b1d4a8ad35dcbff186c3e9713f27b20a7fbbb2a07b761d8dbdebd33edbb947f6"
+      },
+      "kueue_admitted": true,
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "allocation_mode": "physical_device",
+      "queue_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    },
+    {
+      "job_id": "j-a1894ec7c2414db7ab97ee6db1e04407",
+      "attempt_id": "a-d5aab56f867644efada7391d10162d1f",
+      "mode": "pilot",
+      "input_strategy": "recompute",
+      "state": "SUCCEEDED",
+      "quality_passed": true,
+      "node_alias": "gpu-worker-a",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-a1894ec7c2414db7ab97ee6db1e04407",
+        "attempt_id": "a-d5aab56f867644efada7391d10162d1f",
+        "epoch": 1,
+        "workload_signature": "sha256:7d37a37a7722465e7608d79d07176b227c2880a97d29982c9682b7489ff54487",
+        "context_signature": "sha256:2258d5be7fab50e3cde4777cb60a195fabebf9a8040c9563973fefd140dce3f9",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.007157268933951855,
+          "peak_memory_mib": 4.26318359375,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.34877847065217793,
+          "latency_p95_ms": 0.40321500273421407,
+          "latency_p99_ms": 0.40321500273421407,
+          "throughput": 2794.3619534996415,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "phase_profile": {
+        "schema_version": "v1",
+        "job_id": "j-a1894ec7c2414db7ab97ee6db1e04407",
+        "attempt_id": "a-d5aab56f867644efada7391d10162d1f",
+        "result_digest": "sha256:5fadb0ef2104e664d6c87f2f7dca113f855e9cc9615b9898a1b90d14b914bd5e",
+        "measurement_boundary": "cnn-serial-input-transfer-forward-v1",
+        "instrumentation": "cooperative_serial",
+        "samples": [
+          {
+            "wall_seconds": 0.00036808999720960855,
+            "phases_seconds": {
+              "cpu_processing": 0.0002513710060156882,
+              "host_to_device": 2.434902125969529e-05,
+              "accelerator_compute": 9.236996993422508e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00040321500273421407,
+            "phases_seconds": {
+              "cpu_processing": 0.00028719595866277814,
+              "host_to_device": 2.3992033675312996e-05,
+              "accelerator_compute": 9.202701039612293e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0004266159958206117,
+            "phases_seconds": {
+              "cpu_processing": 0.00031329202465713024,
+              "host_to_device": 2.230401150882244e-05,
+              "accelerator_compute": 9.101995965465903e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0004015209851786494,
+            "phases_seconds": {
+              "cpu_processing": 0.0002885719877667725,
+              "host_to_device": 2.3455999325960875e-05,
+              "accelerator_compute": 8.949299808591604e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003446160117164254,
+            "phases_seconds": {
+              "cpu_processing": 0.00023956800578162074,
+              "host_to_device": 1.9768020138144493e-05,
+              "accelerator_compute": 8.527998579666018e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003437410341575742,
+            "phases_seconds": {
+              "cpu_processing": 0.0002388140419498086,
+              "host_to_device": 1.912197330966592e-05,
+              "accelerator_compute": 8.580501889809966e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003556779702194035,
+            "phases_seconds": {
+              "cpu_processing": 0.0002522189752198756,
+              "host_to_device": 1.826201332733035e-05,
+              "accelerator_compute": 8.519698167219758e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003528529778122902,
+            "phases_seconds": {
+              "cpu_processing": 0.000249675998929888,
+              "host_to_device": 1.8157996237277985e-05,
+              "accelerator_compute": 8.50189826451242e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034796702675521374,
+            "phases_seconds": {
+              "cpu_processing": 0.0002458720118738711,
+              "host_to_device": 1.7856014892458916e-05,
+              "accelerator_compute": 8.423899998888373e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003530000103637576,
+            "phases_seconds": {
+              "cpu_processing": 0.00024954701075330377,
+              "host_to_device": 1.793599221855402e-05,
+              "accelerator_compute": 8.551700739189982e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034921395126730204,
+            "phases_seconds": {
+              "cpu_processing": 0.00024667999241501093,
+              "host_to_device": 1.7858983483165503e-05,
+              "accelerator_compute": 8.46749753691256e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00035016698529943824,
+            "phases_seconds": {
+              "cpu_processing": 0.00024858000688254833,
+              "host_to_device": 1.7833022866398096e-05,
+              "accelerator_compute": 8.375395555049181e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003483429900370538,
+            "phases_seconds": {
+              "cpu_processing": 0.00024617300368845463,
+              "host_to_device": 1.779600279405713e-05,
+              "accelerator_compute": 8.437398355454206e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034831796074286103,
+            "phases_seconds": {
+              "cpu_processing": 0.0002460929681546986,
+              "host_to_device": 1.7555023077875376e-05,
+              "accelerator_compute": 8.466996951028705e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003469270304776728,
+            "phases_seconds": {
+              "cpu_processing": 0.0002447690349072218,
+              "host_to_device": 1.7449958249926567e-05,
+              "accelerator_compute": 8.470803732052445e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003448289935477078,
+            "phases_seconds": {
+              "cpu_processing": 0.00024304399266839027,
+              "host_to_device": 1.7623999156057835e-05,
+              "accelerator_compute": 8.416100172325969e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003471950185485184,
+            "phases_seconds": {
+              "cpu_processing": 0.000244705006480217,
+              "host_to_device": 1.8207007087767124e-05,
+              "accelerator_compute": 8.428300498053432e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034939299803227186,
+            "phases_seconds": {
+              "cpu_processing": 0.0002476709778420627,
+              "host_to_device": 1.7468002624809742e-05,
+              "accelerator_compute": 8.425401756539941e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034105696249753237,
+            "phases_seconds": {
+              "cpu_processing": 0.00024139101151376963,
+              "host_to_device": 1.6943959053605795e-05,
+              "accelerator_compute": 8.272199193015695e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003345290315337479,
+            "phases_seconds": {
+              "cpu_processing": 0.0002345810062251985,
+              "host_to_device": 1.7324986401945353e-05,
+              "accelerator_compute": 8.262303890660405e-05
+            }
+          }
+        ]
+      },
+      "diagnosis": {
+        "policy_version": "serial-phases-v1",
+        "status": "HYPOTHESIS",
+        "hypothesis": "POSSIBLE_INPUT_SUPPLY_BOUND",
+        "auto_apply": false,
+        "resource_change": null,
+        "reasons": [
+          "SERIAL_PHASE_SHARE_GE_60_PERCENT",
+          "DOMINANT_IN_GE_80_PERCENT_STEPS"
+        ],
+        "phase_shares": {
+          "cpu_processing": 0.7069475897972937,
+          "host_to_device": 0.053269483682558585,
+          "accelerator_compute": 0.23978292652014774
+        },
+        "coverage": 1.0,
+        "limitations": [
+          "Phase wall time includes software/launch/wait overhead; it is not kernel busy time.",
+          "One run suggests a hypothesis; independent one-variable trials are required.",
+          "Missing phases are unknown, not zero; overlapping pipelines need separate analysis."
+        ],
+        "attempt_id": "a-d5aab56f867644efada7391d10162d1f",
+        "result_digest": "sha256:5fadb0ef2104e664d6c87f2f7dca113f855e9cc9615b9898a1b90d14b914bd5e",
+        "profile_digest": "sha256:d37515ae74aa4929ff086fe6ac0280595ff002de6f8f0ab856eb490534f693eb",
+        "sample_count": 20,
+        "unclassified_share": 0.0,
+        "dominant_share": 0.7069475897972937,
+        "next_action": "Request an approved one-variable trial; preserve GPU count."
+      },
+      "fixture_digests": {
+        "model_weights_digest": "sha256:6444bfb84104d55fd19427bfc8c6f718e3a5985ed9bfcd8b2fa7e70667da0f82",
+        "input_digest": "sha256:ca4b78f33dfa12aa73b82b89623c9c0efb9a028e24b9f13e6fe95a6ac56e60bc",
+        "prepared_input_digest": "sha256:b1d4a8ad35dcbff186c3e9713f27b20a7fbbb2a07b761d8dbdebd33edbb947f6"
+      },
+      "kueue_admitted": true,
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "allocation_mode": "physical_device",
+      "queue_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    },
+    {
+      "job_id": "j-3abc6962193e41d1be55b069b19bca7c",
+      "attempt_id": "a-82c5684db3f34876b86f5a8ff1b48ce7",
+      "mode": "confirmation",
+      "input_strategy": "recompute",
+      "state": "SUCCEEDED",
+      "quality_passed": true,
+      "node_alias": "gpu-worker-a",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-3abc6962193e41d1be55b069b19bca7c",
+        "attempt_id": "a-82c5684db3f34876b86f5a8ff1b48ce7",
+        "epoch": 1,
+        "workload_signature": "sha256:7d37a37a7722465e7608d79d07176b227c2880a97d29982c9682b7489ff54487",
+        "context_signature": "sha256:2258d5be7fab50e3cde4777cb60a195fabebf9a8040c9563973fefd140dce3f9",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.007179112057201564,
+          "peak_memory_mib": 4.26318359375,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.35046751145273447,
+          "latency_p95_ms": 0.39742200169712305,
+          "latency_p99_ms": 0.39742200169712305,
+          "throughput": 2785.8598445942143,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "phase_profile": {
+        "schema_version": "v1",
+        "job_id": "j-3abc6962193e41d1be55b069b19bca7c",
+        "attempt_id": "a-82c5684db3f34876b86f5a8ff1b48ce7",
+        "result_digest": "sha256:525d4e0f683242ac51b257c3c53109b2e3259d48ba7e37a60160b426f941ad46",
+        "measurement_boundary": "cnn-serial-input-transfer-forward-v1",
+        "instrumentation": "cooperative_serial",
+        "samples": [
+          {
+            "wall_seconds": 0.00036633701529353857,
+            "phases_seconds": {
+              "cpu_processing": 0.0002492010244168341,
+              "host_to_device": 2.4886976461857557e-05,
+              "accelerator_compute": 9.22490144148469e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00040820601861923933,
+            "phases_seconds": {
+              "cpu_processing": 0.00028864003252238035,
+              "host_to_device": 2.802099334076047e-05,
+              "accelerator_compute": 9.154499275609851e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00039742200169712305,
+            "phases_seconds": {
+              "cpu_processing": 0.00028707500314339995,
+              "host_to_device": 2.165901241824031e-05,
+              "accelerator_compute": 8.868798613548279e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003933149855583906,
+            "phases_seconds": {
+              "cpu_processing": 0.00028429500525817275,
+              "host_to_device": 2.232700353488326e-05,
+              "accelerator_compute": 8.66929767653346e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00035644700983539224,
+            "phases_seconds": {
+              "cpu_processing": 0.000249525997787714,
+              "host_to_device": 2.0062027033418417e-05,
+              "accelerator_compute": 8.685898501425982e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003496530116535723,
+            "phases_seconds": {
+              "cpu_processing": 0.0002449990133754909,
+              "host_to_device": 1.8991006072610617e-05,
+              "accelerator_compute": 8.56629922054708e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003517380100674927,
+            "phases_seconds": {
+              "cpu_processing": 0.00024809298338368535,
+              "host_to_device": 1.8723018001765013e-05,
+              "accelerator_compute": 8.492200868204236e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003505790373310447,
+            "phases_seconds": {
+              "cpu_processing": 0.00024708203272894025,
+              "host_to_device": 1.8368999008089304e-05,
+              "accelerator_compute": 8.512800559401512e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003487020148895681,
+            "phases_seconds": {
+              "cpu_processing": 0.00024524203035980463,
+              "host_to_device": 1.8862017896026373e-05,
+              "accelerator_compute": 8.459796663373709e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034964398946613073,
+            "phases_seconds": {
+              "cpu_processing": 0.00024720997316762805,
+              "host_to_device": 1.8003047443926334e-05,
+              "accelerator_compute": 8.443096885457635e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003481340245343745,
+            "phases_seconds": {
+              "cpu_processing": 0.00024601101176813245,
+              "host_to_device": 1.8063990864902735e-05,
+              "accelerator_compute": 8.405902190133929e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00035035598557442427,
+            "phases_seconds": {
+              "cpu_processing": 0.0002486199955455959,
+              "host_to_device": 1.7775979358702898e-05,
+              "accelerator_compute": 8.396001067012548e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00035701203159987926,
+            "phases_seconds": {
+              "cpu_processing": 0.0002538749831728637,
+              "host_to_device": 1.7998041585087776e-05,
+              "accelerator_compute": 8.513900684192777e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003473919932730496,
+            "phases_seconds": {
+              "cpu_processing": 0.0002460440155118704,
+              "host_to_device": 1.777498982846737e-05,
+              "accelerator_compute": 8.357298793271184e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034902297193184495,
+            "phases_seconds": {
+              "cpu_processing": 0.00024714594474062324,
+              "host_to_device": 1.7725047655403614e-05,
+              "accelerator_compute": 8.41519795358181e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00035361701156944036,
+            "phases_seconds": {
+              "cpu_processing": 0.00025021302280947566,
+              "host_to_device": 1.8013000953942537e-05,
+              "accelerator_compute": 8.539098780602217e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034974899608641863,
+            "phases_seconds": {
+              "cpu_processing": 0.000246838026214391,
+              "host_to_device": 1.8207007087767124e-05,
+              "accelerator_compute": 8.470396278426051e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00035210198257118464,
+            "phases_seconds": {
+              "cpu_processing": 0.0002501690178178251,
+              "host_to_device": 1.74029846675694e-05,
+              "accelerator_compute": 8.452998008579016e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034944695653393865,
+            "phases_seconds": {
+              "cpu_processing": 0.00024725397815927863,
+              "host_to_device": 1.7924001440405846e-05,
+              "accelerator_compute": 8.426897693425417e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00035023700911551714,
+            "phases_seconds": {
+              "cpu_processing": 0.00024888303596526384,
+              "host_to_device": 1.770199742168188e-05,
+              "accelerator_compute": 8.365197572857141e-05
+            }
+          }
+        ]
+      },
+      "diagnosis": {
+        "policy_version": "serial-phases-v1",
+        "status": "HYPOTHESIS",
+        "hypothesis": "POSSIBLE_INPUT_SUPPLY_BOUND",
+        "auto_apply": false,
+        "resource_change": null,
+        "reasons": [
+          "SERIAL_PHASE_SHARE_GE_60_PERCENT",
+          "DOMINANT_IN_GE_80_PERCENT_STEPS"
+        ],
+        "phase_shares": {
+          "cpu_processing": 0.7071091922513005,
+          "host_to_device": 0.05411409363443529,
+          "accelerator_compute": 0.23877671411426424
+        },
+        "coverage": 1.0,
+        "limitations": [
+          "Phase wall time includes software/launch/wait overhead; it is not kernel busy time.",
+          "One run suggests a hypothesis; independent one-variable trials are required.",
+          "Missing phases are unknown, not zero; overlapping pipelines need separate analysis."
+        ],
+        "attempt_id": "a-82c5684db3f34876b86f5a8ff1b48ce7",
+        "result_digest": "sha256:525d4e0f683242ac51b257c3c53109b2e3259d48ba7e37a60160b426f941ad46",
+        "profile_digest": "sha256:3ba83305f79c2ada526dc56117804b5d8d487147b2a56db29b370dbc75902d13",
+        "sample_count": 20,
+        "unclassified_share": 0.0,
+        "dominant_share": 0.7071091922513005,
+        "next_action": "Request an approved one-variable trial; preserve GPU count."
+      },
+      "fixture_digests": {
+        "model_weights_digest": "sha256:6444bfb84104d55fd19427bfc8c6f718e3a5985ed9bfcd8b2fa7e70667da0f82",
+        "input_digest": "sha256:ca4b78f33dfa12aa73b82b89623c9c0efb9a028e24b9f13e6fe95a6ac56e60bc",
+        "prepared_input_digest": "sha256:b1d4a8ad35dcbff186c3e9713f27b20a7fbbb2a07b761d8dbdebd33edbb947f6"
+      },
+      "kueue_admitted": true,
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "allocation_mode": "physical_device",
+      "queue_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    },
+    {
+      "job_id": "j-707567c7f21b402ebb4e57b07fff4f9c",
+      "attempt_id": "a-9a7429dc0c8f45338a17c306802f8f18",
+      "mode": "confirmation",
+      "input_strategy": "recompute",
+      "state": "SUCCEEDED",
+      "quality_passed": true,
+      "node_alias": "gpu-worker-a",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-707567c7f21b402ebb4e57b07fff4f9c",
+        "attempt_id": "a-9a7429dc0c8f45338a17c306802f8f18",
+        "epoch": 1,
+        "workload_signature": "sha256:7d37a37a7722465e7608d79d07176b227c2880a97d29982c9682b7489ff54487",
+        "context_signature": "sha256:2258d5be7fab50e3cde4777cb60a195fabebf9a8040c9563973fefd140dce3f9",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.00684346113121137,
+          "peak_memory_mib": 4.26318359375,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.3351305203977972,
+          "latency_p95_ms": 0.38386404048651457,
+          "latency_p99_ms": 0.38386404048651457,
+          "throughput": 2922.4977853362593,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "phase_profile": {
+        "schema_version": "v1",
+        "job_id": "j-707567c7f21b402ebb4e57b07fff4f9c",
+        "attempt_id": "a-9a7429dc0c8f45338a17c306802f8f18",
+        "result_digest": "sha256:818e3a9cf71999d05f88fbe45a5a9577f69f50af7c381ebc426ad8b9683553b1",
+        "measurement_boundary": "cnn-serial-input-transfer-forward-v1",
+        "instrumentation": "cooperative_serial",
+        "samples": [
+          {
+            "wall_seconds": 0.0003502650070004165,
+            "phases_seconds": {
+              "cpu_processing": 0.00023752701235935092,
+              "host_to_device": 2.3600005079060793e-05,
+              "accelerator_compute": 8.91379895620048e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003850639914162457,
+            "phases_seconds": {
+              "cpu_processing": 0.000275229976978153,
+              "host_to_device": 2.1895975805819035e-05,
+              "accelerator_compute": 8.793803863227367e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00038386404048651457,
+            "phases_seconds": {
+              "cpu_processing": 0.0002766450052149594,
+              "host_to_device": 2.039800165221095e-05,
+              "accelerator_compute": 8.682103361934423e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003755639772862196,
+            "phases_seconds": {
+              "cpu_processing": 0.0002684629871509969,
+              "host_to_device": 2.1671992726624012e-05,
+              "accelerator_compute": 8.542899740859866e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003361619892530143,
+            "phases_seconds": {
+              "cpu_processing": 0.0002330829738639295,
+              "host_to_device": 1.86110264621675e-05,
+              "accelerator_compute": 8.446798892691731e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033590098610147834,
+            "phases_seconds": {
+              "cpu_processing": 0.00023398699704557657,
+              "host_to_device": 1.818797318264842e-05,
+              "accelerator_compute": 8.372601587325335e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033474102383479476,
+            "phases_seconds": {
+              "cpu_processing": 0.0002342140069231391,
+              "host_to_device": 1.7366022802889347e-05,
+              "accelerator_compute": 8.316099410876632e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033328001154586673,
+            "phases_seconds": {
+              "cpu_processing": 0.00023208698257803917,
+              "host_to_device": 1.7245998606085777e-05,
+              "accelerator_compute": 8.394703036174178e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003337229718454182,
+            "phases_seconds": {
+              "cpu_processing": 0.00023285194765776396,
+              "host_to_device": 1.7658050637692213e-05,
+              "accelerator_compute": 8.321297354996204e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003373210201971233,
+            "phases_seconds": {
+              "cpu_processing": 0.00023549498291686177,
+              "host_to_device": 1.7790007404983044e-05,
+              "accelerator_compute": 8.403602987527847e-05
+            }
+          },
+          {
+            "wall_seconds": 0.000336511991918087,
+            "phases_seconds": {
+              "cpu_processing": 0.0002364239771850407,
+              "host_to_device": 1.7027021385729313e-05,
+              "accelerator_compute": 8.306099334731698e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003355200169607997,
+            "phases_seconds": {
+              "cpu_processing": 0.00023499602684751153,
+              "host_to_device": 1.760997110977769e-05,
+              "accelerator_compute": 8.291401900351048e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003296509967185557,
+            "phases_seconds": {
+              "cpu_processing": 0.0002304209629073739,
+              "host_to_device": 1.7106998711824417e-05,
+              "accelerator_compute": 8.212303509935737e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003406400210224092,
+            "phases_seconds": {
+              "cpu_processing": 0.000241042987909168,
+              "host_to_device": 1.6840000171214342e-05,
+              "accelerator_compute": 8.275703294202685e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003338950336910784,
+            "phases_seconds": {
+              "cpu_processing": 0.0002340360078960657,
+              "host_to_device": 1.7140991985797882e-05,
+              "accelerator_compute": 8.271803380921483e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033099501160904765,
+            "phases_seconds": {
+              "cpu_processing": 0.00023186200996860862,
+              "host_to_device": 1.7354032024741173e-05,
+              "accelerator_compute": 8.177896961569786e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033127202186733484,
+            "phases_seconds": {
+              "cpu_processing": 0.0002312490250915289,
+              "host_to_device": 1.7344020307064056e-05,
+              "accelerator_compute": 8.26789764687419e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033373304177075624,
+            "phases_seconds": {
+              "cpu_processing": 0.00023450498702004552,
+              "host_to_device": 1.724000321701169e-05,
+              "accelerator_compute": 8.198805153369904e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003310229512862861,
+            "phases_seconds": {
+              "cpu_processing": 0.00023100298130884767,
+              "host_to_device": 1.744297333061695e-05,
+              "accelerator_compute": 8.25769966468215e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003343350253999233,
+            "phases_seconds": {
+              "cpu_processing": 0.00023477600188925862,
+              "host_to_device": 1.7344020307064056e-05,
+              "accelerator_compute": 8.221500320360065e-05
+            }
+          }
+        ]
+      },
+      "diagnosis": {
+        "policy_version": "serial-phases-v1",
+        "status": "HYPOTHESIS",
+        "hypothesis": "POSSIBLE_INPUT_SUPPLY_BOUND",
+        "auto_apply": false,
+        "resource_change": null,
+        "reasons": [
+          "SERIAL_PHASE_SHARE_GE_60_PERCENT",
+          "DOMINANT_IN_GE_80_PERCENT_STEPS"
+        ],
+        "phase_shares": {
+          "cpu_processing": 0.7013845404660877,
+          "host_to_device": 0.05360958144962556,
+          "accelerator_compute": 0.24500587808428675
+        },
+        "coverage": 1.0,
+        "limitations": [
+          "Phase wall time includes software/launch/wait overhead; it is not kernel busy time.",
+          "One run suggests a hypothesis; independent one-variable trials are required.",
+          "Missing phases are unknown, not zero; overlapping pipelines need separate analysis."
+        ],
+        "attempt_id": "a-9a7429dc0c8f45338a17c306802f8f18",
+        "result_digest": "sha256:818e3a9cf71999d05f88fbe45a5a9577f69f50af7c381ebc426ad8b9683553b1",
+        "profile_digest": "sha256:5fe3fb7fdfb20f113e84a5825e7cc2f3a043f28cdae10664199158532c5f12ca",
+        "sample_count": 20,
+        "unclassified_share": 0.0,
+        "dominant_share": 0.7013845404660877,
+        "next_action": "Request an approved one-variable trial; preserve GPU count."
+      },
+      "fixture_digests": {
+        "model_weights_digest": "sha256:6444bfb84104d55fd19427bfc8c6f718e3a5985ed9bfcd8b2fa7e70667da0f82",
+        "input_digest": "sha256:ca4b78f33dfa12aa73b82b89623c9c0efb9a028e24b9f13e6fe95a6ac56e60bc",
+        "prepared_input_digest": "sha256:b1d4a8ad35dcbff186c3e9713f27b20a7fbbb2a07b761d8dbdebd33edbb947f6"
+      },
+      "kueue_admitted": true,
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "allocation_mode": "physical_device",
+      "queue_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    },
+    {
+      "job_id": "j-53911d2fffd9426b9731134b186aa032",
+      "attempt_id": "a-6e6714567e32452f8e2658bb39dc6ff7",
+      "mode": "confirmation",
+      "input_strategy": "cache",
+      "state": "SUCCEEDED",
+      "quality_passed": true,
+      "node_alias": "gpu-worker-a",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-53911d2fffd9426b9731134b186aa032",
+        "attempt_id": "a-6e6714567e32452f8e2658bb39dc6ff7",
+        "epoch": 1,
+        "workload_signature": "sha256:7d37a37a7722465e7608d79d07176b227c2880a97d29982c9682b7489ff54487",
+        "context_signature": "sha256:25e12a33dfef853537cbb485dadfc4e98e86b4d9ca036f462bf67bcacd6f0fc0",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0022854070994071662,
+          "peak_memory_mib": 4.26318359375,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.09967401274479926,
+          "latency_p95_ms": 0.11011195601895452,
+          "latency_p99_ms": 0.11011195601895452,
+          "throughput": 8751.176105643495,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "phase_profile": {
+        "schema_version": "v1",
+        "job_id": "j-53911d2fffd9426b9731134b186aa032",
+        "attempt_id": "a-6e6714567e32452f8e2658bb39dc6ff7",
+        "result_digest": "sha256:d8e13b1199a5ffa3316c153ae4db3958aa0bd07d08270a010c7cd25607c8d207",
+        "measurement_boundary": "cnn-serial-input-transfer-forward-v1",
+        "instrumentation": "cooperative_serial",
+        "samples": [
+          {
+            "wall_seconds": 0.00037559703923761845,
+            "phases_seconds": {
+              "cpu_processing": 0.0002585439942777157,
+              "host_to_device": 2.6131048798561096e-05,
+              "accelerator_compute": 9.092199616134167e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00011011195601895452,
+            "phases_seconds": {
+              "cpu_processing": 1.9400613382458687e-07,
+              "host_to_device": 2.2873980924487114e-05,
+              "accelerator_compute": 8.704396896064281e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010392599506303668,
+            "phases_seconds": {
+              "cpu_processing": 9.295763447880745e-08,
+              "host_to_device": 1.968099968507886e-05,
+              "accelerator_compute": 8.415203774347901e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010460999328643084,
+            "phases_seconds": {
+              "cpu_processing": 1.200241968035698e-07,
+              "host_to_device": 2.0989973563700914e-05,
+              "accelerator_compute": 8.349999552592635e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010267301695421338,
+            "phases_seconds": {
+              "cpu_processing": 2.5599729269742966e-07,
+              "host_to_device": 1.8366030417382717e-05,
+              "accelerator_compute": 8.405098924413323e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010132999159395695,
+            "phases_seconds": {
+              "cpu_processing": 9.895302355289459e-08,
+              "host_to_device": 1.775601413100958e-05,
+              "accelerator_compute": 8.347502443939447e-05
+            }
+          },
+          {
+            "wall_seconds": 9.999703615903854e-05,
+            "phases_seconds": {
+              "cpu_processing": 8.300412446260452e-08,
+              "host_to_device": 1.736002741381526e-05,
+              "accelerator_compute": 8.255400462076068e-05
+            }
+          },
+          {
+            "wall_seconds": 9.985297219827771e-05,
+            "phases_seconds": {
+              "cpu_processing": 8.300412446260452e-08,
+              "host_to_device": 1.7201004084199667e-05,
+              "accelerator_compute": 8.256896398961544e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010023097274824977,
+            "phases_seconds": {
+              "cpu_processing": 1.369626261293888e-07,
+              "host_to_device": 1.7355021554976702e-05,
+              "accelerator_compute": 8.273898856714368e-05
+            }
+          },
+          {
+            "wall_seconds": 9.874103125184774e-05,
+            "phases_seconds": {
+              "cpu_processing": 5.698530003428459e-08,
+              "host_to_device": 1.6744015738368034e-05,
+              "accelerator_compute": 8.194003021344543e-05
+            }
+          },
+          {
+            "wall_seconds": 9.90360276773572e-05,
+            "phases_seconds": {
+              "cpu_processing": 5.00003807246685e-08,
+              "host_to_device": 1.682701986283064e-05,
+              "accelerator_compute": 8.215900743380189e-05
+            }
+          },
+          {
+            "wall_seconds": 9.9128985311836e-05,
+            "phases_seconds": {
+              "cpu_processing": 5.1979441195726395e-08,
+              "host_to_device": 1.686799805611372e-05,
+              "accelerator_compute": 8.220900781452656e-05
+            }
+          },
+          {
+            "wall_seconds": 9.863002924248576e-05,
+            "phases_seconds": {
+              "cpu_processing": 3.702007234096527e-08,
+              "host_to_device": 1.6554025933146477e-05,
+              "accelerator_compute": 8.203898323699832e-05
+            }
+          },
+          {
+            "wall_seconds": 9.94950532913208e-05,
+            "phases_seconds": {
+              "cpu_processing": 3.702007234096527e-08,
+              "host_to_device": 1.7001002561300993e-05,
+              "accelerator_compute": 8.245703065767884e-05
+            }
+          },
+          {
+            "wall_seconds": 9.904301259666681e-05,
+            "phases_seconds": {
+              "cpu_processing": 6.402842700481415e-08,
+              "host_to_device": 1.6945006791502237e-05,
+              "accelerator_compute": 8.203397737815976e-05
+            }
+          },
+          {
+            "wall_seconds": 9.763799607753754e-05,
+            "phases_seconds": {
+              "cpu_processing": 6.50179572403431e-08,
+              "host_to_device": 1.6698031686246395e-05,
+              "accelerator_compute": 8.08749464340508e-05
+            }
+          },
+          {
+            "wall_seconds": 9.857601253315806e-05,
+            "phases_seconds": {
+              "cpu_processing": 3.899913281202316e-08,
+              "host_to_device": 1.6730977222323418e-05,
+              "accelerator_compute": 8.180603617802262e-05
+            }
+          },
+          {
+            "wall_seconds": 9.996001608669758e-05,
+            "phases_seconds": {
+              "cpu_processing": 4.802132025361061e-08,
+              "host_to_device": 1.6328005585819483e-05,
+              "accelerator_compute": 8.358398918062449e-05
+            }
+          },
+          {
+            "wall_seconds": 9.833998046815395e-05,
+            "phases_seconds": {
+              "cpu_processing": 5.00003807246685e-08,
+              "host_to_device": 1.6628997400403023e-05,
+              "accelerator_compute": 8.166098268702626e-05
+            }
+          },
+          {
+            "wall_seconds": 9.848998161032796e-05,
+            "phases_seconds": {
+              "cpu_processing": 4.598405212163925e-08,
+              "host_to_device": 1.6632024198770523e-05,
+              "accelerator_compute": 8.18119733594358e-05
+            }
+          }
+        ]
+      },
+      "diagnosis": {
+        "policy_version": "serial-phases-v1",
+        "status": "HYPOTHESIS",
+        "hypothesis": "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "auto_apply": false,
+        "resource_change": null,
+        "reasons": [
+          "SERIAL_PHASE_SHARE_GE_60_PERCENT",
+          "DOMINANT_IN_GE_80_PERCENT_STEPS"
+        ],
+        "phase_shares": {
+          "cpu_processing": 0.11383265591430303,
+          "host_to_device": 0.15825242063169148,
+          "accelerator_compute": 0.7279149234540054
+        },
+        "coverage": 1.0,
+        "limitations": [
+          "Phase wall time includes software/launch/wait overhead; it is not kernel busy time.",
+          "One run suggests a hypothesis; independent one-variable trials are required.",
+          "Missing phases are unknown, not zero; overlapping pipelines need separate analysis."
+        ],
+        "attempt_id": "a-6e6714567e32452f8e2658bb39dc6ff7",
+        "result_digest": "sha256:d8e13b1199a5ffa3316c153ae4db3958aa0bd07d08270a010c7cd25607c8d207",
+        "profile_digest": "sha256:ddedec0a73d5119ad25fb31b98c2a92333c802044ac6befd1618bf9c43108180",
+        "sample_count": 20,
+        "unclassified_share": 0.0,
+        "dominant_share": 0.7279149234540054,
+        "next_action": "Request an approved one-variable trial; preserve GPU count."
+      },
+      "fixture_digests": {
+        "model_weights_digest": "sha256:6444bfb84104d55fd19427bfc8c6f718e3a5985ed9bfcd8b2fa7e70667da0f82",
+        "input_digest": "sha256:ca4b78f33dfa12aa73b82b89623c9c0efb9a028e24b9f13e6fe95a6ac56e60bc",
+        "prepared_input_digest": "sha256:b1d4a8ad35dcbff186c3e9713f27b20a7fbbb2a07b761d8dbdebd33edbb947f6"
+      },
+      "kueue_admitted": true,
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "allocation_mode": "physical_device",
+      "queue_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    },
+    {
+      "job_id": "j-9756bc437cae412e8e849f8bb71e478d",
+      "attempt_id": "a-8ac4d7e939e84f46aa0202b7735576ac",
+      "mode": "confirmation",
+      "input_strategy": "cache",
+      "state": "SUCCEEDED",
+      "quality_passed": true,
+      "node_alias": "gpu-worker-a",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-9756bc437cae412e8e849f8bb71e478d",
+        "attempt_id": "a-8ac4d7e939e84f46aa0202b7735576ac",
+        "epoch": 1,
+        "workload_signature": "sha256:7d37a37a7722465e7608d79d07176b227c2880a97d29982c9682b7489ff54487",
+        "context_signature": "sha256:25e12a33dfef853537cbb485dadfc4e98e86b4d9ca036f462bf67bcacd6f0fc0",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0022773201926611364,
+          "peak_memory_mib": 4.26318359375,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.10015349835157394,
+          "latency_p95_ms": 0.10845600627362728,
+          "latency_p99_ms": 0.10845600627362728,
+          "throughput": 8782.25208051628,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "phase_profile": {
+        "schema_version": "v1",
+        "job_id": "j-9756bc437cae412e8e849f8bb71e478d",
+        "attempt_id": "a-8ac4d7e939e84f46aa0202b7735576ac",
+        "result_digest": "sha256:e775320522648e4ba164fd5d0dbbd107a43c7266bc420fd897746f45fb9196a9",
+        "measurement_boundary": "cnn-serial-input-transfer-forward-v1",
+        "instrumentation": "cooperative_serial",
+        "samples": [
+          {
+            "wall_seconds": 0.00035368604585528374,
+            "phases_seconds": {
+              "cpu_processing": 0.00023751205299049616,
+              "host_to_device": 2.5754969101399183e-05,
+              "accelerator_compute": 9.04190237633884e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010845600627362728,
+            "phases_seconds": {
+              "cpu_processing": 1.680455170571804e-07,
+              "host_to_device": 2.242298796772957e-05,
+              "accelerator_compute": 8.586497278884053e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010719202691689134,
+            "phases_seconds": {
+              "cpu_processing": 1.1903466656804085e-07,
+              "host_to_device": 2.104596933349967e-05,
+              "accelerator_compute": 8.602702291682363e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010827102232724428,
+            "phases_seconds": {
+              "cpu_processing": 8.498318493366241e-08,
+              "host_to_device": 2.2410997189581394e-05,
+              "accelerator_compute": 8.577504195272923e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010430801194161177,
+            "phases_seconds": {
+              "cpu_processing": 2.480228431522846e-07,
+              "host_to_device": 1.9942002836614847e-05,
+              "accelerator_compute": 8.411798626184464e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010185601422563195,
+            "phases_seconds": {
+              "cpu_processing": 1.4703255146741867e-07,
+              "host_to_device": 1.8863007426261902e-05,
+              "accelerator_compute": 8.284597424790263e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0001004550140351057,
+            "phases_seconds": {
+              "cpu_processing": 7.299240678548813e-08,
+              "host_to_device": 1.851399429142475e-05,
+              "accelerator_compute": 8.186802733689547e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010130001464858651,
+            "phases_seconds": {
+              "cpu_processing": 6.897607818245888e-08,
+              "host_to_device": 1.8393038772046566e-05,
+              "accelerator_compute": 8.283799979835749e-05
+            }
+          },
+          {
+            "wall_seconds": 9.923696052283049e-05,
+            "phases_seconds": {
+              "cpu_processing": 6.495974957942963e-08,
+              "host_to_device": 1.7462007235735655e-05,
+              "accelerator_compute": 8.17099935375154e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0001003179932013154,
+            "phases_seconds": {
+              "cpu_processing": 9.598443284630775e-08,
+              "host_to_device": 1.8162012565881014e-05,
+              "accelerator_compute": 8.205999620258808e-05
+            }
+          },
+          {
+            "wall_seconds": 9.953201515600085e-05,
+            "phases_seconds": {
+              "cpu_processing": 4.598405212163925e-08,
+              "host_to_device": 1.7726037185639143e-05,
+              "accelerator_compute": 8.175999391824007e-05
+            }
+          },
+          {
+            "wall_seconds": 9.910098742693663e-05,
+            "phases_seconds": {
+              "cpu_processing": 5.698530003428459e-08,
+              "host_to_device": 1.7762009520083666e-05,
+              "accelerator_compute": 8.128199260681868e-05
+            }
+          },
+          {
+            "wall_seconds": 9.904499165713787e-05,
+            "phases_seconds": {
+              "cpu_processing": 4.598405212163925e-08,
+              "host_to_device": 1.7061014659702778e-05,
+              "accelerator_compute": 8.193799294531345e-05
+            }
+          },
+          {
+            "wall_seconds": 9.90299740806222e-05,
+            "phases_seconds": {
+              "cpu_processing": 3.800960257649422e-08,
+              "host_to_device": 1.7664977349340916e-05,
+              "accelerator_compute": 8.132698712870479e-05
+            }
+          },
+          {
+            "wall_seconds": 9.837903780862689e-05,
+            "phases_seconds": {
+              "cpu_processing": 4.4994521886110306e-08,
+              "host_to_device": 1.685001188889146e-05,
+              "accelerator_compute": 8.148403139784932e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0001007450046017766,
+            "phases_seconds": {
+              "cpu_processing": 8.201459422707558e-08,
+              "host_to_device": 1.7926970031112432e-05,
+              "accelerator_compute": 8.273601997643709e-05
+            }
+          },
+          {
+            "wall_seconds": 9.998900350183249e-05,
+            "phases_seconds": {
+              "cpu_processing": 3.597233444452286e-08,
+              "host_to_device": 1.774699194356799e-05,
+              "accelerator_compute": 8.220603922381997e-05
+            }
+          },
+          {
+            "wall_seconds": 9.897403651848435e-05,
+            "phases_seconds": {
+              "cpu_processing": 5.50062395632267e-08,
+              "host_to_device": 1.7547979950904846e-05,
+              "accelerator_compute": 8.137105032801628e-05
+            }
+          },
+          {
+            "wall_seconds": 9.819900151342154e-05,
+            "phases_seconds": {
+              "cpu_processing": 3.899913281202316e-08,
+              "host_to_device": 1.715205144137144e-05,
+              "accelerator_compute": 8.100795093923807e-05
+            }
+          },
+          {
+            "wall_seconds": 9.924703044816852e-05,
+            "phases_seconds": {
+              "cpu_processing": 4.802132025361061e-08,
+              "host_to_device": 1.7523998394608498e-05,
+              "accelerator_compute": 8.167501073330641e-05
+            }
+          }
+        ]
+      },
+      "diagnosis": {
+        "policy_version": "serial-phases-v1",
+        "status": "HYPOTHESIS",
+        "hypothesis": "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "auto_apply": false,
+        "resource_change": null,
+        "reasons": [
+          "SERIAL_PHASE_SHARE_GE_60_PERCENT",
+          "DOMINANT_IN_GE_80_PERCENT_STEPS"
+        ],
+        "phase_shares": {
+          "cpu_processing": 0.10498043109684185,
+          "host_to_device": 0.16595515654905268,
+          "accelerator_compute": 0.7290644123541055
+        },
+        "coverage": 1.0,
+        "limitations": [
+          "Phase wall time includes software/launch/wait overhead; it is not kernel busy time.",
+          "One run suggests a hypothesis; independent one-variable trials are required.",
+          "Missing phases are unknown, not zero; overlapping pipelines need separate analysis."
+        ],
+        "attempt_id": "a-8ac4d7e939e84f46aa0202b7735576ac",
+        "result_digest": "sha256:e775320522648e4ba164fd5d0dbbd107a43c7266bc420fd897746f45fb9196a9",
+        "profile_digest": "sha256:c9733bc0a829b42498fa1cc2226cecd607181a68b75b7b093600b1a20e92b92d",
+        "sample_count": 20,
+        "unclassified_share": 0.0,
+        "dominant_share": 0.7290644123541055,
+        "next_action": "Request an approved one-variable trial; preserve GPU count."
+      },
+      "fixture_digests": {
+        "model_weights_digest": "sha256:6444bfb84104d55fd19427bfc8c6f718e3a5985ed9bfcd8b2fa7e70667da0f82",
+        "input_digest": "sha256:ca4b78f33dfa12aa73b82b89623c9c0efb9a028e24b9f13e6fe95a6ac56e60bc",
+        "prepared_input_digest": "sha256:b1d4a8ad35dcbff186c3e9713f27b20a7fbbb2a07b761d8dbdebd33edbb947f6"
+      },
+      "kueue_admitted": true,
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 3.0,
+      "allocation_mode": "physical_device",
+      "queue_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    },
+    {
+      "job_id": "j-598c68d76fcb4ef09a3aab514b449b47",
+      "attempt_id": "a-c6670def8c4f4ab2b6111920b232c8ad",
+      "mode": "confirmation",
+      "input_strategy": "cache",
+      "state": "SUCCEEDED",
+      "quality_passed": true,
+      "node_alias": "gpu-worker-a",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-598c68d76fcb4ef09a3aab514b449b47",
+        "attempt_id": "a-c6670def8c4f4ab2b6111920b232c8ad",
+        "epoch": 1,
+        "workload_signature": "sha256:7d37a37a7722465e7608d79d07176b227c2880a97d29982c9682b7489ff54487",
+        "context_signature": "sha256:25e12a33dfef853537cbb485dadfc4e98e86b4d9ca036f462bf67bcacd6f0fc0",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.002288157003931701,
+          "peak_memory_mib": 4.26318359375,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.10053548612631857,
+          "latency_p95_ms": 0.10942399967461824,
+          "latency_p99_ms": 0.10942399967461824,
+          "throughput": 8740.658952001257,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "phase_profile": {
+        "schema_version": "v1",
+        "job_id": "j-598c68d76fcb4ef09a3aab514b449b47",
+        "attempt_id": "a-c6670def8c4f4ab2b6111920b232c8ad",
+        "result_digest": "sha256:e85ef8cf61ef9b8ba82eeddd30f021a1d03f398db0bdf7e88051edcda0d4434a",
+        "measurement_boundary": "cnn-serial-input-transfer-forward-v1",
+        "instrumentation": "cooperative_serial",
+        "samples": [
+          {
+            "wall_seconds": 0.00035551399923861027,
+            "phases_seconds": {
+              "cpu_processing": 0.00023920094827190042,
+              "host_to_device": 2.45150295086205e-05,
+              "accelerator_compute": 9.179802145808935e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010942399967461824,
+            "phases_seconds": {
+              "cpu_processing": 1.8801074475049973e-07,
+              "host_to_device": 2.2599997464567423e-05,
+              "accelerator_compute": 8.663599146530032e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010531098814681172,
+            "phases_seconds": {
+              "cpu_processing": 1.150183379650116e-07,
+              "host_to_device": 1.8967024516314268e-05,
+              "accelerator_compute": 8.622894529253244e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010622100671753287,
+            "phases_seconds": {
+              "cpu_processing": 1.100124791264534e-07,
+              "host_to_device": 2.0967971067875624e-05,
+              "accelerator_compute": 8.51430231705308e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010411604307591915,
+            "phases_seconds": {
+              "cpu_processing": 2.130400389432907e-07,
+              "host_to_device": 1.8977967556566e-05,
+              "accelerator_compute": 8.492503548040986e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010641600238159299,
+            "phases_seconds": {
+              "cpu_processing": 1.069856807589531e-07,
+              "host_to_device": 1.8226040992885828e-05,
+              "accelerator_compute": 8.808297570794821e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010244199074804783,
+            "phases_seconds": {
+              "cpu_processing": 9.103678166866302e-08,
+              "host_to_device": 1.8082966562360525e-05,
+              "accelerator_compute": 8.426798740401864e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010051298886537552,
+            "phases_seconds": {
+              "cpu_processing": 6.699701771140099e-08,
+              "host_to_device": 1.7531972844153643e-05,
+              "accelerator_compute": 8.291401900351048e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010095798643305898,
+            "phases_seconds": {
+              "cpu_processing": 7.700873538851738e-08,
+              "host_to_device": 1.7940998077392578e-05,
+              "accelerator_compute": 8.293997962027788e-05
+            }
+          },
+          {
+            "wall_seconds": 9.960500756278634e-05,
+            "phases_seconds": {
+              "cpu_processing": 7.101334631443024e-08,
+              "host_to_device": 1.7179001588374376e-05,
+              "accelerator_compute": 8.235499262809753e-05
+            }
+          },
+          {
+            "wall_seconds": 9.924400364980102e-05,
+            "phases_seconds": {
+              "cpu_processing": 5.5995769798755646e-08,
+              "host_to_device": 1.6964972019195557e-05,
+              "accelerator_compute": 8.22230358608067e-05
+            }
+          },
+          {
+            "wall_seconds": 9.982002666220069e-05,
+            "phases_seconds": {
+              "cpu_processing": 3.800960257649422e-08,
+              "host_to_device": 1.7135986126959324e-05,
+              "accelerator_compute": 8.264603093266487e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010055798338726163,
+            "phases_seconds": {
+              "cpu_processing": 7.404014468193054e-08,
+              "host_to_device": 1.7579994164407253e-05,
+              "accelerator_compute": 8.290394907817245e-05
+            }
+          },
+          {
+            "wall_seconds": 9.931501699611545e-05,
+            "phases_seconds": {
+              "cpu_processing": 5.8033037930727005e-08,
+              "host_to_device": 1.69629929587245e-05,
+              "accelerator_compute": 8.229399099946022e-05
+            }
+          },
+          {
+            "wall_seconds": 9.939400479197502e-05,
+            "phases_seconds": {
+              "cpu_processing": 3.702007234096527e-08,
+              "host_to_device": 1.707399496808648e-05,
+              "accelerator_compute": 8.228298975154757e-05
+            }
+          },
+          {
+            "wall_seconds": 9.977497393265367e-05,
+            "phases_seconds": {
+              "cpu_processing": 9.499490261077881e-08,
+              "host_to_device": 1.7336977180093527e-05,
+              "accelerator_compute": 8.234300184994936e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00010291399667039514,
+            "phases_seconds": {
+              "cpu_processing": 8.102506399154663e-08,
+              "host_to_device": 1.8892984371632338e-05,
+              "accelerator_compute": 8.393998723477125e-05
+            }
+          },
+          {
+            "wall_seconds": 9.899301221594214e-05,
+            "phases_seconds": {
+              "cpu_processing": 5.00003807246685e-08,
+              "host_to_device": 1.6689009498804808e-05,
+              "accelerator_compute": 8.225400233641267e-05
+            }
+          },
+          {
+            "wall_seconds": 9.880500147119164e-05,
+            "phases_seconds": {
+              "cpu_processing": 5.50062395632267e-08,
+              "host_to_device": 1.7151993233710527e-05,
+              "accelerator_compute": 8.159800199791789e-05
+            }
+          },
+          {
+            "wall_seconds": 9.881897130981088e-05,
+            "phases_seconds": {
+              "cpu_processing": 3.795139491558075e-08,
+              "host_to_device": 1.6791047528386116e-05,
+              "accelerator_compute": 8.198997238650918e-05
+            }
+          }
+        ]
+      },
+      "diagnosis": {
+        "policy_version": "serial-phases-v1",
+        "status": "HYPOTHESIS",
+        "hypothesis": "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "auto_apply": false,
+        "resource_change": null,
+        "reasons": [
+          "SERIAL_PHASE_SHARE_GE_60_PERCENT",
+          "DOMINANT_IN_GE_80_PERCENT_STEPS"
+        ],
+        "phase_shares": {
+          "cpu_processing": 0.10524721320690045,
+          "host_to_device": 0.16063972952796673,
+          "accelerator_compute": 0.7341130572651328
+        },
+        "coverage": 1.0,
+        "limitations": [
+          "Phase wall time includes software/launch/wait overhead; it is not kernel busy time.",
+          "One run suggests a hypothesis; independent one-variable trials are required.",
+          "Missing phases are unknown, not zero; overlapping pipelines need separate analysis."
+        ],
+        "attempt_id": "a-c6670def8c4f4ab2b6111920b232c8ad",
+        "result_digest": "sha256:e85ef8cf61ef9b8ba82eeddd30f021a1d03f398db0bdf7e88051edcda0d4434a",
+        "profile_digest": "sha256:afdba2c69c8d0b905a1a680c66657aa4acd8d31db2b81bc30b2e889700ba4d38",
+        "sample_count": 20,
+        "unclassified_share": 0.0,
+        "dominant_share": 0.7341130572651328,
+        "next_action": "Request an approved one-variable trial; preserve GPU count."
+      },
+      "fixture_digests": {
+        "model_weights_digest": "sha256:6444bfb84104d55fd19427bfc8c6f718e3a5985ed9bfcd8b2fa7e70667da0f82",
+        "input_digest": "sha256:ca4b78f33dfa12aa73b82b89623c9c0efb9a028e24b9f13e6fe95a6ac56e60bc",
+        "prepared_input_digest": "sha256:b1d4a8ad35dcbff186c3e9713f27b20a7fbbb2a07b761d8dbdebd33edbb947f6"
+      },
+      "kueue_admitted": true,
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "allocation_mode": "physical_device",
+      "queue_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    },
+    {
+      "job_id": "j-4a5fbc37def34f36af37c2119d2707a0",
+      "attempt_id": "a-33a34589938a49e78c7e923cd1337301",
+      "mode": "confirmation",
+      "input_strategy": "recompute",
+      "state": "SUCCEEDED",
+      "quality_passed": true,
+      "node_alias": "gpu-worker-a",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-4a5fbc37def34f36af37c2119d2707a0",
+        "attempt_id": "a-33a34589938a49e78c7e923cd1337301",
+        "epoch": 1,
+        "workload_signature": "sha256:7d37a37a7722465e7608d79d07176b227c2880a97d29982c9682b7489ff54487",
+        "context_signature": "sha256:2258d5be7fab50e3cde4777cb60a195fabebf9a8040c9563973fefd140dce3f9",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0069564159493893385,
+          "peak_memory_mib": 4.26318359375,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.33895799424499273,
+          "latency_p95_ms": 0.3905629855580628,
+          "latency_p99_ms": 0.3905629855580628,
+          "throughput": 2875.0437215813236,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "phase_profile": {
+        "schema_version": "v1",
+        "job_id": "j-4a5fbc37def34f36af37c2119d2707a0",
+        "attempt_id": "a-33a34589938a49e78c7e923cd1337301",
+        "result_digest": "sha256:91bc87b64ddf90e927eec1dfafe4356fbdba32c67d6bc7a230811d4cbeb9e91b",
+        "measurement_boundary": "cnn-serial-input-transfer-forward-v1",
+        "instrumentation": "cooperative_serial",
+        "samples": [
+          {
+            "wall_seconds": 0.0003685529809445143,
+            "phases_seconds": {
+              "cpu_processing": 0.00025092100258916616,
+              "host_to_device": 2.5172950699925423e-05,
+              "accelerator_compute": 9.245902765542269e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00040295603685081005,
+            "phases_seconds": {
+              "cpu_processing": 0.00028672104235738516,
+              "host_to_device": 2.509600017219782e-05,
+              "accelerator_compute": 9.113899432122707e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003905629855580628,
+            "phases_seconds": {
+              "cpu_processing": 0.0002821739763021469,
+              "host_to_device": 2.0956038497388363e-05,
+              "accelerator_compute": 8.743297075852752e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00037984101800248027,
+            "phases_seconds": {
+              "cpu_processing": 0.0002717750030569732,
+              "host_to_device": 2.2337015252560377e-05,
+              "accelerator_compute": 8.572899969294667e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033776898635551333,
+            "phases_seconds": {
+              "cpu_processing": 0.00023354397853836417,
+              "host_to_device": 1.9137980416417122e-05,
+              "accelerator_compute": 8.508702740073204e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003395460080355406,
+            "phases_seconds": {
+              "cpu_processing": 0.0002367930137552321,
+              "host_to_device": 1.8930993974208832e-05,
+              "accelerator_compute": 8.382200030609965e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003369550104252994,
+            "phases_seconds": {
+              "cpu_processing": 0.000235065002925694,
+              "host_to_device": 1.8084014300256968e-05,
+              "accelerator_compute": 8.380599319934845e-05
+            }
+          },
+          {
+            "wall_seconds": 0.000334535026922822,
+            "phases_seconds": {
+              "cpu_processing": 0.00023295002756640315,
+              "host_to_device": 1.7995014786720276e-05,
+              "accelerator_compute": 8.358998456969857e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003383699804544449,
+            "phases_seconds": {
+              "cpu_processing": 0.00023522000992670655,
+              "host_to_device": 1.8438964616507292e-05,
+              "accelerator_compute": 8.471100591123104e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034362298902124166,
+            "phases_seconds": {
+              "cpu_processing": 0.00024095596745610237,
+              "host_to_device": 1.880002673715353e-05,
+              "accelerator_compute": 8.386699482798576e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033397297374904156,
+            "phases_seconds": {
+              "cpu_processing": 0.0002344850217923522,
+              "host_to_device": 1.6866950318217278e-05,
+              "accelerator_compute": 8.262100163847208e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033134198747575283,
+            "phases_seconds": {
+              "cpu_processing": 0.00023101898841559887,
+              "host_to_device": 1.7474987544119358e-05,
+              "accelerator_compute": 8.28480115160346e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034301698906347156,
+            "phases_seconds": {
+              "cpu_processing": 0.0002406950225122273,
+              "host_to_device": 1.7422949895262718e-05,
+              "accelerator_compute": 8.489901665598154e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033480196725577116,
+            "phases_seconds": {
+              "cpu_processing": 0.00023440795484930277,
+              "host_to_device": 1.7681042663753033e-05,
+              "accelerator_compute": 8.271296974271536e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003326800069771707,
+            "phases_seconds": {
+              "cpu_processing": 0.00023283000336959958,
+              "host_to_device": 1.7188023775815964e-05,
+              "accelerator_compute": 8.266197983175516e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003458010032773018,
+            "phases_seconds": {
+              "cpu_processing": 0.00024381204275414348,
+              "host_to_device": 1.802499173209071e-05,
+              "accelerator_compute": 8.39639687910676e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034443801268935204,
+            "phases_seconds": {
+              "cpu_processing": 0.00024300202494487166,
+              "host_to_device": 1.7930986359715462e-05,
+              "accelerator_compute": 8.350500138476491e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00033637601882219315,
+            "phases_seconds": {
+              "cpu_processing": 0.00023616704856976867,
+              "host_to_device": 1.7045997083187103e-05,
+              "accelerator_compute": 8.316297316923738e-05
+            }
+          },
+          {
+            "wall_seconds": 0.00034490099642425776,
+            "phases_seconds": {
+              "cpu_processing": 0.00024339498486369848,
+              "host_to_device": 1.758500002324581e-05,
+              "accelerator_compute": 8.392101153731346e-05
+            }
+          },
+          {
+            "wall_seconds": 0.0003363749710842967,
+            "phases_seconds": {
+              "cpu_processing": 0.0002367679844610393,
+              "host_to_device": 1.7063983250409365e-05,
+              "accelerator_compute": 8.254300337284803e-05
+            }
+          }
+        ]
+      },
+      "diagnosis": {
+        "policy_version": "serial-phases-v1",
+        "status": "HYPOTHESIS",
+        "hypothesis": "POSSIBLE_INPUT_SUPPLY_BOUND",
+        "auto_apply": false,
+        "resource_change": null,
+        "reasons": [
+          "SERIAL_PHASE_SHARE_GE_60_PERCENT",
+          "DOMINANT_IN_GE_80_PERCENT_STEPS"
+        ],
+        "phase_shares": {
+          "cpu_processing": 0.7018988134882013,
+          "host_to_device": 0.05451570389956964,
+          "accelerator_compute": 0.24358548261222907
+        },
+        "coverage": 1.0,
+        "limitations": [
+          "Phase wall time includes software/launch/wait overhead; it is not kernel busy time.",
+          "One run suggests a hypothesis; independent one-variable trials are required.",
+          "Missing phases are unknown, not zero; overlapping pipelines need separate analysis."
+        ],
+        "attempt_id": "a-33a34589938a49e78c7e923cd1337301",
+        "result_digest": "sha256:91bc87b64ddf90e927eec1dfafe4356fbdba32c67d6bc7a230811d4cbeb9e91b",
+        "profile_digest": "sha256:121c2397d15a0a347b99e854d7df3ac4c074dedcad3b0fb52cfebc507fed772d",
+        "sample_count": 20,
+        "unclassified_share": 0.0,
+        "dominant_share": 0.7018988134882013,
+        "next_action": "Request an approved one-variable trial; preserve GPU count."
+      },
+      "fixture_digests": {
+        "model_weights_digest": "sha256:6444bfb84104d55fd19427bfc8c6f718e3a5985ed9bfcd8b2fa7e70667da0f82",
+        "input_digest": "sha256:ca4b78f33dfa12aa73b82b89623c9c0efb9a028e24b9f13e6fe95a6ac56e60bc",
+        "prepared_input_digest": "sha256:b1d4a8ad35dcbff186c3e9713f27b20a7fbbb2a07b761d8dbdebd33edbb947f6"
+      },
+      "kueue_admitted": true,
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "allocation_mode": "physical_device",
+      "queue_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ]
+    }
+  ],
+  "artifact_delivery": [
+    {
+      "attempt_id": "a-7985fceaac8d40beb214052191aa4c1f",
+      "mlflow_run_id": "5cf0bfb3231245b5abcebb7a3a714d0b",
+      "artifact_digest": "sha256:61c99892cbdb276a7229b0ab682975848939be6008f9d8f52d103ca52a9e396a",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-d5aab56f867644efada7391d10162d1f",
+      "mlflow_run_id": "485f96460559489699396abe38238461",
+      "artifact_digest": "sha256:9a119e2f5ddb232b63fdac8aac434dbf7a6324026547929e489b75702ef8ab17",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-82c5684db3f34876b86f5a8ff1b48ce7",
+      "mlflow_run_id": "fa485e8f131e4285a2922436ab2269b2",
+      "artifact_digest": "sha256:c9f4c952ac57bb7662b1306984992b4f1bdb1a6ed8f6b3118d769907bb86c4a7",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-9a7429dc0c8f45338a17c306802f8f18",
+      "mlflow_run_id": "dd48d893808b42b194e514ab179fc55c",
+      "artifact_digest": "sha256:ebd7cd60d56c0672aec4ddf0810d06a8fa261076c7691ec027c03ba7737d2ff7",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-6e6714567e32452f8e2658bb39dc6ff7",
+      "mlflow_run_id": "5836623c9fc040aabbd40883ef11f537",
+      "artifact_digest": "sha256:40ffc5ebe5819ef59aefd0fc50bc96c02568c112b35de9a7530903234b077c31",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-8ac4d7e939e84f46aa0202b7735576ac",
+      "mlflow_run_id": "9611611a7e0543e4a9ecd0f2f4140cda",
+      "artifact_digest": "sha256:8269abbb25205cace86f6af452d30280b7a5261fe4a7aac6ffa50cf40fc2ee6a",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-c6670def8c4f4ab2b6111920b232c8ad",
+      "mlflow_run_id": "e312d7dc07c54bada38135e710652d18",
+      "artifact_digest": "sha256:17192b648be1188ef3e5d9ee067381f760595c1759a2cb4120b9fcaa6ea6669e",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    },
+    {
+      "attempt_id": "a-33a34589938a49e78c7e923cd1337301",
+      "mlflow_run_id": "8d00928d1bfe4b21ab3079d3f2f8f2e6",
+      "artifact_digest": "sha256:946657bad428864b09a427bb8c63bebd2f14e5b2eff70e8cbee2140510e145d4",
+      "s3_api_readback": true,
+      "mlflow_state": "FINISHED",
+      "mlflow_metrics_match": true,
+      "mlflow_artifact_listed": true,
+      "mlflow_artifact_bytes_match": true
+    }
+  ],
+  "limits": [
+    "Two separate qualification jobs preceded the eight application attempts; their allocation is outside the application ledger.",
+    "First cache fill is inside the measured boundary; setup, imports, model loading, warmup and numerical validation are outside it.",
+    "Randomly initialized CNN and generated repeated input; numerical agreement does not establish classifier accuracy.",
+    "Per-phase wall time includes launch, synchronization and instrumentation overhead; not CUDA kernel busy time or utilization.",
+    "No causal inference for arbitrary workloads, asynchronous pipelines, training or real storage/network bottlenecks.",
+    "No net operational saving claimed: allocation, queue, setup and qualification costs exceed these millisecond compute savings."
+  ]
+}

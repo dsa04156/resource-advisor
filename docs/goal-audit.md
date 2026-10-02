@@ -9,11 +9,11 @@ direct evidence; conditional extensions require an explicit applicability result
 |---|---|---|
 | Independent project | Own source/API/DB/history and scoped credentials | Implemented |
 | Environment inventory | Current node/runtime versions, static/dynamic distinction, backend pools | Read-only Kubernetes/metrics/Prometheus collector and project API verified on ten live nodes; Slurm inventory and full hardware discovery pending |
-| GPU/NPU support matrix | Detected/runtime/model/training validation, real model outputs per variant | RTX 5080 CUDA/matmul qualified; other runtimes/models/NPU pending |
+| GPU/NPU support matrix | Detected/runtime/model/training validation, real model outputs per variant | RTX 5080 CUDA/matmul and deterministic CNN numerical fixture qualified; trained-model accuracy, other runtimes/models/NPU pending |
 | Reproducible workload | Code/model/data/config/precision/work units and two signatures | Contract tests pass |
 | Cooperative observation/pilot | Fixed/observe/recommend/pilot paths with approval and immutable context | Real GPU pilot/confirmation completed; training protection pending |
 | Training protection | Isolated checkpoint/input/output with no mutation of original training | Pending; training pilots rejected |
-| Bottleneck diagnosis | CPU/data-loader/IO/accelerator evidence and uncertainty | Pending |
+| Bottleneck diagnosis | CPU/data-loader/IO/accelerator evidence and uncertainty | Serial phase contract/API/console and abstaining hypotheses implemented; eight actual same-CNN GPU trials isolated input reuse with unchanged GPU count. Real IO/network, asynchronous pipelines and training diagnostics remain open |
 | KFP launch | Real uncached workflow → API → Kueue admission → GPU job → result | Actual uncached KFP → HTTPS API → Kueue → RTX 5080 → validated result → S3/MLflow completed; prior eviction retained |
 | Kueue policy | Real project LocalQueue/ClusterQueue/flavor/priority and over-quota tests | Live GPU quota pending/no-Pod, concurrent queueing, later-high-first CUDA execution and KFP/API admission verified; cross-project chain remains open |
 | Slurm execution | Actual sbatch/squeue/sacct/scancel, image/env lock, accelerator reservation | Live GPU F0/accounting historical evidence; pinned native guard and verified node-local result transport implemented; controller currently unreachable, full API/model/result path pending |

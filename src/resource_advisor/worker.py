@@ -215,7 +215,12 @@ class Worker:
                 if state == State.COLLECTING:
                     envelope = backend.result(row)
                     result = ExecutionResult.model_validate(envelope["result"])
-                    self.service.ingest(row["project"], result, envelope["digest"])
+                    self.service.ingest(
+                        row["project"],
+                        result,
+                        envelope["digest"],
+                        phase_profile=envelope.get("phase_profile"),
+                    )
             except (BackendError, Conflict, Rejected, ValueError, KeyError) as exc:
                 # Transport errors are observable without falsely failing a running workload.
                 try:
@@ -269,6 +274,7 @@ class MLflowDelivery:
             attempt = result["attempt_id"]
             with self.store.transaction() as conn:
                 job = self.store.job(conn, b["job_id"])["body"]
+                phases = self.store.get(conn, "phase_profile", attempt)
             start_time = int(
                 datetime.fromisoformat(job.get("started_at") or job["created_at"]).timestamp()
                 * 1000
@@ -338,6 +344,25 @@ class MLflowDelivery:
                 for k, v in (result.get("measurements") or {}).items()
                 if v is not None
             ]
+            if phases:
+                from .diagnostics import diagnose
+
+                diagnosis = diagnose(phases["body"], evidence_kind=result["evidence_kind"])
+                tags["diagnosis.hypothesis"] = diagnosis["hypothesis"] or diagnosis["status"]
+                tags["diagnosis.policy"] = diagnosis["policy_version"]
+                for key in set.intersection(
+                    *(set(s["phases_seconds"]) for s in phases["body"]["samples"])
+                ):
+                    metrics.append(
+                        {
+                            "key": "phase_seconds." + key,
+                            "value": sum(
+                                s["phases_seconds"][key] for s in phases["body"]["samples"]
+                            ),
+                            "timestamp": timestamp,
+                            "step": 0,
+                        }
+                    )
             self.post(
                 "runs/log-batch",
                 {
