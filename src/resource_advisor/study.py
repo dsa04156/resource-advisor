@@ -397,12 +397,17 @@ class Studies:
         if not confirming:
             available_device -= policy.final_validation_seconds * unit["count"]
         collection = min(10, max(1, int(available_wall / 10)))
+        execution_wall = int(available_wall) - collection
+        # A run-time upper bound is not a prediction. Giving it every remaining
+        # second can leave only one second for real scheduler admission/startup.
+        # Reserve up to half the remaining wall budget for queueing first.
+        queue_reserve = min(policy.max_queue_seconds, max(1, execution_wall // 2))
         run_limit = min(
             policy.max_wall_seconds_per_candidate,
             int(available_device / unit["count"]),
-            int(available_wall) - collection - 1,
+            execution_wall - queue_reserve,
         )
-        queue_limit = min(policy.max_queue_seconds, int(available_wall) - run_limit - collection)
+        queue_limit = min(policy.max_queue_seconds, execution_wall - run_limit)
         if run_limit < 1 or queue_limit < 1:
             return self._abstain(ref, token, body, "RESERVED_CONFIRMATION_BUDGET_PROTECTED")
         plan_ref = "plan-" + uuid4().hex

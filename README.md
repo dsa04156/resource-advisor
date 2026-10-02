@@ -35,7 +35,7 @@ flowchart LR
 
 ## Run locally
 
-Python 3.12–3.13 and `uv` are required. Commands below assume this directory.
+Python 3.11–3.13 and `uv` are required. Commands below assume this directory.
 
 ```sh
 uv sync --locked

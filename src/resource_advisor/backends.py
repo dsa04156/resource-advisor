@@ -76,12 +76,21 @@ def identity_environment(job):
 
 class KubernetesBackend:
     def __init__(
-        self, *, namespace, local_queue, node_selector, kubeconfig=None, context=None, execute=run
+        self,
+        *,
+        namespace,
+        local_queue,
+        node_selector,
+        kubeconfig=None,
+        context=None,
+        runtime_bundles=None,
+        execute=run,
     ):
         if not namespace or not local_queue or not node_selector:
             raise ValueError("explicit namespace, LocalQueue and allowed node pool are required")
         self.namespace, self.local_queue, self.node_selector = namespace, local_queue, node_selector
         self.execute = execute
+        self.runtime_bundles = runtime_bundles or {}
         self.prefix = ["kubectl"]
         if kubeconfig:
             self.prefix += ["--kubeconfig", kubeconfig]
@@ -102,9 +111,12 @@ class KubernetesBackend:
         if selectors.get("kubernetes.io/arch", b["variant"]["arch"]) != b["variant"]["arch"]:
             raise BackendError("configured pool architecture mismatch")
         selectors["kubernetes.io/arch"] = b["variant"]["arch"]
+        allowed_host = selectors.get("kubernetes.io/hostname")
+        if allowed_host and allowed_host != b["capability"]["node_ref"]:
+            raise BackendError("candidate is outside the configured node allowlist")
         # Select the verified node through scheduling, never spec.nodeName.
         selectors["kubernetes.io/hostname"] = b["capability"]["node_ref"]
-        return {
+        manifest = {
             "apiVersion": "batch/v1",
             "kind": "Job",
             "metadata": {
@@ -126,9 +138,11 @@ class KubernetesBackend:
                     "max_run_seconds"
                 ],
                 "template": {
+                    "metadata": {"annotations": {"sidecar.istio.io/inject": "false"}},
                     "spec": {
                         "restartPolicy": "Never",
                         "automountServiceAccountToken": False,
+                        "terminationGracePeriodSeconds": 5,
                         "nodeSelector": selectors,
                         "securityContext": {"seccompProfile": {"type": "RuntimeDefault"}},
                         "containers": [
@@ -147,10 +161,40 @@ class KubernetesBackend:
                                 },
                             }
                         ],
-                    }
+                    },
                 },
             },
         }
+        bundle = self.runtime_bundles.get(b["variant"]["ref"])
+        if bundle:
+            if bundle["environment_digest"] != b["variant"]["environment_digest"]:
+                raise BackendError("configured runtime bundle does not match qualified environment")
+            pod = manifest["spec"]["template"]["spec"]
+            pod["volumes"] = [
+                {
+                    "name": "qualified-runtime",
+                    "persistentVolumeClaim": {"claimName": bundle["pvc"], "readOnly": True},
+                },
+                {"name": "qualified-source", "configMap": {"name": bundle["source_config_map"]}},
+            ]
+            container = pod["containers"][0]
+            container["volumeMounts"] = [
+                {
+                    "name": "qualified-runtime",
+                    "mountPath": "/opt/qualified-runtime",
+                    "readOnly": True,
+                },
+                {
+                    "name": "qualified-source",
+                    "mountPath": "/opt/resource-advisor/resource_advisor",
+                    "readOnly": True,
+                },
+            ]
+            container["env"].append(
+                {"name": "PYTHONPATH", "value": "/opt/resource-advisor:/opt/qualified-runtime/site"}
+            )
+            container["env"].append({"name": "PYTHONDONTWRITEBYTECODE", "value": "1"})
+        return manifest
 
     def submit(self, job):
         try:

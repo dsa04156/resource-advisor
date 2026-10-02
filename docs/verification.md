@@ -57,3 +57,26 @@ are executed rather than silently skipped.
 
 The live optimization, budget-overrun/termination behavior on both schedulers,
 checkpoint isolation and complete failure accounting are still open gates.
+
+## GPU execution increment
+
+The suite now has **56 passing tests on both SQLite and isolated PostgreSQL**.
+Python 3.11 is supported for the qualified GPU runner; CI also checks 3.13.
+An actual Kueue-admitted CUDA job executed a 4,096-element vector kernel and
+verified every result. See [the sanitized evidence](evidence/cuda-f0.json) and
+[the independently implemented probe](../examples/hardware_probe.cu).
+
+A pinned base image plus an operator-qualified package PVC and immutable source
+ConfigMap also ran PyTorch 2.8.0+cu128 on a physical RTX 5080. These mounts are
+read-only in workload Pods, with a checked environment signature. This is lab
+qualification: the PVC is not a content-addressed, automatically attested
+production image. Runtime-bundle configuration belongs to the operator, never
+to the job submitter. The worker credential is namespace-scoped and cannot read
+Secrets or create jobs in other namespaces.
+
+Live confirmation exposed a time-budget defect: a maximum run-time allowance
+left only one second for queueing. Planning now reserves queue time before
+allocating run time, within the same per-confirmation wall allowance. A
+regression test checks that both queueing and execution receive useful time
+without consuming another confirmation's reservation. This split is a bounded
+heuristic, not a workload duration prediction or a guarantee of admission.

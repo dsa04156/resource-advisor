@@ -1,0 +1,21 @@
+{
+  "evidence_kind": "hardware",
+  "scope": "CUDA F0 execution qualification, not benchmarking",
+  "source_sha256": "be7ad70ad4ba2c3de85a3fbbece38d98efca09d8b2f0d3b7922d722890b9436e",
+  "image": "nvcr.io/nvidia/cuda@sha256:c4e81887e4aa9f13b1119337323cba89601319ecb282383b879c4ba50510fd17",
+  "kueue_admitted": true,
+  "job_succeeded": true,
+  "admitted_at": "2026-10-02T04:36:03Z",
+  "finished_at": "2026-10-02T04:36:08Z",
+  "result": {
+    "phase": "F0",
+    "performance_measurement": false,
+    "cuda_devices": 1,
+    "driver_api": 13020,
+    "runtime_api": 12020,
+    "compute_capability": "12.0",
+    "verified_elements": 4096,
+    "result": "PASS"
+  },
+  "site_identifiers": "omitted from public evidence"
+}

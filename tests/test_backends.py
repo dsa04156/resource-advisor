@@ -30,6 +30,28 @@ def test_kubernetes_submission_suspended_and_bounded(service):
     assert obj["metadata"]["labels"]["kueue.x-k8s.io/queue-name"] == "batch"
 
 
+def test_qualified_runtime_mount_is_read_only_and_digest_bound(service):
+    job = row(service)
+    bundle = {
+        "variant-1": {
+            "environment_digest": job["body"]["variant"]["environment_digest"],
+            "pvc": "qualified-packages",
+            "source_config_map": "immutable-source",
+        }
+    }
+    backend = KubernetesBackend(
+        namespace="research-a",
+        local_queue="batch",
+        node_selector={"pool": "lab"},
+        runtime_bundles=bundle,
+    )
+    pod = backend.manifest(job)["spec"]["template"]["spec"]
+    assert all(m["readOnly"] for m in pod["containers"][0]["volumeMounts"])
+    bundle["variant-1"]["environment_digest"] = "wrong"
+    with pytest.raises(BackendError, match="qualified environment"):
+        backend.manifest(job)
+
+
 def test_slurm_is_not_wrapped_in_kueue_and_quotes_payload(service):
     job = row(service)
     job["body"]["capability"]["resource_key"] = "gpu:test"

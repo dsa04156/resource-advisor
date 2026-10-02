@@ -107,6 +107,47 @@ def test_cannot_forge_unreserved_probe(study_fixture):
         )
 
 
+def test_confirmation_reserves_time_for_scheduler_admission(study_fixture):
+    service, engine, spec = study_fixture
+    with service.store.transaction() as conn:
+        variant = dict(service.store.get(conn, "variant", spec.candidates[0].variant_ref)["body"])
+    variant.update(ref="confirmation-variant", workload_ref="confirmation-queue-budget")
+    with service.store.transaction() as conn:
+        service.store.put(conn, "variant", variant["ref"], "team-a", variant)
+    spec = spec.model_copy(
+        update={
+            "ref": "confirmation-queue-budget",
+            "candidates": tuple(
+                c.model_copy(update={"variant_ref": variant["ref"]}) for c in spec.candidates
+            ),
+            "profiling": spec.profiling.model_copy(
+                update={"max_wall_seconds_per_candidate": 60, "max_probes": 1}
+            ),
+        }
+    )
+    service.register("workload", spec, "team-a")
+    study = engine.create("team-a", StudyRequest(workload_ref=spec.ref, strategy="random"), "queue")
+    backend = SchedulerDouble()
+    backend.observation = Observation(State.COLLECTING)
+    worker = Worker(service, {("team-a", "lab"): backend})
+    for _ in range(12):
+        engine.tick(study["ref"])
+        current = engine.get("team-a", study["ref"])
+        if current["state"] == "CONFIRMING" and current["active_plan"]:
+            with service.store.transaction() as conn:
+                plan = service.store.get(conn, "probe_plan", current["active_plan"])["body"]
+            limits = plan["execution_limits"]
+            # With 180 s reserved and 3–6 confirmations, startup gets a usable
+            # share without borrowing from another confirmation's budget.
+            assert limits["max_queue_seconds"] >= 10
+            assert limits["max_run_seconds"] >= 10
+            assert sum(limits.values()) <= 180 / len(current["confirmation_schedule"])
+            return
+        worker.submit_one()
+        worker.reconcile_all()
+    pytest.fail("independent confirmation was not planned")
+
+
 def test_reserved_plan_has_deadline_and_cannot_duplicate_with_another_key(study_fixture):
     service, engine, spec = study_fixture
     study = engine.create("team-a", StudyRequest(workload_ref=spec.ref, strategy="random"), "one")
