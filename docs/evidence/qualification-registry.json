@@ -1,0 +1,101 @@
+{
+  "captured_at": "2026-10-02T21:26:36.283097+00:00",
+  "scope": "Operator-imported external classification experiments, not platform-submitted Jobs",
+  "service_image_digest": "sha256:f5aedbb7740bc2e931250355578a4b0a4376a71eb3090d720b21f0688514fc57",
+  "source_tree_sha256": "52788ed5761f1ca76763afa79819b2fc95709817c54113834673be67e6f3682f",
+  "console_js_sha256": "8c43726a7e7efe981dcf9522276d7c00830ef64c73e8788a6645373b04c92c46",
+  "records": [
+    {
+      "ref": "hailo-resnet18-20261003",
+      "model_name": "ResNet18",
+      "record_digest": "sha256:ace130a34811602ca38d76b206eeceb6fb193dc67b984cb2ee7db0633b248753",
+      "source_report_digest": "sha256:1f5a556c5f014316b645381103cbc1c2fe5d2b5b0ff353d44eaf92cefc414631",
+      "expected_images": 100,
+      "container_exit_code": 2,
+      "assessment": {
+        "sample_count": 100,
+        "accuracy": 0.66,
+        "reference_accuracy": 0.64,
+        "reference_agreement": 0.95,
+        "accuracy_loss": -0.020000000000000018,
+        "checks": {
+          "minimum_accuracy": false,
+          "minimum_reference_agreement": true,
+          "maximum_accuracy_loss": true
+        },
+        "quality_passed": false,
+        "failed_checks": [
+          "minimum_accuracy"
+        ],
+        "inference_completed": true,
+        "elapsed_seconds": 0.1518656060216017,
+        "latency_p95_ms": 1.5413789951708168,
+        "throughput_images_per_second": 658.4769430003511,
+        "recommendation_authorized": false
+      }
+    },
+    {
+      "ref": "hailo-efficientformer-20261003",
+      "model_name": "EfficientFormer-L1",
+      "record_digest": "sha256:a384767a5fe414cc853e5c8405abd7a33aa2179b75d868d3041d40583e60f04d",
+      "source_report_digest": "sha256:e3be9625f76a32a1d3761863f1e6a8d49bd4abe1b1e1c238049a6ac314d9da95",
+      "expected_images": 100,
+      "container_exit_code": 2,
+      "assessment": {
+        "sample_count": 100,
+        "accuracy": 0.77,
+        "reference_accuracy": 0.81,
+        "reference_agreement": 0.89,
+        "accuracy_loss": 0.040000000000000036,
+        "checks": {
+          "minimum_accuracy": true,
+          "minimum_reference_agreement": false,
+          "maximum_accuracy_loss": true
+        },
+        "quality_passed": false,
+        "failed_checks": [
+          "minimum_reference_agreement"
+        ],
+        "inference_completed": true,
+        "elapsed_seconds": 2.7430338569974992,
+        "latency_p95_ms": 27.53412799211219,
+        "throughput_images_per_second": 36.45598458250863,
+        "recommendation_authorized": false
+      }
+    }
+  ],
+  "checks": {
+    "https_certificate_verified_by_http_client": true,
+    "deployed_console_asset_matches_source": true,
+    "postgresql_readback_matches_api": true,
+    "identical_reimport_is_idempotent": true,
+    "reader_import_denied": true,
+    "job_usage_outbox_counts_unchanged": true,
+    "capability_variant_recommendation_counts_unchanged": true,
+    "api_inventory_worker_ready": true,
+    "inventory_worker_images_unchanged": true
+  },
+  "browser": {
+    "transport": "Chromium via loopback read-only proxy to live HTTPS API; proxy verifies the lab CA. Browser did not independently trust the lab certificate.",
+    "checks": {
+      "failed_gates_visible": true,
+      "actual_metrics_visible": true,
+      "import_provenance_visible": true,
+      "mobile_no_page_overflow": true,
+      "import_text_escaped": true,
+      "empty_not_success": true,
+      "no_browser_errors": true
+    },
+    "fault_cases": "HTML-like model text and empty-history responses were browser route injections only."
+  },
+  "tests": {
+    "local_full_suite_sqlite_passed": 475
+  },
+  "limits": [
+    "Imports are operator attestations, not remote device attestation.",
+    "Both physical model trials remain unqualified; imports authorize no RuntimeVariant.",
+    "No new compute Jobs, usage ledger entries, S3 objects or MLflow runs created.",
+    "Full NPU platform submission/result delivery gate remains open.",
+    "Pod rollout interrupted the lab port-forward; existing systemd restart recovered HTTPS access. Production ingress and HA remain open."
+  ]
+}

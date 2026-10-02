@@ -20,6 +20,8 @@ from .contracts import (
     StudyRequest,
     WorkloadSpec,
 )
+from .qualifications import QualificationImport, Qualifications
+from .qualifications import list_page as qualification_page
 from .service import NotFound, Rejected, Service
 from .store import Conflict, jobs, outbox, usage
 
@@ -39,6 +41,7 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
     from .study import Studies
 
     study_service = Studies(service)
+    model_qualifications = Qualifications(service.store)
 
     def principal(authorization: str = Header(default="")):
         if not authorization.startswith("Bearer "):
@@ -97,6 +100,7 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
         compatibility_page: int = Query(default=0, ge=0, le=100000),
         history_page: int = Query(default=0, ge=0, le=100000),
         recommendations_page: int = Query(default=0, ge=0, le=100000),
+        qualifications_page: int = Query(default=0, ge=0, le=100000),
         p=Depends(principal),
     ):
         from .console import overview
@@ -108,6 +112,7 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
             compatibility_page=compatibility_page,
             history_page=history_page,
             recommendations_page=recommendations_page,
+            qualifications_page=qualifications_page,
         )
 
     @app.get(PREFIX + "/recommendations/{ref}/evidence")
@@ -247,6 +252,19 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
     @app.post(PREFIX + "/variants")
     def register_variant(value: RuntimeVariant, p=Depends(operator)):
         return service.register("variant", value, p.project)
+
+    @app.post(PREFIX + "/qualifications")
+    def import_qualification(value: QualificationImport, p=Depends(operator)):
+        return model_qualifications.create(p.project, value)
+
+    @app.get(PREFIX + "/qualifications")
+    def list_qualifications(page: int = Query(default=0, ge=0, le=100000), p=Depends(principal)):
+        with service.store.transaction() as conn:
+            return qualification_page(service.store, conn, p.project, page)
+
+    @app.get(PREFIX + "/qualifications/{ref}")
+    def get_qualification(ref: str, p=Depends(principal)):
+        return model_qualifications.get(p.project, ref)
 
     @app.post(PREFIX + "/workloads")
     def register_workload(value: WorkloadSpec, p=Depends(principal)):

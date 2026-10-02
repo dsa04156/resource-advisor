@@ -83,7 +83,14 @@ def selected_context(store, conn, project, rec):
 
 
 def overview(
-    service, project, *, jobs_page=0, compatibility_page=0, history_page=0, recommendations_page=0
+    service,
+    project,
+    *,
+    jobs_page=0,
+    compatibility_page=0,
+    history_page=0,
+    recommendations_page=0,
+    qualifications_page=0,
 ):
     store = service.store
     with store.transaction() as conn:
@@ -180,6 +187,9 @@ def overview(
             {**r["body"], "selected_context": selected_context(store, conn, project, r["body"])}
             for r in rows
         ]
+        from .qualifications import list_page as qualification_page
+
+        qualifications = qualification_page(store, conn, project, qualifications_page)
     return {
         "generated_at": now().isoformat(),
         "project_ref": project,
@@ -189,6 +199,7 @@ def overview(
         "compatibility": compat_page,
         "history": history,
         "recommendations": recommendations,
+        "qualifications": qualifications,
         "semantics": "Recorded state; inventory is not model qualification or admission. Null is unknown.",
     }
 

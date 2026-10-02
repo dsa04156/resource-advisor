@@ -40,3 +40,10 @@ namespaces. Dense flavor/resource tables separate nominal quota, reservation and
 admission; no available-GPU total is inferred from subtraction. Missing fields say
 unreported, and stale observations hide the complete table. Use expandable native
 details for controller conditions and admission-check messages.
+
+Classification qualification imports live within Compatibility, using the existing
+table/pager/details patterns. Separate inference completion from quality verdict;
+show measured percentages beside their thresholds, and accuracy loss in percentage
+points. Imported evidence has an amber provenance label. A passing imported report
+uses a neutral badge, because import never authorizes a runtime candidate. The page
+must retain both failures and an honest empty state without implying completion.

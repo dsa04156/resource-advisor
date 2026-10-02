@@ -8,7 +8,7 @@ let token = "",
 let receivedAt = 0,
   expiryTimer = null,
   active = "execution";
-const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0 };
+const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, qualifications: 0 };
 const views = {
   execution: [
     "OBSERVATION",
@@ -490,6 +490,7 @@ function compatibilityView() {
       ),
     ),
   );
+  root.append(qualificationView());
   for (const w of data.compatibility.items) {
     const rows = w.candidates.map((c) => [
       add(el("div"), code(c.candidate_ref), el("small", c.variant_ref)),
@@ -539,6 +540,43 @@ function compatibilityView() {
     );
   root.append(pager("compatibility", data.compatibility));
   return root;
+}
+function qualificationView() {
+  const page = data.qualifications;
+  if (!page)
+    return panel("모델 검증 이력", "", empty("검증 이력 조회를 지원하지 않는 서버입니다."));
+  const gateNames = {
+    minimum_accuracy: "정확도 미달",
+    minimum_reference_agreement: "원본 일치율 미달",
+    maximum_accuracy_loss: "정확도 감소 초과",
+  };
+  const percent = (v) => fmt(v * 100, 2) + "%";
+  const rows = page.items.map((record) => {
+    const a = record.assessment, g = record.gates;
+    return [
+      add(el("div"), el("b", record.model_name), el("small", record.accelerator_model),
+        code(record.ref)),
+      add(el("div"), badge(a.inference_completed ? "추론 완료" : "실행 미확인"),
+        badge(a.quality_passed ? "품질 기준 통과" : "품질 기준 미달", a.quality_passed ? "" : "bad"),
+        ...a.failed_checks.map((key) => el("small", gateNames[key] || key)),
+        el("small", "자동 추천 등록 없음")),
+      add(el("div"), el("b", percent(a.accuracy)),
+        el("small", "기준 ≥ " + percent(g.minimum_accuracy))),
+      add(el("div"), el("b", percent(a.reference_agreement)),
+        el("small", "기준 ≥ " + percent(g.minimum_reference_agreement))),
+      add(el("div"), el("b", fmt(a.accuracy_loss * 100, 2) + "%p"),
+        el("small", "한도 ≤ " + fmt(g.maximum_accuracy_loss * 100, 2) + "%p")),
+      add(el("div"), badge(record.evidence_kind === "hardware" ? "외부 실측 가져옴" : "합성 테스트", "warn"),
+        el("small", stamp(record.finished_at) + " · " + a.sample_count + "장"),
+        details("실험 조건 · 근거", record)),
+    ];
+  });
+  return panel("모델 검증 이력",
+    "운영자가 가져온 외부 실험입니다. 서버가 이미지별 결과에서 품질 지표를 재계산합니다. 기록만으로 실행 후보나 사용량 원장에 추가되지 않습니다.",
+    add(el("div"), page.items.length
+      ? table(["모델 / 장비", "실행 · 품질", "정확도", "원본 일치율", "정확도 감소", "출처 · 조건"], rows)
+      : empty("가져온 검증 기록이 없습니다. 미검증을 성공으로 표시하지 않습니다."),
+    pager("qualifications", page)));
 }
 function queuePolicyView(q, title) {
   const format = (value, unit) =>
