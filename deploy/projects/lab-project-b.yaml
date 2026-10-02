@@ -1,0 +1,57 @@
+# Optional E6 lab project. Existing shared ClusterQueue quota is NOT modified.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: resource-advisor-team-b
+  labels:
+    app.kubernetes.io/managed-by: resource-advisor-verification
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata:
+  name: research
+  namespace: resource-advisor-team-b
+spec:
+  clusterQueue: ra-f0-gpu
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: project-gpu-ceiling
+  namespace: resource-advisor-team-b
+spec:
+  hard:
+    requests.nvidia.com/gpu: '1'
+    limits.nvidia.com/gpu: '1'
+---
+# The trusted platform controller can manage this route. Researchers use the
+# scoped API; ordinary compute Pods receive no service-account token.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ra-project-worker
+  namespace: resource-advisor-team-b
+rules:
+- apiGroups: [batch]
+  resources: [jobs]
+  verbs: [create, get, list, watch, delete]
+- apiGroups: ['']
+  resources: [pods]
+  verbs: [get, list, watch, patch]
+- apiGroups: ['']
+  resources: [pods/log]
+  verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ra-project-worker
+  namespace: resource-advisor-team-b
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ra-project-worker
+subjects:
+- kind: ServiceAccount
+  name: ra-worker
+  namespace: resource-advisor-lab
