@@ -18,6 +18,8 @@ from sqlalchemy import (
     select,
     update,
 )
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.pool import StaticPool
 
 from .contracts import TERMINAL, State, now, signature
@@ -113,8 +115,13 @@ class Store:
             if existing["digest"] != digest or existing["project"] != project:
                 raise Conflict("immutable reference already exists with different contents")
             return existing
+        # Two result collectors can both observe absence before either commits.
+        # Let the unique key arbitrate without aborting the transaction, then
+        # check ownership/content. Never overwrite immutable evidence.
+        make_insert = pg_insert if conn.dialect.name == "postgresql" else sqlite_insert
         conn.execute(
-            insert(entities).values(
+            make_insert(entities)
+            .values(
                 kind=kind,
                 ref=ref,
                 project=project,
@@ -122,8 +129,12 @@ class Store:
                 body=body,
                 created_at=now().isoformat(),
             )
+            .on_conflict_do_nothing(index_elements=[entities.c.kind, entities.c.ref])
         )
-        return self.get(conn, kind, ref)
+        existing = self.get(conn, kind, ref)
+        if existing["digest"] != digest or existing["project"] != project:
+            raise Conflict("immutable reference already exists with different contents")
+        return existing
 
     def get(self, conn, kind, ref):
         return (

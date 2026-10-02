@@ -120,13 +120,24 @@ class Worker:
                 return True
             with self.store.transaction() as conn:
                 latest = self.store.job(conn, row["id"])
-                body = dict(latest["body"], external_id=external, queued_at=now().isoformat())
-                target = (
-                    State.CANCEL_REQUESTED
-                    if latest["state"] == State.CANCEL_REQUESTED
-                    else State.QUEUED
-                )
-                self.store.change_job(conn, latest, target, body)
+                if latest["body"].get("external_id") not in {None, external}:
+                    raise Conflict("submission acknowledgement refers to another external job")
+                # An expired lease can be reclaimed while this remote call is
+                # still returning. Its acknowledgement is not a new observation
+                # of an attempt another worker has already advanced/completed.
+                if latest["state"] in {
+                    State.SUBMITTING,
+                    State.SUBMISSION_UNKNOWN,
+                    State.CANCEL_REQUESTED,
+                }:
+                    body = dict(latest["body"], external_id=external)
+                    body.setdefault("queued_at", now().isoformat())
+                    target = (
+                        State.CANCEL_REQUESTED
+                        if latest["state"] == State.CANCEL_REQUESTED
+                        else State.QUEUED
+                    )
+                    self.store.change_job(conn, latest, target, body)
             self.store.finish(event)
         except (BackendError, Conflict, ValueError) as exc:
             # Exceptions after intent can be transport failures or malformed successful responses.
@@ -306,6 +317,8 @@ class Worker:
             latest = self.store.job(conn, row["id"])
             if latest["state"] in TERMINAL:
                 return
+            if latest["version"] != row["version"]:
+                raise Conflict("job changed while backend observation was in flight; reobserve")
             body = self.observed_body(latest, observation)
             state = observation.state
             limits = body.get("execution_limits", body["spec"]["execution"])
