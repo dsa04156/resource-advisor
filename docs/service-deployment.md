@@ -75,6 +75,11 @@ both the minimal API/collector and the optimizer worker. Each running container'
 runtime-library or database version changed. Site build reports stay private
 because image repositories can contain internal addresses.
 
+Before changing Secrets, run the [project configuration preflight](configuration-checks.md)
+against the intended API credentials, artifact map and worker routes. This checks
+local project wiring without contacting the database or infrastructure; keep the
+subsequent server dry-run, readiness and result-readback checks.
+
 Create the dedicated Secrets from protected files, then apply a **private** site
 overlay that replaces the placeholder image and node selector:
 

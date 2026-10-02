@@ -1,0 +1,75 @@
+{
+  "date_kst": "2026-10-03",
+  "implementation_commit": "96c2be3697a87b77a29582f2b32c5fda93d80cdf",
+  "status": "PASS",
+  "image_digest": "sha256:a898836b4ed6038210724f45cda7404c7acdfacdc08d2aa902c1c494cca2543b",
+  "source_tree_sha256": "687c06fd66f2a7aeac85c142abfedd67697d46a634854304b01c4f020dfac869",
+  "dependency_lock_unchanged": true,
+  "services": [
+    {
+      "role": "api",
+      "ready": true,
+      "image_matches": true,
+      "source_sha256": {
+        "configuration.py": "2d8da62480d1f8d7c8d5b2f2fdf621b1ac217412766b892a0848b9a344234016",
+        "cli.py": "d889afc1c3f3506ebe89ad0dd3ce59c93afd17e7eef14ce2031bafd6042886c3"
+      },
+      "positive": {
+        "status": "PASS",
+        "scope": "local configuration only; no connectivity or hardware qualification",
+        "api_projects": 2,
+        "worker_projects": null,
+        "routes": null,
+        "api_artifacts_enabled": true,
+        "worker_artifacts_enabled": null,
+        "mlflow_enabled": null
+      },
+      "negative": {
+        "exit": 2,
+        "error": "ARTIFACT_PROJECT_MAPPING_MISSING",
+        "database_construction_reached": false
+      }
+    },
+    {
+      "role": "worker",
+      "ready": true,
+      "image_matches": true,
+      "source_sha256": {
+        "configuration.py": "2d8da62480d1f8d7c8d5b2f2fdf621b1ac217412766b892a0848b9a344234016",
+        "cli.py": "d889afc1c3f3506ebe89ad0dd3ce59c93afd17e7eef14ce2031bafd6042886c3"
+      },
+      "positive": {
+        "status": "PASS",
+        "scope": "local configuration only; no connectivity or hardware qualification",
+        "api_projects": null,
+        "worker_projects": 2,
+        "routes": 2,
+        "api_artifacts_enabled": null,
+        "worker_artifacts_enabled": true,
+        "mlflow_enabled": true
+      },
+      "negative": {
+        "exit": 2,
+        "error": "ARTIFACT_PROJECT_MAPPING_MISSING",
+        "database_construction_reached": false
+      }
+    }
+  ],
+  "local_regression_tests_passed": 508,
+  "readback": {
+    "existing_attempts": 8,
+    "matching_artifact_bundles": 6,
+    "ledger_and_mlflow_unique": true,
+    "foreign_artifacts_http": 404,
+    "pending_outbox": 0,
+    "retained_trial_finalizers": 0,
+    "shared_quota_unchanged": true,
+    "new_gpu_jobs": 0
+  },
+  "https_health_status": 200,
+  "limits": [
+    "Configuration validation is local; no connectivity, runtime qualification or direct storage authorization proof.",
+    "API and worker cross-service consistency requires supplying both configurations to check-config.",
+    "Slurm controller currently unreachable; no new Slurm submission is claimed."
+  ]
+}

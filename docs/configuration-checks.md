@@ -67,3 +67,20 @@ missing MLflow scope, duplicate routes and credential ambiguity. CLI tests make
 database/network construction fail if attempted, proving invalid configurations
 stop before side effects. The corrected two-project lab configuration passes;
 the preserved pre-correction API and worker mappings fail immediately.
+
+## Actual deployment verification — 2026-10-03 KST
+
+The source change was deployed to the existing API and worker using their same
+locked runtime dependencies. Both deployments became Ready with the expected
+image digest; their running `configuration.py` and `cli.py` hashes matched the
+build report. In each running container, its mounted configuration passed and a
+temporary copy with one project bucket removed exited 2 with
+`ARTIFACT_PROJECT_MAPPING_MISSING`, before an intentionally invalid database URL
+could be used. The mounted configurations were unchanged by these negative tests.
+
+Post-rollout readback rechecked the earlier eight E6 attempts: one ledger and
+MLflow run per attempt, six identical S3/API/MLflow bundles and foreign-project
+artifact denial. No GPU work was resubmitted, and no outbox item or retained trial
+finalizer remained. HTTPS health returned 200 after the existing lab access
+supervisor reconnected to the new API Pod. Local tests passed 508 cases.
+See the [sanitized deployment evidence](evidence/configuration-checks.json).
