@@ -14,7 +14,7 @@ direct evidence; conditional extensions require an explicit applicability result
 | Cooperative observation/pilot | Fixed/observe/recommend/pilot paths with approval and immutable context | Real GPU pilot/confirmation completed; training protection pending |
 | Training protection | Isolated checkpoint/input/output with no mutation of original training | Pending; training pilots rejected |
 | Bottleneck diagnosis | CPU/data-loader/IO/accelerator evidence and uncertainty | Pending |
-| KFP launch | Real uncached workflow → API → Kueue admission → GPU job → result | Compilation verified; live chain blocked by existing storage image-pull failure |
+| KFP launch | Real uncached workflow → API → Kueue admission → GPU job → result | Compilation verified; existing object store and pipeline API recovered with preserved objects; live chain pending |
 | Kueue policy | Real project LocalQueue/ClusterQueue/flavor/priority and over-quota tests | Live GPU quota pending/no-Pod, concurrent queueing and later-high-first CUDA execution verified; cross-project/API chain remains open |
 | Slurm execution | Actual sbatch/squeue/sacct/scancel, image/env lock, accelerator reservation | Live GPU F0 and adapter accounting read verified; full API/model/result path pending |
 | Slurm policy | Accounting DB/association/QOS enforcement, priority and oversize rejection | Lab enforcement, four rejection cases, account queue limit and real GPU priority order verified; cross-user and API execution gates remain open |
