@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff
-      - run: uv sync --locked --extra pipelines --extra optimizer
+      - run: uv sync --locked --extra pipelines --extra optimizer --extra artifacts
       - run: uv run ruff check src tests examples
       - run: uv run ruff format --check src tests examples
       - run: uv run pytest -q

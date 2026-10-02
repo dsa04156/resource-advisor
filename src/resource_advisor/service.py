@@ -290,6 +290,12 @@ class Service:
                     )
                 self.store.enqueue(
                     conn,
+                    "artifact-" + result.attempt_id,
+                    "artifact",
+                    {"job_id": row["id"]},
+                )
+                self.store.enqueue(
+                    conn,
                     "mlflow-" + result.attempt_id,
                     "mlflow",
                     {

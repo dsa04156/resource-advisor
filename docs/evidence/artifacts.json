@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-02",
+  "evidence_kind": "hardware_results_on_real_services",
+  "s3_and_api": {
+    "real_hardware_bundles": 28,
+    "api_digest_verified": true,
+    "storage_connection_outage_http": 503,
+    "completed_job_preserved": true,
+    "retrieval_after_reconnect": 200
+  },
+  "mlflow": {
+    "artifact_uploads": 28,
+    "mlflow_listing_verified": true,
+    "byte_readback_verified": true,
+    "outbox": {
+      "DONE": 28
+    }
+  },
+  "scope": "bounded JSON result bundles; large model/checkpoint transfer is unverified",
+  "private_service_details": "omitted"
+}

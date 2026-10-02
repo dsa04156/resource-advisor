@@ -14,6 +14,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+artifacts = ["boto3>=1.36,<2"]
 optimizer = ["botorch>=0.15,<0.17", "torch>=2.8,<2.9"]
 pipelines = [
     "kfp>=2.5,<3",

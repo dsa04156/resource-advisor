@@ -1,6 +1,7 @@
 """Durable worker; uncertain submission is reconciled, never blindly repeated."""
 
 from datetime import datetime
+from urllib.parse import urlparse
 
 import httpx
 from sqlalchemy import select
@@ -215,7 +216,7 @@ class Worker:
 
 
 class MLflowDelivery:
-    def __init__(self, store, url, *, experiments, token=None, client=None):
+    def __init__(self, store, url, *, experiments, token=None, client=None, artifact_storage=None):
         import httpx
 
         self.store = store
@@ -224,6 +225,7 @@ class MLflowDelivery:
         ):
             raise ValueError("explicit project-to-MLflow-experiment mapping required")
         self.experiments = dict(experiments)
+        self.artifact_storage = artifact_storage
         self.client = client or httpx.Client(
             base_url=url.rstrip("/"),
             timeout=15,
@@ -334,5 +336,103 @@ class MLflowDelivery:
             )
             self.store.finish(event)
         except (httpx.HTTPError, ValueError, KeyError, TypeError, Conflict) as exc:
+            self.store.finish(event, type(exc).__name__)
+        return True
+
+    def enqueue_artifacts(self):
+        """Idempotently enable MLflow artifact delivery for existing S3 records."""
+        with self.store.transaction() as conn:
+            for row in self.store.list(conn, "artifact"):
+                self.store.enqueue(
+                    conn,
+                    "mlflow-artifact-" + row["body"]["attempt_id"],
+                    "mlflow_artifact",
+                    {"artifact_ref": row["ref"]},
+                )
+
+    def deliver_artifact_one(self):
+        if self.artifact_storage is None:
+            return False
+        from botocore.exceptions import BotoCoreError, ClientError
+
+        from .artifacts import MAX_RESULT_BYTES, ArtifactError
+
+        event = self.store.claim("mlflow_artifact")
+        if not event:
+            return False
+        try:
+            with self.store.transaction() as conn:
+                row = self.store.get(conn, "artifact", event["body"]["artifact_ref"])
+                artifact = row["body"]
+                tracking = self.store.get(conn, "tracking", artifact["attempt_id"])
+                if not tracking or tracking["project"] != row["project"]:
+                    raise ArtifactError("MLflow run link not available")
+                link = tracking["body"]
+            response = self.client.get(
+                "/api/2.0/mlflow/runs/get", params={"run_id": link["run_id"]}
+            )
+            response.raise_for_status()
+            run = response.json()["run"]
+            tags = {t["key"]: t["value"] for t in run["data"]["tags"]}
+            if (
+                run["info"]["experiment_id"] != self.experiments[row["project"]]
+                or tags.get("project") != row["project"]
+                or tags.get("resource_advisor.attempt_id") != artifact["attempt_id"]
+            ):
+                raise ArtifactError("external run ownership mismatch")
+            uri = urlparse(run["info"]["artifact_uri"])
+            parts = uri.path.lstrip("/").split("/")
+            if (
+                uri.scheme != "mlflow-artifacts"
+                or uri.netloc
+                or uri.query
+                or uri.fragment
+                or any(p in {"", ".", ".."} or not p.replace("-", "").isalnum() for p in parts)
+            ):
+                raise ArtifactError("same-server MLflow artifact proxy URI required")
+            name = "resource-advisor/" + artifact["digest"][7:] + ".json"
+            path = "/api/2.0/mlflow-artifacts/artifacts/" + "/".join(parts) + "/" + name
+            data = self.artifact_storage.read(artifact)
+
+            def read_back():
+                with self.client.stream("GET", path) as response:
+                    if response.status_code == 404:
+                        return None
+                    response.raise_for_status()
+                    content = bytearray()
+                    for chunk in response.iter_bytes():
+                        content.extend(chunk)
+                        if len(content) > MAX_RESULT_BYTES:
+                            raise ArtifactError("MLflow artifact exceeds size limit")
+                    return bytes(content)
+
+            existing = read_back()
+            if existing is None:
+                response = self.client.put(
+                    path, content=data, headers={"Content-Type": "application/json"}
+                )
+                response.raise_for_status()
+                existing = read_back()
+            if existing != data:
+                raise ArtifactError("MLflow artifact integrity mismatch; refusing overwrite")
+            with self.store.transaction() as conn:
+                self.store.put(
+                    conn,
+                    "artifact_tracking",
+                    artifact["attempt_id"],
+                    row["project"],
+                    {"run_id": link["run_id"], "path": name, "digest": artifact["digest"]},
+                )
+            self.store.finish(event)
+        except (
+            httpx.HTTPError,
+            BotoCoreError,
+            ClientError,
+            ArtifactError,
+            Conflict,
+            ValueError,
+            KeyError,
+            TypeError,
+        ) as exc:
             self.store.finish(event, type(exc).__name__)
         return True

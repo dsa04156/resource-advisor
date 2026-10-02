@@ -72,6 +72,8 @@ schema upgrades and an operational migration process are not yet implemented.
 - Digest/schema/attempt validation; quality-gated historical profiles.
 - Lookup recommendations with independent-run counts, uncertainty and approval.
 - Device allocation units stay separate; missing scheduler times remain null.
+- S3 result bundles with verified read-back, project-authorized downloads and
+  separate MLflow artifact delivery; see [artifact setup](docs/artifacts.md).
 - Prometheus job/outbox metrics; compiled CPU-only KFP launcher with caching off.
 - Cooperative CUDA matmul runner qualified on one physical GPU/runtime combination.
 

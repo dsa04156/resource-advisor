@@ -100,3 +100,11 @@ tracking links was also dumped and restored into a fresh DB: all five service
 tables matched by count and deterministic content hash. The lab database uses
 ephemeral storage; a private backup was retained. This is recovery verification,
 not persistent production deployment.
+
+## Result-artifact increment
+
+The suite passes **68 tests on SQLite and 68 on isolated PostgreSQL**, with the
+artifacts extra installed. 28 real GPU result bundles passed conditional S3 upload,
+byte/digest verification, authenticated API download and MLflow artifact upload/list/read
+checks. A disconnected storage connection returned 503 while preserving compute
+success, then recovered on reconnect. See [artifact evidence and limitations](artifacts.md).

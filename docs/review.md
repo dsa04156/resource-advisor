@@ -33,9 +33,10 @@ independent confirmation, including real GPU runs. Complete failed-run cost
 accounting and randomized equal-budget trials remain production/evaluation gates.
 The small smoke experiment does not prove BO superiority or hard physical budget bounds.
 
-**Artifacts and environments:** JSON digest verification is implemented; model
-artifact transfer, image attestation, checkpoint isolation and runtime
-qualification on each GPU/NPU are still required.
+**Artifacts and environments:** bounded JSON result bundles now have conditional
+S3 writes, verified API downloads and live MLflow artifact copies. Large-model
+transfer, storage retention/backup, image attestation, checkpoint isolation and
+runtime qualification on each GPU/NPU are still required.
 
 **Accounting:** collected outcomes have a unit-separated ledger. Reconcile
 backend-only failures and cancellation into accounting before reporting complete
@@ -44,7 +45,7 @@ configuration and an actual rejection test.
 
 **MLflow and observability:** 28 real hardware results were delivered to a
 dedicated experiment, with project-to-experiment routing and durable run links.
-Artifact upload, server-side multi-tenant authorization, circuit breakers,
+Result-bundle artifact upload is verified. Server-side multi-tenant authorization, circuit breakers,
 comprehensive event metrics and dashboards remain to implement. Experiment routing
 alone is not an MLflow authorization boundary.
 

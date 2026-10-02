@@ -14,12 +14,12 @@ direct evidence; conditional extensions require an explicit applicability result
 | Cooperative observation/pilot | Fixed/observe/recommend/pilot paths with approval and immutable context | Real GPU pilot/confirmation completed; training protection pending |
 | Training protection | Isolated checkpoint/input/output with no mutation of original training | Pending; training pilots rejected |
 | Bottleneck diagnosis | CPU/data-loader/IO/accelerator evidence and uncertainty | Pending |
-| KFP launch | Real uncached workflow → API → Kueue admission → GPU job → result | Compilation verified; live chain pending |
+| KFP launch | Real uncached workflow → API → Kueue admission → GPU job → result | Compilation verified; live chain blocked by existing storage image-pull failure |
 | Kueue policy | Real project LocalQueue/ClusterQueue/flavor/priority and over-quota tests | Pending |
 | Slurm execution | Actual sbatch/squeue/sacct/scancel, image/env lock, accelerator reservation | Adapter implemented; new service live validation pending |
 | Slurm policy | Accounting DB/association/QOS enforcement, priority and oversize rejection | Pending |
-| Results/artifacts | Schema/digest/attempt/work units, artifact ownership and durable storage | JSON checks pass; object artifacts pending |
-| MLflow | Actual parameters/metrics/artifacts/model links, outage recovery | 28 live hardware runs delivered to dedicated experiment; artifacts pending |
+| Results/artifacts | Schema/digest/attempt/work units, artifact ownership and durable storage | 28 result bundles verified in S3/API; large models/checkpoints/retention pending |
+| MLflow | Actual parameters/metrics/artifacts/model links, outage recovery | 28 live runs and corresponding result artifacts verified; model registration/failure tracking pending |
 | Lookup recommendation | Comparable measured evidence, repeats, quality/memory gates, abstention | Tested |
 | Recommendation approval | Immutable configuration/version, expiry, permission recheck | Tested |
 | Idempotency/recovery | Response loss, restart, duplicate create/cancel, stale result and epoch | Fault tests pass; real process-crash/backend trials pending |

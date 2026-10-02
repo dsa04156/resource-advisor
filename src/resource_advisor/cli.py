@@ -26,6 +26,7 @@ def main():
     )
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=18040)
+    serve.add_argument("--artifacts-config", help="private S3 endpoint and project bucket map")
     worker = sub.add_parser("worker")
     worker.add_argument("--config", required=True, help="private backend routes")
     worker.add_argument("--once", action="store_true")
@@ -44,7 +45,16 @@ def main():
         credentials = {
             h: Principal(**p) for h, p in json.loads(Path(args.credentials).read_text()).items()
         }
-        uvicorn.run(create_app(service, credentials), host=args.host, port=args.port)
+        artifact_storage = None
+        if args.artifacts_config:
+            from .artifacts import S3Artifacts
+
+            artifact_storage = S3Artifacts(**json.loads(Path(args.artifacts_config).read_text()))
+        uvicorn.run(
+            create_app(service, credentials, artifact_storage=artifact_storage),
+            host=args.host,
+            port=args.port,
+        )
     elif args.action == "worker":
         config = json.loads(Path(args.config).read_text())
         backends = {}
@@ -59,12 +69,18 @@ def main():
         from .study import Studies
 
         study_runner = Studies(service)
+        artifacts = None
+        if config.get("artifacts"):
+            from .artifacts import ArtifactDelivery, S3Artifacts
+
+            artifacts = ArtifactDelivery(store, S3Artifacts(**config["artifacts"]))
         delivery = (
             MLflowDelivery(
                 store,
                 config["mlflow_url"],
                 experiments=config["mlflow_experiments"],
                 token=os.getenv("RA_MLFLOW_TOKEN"),
+                artifact_storage=artifacts.storage if artifacts else None,
             )
             if config.get("mlflow_url")
             else None
@@ -74,8 +90,11 @@ def main():
             runner.submit_one()
             runner.cancel_one()
             runner.reconcile_all()
+            if artifacts:
+                artifacts.deliver_one()
             if delivery:
                 delivery.deliver_one()
+                delivery.deliver_artifact_one()
             if args.once:
                 break
             time.sleep(5)

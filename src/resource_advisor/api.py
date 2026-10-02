@@ -31,7 +31,7 @@ class Principal:
     operator: bool = False
 
 
-def create_app(service: Service, credentials: dict[str, Principal]):
+def create_app(service: Service, credentials: dict[str, Principal], *, artifact_storage=None):
     if not credentials:
         raise ValueError("at least one external credential hash is required")
     app = FastAPI(title="Resource Advisor", version="0.1.0")
@@ -115,6 +115,38 @@ def create_app(service: Service, credentials: dict[str, Principal]):
                 select(jobs).where(jobs.c.project == p.project).limit(200)
             ).mappings()
             return [service.public_job(row) for row in rows]
+
+    @app.get(PREFIX + "/jobs/{job_id}/artifacts")
+    def artifacts(job_id: str, p=Depends(principal)):
+        service.get_job(p.project, job_id)
+        with service.store.transaction() as conn:
+            return [
+                {k: v for k, v in row["body"].items() if k not in {"bucket", "key"}}
+                for row in service.store.list(conn, "artifact", p.project)
+                if row["body"]["job_id"] == job_id
+            ]
+
+    @app.get(PREFIX + "/artifacts/{ref}/content")
+    def artifact_content(ref: str, p=Depends(principal)):
+        with service.store.transaction() as conn:
+            row = service.store.get(conn, "artifact", ref)
+            if not row or row["project"] != p.project:
+                raise HTTPException(404, "Artifact not found")
+        if artifact_storage is None:
+            raise HTTPException(503, "Artifact storage not configured")
+        from botocore.exceptions import BotoCoreError, ClientError
+
+        from .artifacts import ArtifactError
+
+        try:
+            data = artifact_storage.read(row["body"])
+        except (ArtifactError, BotoCoreError, ClientError):
+            raise HTTPException(503, "Artifact unavailable or integrity check failed") from None
+        return Response(
+            data,
+            media_type="application/json",
+            headers={"ETag": '"' + row["body"]["digest"] + '"'},
+        )
 
     @app.post(PREFIX + "/jobs/{job_id}/cancel")
     def cancel(job_id: str, p=Depends(principal)):
