@@ -123,8 +123,15 @@ individual observed durations do not establish a recovery-time objective.
 All **306 result bundles** matched S3, restored project API and MLflow bytes;
 all **319 MLflow links** resolved to their original project/attempt/experiment.
 Unauthenticated Job reads returned 401 and foreign-project artifact reads 404.
-Readback did not alter any restored table. Thirteen resultless terminal attempts
-had tracking/usage records without invented result artifacts.
+Readback did not alter any restored table. Thirteen terminal attempts without
+validated result bundles retained their tracking/usage records.
+
+After verification, only the target StatefulSet was scaled to zero and its
+task-owned port-forward was closed. The source Pod UID remained unchanged. The
+new target PVC, private archive and manifest were retained; no claim was deleted.
+See the [sanitized evidence](evidence/restore-rehearsal.json). PostgreSQL regression
+tests passed 512 cases; SQLite's full 511-case run and the subsequent six-case
+backup suite passed before publication, with final CI covering both backends.
 
 No new GPU Job, MLflow run or source database write was submitted by this drill.
 Existing inventory writes continued independently. The separate target uses the

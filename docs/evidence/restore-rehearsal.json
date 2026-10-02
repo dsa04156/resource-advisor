@@ -1,0 +1,76 @@
+{
+  "schema_version": "v1",
+  "status": "PASS",
+  "date_kst": "2026-10-03",
+  "implementation_commit": "591396b",
+  "protocol": "E7 isolated online PostgreSQL snapshot restore; assistant-executed",
+  "database_version": "17.6",
+  "snapshot_at": "2026-10-02T23:04:26.962004+00:00",
+  "archive": {
+    "size_bytes": 5045952,
+    "sha256": "f4922870c4252cc019526d6fae0787a5f4c8f3ff11846d7898f7a7e491c3d525"
+  },
+  "tables": {
+    "ra_entities": {
+      "rows": 3921,
+      "sha256": "6bd4c33136d6247d093ec8e88ed11265193706968cc284bf5687f1cf3164771a"
+    },
+    "ra_jobs": {
+      "rows": 319,
+      "sha256": "e06cf0f750f29132844b74f3adf9a8e99518753e5822ea1114467d7656a24c6f"
+    },
+    "ra_outbox": {
+      "rows": 1271,
+      "sha256": "2dce761719d691ba48be8703da82754c2e200d7f884b6ee10b038e85b67c89d2"
+    },
+    "ra_studies": {
+      "rows": 24,
+      "sha256": "0bdc721a1491f3804c2bc8b58744541e1356233df75a765ba0aaa5b1b98ad7a1"
+    },
+    "ra_usage": {
+      "rows": 319,
+      "sha256": "900a9a45af786adf558dfe3356aa9c2acad58dc529908f252499d17c8f5841ac"
+    }
+  },
+  "total_records": 5854,
+  "durations_seconds": {
+    "capture": 2.2751668879645877,
+    "restore_only": 0.8327298180083744,
+    "final_link_verification": 15.135367628012318
+  },
+  "verification": {
+    "all_table_contents_match": true,
+    "archive_digest_matches": true,
+    "restored_table_contents_unchanged_by_readback": true,
+    "executions": 319,
+    "result_bundles": 306,
+    "mlflow_links": 319,
+    "usage_rows": 319,
+    "s3_api_mlflow_bytes_match": true,
+    "unauthenticated_job_http": 401,
+    "foreign_project_artifact_http": 404,
+    "api_transport": "FastAPI TestClient against restored PostgreSQL; no recovery HTTP deployment",
+    "corrupted_archive_cli_exit": 1,
+    "new_gpu_jobs": 0
+  },
+  "source_preservation": {
+    "https_health": 200,
+    "services_ready": true,
+    "pod_uid_unchanged": true,
+    "new_inventory_rows_after_snapshot": 23,
+    "job_count_unchanged": true,
+    "pending_outbox": 0
+  },
+  "cleanup": {
+    "target_replicas": 0,
+    "target_pvc_retained": true,
+    "private_dump_and_manifest_retained": true,
+    "only_task_owned_forward_stopped": true
+  },
+  "limits": [
+    "Same PostgreSQL version and same qualified metadata node; separate target Pod/PVC/PV.",
+    "Original object store and MLflow were read, not restored.",
+    "No node-loss, PITR, off-site retention, HA or RTO guarantee.",
+    "Manifest is trusted operator evidence, not a signed authenticity claim."
+  ]
+}

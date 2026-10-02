@@ -126,6 +126,12 @@ of those writes. Simply returning to the old copy loses post-cutover changes.
 
 ## Remaining operational limits
 
+The later [isolated restore rehearsal](restore-rehearsal.md) uses an exported
+transaction snapshot to capture and restore without stopping source writers.
+It verifies a separate instance/new PVC and all restored result/MLflow links.
+The quiesced `verify-db-copy` procedure above remains the cutover workflow;
+`verify-db-snapshot` compares a restore with its saved backup-time fingerprint.
+
 - The verifier loads each table into memory and checks known table contents,
   not every schema/index/extension or external service. Missing tables fail
   rather than passing as empty. Same-count JSON corruption and missing outbox
