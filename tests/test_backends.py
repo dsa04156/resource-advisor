@@ -84,6 +84,45 @@ def test_slurm_accounting_requests_explicit_timezone(service):
     assert result.finished_at.endswith("+0000")
 
 
+def test_priority_grade_maps_to_distinct_backend_policies(service):
+    job = row(service)
+    job["body"]["spec"]["execution"]["priority"] = "high"
+    k8s = KubernetesBackend(
+        namespace="research-a",
+        local_queue="batch",
+        node_selector={"pool": "lab"},
+        priority_classes={"high": "research-urgent"},
+    )
+    manifest = k8s.manifest(job)
+    assert manifest["metadata"]["labels"]["kueue.x-k8s.io/priority-class"] == "research-urgent"
+    assert "priorityClassName" not in manifest["spec"]["template"]["spec"]
+    job["body"]["capability"]["resource_key"] = "gpu:test"
+    slurm = SlurmBackend(
+        partition="gpu",
+        account="team-a",
+        qos="standard",
+        output_dir="/tmp/ra-test",
+        qos_by_priority={"high": "lab-expedited"},
+    )
+    assert "#SBATCH --qos=lab-expedited" in slurm.script(job)
+    assert "--priority=" not in slurm.script(job)
+
+
+@pytest.mark.parametrize("kind", ["kubernetes", "slurm"])
+def test_unmapped_priority_is_rejected_before_submission(service, kind):
+    job = row(service)
+    job["body"]["spec"]["execution"]["priority"] = "high"
+    job["body"]["capability"]["resource_key"] = "gpu:test"
+    if kind == "slurm":
+        backend = SlurmBackend(partition="gpu", account="a", qos="normal", output_dir="/tmp/ra")
+        build = backend.script
+    else:
+        backend = KubernetesBackend(namespace="a", local_queue="batch", node_selector={"pool": "a"})
+        build = backend.manifest
+    with pytest.raises(BackendError, match="priority is not enabled"):
+        build(job)
+
+
 @pytest.mark.parametrize("text", ["", "RESOURCE_ADVISOR_RESULT {}\nRESOURCE_ADVISOR_RESULT {}"])
 def test_missing_or_duplicate_envelope_rejected(text):
     with pytest.raises(BackendError):

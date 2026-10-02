@@ -74,6 +74,29 @@ def identity_environment(job):
     }
 
 
+def priority_mapping(mapping):
+    mapping = dict(mapping or {})
+    for grade, name in mapping.items():
+        if (
+            grade not in {"normal", "high"}
+            or not isinstance(name, str)
+            or not re.fullmatch(r"[A-Za-z0-9_.-]+", name)
+        ):
+            raise ValueError("priority mappings need normal/high grades and safe policy names")
+    return mapping
+
+
+def policy_priority(job, mapping, default=None):
+    # Names and numeric weights belong to the administrator's project route,
+    # not the workload. Older immutable contracts imply normal priority.
+    grade = job["body"]["spec"]["execution"].get("priority", "normal")
+    if grade in mapping:
+        return mapping[grade]
+    if grade == "normal":
+        return default
+    raise BackendError("requested priority is not enabled for this project/backend")
+
+
 class KubernetesBackend:
     def __init__(
         self,
@@ -84,6 +107,7 @@ class KubernetesBackend:
         kubeconfig=None,
         context=None,
         runtime_bundles=None,
+        priority_classes=None,
         execute=run,
     ):
         if not namespace or not local_queue or not node_selector:
@@ -91,6 +115,7 @@ class KubernetesBackend:
         self.namespace, self.local_queue, self.node_selector = namespace, local_queue, node_selector
         self.execute = execute
         self.runtime_bundles = runtime_bundles or {}
+        self.priority_classes = priority_mapping(priority_classes)
         self.prefix = ["kubectl"]
         if kubeconfig:
             self.prefix += ["--kubeconfig", kubeconfig]
@@ -100,6 +125,7 @@ class KubernetesBackend:
 
     def manifest(self, job):
         b = job["body"]
+        priority_class = policy_priority(job, self.priority_classes)
         r = b["candidate"]["context"]["resources"]
         resources = {"cpu": str(r["host_cpu"]), "memory": f"{r['host_memory_mib']}Mi"}
         key = b["capability"]["resource_key"]
@@ -125,6 +151,7 @@ class KubernetesBackend:
                 "labels": {
                     "app.kubernetes.io/managed-by": "resource-advisor",
                     "kueue.x-k8s.io/queue-name": self.local_queue,
+                    **({"kueue.x-k8s.io/priority-class": priority_class} if priority_class else {}),
                 },
                 "annotations": {
                     "resource-advisor/job-id": job["id"],
@@ -309,7 +336,17 @@ class KubernetesBackend:
 class SlurmBackend:
     """Run on the controller, or through an existing SSH alias/key (no passwords)."""
 
-    def __init__(self, *, partition, account, qos, output_dir, ssh_target=None, execute=run):
+    def __init__(
+        self,
+        *,
+        partition,
+        account,
+        qos,
+        output_dir,
+        ssh_target=None,
+        qos_by_priority=None,
+        execute=run,
+    ):
         for value in [partition, account, qos]:
             if not re.fullmatch(r"[A-Za-z0-9_.-]+", value):
                 raise ValueError("partition, account and QOS must be explicit safe identifiers")
@@ -320,6 +357,7 @@ class SlurmBackend:
         ):
             raise ValueError("invalid SSH target")
         self.partition, self.account, self.qos = partition, account, qos
+        self.qos_by_priority = priority_mapping(qos_by_priority)
         self.output_dir, self.ssh_target, self.execute = output_dir, ssh_target, execute
 
     def call(self, argv, **kwargs):
@@ -355,7 +393,7 @@ class SlurmBackend:
             f"--comment=resource-advisor:{job['id']}",
             f"--partition={self.partition}",
             f"--account={self.account}",
-            f"--qos={self.qos}",
+            f"--qos={policy_priority(job, self.qos_by_priority, self.qos)}",
             f"--nodelist={node}",
             "--nodes=1",
             "--ntasks=1",

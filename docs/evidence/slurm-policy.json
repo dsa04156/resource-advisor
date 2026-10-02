@@ -1,0 +1,178 @@
+{
+  "date": "2026-10-02",
+  "slurm_version": "24.11.5",
+  "source": "actual sbatch/scontrol/sacct on a lab GPU node",
+  "enforcement": "associations,limits,qos",
+  "priority_type": "priority/multifactor",
+  "priority_weight_qos": 1000,
+  "account_limits": {
+    "cpu": 1,
+    "memory_mib": 1024,
+    "gpu": 1
+  },
+  "qos_limits": {
+    "cpu_per_job": 1,
+    "memory_mib_per_job": 1024,
+    "gpu_per_job": 1,
+    "wall_seconds": 120,
+    "flags": [
+      "DenyOnLimit"
+    ]
+  },
+  "rejections": {
+    "cpu-over-limit": {
+      "exit": 1,
+      "stderr": "sbatch: error: QOSMaxCpuPerJobLimit\nsbatch: error: Batch job submission failed: Job violates accounting/QOS policy (job submit limit, user's size and/or time limits)"
+    },
+    "memory-over-limit": {
+      "exit": 1,
+      "stderr": "sbatch: error: QOSMaxMemoryPerJob\nsbatch: error: Batch job submission failed: Job violates accounting/QOS policy (job submit limit, user's size and/or time limits)"
+    },
+    "time-over-limit": {
+      "exit": 1,
+      "stderr": "sbatch: error: QOSMaxWallDurationPerJobLimit\nsbatch: error: Batch job submission failed: Job violates accounting/QOS policy (job submit limit, user's size and/or time limits)"
+    },
+    "unauthorized-qos": {
+      "exit": 1,
+      "stderr": "sbatch: error: Batch job submission failed: Invalid qos specification"
+    }
+  },
+  "pending": {
+    "normal": {
+      "JobState": "PENDING",
+      "Reason": "AssocGrpCpuLimit",
+      "Priority": "100",
+      "QOS": "ra-normal"
+    },
+    "high": {
+      "JobState": "PENDING",
+      "Reason": "AssocGrpCpuLimit",
+      "Priority": "1000",
+      "QOS": "ra-high"
+    }
+  },
+  "checks": {
+    "normal_submitted_first": true,
+    "high_started_first": true,
+    "gpu_reserved_for_both_completed_jobs": true,
+    "quota_pending_reason_verified": true
+  },
+  "result": "PASS",
+  "jobs": [
+    {
+      "trial": "verifier_diagnostic_failure",
+      "role": "earlier-test-job",
+      "state": "CANCELLED",
+      "exit_code": "0:0",
+      "start": "2026-10-02T05:46:47+0000",
+      "end": "2026-10-02T05:47:23+0000",
+      "elapsed_seconds": 36,
+      "allocated_tres": "billing=1,cpu=1,gres/gpu=1,mem=512M,node=1",
+      "qos": "ra-normal"
+    },
+    {
+      "trial": "verifier_diagnostic_failure",
+      "role": "earlier-test-job",
+      "state": "CANCELLED",
+      "exit_code": "0:0",
+      "start": "None",
+      "end": "2026-10-02T05:47:23+0000",
+      "elapsed_seconds": 0,
+      "allocated_tres": "",
+      "qos": "ra-normal"
+    },
+    {
+      "trial": "verifier_diagnostic_failure",
+      "role": "earlier-test-job",
+      "state": "CANCELLED",
+      "exit_code": "0:0",
+      "start": "None",
+      "end": "2026-10-02T05:47:23+0000",
+      "elapsed_seconds": 0,
+      "allocated_tres": "",
+      "qos": "ra-high"
+    },
+    {
+      "trial": "verifier_diagnostic_failure",
+      "role": "earlier-test-job",
+      "state": "CANCELLED",
+      "exit_code": "0:0",
+      "start": "2026-10-02T05:47:45+0000",
+      "end": "2026-10-02T05:47:48+0000",
+      "elapsed_seconds": 3,
+      "allocated_tres": "billing=1,cpu=1,gres/gpu=1,mem=512M,node=1",
+      "qos": "ra-normal"
+    },
+    {
+      "trial": "verifier_diagnostic_failure",
+      "role": "earlier-test-job",
+      "state": "CANCELLED",
+      "exit_code": "0:0",
+      "start": "None",
+      "end": "2026-10-02T05:47:48+0000",
+      "elapsed_seconds": 0,
+      "allocated_tres": "",
+      "qos": "ra-normal"
+    },
+    {
+      "trial": "verifier_diagnostic_failure",
+      "role": "earlier-test-job",
+      "state": "CANCELLED",
+      "exit_code": "0:0",
+      "start": "None",
+      "end": "2026-10-02T05:47:48+0000",
+      "elapsed_seconds": 0,
+      "allocated_tres": "",
+      "qos": "ra-high"
+    },
+    {
+      "trial": "accepted",
+      "role": "blocker",
+      "state": "CANCELLED",
+      "exit_code": "0:0",
+      "start": "2026-10-02T05:48:33+0000",
+      "end": "2026-10-02T05:48:36+0000",
+      "elapsed_seconds": 3,
+      "allocated_tres": "billing=1,cpu=1,gres/gpu=1,mem=512M,node=1",
+      "qos": "ra-normal"
+    },
+    {
+      "trial": "accepted",
+      "role": "normal",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "start": "2026-10-02T05:48:41+0000",
+      "end": "2026-10-02T05:48:45+0000",
+      "elapsed_seconds": 4,
+      "allocated_tres": "billing=1,cpu=1,gres/gpu=1,mem=512M,node=1",
+      "qos": "ra-normal"
+    },
+    {
+      "trial": "accepted",
+      "role": "high",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "start": "2026-10-02T05:48:38+0000",
+      "end": "2026-10-02T05:48:41+0000",
+      "elapsed_seconds": 3,
+      "allocated_tres": "billing=1,cpu=1,gres/gpu=1,mem=512M,node=1",
+      "qos": "ra-high"
+    }
+  ],
+  "diagnostics": {
+    "earlier_trial_1": "Verifier expected AssocGrpCPU rather than actual AssocGrpCpuLimit; owned jobs cancelled.",
+    "earlier_trial_2": "sprio returned Invalid job id despite pending scontrol record; owned jobs cancelled.",
+    "accepted_trial": "sprio factor lookup still failed; preserved as unknown. scontrol priorities and actual sacct start order verified."
+  },
+  "health_after": {
+    "controller": "UP",
+    "nodes_idle": 2,
+    "active_jobs": 0
+  },
+  "limitations": [
+    "CUDA F0 only, no model performance comparison",
+    "GPU capacity is one, so requested GPU count above one cannot independently distinguish policy from physical capacity",
+    "No cross-user identity isolation or device cgroup verification",
+    "API grade mapping tested separately; this scheduler trial submits with sbatch directly"
+  ]
+}

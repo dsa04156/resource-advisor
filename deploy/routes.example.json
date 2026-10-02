@@ -7,6 +7,7 @@
       "options": {
         "namespace": "resource-advisor-team-a",
         "local_queue": "research",
+        "priority_classes": {"normal": "research-normal", "high": "research-high"},
         "node_selector": {"resource-advisor/pool": "qualified-lab"},
         "kubeconfig": "/run/resource-advisor/kubeconfig"
       }
@@ -19,6 +20,7 @@
         "partition": "gpu",
         "account": "team-a",
         "qos": "research",
+        "qos_by_priority": {"normal": "research", "high": "research-high"},
         "output_dir": "/var/lib/resource-advisor/results",
         "ssh_target": "resource-advisor-slurm"
       }

@@ -190,6 +190,7 @@ class QualityPolicy(Contract):
 
 
 class ExecutionPolicy(Contract):
+    priority: Literal["normal", "high"] = "normal"
     max_run_seconds: int = Field(default=3600, ge=1, le=86400)
     max_queue_seconds: int = Field(default=600, ge=1, le=86400)
     max_collection_seconds: int = Field(default=300, ge=1, le=3600)

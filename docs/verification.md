@@ -108,3 +108,19 @@ artifacts extra installed. 28 real GPU result bundles passed conditional S3 uplo
 byte/digest verification, authenticated API download and MLflow artifact upload/list/read
 checks. A disconnected storage connection returned 503 while preserving compute
 success, then recovered on reconnect. See [artifact evidence and limitations](artifacts.md).
+
+## Slurm policy increment
+
+The suite passes **73 tests on SQLite and 73 on isolated PostgreSQL**. New
+priority checks cover backend-specific policy mapping and refusal of an unmapped
+high grade, with no direct numeric priority override or Pod preemption priority.
+The previous UTC accounting regression and driver-only F0 are retained.
+
+Live Slurm 24.11.5 now enforces the dedicated account's resource/QOS limits.
+Four invalid requests were rejected, simultaneous work waited for the account CPU
+limit, and a later high-QOS GPU job started before an older normal-QOS GPU job.
+Both completed the CUDA probe. Earlier verifier failures and cancelled allocations
+are retained alongside the successful trial in [the policy report](slurm-policy.md).
+`sprio` factor lookup failed; the report uses actual `scontrol` priority and `sacct`
+start order rather than inventing a factor breakdown. This does not complete the
+Compute API → Slurm model/result path or cross-user isolation testing.

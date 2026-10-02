@@ -17,7 +17,7 @@ direct evidence; conditional extensions require an explicit applicability result
 | KFP launch | Real uncached workflow → API → Kueue admission → GPU job → result | Compilation verified; live chain blocked by existing storage image-pull failure |
 | Kueue policy | Real project LocalQueue/ClusterQueue/flavor/priority and over-quota tests | Pending |
 | Slurm execution | Actual sbatch/squeue/sacct/scancel, image/env lock, accelerator reservation | Live GPU F0 and adapter accounting read verified; full API/model/result path pending |
-| Slurm policy | Accounting DB/association/QOS enforcement, priority and oversize rejection | SlurmDBD and lab association active; enforcement/priority tests pending |
+| Slurm policy | Accounting DB/association/QOS enforcement, priority and oversize rejection | Lab enforcement, four rejection cases, account queue limit and real GPU priority order verified; cross-user and API execution gates remain open |
 | Results/artifacts | Schema/digest/attempt/work units, artifact ownership and durable storage | 28 result bundles verified in S3/API; large models/checkpoints/retention pending |
 | MLflow | Actual parameters/metrics/artifacts/model links, outage recovery | 28 live runs and corresponding result artifacts verified; model registration/failure tracking pending |
 | Lookup recommendation | Comparable measured evidence, repeats, quality/memory gates, abstention | Tested |

@@ -24,8 +24,9 @@ to a shared state directory or an existing production accounting database.
 
 A lab account/user association was created. A CPU smoke job completed and appeared
 in `sacct`; then GPU qualification was submitted with one typed GPU GRES. Admission
-enforcement remains `none`. Creating accounts is not proof that quota or priority
-is enforced. The existing two-node compute partition remained present and returned
+enforcement remained `none` at the F0 milestone. The later
+[policy trial](slurm-policy.md) enabled and verified limits separately. Creating
+accounts alone is not proof that quota or priority is enforced. The existing two-node compute partition remained present and returned
 to idle after verification.
 
 ## Real GPU execution
@@ -59,7 +60,7 @@ claimed. GPU reservation is not GPU utilization.
 
 Open work: qualified model environment/identity enforcement, API submission and
 result transport across non-shared worker filesystems, scoped SSH credentials,
-Slurm account/QOS enforcement and priority demonstrations, job/step utilization,
+cross-user account/QOS isolation, job/step utilization,
 device cgroups, failure/cancellation recovery and PostgreSQL usage integration.
 The NPU node remains unqualified until its physical device and runtime/model path
 are independently verified.
