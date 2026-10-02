@@ -4,7 +4,9 @@ from kfp import compiler, dsl, kubernetes
 
 
 @dsl.container_component
-def launch(api_url: str, image: str, workload: str, candidate: str, run_key: str):
+def launch(
+    api_url: str, image: str, workload: str, candidate: str, run_key: str, owner_lease_seconds: int
+):
     return dsl.ContainerSpec(
         image=str(image),
         command=["python", "-m", "resource_advisor.launcher"],
@@ -17,6 +19,8 @@ def launch(api_url: str, image: str, workload: str, candidate: str, run_key: str
             candidate,
             "--idempotency-key",
             run_key,
+            "--owner-lease-seconds",
+            owner_lease_seconds,
         ],
     )
 
@@ -29,6 +33,7 @@ def observe(
     candidate: str,
     token_secret: str,
     run_key: str,
+    owner_lease_seconds: int = 60,
 ):
     task = launch(
         api_url=api_url,
@@ -36,6 +41,7 @@ def observe(
         workload=workload,
         candidate=candidate,
         run_key=run_key,
+        owner_lease_seconds=owner_lease_seconds,
     )
     task.set_caching_options(False)
     kubernetes.add_node_selector(task, "kubernetes.io/arch", "amd64")

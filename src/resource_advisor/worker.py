@@ -29,6 +29,7 @@ class Worker:
             return self.store.job(conn, job_id)
 
     def submit_one(self):
+        self.expire_owner_leases()
         event = self.store.claim("submit")
         if not event:
             return False
@@ -126,6 +127,39 @@ class Worker:
                     )
             self.store.finish(event, type(exc).__name__)
         return True
+
+    def expire_owner_leases(self):
+        # Only explicit workflow-owned attempts opt in; ordinary research jobs
+        # must never be stopped because a monitoring client disappeared.
+        with self.store.transaction() as conn:
+            active = list(
+                conn.execute(
+                    select(jobs).where(
+                        jobs.c.state.in_(
+                            [
+                                State.VALIDATED,
+                                State.SUBMITTING,
+                                State.SUBMISSION_UNKNOWN,
+                                State.QUEUED,
+                                State.RUNNING,
+                            ]
+                        )
+                    )
+                ).mappings()
+            )
+        for row in active:
+            try:
+                with self.store.transaction() as conn:
+                    latest = self.store.job(conn, row["id"])
+                    expires = latest["body"].get("owner_lease_expires_at")
+                    if (
+                        latest["state"] not in TERMINAL | {State.CANCEL_REQUESTED, State.COLLECTING}
+                        and expires
+                        and now() >= datetime.fromisoformat(expires)
+                    ):
+                        self.service.request_cancel(conn, latest, reason="OWNER_LEASE_EXPIRED")
+            except Conflict:
+                pass  # Retry the fresh persisted state on the next worker cycle.
 
     def cancel_one(self):
         event = self.store.claim("cancel")

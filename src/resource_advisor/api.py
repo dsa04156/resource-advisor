@@ -250,6 +250,10 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
     def cancel(job_id: str, p=Depends(principal)):
         return service.cancel(p.project, job_id)
 
+    @app.post(PREFIX + "/jobs/{job_id}/heartbeat")
+    def heartbeat(job_id: str, p=Depends(principal)):
+        return service.heartbeat(p.project, job_id)
+
     @app.post(PREFIX + "/results")
     def result(value: ExecutionResult, x_artifact_digest: str = Header(), p=Depends(operator)):
         return service.ingest(p.project, value, x_artifact_digest)

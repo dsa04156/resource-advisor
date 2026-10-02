@@ -40,11 +40,47 @@ hostname verification remain enabled. Never put token values in pipeline
 parameters, run metadata, notebook cells or the image.
 
 Pipeline parameters are `api_url`, `launcher_image` (digest pinned), `workload`,
-`candidate`, `token_secret` (name only), and `run_key`. The workload and runtime
+`candidate`, `token_secret` (name only), `run_key`, and `owner_lease_seconds`
+(default 60). The workload and runtime
 variant must already be registered, qualified and not stale. Start the worker
 with a restricted Kubernetes route before submitting. API and database
 processes must remain reachable for the entire workflow; a launcher success
 alone does not prove artifact delivery or MLflow delivery.
+
+## Workflow cancellation and owner loss
+
+The pipeline explicitly opts its own compute attempt into an ownership lease.
+The launcher renews it through the authenticated
+`POST /api/v1/compute/jobs/{job_id}/heartbeat` endpoint while polling. SIGTERM or
+a polling error still attempts immediate cancellation. If the process is killed
+before cleanup, or its successful submit response is lost, the SQL-persisted
+lease remains available to the worker, which requests cancellation when it expires.
+No project-scoped API token or Kubernetes administrator credential is embedded
+in the launcher image.
+
+This is opt-in for ordinary Job API callers: omitting `owner_lease_seconds` retains
+independent job lifetime. The allowed interval is 15–300 seconds; polling must be
+faster than one third of the lease (the launcher polls every five seconds). Use
+60 seconds or more outside bounded lab tests. Healthy polling cannot extend the
+workload's execution deadline, revive an expired/canceled attempt, or modify
+another project's job. A repeated submit with the same key does not renew the
+lease. Existing requests without the field retain their original idempotency
+digest; enabling a lease is a different request and needs a new run key.
+
+Already completed execution can still produce a validated result after its
+owner disappears; collection has its own deadline. Cancellation acknowledgement
+does not prove resource release. The worker needs a working database and backend
+connection to reconcile and confirm cleanup, so this is not a hard real-time
+resource-release guarantee during infrastructure failure. Use the existing
+backend execution limits as an additional bound. Separate workflows must not
+share a run key unless they deliberately refer to the same execution/retry.
+
+An exit handler alone is insufficient for this failure boundary: Argo's
+[terminate command](https://argo-workflows.readthedocs.io/en/latest/cli/argo_terminate/)
+does not run exit handlers. Kubeflow's
+[ExitHandler](https://www.kubeflow.org/docs/components/pipelines/user-guides/core-functions/control-flow/#exit-handling)
+is useful for normal task completion/failure cleanup but is not the owner-loss
+mechanism here. See [actual cancellation trials](kubeflow-cancellation.md).
 
 ## Acceptance evidence
 

@@ -273,6 +273,7 @@ class JobRequest(Contract):
     study_ref: Ref | None = None
     parent_run_ref: Ref | None = None
     probe_plan_ref: Ref | None = None
+    owner_lease_seconds: int | None = Field(default=None, ge=15, le=300, strict=True)
 
 
 class RecommendationRequest(Contract):

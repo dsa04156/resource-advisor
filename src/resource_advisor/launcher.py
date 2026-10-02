@@ -14,6 +14,9 @@ from .contracts import TERMINAL
 def execute(api_url, token, request, key, deadline_seconds, *, client=None, poll_seconds=5):
     if not key or deadline_seconds <= 0:
         raise ValueError("stable run idempotency key and positive deadline required")
+    owner_lease = request.get("owner_lease_seconds")
+    if owner_lease is not None and not 0 <= poll_seconds < owner_lease / 3:
+        raise ValueError("heartbeat polling must be faster than one third of the owner lease")
     client = client or httpx.Client(
         base_url=api_url.rstrip("/"), headers={"Authorization": "Bearer " + token}, timeout=20
     )
@@ -26,7 +29,11 @@ def execute(api_url, token, request, key, deadline_seconds, *, client=None, poll
         job_id = response.json()["job_id"]
         deadline = time.monotonic() + deadline_seconds
         while time.monotonic() < deadline:
-            response = client.get(prefix + "/" + job_id)
+            response = (
+                client.post(prefix + "/" + job_id + "/heartbeat")
+                if owner_lease is not None
+                else client.get(prefix + "/" + job_id)
+            )
             response.raise_for_status()
             job = response.json()
             if job["state"] in TERMINAL:
@@ -52,6 +59,7 @@ def main():
     parser.add_argument("--candidate", required=True)
     parser.add_argument("--idempotency-key", required=True)
     parser.add_argument("--deadline-seconds", type=int, default=3900)
+    parser.add_argument("--owner-lease-seconds", type=int, default=60)
     args = parser.parse_args()
 
     def terminated(_signum, _frame):
@@ -61,7 +69,12 @@ def main():
     result = execute(
         args.api_url,
         os.environ["RA_API_TOKEN"],
-        {"workload_ref": args.workload, "candidate_ref": args.candidate, "mode": "observe"},
+        {
+            "workload_ref": args.workload,
+            "candidate_ref": args.candidate,
+            "mode": "observe",
+            "owner_lease_seconds": args.owner_lease_seconds,
+        },
         args.idempotency_key,
         args.deadline_seconds,
     )

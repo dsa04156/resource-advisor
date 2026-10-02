@@ -76,6 +76,11 @@ class Service:
         return spec, candidate, variant, cap
 
     def submit(self, project: str, request: JobRequest, key: str):
+        request_body = request.model_dump(mode="json")
+        # Optional ownership must not invalidate pre-upgrade idempotency keys.
+        if request.owner_lease_seconds is None:
+            request_body.pop("owner_lease_seconds")
+        request_digest = signature(request_body)
         if not key or len(key) > 128:
             raise Rejected("Idempotency-Key must contain 1–128 characters")
         try:
@@ -88,7 +93,7 @@ class Service:
                     .first()
                 )
                 if existing:
-                    if existing["request_digest"] != signature(request):
+                    if existing["request_digest"] != request_digest:
                         raise Conflict("idempotency key reused with different request")
                     return self.public_job(existing)
                 spec, candidate, variant, cap = self.bundle(
@@ -146,7 +151,7 @@ class Service:
                     self.check_approval_evidence(conn, project, approval)
                 job_id, attempt_id = "j-" + uuid4().hex, "a-" + uuid4().hex
                 body = {
-                    "request": request.model_dump(mode="json"),
+                    "request": request_body,
                     "attempt_id": attempt_id,
                     "epoch": 1,
                     "workload_signature": signature(spec.identity),
@@ -169,6 +174,10 @@ class Service:
                     if request.mode == "pilot"
                     else list(variant.command),
                 }
+                if request.owner_lease_seconds is not None:
+                    body["owner_lease_expires_at"] = (
+                        now() + timedelta(seconds=request.owner_lease_seconds)
+                    ).isoformat()
                 if spec.identity.task_type == "training":
                     body["training_isolation"] = required(
                         self.store, conn, "training_isolation", spec.ref, project
@@ -178,7 +187,7 @@ class Service:
                         id=job_id,
                         project=project,
                         idempotency_key=key,
-                        request_digest=signature(request),
+                        request_digest=request_digest,
                         state=State.VALIDATED,
                         epoch=1,
                         version=1,
@@ -197,7 +206,7 @@ class Service:
                     .mappings()
                     .first()
                 )
-                if row and row["request_digest"] == signature(request):
+                if row and row["request_digest"] == request_digest:
                     return self.public_job(row)
             raise Conflict("concurrent immutable write; retry with the same key") from None
 
@@ -224,6 +233,8 @@ class Service:
                     "cancel_requested_at",
                     "cancel_dispatch_started_at",
                     "cancel_acknowledged_at",
+                    "owner_lease_expires_at",
+                    "owner_last_heartbeat_at",
                 ]
             },
         }
@@ -241,12 +252,36 @@ class Service:
             if not row or row["project"] != project:
                 raise NotFound("job not found")
             if row["state"] not in TERMINAL:
-                body = dict(row["body"])
-                body.setdefault("cancel_before_submit", row["state"] == State.VALIDATED)
-                self.store.change_job(conn, row, State.CANCEL_REQUESTED, body)
-                self.store.enqueue(
-                    conn, "cancel-" + row["body"]["attempt_id"], "cancel", {"job_id": job_id}
-                )
+                self.request_cancel(conn, row)
+            return self.public_job(self.store.job(conn, job_id))
+
+    def request_cancel(self, conn, row, *, reason=None):
+        body = dict(row["body"])
+        body.setdefault("cancel_before_submit", row["state"] == State.VALIDATED)
+        if reason:
+            body["error"] = reason
+        self.store.change_job(conn, row, State.CANCEL_REQUESTED, body)
+        self.store.enqueue(conn, "cancel-" + body["attempt_id"], "cancel", {"job_id": row["id"]})
+
+    def heartbeat(self, project, job_id):
+        with self.store.transaction() as conn:
+            row = self.store.job(conn, job_id)
+            if not row or row["project"] != project:
+                raise NotFound("job not found")
+            seconds = row["body"]["request"].get("owner_lease_seconds")
+            if seconds is None:
+                raise Rejected("job has no workflow ownership lease")
+            if row["state"] not in TERMINAL | {State.CANCEL_REQUESTED, State.COLLECTING}:
+                stamp = now()
+                if stamp >= datetime.fromisoformat(row["body"]["owner_lease_expires_at"]):
+                    self.request_cancel(conn, row, reason="OWNER_LEASE_EXPIRED")
+                else:
+                    body = dict(
+                        row["body"],
+                        owner_last_heartbeat_at=stamp.isoformat(),
+                        owner_lease_expires_at=(stamp + timedelta(seconds=seconds)).isoformat(),
+                    )
+                    self.store.change_job(conn, row, row["state"], body)
             return self.public_job(self.store.job(conn, job_id))
 
     def ingest(

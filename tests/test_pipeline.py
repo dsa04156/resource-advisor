@@ -27,6 +27,11 @@ def test_compiled_launcher_does_not_request_gpu_or_cache(tmp_path):
     assert "kubernetes.io/arch" in output.read_text()
     assert "SSL_CERT_FILE" in output.read_text()
     assert "/var/run/resource-advisor/ca.crt" in output.read_text()
+    assert "--owner-lease-seconds" in container["args"]
+    assert (
+        pipeline["root"]["inputDefinitions"]["parameters"]["owner_lease_seconds"]["defaultValue"]
+        == 60
+    )
 
 
 def test_server_requires_both_tls_files(monkeypatch):

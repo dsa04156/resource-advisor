@@ -41,6 +41,8 @@ The [supervised worker crash trial](docs/worker-recovery.md) kills the controlle
 after accepted GPU submission and verifies recovery without another Job creation.
 The [GPU cancellation trials](docs/cancellation-verification.md) separate request
 from confirmed cancellation and preserve completed results across worker restart.
+The [Kubeflow cancellation trials](docs/kubeflow-cancellation.md) confirm external
+GPU cleanup after workflow termination and uncatchable launcher process loss.
 
 ## Responsibility
 

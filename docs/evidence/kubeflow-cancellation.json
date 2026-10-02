@@ -1,0 +1,155 @@
+{
+  "evidence_kind": "real_hardware",
+  "accelerator": "NVIDIA GeForce RTX 5080",
+  "compute_preparation_wait_seconds": 30,
+  "useful_compute_measured": false,
+  "trials": [
+    {
+      "scenario": "terminate",
+      "pipeline_run_id": "cd8085b8-81d9-43b7-8002-1ac12c697814",
+      "pipeline_terminal_state": "FAILED",
+      "compute_job_id": "j-2c3b6d672078490a994e63de8093d971",
+      "attempt_id": "a-0c323b90372b4ba2873ad97c52f1054d",
+      "compute_terminal_state": "CANCELED",
+      "error": null,
+      "cuda_initialized": true,
+      "owner_lease_seconds": 60,
+      "interruption_at": "2026-10-02T12:19:46.167157+00:00",
+      "times": {
+        "owner_last_heartbeat_at": "2026-10-02T12:19:42.818139+00:00",
+        "owner_lease_expires_at": "2026-10-02T12:20:42.818139+00:00",
+        "cancel_requested_at": "2026-10-02T12:19:46.346705+00:00",
+        "cancel_dispatch_started_at": "2026-10-02T12:19:49.313832+00:00",
+        "cancel_acknowledged_at": "2026-10-02T12:19:49.366427+00:00",
+        "finished_at": "2026-10-02T12:19:59.705008+00:00"
+      },
+      "interruption_to_confirmed_seconds": 13.537851,
+      "launcher_resources": {
+        "limits": {
+          "cpu": "1",
+          "memory": "256Mi"
+        },
+        "requests": {
+          "cpu": "100m",
+          "memory": "128Mi"
+        }
+      },
+      "launcher_exit_code": 143,
+      "launcher_exit_reason": "Error",
+      "ledger_records": 1,
+      "result_records": 0,
+      "allocated_device_seconds": null,
+      "observed_allocation": {
+        "source": "kubernetes:scheduled workload container requests",
+        "accelerator_count": 1.0,
+        "cpu": 1.0,
+        "memory_mib": 2048.0
+      },
+      "uncertainty": [
+        "ALLOCATION_INTERVAL_UNKNOWN",
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "external_job_and_pods_absent": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "KILLED",
+      "outbox": [
+        {
+          "kind": "cancel",
+          "status": "DONE",
+          "tries": 1
+        },
+        {
+          "kind": "submit",
+          "status": "DONE",
+          "tries": 1
+        },
+        {
+          "kind": "mlflow",
+          "status": "DONE",
+          "tries": 1
+        }
+      ]
+    },
+    {
+      "scenario": "sigkill",
+      "pipeline_run_id": "0d57193f-c088-4478-bcc5-d22a232f50c6",
+      "pipeline_terminal_state": "FAILED",
+      "compute_job_id": "j-ddde4db829ff4ebe9c895a219f9e635d",
+      "attempt_id": "a-49cf886f3ae34d4aa6bebabfb531a2b3",
+      "compute_terminal_state": "CANCELED",
+      "error": "OWNER_LEASE_EXPIRED",
+      "cuda_initialized": true,
+      "owner_lease_seconds": 20,
+      "interruption_at": "2026-10-02T12:20:53.026813+00:00",
+      "times": {
+        "owner_last_heartbeat_at": "2026-10-02T12:20:49.207355+00:00",
+        "owner_lease_expires_at": "2026-10-02T12:21:09.207355+00:00",
+        "cancel_requested_at": "2026-10-02T12:21:11.517091+00:00",
+        "cancel_dispatch_started_at": "2026-10-02T12:21:11.623542+00:00",
+        "cancel_acknowledged_at": "2026-10-02T12:21:11.675142+00:00",
+        "finished_at": "2026-10-02T12:21:16.978797+00:00"
+      },
+      "interruption_to_confirmed_seconds": 23.951984,
+      "launcher_resources": {
+        "limits": {
+          "cpu": "1",
+          "memory": "256Mi"
+        },
+        "requests": {
+          "cpu": "100m",
+          "memory": "128Mi"
+        }
+      },
+      "launcher_exit_code": 1,
+      "launcher_exit_reason": "Error",
+      "ledger_records": 1,
+      "result_records": 0,
+      "allocated_device_seconds": null,
+      "observed_allocation": {
+        "source": "kubernetes:scheduled workload container requests",
+        "accelerator_count": 1.0,
+        "cpu": 1.0,
+        "memory_mib": 2048.0
+      },
+      "uncertainty": [
+        "ALLOCATION_INTERVAL_UNKNOWN",
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "external_job_and_pods_absent": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "KILLED",
+      "outbox": [
+        {
+          "kind": "submit",
+          "status": "DONE",
+          "tries": 1
+        },
+        {
+          "kind": "cancel",
+          "status": "DONE",
+          "tries": 1
+        },
+        {
+          "kind": "mlflow",
+          "status": "DONE",
+          "tries": 1
+        }
+      ],
+      "injection": "SIGKILL to the sole Python launcher child process; no signal cleanup",
+      "expiry_to_cancel_request_seconds": 2.309736
+    }
+  ],
+  "worker_image_digest": "sha256:82d69a8ea1d38f5adb5641c802459cb2759974273ca3d50c9b321b4587d3b479",
+  "api_and_launcher_image_digest": "sha256:2f2c6636ae1985ef6f7fd7c62f1a70063a21fd44193009b942e8fb7ce59f6a05",
+  "final_cluster": {
+    "nodes": 10,
+    "ready": 10,
+    "pressure_nodes": 0
+  },
+  "final_local_queue": {
+    "pendingWorkloads": 0,
+    "admittedWorkloads": 0,
+    "reservingWorkloads": 0
+  },
+  "unfinished_outbox": 0
+}
