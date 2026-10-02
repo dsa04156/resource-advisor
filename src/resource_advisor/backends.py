@@ -66,6 +66,9 @@ def identity_environment(job):
         "RA_CONTEXT_SIGNATURE": b["context_signature"],
         "RA_CONTEXT_JSON": json.dumps(b["candidate"]["context"], separators=(",", ":")),
         "RA_WORK_UNITS": str(b["spec"]["identity"]["work_units"]),
+        "RA_INPUT_SHAPE": json.dumps(b["spec"]["identity"]["input_shape"]),
+        "RA_PRECISION": b["spec"]["identity"]["precision"],
+        "RA_SEED": str(b["spec"]["identity"]["seed"]),
     }
 
 
@@ -117,7 +120,7 @@ class KubernetesBackend:
             "spec": {
                 "suspend": True,
                 "backoffLimit": 0,
-                "activeDeadlineSeconds": b["spec"]["profiling"]["max_wall_seconds_per_candidate"],
+                "activeDeadlineSeconds": b["spec"]["execution"]["max_run_seconds"],
                 "template": {
                     "spec": {
                         "restartPolicy": "Never",
@@ -179,27 +182,60 @@ class KubernetesBackend:
             self.prefix
             + ["get", "job", job["body"]["external_id"], "--ignore-not-found", "-o", "json"]
         )
+        pods = json.loads(
+            self.execute(
+                self.prefix
+                + ["get", "pods", "-l", "job-name=" + job["body"]["external_id"], "-o", "json"]
+            )
+        )["items"]
         if not raw.strip():
             if job["state"] == State.CANCEL_REQUESTED:
-                return Observation(State.CANCELED)
+                active = any(
+                    p.get("status", {}).get("phase") not in {"Succeeded", "Failed"} for p in pods
+                )
+                return Observation(State.CANCEL_REQUESTED if active else State.CANCELED)
             raise BackendError("Job missing; disappearance is not successful completion")
         obj = json.loads(raw)
         status = obj.get("status", {})
+        pods = [
+            p
+            for p in pods
+            if any(
+                owner.get("uid") == obj["metadata"].get("uid")
+                for owner in p["metadata"].get("ownerReferences", [])
+            )
+        ]
+        if len(pods) > 1:
+            raise BackendError("unexpected multiple Pods for a single non-retrying attempt")
+        pod_status = pods[0].get("status", {}) if pods else {}
+        scheduled = next(
+            (
+                c.get("lastTransitionTime")
+                for c in pod_status.get("conditions", [])
+                if c["type"] == "PodScheduled" and c["status"] == "True"
+            ),
+            None,
+        )
+        container = next(
+            (
+                c.get("state", {})
+                for c in pod_status.get("containerStatuses", [])
+                if c["name"] == "workload"
+            ),
+            {},
+        )
+        finished = container.get("terminated", {}).get("finishedAt")
         for condition in status.get("conditions", []):
             if condition["type"] == "Complete" and condition["status"] == "True":
-                return Observation(
-                    State.COLLECTING, status.get("startTime"), status.get("completionTime")
-                )
+                return Observation(State.COLLECTING, scheduled, finished)
             if condition["type"] == "Failed" and condition["status"] == "True":
                 return Observation(
                     State.FAILED,
-                    status.get("startTime"),
-                    condition.get("lastTransitionTime"),
+                    scheduled,
+                    finished,
                     condition.get("reason", "BACKEND_FAILED"),
                 )
-        return Observation(
-            State.RUNNING if status.get("active") else State.QUEUED, status.get("startTime")
-        )
+        return Observation(State.RUNNING if "running" in container else State.QUEUED, scheduled)
 
     def cancel(self, job):
         self.execute(
@@ -261,7 +297,7 @@ class SlurmBackend:
         node = b["capability"]["node_ref"]
         if not re.fullmatch(r"[A-Za-z0-9_.-]+", node):
             raise BackendError("invalid qualified node reference")
-        seconds = b["spec"]["profiling"]["max_wall_seconds_per_candidate"]
+        seconds = b["spec"]["execution"]["max_run_seconds"]
         directives = [
             f"--job-name={b['attempt_id']}",
             f"--comment=resource-advisor:{job['id']}",

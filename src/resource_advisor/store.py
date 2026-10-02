@@ -151,7 +151,13 @@ class Store:
                 select(outbox)
                 .where(
                     outbox.c.kind == kind,
-                    (outbox.c.status == "PENDING")
+                    (
+                        (outbox.c.status == "PENDING")
+                        & (
+                            (outbox.c.lease_until.is_(None))
+                            | (outbox.c.lease_until < now().isoformat())
+                        )
+                    )
                     | ((outbox.c.status == "LEASED") & (outbox.c.lease_until < now().isoformat())),
                 )
                 .order_by(outbox.c.id)
@@ -172,7 +178,11 @@ class Store:
                     lease_until=(now() + timedelta(seconds=seconds)).isoformat(),
                 )
             )
-            return dict(row, lease_token=token) if result.rowcount == 1 else None
+            return (
+                dict(row, lease_token=token, tries=row["tries"] + 1)
+                if result.rowcount == 1
+                else None
+            )
 
     def finish(self, event, error: str | None = None):
         with self.transaction() as conn:
@@ -182,7 +192,11 @@ class Store:
                 .values(
                     status="PENDING" if error else "DONE",
                     last_error=error,
-                    lease_until=None,
+                    lease_until=(
+                        now() + timedelta(seconds=min(300, 2 ** min(event["tries"], 8)))
+                    ).isoformat()
+                    if error
+                    else None,
                     lease_token=None,
                 )
             )

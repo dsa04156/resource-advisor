@@ -97,6 +97,7 @@ class RuntimeVariant(Contract):
     ref: Ref
     workload_ref: Ref
     project_ref: Ref
+    workload_signature: Digest
     arch: Literal["amd64", "arm64"]
     accelerator_vendor: str
     device_class: Literal["gpu", "npu", "cpu"]
@@ -180,6 +181,12 @@ class QualityPolicy(Contract):
     max_profile_age_seconds: int = Field(default=86400, ge=1)
 
 
+class ExecutionPolicy(Contract):
+    max_run_seconds: int = Field(default=3600, ge=1, le=86400)
+    max_queue_seconds: int = Field(default=600, ge=1, le=86400)
+    max_collection_seconds: int = Field(default=300, ge=1, le=3600)
+
+
 class WorkloadSpec(Contract):
     schema_version: Literal["v1"] = "v1"
     ref: Ref
@@ -189,6 +196,7 @@ class WorkloadSpec(Contract):
     baseline_candidate_ref: Ref
     profiling: ProfilingPolicy = Field(default_factory=ProfilingPolicy)
     quality: QualityPolicy
+    execution: ExecutionPolicy = Field(default_factory=ExecutionPolicy)
 
     @model_validator(mode="after")
     def approved_space(self):

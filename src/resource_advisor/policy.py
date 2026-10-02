@@ -41,6 +41,7 @@ def compatibility(
         "VENDOR_MISMATCH": variant.accelerator_vendor != cap.accelerator_vendor,
         "DEVICE_CLASS_MISMATCH": variant.device_class != cap.device_class,
         "MODEL_MISMATCH": variant.model_digest != spec.identity.model_digest,
+        "LOGICAL_WORKLOAD_MISMATCH": variant.workload_signature != signature(spec.identity),
         "PRECISION_MISMATCH": variant.precision != spec.identity.precision,
         "INPUT_SHAPE_UNVERIFIED": spec.identity.input_shape not in variant.supported_shapes,
         "ENVIRONMENT_MISMATCH": not (

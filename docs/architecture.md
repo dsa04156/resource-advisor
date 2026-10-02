@@ -62,12 +62,29 @@ failures and canceled jobs still need reconciliation into the ledger.
 - MLflow metadata delivery is retryable, not globally exactly-once: a crash
   during external run creation can require duplicate reconciliation. Artifact
   upload and per-project MLflow access segregation remain deployment work.
-- Multi-worker contention, worker restarts, bounded collection retries,
-  PostgreSQL restore, Slurm accounting, pipeline compilation, GPU/NPU model
-  execution, and real quota/priority scenarios require additional verification.
+- PostgreSQL persistence and backup/restore, bounded result collection, and KFP
+  compilation are verified in the initial suite. Multi-worker contention,
+  process-crash recovery, Slurm accounting, GPU/NPU model execution and real
+  quota/priority scenarios require additional verification.
 - No pilot/BO, MF-KG, RGPE, interference optimization or custom dashboard is
   presented as working in this release.
 
 Use separate service accounts, namespaces, LocalQueues, allowlisted node pools,
 Slurm accounts/QOS and an independent database. Runtime jobs stay outside GitOps.
 Never commit site endpoints, credentials or private documentation.
+
+## Workflow and benchmark integration
+
+`examples/pipeline.py` compiles a CPU-only launcher. The token comes from a
+Kubernetes Secret, not a pipeline parameter. A caller supplies a stable run key;
+retries reuse it. Caching is disabled. SIGTERM or launcher timeout requests
+cancellation; SIGKILL cannot run cleanup, so backend execution/queue deadlines
+are also enforced. See the [official KFP caching contract](https://www.kubeflow.org/docs/components/pipelines/user-guides/core-functions/caching/).
+
+`gpu_benchmark.py` is a bounded cooperative PyTorch CUDA matrix-multiplication
+runner. It refuses CPU fallback, checks device/runtime identity, synchronizes
+the GPU, checks numerical agreement, and emits the result envelope. It is **not
+yet hardware-validated**. Memory means PyTorch peak allocated device memory;
+it is not total board memory. Power, temperature and utilization remain null
+until a qualified telemetry source supplies them. It does not implement CNN,
+transformer or NPU model benchmarks yet.

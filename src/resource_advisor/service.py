@@ -164,6 +164,8 @@ class Service:
                     "context_signature",
                     "error",
                     "result_digest",
+                    "last_observation_error",
+                    "last_observation_error_at",
                 ]
             },
         }
@@ -181,7 +183,9 @@ class Service:
             if not row or row["project"] != project:
                 raise NotFound("job not found")
             if row["state"] not in TERMINAL:
-                self.store.change_job(conn, row, State.CANCEL_REQUESTED, row["body"])
+                body = dict(row["body"])
+                body.setdefault("cancel_before_submit", row["state"] == State.VALIDATED)
+                self.store.change_job(conn, row, State.CANCEL_REQUESTED, body)
                 self.store.enqueue(
                     conn, "cancel-" + row["body"]["attempt_id"], "cancel", {"job_id": job_id}
                 )

@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from resource_advisor.contracts import (
@@ -13,7 +15,7 @@ from resource_advisor.contracts import (
     signature,
 )
 from resource_advisor.service import Service
-from resource_advisor.store import Store
+from resource_advisor.store import Store, metadata
 
 
 @pytest.fixture
@@ -54,10 +56,24 @@ def bundle():
         reservation_verified=True,
         evidence_refs=("fixture-reservation",),
     )
+    identity = WorkloadIdentity(
+        code_digest=digest,
+        model_digest=digest,
+        dataset_version="fixture-v1",
+        config_digest=digest,
+        task_type="inference",
+        input_shape=(1, 3, 32, 32),
+        batch_size=1,
+        precision="fp32",
+        work_units=10,
+        quality_contract_digest=signature(quality),
+        measurement_boundary="fixture-forward-only",
+    )
     variant = RuntimeVariant(
         ref="variant-1",
         workload_ref="workload-1",
         project_ref="team-a",
+        workload_signature=signature(identity),
         arch="arm64",
         accelerator_vendor="nvidia",
         device_class="gpu",
@@ -78,19 +94,6 @@ def bundle():
         backend="kubernetes",
         context=context,
     )
-    identity = WorkloadIdentity(
-        code_digest=digest,
-        model_digest=digest,
-        dataset_version="fixture-v1",
-        config_digest=digest,
-        task_type="inference",
-        input_shape=(1, 3, 32, 32),
-        batch_size=1,
-        precision="fp32",
-        work_units=10,
-        quality_contract_digest=signature(quality),
-        measurement_boundary="fixture-forward-only",
-    )
     spec = WorkloadSpec(
         ref="workload-1",
         project_ref="team-a",
@@ -104,10 +107,18 @@ def bundle():
 
 @pytest.fixture
 def service(bundle):
-    store = Store("sqlite://")
+    url = os.getenv("RA_TEST_DATABASE_URL", "sqlite://")
+    store = Store(url)
+    if url != "sqlite://":
+        if not (store.engine.url.database or "").startswith("ra_test_"):
+            raise ValueError(
+                "destructive test reset is allowed only in a dedicated ra_test_* database"
+            )
+        metadata.drop_all(store.engine)
     store.initialize()
     svc = Service(store, accept_synthetic=True)
     spec, _, variant, cap = bundle
     for kind, model in [("workload", spec), ("variant", variant), ("capability", cap)]:
         svc.register(kind, model, "team-a")
-    return svc
+    yield svc
+    store.engine.dispose()

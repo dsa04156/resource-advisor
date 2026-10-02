@@ -4,7 +4,8 @@ An independent, evidence-based resource recommendation and execution service
 for heterogeneous Kubernetes/KubeEdge and Slurm compute pools.
 
 **Status: initial implementation, not a completed production platform.**
-Current tests use explicitly synthetic data. No GPU/NPU benchmark or live
+Performance fixtures use explicitly synthetic data. PostgreSQL persistence and
+restore have been tested against a real, isolated instance. No GPU/NPU benchmark or live
 scheduler integration result is implied by a passing unit test.
 
 ## Responsibility
@@ -70,7 +71,8 @@ schema upgrades and an operational migration process are not yet implemented.
 - Digest/schema/attempt validation; quality-gated historical profiles.
 - Lookup recommendations with independent-run counts, uncertainty and approval.
 - Device allocation units stay separate; missing scheduler times remain null.
-- Prometheus job/outbox metrics.
+- Prometheus job/outbox metrics; compiled CPU-only KFP launcher with caching off.
+- Cooperative CUDA matmul runner provided for subsequent hardware qualification.
 
 Pilot execution and BO search are deliberately rejected until the budgeted
 worker and independent confirmation are implemented. NPU readiness requires
@@ -78,3 +80,5 @@ actual model validation; hardware detection alone is insufficient.
 
 See [implementation ledger](docs/implementation.md) and
 [architecture and operational limits](docs/architecture.md).
+For the current evidence see [verification](docs/verification.md); for an easy
+Korean explanation see [the walkthrough](docs/walkthrough.ko.md).

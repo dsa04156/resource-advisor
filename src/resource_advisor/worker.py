@@ -7,6 +7,7 @@ from sqlalchemy import select
 
 from .backends import BackendError, SubmissionUnknown
 from .contracts import TERMINAL, ExecutionResult, State, now, signature
+from .policy import compatibility
 from .service import Rejected
 from .store import Conflict, jobs
 
@@ -43,6 +44,24 @@ class Worker:
                         "no matching external job yet; operator resolution required"
                     )
             elif row["state"] == State.VALIDATED:
+                with self.store.transaction() as conn:
+                    args = self.service.bundle(
+                        conn,
+                        row["project"],
+                        row["body"]["spec"]["ref"],
+                        row["body"]["candidate"]["ref"],
+                    )
+                    errors = compatibility(*args)
+                    if errors:
+                        self.store.change_job(
+                            conn,
+                            row,
+                            State.FAILED,
+                            dict(row["body"], error="PRE_SUBMISSION:" + ",".join(errors)),
+                        )
+                if errors:
+                    self.store.finish(event)
+                    return True
                 # Commit intent before the remote call. A crash now must reconcile.
                 with self.store.transaction() as conn:
                     self.store.change_job(conn, row, State.SUBMITTING, row["body"])
@@ -81,6 +100,11 @@ class Worker:
         try:
             row = self._row(event["body"]["job_id"])
             if row["state"] in TERMINAL:
+                self.store.finish(event)
+                return True
+            if row["body"].get("cancel_before_submit"):
+                with self.store.transaction() as conn:
+                    self.store.change_job(conn, row, State.CANCELED, row["body"])
                 self.store.finish(event)
                 return True
             if not row["body"].get("external_id"):
@@ -129,11 +153,21 @@ class Worker:
                         if value:
                             body[key] = value
                     state = observation.state
+                    if state == State.COLLECTING:
+                        body.setdefault("collecting_since", now().isoformat())
+                        collection_age = (
+                            now() - datetime.fromisoformat(body["collecting_since"])
+                        ).total_seconds()
+                        if collection_age > body["spec"]["execution"]["max_collection_seconds"]:
+                            state, body["error"] = (
+                                State.RESULT_INVALID,
+                                "RESULT_COLLECTION_DEADLINE",
+                            )
                     if latest["state"] == State.CANCEL_REQUESTED and state not in TERMINAL:
                         state = State.CANCEL_REQUESTED
                     if state == State.QUEUED and body.get("queued_at"):
                         wait = (now() - datetime.fromisoformat(body["queued_at"])).total_seconds()
-                        if wait > body["spec"]["profiling"]["max_queue_seconds"]:
+                        if wait > body["spec"]["execution"]["max_queue_seconds"]:
                             state, body["error"] = State.CANCEL_REQUESTED, "QUEUE_DEADLINE_EXCEEDED"
                             self.store.enqueue(
                                 conn,
@@ -146,11 +180,24 @@ class Worker:
                     envelope = backend.result(row)
                     result = ExecutionResult.model_validate(envelope["result"])
                     self.service.ingest(row["project"], result, envelope["digest"])
-            except (BackendError, Conflict, Rejected, ValueError, KeyError):
-                # A temporary collector/transport failure does not mean workload failure.
-                # Visible in worker metrics/logs; successful backend without a valid result
-                # remains COLLECTING, never silently SUCCEEDED.
-                continue
+            except (BackendError, Conflict, Rejected, ValueError, KeyError) as exc:
+                # Transport errors are observable without falsely failing a running workload.
+                try:
+                    with self.store.transaction() as conn:
+                        latest = self.store.job(conn, row["id"])
+                        if latest["state"] not in TERMINAL:
+                            self.store.change_job(
+                                conn,
+                                latest,
+                                latest["state"],
+                                dict(
+                                    latest["body"],
+                                    last_observation_error=type(exc).__name__,
+                                    last_observation_error_at=now().isoformat(),
+                                ),
+                            )
+                except Conflict:
+                    pass  # Another worker already changed this version.
 
 
 class MLflowDelivery:

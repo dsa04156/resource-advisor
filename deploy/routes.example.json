@@ -1,0 +1,27 @@
+{
+  "routes": [
+    {
+      "project": "team-a",
+      "cluster": "lab-kubernetes",
+      "backend": "kubernetes",
+      "options": {
+        "namespace": "resource-advisor-team-a",
+        "local_queue": "research",
+        "node_selector": {"resource-advisor/pool": "qualified-lab"},
+        "kubeconfig": "/run/resource-advisor/kubeconfig"
+      }
+    },
+    {
+      "project": "team-a",
+      "cluster": "lab-slurm",
+      "backend": "slurm",
+      "options": {
+        "partition": "gpu",
+        "account": "team-a",
+        "qos": "research",
+        "output_dir": "/var/lib/resource-advisor/results",
+        "ssh_target": "resource-advisor-slurm"
+      }
+    }
+  ]
+}

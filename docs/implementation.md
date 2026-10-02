@@ -9,13 +9,13 @@ No private design document or site configuration belongs in this repository.
 
 | Milestone | Required evidence | Initial state |
 |---|---|---|
-| M0 | Read-only inventory, versions, allowlists, separate backend pools | In progress |
-| M1 | KFP launcher → API → suspended Kubernetes Job → result + MLflow | Pending |
-| M2 | Slurm submission/status/cancel/results on qualified GPU/NPU | GPU available; NPU link unavailable |
+| M0 | Read-only inventory, versions, allowlists, separate backend pools | Existing versions reviewed; live service qualification pending |
+| M1 | KFP launcher → API → suspended Kubernetes Job → result + MLflow | API/worker implemented; KFP compiled; live end-to-end pending |
+| M2 | Slurm submission/status/cancel/results on qualified GPU/NPU | Adapter implemented; new service live qualification pending; NPU link unavailable |
 | M3 | Actual Kueue and Slurm quota/account enforcement, unit-separated ledger | Pending |
-| M4 | Immutable variants, two signatures, consent/budgets, quality-gated profiles | In progress |
+| M4 | Immutable variants, two signatures, consent/budgets, quality-gated profiles | Contracts/lookup/approval tested; budgeted pilot worker pending |
 | M5 | Lookup/random/qLogNEI ask/execute/observe/final-confirmation | Pending |
-| M6 | Authorization, idempotency, failure/recovery, E0–E7, S0–S2 comparison | Pending |
+| M6 | Authorization, idempotency, failure/recovery, E0–E7, S0–S2 comparison | Initial contract/failure suite and PostgreSQL restore verified; experiments pending |
 | M7 | Shared GPU interference and conditional MF/transfer | Explicit extension |
 
 ## Implementation sequence
