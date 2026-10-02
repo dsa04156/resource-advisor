@@ -144,6 +144,26 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
     def cancel_study(ref: str, p=Depends(principal)):
         return study_service.cancel(p.project, ref)
 
+    from .fidelity import FidelityCalibration, FidelityPlan
+
+    fidelity = FidelityCalibration(service)
+
+    @app.post(PREFIX + "/fidelity-plans")
+    def create_fidelity_plan(value: FidelityPlan, p=Depends(operator)):
+        return fidelity.create(p.project, value)
+
+    @app.get(PREFIX + "/fidelity-plans/{ref}")
+    def get_fidelity_plan(ref: str, p=Depends(principal)):
+        return fidelity.get(p.project, ref)
+
+    @app.post(PREFIX + "/fidelity-plans/{ref}/slots/{slot}")
+    def submit_fidelity_slot(ref: str, slot: int, p=Depends(principal)):
+        return fidelity.submit_slot(p.project, ref, slot)
+
+    @app.get(PREFIX + "/fidelity-plans/{ref}/assessment")
+    def fidelity_assessment(ref: str, p=Depends(principal)):
+        return fidelity.assess(p.project, ref)
+
     @app.post(PREFIX + "/capabilities")
     def register_capability(value: CapabilitySnapshot, p=Depends(operator)):
         return service.register("capability", value, p.project)

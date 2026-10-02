@@ -43,6 +43,9 @@ The [GPU cancellation trials](docs/cancellation-verification.md) separate reques
 from confirmed cancellation and preserve completed results across worker restart.
 The [Kubeflow cancellation trials](docs/kubeflow-cancellation.md) confirm external
 GPU cleanup after workflow termination and uncatchable launcher process loss.
+The [paired calibration protocol](docs/fidelity-calibration.md) preregisters
+short/long measurement comparisons and prevents replication-only evidence from
+being mislabeled as qualified multi-fidelity optimization.
 
 ## Responsibility
 

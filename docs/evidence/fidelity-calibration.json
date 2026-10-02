@@ -1,0 +1,1059 @@
+{
+  "evidence_kind": "real_hardware",
+  "plan": {
+    "plan": {
+      "ref": "pair-plan-124014-r2",
+      "project_ref": "ra-lab",
+      "cells": [
+        {
+          "arm": "cpu1",
+          "phase": "F1",
+          "workload_ref": "pair-124014-cpu1-F1",
+          "candidate_ref": "baseline"
+        },
+        {
+          "arm": "cpu1",
+          "phase": "F2",
+          "workload_ref": "pair-124014-cpu1-F2",
+          "candidate_ref": "baseline"
+        },
+        {
+          "arm": "cpu1",
+          "phase": "F3",
+          "workload_ref": "pair-124014-cpu1-F2",
+          "candidate_ref": "baseline"
+        },
+        {
+          "arm": "cpu2",
+          "phase": "F1",
+          "workload_ref": "pair-124014-cpu2-F1",
+          "candidate_ref": "baseline"
+        },
+        {
+          "arm": "cpu2",
+          "phase": "F2",
+          "workload_ref": "pair-124014-cpu2-F2",
+          "candidate_ref": "baseline"
+        },
+        {
+          "arm": "cpu2",
+          "phase": "F3",
+          "workload_ref": "pair-124014-cpu2-F2",
+          "candidate_ref": "baseline"
+        }
+      ],
+      "blocks": 3,
+      "seed": 20261002,
+      "total_wall_seconds": 900,
+      "reserved_device_seconds": 600.0,
+      "relative_tie_band": 0.05,
+      "sampling_policy": "identical_input_repetition"
+    },
+    "registered_at": "2026-10-02T12:49:47.735835+00:00",
+    "group_signature": "sha256:79040dc613c3e0d617c9fd839e6d9da6ba3f602dc12577bbad6f609731d48748",
+    "schedule": [
+      {
+        "arm": "cpu1",
+        "phase": "F1",
+        "workload_ref": "pair-124014-cpu1-F1",
+        "candidate_ref": "baseline",
+        "work_units": 10,
+        "workload_digest": "sha256:4b7f24b2318bde7328a8b6c6b4dfd2b3097701fba79a555983d097be3eeb3210",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 0,
+        "block": 0
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F1",
+        "workload_ref": "pair-124014-cpu2-F1",
+        "candidate_ref": "baseline",
+        "work_units": 10,
+        "workload_digest": "sha256:754c09e3f7bffcf01a3d91785063fcef2a82baac2530e78a12ac94753bb48503",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 1,
+        "block": 0
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F2",
+        "workload_ref": "pair-124014-cpu2-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:c1af0d82f06d739b60ab66fb729178d7d77746cbf9376dbacc599a87b87b777d",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 2,
+        "block": 0
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F3",
+        "workload_ref": "pair-124014-cpu1-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:d2fcf1aa2b7455f58817fed78e9857193c41ff8047f540f858127f001bfe173e",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 3,
+        "block": 0
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F3",
+        "workload_ref": "pair-124014-cpu2-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:c1af0d82f06d739b60ab66fb729178d7d77746cbf9376dbacc599a87b87b777d",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 4,
+        "block": 0
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F2",
+        "workload_ref": "pair-124014-cpu1-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:d2fcf1aa2b7455f58817fed78e9857193c41ff8047f540f858127f001bfe173e",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 5,
+        "block": 0
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F3",
+        "workload_ref": "pair-124014-cpu2-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:c1af0d82f06d739b60ab66fb729178d7d77746cbf9376dbacc599a87b87b777d",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 6,
+        "block": 1
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F2",
+        "workload_ref": "pair-124014-cpu2-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:c1af0d82f06d739b60ab66fb729178d7d77746cbf9376dbacc599a87b87b777d",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 7,
+        "block": 1
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F2",
+        "workload_ref": "pair-124014-cpu1-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:d2fcf1aa2b7455f58817fed78e9857193c41ff8047f540f858127f001bfe173e",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 8,
+        "block": 1
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F3",
+        "workload_ref": "pair-124014-cpu1-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:d2fcf1aa2b7455f58817fed78e9857193c41ff8047f540f858127f001bfe173e",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 9,
+        "block": 1
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F1",
+        "workload_ref": "pair-124014-cpu2-F1",
+        "candidate_ref": "baseline",
+        "work_units": 10,
+        "workload_digest": "sha256:754c09e3f7bffcf01a3d91785063fcef2a82baac2530e78a12ac94753bb48503",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 10,
+        "block": 1
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F1",
+        "workload_ref": "pair-124014-cpu1-F1",
+        "candidate_ref": "baseline",
+        "work_units": 10,
+        "workload_digest": "sha256:4b7f24b2318bde7328a8b6c6b4dfd2b3097701fba79a555983d097be3eeb3210",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 11,
+        "block": 1
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F1",
+        "workload_ref": "pair-124014-cpu2-F1",
+        "candidate_ref": "baseline",
+        "work_units": 10,
+        "workload_digest": "sha256:754c09e3f7bffcf01a3d91785063fcef2a82baac2530e78a12ac94753bb48503",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 12,
+        "block": 2
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F2",
+        "workload_ref": "pair-124014-cpu1-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:d2fcf1aa2b7455f58817fed78e9857193c41ff8047f540f858127f001bfe173e",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 13,
+        "block": 2
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F1",
+        "workload_ref": "pair-124014-cpu1-F1",
+        "candidate_ref": "baseline",
+        "work_units": 10,
+        "workload_digest": "sha256:4b7f24b2318bde7328a8b6c6b4dfd2b3097701fba79a555983d097be3eeb3210",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 14,
+        "block": 2
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F3",
+        "workload_ref": "pair-124014-cpu1-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:d2fcf1aa2b7455f58817fed78e9857193c41ff8047f540f858127f001bfe173e",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 15,
+        "block": 2
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F3",
+        "workload_ref": "pair-124014-cpu2-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:c1af0d82f06d739b60ab66fb729178d7d77746cbf9376dbacc599a87b87b777d",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 16,
+        "block": 2
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F2",
+        "workload_ref": "pair-124014-cpu2-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:c1af0d82f06d739b60ab66fb729178d7d77746cbf9376dbacc599a87b87b777d",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 17,
+        "block": 2
+      }
+    ],
+    "planned_device_seconds": 540.0,
+    "design": "randomized complete blocks; independent Job per cell",
+    "method": "paired_replication_calibration"
+  },
+  "assessment": {
+    "plan_ref": "pair-plan-124014-r2",
+    "plan_digest": "sha256:68a02a4f35fde1d37b09890e9ed6c820c4c710de669086d244a3569f51925c11",
+    "rows": [
+      {
+        "arm": "cpu1",
+        "phase": "F1",
+        "workload_ref": "pair-124014-cpu1-F1",
+        "candidate_ref": "baseline",
+        "work_units": 10,
+        "workload_digest": "sha256:4b7f24b2318bde7328a8b6c6b4dfd2b3097701fba79a555983d097be3eeb3210",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 0,
+        "block": 0,
+        "job_id": "j-be0e03720d0b4fa894b212486c1a1ac0",
+        "attempt_id": "a-4cd5ca2cf927482ca7f0d7d43ff40ad5",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:a7793b4f736af139b4701b9b0b1f145ed8b888011d1f669ac169ceda787fb99a",
+        "created_at": "2026-10-02T12:49:47.762940+00:00",
+        "finished_at": "2026-10-02T12:49:57.285229+00:00",
+        "seconds_per_work_unit": 1.4262000331655144e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 1.0,
+        "preparation_seconds": 0.0,
+        "collection_seconds": 0.073304,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 9.522289
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F1",
+        "workload_ref": "pair-124014-cpu2-F1",
+        "candidate_ref": "baseline",
+        "work_units": 10,
+        "workload_digest": "sha256:754c09e3f7bffcf01a3d91785063fcef2a82baac2530e78a12ac94753bb48503",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 1,
+        "block": 0,
+        "job_id": "j-d102fd07c4134177888b835a7ba39b93",
+        "attempt_id": "a-8adcf434b4284ff99270bf17178056d3",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:cebf6b64e453b489048460122dda03f1b8135386ae5e2dad8a60a8089e2e3abe",
+        "created_at": "2026-10-02T12:49:57.911896+00:00",
+        "finished_at": "2026-10-02T12:50:07.861988+00:00",
+        "seconds_per_work_unit": 1.4187500346451997e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.057379,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 9.950092
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F2",
+        "workload_ref": "pair-124014-cpu2-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:c1af0d82f06d739b60ab66fb729178d7d77746cbf9376dbacc599a87b87b777d",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 2,
+        "block": 0,
+        "job_id": "j-3397f886b7a14eca89a1c07b1666f88f",
+        "attempt_id": "a-87a6e58d80844f38a5f23737a16304bc",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:d3ba5408654cf9a09f7f18dc67fb3223b4db45b14610798983dd97ba4ffdab61",
+        "created_at": "2026-10-02T12:50:08.036307+00:00",
+        "finished_at": "2026-10-02T12:50:18.616236+00:00",
+        "seconds_per_work_unit": 1.3089067651890218e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.063693,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 10.579929
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F3",
+        "workload_ref": "pair-124014-cpu1-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:d2fcf1aa2b7455f58817fed78e9857193c41ff8047f540f858127f001bfe173e",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 3,
+        "block": 0,
+        "job_id": "j-1c109c291fce49099ddc13c0bae898f4",
+        "attempt_id": "a-bf335d23418840b0a1a3e8cd74d51068",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:b9a7a1b844a8bd8b277df88bb921d59b0bf59f67d8f557948f5c9fd7e8c893b2",
+        "created_at": "2026-10-02T12:50:19.210033+00:00",
+        "finished_at": "2026-10-02T12:50:29.249491+00:00",
+        "seconds_per_work_unit": 1.3232711353339255e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 3.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.118746,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 10.039458
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F3",
+        "workload_ref": "pair-124014-cpu2-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:c1af0d82f06d739b60ab66fb729178d7d77746cbf9376dbacc599a87b87b777d",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 4,
+        "block": 0,
+        "job_id": "j-8a2b0b9cb67946759195462b713a8405",
+        "attempt_id": "a-b7861919a099479dada3e710cc8b9511",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:2ef104e007a4b37301d633a327b5e13c06340c9849b877d8771571f4b5e0521b",
+        "created_at": "2026-10-02T12:50:29.387174+00:00",
+        "finished_at": "2026-10-02T12:50:39.816574+00:00",
+        "seconds_per_work_unit": 1.3023039791733026e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.107447,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 10.4294
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F2",
+        "workload_ref": "pair-124014-cpu1-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:d2fcf1aa2b7455f58817fed78e9857193c41ff8047f540f858127f001bfe173e",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 5,
+        "block": 0,
+        "job_id": "j-c3cf4123bd85443f91546bf8451234dc",
+        "attempt_id": "a-fb28613aa0474360965d396125d6921a",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:137221d10e04f95d95762109d6716b143abbdbcd9c44bb370676d48c6a821a53",
+        "created_at": "2026-10-02T12:50:40.526298+00:00",
+        "finished_at": "2026-10-02T12:50:55.683400+00:00",
+        "seconds_per_work_unit": 1.3079767813906074e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.054173,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 15.157102
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F3",
+        "workload_ref": "pair-124014-cpu2-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:c1af0d82f06d739b60ab66fb729178d7d77746cbf9376dbacc599a87b87b777d",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 6,
+        "block": 1,
+        "job_id": "j-daca8bd4cd374d599a536a352a9e02c0",
+        "attempt_id": "a-65a12143c61c45dd85879023fb21b9f4",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:ee019aa3f8423e922b449f35c85ec4e75f40a5df29b3844710da52b28801a55d",
+        "created_at": "2026-10-02T12:50:56.716075+00:00",
+        "finished_at": "2026-10-02T12:51:06.343560+00:00",
+        "seconds_per_work_unit": 1.3023518258705735e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 0.0,
+        "collection_seconds": 0.063747,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 9.627485
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F2",
+        "workload_ref": "pair-124014-cpu2-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:c1af0d82f06d739b60ab66fb729178d7d77746cbf9376dbacc599a87b87b777d",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 7,
+        "block": 1,
+        "job_id": "j-f3957302a01a4d29b3b6a60c221c58cf",
+        "attempt_id": "a-2d22132621f743c49dcf5ea1907a3929",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:f3f87eeea67ed4cd9a1e78893940ebee7154c285a31a3d7c7e95bcfd17a52974",
+        "created_at": "2026-10-02T12:51:06.864148+00:00",
+        "finished_at": "2026-10-02T12:51:17.095295+00:00",
+        "seconds_per_work_unit": 1.3023520587012172e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.072063,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 10.231147
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F2",
+        "workload_ref": "pair-124014-cpu1-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:d2fcf1aa2b7455f58817fed78e9857193c41ff8047f540f858127f001bfe173e",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 8,
+        "block": 1,
+        "job_id": "j-32c30c78b35d4719af5119c3ef4a8ad3",
+        "attempt_id": "a-471816af8bcc4a11a585507394372e78",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:4a7352fbe8e8c3abd7c7c71d5af002a18af29e611d34165f8bce728ae6697231",
+        "created_at": "2026-10-02T12:51:18.010259+00:00",
+        "finished_at": "2026-10-02T12:51:27.820796+00:00",
+        "seconds_per_work_unit": 1.3189043384045363e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.106347,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 9.810537
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F3",
+        "workload_ref": "pair-124014-cpu1-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:d2fcf1aa2b7455f58817fed78e9857193c41ff8047f540f858127f001bfe173e",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 9,
+        "block": 1,
+        "job_id": "j-454fa013c49449f7938974a96b1286f6",
+        "attempt_id": "a-80fcc9ef59c4429681ebf3195914b4c9",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:8a2a27aa27ead934d6b68a907d0a22aec9e42fa896bd126aa367fbdf4ae20e5f",
+        "created_at": "2026-10-02T12:51:28.191356+00:00",
+        "finished_at": "2026-10-02T12:51:38.572289+00:00",
+        "seconds_per_work_unit": 1.3176808133721351e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.048935,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 10.380933
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F1",
+        "workload_ref": "pair-124014-cpu2-F1",
+        "candidate_ref": "baseline",
+        "work_units": 10,
+        "workload_digest": "sha256:754c09e3f7bffcf01a3d91785063fcef2a82baac2530e78a12ac94753bb48503",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 10,
+        "block": 1,
+        "job_id": "j-14e19bde6867436fa9d8eb5693de61f2",
+        "attempt_id": "a-e207a26e3d7a48398e342338abbc0997",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:efe7b5049961fa1cffd29722cbcd4a62c02977c60f14c0b41e49674d8782d2af",
+        "created_at": "2026-10-02T12:51:39.380668+00:00",
+        "finished_at": "2026-10-02T12:51:49.332285+00:00",
+        "seconds_per_work_unit": 1.4190695947036146e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 1.0,
+        "preparation_seconds": 0.0,
+        "collection_seconds": 0.051012,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 9.951617
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F1",
+        "workload_ref": "pair-124014-cpu1-F1",
+        "candidate_ref": "baseline",
+        "work_units": 10,
+        "workload_digest": "sha256:4b7f24b2318bde7328a8b6c6b4dfd2b3097701fba79a555983d097be3eeb3210",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 11,
+        "block": 1,
+        "job_id": "j-8bd0891078064c7cbf3360523daef47a",
+        "attempt_id": "a-6a74c010ae7c4354a4dceec4a20a20ba",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:f9214aeead26399f66468be3526a6249f9918eeb5358b3f036580bc050779457",
+        "created_at": "2026-10-02T12:51:49.508864+00:00",
+        "finished_at": "2026-10-02T12:52:00.017099+00:00",
+        "seconds_per_work_unit": 1.4326401287689806e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.064998,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 10.508235
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F1",
+        "workload_ref": "pair-124014-cpu2-F1",
+        "candidate_ref": "baseline",
+        "work_units": 10,
+        "workload_digest": "sha256:754c09e3f7bffcf01a3d91785063fcef2a82baac2530e78a12ac94753bb48503",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 12,
+        "block": 2,
+        "job_id": "j-45c8532d7a0a499ea7026276c4962ee4",
+        "attempt_id": "a-0817b2ed0c8248dcb445cb4394a76ed8",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:c6b6d2097cbcf4e587ad4aef9d396e5b4c3c996f1abd3a36adec010804cfbaee",
+        "created_at": "2026-10-02T12:52:00.644958+00:00",
+        "finished_at": "2026-10-02T12:52:10.756734+00:00",
+        "seconds_per_work_unit": 1.4745298540219664e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.051859,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 10.111776
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F2",
+        "workload_ref": "pair-124014-cpu1-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:d2fcf1aa2b7455f58817fed78e9857193c41ff8047f540f858127f001bfe173e",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 13,
+        "block": 2,
+        "job_id": "j-13925d8dd664410795ca140f7498496c",
+        "attempt_id": "a-3201f05f8f4443b7a4850614e8ac4057",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:ad7cc4ae49e1b00ebfb134de13305fe6fe2982392cfa5efdb12efa54776244f3",
+        "created_at": "2026-10-02T12:52:11.868991+00:00",
+        "finished_at": "2026-10-02T12:52:21.305212+00:00",
+        "seconds_per_work_unit": 1.3183960109017789e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 0.0,
+        "collection_seconds": 0.057252,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 9.436221
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F1",
+        "workload_ref": "pair-124014-cpu1-F1",
+        "candidate_ref": "baseline",
+        "work_units": 10,
+        "workload_digest": "sha256:4b7f24b2318bde7328a8b6c6b4dfd2b3097701fba79a555983d097be3eeb3210",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 14,
+        "block": 2,
+        "job_id": "j-bebc5080930545258073df0bf27769db",
+        "attempt_id": "a-16dd626bda514f6e9f7c5d92c5b2ac7c",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:d0a2289adedeef0424f3b862c23ff432fb1a8c459ec8fe381b099d4eed81b851",
+        "created_at": "2026-10-02T12:52:21.990068+00:00",
+        "finished_at": "2026-10-02T12:52:31.995254+00:00",
+        "seconds_per_work_unit": 1.4168804045766593e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.052044,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 10.005186
+      },
+      {
+        "arm": "cpu1",
+        "phase": "F3",
+        "workload_ref": "pair-124014-cpu1-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:d2fcf1aa2b7455f58817fed78e9857193c41ff8047f540f858127f001bfe173e",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 15,
+        "block": 2,
+        "job_id": "j-edb20fe2872e4a8fb0dbbf5e431ecaaa",
+        "attempt_id": "a-387f01ee33fb4245a752b8f3b33f40ac",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:8328dba1410bd5a1117348d788589963e338148103121fc20e435d2dadc31fbd",
+        "created_at": "2026-10-02T12:52:32.164020+00:00",
+        "finished_at": "2026-10-02T12:52:47.877533+00:00",
+        "seconds_per_work_unit": 1.3166660792194307e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.064478,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 15.713513
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F3",
+        "workload_ref": "pair-124014-cpu2-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:c1af0d82f06d739b60ab66fb729178d7d77746cbf9376dbacc599a87b87b777d",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 16,
+        "block": 2,
+        "job_id": "j-b2927db686914c5c8959a8532c3a8011",
+        "attempt_id": "a-8ea7be6270d84ab5b158fdcca5210579",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:67ef028b855e74d4c90250802cc8b9005c2862e1be6b8d86e2ecfc4a4aa91b56",
+        "created_at": "2026-10-02T12:52:48.415929+00:00",
+        "finished_at": "2026-10-02T12:52:58.469087+00:00",
+        "seconds_per_work_unit": 1.295505091547966e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 2.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.049296,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 10.053158
+      },
+      {
+        "arm": "cpu2",
+        "phase": "F2",
+        "workload_ref": "pair-124014-cpu2-F2",
+        "candidate_ref": "baseline",
+        "work_units": 100,
+        "workload_digest": "sha256:c1af0d82f06d739b60ab66fb729178d7d77746cbf9376dbacc599a87b87b777d",
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "slot": 17,
+        "block": 2,
+        "job_id": "j-46672fa8203d4363bcf80f2fae9a4d0a",
+        "attempt_id": "a-043933d0a4944a919268b85a68787ad0",
+        "state": "SUCCEEDED",
+        "result_digest": "sha256:9bbb7b2fa44d60156efa3cf21698ce3c0c322def26ef7aa95239141b79771412",
+        "created_at": "2026-10-02T12:52:58.555015+00:00",
+        "finished_at": "2026-10-02T12:53:09.240866+00:00",
+        "seconds_per_work_unit": 1.3209261232987047e-05,
+        "temperature_celsius": null,
+        "allocated_device_seconds": 3.0,
+        "queue_seconds": 0.0,
+        "preparation_seconds": 1.0,
+        "collection_seconds": 0.05377,
+        "cost_uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "end_to_end_seconds": 10.685851
+      }
+    ],
+    "rank_checks": [
+      {
+        "block": 0,
+        "arms": [
+          "cpu1",
+          "cpu2"
+        ],
+        "phase_order_sign": {
+          "F1": 0,
+          "F2": 0,
+          "F3": 0
+        },
+        "rank_reversal": false
+      },
+      {
+        "block": 1,
+        "arms": [
+          "cpu1",
+          "cpu2"
+        ],
+        "phase_order_sign": {
+          "F1": 0,
+          "F2": 0,
+          "F3": 0
+        },
+        "rank_reversal": false
+      },
+      {
+        "block": 2,
+        "arms": [
+          "cpu1",
+          "cpu2"
+        ],
+        "phase_order_sign": {
+          "F1": 0,
+          "F2": 0,
+          "F3": 0
+        },
+        "rank_reversal": false
+      }
+    ],
+    "reasons": [
+      "RANK_UNRESOLVED_WITHIN_TIE_BAND",
+      "REPLICATION_ONLY_NOT_MULTI_FIDELITY",
+      "THERMAL_BEHAVIOR_UNVERIFIED"
+    ],
+    "complete": true,
+    "multi_fidelity_eligible": false,
+    "early_pruning_allowed": false,
+    "method": "paired_replication_calibration; descriptive ranks only",
+    "independent_unit": "one separate Job, not inner benchmark samples",
+    "costs": [
+      {
+        "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device",
+        "completed_attempts": 18,
+        "known_allocated_device_seconds": 38.0,
+        "unknown_allocation_attempts": 0
+      }
+    ],
+    "cost_semantics": "scheduler reservations and control-plane intervals; model fitting, transfer and energy not measured here",
+    "ref": "fidelity-2370e911ace0cc906409478e71f5abc9"
+  },
+  "qualification_runs": [
+    {
+      "job_id": "ra-pair-f0-124014-1-10",
+      "phase": "F0",
+      "cpu": 1,
+      "work_units": 10,
+      "quality_value": 1.0,
+      "result_digest": "sha256:b632537b20e37254444d028f91a8ab59c020d918517db6faf12bdc82ead48808",
+      "allocated_device_seconds": 2.0,
+      "included_in_performance_comparison": false
+    },
+    {
+      "job_id": "ra-pair-f0-124014-1-100",
+      "phase": "F0",
+      "cpu": 1,
+      "work_units": 100,
+      "quality_value": 1.0,
+      "result_digest": "sha256:680ad367053048ea3e00f8dc37174b73b008085ed38e8cf818a79558ff8e4609",
+      "allocated_device_seconds": 2.0,
+      "included_in_performance_comparison": false
+    },
+    {
+      "job_id": "ra-pair-f0-124014-2-10",
+      "phase": "F0",
+      "cpu": 2,
+      "work_units": 10,
+      "quality_value": 1.0,
+      "result_digest": "sha256:a615e053139d0964d709f416391060414ea9355d232fd61be3a6a7fb861a24a9",
+      "allocated_device_seconds": 2.0,
+      "included_in_performance_comparison": false
+    },
+    {
+      "job_id": "ra-pair-f0-124014-2-100",
+      "phase": "F0",
+      "cpu": 2,
+      "work_units": 100,
+      "quality_value": 1.0,
+      "result_digest": "sha256:b500b5d7dfd266b69624906c9d4f68a927289188299b5a8fcfea3ce28363c18b",
+      "allocated_device_seconds": 2.0,
+      "included_in_performance_comparison": false
+    }
+  ],
+  "deliveries": [
+    {
+      "attempt_id": "a-4cd5ca2cf927482ca7f0d7d43ff40ad5",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:a8a198e6e9242315b328ea38d18bd599bfeaa83d6d502a5917ddba613551d61d",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-8adcf434b4284ff99270bf17178056d3",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:94090c677357a5625ca728ced1dca5315aab5319f805e812fc1b068b4c81ee93",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-87a6e58d80844f38a5f23737a16304bc",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:16c73f0812b6c6127803f56508b67f52e96372c94a175b8c4573fd383f6e2b8a",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-bf335d23418840b0a1a3e8cd74d51068",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:45c59eeb09974c6dfc2a0d9fc3be91cdb0d5fff24d582414da57fd7fc4d538d4",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-b7861919a099479dada3e710cc8b9511",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:9213e9b83e6b7b1da0abb330221403c6f19db0a7615cf0c5abe445d8645636da",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-fb28613aa0474360965d396125d6921a",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:1d5ebf4f585b9f50f2a8501b433a18605b9cb896b14f6420d38096d671d1b06d",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-65a12143c61c45dd85879023fb21b9f4",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:12875a979b58c0a688088a92ea4c1edd60ba26f84bdaa7f51e7ae11447686740",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-2d22132621f743c49dcf5ea1907a3929",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:8c646932dd4ff815441c19d01307d8253441d30cc90d3964874918a7fadfdc87",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-471816af8bcc4a11a585507394372e78",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:b28bc7e7531f7a3ef274e53776dda77fb4801b7f2119e2bbafe5d75849e7733e",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-80fcc9ef59c4429681ebf3195914b4c9",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:0c7c4ff1e2f1ce5bd67686d7635371b44f21589454e6562c8c561ce3cbc8fcae",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-e207a26e3d7a48398e342338abbc0997",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:2495b792c4348210b8a5dc9889f310df07fb11a59ed3a4fdee0ef6ddcd5c2a9e",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-6a74c010ae7c4354a4dceec4a20a20ba",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:0b8b9744902596e2390f71dc354f124e214d723d21f154c6409ac715b94bda38",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-0817b2ed0c8248dcb445cb4394a76ed8",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:c185455d2d934846f99119e6bac59794bec1eb0f4ead9c2eb1d9c21a52fc6033",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-3201f05f8f4443b7a4850614e8ac4057",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:c97e1533c6fd6dfd20582d018dff5d6bbcbbe1b50981a02b3ba907efd919f6f0",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-16dd626bda514f6e9f7c5d92c5b2ac7c",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:c350a25f635cb5c0bee64896c585e8558d47e27de46fce85609a76b863195351",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-387f01ee33fb4245a752b8f3b33f40ac",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:42536037b374b0dbaf248c83512e6a09bb069df1ed1c2c7250fdeeaa3251d233",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-8ea7be6270d84ab5b158fdcca5210579",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:27de697eacababc3bc5dbbf1f171b898fe904ffa4f38d6b1e04e9ac22a8a2365",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    },
+    {
+      "attempt_id": "a-043933d0a4944a919268b85a68787ad0",
+      "gpu_count": 1,
+      "compute_exit_code": 0,
+      "artifact_digest": "sha256:a92bff6c6f8a1b09e98b50d7ec5fe03f109192d84e1837d47cf647ee36e66736",
+      "api_s3_mlflow_bytes_equal": true,
+      "mlflow_run_count": 1,
+      "mlflow_status": "FINISHED"
+    }
+  ],
+  "initial_rejection": {
+    "plan_ref": "pair-plan-124014",
+    "job_id": "j-4b1322632973441e90b997c75c810f69",
+    "attempt_id": "a-d2a2347930ed428487803f0f2157b5bd",
+    "state": "FAILED",
+    "error": "PRE_SUBMISSION_BACKEND",
+    "allocated_device_seconds": 0.0,
+    "never_submitted": true,
+    "cause": "Copied runtime binding fingerprint differed from all four fresh F0 observations; only new variant bindings were corrected before a new preregistration.",
+    "backend_job_absent": true
+  },
+  "final_queue": {
+    "pendingWorkloads": 0,
+    "admittedWorkloads": 0,
+    "reservingWorkloads": 0
+  },
+  "final_job_counts": {
+    "CANCELED": 8,
+    "FAILED": 1,
+    "SUCCEEDED": 66,
+    "RESULT_INVALID": 1
+  },
+  "runtime": {
+    "pytorch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "environment_digest": "sha256:e61b117fc737546490a7126399cb551947f78e4de88de78220f8e77f35382396",
+    "code_digest": "sha256:ab9a255bfe9134d984527e8d6690e1dd4024e0bce2be121f8742161947d8b470",
+    "api_image_digest": "sha256:2d54ce5d81eb298af298a59d4b58bd3bccda3f316056c51da9d347bb34cba09f"
+  },
+  "cost_scope": {
+    "calibration_device_seconds": 38.0,
+    "f0_device_seconds": 8.0,
+    "preflight_rejection_device_seconds": 0,
+    "model_fitting": "not applicable; no MF model fitted",
+    "energy": null,
+    "transfer": null
+  },
+  "final_nodes": {
+    "total": 10,
+    "ready": 10,
+    "pressure": 0
+  }
+}

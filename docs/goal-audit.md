@@ -27,7 +27,7 @@ direct evidence; conditional extensions require an explicit applicability result
 | Search representation | Approved finite conditional space, normalized numeric and unordered categories | Implemented/tested |
 | Prediction separation | Model snapshot/run IDs, predictions distinct from measurements | Implemented/tested |
 | Budgets | Final reserve, per-device units, preparation/transfer/model/failed-run costs | Durable plan reservation implemented; complete measured cost sources pending |
-| R2 fidelity | Paired F1/F2/F3 validation, cost-aware MF-KG within qualified groups | Disabled with reason; implementation/paired data pending |
+| R2 fidelity | Paired F1/F2/F3 validation, cost-aware MF-KG within qualified groups | Preregistered paired-calibration API and 18 actual GPU comparisons verified, including costs/artifacts. All configuration comparisons unresolved within the fixed tie band; replication-only and missing thermal evidence keep MF-KG/early pruning disabled. Meaningful fidelity-axis qualification, MF-GP/KG implementation and equal-budget comparison remain open |
 | R3 transfer | Explicit warm start vs RGPE, independent sources, target validation/fallback | Disabled with reason; implementation/source data pending |
 | R4 uncertainty | OOD/stale context, independent confirmation, workload/time holdouts | Evidence-age/scope and residual gates at approval/submission, recent-window lookup and chronological forecast audit implemented; two actual held-out GPU forecasts both outside saved intervals. Workload holdout, calibration, load-context observation and live drift trial pending |
 | R5 interference | Qualified solo/shared pairs, per-workload slowdown, unknown-pair abstention | Conditional follow-up; not claimed implemented |

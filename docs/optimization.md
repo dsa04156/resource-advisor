@@ -31,6 +31,13 @@ Strategies:
   not aliases for qLogNEI. Their implementation and paired/source-data gates
   remain open in the full completion audit.
 
+[Paired calibration](fidelity-calibration.md) now preregisters a bounded,
+randomized F1/F2/F3 measurement schedule and submits its cells through the same
+Compute API. It checks independent attempt IDs, workload/runtime invariants,
+quality, rank reversal and known-vs-unknown costs. Its identical-input repetition
+fixture cannot establish a fidelity-bias model; it does not enable `mfkg` or
+claim that fixed replication is adaptive profiling.
+
 OOM/timeouts never become zero-time successful observations. A model failure
 falls back explicitly to seeded random selection. Only independent confirmation
 runs can create the study's final recommendation; overlap preserves the baseline.
