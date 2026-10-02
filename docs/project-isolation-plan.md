@@ -79,6 +79,8 @@ routes, immutable project-owned workload/variant/capability registrations,
 normal/high priority mappings, MLflow experiment mappings and artifact bucket
 mappings before invoking it. Shared storage requires project-prefixed keys and
 API ownership checks; this is not direct storage-service tenant authorization.
+Run the [local deployment preflight](configuration-checks.md) on both API and
+worker files before updating service configuration.
 
 The optional `deploy/projects/lab-project-b.yaml` assumes the existing shared
 ClusterQueue. Its namespace must also match the installed controller's

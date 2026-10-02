@@ -7,8 +7,7 @@ import signal
 from pathlib import Path
 from threading import Event
 
-from .api import Principal, create_app
-from .backends import KubernetesBackend, SlurmBackend
+from .api import create_app
 from .service import Service
 from .store import Store
 from .worker import MLflowDelivery, Worker
@@ -23,6 +22,12 @@ def main():
     sub.add_parser("init-db")
     sub.add_parser("backfill-usage")
     sub.add_parser("backfill-tracking")
+    config_check = sub.add_parser(
+        "check-config", help="local deployment checks without network or DB"
+    )
+    config_check.add_argument("--credentials", type=Path)
+    config_check.add_argument("--artifacts-config", type=Path)
+    config_check.add_argument("--worker-config", type=Path)
     mfkg = sub.add_parser(
         "mfkg-analyze", help="numerical analysis only; cannot authorize execution"
     )
@@ -60,6 +65,36 @@ def main():
     heartbeat.add_argument("--path", required=True)
     heartbeat.add_argument("--max-age", type=float, default=120)
     args = parser.parse_args()
+    if args.action in {"check-config", "serve", "worker"}:
+        from .configuration import (
+            ConfigurationError,
+            api_configuration,
+            check_configuration,
+            read_config,
+            worker_configuration,
+        )
+
+        try:
+            if args.action == "check-config":
+                report = check_configuration(
+                    credentials=read_config(args.credentials) if args.credentials else None,
+                    artifacts=read_config(args.artifacts_config) if args.artifacts_config else None,
+                    worker=read_config(args.worker_config) if args.worker_config else None,
+                )
+                print(json.dumps(report))
+                return
+            if args.action == "serve":
+                artifact_config = (
+                    read_config(Path(args.artifacts_config)) if args.artifacts_config else None
+                )
+                credentials = api_configuration(
+                    read_config(Path(args.credentials)), artifact_config
+                )
+            else:
+                config = read_config(Path(args.config))
+                backends = worker_configuration(config)
+        except ConfigurationError as exc:
+            parser.error(str(exc))
     if args.action == "mfkg-analyze":
         from .mfkg import MFKernelInput, ask_mfkg
 
@@ -139,14 +174,11 @@ def main():
     if args.action == "serve":
         import uvicorn
 
-        credentials = {
-            h: Principal(**p) for h, p in json.loads(Path(args.credentials).read_text()).items()
-        }
         artifact_storage = None
-        if args.artifacts_config:
+        if artifact_config is not None:
             from .artifacts import S3Artifacts
 
-            artifact_storage = S3Artifacts(**json.loads(Path(args.artifacts_config).read_text()))
+            artifact_storage = S3Artifacts(**artifact_config)
         uvicorn.run(
             create_app(service, credentials, artifact_storage=artifact_storage),
             host=args.host,
@@ -155,15 +187,6 @@ def main():
             ssl_certfile=args.ssl_certfile,
         )
     elif args.action == "worker":
-        config = json.loads(Path(args.config).read_text())
-        backends = {}
-        for route in config["routes"]:
-            kind = route["backend"]
-            cls = {"kubernetes": KubernetesBackend, "slurm": SlurmBackend}[kind]
-            key = (route["project"], route["cluster"])
-            if key in backends:
-                raise ValueError("duplicate route")
-            backends[key] = cls(**route["options"])
         runner = Worker(service, backends)
         from .study import Studies
 

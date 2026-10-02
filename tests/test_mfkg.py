@@ -141,14 +141,14 @@ def test_fit_failure_is_not_a_fake_random_mfkg_suggestion(problem, monkeypatch):
 
 def test_analysis_cli_does_not_open_database_or_submit_jobs(problem, monkeypatch, tmp_path, capsys):
     pytest.importorskip("botorch")
-    from resource_advisor import cli
+    from resource_advisor import cli, configuration
 
     def forbidden(*args, **kwargs):
         pytest.fail("numerical analysis must not open database or backend")
 
     monkeypatch.setattr(cli, "Store", forbidden)
-    monkeypatch.setattr(cli, "KubernetesBackend", forbidden)
-    monkeypatch.setattr(cli, "SlurmBackend", forbidden)
+    monkeypatch.setattr(configuration, "KubernetesBackend", forbidden)
+    monkeypatch.setattr(configuration, "SlurmBackend", forbidden)
     source, output = tmp_path / "input.json", tmp_path / "output.json"
     source.write_text(problem.model_dump_json())
     monkeypatch.setattr(

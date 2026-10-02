@@ -1,0 +1,69 @@
+# Check project integrations before starting services
+
+The two-project GPU acceptance exposed a deployment error: a new project had a
+worker route and MLflow experiment, but no result-bucket mapping. Its GPU work
+completed correctly while artifact delivery retried. The outbox recovered after
+the mapping was repaired; it did not require another GPU execution.
+
+`serve` and `worker` now reject incomplete enabled project integrations **before
+creating the database engine or external clients**. API credentials must use token
+SHA-256 keys and an actual JSON boolean for `operator`; a string such as `"false"`
+is rejected. Duplicate JSON keys are rejected rather than silently replacing a
+project, token identity or route option. Errors print fixed codes without supplied
+credential values, endpoints, bucket names or backend options.
+
+## Deployment preflight
+
+Run this with the actual private configurations intended for a deployment:
+
+```sh
+resource-advisor check-config \
+  --credentials /private/credentials.json \
+  --artifacts-config /private/artifacts.json \
+  --worker-config /private/worker.json
+```
+
+It reads local files and constructs backend adapters for argument validation.
+It does not connect to the database, scheduler, MLflow, object storage or cloud
+credential providers. `--database` is not used by this command. A successful
+report includes only project/route counts, enabled integrations and its scope.
+Failure exits with code 2. Use it before updating Secrets or restarting services.
+
+Checks cover:
+
+- Every API project has a bucket mapping when artifact reading is enabled.
+- Every worker route's project has a bucket mapping when artifact delivery is
+  enabled, and an experiment ID when MLflow delivery is enabled.
+- Project/cluster route pairs are unique, backend options pass the existing
+  Kubernetes/Slurm constructor checks, and project identities are valid.
+- When API and worker files are supplied together, every worker project has an
+  API identity; artifact enablement and per-project bucket names agree.
+
+Multiple routes per project and workers serving only a subset of API projects
+are supported. A shared bucket remains valid because object keys are project
+scoped; this is not proof of direct storage-service user isolation. Disabled
+optional integrations remain supported and are explicitly reported as disabled.
+Checking only one service's files cannot establish cross-service consistency.
+
+| Error code | Correction |
+|---|---|
+| `ARTIFACT_PROJECT_MAPPING_MISSING` | Add the project's intended bucket to that service's artifact map. |
+| `MLFLOW_PROJECT_MAPPING_MISSING` | Add its experiment ID to the enabled worker MLflow map. |
+| `API_WORKER_BUCKET_MAPPING_MISMATCH` | Align each project's reader and writer bucket mapping. |
+| `API_WORKER_ARTIFACT_ENABLEMENT_MISMATCH` | Align enabled reading/delivery in the checked service pair. |
+| `WORKER_PROJECT_WITHOUT_API_IDENTITY` | Check the intended API credential scope and worker route. |
+| `DUPLICATE_JSON_KEY` | Remove the ambiguous duplicate from the private file. |
+| `INVALID_PRINCIPAL` | Use a valid project identifier and JSON boolean operator flag. |
+
+Do not remove a project mapping merely to clear a pending delivery. Existing
+outbox items still need their original project-owned destination. After startup,
+verify service readiness, scoped credentials, real scheduler access and artifact
+readback separately. This command does not prove namespace selectors, runtime
+bundle availability, RBAC, endpoint equivalence, bucket existence, MLflow access,
+hardware compatibility or completion of already pending work.
+
+The regression suite reproduces the E6 omission, reader/writer disagreement,
+missing MLflow scope, duplicate routes and credential ambiguity. CLI tests make
+database/network construction fail if attempted, proving invalid configurations
+stop before side effects. The corrected two-project lab configuration passes;
+the preserved pre-correction API and worker mappings fail immediately.
