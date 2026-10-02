@@ -1,0 +1,1154 @@
+{
+  "evidence_kind": "hardware",
+  "scope": "one fixed-work-unit RTX 5080 adaptive-replication smoke study; no strategy superiority claim",
+  "code_commit": "683f5915f18d54be7dbc8bcbd383a6f39b59dd17",
+  "service_layer_sha256": "39bf793cb909f19896c336ce874c1a823f89434129697eccfd4fc0ed0cf99443",
+  "captured_at": "2026-10-02T13:21:49.092443+00:00",
+  "study": {
+    "ref": "study-cdefa8d5549c486d8e41c90e6a45960b",
+    "request": {
+      "workload_ref": "adaptive-131105",
+      "strategy": "adaptive_replication",
+      "seed": 20261002,
+      "replication": {
+        "minimum_runs": 3,
+        "maximum_runs": 5,
+        "target_relative_standard_error": 0.05
+      }
+    },
+    "state": "COMPLETED",
+    "created_at": "2026-10-02T13:17:44.575309+00:00",
+    "deadline_at": "2026-10-02T13:32:44.575313+00:00",
+    "exploration_stop_reason": "REPLICATION_PRECISION_TARGET_MET",
+    "replication_assessment": {
+      "candidate_ref": null,
+      "reason": "REPLICATION_PRECISION_TARGET_MET",
+      "stop_exploration": true,
+      "statistics": [
+        {
+          "candidate_ref": "cpu1",
+          "independent_runs": 3,
+          "mean_seconds": 0.001321522732420514,
+          "relative_standard_error": 0.0021357677021675847,
+          "target_met": true,
+          "attempt_ids": [
+            "a-7aac00c2b4e145669d8ed2ff12c05a16",
+            "a-36f12c19684140feb68064c4a6fe0081",
+            "a-79e8ae1c422041daa09b48941cd99285"
+          ]
+        },
+        {
+          "candidate_ref": "cpu2",
+          "independent_runs": 3,
+          "mean_seconds": 0.0013331046405558784,
+          "relative_standard_error": 0.004856087001117669,
+          "target_met": true,
+          "attempt_ids": [
+            "a-7f3ad9d7a2aa4a6f80d9dee2df38e184",
+            "a-6ade02ad82a642df942cdfec7bceca4a",
+            "a-96c0bf82f9304227ae6c2a9f62fd82d7"
+          ]
+        }
+      ],
+      "excluded": {},
+      "policy": {
+        "minimum_runs": 3,
+        "maximum_runs": 5,
+        "target_relative_standard_error": 0.05
+      },
+      "statistical_scope": "descriptive RSE; no sequential coverage or rank guarantee",
+      "multi_fidelity": false,
+      "measured": false,
+      "planning_seconds": 0.00010749296052381396
+    },
+    "planning_seconds": 0.0010582100367173553,
+    "charged_device_seconds": {
+      "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 18.0
+    },
+    "recommendation": {
+      "ref": "rec-b1da2f39620749a094940d940125b56f",
+      "workload_ref": "adaptive-131105",
+      "workload_digest": "sha256:bd4214c488a2f41fe6088d72f9fc85df021d19cf8aa30397b1a8f76378222c84",
+      "status": "CONFIRMED_RECOMMENDATION",
+      "candidate_ref": "cpu1",
+      "confirmed_candidate": "cpu1",
+      "predicted_candidate": "cpu1",
+      "study_ref": "study-cdefa8d5549c486d8e41c90e6a45960b",
+      "measured": true,
+      "ranking": [
+        {
+          "candidate_ref": "cpu1",
+          "mean_seconds": 0.0013120898511260748,
+          "interval_seconds": [
+            0.0012973433914477972,
+            0.0013268363108043524
+          ],
+          "evidence_refs": [
+            "a-7d096ec21147451b9be1dbae789b7971",
+            "a-3ee2eb52292c4f758ddea46e8752243d",
+            "a-7ad0b36ecdb54fe49b35b2cf7c02a4e1"
+          ],
+          "independent_runs": 3
+        }
+      ],
+      "approval_required": true,
+      "created_at": "2026-10-02T13:20:53.814234+00:00",
+      "expires_at": "2026-10-02T13:35:53.814254+00:00",
+      "confirmation_run_ids": [
+        "a-7d096ec21147451b9be1dbae789b7971",
+        "a-3ee2eb52292c4f758ddea46e8752243d",
+        "a-7ad0b36ecdb54fe49b35b2cf7c02a4e1"
+      ],
+      "cost": {
+        "wall_seconds": 189.238961,
+        "planning_seconds": 0.0010582100367173553,
+        "device_seconds": {
+          "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 18.0
+        }
+      }
+    }
+  },
+  "workload_identity": {
+    "code_digest": "sha256:ab9a255bfe9134d984527e8d6690e1dd4024e0bce2be121f8742161947d8b470",
+    "model_digest": "sha256:07d2b7a9750a7c473868c22e215d1ad3db7626c193238fd907dc2713ac437ee0",
+    "dataset_version": "generated-torch-randn-seed-0",
+    "config_digest": "sha256:c7dbd1e1a27c1b5c3df300676d0fc112345e7ceb1288df485fd915dd13c3dc5a",
+    "task_type": "benchmark",
+    "input_shape": [
+      256,
+      256
+    ],
+    "batch_size": 1,
+    "global_batch_size": null,
+    "gradient_accumulation": 1,
+    "precision": "fp32",
+    "seed": 0,
+    "work_units": 100,
+    "quality_contract_digest": "sha256:a9f0bd7d40be67709a2fcc7ca47d00eccac388f46be97234dc9fb0825dcc9496",
+    "measurement_boundary": "CUDA synchronized forward-only; excludes setup/reference"
+  },
+  "registered_budgets": {
+    "consent": true,
+    "max_candidates": 2,
+    "max_wall_seconds_per_candidate": 30,
+    "max_queue_seconds": 60,
+    "total_wall_seconds": 900,
+    "final_validation_seconds": 360,
+    "mutable_parameters": [
+      "host_cpu"
+    ],
+    "checkpoint_digest": null,
+    "max_probes": 12,
+    "device_seconds": {
+      "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 1200
+    }
+  },
+  "plans": [
+    {
+      "ref": "plan-75796eb045d54c439f7ec21c57a2b101",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "reason": "REPLICATION_BALANCED_INITIAL_RUNS",
+        "stop_exploration": false,
+        "statistics": [
+          {
+            "candidate_ref": "cpu1",
+            "independent_runs": 0,
+            "mean_seconds": null,
+            "relative_standard_error": null,
+            "target_met": false,
+            "attempt_ids": []
+          },
+          {
+            "candidate_ref": "cpu2",
+            "independent_runs": 0,
+            "mean_seconds": null,
+            "relative_standard_error": null,
+            "target_met": false,
+            "attempt_ids": []
+          }
+        ],
+        "excluded": {},
+        "policy": {
+          "minimum_runs": 3,
+          "maximum_runs": 5,
+          "target_relative_standard_error": 0.05
+        },
+        "statistical_scope": "descriptive RSE; no sequential coverage or rank guarantee",
+        "multi_fidelity": false,
+        "measured": false,
+        "planning_seconds": 2.6363006327301264e-05
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T13:17:46.091667+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device"
+    },
+    {
+      "ref": "plan-dd6556b1c0374a918da2e893e5eb75ff",
+      "candidate_ref": "cpu2",
+      "choice": {
+        "candidate_ref": "cpu2",
+        "reason": "REPLICATION_BALANCED_INITIAL_RUNS",
+        "stop_exploration": false,
+        "statistics": [
+          {
+            "candidate_ref": "cpu1",
+            "independent_runs": 1,
+            "mean_seconds": 0.001316398149356246,
+            "relative_standard_error": null,
+            "target_met": false,
+            "attempt_ids": [
+              "a-7aac00c2b4e145669d8ed2ff12c05a16"
+            ]
+          },
+          {
+            "candidate_ref": "cpu2",
+            "independent_runs": 0,
+            "mean_seconds": null,
+            "relative_standard_error": null,
+            "target_met": false,
+            "attempt_ids": []
+          }
+        ],
+        "excluded": {},
+        "policy": {
+          "minimum_runs": 3,
+          "maximum_runs": 5,
+          "target_relative_standard_error": 0.05
+        },
+        "statistical_scope": "descriptive RSE; no sequential coverage or rank guarantee",
+        "multi_fidelity": false,
+        "measured": false,
+        "planning_seconds": 6.461900193244219e-05
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T13:18:06.895632+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device"
+    },
+    {
+      "ref": "plan-3276912bd0b34533b6d4fa61c9073c86",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "reason": "REPLICATION_BALANCED_INITIAL_RUNS",
+        "stop_exploration": false,
+        "statistics": [
+          {
+            "candidate_ref": "cpu1",
+            "independent_runs": 1,
+            "mean_seconds": 0.001316398149356246,
+            "relative_standard_error": null,
+            "target_met": false,
+            "attempt_ids": [
+              "a-7aac00c2b4e145669d8ed2ff12c05a16"
+            ]
+          },
+          {
+            "candidate_ref": "cpu2",
+            "independent_runs": 1,
+            "mean_seconds": 0.0013353510876186192,
+            "relative_standard_error": null,
+            "target_met": false,
+            "attempt_ids": [
+              "a-7f3ad9d7a2aa4a6f80d9dee2df38e184"
+            ]
+          }
+        ],
+        "excluded": {},
+        "policy": {
+          "minimum_runs": 3,
+          "maximum_runs": 5,
+          "target_relative_standard_error": 0.05
+        },
+        "statistical_scope": "descriptive RSE; no sequential coverage or rank guarantee",
+        "multi_fidelity": false,
+        "measured": false,
+        "planning_seconds": 0.00030907202744856477
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T13:18:27.803667+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device"
+    },
+    {
+      "ref": "plan-41d5b890ed8b468c9d7eece14f9004b7",
+      "candidate_ref": "cpu2",
+      "choice": {
+        "candidate_ref": "cpu2",
+        "reason": "REPLICATION_BALANCED_INITIAL_RUNS",
+        "stop_exploration": false,
+        "statistics": [
+          {
+            "candidate_ref": "cpu1",
+            "independent_runs": 2,
+            "mean_seconds": 0.0013212666381150484,
+            "relative_standard_error": 0.0036847133034009845,
+            "target_met": false,
+            "attempt_ids": [
+              "a-7aac00c2b4e145669d8ed2ff12c05a16",
+              "a-36f12c19684140feb68064c4a6fe0081"
+            ]
+          },
+          {
+            "candidate_ref": "cpu2",
+            "independent_runs": 1,
+            "mean_seconds": 0.0013353510876186192,
+            "relative_standard_error": null,
+            "target_met": false,
+            "attempt_ids": [
+              "a-7f3ad9d7a2aa4a6f80d9dee2df38e184"
+            ]
+          }
+        ],
+        "excluded": {},
+        "policy": {
+          "minimum_runs": 3,
+          "maximum_runs": 5,
+          "target_relative_standard_error": 0.05
+        },
+        "statistical_scope": "descriptive RSE; no sequential coverage or rank guarantee",
+        "multi_fidelity": false,
+        "measured": false,
+        "planning_seconds": 9.317399235442281e-05
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T13:18:48.735924+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device"
+    },
+    {
+      "ref": "plan-297dceac6f334b0fa4591cea5540cfea",
+      "candidate_ref": "cpu2",
+      "choice": {
+        "candidate_ref": "cpu2",
+        "reason": "REPLICATION_BALANCED_INITIAL_RUNS",
+        "stop_exploration": false,
+        "statistics": [
+          {
+            "candidate_ref": "cpu1",
+            "independent_runs": 2,
+            "mean_seconds": 0.0013212666381150484,
+            "relative_standard_error": 0.0036847133034009845,
+            "target_met": false,
+            "attempt_ids": [
+              "a-7aac00c2b4e145669d8ed2ff12c05a16",
+              "a-36f12c19684140feb68064c4a6fe0081"
+            ]
+          },
+          {
+            "candidate_ref": "cpu2",
+            "independent_runs": 2,
+            "mean_seconds": 0.0013391875836532563,
+            "relative_standard_error": 0.002864793611789073,
+            "target_met": false,
+            "attempt_ids": [
+              "a-7f3ad9d7a2aa4a6f80d9dee2df38e184",
+              "a-6ade02ad82a642df942cdfec7bceca4a"
+            ]
+          }
+        ],
+        "excluded": {},
+        "policy": {
+          "minimum_runs": 3,
+          "maximum_runs": 5,
+          "target_relative_standard_error": 0.05
+        },
+        "statistical_scope": "descriptive RSE; no sequential coverage or rank guarantee",
+        "multi_fidelity": false,
+        "measured": false,
+        "planning_seconds": 0.00011823803652077913
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T13:19:09.493336+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device"
+    },
+    {
+      "ref": "plan-12e0ed3c20194f14935083ba3092a22d",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "reason": "REPLICATION_BALANCED_INITIAL_RUNS",
+        "stop_exploration": false,
+        "statistics": [
+          {
+            "candidate_ref": "cpu1",
+            "independent_runs": 2,
+            "mean_seconds": 0.0013212666381150484,
+            "relative_standard_error": 0.0036847133034009845,
+            "target_met": false,
+            "attempt_ids": [
+              "a-7aac00c2b4e145669d8ed2ff12c05a16",
+              "a-36f12c19684140feb68064c4a6fe0081"
+            ]
+          },
+          {
+            "candidate_ref": "cpu2",
+            "independent_runs": 3,
+            "mean_seconds": 0.0013331046405558784,
+            "relative_standard_error": 0.004856087001117669,
+            "target_met": true,
+            "attempt_ids": [
+              "a-7f3ad9d7a2aa4a6f80d9dee2df38e184",
+              "a-6ade02ad82a642df942cdfec7bceca4a",
+              "a-96c0bf82f9304227ae6c2a9f62fd82d7"
+            ]
+          }
+        ],
+        "excluded": {},
+        "policy": {
+          "minimum_runs": 3,
+          "maximum_runs": 5,
+          "target_relative_standard_error": 0.05
+        },
+        "statistical_scope": "descriptive RSE; no sequential coverage or rank guarantee",
+        "multi_fidelity": false,
+        "measured": false,
+        "planning_seconds": 0.00033925101161003113
+      },
+      "mode": "pilot",
+      "created_at": "2026-10-02T13:19:30.220036+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device"
+    },
+    {
+      "ref": "plan-700b1d8838e54c6885f9d05629f17136",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "reason": "INDEPENDENT_FINAL_CONFIRMATION",
+        "planning_seconds": 0
+      },
+      "mode": "confirmation",
+      "created_at": "2026-10-02T13:19:51.176292+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device"
+    },
+    {
+      "ref": "plan-9d75f14121544ca3af2ec73aa369ceeb",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "reason": "INDEPENDENT_FINAL_CONFIRMATION",
+        "planning_seconds": 0
+      },
+      "mode": "confirmation",
+      "created_at": "2026-10-02T13:20:11.961928+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device"
+    },
+    {
+      "ref": "plan-3cf68b509a244c21a4d72a99f5256746",
+      "candidate_ref": "cpu1",
+      "choice": {
+        "candidate_ref": "cpu1",
+        "reason": "INDEPENDENT_FINAL_CONFIRMATION",
+        "planning_seconds": 0
+      },
+      "mode": "confirmation",
+      "created_at": "2026-10-02T13:20:32.948389+00:00",
+      "reserved_device_seconds": 30,
+      "execution_limits": {
+        "max_run_seconds": 30,
+        "max_queue_seconds": 60,
+        "max_collection_seconds": 10
+      },
+      "device_unit": "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device"
+    }
+  ],
+  "observations": [
+    {
+      "plan_ref": "plan-75796eb045d54c439f7ec21c57a2b101",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-7aac00c2b4e145669d8ed2ff12c05a16",
+      "job_id": "j-c2379433a5eb4ed4a7cc54fbf2179193",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.001316398149356246,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013053504517301917,
+        "latency_p95_ms": 0.013947021216154099,
+        "latency_p99_ms": 0.01557002542540431,
+        "throughput": 75964.85914911282,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T13:18:01.820937+00:00",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-c2379433a5eb4ed4a7cc54fbf2179193",
+        "attempt_id": "a-7aac00c2b4e145669d8ed2ff12c05a16",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.001316398149356246,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013053504517301917,
+          "latency_p95_ms": 0.013947021216154099,
+          "latency_p99_ms": 0.01557002542540431,
+          "throughput": 75964.85914911282,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:d82d750c26598a439d473f480f38cc015a3514f4b6192e7a0395fb370383243b",
+      "backend_job_id": "a-7aac00c2b4e145669d8ed2ff12c05a16",
+      "submitted_at": "2026-10-02T13:17:51Z",
+      "started_at": "2026-10-02T13:17:51Z",
+      "finished_at": "2026-10-02T13:17:53Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.07307,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "delivery": {
+        "mlflow_run_id": "f3c68272146d427eb589ee96481ee6e9",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:b0dd1c5e21eecfa41e65d85e01b12945363e0fb543b5792a860921a844c1fd7e",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-dd6556b1c0374a918da2e893e5eb75ff",
+      "candidate_ref": "cpu2",
+      "attempt_id": "a-7f3ad9d7a2aa4a6f80d9dee2df38e184",
+      "job_id": "j-75f1724843014ecab9d1f8ddb0a4e99a",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013353510876186192,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013237528037279844,
+        "latency_p95_ms": 0.014046032447367907,
+        "latency_p99_ms": 0.015316007193177938,
+        "throughput": 74886.67282125309,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T13:18:22.722902+00:00",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-75f1724843014ecab9d1f8ddb0a4e99a",
+        "attempt_id": "a-7f3ad9d7a2aa4a6f80d9dee2df38e184",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013353510876186192,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013237528037279844,
+          "latency_p95_ms": 0.014046032447367907,
+          "latency_p99_ms": 0.015316007193177938,
+          "throughput": 74886.67282125309,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:ff9d6f154f6991443267b56494fd0a7addd26669ce70ae7f207015672d886b40",
+      "backend_job_id": "a-7f3ad9d7a2aa4a6f80d9dee2df38e184",
+      "submitted_at": "2026-10-02T13:18:12Z",
+      "started_at": "2026-10-02T13:18:12Z",
+      "finished_at": "2026-10-02T13:18:14Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.082524,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "delivery": {
+        "mlflow_run_id": "6af1a8551af6479bb356818f0aed6c53",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:beb925adb16132a2e377b2ccae49a87e0a69c4600d9cdb1bba6a1e1f0ed670eb",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-3276912bd0b34533b6d4fa61c9073c86",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-36f12c19684140feb68064c4a6fe0081",
+      "job_id": "j-77d880f173fc4d92866ba3a43e9516a4",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013261351268738508,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.01310952939093113,
+        "latency_p95_ms": 0.013778975699096918,
+        "latency_p99_ms": 0.015441968571394682,
+        "throughput": 75407.09688893758,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T13:18:43.676541+00:00",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-77d880f173fc4d92866ba3a43e9516a4",
+        "attempt_id": "a-36f12c19684140feb68064c4a6fe0081",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013261351268738508,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.01310952939093113,
+          "latency_p95_ms": 0.013778975699096918,
+          "latency_p99_ms": 0.015441968571394682,
+          "throughput": 75407.09688893758,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:d5dc62a447af3a6e4e5158e7e7a103be64295428eea0d02f81662d3dd25ded3b",
+      "backend_job_id": "a-36f12c19684140feb68064c4a6fe0081",
+      "submitted_at": "2026-10-02T13:18:32Z",
+      "started_at": "2026-10-02T13:18:33Z",
+      "finished_at": "2026-10-02T13:18:35Z",
+      "queue_seconds": 1.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 0.0,
+      "collection_seconds": 0.126237,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "delivery": {
+        "mlflow_run_id": "102e3709a0354b63ae4299c6679e6b10",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:3f3119d453c337bbb15982595c7bcdeec298d7a58b2346952c2ea721d02a692d",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-41d5b890ed8b468c9d7eece14f9004b7",
+      "candidate_ref": "cpu2",
+      "attempt_id": "a-6ade02ad82a642df942cdfec7bceca4a",
+      "job_id": "j-a1302050391642feaa7b548f36794692",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013430240796878934,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013188488082960248,
+        "latency_p95_ms": 0.01440901542082429,
+        "latency_p99_ms": 0.01985003473237157,
+        "throughput": 74458.82878230976,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T13:19:04.434692+00:00",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-a1302050391642feaa7b548f36794692",
+        "attempt_id": "a-6ade02ad82a642df942cdfec7bceca4a",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013430240796878934,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013188488082960248,
+          "latency_p95_ms": 0.01440901542082429,
+          "latency_p99_ms": 0.01985003473237157,
+          "throughput": 74458.82878230976,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:effa73e4e3693b19c42100c73fca94580d88b86c58d3ff5babb60cb7e752b922",
+      "backend_job_id": "a-6ade02ad82a642df942cdfec7bceca4a",
+      "submitted_at": "2026-10-02T13:18:53Z",
+      "started_at": "2026-10-02T13:18:54Z",
+      "finished_at": "2026-10-02T13:18:56Z",
+      "queue_seconds": 1.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 0.0,
+      "collection_seconds": 0.036549,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "delivery": {
+        "mlflow_run_id": "94813ae3367d40819fa8c382b13a990d",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:498cd736ffb8820eb08b86e155ab5c1c738965969a451306233441ab048e3010",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-297dceac6f334b0fa4591cea5540cfea",
+      "candidate_ref": "cpu2",
+      "attempt_id": "a-96c0bf82f9304227ae6c2a9f62fd82d7",
+      "job_id": "j-1f579c84da9d4a208f715751eeb661d4",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013209387543611228,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013100012438371778,
+        "latency_p95_ms": 0.013665994629263878,
+        "latency_p99_ms": 0.014214019756764174,
+        "throughput": 75703.73695967864,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T13:19:25.139570+00:00",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-1f579c84da9d4a208f715751eeb661d4",
+        "attempt_id": "a-96c0bf82f9304227ae6c2a9f62fd82d7",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:3d39f8162e997e88256ace26fdf593abb8ce65a28599bf1ac466a9e1430015cf",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013209387543611228,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013100012438371778,
+          "latency_p95_ms": 0.013665994629263878,
+          "latency_p99_ms": 0.014214019756764174,
+          "throughput": 75703.73695967864,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:0620def76666c34946ccc68ced38a25aee14bee832a40916efeb46a8b792c43a",
+      "backend_job_id": "a-96c0bf82f9304227ae6c2a9f62fd82d7",
+      "submitted_at": "2026-10-02T13:19:14Z",
+      "started_at": "2026-10-02T13:19:14Z",
+      "finished_at": "2026-10-02T13:19:16Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.050136,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "delivery": {
+        "mlflow_run_id": "2789081a13564f02abebdf3534fbef25",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:cf5afd40ec1e5470a0ddaea3f0905eb8d2273571fc988e592be2822c4c07b2be",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-12e0ed3c20194f14935083ba3092a22d",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-79e8ae1c422041daa09b48941cd99285",
+      "job_id": "j-783e50edcf014af4a3fe9bd855128992",
+      "mode": "pilot",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013220349210314453,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013003998901695013,
+        "latency_p95_ms": 0.013520009815692902,
+        "latency_p99_ms": 0.01846597297117114,
+        "throughput": 75640.96712511987,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T13:19:46.100082+00:00",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-783e50edcf014af4a3fe9bd855128992",
+        "attempt_id": "a-79e8ae1c422041daa09b48941cd99285",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013220349210314453,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013003998901695013,
+          "latency_p95_ms": 0.013520009815692902,
+          "latency_p99_ms": 0.01846597297117114,
+          "throughput": 75640.96712511987,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:4e442f24c36e7843cf2ecfdc6eac08d15602fd2e5be20de90091472c9dc9f827",
+      "backend_job_id": "a-79e8ae1c422041daa09b48941cd99285",
+      "submitted_at": "2026-10-02T13:19:35Z",
+      "started_at": "2026-10-02T13:19:35Z",
+      "finished_at": "2026-10-02T13:19:37Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.106137,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "delivery": {
+        "mlflow_run_id": "66657d9645f840b7b3a9b2f45bb1a628",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:54ac63713a0a49b59da3718559d87c8ed70cae8db18103585302e8f6b8ef3ed4",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-700b1d8838e54c6885f9d05629f17136",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-7d096ec21147451b9be1dbae789b7971",
+      "job_id": "j-31769ddd947848368a1fa87af209d050",
+      "mode": "confirmation",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013023482752032578,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.01294352114200592,
+        "latency_p95_ms": 0.01350202364847064,
+        "latency_p99_ms": 0.014979043044149876,
+        "throughput": 76784.37627169504,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T13:20:06.865763+00:00",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-31769ddd947848368a1fa87af209d050",
+        "attempt_id": "a-7d096ec21147451b9be1dbae789b7971",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013023482752032578,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.01294352114200592,
+          "latency_p95_ms": 0.01350202364847064,
+          "latency_p99_ms": 0.014979043044149876,
+          "throughput": 76784.37627169504,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:9b8a4dd2745d74fdf9682903b51745cfe879ec7ea2ce9681a6d2f7700c1973ef",
+      "backend_job_id": "a-7d096ec21147451b9be1dbae789b7971",
+      "submitted_at": "2026-10-02T13:19:56Z",
+      "started_at": "2026-10-02T13:19:56Z",
+      "finished_at": "2026-10-02T13:19:58Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.050373,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "delivery": {
+        "mlflow_run_id": "4a4b09751a9b450a85ac07add469f978",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:7699c6d9c18e9c275a94759437cce6237a7f17979bf6e5d97b13f6e45f6edebf",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-9d75f14121544ca3af2ec73aa369ceeb",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-3ee2eb52292c4f758ddea46e8752243d",
+      "job_id": "j-755bae483e8a4878a67452ba7ba62933",
+      "mode": "confirmation",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013181061949580908,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.01303601311519742,
+        "latency_p95_ms": 0.013982004020363092,
+        "latency_p99_ms": 0.016272999346256256,
+        "throughput": 75866.42137220173,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T13:20:27.871516+00:00",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-755bae483e8a4878a67452ba7ba62933",
+        "attempt_id": "a-3ee2eb52292c4f758ddea46e8752243d",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013181061949580908,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.01303601311519742,
+          "latency_p95_ms": 0.013982004020363092,
+          "latency_p99_ms": 0.016272999346256256,
+          "throughput": 75866.42137220173,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:d051df7f09dc4ca12119affb832e01c04c0caad4873854c96a9fd8d95e567500",
+      "backend_job_id": "a-3ee2eb52292c4f758ddea46e8752243d",
+      "submitted_at": "2026-10-02T13:20:17Z",
+      "started_at": "2026-10-02T13:20:17Z",
+      "finished_at": "2026-10-02T13:20:19Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.064987,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "delivery": {
+        "mlflow_run_id": "e4c775c14b9846bfb1055d78e3468604",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:3218b17cb8c667b1c8444f525a64d7543548e4d4a9dd7d7eb2350d31ff5d9306",
+        "s3_api_mlflow_bytes_match": true
+      }
+    },
+    {
+      "plan_ref": "plan-3cf68b509a244c21a4d72a99f5256746",
+      "candidate_ref": "cpu1",
+      "attempt_id": "a-7ad0b36ecdb54fe49b35b2cf7c02a4e1",
+      "job_id": "j-5135ef1dd6cd445b8685da77ed4f3711",
+      "mode": "confirmation",
+      "outcome": "COMPLETED",
+      "measurements": {
+        "elapsed_seconds": 0.0013158150832168758,
+        "peak_memory_mib": 9.125,
+        "quality_value": 1.0,
+        "sample_count": 100,
+        "work_units": 100,
+        "latency_p50_ms": 0.013006036169826984,
+        "latency_p95_ms": 0.013977987691760063,
+        "latency_p99_ms": 0.01687603071331978,
+        "throughput": 75998.52082218285,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "evidence_kind": "hardware",
+      "device_seconds": 2.0,
+      "cost_source": "scheduler_allocation",
+      "recorded_at": "2026-10-02T13:20:48.730943+00:00",
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-5135ef1dd6cd445b8685da77ed4f3711",
+        "attempt_id": "a-7ad0b36ecdb54fe49b35b2cf7c02a4e1",
+        "epoch": 1,
+        "workload_signature": "sha256:7a1282af837a7eccd52542c3aab1c42febb88d51e75979d80c2518f2ffd820f3",
+        "context_signature": "sha256:a4272e6aecb7690cbaedf68bae3a49f45566e326d8a1ff4c6afedf18d35089c8",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0013158150832168758,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 0.013006036169826984,
+          "latency_p95_ms": 0.013977987691760063,
+          "latency_p99_ms": 0.01687603071331978,
+          "throughput": 75998.52082218285,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:17d082b577043018fb1c27cf71cced113867c55b4cf4c55743feb1cd8231eb20",
+      "backend_job_id": "a-7ad0b36ecdb54fe49b35b2cf7c02a4e1",
+      "submitted_at": "2026-10-02T13:20:38Z",
+      "started_at": "2026-10-02T13:20:38Z",
+      "finished_at": "2026-10-02T13:20:40Z",
+      "queue_seconds": 0.0,
+      "allocated_device_seconds": 2.0,
+      "preparation_seconds": 1.0,
+      "collection_seconds": 0.062611,
+      "cost_uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "delivery": {
+        "mlflow_run_id": "98b6762403734036a51809a531f04379",
+        "mlflow_state": "FINISHED",
+        "artifact_digest": "sha256:ae612f49765790fc0e8c2f515842b469fab4e75d611673943ba186a35f0c16d2",
+        "s3_api_mlflow_bytes_match": true
+      }
+    }
+  ],
+  "ledger_device_seconds": 18.0,
+  "unfinished_outbox": 0,
+  "final_queue": {
+    "pendingWorkloads": 0,
+    "admittedWorkloads": 0,
+    "reservingWorkloads": 0
+  },
+  "final_nodes": {
+    "count": 10,
+    "ready": 10,
+    "pressure": 0
+  },
+  "limitations": [
+    "single-study numerical matmul fixture; not trained-model accuracy",
+    "RSE is descriptive, not a sequential confidence bound",
+    "no thermal or load-context attribution",
+    "no equal-budget strategy comparison",
+    "GPU reservation is not utilization or energy",
+    "historical F0 qualification was reused; qualification costs are reported separately in fidelity-calibration.json"
+  ]
+}
