@@ -1,0 +1,1325 @@
+{
+  "schema_version": "v1",
+  "evidence_kind": "hardware",
+  "scope": "single-GPU control-path smoke experiment; not a scientific strategy ranking",
+  "hardware": {
+    "accelerator": "NVIDIA GeForce RTX 5080",
+    "count": 1,
+    "pytorch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "precision": "fp32",
+    "matrix_shape": [
+      256,
+      256
+    ],
+    "iterations": 20,
+    "warmup": 3,
+    "power_mode": "unmanaged-default"
+  },
+  "measurement_boundary": "CUDA-synchronized forward-only; excludes container startup, reference computation and collection",
+  "policy": {
+    "total_wall_seconds": 600,
+    "final_confirmation_reserved_seconds": 180,
+    "max_probes": 4,
+    "max_candidates": 2,
+    "candidate_cpu_requests": [
+      1,
+      2
+    ],
+    "device_budget_seconds": 600
+  },
+  "rounds": [
+    {
+      "round": "before_queue_fix",
+      "trials": [
+        {
+          "strategy": "lookup",
+          "seed": 7,
+          "state": "ABSTAINED",
+          "stop_reason": "INDEPENDENT_CONFIRMATION_FAILED",
+          "planning_seconds": 0.0,
+          "charged_device_seconds": {
+            "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 53
+          },
+          "plans": [
+            {
+              "ref": "plan-50dea943d4714115bca8f512dda05494",
+              "mode": "confirmation",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 53,
+                "max_queue_seconds": 1,
+                "max_collection_seconds": 5
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            }
+          ],
+          "observations": [
+            {
+              "plan_ref": "plan-50dea943d4714115bca8f512dda05494",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-ac2c0bbc101f498c838769be00117f3d",
+              "job_id": "j-0049067eb2e74ecf80bab04bb92e2901",
+              "mode": "confirmation",
+              "outcome": "FAILED",
+              "measurements": null,
+              "evidence_kind": null,
+              "device_seconds": 53,
+              "cost_source": "conservative_reservation_unknown_actual",
+              "recorded_at": "2026-10-02T04:47:55.787241+00:00",
+              "job_state": "CANCELED",
+              "error": "QUEUE_DEADLINE_EXCEEDED"
+            }
+          ],
+          "recommendation": null
+        },
+        {
+          "strategy": "random",
+          "seed": 7,
+          "state": "ABSTAINED",
+          "stop_reason": "INDEPENDENT_CONFIRMATION_FAILED",
+          "planning_seconds": 6.996397860348225e-05,
+          "charged_device_seconds": {
+            "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 61.0
+          },
+          "plans": [
+            {
+              "ref": "plan-905662da508546d397887af133be4d6a",
+              "mode": "pilot",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "SEEDED_RANDOM",
+              "planning_seconds": 2.0781008061021566e-05
+            },
+            {
+              "ref": "plan-38452b74249d4d3e8f83ea9170d797c9",
+              "mode": "pilot",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "SEEDED_RANDOM",
+              "planning_seconds": 1.554499613121152e-05
+            },
+            {
+              "ref": "plan-5ad732482f564c098ae6059cc0d2633c",
+              "mode": "pilot",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "SEEDED_RANDOM",
+              "planning_seconds": 1.6803969629108906e-05
+            },
+            {
+              "ref": "plan-29bc146a254a4c45b24b3821bd965567",
+              "mode": "pilot",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "SEEDED_RANDOM",
+              "planning_seconds": 1.6834004782140255e-05
+            },
+            {
+              "ref": "plan-aa5850123ec24fc2b7a5b319b2b416e1",
+              "mode": "confirmation",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 53,
+                "max_queue_seconds": 1,
+                "max_collection_seconds": 5
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            }
+          ],
+          "observations": [
+            {
+              "plan_ref": "plan-905662da508546d397887af133be4d6a",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-cac4e657b1e94ef69991eb4314cc4c90",
+              "job_id": "j-919c5d2623f34cd18d07d68e55c3dd8a",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.0002752429572865367,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013479497283697128,
+                "latency_p95_ms": 0.0142659991979599,
+                "latency_p99_ms": 0.0142659991979599,
+                "throughput": 72663.07627693217,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:48:03.025423+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-38452b74249d4d3e8f83ea9170d797c9",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-dc7c61a1a94943f2a485e0c30135cf17",
+              "job_id": "j-1a70e6a365c84c62b9a5ada837237e06",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.00027194106951355934,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013249489711597562,
+                "latency_p95_ms": 0.01403602072969079,
+                "latency_p99_ms": 0.01403602072969079,
+                "throughput": 73545.3458198699,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:48:12.342429+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-5ad732482f564c098ae6059cc0d2633c",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-4f3cd50b50b1405dbdc134a93aea8c82",
+              "job_id": "j-414284c6edb442b1aa3907c02b089633",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.00026969797909259796,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013218988897278905,
+                "latency_p95_ms": 0.014061981346458197,
+                "latency_p99_ms": 0.014061981346458197,
+                "throughput": 74157.02582307156,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:48:21.679821+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-29bc146a254a4c45b24b3821bd965567",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-96413289a03e4b6fbf573d569667092c",
+              "job_id": "j-567f751afa3543c1a971cc6d81359a90",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.00026936002541333437,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.01312600215896964,
+                "latency_p95_ms": 0.013853015843778849,
+                "latency_p99_ms": 0.013853015843778849,
+                "throughput": 74250.06724479586,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:48:30.858553+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-aa5850123ec24fc2b7a5b319b2b416e1",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-292afb06c2254ceabd7751ebeb178538",
+              "job_id": "j-f8ef6a4fbee04974a196c475841fb6d9",
+              "mode": "confirmation",
+              "outcome": "FAILED",
+              "measurements": null,
+              "evidence_kind": null,
+              "device_seconds": 53,
+              "cost_source": "conservative_reservation_unknown_actual",
+              "recorded_at": "2026-10-02T04:48:37.920241+00:00",
+              "job_state": "CANCELED",
+              "error": "QUEUE_DEADLINE_EXCEEDED"
+            }
+          ],
+          "recommendation": null
+        },
+        {
+          "strategy": "qlognei",
+          "seed": 7,
+          "state": "ABSTAINED",
+          "stop_reason": "INDEPENDENT_CONFIRMATION_FAILED",
+          "planning_seconds": 1.2191548460396007,
+          "charged_device_seconds": {
+            "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 61.0
+          },
+          "plans": [
+            {
+              "ref": "plan-dfa503e03283444d9acba21028384e12",
+              "mode": "pilot",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+              "planning_seconds": 0.00011108699254691601
+            },
+            {
+              "ref": "plan-4c0c8d8d851249ac9efa7ff1c07b44be",
+              "mode": "pilot",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+              "planning_seconds": 6.392400246113539e-05
+            },
+            {
+              "ref": "plan-cc3c1f448dbc4e318dc707e5873c1315",
+              "mode": "pilot",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+              "planning_seconds": 2.342602238059044e-05
+            },
+            {
+              "ref": "plan-170750b975f641bb8a52c4737ee25d2a",
+              "mode": "pilot",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "CONSTRAINED_QLOGNEI",
+              "planning_seconds": 1.218956409022212
+            },
+            {
+              "ref": "plan-f8839e38d5a64ec5ae9733bd26bcc313",
+              "mode": "confirmation",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 53,
+                "max_queue_seconds": 1,
+                "max_collection_seconds": 5
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            }
+          ],
+          "observations": [
+            {
+              "plan_ref": "plan-dfa503e03283444d9acba21028384e12",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-1b64a22f11dd4a6da6ac315c774c6293",
+              "job_id": "j-bfceacf44e874bdbb56b5f5aeaab52a5",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.0002798939822241664,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013618002412840724,
+                "latency_p95_ms": 0.014242948964238167,
+                "latency_p99_ms": 0.014242948964238167,
+                "throughput": 71455.62702374233,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:48:46.250044+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-4c0c8d8d851249ac9efa7ff1c07b44be",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-1515014e40a742c2b91673d19bc51e32",
+              "job_id": "j-40935123f3854eaa999af187ebe03b8d",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.00026999693363904953,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013136013876646757,
+                "latency_p95_ms": 0.013943994417786598,
+                "latency_p99_ms": 0.013943994417786598,
+                "throughput": 74074.91533491775,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:48:54.733760+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-cc3c1f448dbc4e318dc707e5873c1315",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-0fcf762d4abc40caa26691009fe80b20",
+              "job_id": "j-6b46859f6aba4601ab3509424a3b4f5a",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.00026682205498218536,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.01302300370298326,
+                "latency_p95_ms": 0.014105986338108778,
+                "latency_p99_ms": 0.014105986338108778,
+                "throughput": 74956.32248741701,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:49:03.881936+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-170750b975f641bb8a52c4737ee25d2a",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-acb65ad0c2b94c939aa4ababe7488350",
+              "job_id": "j-38533e5642b14e2b9673218b27306818",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.0002788060228340328,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013564014807343483,
+                "latency_p95_ms": 0.014104996807873249,
+                "latency_p99_ms": 0.014104996807873249,
+                "throughput": 71734.46181937601,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:49:14.208714+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-f8839e38d5a64ec5ae9733bd26bcc313",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-c9e08d3b1eea4991a920ba55e9edccf6",
+              "job_id": "j-26cbfbbdea284641957db0032d92b678",
+              "mode": "confirmation",
+              "outcome": "FAILED",
+              "measurements": null,
+              "evidence_kind": null,
+              "device_seconds": 53,
+              "cost_source": "conservative_reservation_unknown_actual",
+              "recorded_at": "2026-10-02T04:49:22.029512+00:00",
+              "job_state": "CANCELED",
+              "error": "QUEUE_DEADLINE_EXCEEDED"
+            }
+          ],
+          "recommendation": null
+        }
+      ]
+    },
+    {
+      "round": "after_queue_fix",
+      "trials": [
+        {
+          "strategy": "lookup",
+          "seed": 7,
+          "state": "ABSTAINED",
+          "stop_reason": "INDEPENDENT_CONFIRMATION_FAILED",
+          "planning_seconds": 0.0,
+          "charged_device_seconds": {
+            "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 27
+          },
+          "plans": [
+            {
+              "ref": "plan-870c98a688fd4770b4a061c96e5fc8ae",
+              "mode": "confirmation",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 27,
+                "max_queue_seconds": 27,
+                "max_collection_seconds": 5
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            }
+          ],
+          "observations": [
+            {
+              "plan_ref": "plan-870c98a688fd4770b4a061c96e5fc8ae",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-a14cdbcbf8f34747bb7d2ade795bfdd6",
+              "job_id": "j-d8868b58c6f94002be3db2231666f4b7",
+              "mode": "confirmation",
+              "outcome": "FAILED",
+              "measurements": null,
+              "evidence_kind": null,
+              "device_seconds": 27,
+              "cost_source": "conservative_reservation_unknown_actual",
+              "recorded_at": "2026-10-02T04:54:17.251796+00:00",
+              "job_state": "CANCELED",
+              "error": "QUEUE_DEADLINE_EXCEEDED"
+            }
+          ],
+          "recommendation": null
+        },
+        {
+          "strategy": "random",
+          "seed": 7,
+          "state": "COMPLETED",
+          "stop_reason": null,
+          "planning_seconds": 0.00013499800115823746,
+          "charged_device_seconds": {
+            "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 22.0
+          },
+          "plans": [
+            {
+              "ref": "plan-32cd100abe784ed9948fc93347202b0e",
+              "mode": "pilot",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "SEEDED_RANDOM",
+              "planning_seconds": 2.1397019736468792e-05
+            },
+            {
+              "ref": "plan-242a8c7863e4471c85d400be24a25dd0",
+              "mode": "pilot",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "SEEDED_RANDOM",
+              "planning_seconds": 2.423400292173028e-05
+            },
+            {
+              "ref": "plan-e8e88cefea36452eb98b660d65767ac3",
+              "mode": "pilot",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "SEEDED_RANDOM",
+              "planning_seconds": 7.513700984418392e-05
+            },
+            {
+              "ref": "plan-eee226a76d3846fea0cd10a117b53178",
+              "mode": "pilot",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "SEEDED_RANDOM",
+              "planning_seconds": 1.4229968655854464e-05
+            },
+            {
+              "ref": "plan-8f0d0e2d13dd4a298284713eebac3ff9",
+              "mode": "confirmation",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 14,
+                "max_queue_seconds": 13,
+                "max_collection_seconds": 2
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            },
+            {
+              "ref": "plan-871ffd775bea4a00976dce603111e9bc",
+              "mode": "confirmation",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 15,
+                "max_queue_seconds": 15,
+                "max_collection_seconds": 3
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            },
+            {
+              "ref": "plan-340e219815ce413e99fc53908abcf7ca",
+              "mode": "confirmation",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 18,
+                "max_queue_seconds": 18,
+                "max_collection_seconds": 3
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            },
+            {
+              "ref": "plan-6ffe45c7330844939b61dd91b02fa55d",
+              "mode": "confirmation",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 23,
+                "max_queue_seconds": 22,
+                "max_collection_seconds": 5
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            },
+            {
+              "ref": "plan-68c98912647e47d8bf5500b74a49a79c",
+              "mode": "confirmation",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 32,
+                "max_queue_seconds": 32,
+                "max_collection_seconds": 7
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            },
+            {
+              "ref": "plan-d62446e8ccb846ecac7c68291406e46d",
+              "mode": "confirmation",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 65,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            }
+          ],
+          "observations": [
+            {
+              "plan_ref": "plan-32cd100abe784ed9948fc93347202b0e",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-b04e649ce36d483dafd15f0e635cbc78",
+              "job_id": "j-a366d1556c374223a4a866a9587b9888",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.00027175917057320476,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013196520740166306,
+                "latency_p95_ms": 0.014070014003664255,
+                "latency_p99_ms": 0.014070014003664255,
+                "throughput": 73594.57256884925,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 3.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:54:27.286990+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-242a8c7863e4471c85d400be24a25dd0",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-5156dbda96ed4d46b057238d07982c83",
+              "job_id": "j-cda3c3003ce04fc2a7fc1681eff9d0c0",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.00027023785514757037,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013107492122799158,
+                "latency_p95_ms": 0.015129975508898497,
+                "latency_p99_ms": 0.015129975508898497,
+                "throughput": 74008.87632518576,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 3.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:54:37.673493+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-e8e88cefea36452eb98b660d65767ac3",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-68bde47556d747dfac3894d74a194c98",
+              "job_id": "j-e935aea1934a4b72a67e97021eb1ad90",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.0002747368416748941,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013334007235243917,
+                "latency_p95_ms": 0.014256045687943697,
+                "latency_p99_ms": 0.014256045687943697,
+                "throughput": 72796.93497993513,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:54:45.767702+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-eee226a76d3846fea0cd10a117b53178",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-78b8375036e245d0996e9eaa60b9609e",
+              "job_id": "j-4baa2a6fd37f4e1690929f5f8b31a161",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.00027847691671922803,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013603479601442814,
+                "latency_p95_ms": 0.014099001418799162,
+                "latency_p99_ms": 0.014099001418799162,
+                "throughput": 71819.23814592083,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:54:53.800073+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-8f0d0e2d13dd4a298284713eebac3ff9",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-8e0e2ae89cb842b3bb468752aee457d5",
+              "job_id": "j-8b3b1d106ef848b38c6466ef2f805141",
+              "mode": "confirmation",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.0002710819826461375,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013338983990252018,
+                "latency_p95_ms": 0.013994984328746796,
+                "latency_p99_ms": 0.013994984328746796,
+                "throughput": 73778.41863473243,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:55:04.234246+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-871ffd775bea4a00976dce603111e9bc",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-7b5ef75d1ca247be897f0901c027a775",
+              "job_id": "j-6ca61cdfb8c54c97883dc6029e2c1195",
+              "mode": "confirmation",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.0002714702859520912,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013349024811759591,
+                "latency_p95_ms": 0.013936019968241453,
+                "latency_p99_ms": 0.013936019968241453,
+                "throughput": 73672.88810212392,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:55:13.845622+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-340e219815ce413e99fc53908abcf7ca",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-ee7242ceb64d453ba0653825a89fcf20",
+              "job_id": "j-387aca9aeb0846e79a22e7ae0f25fd42",
+              "mode": "confirmation",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.0002716287272050977,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013287499314174056,
+                "latency_p95_ms": 0.014154997188597918,
+                "latency_p99_ms": 0.014154997188597918,
+                "throughput": 73629.91464779303,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:55:21.838943+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-6ffe45c7330844939b61dd91b02fa55d",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-93ebd77c800e4d94a6cb5e08ef0cdd9b",
+              "job_id": "j-b1bbd4bc6ffb4e7086e1a1923bf74a8a",
+              "mode": "confirmation",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.000278717081528157,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013605982530862093,
+                "latency_p95_ms": 0.016044010408222675,
+                "latency_p99_ms": 0.016044010408222675,
+                "throughput": 71757.35297723232,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:55:30.002819+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-68c98912647e47d8bf5500b74a49a79c",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-628f93e56d5f40678d8677b1d80a7431",
+              "job_id": "j-26320154d26a4920b86ea45e3c2adfe0",
+              "mode": "confirmation",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.00027361209504306316,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013340992154553533,
+                "latency_p95_ms": 0.014327000826597214,
+                "latency_p99_ms": 0.014327000826597214,
+                "throughput": 73096.1838395786,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:55:37.974661+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-d62446e8ccb846ecac7c68291406e46d",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-7ba2669eeeda46a3a10950503fce29d4",
+              "job_id": "j-476726255c9047b4bdaf8c8bb8c82c85",
+              "mode": "confirmation",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.0002720329794101417,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013298500562086701,
+                "latency_p95_ms": 0.014026998542249203,
+                "latency_p99_ms": 0.014026998542249203,
+                "throughput": 73520.49756381258,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:55:47.163205+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            }
+          ],
+          "recommendation": {
+            "candidate_ref": "cpu1",
+            "predicted_candidate": "cpu2",
+            "ranking": [
+              {
+                "candidate_ref": "cpu1",
+                "mean_seconds": 0.00027152841600279015,
+                "interval_seconds": [
+                  0.00027070022573772606,
+                  0.00027235660626785424
+                ],
+                "evidence_refs": [
+                  "a-8e0e2ae89cb842b3bb468752aee457d5",
+                  "a-7b5ef75d1ca247be897f0901c027a775",
+                  "a-7ba2669eeeda46a3a10950503fce29d4"
+                ],
+                "independent_runs": 3
+              },
+              {
+                "candidate_ref": "cpu2",
+                "mean_seconds": 0.0002746526345921059,
+                "interval_seconds": [
+                  0.00026831862314583824,
+                  0.0002809866460383736
+                ],
+                "evidence_refs": [
+                  "a-ee7242ceb64d453ba0653825a89fcf20",
+                  "a-93ebd77c800e4d94a6cb5e08ef0cdd9b",
+                  "a-628f93e56d5f40678d8677b1d80a7431"
+                ],
+                "independent_runs": 3
+              }
+            ],
+            "cost": {
+              "wall_seconds": 91.005267,
+              "planning_seconds": 0.00013499800115823746,
+              "device_seconds": {
+                "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 22.0
+              }
+            }
+          }
+        },
+        {
+          "strategy": "qlognei",
+          "seed": 7,
+          "state": "COMPLETED",
+          "stop_reason": null,
+          "planning_seconds": 1.1719285469735041,
+          "charged_device_seconds": {
+            "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 15.0
+          },
+          "plans": [
+            {
+              "ref": "plan-52f39dc9b28047a58f4417787d6fe58c",
+              "mode": "pilot",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+              "planning_seconds": 2.0713021513074636e-05
+            },
+            {
+              "ref": "plan-444ed723b05a419abc223bdc11cffa0f",
+              "mode": "pilot",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+              "planning_seconds": 6.740697426721454e-05
+            },
+            {
+              "ref": "plan-bf9893429e304314a511fb75ddd8a67b",
+              "mode": "pilot",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+              "planning_seconds": 1.751800300553441e-05
+            },
+            {
+              "ref": "plan-26ece85f690f4f45ac82443628fa9df8",
+              "mode": "pilot",
+              "candidate_ref": "cpu2",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 120,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "CONSTRAINED_QLOGNEI",
+              "planning_seconds": 1.1718229089747183
+            },
+            {
+              "ref": "plan-10284aea1b4a4d47b4934de986724f20",
+              "mode": "confirmation",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 27,
+                "max_queue_seconds": 27,
+                "max_collection_seconds": 5
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            },
+            {
+              "ref": "plan-5d0845ec1447491bbff4157ba99ba9b8",
+              "mode": "confirmation",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 39,
+                "max_queue_seconds": 38,
+                "max_collection_seconds": 8
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            },
+            {
+              "ref": "plan-5350195023b145328c2f4b1a9bff1871",
+              "mode": "confirmation",
+              "candidate_ref": "cpu1",
+              "execution_limits": {
+                "max_run_seconds": 60,
+                "max_queue_seconds": 91,
+                "max_collection_seconds": 10
+              },
+              "choice_reason": "INDEPENDENT_FINAL_CONFIRMATION",
+              "planning_seconds": 0
+            }
+          ],
+          "observations": [
+            {
+              "plan_ref": "plan-52f39dc9b28047a58f4417787d6fe58c",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-737e7c9354184fa88f70a0627b06f0ab",
+              "job_id": "j-62d130d111174a2e95a27022a23af191",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.0002753800363279879,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013367971405386925,
+                "latency_p95_ms": 0.01605501165613532,
+                "latency_p99_ms": 0.01605501165613532,
+                "throughput": 72626.90595399316,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:55:58.739245+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-444ed723b05a419abc223bdc11cffa0f",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-540a9ad229234da9a78c3e5ce84391e5",
+              "job_id": "j-93955060d7624e8686a3f2452a1afea1",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.00026986817829310894,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013163982657715678,
+                "latency_p95_ms": 0.013971002772450447,
+                "latency_p99_ms": 0.013971002772450447,
+                "throughput": 74110.25681685827,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:56:08.119348+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-bf9893429e304314a511fb75ddd8a67b",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-eced73d4d5c548239587b65bfda84c44",
+              "job_id": "j-93f42754110549d3943f9b764c00d96e",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.00027455599047243595,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013372511602938175,
+                "latency_p95_ms": 0.01424702350050211,
+                "latency_p99_ms": 0.01424702350050211,
+                "throughput": 72844.88663163189,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:56:17.343546+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-26ece85f690f4f45ac82443628fa9df8",
+              "candidate_ref": "cpu2",
+              "attempt_id": "a-0d7cd2468810427a960bca100a24b4ad",
+              "job_id": "j-f775fc3c80aa4dc8965a1599606882a4",
+              "mode": "pilot",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.0002699150936678052,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.01329949009232223,
+                "latency_p95_ms": 0.013814016710966825,
+                "latency_p99_ms": 0.013814016710966825,
+                "throughput": 74097.37531986544,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 3.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:56:26.646122+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-10284aea1b4a4d47b4934de986724f20",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-0ab15e1ab8e344268165480ebd872233",
+              "job_id": "j-caa85e4685c0432b8685d143dc9a38cd",
+              "mode": "confirmation",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.0002725927624851465,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013376993592828512,
+                "latency_p95_ms": 0.01415301812812686,
+                "latency_p99_ms": 0.01415301812812686,
+                "throughput": 73369.51949004806,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:56:35.929239+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-5d0845ec1447491bbff4157ba99ba9b8",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-014fe2e95ac64f0a90fa43614f961113",
+              "job_id": "j-642dbf7f357343c7a1c0298e44943cf8",
+              "mode": "confirmation",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.0002747078542597592,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013382494216784835,
+                "latency_p95_ms": 0.014392018783837557,
+                "latency_p99_ms": 0.014392018783837557,
+                "throughput": 72804.6165767373,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:56:45.089657+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            },
+            {
+              "plan_ref": "plan-5350195023b145328c2f4b1a9bff1871",
+              "candidate_ref": "cpu1",
+              "attempt_id": "a-ad920dfb744c403c81912f5ad52b8dba",
+              "job_id": "j-6cc49d58779b4558b51a17d6c3055387",
+              "mode": "confirmation",
+              "outcome": "COMPLETED",
+              "measurements": {
+                "elapsed_seconds": 0.00026924110716208816,
+                "peak_memory_mib": 9.125,
+                "quality_value": 1.0,
+                "sample_count": 20,
+                "work_units": 20,
+                "latency_p50_ms": 0.013140030205249786,
+                "latency_p95_ms": 0.014083983842283487,
+                "latency_p99_ms": 0.014083983842283487,
+                "throughput": 74282.86197010633,
+                "gpu_utilization": null,
+                "power_watts": null,
+                "temperature_celsius": null
+              },
+              "evidence_kind": "hardware",
+              "device_seconds": 2.0,
+              "cost_source": "scheduler_allocation",
+              "recorded_at": "2026-10-02T04:56:54.181837+00:00",
+              "job_state": "SUCCEEDED",
+              "error": null
+            }
+          ],
+          "recommendation": {
+            "candidate_ref": "cpu1",
+            "predicted_candidate": "cpu1",
+            "ranking": [
+              {
+                "candidate_ref": "cpu1",
+                "mean_seconds": 0.00027218057463566464,
+                "interval_seconds": [
+                  0.00026740603117845775,
+                  0.00027695511809287153
+                ],
+                "evidence_refs": [
+                  "a-0ab15e1ab8e344268165480ebd872233",
+                  "a-014fe2e95ac64f0a90fa43614f961113",
+                  "a-ad920dfb744c403c81912f5ad52b8dba"
+                ],
+                "independent_runs": 3
+              }
+            ],
+            "cost": {
+              "wall_seconds": 66.904568,
+              "planning_seconds": 1.1719285469735041,
+              "device_seconds": {
+                "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 15.0
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Two finite CPU-request candidates and one GPU; no NPU or training qualification",
+    "One seed, sequential strategies, shared initial history; no randomized strategy trials or holdout evaluation",
+    "Tiny kernels are overhead-sensitive; no GPU saturation or system-wide speedup claim",
+    "GPU utilization, power and temperature were not collected and remain null",
+    "Intervals are descriptive mean +/- 3 standard errors from three independent jobs, not calibrated guarantees",
+    "Failed/canceled allocation may be a conservative reservation charge, not measured consumption",
+    "Preparation cost and complete failed-job usage ledger are still incomplete",
+    "Read-only runtime PVC is operator-qualified, not an automatically attested container image"
+  ],
+  "mlflow": {
+    "real_hardware_runs": 28,
+    "outbox": {
+      "DONE": 28
+    },
+    "durable_links": 28,
+    "artifact_upload_verified": false
+  }
+}

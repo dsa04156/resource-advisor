@@ -55,5 +55,6 @@ uv run pytest tests/test_study.py -q
 ```
 
 Tested optimizer versions: PyTorch 2.8.0+cpu, BoTorch 0.16.1, GPyTorch 1.15.2.
-These prove the implementation executes, not that BO outperforms random search
-on real GPUs. S0/S1/S2 hardware comparison remains mandatory.
+See the [real GPU smoke experiment](gpu-experiment.md) for an executed qLogNEI
+loop. It retained the baseline and does not show superiority over random search.
+Repeated, randomized S0/S1/S2 evaluation remains mandatory.

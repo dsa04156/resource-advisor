@@ -215,10 +215,15 @@ class Worker:
 
 
 class MLflowDelivery:
-    def __init__(self, store, url, *, token=None, client=None):
+    def __init__(self, store, url, *, experiments, token=None, client=None):
         import httpx
 
         self.store = store
+        if not experiments or any(
+            not isinstance(v, str) or not v.strip() for v in experiments.values()
+        ):
+            raise ValueError("explicit project-to-MLflow-experiment mapping required")
+        self.experiments = dict(experiments)
         self.client = client or httpx.Client(
             base_url=url.rstrip("/"),
             timeout=15,
@@ -237,12 +242,19 @@ class MLflowDelivery:
         try:
             b = event["body"]
             result = b["result"]
-            # Experiment 0 is the configured server default. Separate deployment/account required.
+            experiment_id = self.experiments[b["project"]]
             attempt = result["attempt_id"]
+            with self.store.transaction() as conn:
+                job = self.store.job(conn, b["job_id"])["body"]
+            start_time = int(
+                datetime.fromisoformat(job.get("started_at") or job["created_at"]).timestamp()
+                * 1000
+            )
+            timestamp = int(datetime.fromisoformat(job["finished_at"]).timestamp() * 1000)
             search = self.post(
                 "runs/search",
                 {
-                    "experiment_ids": ["0"],
+                    "experiment_ids": [experiment_id],
                     "filter": f"tags.`resource_advisor.attempt_id` = '{attempt}'",
                     "max_results": 2,
                 },
@@ -259,7 +271,10 @@ class MLflowDelivery:
                 "context_signature": result["context_signature"],
                 "result_digest": signature(result),
                 "quality_passed": str(b["quality_passed"]).lower(),
+                "execution_mode": job["request"]["mode"],
             }
+            if job["request"].get("study_ref"):
+                tags["resource_advisor.study_id"] = job["request"]["study_ref"]
             if b.get("parent_run_ref"):
                 tags["mlflow.parentRunId"] = b["parent_run_ref"]
             run = (
@@ -268,14 +283,33 @@ class MLflowDelivery:
                 else self.post(
                     "runs/create",
                     {
-                        "experiment_id": "0",
-                        "start_time": int(now().timestamp() * 1000),
+                        "experiment_id": experiment_id,
+                        "start_time": start_time,
                         "tags": [{"key": k, "value": v} for k, v in tags.items()],
                     },
                 )["run"]
             )
             run_id = run["info"]["run_id"]
-            timestamp = int(now().timestamp() * 1000)
+            with self.store.transaction() as conn:
+                self.store.put(
+                    conn,
+                    "tracking",
+                    attempt,
+                    b["project"],
+                    {"job_id": b["job_id"], "experiment_id": experiment_id, "run_id": run_id},
+                )
+            context = b["candidate"]["context"]
+            params = {
+                "backend": b["candidate"]["backend"],
+                "variant": b["variant"]["ref"],
+                "image": b["variant"]["image"],
+                "environment_digest": context["environment_digest"],
+                "accelerator_model": context["accelerator_model"],
+                "allocation_mode": context["allocation_mode"],
+                **job["spec"]["identity"],
+                **context["resources"],
+                **{"runtime." + k: v for k, v in context["runtime_versions"].items()},
+            }
             metrics = [
                 {"key": k, "value": v, "timestamp": timestamp, "step": 0}
                 for k, v in (result.get("measurements") or {}).items()
@@ -286,10 +320,7 @@ class MLflowDelivery:
                 {
                     "run_id": run_id,
                     "metrics": metrics,
-                    "params": [
-                        {"key": "backend", "value": b["candidate"]["backend"]},
-                        {"key": "variant", "value": b["variant"]["ref"]},
-                    ],
+                    "params": [{"key": k, "value": str(v)} for k, v in params.items()],
                     "tags": [{"key": k, "value": v} for k, v in tags.items()],
                 },
             )
@@ -302,6 +333,6 @@ class MLflowDelivery:
                 },
             )
             self.store.finish(event)
-        except (httpx.HTTPError, ValueError, KeyError, TypeError) as exc:
+        except (httpx.HTTPError, ValueError, KeyError, TypeError, Conflict) as exc:
             self.store.finish(event, type(exc).__name__)
         return True

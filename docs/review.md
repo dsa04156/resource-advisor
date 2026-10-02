@@ -24,14 +24,14 @@ This review records scope and remaining gaps, not production certification.
 
 ## Open implementation gates
 
-**Live execution:** generated manifests/scripts and test doubles are not live
-Kubernetes/Slurm evidence. Qualify the service with real scoped GPU jobs,
-Kueue admission, cancellation, disconnection and Slurm accounting tests.
+**Live execution:** scoped Kubernetes/Kueue CUDA and PyTorch jobs now have actual
+hardware evidence. Live KFP submission, Slurm execution through this service,
+disconnection recovery, full cancellation accounting and Slurm policy tests remain.
 
-**Optimization:** do not activate pilot/BO endpoints before durable budget
-reservation, failure-cost accounting, independent final confirmation, runtime
-contracts and randomized equal-budget comparisons exist. Optional optimizer
-dependencies and schema fields do not count as an integration.
+**Optimization:** consented lab pilot/BO execution has durable reservation and
+independent confirmation, including real GPU runs. Complete failed-run cost
+accounting and randomized equal-budget trials remain production/evaluation gates.
+The small smoke experiment does not prove BO superiority or hard physical budget bounds.
 
 **Artifacts and environments:** JSON digest verification is implemented; model
 artifact transfer, image attestation, checkpoint isolation and runtime
@@ -42,9 +42,11 @@ backend-only failures and cancellation into accounting before reporting complete
 project costs. Do not claim Slurm quota enforcement without accounting/QOS
 configuration and an actual rejection test.
 
-**MLflow and observability:** metadata delivery has a durable retry queue;
-artifact upload, actual server validation, project segregation, circuit
-breakers, comprehensive event metrics and dashboards remain to implement.
+**MLflow and observability:** 28 real hardware results were delivered to a
+dedicated experiment, with project-to-experiment routing and durable run links.
+Artifact upload, server-side multi-tenant authorization, circuit breakers,
+comprehensive event metrics and dashboards remain to implement. Experiment routing
+alone is not an MLflow authorization boundary.
 
 **Deployment:** real PostgreSQL tests and a restore check pass. This is not an
 HA deployment, migration strategy, key rotation system or workload isolation

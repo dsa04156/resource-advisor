@@ -53,8 +53,10 @@ def test_http_to_recommendation_and_mlflow_retry(service):
         calls.append(request.url.path)
         body = json.loads(request.content)
         if request.url.path.endswith("runs/search"):
+            assert body["experiment_ids"] == ["team-a-experiment"]
             return httpx.Response(200, json={"runs": []})
         if request.url.path.endswith("runs/create"):
+            assert body["experiment_id"] == "team-a-experiment"
             attempt = next(
                 t["value"] for t in body["tags"] if t["key"] == "resource_advisor.attempt_id"
             )
@@ -65,6 +67,7 @@ def test_http_to_recommendation_and_mlflow_retry(service):
     delivery = MLflowDelivery(
         service.store,
         "https://mlflow.invalid",
+        experiments={"team-a": "team-a-experiment"},
         client=httpx.Client(
             base_url="https://mlflow.invalid", transport=httpx.MockTransport(mlflow)
         ),
@@ -72,6 +75,9 @@ def test_http_to_recommendation_and_mlflow_retry(service):
     assert all(delivery.deliver_one() for _ in range(3))
     assert len(runs) == 3
     assert not delivery.deliver_one()
+    with service.store.transaction() as conn:
+        links = service.store.list(conn, "tracking", "team-a")
+        assert len(links) == 3
     report = {
         "evidence_kind": "synthetic",
         "real_schedulers_used": False,

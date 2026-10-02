@@ -60,7 +60,12 @@ def main():
 
         study_runner = Studies(service)
         delivery = (
-            MLflowDelivery(store, config["mlflow_url"], token=os.getenv("RA_MLFLOW_TOKEN"))
+            MLflowDelivery(
+                store,
+                config["mlflow_url"],
+                experiments=config["mlflow_experiments"],
+                token=os.getenv("RA_MLFLOW_TOKEN"),
+            )
             if config.get("mlflow_url")
             else None
         )

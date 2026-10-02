@@ -37,7 +37,7 @@ One upstream Starlette warning about its HTTPX test-client integration remains;
 it does not fail these checks. The current dependency lock records the tested
 versions. GitHub Actions repeats the SQLite and PostgreSQL suite for each push.
 
-Not yet verified: live GPU/NPU benchmark, Slurm QOS enforcement, live Kueue
+Not yet verified at the initial revision: live GPU/NPU benchmark, Slurm QOS enforcement, live Kueue
 admission/priority, live KFP→API→GPU execution, MLflow artifact upload, pilot/BO
 optimization, workload migration, or production hardening.
 
@@ -80,3 +80,23 @@ allocating run time, within the same per-confirmation wall allowance. A
 regression test checks that both queueing and execution receive useful time
 without consuming another confirmation's reservation. This split is a bounded
 heuristic, not a workload duration prediction or a guarantee of admission.
+
+## Live tracking and study increment
+
+Random search and qLogNEI completed real GPU exploration and independent
+confirmation. Both retained the baseline. Lookup abstained on a real queue
+deadline. Full initial and corrected rounds are retained in the
+[hardware report](gpu-experiment.md); this is not a claim of optimization gains.
+
+A real MLflow server received 28 hardware runs in an explicitly mapped dedicated
+experiment. All corresponding outbox events are DONE and independent DB run links
+exist. Parameters, measured metrics, quality/signature tags and terminal run state
+were read back. Artifacts, failed-job tracking and MLflow authorization enforcement
+remain open. Response-loss tests verify reuse of the external run and timestamp.
+
+The current suite passes **58 tests on SQLite and 58 on isolated PostgreSQL**;
+lint and format checks pass. The live database containing the GPU studies and
+tracking links was also dumped and restored into a fresh DB: all five service
+tables matched by count and deterministic content hash. The lab database uses
+ephemeral storage; a private backup was retained. This is recovery verification,
+not persistent production deployment.

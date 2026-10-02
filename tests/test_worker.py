@@ -1,3 +1,4 @@
+import json
 from datetime import timedelta
 
 import httpx
@@ -179,7 +180,12 @@ def test_mlflow_outage_is_durable_and_does_not_fail_job(service):
     client = httpx.Client(
         transport=httpx.MockTransport(unavailable), base_url="https://mlflow.invalid"
     )
-    assert MLflowDelivery(service.store, "https://mlflow.invalid", client=client).deliver_one()
+    assert MLflowDelivery(
+        service.store,
+        "https://mlflow.invalid",
+        experiments={"team-a": "team-a-experiment"},
+        client=client,
+    ).deliver_one()
     with service.store.transaction() as conn:
         row = conn.execute(select(outbox).where(outbox.c.kind == "mlflow")).mappings().one()
         assert row["status"] == "PENDING"
@@ -191,6 +197,80 @@ def test_claim_lease_prevents_duplicate_worker_claim(service):
     setup(service)
     assert service.store.claim("submit") is not None
     assert service.store.claim("submit") is None
+
+
+def test_unmapped_project_cannot_write_to_mlflow_default_experiment(service):
+    backend, worker, job = setup(service)
+    worker.submit_one()
+    backend.observation = Observation(State.COLLECTING)
+    worker.reconcile_all()
+    calls = []
+
+    def unexpected(request):
+        calls.append(request)
+        return httpx.Response(500)
+
+    with httpx.Client(
+        transport=httpx.MockTransport(unexpected), base_url="https://mlflow.invalid"
+    ) as client:
+        delivery = MLflowDelivery(
+            service.store,
+            "https://mlflow.invalid",
+            experiments={"other-project": "42"},
+            client=client,
+        )
+        assert delivery.deliver_one()
+    assert calls == []
+    assert service.get_job("team-a", job["job_id"])["state"] == "SUCCEEDED"
+    with service.store.transaction() as conn:
+        event = conn.execute(select(outbox).where(outbox.c.kind == "mlflow")).mappings().one()
+        assert event["status"] == "PENDING"
+
+
+def test_mlflow_response_loss_reuses_run_and_measurement_timestamp(service):
+    backend, worker, _ = setup(service)
+    worker.submit_one()
+    backend.observation = Observation(State.COLLECTING)
+    worker.reconcile_all()
+    runs, batches = [], []
+    lose_response = True
+
+    def server(request):
+        nonlocal lose_response
+        body = json.loads(request.content)
+        if request.url.path.endswith("runs/search"):
+            return httpx.Response(200, json={"runs": runs})
+        if request.url.path.endswith("runs/create"):
+            runs.append({"info": {"run_id": "external-run-1"}})
+            return httpx.Response(200, json={"run": runs[-1]})
+        if request.url.path.endswith("runs/log-batch"):
+            batches.append(body)
+            if lose_response:
+                lose_response = False
+                return httpx.Response(503)
+        return httpx.Response(200, json={})
+
+    with httpx.Client(
+        transport=httpx.MockTransport(server), base_url="https://mlflow.invalid"
+    ) as client:
+        delivery = MLflowDelivery(
+            service.store, "https://mlflow.invalid", experiments={"team-a": "42"}, client=client
+        )
+        delivery.deliver_one()
+        with service.store.transaction() as conn:
+            conn.execute(
+                update(outbox)
+                .where(outbox.c.kind == "mlflow")
+                .values(lease_until=(now() - timedelta(seconds=1)).isoformat())
+            )
+        delivery.deliver_one()
+    assert len(runs) == 1
+    assert len(batches) == 2
+    assert batches[0] == batches[1]
+    with service.store.transaction() as conn:
+        assert len(service.store.list(conn, "tracking", "team-a")) == 1
+        event = conn.execute(select(outbox).where(outbox.c.kind == "mlflow")).mappings().one()
+        assert event["status"] == "DONE"
 
 
 def test_failed_event_backoff_does_not_block_next_submission(service):

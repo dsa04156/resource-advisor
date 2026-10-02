@@ -4,9 +4,10 @@ An independent, evidence-based resource recommendation and execution service
 for heterogeneous Kubernetes/KubeEdge and Slurm compute pools.
 
 **Status: initial implementation, not a completed production platform.**
-Performance fixtures use explicitly synthetic data. PostgreSQL persistence and
-restore have been tested against a real, isolated instance. No GPU/NPU benchmark or live
-scheduler integration result is implied by a passing unit test.
+Unit-test performance fixtures use explicitly synthetic data. A separate live
+experiment has run on a physical RTX 5080 through Kueue, with measured results
+in PostgreSQL and MLflow. See the [hardware report](docs/gpu-experiment.md) for
+failures, raw measurements and limits. NPU/Slurm qualification remains open.
 
 ## Responsibility
 
@@ -72,12 +73,13 @@ schema upgrades and an operational migration process are not yet implemented.
 - Lookup recommendations with independent-run counts, uncertainty and approval.
 - Device allocation units stay separate; missing scheduler times remain null.
 - Prometheus job/outbox metrics; compiled CPU-only KFP launcher with caching off.
-- Cooperative CUDA matmul runner provided for subsequent hardware qualification.
+- Cooperative CUDA matmul runner qualified on one physical GPU/runtime combination.
 
 Consent-bound pilot studies, seeded random search and constrained qLogNEI now
-use the durable worker with reserved confirmation budgets. They have synthetic
-execution tests; the real GPU optimization loop remains unverified. NPU readiness requires
-actual model validation; hardware detection alone is insufficient.
+use the durable worker with reserved confirmation budgets. Random search and
+qLogNEI completed a real GPU loop and independent confirmation, retaining the
+baseline; this small smoke experiment does not establish strategy superiority.
+NPU readiness requires actual model validation; hardware detection alone is insufficient.
 
 See [implementation ledger](docs/implementation.md) and
 [architecture and operational limits](docs/architecture.md).
