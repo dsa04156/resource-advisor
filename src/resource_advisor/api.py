@@ -168,6 +168,28 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
 
     fidelity_spaces = FidelitySpaces(service)
 
+    from .transfer import TransferEvidenceRequest, TransferSpace, TransferSpaces
+
+    transfer_spaces = TransferSpaces(service)
+
+    @app.post(PREFIX + "/transfer-spaces")
+    def create_transfer_space(value: TransferSpace, p=Depends(operator)):
+        return transfer_spaces.create(p.project, value)
+
+    @app.get(PREFIX + "/transfer-spaces/{ref}")
+    def get_transfer_space(ref: str, p=Depends(principal)):
+        return transfer_spaces.get(p.project, ref)
+
+    @app.post(PREFIX + "/transfer-spaces/{ref}/evidence")
+    def bind_transfer_evidence(ref: str, value: TransferEvidenceRequest, p=Depends(principal)):
+        return transfer_spaces.evidence(p.project, ref, value)
+
+    @app.get(PREFIX + "/transfer-spaces/{ref}/evidence/{evidence_ref}")
+    def get_transfer_evidence(ref: str, evidence_ref: str, p=Depends(principal)):
+        with service.store.transaction() as conn:
+            _, evidence = transfer_spaces.checked(conn, p.project, ref, evidence_ref)
+        return evidence
+
     from .fidelity_qualification import FidelityQualificationPlan, FidelityQualifications
 
     qualifications = FidelityQualifications(service)

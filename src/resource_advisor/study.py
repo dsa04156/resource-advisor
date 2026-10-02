@@ -42,14 +42,18 @@ class Studies:
             request_body.pop("fidelity_space_ref")
         if request.fidelity_qualification_ref is None:
             request_body.pop("fidelity_qualification_ref")
+        for field in ("transfer_space_ref", "transfer_evidence_ref"):
+            if request_body[field] is None:
+                request_body.pop(field)
         request_digest = signature(request_body)
-        if request.strategy == "rgpe" or (
-            request.strategy == "mfkg" and not request.fidelity_qualification_ref
-        ):
+        if (
+            request.strategy in {"rgpe", "history_warm_start"} and not request.transfer_evidence_ref
+        ) or (request.strategy == "mfkg" and not request.fidelity_qualification_ref):
             raise Rejected(
                 {
                     "mfkg": "MF_KG_DISABLED: no qualified paired-fidelity group",
                     "rgpe": "RGPE_DISABLED: no validated independent source models",
+                    "history_warm_start": "WARM_START_DISABLED: no validated independent sources",
                 }[request.strategy]
             )
         with self.store.transaction() as conn:
@@ -99,6 +103,20 @@ class Studies:
             if spec.baseline_candidate_ref not in eligible:
                 raise Rejected("baseline is not a qualified consented pilot: " + str(excluded))
             eligible = eligible[: policy.max_candidates]
+            transfer_space = transfer_evidence = None
+            if request.strategy in {"rgpe", "history_warm_start"}:
+                from .transfer import TransferSpaces
+
+                transfer_space, transfer_evidence = TransferSpaces(self.service).checked(
+                    conn, project, request.transfer_space_ref, request.transfer_evidence_ref
+                )
+                if transfer_space["request"]["target_workload_ref"] != spec.ref:
+                    raise Rejected("transfer target differs from study workload")
+                if set(eligible) != {o["candidate_ref"] for o in transfer_space["options"]}:
+                    raise Rejected("all transfer candidates must fit the eligible candidate budget")
+                initial = len(eligible) * (2 if request.strategy == "rgpe" else 1)
+                if policy.max_probes <= initial:
+                    raise Rejected("probe budget must cover target checks and a subsequent BO step")
             if request.replication and policy.max_probes < (
                 len(eligible) * request.replication.minimum_runs
             ):
@@ -191,6 +209,17 @@ class Studies:
                     fidelity_space=fidelity,
                     fidelity_space_digest=signature(fidelity),
                     fidelity_schedule=fidelity_schedule,
+                )
+            if transfer_space is not None:
+                body.update(
+                    transfer_space=transfer_space,
+                    transfer_space_digest=signature(transfer_space),
+                    transfer_evidence=transfer_evidence,
+                    transfer_evidence_digest=signature(transfer_evidence),
+                    historical_source_wall_seconds=transfer_evidence[
+                        "historical_source_wall_seconds"
+                    ],
+                    historical_source_cost_recharged=False,
                 )
             if qualification is not None:
                 body.update(
@@ -385,6 +414,10 @@ class Studies:
             "cost_source": source,
             "recorded_at": now().isoformat(),
         }
+        if "transfer_space" in body:
+            obs["evaluation_wall_seconds"] = (
+                datetime.fromisoformat(jb["finished_at"]) - datetime.fromisoformat(jb["created_at"])
+            ).total_seconds()
         if "fidelity_space" in body:
             obs.update(
                 workload_ref=plan["workload_ref"],
@@ -480,6 +513,69 @@ class Studies:
             and m["quality_value"] >= spec.quality.minimum
             and m["peak_memory_mib"] <= spec.quality.maximum_peak_memory_mib
         )
+
+    def _transfer_choice(self, project, body, spec, allowed, probes):
+        from .rgpe import TransferObservation, ask_rgpe, history_order
+        from .transfer import TransferSpaces
+
+        started = time.monotonic()
+        request, failure = body["request"], None
+        try:
+            registry = TransferSpaces(self.service)
+            with self.store.transaction() as conn:
+                space, evidence = registry.checked(
+                    conn, project, request["transfer_space_ref"], request["transfer_evidence_ref"]
+                )
+            if (
+                signature(space) != body["transfer_space_digest"]
+                or signature(evidence) != body["transfer_evidence_digest"]
+            ):
+                raise Rejected("frozen study transfer binding changed")
+            if {c.ref for c in allowed} != {o["candidate_ref"] for o in space["options"]}:
+                raise Rejected("transfer configurations changed or lost budget")
+            if any(not self._feasible(o, spec) or o["evidence_kind"] != "hardware" for o in probes):
+                raise Rejected("transfer target check failed or lacks hardware evidence")
+            target = [
+                TransferObservation(
+                    attempt_id=o["attempt_id"],
+                    candidate_ref=o["candidate_ref"],
+                    elapsed_seconds=o["measurements"]["elapsed_seconds"],
+                    evaluation_wall_seconds=o["evaluation_wall_seconds"],
+                    peak_memory_mib=o["measurements"]["peak_memory_mib"],
+                    quality_value=o["measurements"]["quality_value"],
+                    quality_passed=True,
+                    memory_passed=True,
+                )
+                for o in probes
+            ]
+            problem = registry.problem(space, evidence["sources"], target, request["seed"])
+            if request["strategy"] == "history_warm_start":
+                order = history_order(problem)
+                observed = {o["candidate_ref"] for o in probes}
+                unseen = [ref for ref in order["candidate_order"] if ref not in observed]
+                if unseen:
+                    choice = dict(
+                        order, candidate_ref=unseen[0], reason="HISTORY_GUIDED_INITIAL_CANDIDATE"
+                    )
+                else:
+                    choice = ask("qlognei", allowed, probes, spec.quality, request["seed"])
+                    choice["warm_start"] = order
+                    choice["transfer_phase"] = "TARGET_ONLY_BO_AFTER_WARM_START"
+            else:
+                choice = ask_rgpe(problem)
+        except (Rejected, NotFound) as exc:
+            failure = "TRANSFER_EVIDENCE_UNAVAILABLE:" + str(exc)
+        except (ArithmeticError, RuntimeError, ValueError, ImportError) as exc:
+            failure = "TRANSFER_MODEL_FAILED:" + type(exc).__name__
+        if failure:
+            choice = ask("qlognei", allowed, probes, spec.quality, request["seed"])
+            choice["transfer_fallback"] = failure
+            choice["transfer_phase"] = "TARGET_ONLY_BO_FALLBACK"
+        choice["transfer_space_digest"] = body["transfer_space_digest"]
+        choice["transfer_evidence_digest"] = body["transfer_evidence_digest"]
+        choice["source_evidence_ref"] = request["transfer_evidence_ref"]
+        choice["planning_seconds"] = time.monotonic() - started
+        return choice
 
     def _plan(self, ref, token):
         with self.store.transaction() as conn:
@@ -714,9 +810,12 @@ class Studies:
             }
             available_wall = remaining - policy.final_validation_seconds
         else:
-            choice = replication_choice or ask(
-                strategy, allowed, probes, spec.quality, body["request"]["seed"]
-            )
+            if strategy in {"rgpe", "history_warm_start"}:
+                choice = self._transfer_choice(row["project"], body, spec, allowed, probes)
+            else:
+                choice = replication_choice or ask(
+                    strategy, allowed, probes, spec.quality, body["request"]["seed"]
+                )
             available_wall = (
                 remaining - policy.final_validation_seconds - choice["planning_seconds"]
             )

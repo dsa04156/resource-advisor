@@ -160,3 +160,10 @@ fidelity groups to mixed-workload ask/execute/observe and independent target
 confirmation. Qualification, expiry, rank drift and failure fallback are tested
 with actual BoTorch and scheduler doubles; a qualified physical GPU trial remains
 open. Existing unqualified reports do not authorize this strategy.
+
+[Conditional rank transfer](docs/transfer.md) distinguishes history-guided warm
+start from actual RGPE. Operator-approved families and immutable source Job/profile
+evidence enable a durable target-check → model → reserved Job → observation loop,
+with source-expiry/negative-transfer fallback and independent target confirmation.
+Real BoTorch tests use explicitly labeled scheduler doubles; physical GPU transfer
+effectiveness and equal-budget comparison remain open.

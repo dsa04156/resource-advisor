@@ -41,8 +41,13 @@ Strategies:
   model. Invalid/missing/expired qualifications are rejected. Numerical failure
   stops exploration and uses new target confirmations. The complete path is
   tested with scheduler doubles; a qualified physical GPU trial remains open.
-- `rgpe`: rejected with its missing-source-model reason; implementation and
-  independent source-data gates remain open. It is not an alias for qLogNEI.
+- `rgpe`: [transfer bindings](transfer.md) join independent source hardware profiles
+  to an operator-approved family. Balanced target checks precede actual rank-weighted
+  GP ensemble/qLogNEI choices and held-out target confirmation. Invalid sources or
+  transfer-model failure fall back explicitly to target-only BO. Missing bindings
+  remain rejected; actual GPU transfer effectiveness is not yet demonstrated.
+- `history_warm_start`: uses the same source provenance but only orders initial
+  candidates by prior ranks, then uses target-only BO. It is separate from RGPE.
 
 [Paired calibration](fidelity-calibration.md) now preregisters a bounded,
 randomized F1/F2/F3 measurement schedule and submits its cells through the same

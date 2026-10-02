@@ -338,14 +338,21 @@ class StudyRequest(Contract):
         "fidelity_calibration",
         "mfkg",
         "rgpe",
+        "history_warm_start",
     ]
     seed: int = 0
     replication: ReplicationPolicy | None = None
     fidelity_space_ref: Ref | None = None
     fidelity_qualification_ref: Ref | None = None
+    transfer_space_ref: Ref | None = None
+    transfer_evidence_ref: Ref | None = None
 
     @model_validator(mode="after")
     def strategy_options(self):
+        if (self.transfer_space_ref is None) != (self.transfer_evidence_ref is None):
+            raise ValueError("transfer space and evidence must be provided together")
+        if self.transfer_space_ref and self.strategy not in {"rgpe", "history_warm_start"}:
+            raise ValueError("transfer options require rgpe or history_warm_start")
         if (self.strategy == "adaptive_replication") != (self.replication is not None):
             raise ValueError("replication options are required only for adaptive_replication")
         if self.strategy == "fidelity_calibration" and self.fidelity_space_ref is None:
