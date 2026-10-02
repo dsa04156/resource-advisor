@@ -1,0 +1,242 @@
+{
+  "date": "2026-10-02",
+  "kubernetes": "v1.31.14",
+  "kueue": "v0.19.5",
+  "scope": "direct suspended Job submission and real CUDA F0, not Compute API end-to-end or model performance",
+  "result": "PASS",
+  "checks": {
+    "oversized_stays_suspended_without_pods": true,
+    "later_high_admitted_before_older_normal": true,
+    "real_cuda_results_both_pass": true,
+    "high_execution_started_first": true
+  },
+  "quota": {
+    "cpu": 2,
+    "memory_gib": 2,
+    "gpu": 1
+  },
+  "queueing_strategy": "BestEffortFIFO",
+  "preemption": {
+    "borrowWithinCohort": {
+      "policy": "Never"
+    },
+    "reclaimWithinCohort": "Never",
+    "withinClusterQueue": "Never"
+  },
+  "jobs": {
+    "oversized": {
+      "requested_gpu": "2",
+      "pending": {
+        "priority": 100,
+        "priority_class": {
+          "group": "kueue.x-k8s.io",
+          "kind": "WorkloadPriorityClass",
+          "name": "ra-policy-normal"
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-02T05:57:15Z",
+            "message": "couldn't assign flavors to pod set main: insufficient quota for nvidia.com/gpu in flavor ra-f0-gpu, previously considered podsets requests (0) + current podset request (2) > maximum capacity (1)",
+            "observedGeneration": 1,
+            "reason": "Pending",
+            "status": "False",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-02T05:57:15Z",
+            "message": "Not all pods are ready or succeeded",
+            "observedGeneration": 1,
+            "reason": "WaitForStart",
+            "status": "False",
+            "type": "PodsReady"
+          }
+        ]
+      },
+      "submitted_at": "2026-10-02T05:57:15Z"
+    },
+    "blocker": {
+      "requested_gpu": "1"
+    },
+    "normal": {
+      "requested_gpu": "1",
+      "pending": {
+        "priority": 100,
+        "priority_class": {
+          "group": "kueue.x-k8s.io",
+          "kind": "WorkloadPriorityClass",
+          "name": "ra-policy-normal"
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-02T05:57:18Z",
+            "message": "Not all pods are ready or succeeded",
+            "observedGeneration": 1,
+            "reason": "WaitForStart",
+            "status": "False",
+            "type": "PodsReady"
+          },
+          {
+            "lastTransitionTime": "2026-10-02T05:57:18Z",
+            "message": "couldn't assign flavors to pod set main: insufficient unused quota for nvidia.com/gpu in flavor ra-f0-gpu, 1 more needed",
+            "observedGeneration": 1,
+            "reason": "Pending",
+            "status": "False",
+            "type": "QuotaReserved"
+          }
+        ]
+      },
+      "submitted_at": "2026-10-02T05:57:18Z",
+      "start": "2026-10-02T05:57:35Z",
+      "end": "2026-10-02T05:57:44Z",
+      "result": {
+        "phase": "F0",
+        "performance_measurement": false,
+        "cuda_devices": 1,
+        "driver_api": 13020,
+        "runtime_api": 12020,
+        "compute_capability": "12.0",
+        "verified_elements": 4096,
+        "result": "PASS"
+      },
+      "completed_workload": {
+        "priority": 100,
+        "priority_class": {
+          "group": "kueue.x-k8s.io",
+          "kind": "WorkloadPriorityClass",
+          "name": "ra-policy-normal"
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-02T05:57:35Z",
+            "message": "Quota reserved in ClusterQueue ra-f0-gpu",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-02T05:57:35Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-02T05:57:44Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-02T05:57:44Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    "high": {
+      "requested_gpu": "1",
+      "pending": {
+        "priority": 1000,
+        "priority_class": {
+          "group": "kueue.x-k8s.io",
+          "kind": "WorkloadPriorityClass",
+          "name": "ra-policy-high"
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-02T05:57:20Z",
+            "message": "Not all pods are ready or succeeded",
+            "observedGeneration": 1,
+            "reason": "WaitForStart",
+            "status": "False",
+            "type": "PodsReady"
+          },
+          {
+            "lastTransitionTime": "2026-10-02T05:57:20Z",
+            "message": "couldn't assign flavors to pod set main: insufficient unused quota for nvidia.com/gpu in flavor ra-f0-gpu, 1 more needed",
+            "observedGeneration": 1,
+            "reason": "Pending",
+            "status": "False",
+            "type": "QuotaReserved"
+          }
+        ]
+      },
+      "submitted_at": "2026-10-02T05:57:20Z",
+      "start": "2026-10-02T05:57:21Z",
+      "end": "2026-10-02T05:57:34Z",
+      "result": {
+        "phase": "F0",
+        "performance_measurement": false,
+        "cuda_devices": 1,
+        "driver_api": 13020,
+        "runtime_api": 12020,
+        "compute_capability": "12.0",
+        "verified_elements": 4096,
+        "result": "PASS"
+      },
+      "completed_workload": {
+        "priority": 1000,
+        "priority_class": {
+          "group": "kueue.x-k8s.io",
+          "kind": "WorkloadPriorityClass",
+          "name": "ra-policy-high"
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-02T05:57:21Z",
+            "message": "Quota reserved in ClusterQueue ra-f0-gpu",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-02T05:57:21Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-02T05:57:34Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-02T05:57:34Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    }
+  },
+  "blocker": "deliberately deleted to release reservation; not counted as completed benchmark",
+  "cleanup_errors": [],
+  "queue_after": {
+    "pendingWorkloads": 0,
+    "admittedWorkloads": 0,
+    "reservingWorkloads": 0
+  },
+  "limitations": [
+    "Single node and physical GPU",
+    "No cross-project sharing/fairness guarantee",
+    "No Pod priority/preemption alteration",
+    "Oversized Job creation succeeds but Kueue admission remains pending; not an API submission rejection"
+  ]
+}

@@ -1,0 +1,17 @@
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: WorkloadPriorityClass
+metadata:
+  name: ra-policy-normal
+  labels:
+    app.kubernetes.io/managed-by: resource-advisor-verification
+value: 100
+description: Explicit Resource Advisor lab normal queue priority
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: WorkloadPriorityClass
+metadata:
+  name: ra-policy-high
+  labels:
+    app.kubernetes.io/managed-by: resource-advisor-verification
+value: 1000
+description: Explicit Resource Advisor lab high queue priority; no Pod preemption

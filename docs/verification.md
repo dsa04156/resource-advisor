@@ -124,3 +124,13 @@ are retained alongside the successful trial in [the policy report](slurm-policy.
 `sprio` factor lookup failed; the report uses actual `scontrol` priority and `sacct`
 start order rather than inventing a factor breakdown. This does not complete the
 Compute API → Slurm model/result path or cross-user isolation testing.
+
+## Live Kueue policy increment
+
+The existing one-GPU lab queue kept a two-GPU Job suspended without creating a Pod.
+With the GPU reserved, normal and high jobs both waited on unused-quota conditions.
+Releasing the holder admitted the later high job first; both jobs then verified
+4,096 real CUDA output values. Their conditions, start/completion times and cleanup
+state are retained in [the Kueue policy report](kueue-policy.md). Kubernetes remained
+v1.31.14 and Kueue v0.19.5; no runtime upgrade or preemption change was made.
+This is direct scheduler acceptance evidence, not a completed KFP/API integration.

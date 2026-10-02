@@ -10,6 +10,8 @@ in PostgreSQL and MLflow. See the [hardware report](docs/gpu-experiment.md) for
 failures, raw measurements and limits. Separate [Slurm CUDA qualification](docs/slurm-verification.md)
 and [quota/priority enforcement](docs/slurm-policy.md) now have live evidence;
 its model/API path and NPU qualification remain open.
+The [Kueue policy trial](docs/kueue-policy.md) also verifies real GPU queueing,
+oversized admission refusal and high-before-normal execution.
 
 ## Responsibility
 
