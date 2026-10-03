@@ -47,6 +47,14 @@ uv run python examples/evaluate_uncertainty_ablation.py \
 Current verification covers synthetic replay contracts: quality/memory/failure
 and repeat gates, unchanged input, duplicate/future/unapproved evidence rejection,
 preserved abstention and exclusion of pilot-only candidates. Actual completed
-capture replay remains pending. Cross-workload holdout, forecast-interval
+capture replay is now verified in [the raw report](evidence/uncertainty-ablation-v1.json):
+all nine recorded selections matched the strict replay and 0/9 changed when the
+uncertainty overlap gate was removed. Both modes had 9/9 decision coverage, 8/9
+nonbaseline recommendations and no promoted invalid candidate. No recorded
+decision used uncertainty-triggered baseline retention, so this null difference
+does not show that the gate is unnecessary. The third qLogNEI study confirmed
+only its predicted baseline; later reference runs cannot retroactively add an
+untested finalist to its selection. No new GPU Job was created, and the existing
+361 GPU reservation seconds remain attributed to the original experiment. Cross-workload holdout, forecast-interval
 calibration and induced-drift evaluation remain separate open R4 requirements;
 this one-workload replay cannot close them.

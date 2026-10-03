@@ -53,6 +53,14 @@ The [paired calibration protocol](docs/fidelity-calibration.md) preregisters
 short/long measurement comparisons and prevents replication-only evidence from
 being mislabeled as qualified multi-fidelity optimization.
 
+The [completed S0/S1/S2 comparison](docs/policy-comparison-v2.md) runs lookup,
+random search and qLogNEI in three temporal blocks, with fresh frozen history and
+a later reference grid. All 129 application results plus three F0 Jobs are accounted
+for; no BO selection advantage is demonstrated. Raw data, cost-aware figures,
+[offline uncertainty replay](docs/uncertainty-ablation.md), and the retained
+failed predecessor are published. The [full acceptance audit](docs/goal-audit.md)
+still lists required Slurm/NPU, operational comparison and holdout gaps.
+
 ## Responsibility
 
 The service validates workload/environment contracts, submits a selected

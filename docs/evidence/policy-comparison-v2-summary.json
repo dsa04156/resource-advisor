@@ -1,0 +1,616 @@
+{
+  "scope": "descriptive three-block single-GPU comparison; no powered superiority claim",
+  "whole_protocol_wall_seconds": 3565.339559,
+  "studies": [
+    {
+      "order": 1,
+      "block": 0,
+      "strategy": "random",
+      "seed": 2026100301,
+      "label": "target-0-random",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu2",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "stop_reason": null,
+      "posthoc_selection_regret_fraction": 0.0,
+      "independent_confirmation_mean_seconds": 0.26104306128884974,
+      "study_wall_seconds": 344.722924,
+      "planning_seconds": 0.00023910996969789267,
+      "allocated_gpu_seconds": 38.0,
+      "first_use_gpu_seconds_including_history": 38.0,
+      "first_use_wall_seconds_including_history": 344.722924,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_jobs": 0,
+      "model_based_choices": 0,
+      "choice_reasons": [
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION"
+      ],
+      "queue_seconds_known": 1.0,
+      "unknown_queue_intervals": 0
+    },
+    {
+      "order": 2,
+      "block": 0,
+      "strategy": "lookup",
+      "seed": 2026100301,
+      "label": "target-0-lookup",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu2",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "stop_reason": null,
+      "posthoc_selection_regret_fraction": 0.0,
+      "independent_confirmation_mean_seconds": 0.26112143670131144,
+      "study_wall_seconds": 150.640709,
+      "planning_seconds": 0.0,
+      "allocated_gpu_seconds": 14.0,
+      "first_use_gpu_seconds_including_history": 60.0,
+      "first_use_wall_seconds_including_history": 529.826152,
+      "pilot_jobs": 0,
+      "confirmation_jobs": 6,
+      "failed_jobs": 0,
+      "model_based_choices": 0,
+      "choice_reasons": [
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION"
+      ],
+      "queue_seconds_known": 0.0,
+      "unknown_queue_intervals": 0
+    },
+    {
+      "order": 3,
+      "block": 0,
+      "strategy": "qlognei",
+      "seed": 2026100301,
+      "label": "target-0-qlognei",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu2",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "stop_reason": null,
+      "posthoc_selection_regret_fraction": 0.0,
+      "independent_confirmation_mean_seconds": 0.2613397377038685,
+      "study_wall_seconds": 350.891631,
+      "planning_seconds": 1.1438313459511846,
+      "allocated_gpu_seconds": 36.0,
+      "first_use_gpu_seconds_including_history": 36.0,
+      "first_use_wall_seconds_including_history": 350.891631,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_jobs": 0,
+      "model_based_choices": 5,
+      "choice_reasons": [
+        "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+        "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+        "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+        "CONSTRAINED_QLOGNEI",
+        "CONSTRAINED_QLOGNEI",
+        "CONSTRAINED_QLOGNEI",
+        "CONSTRAINED_QLOGNEI",
+        "CONSTRAINED_QLOGNEI",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION"
+      ],
+      "queue_seconds_known": 4.0,
+      "unknown_queue_intervals": 0
+    },
+    {
+      "order": 4,
+      "block": 1,
+      "strategy": "qlognei",
+      "seed": 2026100302,
+      "label": "target-1-qlognei",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu2",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "stop_reason": null,
+      "posthoc_selection_regret_fraction": 0.0,
+      "independent_confirmation_mean_seconds": 0.261590613964169,
+      "study_wall_seconds": 350.957482,
+      "planning_seconds": 0.19134084292454645,
+      "allocated_gpu_seconds": 37.0,
+      "first_use_gpu_seconds_including_history": 37.0,
+      "first_use_wall_seconds_including_history": 350.957482,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_jobs": 0,
+      "model_based_choices": 5,
+      "choice_reasons": [
+        "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+        "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+        "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+        "CONSTRAINED_QLOGNEI",
+        "CONSTRAINED_QLOGNEI",
+        "CONSTRAINED_QLOGNEI",
+        "CONSTRAINED_QLOGNEI",
+        "CONSTRAINED_QLOGNEI",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION"
+      ],
+      "queue_seconds_known": 3.0,
+      "unknown_queue_intervals": 0
+    },
+    {
+      "order": 5,
+      "block": 1,
+      "strategy": "lookup",
+      "seed": 2026100302,
+      "label": "target-1-lookup",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu2",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "stop_reason": null,
+      "posthoc_selection_regret_fraction": 0.0,
+      "independent_confirmation_mean_seconds": 0.26109728805022314,
+      "study_wall_seconds": 151.368757,
+      "planning_seconds": 0.0,
+      "allocated_gpu_seconds": 15.0,
+      "first_use_gpu_seconds_including_history": 61.0,
+      "first_use_wall_seconds_including_history": 530.5542,
+      "pilot_jobs": 0,
+      "confirmation_jobs": 6,
+      "failed_jobs": 0,
+      "model_based_choices": 0,
+      "choice_reasons": [
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION"
+      ],
+      "queue_seconds_known": 0.0,
+      "unknown_queue_intervals": 0
+    },
+    {
+      "order": 6,
+      "block": 1,
+      "strategy": "random",
+      "seed": 2026100302,
+      "label": "target-1-random",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu2",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "stop_reason": null,
+      "posthoc_selection_regret_fraction": 0.0,
+      "independent_confirmation_mean_seconds": 0.2608714986514921,
+      "study_wall_seconds": 350.995023,
+      "planning_seconds": 0.00030392996268346906,
+      "allocated_gpu_seconds": 37.0,
+      "first_use_gpu_seconds_including_history": 37.0,
+      "first_use_wall_seconds_including_history": 350.995023,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_jobs": 0,
+      "model_based_choices": 0,
+      "choice_reasons": [
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION"
+      ],
+      "queue_seconds_known": 1.0,
+      "unknown_queue_intervals": 0
+    },
+    {
+      "order": 7,
+      "block": 2,
+      "strategy": "qlognei",
+      "seed": 2026100303,
+      "label": "target-2-qlognei",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu1",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "stop_reason": null,
+      "posthoc_selection_regret_fraction": 0.009691289713812168,
+      "independent_confirmation_mean_seconds": 0.26411533256759867,
+      "study_wall_seconds": 276.566287,
+      "planning_seconds": 0.1879686620668508,
+      "allocated_gpu_seconds": 29.0,
+      "first_use_gpu_seconds_including_history": 29.0,
+      "first_use_wall_seconds_including_history": 276.566287,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 3,
+      "failed_jobs": 0,
+      "model_based_choices": 5,
+      "choice_reasons": [
+        "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+        "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+        "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+        "CONSTRAINED_QLOGNEI",
+        "CONSTRAINED_QLOGNEI",
+        "CONSTRAINED_QLOGNEI",
+        "CONSTRAINED_QLOGNEI",
+        "CONSTRAINED_QLOGNEI",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION"
+      ],
+      "queue_seconds_known": 1.0,
+      "unknown_queue_intervals": 0
+    },
+    {
+      "order": 8,
+      "block": 2,
+      "strategy": "random",
+      "seed": 2026100303,
+      "label": "target-2-random",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu2",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "stop_reason": null,
+      "posthoc_selection_regret_fraction": 0.0,
+      "independent_confirmation_mean_seconds": 0.2606575229632047,
+      "study_wall_seconds": 346.396544,
+      "planning_seconds": 0.0002662399201653898,
+      "allocated_gpu_seconds": 39.0,
+      "first_use_gpu_seconds_including_history": 39.0,
+      "first_use_wall_seconds_including_history": 346.396544,
+      "pilot_jobs": 8,
+      "confirmation_jobs": 6,
+      "failed_jobs": 0,
+      "model_based_choices": 0,
+      "choice_reasons": [
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "SEEDED_RANDOM",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION"
+      ],
+      "queue_seconds_known": 2.0,
+      "unknown_queue_intervals": 0
+    },
+    {
+      "order": 9,
+      "block": 2,
+      "strategy": "lookup",
+      "seed": 2026100303,
+      "label": "target-2-lookup",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu2",
+      "recommendation_status": "CONFIRMED_RECOMMENDATION",
+      "stop_reason": null,
+      "posthoc_selection_regret_fraction": 0.0,
+      "independent_confirmation_mean_seconds": 0.26095941303841147,
+      "study_wall_seconds": 150.587581,
+      "planning_seconds": 0.0,
+      "allocated_gpu_seconds": 17.0,
+      "first_use_gpu_seconds_including_history": 63.0,
+      "first_use_wall_seconds_including_history": 529.7730240000001,
+      "pilot_jobs": 0,
+      "confirmation_jobs": 6,
+      "failed_jobs": 0,
+      "model_based_choices": 0,
+      "choice_reasons": [
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION",
+        "INDEPENDENT_FINAL_CONFIRMATION"
+      ],
+      "queue_seconds_known": 0.0,
+      "unknown_queue_intervals": 0
+    }
+  ],
+  "block_paired_differences": [
+    {
+      "block": 0,
+      "left": "lookup",
+      "right": "random",
+      "first_use_gpu_seconds_difference": 22.0,
+      "regret_fraction_difference": 0.0
+    },
+    {
+      "block": 1,
+      "left": "lookup",
+      "right": "random",
+      "first_use_gpu_seconds_difference": 24.0,
+      "regret_fraction_difference": 0.0
+    },
+    {
+      "block": 2,
+      "left": "lookup",
+      "right": "random",
+      "first_use_gpu_seconds_difference": 24.0,
+      "regret_fraction_difference": 0.0
+    },
+    {
+      "block": 0,
+      "left": "lookup",
+      "right": "qlognei",
+      "first_use_gpu_seconds_difference": 24.0,
+      "regret_fraction_difference": 0.0
+    },
+    {
+      "block": 1,
+      "left": "lookup",
+      "right": "qlognei",
+      "first_use_gpu_seconds_difference": 24.0,
+      "regret_fraction_difference": 0.0
+    },
+    {
+      "block": 2,
+      "left": "lookup",
+      "right": "qlognei",
+      "first_use_gpu_seconds_difference": 34.0,
+      "regret_fraction_difference": -0.009691289713812168
+    },
+    {
+      "block": 0,
+      "left": "random",
+      "right": "qlognei",
+      "first_use_gpu_seconds_difference": 2.0,
+      "regret_fraction_difference": 0.0
+    },
+    {
+      "block": 1,
+      "left": "random",
+      "right": "qlognei",
+      "first_use_gpu_seconds_difference": 0.0,
+      "regret_fraction_difference": 0.0
+    },
+    {
+      "block": 2,
+      "left": "random",
+      "right": "qlognei",
+      "first_use_gpu_seconds_difference": 10.0,
+      "regret_fraction_difference": -0.009691289713812168
+    }
+  ],
+  "oracle_confirmation_mean_seconds": {
+    "cpu0-5": 0.4113834482850507,
+    "cpu1": 0.263867338343213,
+    "cpu2": 0.26133466835987446
+  },
+  "history_cost": {
+    "jobs": 15,
+    "profile_jobs": 9,
+    "wall_seconds": 379.185443,
+    "gpu_seconds": 46.0
+  },
+  "three_block_gpu_cost_including_history_once": {
+    "lookup": 92.0,
+    "random": 114.0,
+    "qlognei": 102.0
+  },
+  "oracle_gpu_seconds": 44.0,
+  "qualification_gpu_seconds": 9.0,
+  "total_gpu_reservation_seconds": 361.0,
+  "retained_predecessor_gpu_reservation_seconds": 140.0,
+  "cumulative_policy_trials_gpu_reservation_seconds": 501.0,
+  "cumulative_cost_scope": "This completed policy trial and its declared stopped predecessor only; not all Resource Advisor experiments or infrastructure operation",
+  "bo_updates": [
+    {
+      "study_ref": "study-a9dddca60fd7403abd77c5ada2d99621",
+      "plan_ref": "plan-02c1723458c14c9e87924c77971fd632",
+      "training_attempts": [
+        "a-756dd46acd42480fa37049418e9e1f74",
+        "a-d57cd062c8894ff3bb6d47771e7932f9",
+        "a-f91ecabf2ca0418c9056e7eeaa43ea59"
+      ]
+    },
+    {
+      "study_ref": "study-a9dddca60fd7403abd77c5ada2d99621",
+      "plan_ref": "plan-466126b9f8f942baaa2502db5092aa60",
+      "training_attempts": [
+        "a-077efa5392a34bf9acc3a94298aa93f2",
+        "a-756dd46acd42480fa37049418e9e1f74",
+        "a-d57cd062c8894ff3bb6d47771e7932f9",
+        "a-f91ecabf2ca0418c9056e7eeaa43ea59"
+      ]
+    },
+    {
+      "study_ref": "study-a9dddca60fd7403abd77c5ada2d99621",
+      "plan_ref": "plan-64e2cb697274481f9999234d64de74b6",
+      "training_attempts": [
+        "a-077efa5392a34bf9acc3a94298aa93f2",
+        "a-0aba98faec8a4707bdb96ef5cb076f07",
+        "a-756dd46acd42480fa37049418e9e1f74",
+        "a-d57cd062c8894ff3bb6d47771e7932f9",
+        "a-f91ecabf2ca0418c9056e7eeaa43ea59"
+      ]
+    },
+    {
+      "study_ref": "study-a9dddca60fd7403abd77c5ada2d99621",
+      "plan_ref": "plan-b01e65c8972642c8821a6ac8ddf772fa",
+      "training_attempts": [
+        "a-077efa5392a34bf9acc3a94298aa93f2",
+        "a-0aba98faec8a4707bdb96ef5cb076f07",
+        "a-756dd46acd42480fa37049418e9e1f74",
+        "a-af8e13205e9244b4bfdcb7ecebf12fe9",
+        "a-d57cd062c8894ff3bb6d47771e7932f9",
+        "a-f91ecabf2ca0418c9056e7eeaa43ea59"
+      ]
+    },
+    {
+      "study_ref": "study-a9dddca60fd7403abd77c5ada2d99621",
+      "plan_ref": "plan-706083a112cb409a884d0f4e792bd4e0",
+      "training_attempts": [
+        "a-077efa5392a34bf9acc3a94298aa93f2",
+        "a-0aba98faec8a4707bdb96ef5cb076f07",
+        "a-578c39cc5be54b4eb91d9b2bc2a11742",
+        "a-756dd46acd42480fa37049418e9e1f74",
+        "a-af8e13205e9244b4bfdcb7ecebf12fe9",
+        "a-d57cd062c8894ff3bb6d47771e7932f9",
+        "a-f91ecabf2ca0418c9056e7eeaa43ea59"
+      ]
+    },
+    {
+      "study_ref": "study-3959ab40108a4e7ba75eac3f9d334b04",
+      "plan_ref": "plan-f44548bc2fd84f7f9c702ffd32372452",
+      "training_attempts": [
+        "a-756d4e4df6e5403595c8bb3d390a700f",
+        "a-c25f8a6f22a640b0b6d28f69d51a32b2",
+        "a-ff1f33cf77ce4749ba2913dede7fbb2b"
+      ]
+    },
+    {
+      "study_ref": "study-3959ab40108a4e7ba75eac3f9d334b04",
+      "plan_ref": "plan-5bc5fbbf6cec40e187fa0d59f4dbe884",
+      "training_attempts": [
+        "a-756d4e4df6e5403595c8bb3d390a700f",
+        "a-c25f8a6f22a640b0b6d28f69d51a32b2",
+        "a-c6e538d436db452994c8376161a4532d",
+        "a-ff1f33cf77ce4749ba2913dede7fbb2b"
+      ]
+    },
+    {
+      "study_ref": "study-3959ab40108a4e7ba75eac3f9d334b04",
+      "plan_ref": "plan-f1c1849e17bf412dbcf71caca18a3700",
+      "training_attempts": [
+        "a-225dee7b4240457ba7ff54c39936e9e6",
+        "a-756d4e4df6e5403595c8bb3d390a700f",
+        "a-c25f8a6f22a640b0b6d28f69d51a32b2",
+        "a-c6e538d436db452994c8376161a4532d",
+        "a-ff1f33cf77ce4749ba2913dede7fbb2b"
+      ]
+    },
+    {
+      "study_ref": "study-3959ab40108a4e7ba75eac3f9d334b04",
+      "plan_ref": "plan-1a984b4e89e04ef28364ddae2869258e",
+      "training_attempts": [
+        "a-225dee7b4240457ba7ff54c39936e9e6",
+        "a-754d13daddda45f39c75d82fdc3ab6b2",
+        "a-756d4e4df6e5403595c8bb3d390a700f",
+        "a-c25f8a6f22a640b0b6d28f69d51a32b2",
+        "a-c6e538d436db452994c8376161a4532d",
+        "a-ff1f33cf77ce4749ba2913dede7fbb2b"
+      ]
+    },
+    {
+      "study_ref": "study-3959ab40108a4e7ba75eac3f9d334b04",
+      "plan_ref": "plan-ac7c2e1dd02c461b8c3ca1285c6e8357",
+      "training_attempts": [
+        "a-225dee7b4240457ba7ff54c39936e9e6",
+        "a-754d13daddda45f39c75d82fdc3ab6b2",
+        "a-756d4e4df6e5403595c8bb3d390a700f",
+        "a-c25f8a6f22a640b0b6d28f69d51a32b2",
+        "a-c6e538d436db452994c8376161a4532d",
+        "a-eeddeb8dba0244daa323a7d29eae1a59",
+        "a-ff1f33cf77ce4749ba2913dede7fbb2b"
+      ]
+    },
+    {
+      "study_ref": "study-a4bee8765b0e47cba09095a91dfed079",
+      "plan_ref": "plan-ced2b80134654928a153adcb6b9bd3a1",
+      "training_attempts": [
+        "a-44b749541ba24a1e836215716657774f",
+        "a-73214e14cfdb4ee2a25ae467f3dcc924",
+        "a-d1345ca45d4540f591241d5f51195fd4"
+      ]
+    },
+    {
+      "study_ref": "study-a4bee8765b0e47cba09095a91dfed079",
+      "plan_ref": "plan-9c6a8e91d2524042891cb57c6e783e32",
+      "training_attempts": [
+        "a-056cd23fd81f4a178affc1b986b5597d",
+        "a-44b749541ba24a1e836215716657774f",
+        "a-73214e14cfdb4ee2a25ae467f3dcc924",
+        "a-d1345ca45d4540f591241d5f51195fd4"
+      ]
+    },
+    {
+      "study_ref": "study-a4bee8765b0e47cba09095a91dfed079",
+      "plan_ref": "plan-0fcd6ea0e0854b1db249ca4a66747616",
+      "training_attempts": [
+        "a-056cd23fd81f4a178affc1b986b5597d",
+        "a-44b749541ba24a1e836215716657774f",
+        "a-73214e14cfdb4ee2a25ae467f3dcc924",
+        "a-80462415a4e94096822235c3af04bea9",
+        "a-d1345ca45d4540f591241d5f51195fd4"
+      ]
+    },
+    {
+      "study_ref": "study-a4bee8765b0e47cba09095a91dfed079",
+      "plan_ref": "plan-eec6c5eac81340ff9e37843b0f1822f3",
+      "training_attempts": [
+        "a-056cd23fd81f4a178affc1b986b5597d",
+        "a-44b749541ba24a1e836215716657774f",
+        "a-73214e14cfdb4ee2a25ae467f3dcc924",
+        "a-80462415a4e94096822235c3af04bea9",
+        "a-97121ded8f8f4a6c920ef578db3db8c0",
+        "a-d1345ca45d4540f591241d5f51195fd4"
+      ]
+    },
+    {
+      "study_ref": "study-a4bee8765b0e47cba09095a91dfed079",
+      "plan_ref": "plan-1c33eb4ff291471f86b685e8eeef1d0b",
+      "training_attempts": [
+        "a-056cd23fd81f4a178affc1b986b5597d",
+        "a-44b749541ba24a1e836215716657774f",
+        "a-73214e14cfdb4ee2a25ae467f3dcc924",
+        "a-80462415a4e94096822235c3af04bea9",
+        "a-97121ded8f8f4a6c920ef578db3db8c0",
+        "a-d09716e4ba494c8b8f20393e76c54e33",
+        "a-d1345ca45d4540f591241d5f51195fd4"
+      ]
+    }
+  ],
+  "frozen_history_and_temporal_leakage_audit_passed": true,
+  "limitations": [
+    "One numerical CNN fixture and one GPU; no trained-model accuracy or multi-backend effectiveness claim.",
+    "S0 has prior observations; their full acquisition cost is included. S1/S2 start cold.",
+    "Three temporal blocks are not independent devices or workload families.",
+    "Oracle estimates use later independent runs, not known ground truth; nonstationarity and finite-sample uncertainty remain.",
+    "GPU reservation time is not active compute time or measured energy; unknown queue durations stay unknown.",
+    "No production break-even or statistical superiority inference."
+  ],
+  "thermal_summary": {
+    "all_traces_eligible": true,
+    "maximum_observed_temperature_c": 55.0,
+    "sensor_query_seconds": 0.3314897551317699,
+    "maximum_query_seconds": 0.0031133609591051936,
+    "maximum_unobserved_gap_seconds": 0.0727458069450222,
+    "power_min_w": 4.53,
+    "power_max_w": 104.352,
+    "scope": "Point samples around blocks; not continuous utilization or integrated energy"
+  },
+  "all_quality_values": [
+    1.0
+  ],
+  "runtime_software_preflight_wall_seconds": 3.327480870997533
+}

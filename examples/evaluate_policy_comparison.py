@@ -411,7 +411,8 @@ def summarize(report, *, predecessor=None):
         "qualification_gpu_seconds": sum(seconds(q["gpu_reservation_seconds"]) for q in f0),
         "total_gpu_reservation_seconds": trial_gpu,
         "retained_predecessor_gpu_reservation_seconds": prior_cost,
-        "cumulative_project_gpu_reservation_seconds": trial_gpu + prior_cost,
+        "cumulative_policy_trials_gpu_reservation_seconds": trial_gpu + prior_cost,
+        "cumulative_cost_scope": "This completed policy trial and its declared stopped predecessor only; not all Resource Advisor experiments or infrastructure operation",
         "bo_updates": bo_updates,
         "frozen_history_and_temporal_leakage_audit_passed": True,
         "limitations": [

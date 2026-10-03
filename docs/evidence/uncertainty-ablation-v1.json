@@ -1,0 +1,609 @@
+{
+  "schema_version": "offline-uncertainty-ablation-v1",
+  "scope": "Exploratory offline replay of the final confirmation uncertainty gate; not a new trial or a new optimizer trajectory",
+  "source_capture_digest": "sha256:c4b89455176f18d780c43afef038ebb0a18b49ac630b49430863db641e4a98c5",
+  "decisions": [
+    {
+      "label": "target-0-random",
+      "block": 0,
+      "strategy": "random",
+      "study_ref": "study-a7206fffc8004a35acff962498df3383",
+      "baseline": "cpu1",
+      "strict": "cpu2",
+      "without_uncertainty": "cpu2",
+      "reason": "RECORDED_FINALISTS_ONLY",
+      "ranking": [
+        {
+          "candidate_ref": "cpu2",
+          "mean_seconds": 0.26104306128884974,
+          "sample_sd_seconds": 0.000229254719761711,
+          "heuristic_interval_seconds": [
+            0.2606459804663475,
+            0.26144014211135197
+          ],
+          "confirmation_attempt_ids": [
+            "a-955918df59074db789e7bdc5967c5c60",
+            "a-7ae4345f859a4716bd98df3c872b1020",
+            "a-b9b9d18f1a74493a8567c324965af4bf"
+          ],
+          "raw_seconds": [
+            0.2610676509793848,
+            0.2608025029185228,
+            0.2612590299686417
+          ]
+        },
+        {
+          "candidate_ref": "cpu1",
+          "mean_seconds": 0.2639595936052501,
+          "sample_sd_seconds": 0.00021410775442011424,
+          "heuristic_interval_seconds": [
+            0.2635887480963,
+            0.26433043911420023
+          ],
+          "confirmation_attempt_ids": [
+            "a-480d43910d2b44bc87bd52d8af3b2b57",
+            "a-1c5f1955b04344a5aa5fc476d8d6f3c6",
+            "a-810b214a70104651b54d3b8824fed266"
+          ],
+          "raw_seconds": [
+            0.26419907493982464,
+            0.2638930379762314,
+            0.2637866678996943
+          ]
+        }
+      ],
+      "rejected": [],
+      "decision_changed": false,
+      "later_reference": {
+        "strict": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        },
+        "without_uncertainty": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        }
+      },
+      "original_study_gpu_reservation_seconds": 38.0
+    },
+    {
+      "label": "target-0-lookup",
+      "block": 0,
+      "strategy": "lookup",
+      "study_ref": "study-61c0116c3af3471ab731d27b22232076",
+      "baseline": "cpu1",
+      "strict": "cpu2",
+      "without_uncertainty": "cpu2",
+      "reason": "RECORDED_FINALISTS_ONLY",
+      "ranking": [
+        {
+          "candidate_ref": "cpu2",
+          "mean_seconds": 0.26112143670131144,
+          "sample_sd_seconds": 0.00016375585386466563,
+          "heuristic_interval_seconds": [
+            0.26083780324238104,
+            0.26140507016024184
+          ],
+          "confirmation_attempt_ids": [
+            "a-5568630324a94e15865cc961f83dcf1e",
+            "a-cf23e5e21d854dca8ccef6620aea687c",
+            "a-fe3b3875ad3541dca838409f340de27d"
+          ],
+          "raw_seconds": [
+            0.26110494101885706,
+            0.26129281608155,
+            0.2609665530035272
+          ]
+        },
+        {
+          "candidate_ref": "cpu1",
+          "mean_seconds": 0.2639946016521814,
+          "sample_sd_seconds": 0.00032905405588669584,
+          "heuristic_interval_seconds": [
+            0.26342466330894904,
+            0.2645645399954138
+          ],
+          "confirmation_attempt_ids": [
+            "a-a4d7daa1a57748fc9809599eae3968d0",
+            "a-a411878f7f1940ddbf24ad6b895d5870",
+            "a-65f0641d18c949acad0f93768a971578"
+          ],
+          "raw_seconds": [
+            0.26403028808999807,
+            0.26364915893645957,
+            0.26430435793008655
+          ]
+        }
+      ],
+      "rejected": [],
+      "decision_changed": false,
+      "later_reference": {
+        "strict": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        },
+        "without_uncertainty": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        }
+      },
+      "original_study_gpu_reservation_seconds": 14.0
+    },
+    {
+      "label": "target-0-qlognei",
+      "block": 0,
+      "strategy": "qlognei",
+      "study_ref": "study-a9dddca60fd7403abd77c5ada2d99621",
+      "baseline": "cpu1",
+      "strict": "cpu2",
+      "without_uncertainty": "cpu2",
+      "reason": "RECORDED_FINALISTS_ONLY",
+      "ranking": [
+        {
+          "candidate_ref": "cpu2",
+          "mean_seconds": 0.2613397377038685,
+          "sample_sd_seconds": 8.097381957467288e-05,
+          "heuristic_interval_seconds": [
+            0.26119948693428224,
+            0.2614799884734547
+          ],
+          "confirmation_attempt_ids": [
+            "a-bce41b9107dc4014abb161862f3298ba",
+            "a-f6f6f3c520dc4e50828b7d60bd8e8d06",
+            "a-07a1f393eaee45368a879e84b9002d93"
+          ],
+          "raw_seconds": [
+            0.2614102890365757,
+            0.2613575999857858,
+            0.261251324089244
+          ]
+        },
+        {
+          "candidate_ref": "cpu1",
+          "mean_seconds": 0.2635027887687708,
+          "sample_sd_seconds": 1.138792948120702e-05,
+          "heuristic_interval_seconds": [
+            0.26348306429631635,
+            0.2635225132412253
+          ],
+          "confirmation_attempt_ids": [
+            "a-067072a9d15647248992ffcc429e5187",
+            "a-c34290738ad54d17bc0e5e2ee0ed79c6",
+            "a-a87617cd5f034a469a7348fb1386935f"
+          ],
+          "raw_seconds": [
+            0.26349868811666965,
+            0.2635156591422856,
+            0.26349401904735714
+          ]
+        }
+      ],
+      "rejected": [],
+      "decision_changed": false,
+      "later_reference": {
+        "strict": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        },
+        "without_uncertainty": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        }
+      },
+      "original_study_gpu_reservation_seconds": 36.0
+    },
+    {
+      "label": "target-1-qlognei",
+      "block": 1,
+      "strategy": "qlognei",
+      "study_ref": "study-3959ab40108a4e7ba75eac3f9d334b04",
+      "baseline": "cpu1",
+      "strict": "cpu2",
+      "without_uncertainty": "cpu2",
+      "reason": "RECORDED_FINALISTS_ONLY",
+      "ranking": [
+        {
+          "candidate_ref": "cpu2",
+          "mean_seconds": 0.261590613964169,
+          "sample_sd_seconds": 0.0007373655612637792,
+          "heuristic_interval_seconds": [
+            0.2603134593483086,
+            0.2628677685800294
+          ],
+          "confirmation_attempt_ids": [
+            "a-63bc8c740d9f46538229a9398e267880",
+            "a-e0927bbec7124327ad55312ef9874da7",
+            "a-52b10a3583234f53b21c2e1738536312"
+          ],
+          "raw_seconds": [
+            0.2614781649899669,
+            0.26237774500623345,
+            0.2609159318963066
+          ]
+        },
+        {
+          "candidate_ref": "cpu1",
+          "mean_seconds": 0.2639083090471104,
+          "sample_sd_seconds": 0.00018719774939559243,
+          "heuristic_interval_seconds": [
+            0.26358407303409465,
+            0.2642325450601261
+          ],
+          "confirmation_attempt_ids": [
+            "a-39f0e20474ba49898409c36bad7ec29f",
+            "a-165465416f1444868f91aa18692918d9",
+            "a-c01cb9d944dc40f59e2785c9e5eb24dc"
+          ],
+          "raw_seconds": [
+            0.26371300203027204,
+            0.2640861771069467,
+            0.2639257480041124
+          ]
+        }
+      ],
+      "rejected": [],
+      "decision_changed": false,
+      "later_reference": {
+        "strict": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        },
+        "without_uncertainty": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        }
+      },
+      "original_study_gpu_reservation_seconds": 37.0
+    },
+    {
+      "label": "target-1-lookup",
+      "block": 1,
+      "strategy": "lookup",
+      "study_ref": "study-8fc2ebf7769e4d818f1e5f2c49d1fb7b",
+      "baseline": "cpu1",
+      "strict": "cpu2",
+      "without_uncertainty": "cpu2",
+      "reason": "RECORDED_FINALISTS_ONLY",
+      "ranking": [
+        {
+          "candidate_ref": "cpu2",
+          "mean_seconds": 0.26109728805022314,
+          "sample_sd_seconds": 0.0004206550629951617,
+          "heuristic_interval_seconds": [
+            0.26036869210865443,
+            0.26182588399179185
+          ],
+          "confirmation_attempt_ids": [
+            "a-de4bfc866cff40e48cfa2a5e411f430f",
+            "a-6d2a2528091e4b3886eae62931e47afc",
+            "a-eacb1c7ae46a49d383b1b7a3ea6d147e"
+          ],
+          "raw_seconds": [
+            0.26061579695669934,
+            0.261282577062957,
+            0.2613934901310131
+          ]
+        },
+        {
+          "candidate_ref": "cpu1",
+          "mean_seconds": 0.26353091599109274,
+          "sample_sd_seconds": 0.0004947306980408731,
+          "heuristic_interval_seconds": [
+            0.2626740172860219,
+            0.26438781469616357
+          ],
+          "confirmation_attempt_ids": [
+            "a-df9987d50cfe43f98184b425da439e3a",
+            "a-7b5bfafe9db144538edfbb129ed7c82d",
+            "a-b12ecf4085b94c49a157a89fa54b4343"
+          ],
+          "raw_seconds": [
+            0.26401296292897314,
+            0.26302440895233303,
+            0.263555376091972
+          ]
+        }
+      ],
+      "rejected": [],
+      "decision_changed": false,
+      "later_reference": {
+        "strict": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        },
+        "without_uncertainty": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        }
+      },
+      "original_study_gpu_reservation_seconds": 15.0
+    },
+    {
+      "label": "target-1-random",
+      "block": 1,
+      "strategy": "random",
+      "study_ref": "study-651a75c3da214594aba1567fdc09bf1c",
+      "baseline": "cpu1",
+      "strict": "cpu2",
+      "without_uncertainty": "cpu2",
+      "reason": "RECORDED_FINALISTS_ONLY",
+      "ranking": [
+        {
+          "candidate_ref": "cpu2",
+          "mean_seconds": 0.2608714986514921,
+          "sample_sd_seconds": 0.0002810586670577088,
+          "heuristic_interval_seconds": [
+            0.26038469076024057,
+            0.26135830654274367
+          ],
+          "confirmation_attempt_ids": [
+            "a-40e0432465624d62a71bb15b7a7585b6",
+            "a-0904f963e94e4f449a661b7036dfc0e0",
+            "a-dec0194ecb4543d0a55d32552747ee86"
+          ],
+          "raw_seconds": [
+            0.26080996193923056,
+            0.2606263070483692,
+            0.26117822696687654
+          ]
+        },
+        {
+          "candidate_ref": "cpu1",
+          "mean_seconds": 0.2638360006579508,
+          "sample_sd_seconds": 0.0005265390645303654,
+          "heuristic_interval_seconds": [
+            0.2629240082460144,
+            0.2647479930698872
+          ],
+          "confirmation_attempt_ids": [
+            "a-24231206b7ac4d549c28413e7f3a0e76",
+            "a-d7b2a67350374e0282f8dca9331e72b2",
+            "a-31d879f9ed8f40f6bc0f924ed6687e0a"
+          ],
+          "raw_seconds": [
+            0.26359082793351263,
+            0.2634767559939064,
+            0.2644404180464335
+          ]
+        }
+      ],
+      "rejected": [],
+      "decision_changed": false,
+      "later_reference": {
+        "strict": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        },
+        "without_uncertainty": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        }
+      },
+      "original_study_gpu_reservation_seconds": 37.0
+    },
+    {
+      "label": "target-2-qlognei",
+      "block": 2,
+      "strategy": "qlognei",
+      "study_ref": "study-a4bee8765b0e47cba09095a91dfed079",
+      "baseline": "cpu1",
+      "strict": "cpu1",
+      "without_uncertainty": "cpu1",
+      "reason": "RECORDED_FINALISTS_ONLY",
+      "ranking": [
+        {
+          "candidate_ref": "cpu1",
+          "mean_seconds": 0.26411533256759867,
+          "sample_sd_seconds": 0.000369172272894318,
+          "heuristic_interval_seconds": [
+            0.2634759074342,
+            0.2647547577009973
+          ],
+          "confirmation_attempt_ids": [
+            "a-9352187489ac4deebe492d789323c4f0",
+            "a-04b98ea67f144d9d968c733f76bc6a5d",
+            "a-476eb52324054370a68b6edaec5e411a"
+          ],
+          "raw_seconds": [
+            0.2637389558949508,
+            0.2641301899566315,
+            0.2644768518512137
+          ]
+        }
+      ],
+      "rejected": [],
+      "decision_changed": false,
+      "later_reference": {
+        "strict": {
+          "mean_seconds": 0.263867338343213,
+          "selection_regret_fraction": 0.009691289713812168,
+          "relative_to_baseline": 0.0
+        },
+        "without_uncertainty": {
+          "mean_seconds": 0.263867338343213,
+          "selection_regret_fraction": 0.009691289713812168,
+          "relative_to_baseline": 0.0
+        }
+      },
+      "original_study_gpu_reservation_seconds": 29.0
+    },
+    {
+      "label": "target-2-random",
+      "block": 2,
+      "strategy": "random",
+      "study_ref": "study-8752e342000943afa20e126247091922",
+      "baseline": "cpu1",
+      "strict": "cpu2",
+      "without_uncertainty": "cpu2",
+      "reason": "RECORDED_FINALISTS_ONLY",
+      "ranking": [
+        {
+          "candidate_ref": "cpu2",
+          "mean_seconds": 0.2606575229632047,
+          "sample_sd_seconds": 0.0005157910897086468,
+          "heuristic_interval_seconds": [
+            0.259764146589738,
+            0.2615508993366714
+          ],
+          "confirmation_attempt_ids": [
+            "a-b08a0fc52a1248c285f2bcd490580ed3",
+            "a-89996228250242cf9939d6215e0d53d8",
+            "a-6ee96868dcb24f90b3f3280a284aeda1"
+          ],
+          "raw_seconds": [
+            0.26018173404736444,
+            0.2605851608677767,
+            0.26120567397447303
+          ]
+        },
+        {
+          "candidate_ref": "cpu1",
+          "mean_seconds": 0.2636394493165426,
+          "sample_sd_seconds": 0.0003444943722704315,
+          "heuristic_interval_seconds": [
+            0.26304276756084866,
+            0.26423613107223654
+          ],
+          "confirmation_attempt_ids": [
+            "a-142a36dd7adc429999708492facfa585",
+            "a-e27f29de6d364c7181801ca92a77215c",
+            "a-0f9387fd3fec4ebaabe158f7638ab090"
+          ],
+          "raw_seconds": [
+            0.26398653688374907,
+            0.2632976080640219,
+            0.2636342030018568
+          ]
+        }
+      ],
+      "rejected": [],
+      "decision_changed": false,
+      "later_reference": {
+        "strict": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        },
+        "without_uncertainty": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        }
+      },
+      "original_study_gpu_reservation_seconds": 39.0
+    },
+    {
+      "label": "target-2-lookup",
+      "block": 2,
+      "strategy": "lookup",
+      "study_ref": "study-1e9e73a4523a4503bcc1c4c9c72877a7",
+      "baseline": "cpu1",
+      "strict": "cpu2",
+      "without_uncertainty": "cpu2",
+      "reason": "RECORDED_FINALISTS_ONLY",
+      "ranking": [
+        {
+          "candidate_ref": "cpu2",
+          "mean_seconds": 0.26095941303841147,
+          "sample_sd_seconds": 2.867100461244429e-05,
+          "heuristic_interval_seconds": [
+            0.2609097534017187,
+            0.26100907267510426
+          ],
+          "confirmation_attempt_ids": [
+            "a-6ed12ad5bc2141309405f8c1ca5efbc0",
+            "a-57911a86b06f4e09aa08a696ac7f1031",
+            "a-b008ec19020c441194d0cd236d4c0532"
+          ],
+          "raw_seconds": [
+            0.2609753549913876,
+            0.26097657007630914,
+            0.26092631404753774
+          ]
+        },
+        {
+          "candidate_ref": "cpu1",
+          "mean_seconds": 0.26382678900457296,
+          "sample_sd_seconds": 0.00037512706269198447,
+          "heuristic_interval_seconds": [
+            0.26317704987269636,
+            0.26447652813644956
+          ],
+          "confirmation_attempt_ids": [
+            "a-8794b2b6e84c4dc19059b6ac917dec6c",
+            "a-8b4dfb8b7e444038bf710ad69d2ecc4f",
+            "a-4f86d80a7a864b73a800a970d71a850a"
+          ],
+          "raw_seconds": [
+            0.2637948279734701,
+            0.2634686650126241,
+            0.2642168740276247
+          ]
+        }
+      ],
+      "rejected": [],
+      "decision_changed": false,
+      "later_reference": {
+        "strict": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        },
+        "without_uncertainty": {
+          "mean_seconds": 0.26133466835987446,
+          "selection_regret_fraction": 0.0,
+          "relative_to_baseline": -0.009598270097545436
+        }
+      },
+      "original_study_gpu_reservation_seconds": 17.0
+    }
+  ],
+  "rates": {
+    "strict": {
+      "decision_count": 9,
+      "abstention_count": 0,
+      "nonbaseline_count": 8,
+      "decision_coverage": 1.0,
+      "nonbaseline_recommendation_fraction": 0.8888888888888888,
+      "denominator_studies": 9
+    },
+    "without_uncertainty": {
+      "decision_count": 9,
+      "abstention_count": 0,
+      "nonbaseline_count": 8,
+      "decision_coverage": 1.0,
+      "nonbaseline_recommendation_fraction": 0.8888888888888888,
+      "denominator_studies": 9
+    }
+  },
+  "changed_decisions": 0,
+  "new_gpu_jobs": 0,
+  "measurement_cost_reused_not_saved": 361.0,
+  "reference_mean_seconds": {
+    "cpu0-5": 0.4113834482850507,
+    "cpu1": 0.263867338343213,
+    "cpu2": 0.26133466835987446
+  },
+  "quality_memory_and_repeat_checks_preserved": true,
+  "cross_workload_holdout": "NOT_QUALIFIED: this capture contains one logical workload",
+  "limitations": [
+    "Finalists and observations come from the executed policy; this does not estimate how removing uncertainty throughout search would change its trajectory.",
+    "The original policy can retain the baseline while returning a valid recommendation; baseline retention is not counted as missing coverage.",
+    "Later independent reference means are finite-sample estimates on the same GPU, not true error labels or a causal trial of S5 execution.",
+    "The replay uses the original mean +/- 3 sample SD / sqrt(n) heuristic; it is not a calibrated 95% interval.",
+    "Untested finalists, failed quality/memory checks and existing abstentions are not promoted into recommendations.",
+    "No significance tests, superiority claims, new measurements, cost savings or workload-generalization claims."
+  ]
+}

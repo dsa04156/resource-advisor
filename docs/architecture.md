@@ -81,8 +81,9 @@ window; it does not qualify the whole backend or a production deployment.
   recovery and the complete E0–E7 scenario matrix still need verification.
 - Actual fixed-fidelity qLogNEI and [RGPE/warm-start transfer](transfer-gpu.md)
   loops have live evidence; the transfer comparison did not demonstrate a
-  selection advantage. A [new equal-budget S0/S1/S2 comparison](policy-comparison-v2.md)
-  is in progress after a stopped trial exposed missing optimizer dependencies.
+  selection advantage. A [completed equal-budget S0/S1/S2 comparison](policy-comparison-v2.md)
+  reports no BO selection advantage; its predecessor stopped after exposing
+  missing optimizer dependencies.
   The repaired worker now requires those dependencies before startup. Physical
   multi-fidelity qualification, broad transfer effectiveness, calibrated
   uncertainty and shared-device interference remain open.

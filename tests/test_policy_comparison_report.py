@@ -261,7 +261,7 @@ def test_separate_trial_retains_failed_predecessor_cost_without_double_charging_
     output = module.summarize(report, predecessor=prior)
     assert output["retained_predecessor_gpu_reservation_seconds"] == 140
     assert (
-        output["cumulative_project_gpu_reservation_seconds"]
+        output["cumulative_policy_trials_gpu_reservation_seconds"]
         == output["total_gpu_reservation_seconds"] + 140
     )
     assert output["three_block_gpu_cost_including_history_once"] == {

@@ -1,0 +1,28 @@
+{
+  "source_sha256": "2b1ec19d2f80241d04f702eeeb9f4438a84870f5e1baa804962de6231b3b27dd",
+  "plan_sha256": "4d261df39fd330d75972ccbe770a01c9bf144e91090f0cb08add0dade6d5c440",
+  "matplotlib_version": "3.10.7",
+  "size_inches": [
+    12,
+    8.8
+  ],
+  "raster_dpi": 180,
+  "destination": "Public repository report; no target journal",
+  "transforms": [
+    "Seconds multiplied by 1000 for A/D",
+    "Arithmetic means of independent confirmation runs",
+    "Fixed horizontal offsets for legibility, no value jitter",
+    "GPU reservation sums, history charged once in C and in each first-use scenario in B"
+  ],
+  "exclusions": "A displays the confirmed selected option only; all candidates and all outcomes remain in the source capture. D uses only the later independent reference confirmations.",
+  "uncertainty": "Individual runs and means, no CI; three repeated temporal blocks on one device",
+  "missingness": "Abstaining policy has N/A and no invented timing point; unknown queue time is not plotted as zero",
+  "limitations": [
+    "One numerical CNN fixture and one GPU; no trained-model accuracy or multi-backend effectiveness claim.",
+    "S0 has prior observations; their full acquisition cost is included. S1/S2 start cold.",
+    "Three temporal blocks are not independent devices or workload families.",
+    "Oracle estimates use later independent runs, not known ground truth; nonstationarity and finite-sample uncertainty remain.",
+    "GPU reservation time is not active compute time or measured energy; unknown queue durations stay unknown.",
+    "No production break-even or statistical superiority inference."
+  ]
+}

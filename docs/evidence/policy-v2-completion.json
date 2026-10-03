@@ -1,0 +1,62 @@
+{
+  "verified_at": "2026-10-03T04:45:41.398363+00:00",
+  "evidence_kind": "hardware",
+  "protocol_state": "completed",
+  "application_jobs": 129,
+  "separate_f0_jobs": 3,
+  "total_gpu_jobs": 132,
+  "distinct_job_attempt_backend_and_mlflow_ids": 129,
+  "all_results_ledger_api_s3_mlflow_verified": true,
+  "application_gpu_reservation_seconds": 352.0,
+  "qualification_gpu_reservation_seconds": 9.0,
+  "two_trial_gpu_reservation_seconds": 501.0,
+  "cost_scope": "This completed policy trial and its declared stopped predecessor only; not all Resource Advisor experiments or infrastructure operation",
+  "delivery_outbox_unfinished": 0,
+  "final_nodes": {
+    "count": 10,
+    "ready": 10,
+    "pressure": 0
+  },
+  "final_queue": {
+    "pendingWorkloads": 0,
+    "admittedWorkloads": 0,
+    "reservingWorkloads": 0
+  },
+  "queue_quota": {
+    "cpu": 2,
+    "physical_gpu": 1
+  },
+  "runtime_source_unchanged": true,
+  "static_specs_and_uids_preserved": 9,
+  "same_core_pods_and_container_statuses": 4,
+  "secret_and_pvc_refs_and_versions_preserved": true,
+  "core_argocd_synced_healthy_at_unchanged_revision": 4,
+  "database_row_increases": {
+    "ra_jobs": 129,
+    "ra_outbox": 645,
+    "ra_studies": 11,
+    "ra_usage": 129,
+    "stable_entities": 1116
+  },
+  "observed_phase_intervals": {
+    "queue_seconds": {
+      "known_intervals": 129,
+      "unknown_intervals": 0,
+      "sum_seconds": 15.0
+    },
+    "preparation_seconds": {
+      "known_intervals": 129,
+      "unknown_intervals": 0,
+      "sum_seconds": 112.0
+    },
+    "collection_seconds": {
+      "known_intervals": 129,
+      "unknown_intervals": 0,
+      "sum_seconds": 9.890493
+    }
+  },
+  "measured_block_sum_seconds": 36.18719014123781,
+  "gpu_timestamp_resolution_notice": "Scheduler/container timestamps are quantized to seconds; reservation is not active compute",
+  "source_capture_sha256": "2b1ec19d2f80241d04f702eeeb9f4438a84870f5e1baa804962de6231b3b27dd",
+  "source_package_unchanged_since_application_commit": "02cd907c1eda3875bfbd4bd1c98f2883ae793ab0"
+}

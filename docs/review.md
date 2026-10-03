@@ -33,8 +33,11 @@ open and the controller is currently unreachable. Disconnection recovery and
 complete cancellation/cost evidence remain required.
 
 **Optimization:** consented lab pilot/BO execution has durable reservation and
-independent confirmation, including real GPU runs. Complete failed-run cost
-accounting and randomized equal-budget trials remain production/evaluation gates.
+independent confirmation, including real GPU runs. A completed three-block
+[S0/S1/S2 comparison](policy-comparison-v2.md) now retains the stopped predecessor
+and full measured allocation costs without demonstrating BO superiority.
+Complete phase/utilization accounting, the separate B0–B2 operational comparison
+and workload holdout remain evaluation gates.
 The small smoke experiment does not prove BO superiority or hard physical budget bounds.
 The first preregistered comparison exposed a shallow deployment integration:
 optimizer tests passed with local dependencies, but the deployed worker lacked
