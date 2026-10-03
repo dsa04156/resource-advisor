@@ -1,0 +1,6 @@
+- name: Restart dedicated node exporter
+  become: true
+  ansible.builtin.systemd_service:
+    name: resource-advisor-node-exporter.service
+    daemon_reload: true
+    state: restarted

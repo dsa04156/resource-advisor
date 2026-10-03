@@ -1,0 +1,14 @@
+all:
+  children:
+    ra_lab_nodes:
+      hosts:
+        slurm-gpu-lab:
+          ansible_host: gpu-lab.example.invalid
+        slurm-npu-lab:
+          ansible_host: npu-lab.example.invalid
+      vars:
+        ansible_user: research-operator
+        # Private inventory supplies approved authentication and concrete paths.
+        ra_lab_authorized: false
+        ra_existing_production: true
+        ra_node_exporter_binary: /secure/verified/node_exporter

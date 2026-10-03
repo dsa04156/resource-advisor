@@ -1,0 +1,25 @@
+# Managed by Resource Advisor's scoped Ansible lab role.
+[Unit]
+Description=Resource Advisor lab system telemetry
+After=network.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+ExecStart={{ ra_node_exporter_prefix }}/{{ ra_node_exporter_version }}/node_exporter --web.listen-address={{ ra_node_exporter_listen }} --collector.disable-defaults --collector.cpu --collector.meminfo --collector.loadavg --collector.stat --collector.time --collector.uname --collector.netdev --collector.diskstats
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+UMask=0077
+CPUQuota=10%
+MemoryMax=128M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

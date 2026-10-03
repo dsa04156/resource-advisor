@@ -1,0 +1,32 @@
+- name: Read the installed Slurm version without changing configuration
+  ansible.builtin.command:
+    argv: [/usr/sbin/slurmd, -V]
+  register: ra_slurm_version
+  changed_when: false
+  check_mode: false
+
+- name: Capture existing Slurm daemon identity
+  ansible.builtin.command:
+    argv: [/usr/bin/systemctl, show, slurmd, -p, MainPID, -p, ActiveState]
+  register: ra_slurmd_before
+  changed_when: false
+  check_mode: false
+
+- name: Capture hashes of protected existing configuration and driver identity
+  ansible.builtin.stat:
+    path: "{{ item }}"
+    checksum_algorithm: sha256
+  loop:
+    - /etc/slurm/slurm.conf
+    - /etc/slurm/gres.conf
+    - /etc/slurm/cgroup.conf
+    - /etc/nv_tegra_release
+    - /proc/driver/nvidia/version
+  register: ra_protected_before
+
+- name: Describe the limited scheduler observation
+  ansible.builtin.debug:
+    msg:
+      client_version: "{{ ra_slurm_version.stdout }}"
+      daemon: "{{ ra_slurmd_before.stdout_lines }}"
+      scheduler_admission: NOT_VERIFIED_BY_DAEMON_ACTIVITY

@@ -1,0 +1,124 @@
+- name: Require qualified architecture and fixed installation boundary
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.architecture == 'aarch64'
+      - ansible_facts.service_mgr == 'systemd'
+      - ra_node_exporter_version == '1.10.2'
+      - ra_node_exporter_binary_sha256 == '123faecd856ab0aa317b2916fdb2cf09089a487930beca2956c6d3bb13e49a03'
+      - ra_node_exporter_prefix == '/opt/resource-advisor/node-exporter'
+      - ra_node_exporter_listen == '127.0.0.1:19100'
+      - ra_node_exporter_binary is match('^/')
+
+- name: Check verified control-host binary bytes
+  ansible.builtin.stat:
+    path: "{{ ra_node_exporter_binary }}"
+    checksum_algorithm: sha256
+  delegate_to: localhost
+  become: false
+  register: ra_local_binary
+
+- name: Reject an absent or modified binary before any host change
+  ansible.builtin.assert:
+    that:
+      - ra_local_binary.stat.isreg | default(false)
+      - ra_local_binary.stat.checksum | default('') == ra_node_exporter_binary_sha256
+
+- name: Inspect project ownership marker and existing unit
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop:
+    - "{{ ra_node_exporter_prefix }}/.ansible-managed"
+    - /etc/systemd/system/resource-advisor-node-exporter.service
+    - "{{ ra_node_exporter_prefix }}"
+  register: ra_existing_paths
+
+- name: Refuse adoption of an unmanaged unit or installation directory
+  ansible.builtin.assert:
+    that:
+      - ra_existing_paths.results[0].stat.exists or not (ra_existing_paths.results[1].stat.exists or ra_existing_paths.results[2].stat.exists)
+
+- name: Check whether the dedicated telemetry port is already listening
+  ansible.builtin.command:
+    argv: [/usr/bin/ss, -H, -ltn, "sport = :19100"]
+  register: ra_existing_listener
+  changed_when: false
+  check_mode: false
+
+- name: Refuse to take an unmanaged listening port
+  ansible.builtin.assert:
+    that:
+      - ra_existing_paths.results[0].stat.exists or ra_existing_listener.stdout | trim == ''
+
+- name: Install only the dedicated telemetry files and service
+  become: true
+  when: not ansible_check_mode
+  block:
+    - name: Create a dedicated versioned binary directory
+      ansible.builtin.file:
+        path: "{{ ra_node_exporter_prefix }}/{{ ra_node_exporter_version }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+    - name: Record ownership of this independent installation
+      ansible.builtin.copy:
+        content: "resource-advisor ansible node-exporter v1\n"
+        dest: "{{ ra_node_exporter_prefix }}/.ansible-managed"
+        owner: root
+        group: root
+        mode: "0644"
+    - name: Copy the pinned official binary without installing OS packages
+      ansible.builtin.copy:
+        src: "{{ ra_node_exporter_binary }}"
+        dest: "{{ ra_node_exporter_prefix }}/{{ ra_node_exporter_version }}/node_exporter"
+        owner: root
+        group: root
+        mode: "0755"
+      notify: Restart dedicated node exporter
+    - name: Verify installed binary bytes
+      ansible.builtin.stat:
+        path: "{{ ra_node_exporter_prefix }}/{{ ra_node_exporter_version }}/node_exporter"
+        checksum_algorithm: sha256
+      register: ra_installed_binary
+    - name: Require matching installed SHA-256
+      ansible.builtin.assert:
+        that: ra_installed_binary.stat.checksum == ra_node_exporter_binary_sha256
+    - name: Install the dedicated resource-bounded unit
+      ansible.builtin.template:
+        src: resource-advisor-node-exporter.service.j2
+        dest: /etc/systemd/system/resource-advisor-node-exporter.service
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart dedicated node exporter
+    - name: Apply only pending exporter changes
+      ansible.builtin.meta: flush_handlers
+    - name: Enable and start the dedicated service idempotently
+      ansible.builtin.systemd_service:
+        name: resource-advisor-node-exporter.service
+        enabled: true
+        state: started
+    - name: Read actual host telemetry from the loopback listener
+      ansible.builtin.uri:
+        url: "http://{{ ra_node_exporter_listen }}/metrics"
+        return_content: true
+        timeout: 10
+      register: ra_metrics
+      retries: 5
+      delay: 2
+      until: ra_metrics.status == 200
+      no_log: true
+    - name: Require real CPU and available-memory metric families
+      ansible.builtin.assert:
+        that:
+          - "'node_cpu_seconds_total{' in ra_metrics.content"
+          - "'node_memory_MemAvailable_bytes ' in ra_metrics.content"
+          - "'node_memory_MemTotal_bytes ' in ra_metrics.content"
+          - "'node_exporter_build_info{' in ra_metrics.content"
+        quiet: true
+      no_log: true
+
+- name: Explain the check-mode boundary
+  ansible.builtin.debug:
+    msg: Preflight and preservation checks only; check mode does not install/start or prove metrics.
+  when: ansible_check_mode

@@ -1,0 +1,2 @@
+# Separate operator environment; not an application/runner dependency.
+ansible-core==2.19.13

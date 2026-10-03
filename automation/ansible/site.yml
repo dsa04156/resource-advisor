@@ -1,0 +1,54 @@
+- name: Provision independent lab system telemetry without changing Slurm or drivers
+  hosts: ra_lab_nodes
+  gather_facts: false
+  serial: 1
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Require explicitly authorized standalone lab hosts
+      ansible.builtin.assert:
+        that:
+          - ra_lab_authorized | default(false) | bool
+          - not (ra_existing_production | default(true) | bool)
+        fail_msg: Use the private allowlisted lab inventory; production nodes are excluded.
+    - name: Gather required operating system facts
+      ansible.builtin.setup:
+        gather_subset: ["!all", min, hardware]
+    - name: Refuse active Kubernetes or KubeEdge host management
+      ansible.builtin.command:
+        # show returns status data for absent/inactive units without treating
+        # their expected is-active exit code as a transport failure.
+        argv: [/usr/bin/systemctl, show, kubelet.service, edgecore.service, -p, ActiveState, --value]
+      register: ra_existing_edge
+      changed_when: false
+      failed_when: "'active' in ra_existing_edge.stdout_lines"
+      check_mode: false
+  roles:
+    - slurm_discovery
+    - node_exporter
+  post_tasks:
+    - name: Recheck existing protected Slurm and driver files
+      ansible.builtin.stat:
+        path: "{{ item.item }}"
+        checksum_algorithm: sha256
+      loop: "{{ ra_protected_before.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+      register: ra_protected_after
+    - name: Require identical existing file bytes and existence
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists == item.item.stat.exists
+          - item.stat.checksum | default('absent') == item.item.stat.checksum | default('absent')
+      loop: "{{ ra_protected_after.results }}"
+      loop_control:
+        label: "{{ item.item.item }}"
+    - name: Recheck Slurm daemon identity without restarting it
+      ansible.builtin.command:
+        argv: [/usr/bin/systemctl, show, slurmd, -p, MainPID, -p, ActiveState]
+      register: ra_slurmd_after
+      changed_when: false
+      check_mode: false
+    - name: Require unchanged Slurm daemon process and activity
+      ansible.builtin.assert:
+        that:
+          - ra_slurmd_after.stdout == ra_slurmd_before.stdout

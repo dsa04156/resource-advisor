@@ -1,0 +1,6 @@
+ra_node_exporter_version: "1.10.2"
+ra_node_exporter_binary_sha256: 123faecd856ab0aa317b2916fdb2cf09089a487930beca2956c6d3bb13e49a03
+ra_node_exporter_binary: ""
+# Host loopback only. Prometheus connectivity requires a separately qualified route.
+ra_node_exporter_listen: "127.0.0.1:19100"
+ra_node_exporter_prefix: /opt/resource-advisor/node-exporter
