@@ -2,6 +2,7 @@
 
 import argparse
 import copy
+import hashlib
 import itertools
 import json
 import math
@@ -42,7 +43,7 @@ def comparable(spec):
     return value
 
 
-def summarize(report):
+def summarize(report, *, predecessor=None):
     require(report["phase"] == "completed", "protocol is not complete")
     studies, design, rows = report["studies"], report["plan"], report["observations"]
     schedule, caps = design["schedule"], design["budgets"]
@@ -87,6 +88,32 @@ def summarize(report):
         by_id[o["attempt_id"]]["allocated_device_seconds"] for o in history["observations"]
     )
     baseline_spec = history["spec"]
+    prior_cost = 0
+    if "predecessor" in design:
+        require(predecessor is not None, "retained predecessor report required")
+        prior_digest = (
+            "sha256:"
+            + hashlib.sha256(
+                json.dumps(predecessor, sort_keys=True, separators=(",", ":")).encode()
+            ).hexdigest()
+        )
+        require(
+            prior_digest == design["predecessor"]["stop_report_digest"]
+            and predecessor["status"] == "stopped"
+            and predecessor["trial_must_not_resume"],
+            "predecessor evidence differs from frozen plan",
+        )
+        require(
+            predecessor["results_ledger_api_s3_mlflow_verified"] == predecessor["application_jobs"],
+            "predecessor accounting is incomplete",
+        )
+        prior_cost = seconds(predecessor["application_gpu_reservation_seconds"]) + seconds(
+            predecessor["qualification_gpu_reservation_seconds"]
+        )
+        require(
+            prior_cost == design["predecessor"]["retained_gpu_reservation_seconds"],
+            "predecessor cost differs from frozen plan",
+        )
     require(
         all(
             baseline_spec["identity"][key] == design["workload"][key]
@@ -130,6 +157,15 @@ def summarize(report):
         "comparison workload/quality/resources changed",
     )
     sequence = [history, *(studies[label] for label in labels), oracle]
+    for study in sequence:
+        require(
+            all(
+                datetime.fromisoformat(study["created_at"])
+                <= datetime.fromisoformat(o["recorded_at"])
+                for o in study["observations"]
+            ),
+            "study contains observations from before its creation",
+        )
     for left, right in zip(sequence, sequence[1:], strict=False):
         boundary = datetime.fromisoformat(right["created_at"])
         require(datetime.fromisoformat(left["created_at"]) < boundary, "study order changed")
@@ -347,6 +383,9 @@ def summarize(report):
     f0 = report["separate_qualification"]
     require(len(f0) == design["maximum_jobs"]["qualification"], "F0 coverage")
     require(len(rows) + len(f0) <= design["maximum_jobs"]["total"], "protocol job cap")
+    trial_gpu = sum(r["allocated_device_seconds"] for r in rows) + sum(
+        seconds(q["gpu_reservation_seconds"]) for q in f0
+    )
     return {
         "scope": "descriptive three-block single-GPU comparison; no powered superiority claim",
         "whole_protocol_wall_seconds": protocol_wall,
@@ -370,8 +409,9 @@ def summarize(report):
             r["allocated_device_seconds"] for r in rows if r["study_ref"] == oracle["ref"]
         ),
         "qualification_gpu_seconds": sum(seconds(q["gpu_reservation_seconds"]) for q in f0),
-        "total_gpu_reservation_seconds": sum(r["allocated_device_seconds"] for r in rows)
-        + sum(seconds(q["gpu_reservation_seconds"]) for q in f0),
+        "total_gpu_reservation_seconds": trial_gpu,
+        "retained_predecessor_gpu_reservation_seconds": prior_cost,
+        "cumulative_project_gpu_reservation_seconds": trial_gpu + prior_cost,
         "bo_updates": bo_updates,
         "frozen_history_and_temporal_leakage_audit_passed": True,
         "limitations": [
@@ -390,6 +430,11 @@ if __name__ == "__main__":
     parser.add_argument("--capture", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument(
+        "--predecessor-stop",
+        type=Path,
+        default=Path(__file__).parents[1] / "docs/evidence/policy-stop.json",
+    )
+    parser.add_argument(
         "--plan",
         type=Path,
         default=Path(__file__).parents[1] / "docs/evidence/policy-comparison-plan.json",
@@ -399,7 +444,10 @@ if __name__ == "__main__":
     require(
         capture["plan"] == json.loads(args.plan.read_text()), "capture differs from frozen plan"
     )
-    result = summarize(capture)
+    predecessor = (
+        json.loads(args.predecessor_stop.read_text()) if "predecessor" in capture["plan"] else None
+    )
+    result = summarize(capture, predecessor=predecessor)
     with args.output.open("x") as target:
         json.dump(result, target, indent=2)
         target.write("\n")

@@ -1,4 +1,6 @@
+import hashlib
 import importlib.util
+import json
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -233,6 +235,53 @@ def test_rejects_quality_time_and_search_space_violations(report, fault):
             study["spec"]["identity"]["work_units"] = 100
     with pytest.raises(ValueError, match="confirmations|wall cap|frozen design"):
         module.summarize(report)
+
+
+def predecessor_report(report):
+    prior = {
+        "status": "stopped",
+        "trial_must_not_resume": True,
+        "results_ledger_api_s3_mlflow_verified": 48,
+        "application_jobs": 48,
+        "application_gpu_reservation_seconds": 132,
+        "qualification_gpu_reservation_seconds": 8,
+    }
+    report["plan"]["predecessor"] = {
+        "stop_report_digest": "sha256:"
+        + hashlib.sha256(
+            json.dumps(prior, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest(),
+        "retained_gpu_reservation_seconds": 140,
+    }
+    return prior
+
+
+def test_separate_trial_retains_failed_predecessor_cost_without_double_charging_policies(report):
+    prior = predecessor_report(report)
+    output = module.summarize(report, predecessor=prior)
+    assert output["retained_predecessor_gpu_reservation_seconds"] == 140
+    assert (
+        output["cumulative_project_gpu_reservation_seconds"]
+        == output["total_gpu_reservation_seconds"] + 140
+    )
+    assert output["three_block_gpu_cost_including_history_once"] == {
+        "lookup": 33,
+        "random": 27,
+        "qlognei": 27,
+    }
+
+
+@pytest.mark.parametrize("fault", ["absent", "modified", "old-observation"])
+def test_prior_failure_cannot_be_hidden_or_reused_as_a_fresh_observation(report, fault):
+    prior = predecessor_report(report)
+    if fault == "absent":
+        prior = None
+    elif fault == "modified":
+        prior["application_gpu_reservation_seconds"] = 0
+    else:
+        report["studies"]["history"]["observations"][0]["recorded_at"] = "2025-01-01T00:00:00+00:00"
+    with pytest.raises(ValueError, match="predecessor|before its creation"):
+        module.summarize(report, predecessor=prior)
 
 
 @pytest.mark.parametrize("fault", ["workload", "repeat", "overlap", "missing", "duplicate"])

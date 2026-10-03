@@ -49,5 +49,18 @@ uv run python examples/evaluate_policy_comparison.py \
   --output /private/path/new-policy-summary-v2.json
 ```
 
-Execution and final evaluation remain pending. This registration does not close
-the [full v0.3 completion audit](goal-audit.md).
+The new trial is now executing. Its [dated launch evidence](evidence/policy-v2-launch.json)
+records a fresh actual-worker configuration/model preflight, three successful
+GPU F0 checks and 15 completed history Jobs verified against Kueue, PostgreSQL,
+S3, API and MLflow. Only six qualified runtime bindings were added. Reloading the
+idle worker preserved its image, static resource specs, other core processes and
+database fingerprints; the four core Argo Applications remained Synced/Healthy.
+
+The offline audit now requires the predecessor's exact content digest and measured
+cost when a plan declares a predecessor. It reports each policy's first-use/reuse
+costs separately from prior failed-trial overhead, and adds both trials to the
+cumulative project total. It rejects attempts recorded before their own study's
+creation and refuses to summarize this partial capture as complete.
+
+The nine policy comparisons and final oracle evaluation remain in progress or
+pending. This launch does not close the [full v0.3 completion audit](goal-audit.md).
