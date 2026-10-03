@@ -66,7 +66,8 @@ The address-family allowlist includes AF_NETLINK because the pinned exporter
 Apply requires success from all eight enabled collectors, not just HTTP 200.
 It does not expose GPU/NPU utilization. Retrieve `/metrics` locally on the host or
 through an authenticated SSH tunnel. Central Prometheus ingestion requires a
-separately reviewed transport/scrape configuration; this play does not provide it.
+separately reviewed transport/scrape configuration; default loopback mode alone
+does not provide it.
 The optional [central mTLS transport](../../deploy/telemetry/README.md) extends
 this play with explicit private certificate inputs and a host-address listener.
 It retains loopback defaults and the Slurm/driver preservation boundary.

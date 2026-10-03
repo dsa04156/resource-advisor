@@ -1,0 +1,121 @@
+{
+  "status": "PASS_CENTRAL_MTLS_TELEMETRY",
+  "implementation_commit": "753cf30df0f969a87e75740cb9588a9632c4c5fb",
+  "prometheus_version": "v3.10.0",
+  "preexisting_prometheus_configuration_and_processes_unchanged": true,
+  "preexisting_scrape_job_count": 27,
+  "argocd": {
+    "sync": "Synced",
+    "health": "Healthy",
+    "operation": "Succeeded",
+    "managed_resources": 1,
+    "prune": false,
+    "kind": "ScrapeConfig"
+  },
+  "protected_worker_slurm_driver_boot_identities_unchanged": true,
+  "repeat_apply_changed_per_host": 0,
+  "tls": {
+    "hosts_verified": 2,
+    "positive_scrapes": true,
+    "missing_client_rejected": true,
+    "foreign_client_rejected": true,
+    "wrong_server_identity_rejected": true,
+    "plaintext_rejected": true,
+    "server_key_root_mode": "0600",
+    "server_key_directory_mode": "0700",
+    "client_keys_not_installed_on_workers": true,
+    "not_after": "2027-01-01T00:57:00+00:00"
+  },
+  "observations": {
+    "slurm-npu-lab": {
+      "memory_available_bytes": {
+        "value": 3674439680.0,
+        "observed_at": "2026-10-03T01:14:31.450000+00:00",
+        "source": "prometheus",
+        "status": "ok",
+        "unit": "bytes"
+      },
+      "memory_total_bytes": {
+        "value": 4241620992.0,
+        "observed_at": "2026-10-03T01:14:31.450000+00:00",
+        "source": "prometheus",
+        "status": "ok",
+        "unit": "bytes"
+      },
+      "cpu_non_idle_cores": {
+        "value": 0.013333333333463204,
+        "observed_at": "2026-10-03T01:14:31.450000+00:00",
+        "source": "prometheus",
+        "status": "ok",
+        "unit": "cores"
+      },
+      "cpu_count": {
+        "value": 4.0,
+        "observed_at": "2026-10-03T01:14:31.450000+00:00",
+        "source": "prometheus",
+        "status": "ok",
+        "unit": "count"
+      }
+    },
+    "slurm-gpu-lab": {
+      "memory_available_bytes": {
+        "value": 6676623360.0,
+        "observed_at": "2026-10-03T01:14:26.376000+00:00",
+        "source": "prometheus",
+        "status": "ok",
+        "unit": "bytes"
+      },
+      "memory_total_bytes": {
+        "value": 7849181184.0,
+        "observed_at": "2026-10-03T01:14:26.376000+00:00",
+        "source": "prometheus",
+        "status": "ok",
+        "unit": "bytes"
+      },
+      "cpu_non_idle_cores": {
+        "value": 0.08777777777868412,
+        "observed_at": "2026-10-03T01:14:26.376000+00:00",
+        "source": "prometheus",
+        "status": "ok",
+        "unit": "cores"
+      },
+      "cpu_count": {
+        "value": 6.0,
+        "observed_at": "2026-10-03T01:14:26.376000+00:00",
+        "source": "prometheus",
+        "status": "ok",
+        "unit": "count"
+      }
+    }
+  },
+  "outage": {
+    "down_up": 0,
+    "affected_signals": {
+      "memory_available_bytes": {
+        "status": "unavailable",
+        "value": null
+      },
+      "memory_total_bytes": {
+        "status": "unavailable",
+        "value": null
+      },
+      "cpu_non_idle_cores": {
+        "status": "unavailable",
+        "value": null
+      },
+      "cpu_count": {
+        "status": "unavailable",
+        "value": null
+      }
+    },
+    "peer_healthy": true,
+    "both_recovered": true,
+    "harness_note": "The first harness required collector_unhealthy; Prometheus removes stale collector series so the reader correctly returned unavailable/null. Original exit1 and observations retained; acceptance rechecked against the frozen unknown-value requirement without repeating the outage."
+  },
+  "limitations": [
+    "Metric reader and Prometheus path qualified; Slurm backend inventory/API/console consumption remains pending.",
+    "No scheduler admission, GPU/NPU utilization or model qualification.",
+    "CPU non-idle rate requires four samples and a healthy one-minute window; initial cold rates are not qualified.",
+    "No automatic certificate renewal, production CA rotation, HA or reboot recovery qualification."
+  ]
+}

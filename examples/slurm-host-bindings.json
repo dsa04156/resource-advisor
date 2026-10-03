@@ -1,0 +1,74 @@
+[
+  {
+    "node_ref": "slurm-npu-lab",
+    "name": "memory_available_bytes",
+    "device_ref": "node",
+    "unit": "bytes",
+    "query": "node_memory_MemAvailable_bytes{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}",
+    "timestamp_query": "min(label_replace(timestamp(node_memory_MemAvailable_bytes{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}), \"ra_time_source\", \"metric\", \"__name__\", \".*\") or label_replace(timestamp(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}), \"ra_time_source\", \"up\", \"__name__\", \".*\") or label_replace(timestamp(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\",collector=\"meminfo\"}), \"ra_time_source\", \"collector\", \"__name__\", \".*\"))",
+    "health_query": "min(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}) * min(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\",collector=\"meminfo\"})"
+  },
+  {
+    "node_ref": "slurm-npu-lab",
+    "name": "memory_total_bytes",
+    "device_ref": "node",
+    "unit": "bytes",
+    "query": "node_memory_MemTotal_bytes{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}",
+    "timestamp_query": "min(label_replace(timestamp(node_memory_MemTotal_bytes{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}), \"ra_time_source\", \"metric\", \"__name__\", \".*\") or label_replace(timestamp(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}), \"ra_time_source\", \"up\", \"__name__\", \".*\") or label_replace(timestamp(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\",collector=\"meminfo\"}), \"ra_time_source\", \"collector\", \"__name__\", \".*\"))",
+    "health_query": "min(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}) * min(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\",collector=\"meminfo\"})"
+  },
+  {
+    "node_ref": "slurm-npu-lab",
+    "name": "cpu_non_idle_cores",
+    "device_ref": "node",
+    "unit": "cores",
+    "query": "sum(1 - rate(node_cpu_seconds_total{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\",mode=\"idle\"}[1m]))",
+    "timestamp_query": "min(label_replace(timestamp(node_cpu_seconds_total{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}), \"ra_time_source\", \"metric\", \"__name__\", \".*\") or label_replace(timestamp(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}), \"ra_time_source\", \"up\", \"__name__\", \".*\") or label_replace(timestamp(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\",collector=\"cpu\"}), \"ra_time_source\", \"collector\", \"__name__\", \".*\"))",
+    "health_query": "min(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}) * min(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\",collector=\"cpu\"}) * (min(count_over_time(node_cpu_seconds_total{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\",mode=\"idle\"}[1m])) >= bool 4) * (min(min_over_time(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}[1m])) == bool 1)"
+  },
+  {
+    "node_ref": "slurm-npu-lab",
+    "name": "cpu_count",
+    "device_ref": "node",
+    "unit": "count",
+    "query": "count(node_cpu_seconds_total{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\",mode=\"idle\"})",
+    "timestamp_query": "min(label_replace(timestamp(node_cpu_seconds_total{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}), \"ra_time_source\", \"metric\", \"__name__\", \".*\") or label_replace(timestamp(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}), \"ra_time_source\", \"up\", \"__name__\", \".*\") or label_replace(timestamp(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\",collector=\"cpu\"}), \"ra_time_source\", \"collector\", \"__name__\", \".*\"))",
+    "health_query": "min(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\"}) * min(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-npu-lab\",collector=\"cpu\"})"
+  },
+  {
+    "node_ref": "slurm-gpu-lab",
+    "name": "memory_available_bytes",
+    "device_ref": "node",
+    "unit": "bytes",
+    "query": "node_memory_MemAvailable_bytes{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}",
+    "timestamp_query": "min(label_replace(timestamp(node_memory_MemAvailable_bytes{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}), \"ra_time_source\", \"metric\", \"__name__\", \".*\") or label_replace(timestamp(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}), \"ra_time_source\", \"up\", \"__name__\", \".*\") or label_replace(timestamp(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\",collector=\"meminfo\"}), \"ra_time_source\", \"collector\", \"__name__\", \".*\"))",
+    "health_query": "min(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}) * min(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\",collector=\"meminfo\"})"
+  },
+  {
+    "node_ref": "slurm-gpu-lab",
+    "name": "memory_total_bytes",
+    "device_ref": "node",
+    "unit": "bytes",
+    "query": "node_memory_MemTotal_bytes{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}",
+    "timestamp_query": "min(label_replace(timestamp(node_memory_MemTotal_bytes{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}), \"ra_time_source\", \"metric\", \"__name__\", \".*\") or label_replace(timestamp(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}), \"ra_time_source\", \"up\", \"__name__\", \".*\") or label_replace(timestamp(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\",collector=\"meminfo\"}), \"ra_time_source\", \"collector\", \"__name__\", \".*\"))",
+    "health_query": "min(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}) * min(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\",collector=\"meminfo\"})"
+  },
+  {
+    "node_ref": "slurm-gpu-lab",
+    "name": "cpu_non_idle_cores",
+    "device_ref": "node",
+    "unit": "cores",
+    "query": "sum(1 - rate(node_cpu_seconds_total{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\",mode=\"idle\"}[1m]))",
+    "timestamp_query": "min(label_replace(timestamp(node_cpu_seconds_total{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}), \"ra_time_source\", \"metric\", \"__name__\", \".*\") or label_replace(timestamp(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}), \"ra_time_source\", \"up\", \"__name__\", \".*\") or label_replace(timestamp(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\",collector=\"cpu\"}), \"ra_time_source\", \"collector\", \"__name__\", \".*\"))",
+    "health_query": "min(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}) * min(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\",collector=\"cpu\"}) * (min(count_over_time(node_cpu_seconds_total{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\",mode=\"idle\"}[1m])) >= bool 4) * (min(min_over_time(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}[1m])) == bool 1)"
+  },
+  {
+    "node_ref": "slurm-gpu-lab",
+    "name": "cpu_count",
+    "device_ref": "node",
+    "unit": "count",
+    "query": "count(node_cpu_seconds_total{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\",mode=\"idle\"})",
+    "timestamp_query": "min(label_replace(timestamp(node_cpu_seconds_total{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}), \"ra_time_source\", \"metric\", \"__name__\", \".*\") or label_replace(timestamp(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}), \"ra_time_source\", \"up\", \"__name__\", \".*\") or label_replace(timestamp(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\",collector=\"cpu\"}), \"ra_time_source\", \"collector\", \"__name__\", \".*\"))",
+    "health_query": "min(up{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\"}) * min(node_scrape_collector_success{job=\"resource-advisor-slurm-hosts\",node_ref=\"slurm-gpu-lab\",collector=\"cpu\"})"
+  }
+]

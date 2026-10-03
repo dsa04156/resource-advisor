@@ -1,5 +1,9 @@
 # Actual ARM lab telemetry provisioning
 
+This records the initial loopback qualification. The lab subsequently adopted
+the explicitly configured [central mTLS transport](central-telemetry.md); the
+loopback measurements below remain historical evidence.
+
 The [frozen acceptance plan](ansible-lab-plan.md) was exercised on two authorized
 standalone ARM lab workers. The corrected play installed and verified the pinned
 node-exporter, preserved existing Slurm/driver identities, and passed a repeat
