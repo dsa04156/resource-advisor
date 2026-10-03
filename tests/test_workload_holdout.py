@@ -189,3 +189,26 @@ def test_duplicate_candidate_forecast_rejected(capture):
     plan["choice"]["predictions"].append(deepcopy(pred))
     with pytest.raises(ValueError, match="duplicate candidate"):
         module.evaluate(capture)
+
+
+def test_result_context_cannot_be_rebound_by_recomputing_its_digest(capture):
+    row = capture["observations"][0]
+    row["result"]["context_signature"] = signature("other-runtime")
+    row["result_digest"] = signature(row["result"])
+    with pytest.raises(ValueError, match="context binding"):
+        module.evaluate(capture)
+
+
+def test_modified_frozen_space_snapshot_rejected(capture):
+    study = next(s for s in capture["studies"].values() if "transfer_space" in s)
+    study["transfer_space"]["bindings"][0]["context_signature"] = signature("other-runtime")
+    with pytest.raises(ValueError, match="space snapshot"):
+        module.evaluate(capture)
+
+
+def test_context_binding_snapshots_required_for_hardware_capture(capture):
+    for study in capture["studies"].values():
+        study.pop("transfer_space", None)
+        study.pop("transfer_space_digest", None)
+    with pytest.raises(ValueError, match="context binding"):
+        module.validate_rows(capture)

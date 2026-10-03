@@ -29,6 +29,13 @@ the existing [rank-holdout auditor](workload-holdout.md). Shape/dataset labels a
 limited to the captured generated-input family. A family fingerprint is not an
 automatic claim that another model or runtime is compatible.
 
+Review found and fixed a missing check in that reused auditor: a result whose
+context signature was changed and whose own digest was recomputed had previously
+passed. Results now also match workload/candidate bindings from the immutable
+transfer-space snapshots, whose digests must agree with each study and the frozen
+source evidence. Missing or altered snapshots fail. Three regression cases failed
+before this fix; the original rank/numerical reports reproduce unchanged after it.
+
 The model is a new **shadow-only** log-duration GP over input pixel area and CPU
 request. It does not change the running BO/RGPE implementations, overwrite any
 saved forecast or issue a recommendation. Target outcomes are only passed to

@@ -7,7 +7,7 @@
     "src/resource_advisor/workload_uncertainty.py": "5ed1dfa82d28eed57e12475462db2418f7d9bdbd89d709a3a718cfb0c804f040",
     "examples/evaluate_numerical_holdout.py": "16c56dce935809f576cdddbb881c0f9d8ac87a2f5014d91dabed2638d87ba56d",
     "examples/plot_numerical_holdout.py": "fafbbb67d084e9511a78ee8f0793e1c8ba9ade0416453288213572ecf25e92de",
-    "examples/evaluate_workload_holdout.py": "1abb3f980c801f46b9ac9f49d8e2bedf27a9fa9854952fc09a1367de0b5ab76e",
+    "examples/evaluate_workload_holdout.py": "3ad9d01def546d3ad0a4a527a5c2deb33e9789147a25ce86cf5964ce00b4ea09",
     "examples/evaluate_transfer.py": "2ef0f0f8f696fa339d5ad25be13e35e09340f7e33dfd529e490e5281571a88ca",
     "uv.lock": "9e65d6e9b2dbc7c6c5ec7c8791947497ca5cab20267227a7c76ab2508975316b",
     "docs/evidence/transfer-gpu.json": "fb0d3f4f7a42ff2b161e2fa25faf2f2c4336f9444ef17fc740aa819c74fb1b71",

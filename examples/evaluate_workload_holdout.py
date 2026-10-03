@@ -39,6 +39,22 @@ def finite(value, *, positive=False):
 
 def validate_rows(report):
     """Bind the published result bytes/identity/timing to each study observation."""
+    bindings = {}
+    for study in report["studies"].values():
+        space = study.get("transfer_space")
+        if space is None:
+            continue
+        require(
+            signature(space)
+            == study["transfer_space_digest"]
+            == report["source_evidence"]["space_digest"],
+            "frozen transfer space snapshot digest mismatch",
+        )
+        snapshot = {(b["workload_ref"], b["candidate_ref"]): b for b in space["bindings"]}
+        require(len(snapshot) == len(space["bindings"]), "duplicate context binding")
+        require(not bindings or bindings == snapshot, "conflicting context binding snapshots")
+        bindings = snapshot
+    require(bindings, "missing frozen context binding snapshots")
     rows = {r["attempt_id"]: r for r in report["observations"]}
     require(len(rows) == len(report["observations"]), "duplicate captured attempt")
     for key in ("job_id", "plan_ref"):
@@ -59,6 +75,14 @@ def validate_rows(report):
                 and signature(result) == row["result_digest"]
                 and result["workload_signature"] == signature(study["spec"]["identity"]),
                 "captured hardware result digest or identity mismatch",
+            )
+            binding = bindings.get((study["request"]["workload_ref"], obs["candidate_ref"]))
+            require(
+                binding is not None
+                and binding["workload_digest"] == signature(study["spec"])
+                and binding["workload_signature"] == result["workload_signature"]
+                and binding["context_signature"] == result["context_signature"],
+                "captured result context binding mismatch",
             )
             require(
                 plan["study_ref"] == row["study_ref"] == study["ref"]
