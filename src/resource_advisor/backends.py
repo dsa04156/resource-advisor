@@ -442,8 +442,11 @@ class KubernetesBackend:
                     submitted_at=submitted,
                     **retained,
                 )
+        # Container exit can precede the controller's terminal Job condition.
+        # Keep the attempt active until that condition arrives; requeueing here
+        # would also incorrectly reapply the admission-wait deadline.
         return Observation(
-            State.RUNNING if "running" in container else State.QUEUED,
+            State.RUNNING if "running" in container or "terminated" in container else State.QUEUED,
             scheduled,
             allocation=allocation,
             execution_started_at=execution_started,

@@ -193,6 +193,38 @@ def test_pending_pod_is_not_running_even_when_job_active(service):
     assert backend.status(job).state == "QUEUED"
 
 
+@pytest.mark.parametrize("retention", [False, True])
+@pytest.mark.parametrize("exit_code", [0, 1])
+def test_terminated_container_waits_for_job_condition_without_requeue(
+    service, retention, exit_code
+):
+    from test_kubernetes_retention import Scheduler
+
+    job = row(service)
+    job["body"]["external_id"] = job["body"]["attempt_id"]
+    scheduler = Scheduler(job)
+    scheduler.terminate(exit_code)
+    backend = KubernetesBackend(
+        namespace="research-a",
+        local_queue="batch",
+        node_selector={"pool": "lab"},
+        retain_termination_evidence=retention,
+        execute=scheduler.execute,
+    )
+    observation = backend.status(job)
+    assert observation.state == "RUNNING"
+    assert observation.started_at == "2026-10-03T00:00:01Z"
+    assert observation.execution_started_at == "2026-10-03T00:00:03Z"
+    assert observation.finished_at is None  # No early backend completion/collection.
+    assert observation.allocation["accelerator_count"] == 1
+    scheduler.obj["status"]["conditions"] = [
+        {"type": "Failed" if exit_code else "Complete", "status": "True"}
+    ]
+    terminal = backend.status(job)
+    assert terminal.state == ("FAILED" if exit_code else "COLLECTING")
+    assert terminal.finished_at == "2026-10-03T00:00:08Z"
+
+
 def test_deleted_job_with_running_pod_is_not_confirmed_cancel(service):
     job = row(service)
     job["body"]["external_id"] = "attempt"

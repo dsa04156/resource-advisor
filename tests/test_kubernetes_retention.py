@@ -2,6 +2,7 @@
 
 import copy
 import json
+from datetime import timedelta
 
 import pytest
 from sqlalchemy import select
@@ -9,7 +10,7 @@ from test_backends import row
 from test_worker import expire_retry
 
 from resource_advisor.backends import BackendError, KubernetesBackend
-from resource_advisor.contracts import State
+from resource_advisor.contracts import State, now
 from resource_advisor.kubernetes_retention import FINALIZER
 from resource_advisor.store import outbox, usage
 from resource_advisor.worker import Worker
@@ -126,6 +127,40 @@ def setup(service):
     worker.submit_one()
     worker.reconcile_all()
     return job, scheduler, backend, worker
+
+
+@pytest.mark.parametrize("exit_code", [0, 1])
+def test_delayed_job_condition_does_not_trigger_queue_timeout_or_early_result(service, exit_code):
+    from test_worker import SchedulerDouble
+
+    job, scheduler, backend, worker = setup(service)
+    with service.store.transaction() as conn:
+        latest = service.store.job(conn, job["id"])
+        body = dict(latest["body"])
+        body["queued_at"] = (
+            now() - timedelta(seconds=body["spec"]["execution"]["max_queue_seconds"] + 1)
+        ).isoformat()
+        service.store.change_job(conn, latest, State.RUNNING, body)
+    scheduler.terminate(exit_code)
+    worker.reconcile_all()
+    with service.store.transaction() as conn:
+        current = service.store.job(conn, job["id"])
+        assert current["state"] == State.RUNNING
+        assert "collecting_since" not in current["body"]
+        assert service.store.get(conn, "result", job["body"]["attempt_id"]) is None
+        assert not conn.execute(select(usage)).first()
+        assert not conn.execute(select(outbox).where(outbox.c.kind == "cancel")).first()
+    assert not any("logs" in command for command in scheduler.commands)
+    backend.result = SchedulerDouble().result
+    scheduler.obj["status"]["conditions"] = [
+        {"type": "Failed" if exit_code else "Complete", "status": "True"}
+    ]
+    worker.reconcile_all()
+    with service.store.transaction() as conn:
+        current = service.store.job(conn, job["id"])
+        assert current["state"] == (State.FAILED if exit_code else State.SUCCEEDED)
+        ledger = conn.execute(select(usage)).mappings().one()
+        assert ledger["allocated_device_seconds"] == 7
 
 
 def test_cancel_commits_exact_evidence_before_retryable_release(service):
