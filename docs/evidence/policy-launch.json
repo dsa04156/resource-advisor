@@ -1,0 +1,64 @@
+{
+  "status": "in_progress",
+  "evidence_kind": "hardware",
+  "as_of": "2026-10-03T03:02:05.910019+00:00",
+  "plan_digest": "sha256:8f3b75634cda50438d6097673f1af94e8b184c565bf237da42030253cca6467a",
+  "release": {
+    "revision": "ca253134ab96b5486b53bf66a493982b3bb484b3",
+    "api_worker_source_hashes": {
+      "api": "94f4beaa16ba78354fadfe5ac8b2252416a2360d81ed5ba55365be9dbe287b44",
+      "worker": "94f4beaa16ba78354fadfe5ac8b2252416a2360d81ed5ba55365be9dbe287b44"
+    },
+    "unchanged_database_fingerprints": true,
+    "preserved_static_object_uids": 9,
+    "preserved_inventory_database_pods": true,
+    "compute_ownership_preserved": true,
+    "argocd_apps_synced_healthy": 4,
+    "anonymous_status": 401,
+    "https_verified": true,
+    "lookup_schema_available": true
+  },
+  "qualification": [
+    {
+      "job_ref": "ra-policy-f0-024343-256-0-5",
+      "host_cpu": 0.5,
+      "quality_value": 1.0,
+      "gpu_reservation_seconds": 4.0,
+      "thermal_status": "ELIGIBLE_TRACE"
+    },
+    {
+      "job_ref": "ra-policy-f0-024343-256-1",
+      "host_cpu": 1,
+      "quality_value": 1.0,
+      "gpu_reservation_seconds": 2.0,
+      "thermal_status": "ELIGIBLE_TRACE"
+    },
+    {
+      "job_ref": "ra-policy-f0-024343-256-2",
+      "host_cpu": 2,
+      "quality_value": 1.0,
+      "gpu_reservation_seconds": 2.0,
+      "thermal_status": "ELIGIBLE_TRACE"
+    }
+  ],
+  "history": {
+    "study_ref": "study-4bc8d7acbca9421eaeda9a637a2ff788",
+    "state": "COMPLETED",
+    "observations": 15,
+    "frozen_confirmation_profiles": 9,
+    "study_wall_seconds": 373.906167,
+    "physical_gpu_seconds": 43.0,
+    "all_results_ledger_kueue_s3_api_mlflow_verified": true
+  },
+  "individually_verified_application_jobs": 20,
+  "lookup_remaining_caps": {
+    "wall_seconds": 826,
+    "physical_gpu_seconds": 857.0
+  },
+  "driver_boundary_correction": "The driver confused completed-observation and succeeded-job status labels; it stopped after the successful history study. A read-only API check confirmed its original 15 attempts, and corrected execution resumed that same study without replaying jobs.",
+  "limits": [
+    "Repeated policy comparison is running; no final policy effectiveness result is claimed.",
+    "Numerical CNN fixture is not trained-model task accuracy.",
+    "Actual service deployment and F0 do not qualify Slurm or NPU execution."
+  ]
+}
