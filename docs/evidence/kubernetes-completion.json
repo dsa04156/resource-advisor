@@ -1,0 +1,48 @@
+{
+  "verified_at": "2026-10-03T08:59:51.215216+00:00",
+  "source_commit": "e813cd3a6c9f79945ae15bc3257c7a47ec2e3aa2",
+  "worker_image_digest": "sha256:a608787a696ca9a737ea8c72e59b1f70788fa1fa964d4e7785b641df50daadfc",
+  "source_tree_sha256": "bedee758a2f8faa4f3c18f93377c8d0c53385cd11ff6fe5269c79d35cfe1dfdd",
+  "before_replay": {
+    "terminal_state": "COLLECTING",
+    "delayed_condition_state": "QUEUED",
+    "delayed_finished_at": null,
+    "same_allocation": true,
+    "mode": "read-only replay of real terminal snapshots with a synthetic delayed Job condition"
+  },
+  "after_replay": {
+    "terminal_state": "COLLECTING",
+    "delayed_condition_state": "RUNNING",
+    "delayed_finished_at": null,
+    "same_allocation": true,
+    "mode": "read-only replay of real terminal snapshots with a synthetic delayed Job condition"
+  },
+  "unchanged_database_fingerprints": {
+    "ra_jobs": {
+      "rows": 536,
+      "sha256": "ecd1f1e3c6337b1e8e65b45f1ebb2778bbe8b8448d97fe0e6d5254e309f15982"
+    },
+    "ra_outbox": {
+      "rows": 2357,
+      "sha256": "d7d8a7f65d0e69227036cee0aa1cc764c88fef2201f1110d88fdf27a96b00ec3"
+    },
+    "ra_studies": {
+      "rows": 40,
+      "sha256": "bd882fb00461b2fd0182a4fd194075b27f6ac785c514656a5d939097c91de2b8"
+    },
+    "ra_usage": {
+      "rows": 536,
+      "sha256": "1d7126766e1c418f803f660401284f5d84494a363f80e6434f2b9e44fc73e661"
+    },
+    "stable_entities": {
+      "rows": 4111,
+      "sha256": "72f8ec80458e727bf1c2a78db66c67ad8d44e63020c830012e06d478d11e8702"
+    }
+  },
+  "unchanged_secrets_pvc_quota": true,
+  "preserved_other_running_pods": 192,
+  "ready_nodes_without_pressure": 10,
+  "synced_healthy_static_applications": 4,
+  "new_gpu_jobs": 0,
+  "scope": "worker-only source rollout and read-only condition-delay replay, not a new GPU trial"
+}

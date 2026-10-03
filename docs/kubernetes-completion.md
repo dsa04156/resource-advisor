@@ -37,5 +37,19 @@ not new hardware benchmark measurements.
 uv run pytest -q tests/test_backends.py tests/test_kubernetes_retention.py tests/test_worker.py
 ```
 
-The source fix must be rolled out to the trusted worker to affect live status
-collection. The original ten-Job workload source and raw evidence stay immutable.
+The trusted worker now runs the fix from `e813cd3`. The
+[deployment record](evidence/kubernetes-completion.json) records its image/source
+digests and a read-only replay in the old and new running worker. This replay
+uses real terminal Job/Pod snapshots with the Job condition deliberately removed
+in memory: old code reports `QUEUED`, new code reports `RUNNING`, and both report
+`COLLECTING` for the unchanged complete snapshot. Allocation fields match, and
+neither delayed observation invents a backend completion time.
+
+That replay is a controlled software check, not a newly observed controller delay
+or another GPU trial. No Kubernetes status object was patched and no GPU Job was
+submitted. Content fingerprints of all 536 existing Jobs and usage rows, 2,357
+outbox rows, 40 studies and 4,111 non-inventory entities were unchanged. The
+worker-only rollout preserved Secrets/PVCs/quota and 192 other running Pods;
+ten nodes remained Ready without pressure and four static Argo applications
+were Synced/Healthy. The original ten-Job workload source and raw evidence stay
+immutable.

@@ -100,3 +100,7 @@ the recorded evidence; they do not themselves execute a GPU or revisit storage.
 Broader unseen-workload interval calibration, real storage/network contention,
 Slurm model execution and other v0.3 gates remain open. This trial qualifies
 this CUDA/cgroup/runtime path, not every device or scheduler.
+
+A transient `RUNNING` → `QUEUED` observation during container exit led to a
+separate [Job-completion handling fix](kubernetes-completion.md). Its regression
+tests and worker rollout do not change this trial's results or add GPU runs.
