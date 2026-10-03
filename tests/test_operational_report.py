@@ -98,12 +98,14 @@ def test_future_b2_setup_is_charged_once_to_every_actual_use_count(evidence):
         runs = [r for r in summary["main_timings"] if r["arm"] == arm]
         for i, step in enumerate(steps):
             setup = summary["B2_setup_wall_seconds"] if arm == "B2" else 0
-            assert step["raw_wall_seconds_including_profile"] == setup + sum(
-                r["raw_result_wall_seconds"] for r in runs[: i + 1]
+            assert step["raw_wall_seconds_including_profile"] == pytest.approx(
+                setup + sum(r["raw_result_wall_seconds"] for r in runs[: i + 1]),
+                rel=0,
+                abs=1e-12,
             )
             endpoint = "raw_result_wall_seconds" if arm == "B0" else "delivery_wall_seconds"
-            assert step["observed_completion_seconds_including_profile"] == setup + sum(
-                r[endpoint] for r in runs[: i + 1]
+            assert step["observed_completion_seconds_including_profile"] == pytest.approx(
+                setup + sum(r[endpoint] for r in runs[: i + 1]), rel=0, abs=1e-12
             )
             if arm == "B0":
                 assert step["platform_recorded_delivery_seconds_including_profile"] is None
