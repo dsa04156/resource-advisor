@@ -64,3 +64,26 @@ creation and refuses to summarize this partial capture as complete.
 
 The nine policy comparisons and final oracle evaluation remain in progress or
 pending. This launch does not close the [full v0.3 completion audit](goal-audit.md).
+
+The [figure generator](../examples/plot_policy_comparison.py) reruns the same
+audit before rendering. It rejects a partial capture or changed plan. Once the
+capture is complete, create a new output directory:
+
+```sh
+uv run --isolated --no-project --with matplotlib==3.10.7 \
+  python examples/plot_policy_comparison.py \
+  --capture /private/path/captured-v2.json \
+  --plan docs/evidence/policy-comparison-plan-v2.json \
+  --output /private/path/new-policy-figure-v2
+```
+
+The PNG/SVG show raw independent confirmation runs, first-use GPU reservation
+cost, actual three-use cost with history charged once, and the later reference
+runs. CSVs and a provenance manifest accompany the figure. Short horizontal
+marks denote arithmetic means, not confidence intervals; the full result capture
+retains every option and failed/abstaining outcome. The selected-configuration
+panel alone cannot establish that one algorithm is faster. Duration is the sum of
+12 measured blocks with 32 CUDA forwards each, including preprocessing and
+transfer; it is not per-request latency. Prior stopped-trial, F0 and oracle costs
+remain in the report outside the individual policy bars. No graph is published
+from an incomplete experiment.
