@@ -108,14 +108,22 @@
       delay: 2
       until: ra_metrics.status == 200
       no_log: true
-    - name: Require real CPU and available-memory metric families
+    - name: Require real CPU memory and network metric families
       ansible.builtin.assert:
         that:
           - "'node_cpu_seconds_total{' in ra_metrics.content"
           - "'node_memory_MemAvailable_bytes ' in ra_metrics.content"
           - "'node_memory_MemTotal_bytes ' in ra_metrics.content"
           - "'node_exporter_build_info{' in ra_metrics.content"
+          - "'node_network_receive_bytes_total{' in ra_metrics.content"
         quiet: true
+      no_log: true
+    - name: Require success for every enabled collector
+      ansible.builtin.assert:
+        that:
+          - "('node_scrape_collector_success{collector=\"' ~ item ~ '\"} 1') in ra_metrics.content.splitlines()"
+        quiet: true
+      loop: [cpu, meminfo, loadavg, stat, time, uname, netdev, diskstats]
       no_log: true
 
 - name: Explain the check-mode boundary

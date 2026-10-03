@@ -61,6 +61,9 @@ partial installation; retain logs and inspect the failed task before retrying.
 The dedicated `resource-advisor-node-exporter.service` listens on
 `127.0.0.1:19100`, uses a dynamic unprivileged user, caps CPU at 10% of one core and
 memory at 128 MiB, and enables CPU, memory, load, system, network and disk counters.
+The address-family allowlist includes AF_NETLINK because the pinned exporter
+[reads network counters through rtnetlink](https://github.com/prometheus/node_exporter/blob/v1.10.2/collector/netdev_linux.go).
+Apply requires success from all eight enabled collectors, not just HTTP 200.
 It does not expose GPU/NPU utilization. Retrieve `/metrics` locally on the host or
 through an authenticated SSH tunnel. Central Prometheus ingestion requires a
 separately reviewed transport/scrape configuration; this play does not provide it.
