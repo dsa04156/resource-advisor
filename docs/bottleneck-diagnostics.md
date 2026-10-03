@@ -112,3 +112,8 @@ phase samples, linked results, diagnostics, accounting and artifact delivery che
 Real storage/network bottleneck interventions, data-loader concurrency, training
 checkpoint protection, asynchronous profiling and instrumentation-cost calibration
 remain open. This is one E5 controlled GPU scenario, not the entire completion gate.
+
+The [CUDA kernel follow-up protocol](e5-kernel-plan.md) separates uninstrumented
+performance from profiler-on kernel evidence and freezes its schedule and budget
+before execution. Its preregistration and synthetic contract tests are not GPU
+execution results; the original eight-Job evidence above remains unchanged.

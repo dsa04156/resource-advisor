@@ -1,0 +1,26 @@
+{
+  "schema_version": "e5-kernel-plan-v1",
+  "status": "PREREGISTERED_NOT_EXECUTED",
+  "seed": 20261009,
+  "randomization": "NumPy 2.2.6 default_rng permuted blocks of four arms",
+  "arms": ["recompute-plain", "cache-plain", "recompute-profiler", "cache-profiler"],
+  "maximum_jobs": 14,
+  "maximum_gpu_reservation_seconds": 1260,
+  "maximum_wall_seconds": 1800,
+  "per_job_max_run_seconds": 90,
+  "qualification": ["cache-plain", "cache-profiler"],
+  "schedule": [
+    {"unit_id": 1, "block": 0, "arm": "cache-plain"},
+    {"unit_id": 2, "block": 0, "arm": "cache-profiler"},
+    {"unit_id": 3, "block": 0, "arm": "recompute-profiler"},
+    {"unit_id": 4, "block": 0, "arm": "recompute-plain"},
+    {"unit_id": 5, "block": 1, "arm": "recompute-profiler"},
+    {"unit_id": 6, "block": 1, "arm": "cache-profiler"},
+    {"unit_id": 7, "block": 1, "arm": "recompute-plain"},
+    {"unit_id": 8, "block": 1, "arm": "cache-plain"},
+    {"unit_id": 9, "block": 2, "arm": "cache-profiler"},
+    {"unit_id": 10, "block": 2, "arm": "recompute-profiler"},
+    {"unit_id": 11, "block": 2, "arm": "recompute-plain"},
+    {"unit_id": 12, "block": 2, "arm": "cache-plain"}
+  ]
+}
