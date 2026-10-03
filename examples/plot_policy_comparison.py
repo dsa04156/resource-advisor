@@ -211,6 +211,8 @@ def render(capture, plan, predecessor, output):
         )
         fig.savefig(output / "comparison.png", dpi=180, facecolor="white")
         fig.savefig(output / "comparison.svg", facecolor="white")
+        svg = output / "comparison.svg"
+        svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
         plt.close(fig)
     for filename, rows in [
         ("selected-confirmations.csv", selected_points),
@@ -218,8 +220,8 @@ def render(capture, plan, predecessor, output):
         ("study-summary.csv", summary["studies"]),
     ]:
         if rows:
-            with (output / filename).open("x") as handle:
-                writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+            with (output / filename).open("x", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=list(rows[0]), lineterminator="\n")
                 writer.writeheader()
                 writer.writerows(rows)
     manifest = {
