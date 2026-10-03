@@ -6,7 +6,12 @@ After=network.target
 [Service]
 Type=simple
 DynamicUser=yes
-ExecStart={{ ra_node_exporter_prefix }}/{{ ra_node_exporter_version }}/node_exporter --web.listen-address={{ ra_node_exporter_listen }} --collector.disable-defaults --collector.cpu --collector.meminfo --collector.loadavg --collector.stat --collector.time --collector.uname --collector.netdev --collector.diskstats
+ExecStart={{ ra_node_exporter_prefix }}/{{ ra_node_exporter_version }}/node_exporter --web.listen-address={{ ra_node_exporter_listen }} --collector.disable-defaults --collector.cpu --collector.meminfo --collector.loadavg --collector.stat --collector.time --collector.uname --collector.netdev --collector.diskstats{{ (' --web.config.file=' ~ ra_node_exporter_prefix ~ '/web.yml') if ra_node_exporter_transport == 'mtls' else '' }}
+{% if ra_node_exporter_transport == 'mtls' %}
+LoadCredential=telemetry-ca.pem:{{ ra_node_exporter_prefix }}/tls/ca.pem
+LoadCredential=telemetry-cert.pem:{{ ra_node_exporter_prefix }}/tls/server_cert.pem
+LoadCredential=telemetry-key.pem:{{ ra_node_exporter_prefix }}/tls/server_key.pem
+{% endif %}
 Restart=on-failure
 RestartSec=5s
 NoNewPrivileges=yes

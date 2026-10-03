@@ -6,8 +6,49 @@
       - ra_node_exporter_version == '1.10.2'
       - ra_node_exporter_binary_sha256 == '123faecd856ab0aa317b2916fdb2cf09089a487930beca2956c6d3bb13e49a03'
       - ra_node_exporter_prefix == '/opt/resource-advisor/node-exporter'
-      - ra_node_exporter_listen == '127.0.0.1:19100'
+      - ra_node_exporter_transport in ['loopback', 'mtls']
+      - ra_node_exporter_listen == '127.0.0.1:19100' if ra_node_exporter_transport == 'loopback' else (ra_node_exporter_listen.endswith(':19100') and ra_node_exporter_listen.split(':')[0] in ansible_facts.all_ipv4_addresses)
       - ra_node_exporter_binary is match('^/')
+
+- name: Require a complete explicit TLS identity set for central collection
+  ansible.builtin.assert:
+    that:
+      - ra_node_exporter_tls_files.keys() | sort == ['ca', 'client_cert', 'client_key', 'server_cert', 'server_key']
+      - ra_node_exporter_tls_files.values() | select('match', '^/') | list | length == 5
+  when: ra_node_exporter_transport == 'mtls'
+
+- name: Check systemd credentials support before target writes
+  ansible.builtin.command:
+    argv: [/usr/bin/systemctl, --version]
+  register: ra_systemd_version
+  changed_when: false
+  check_mode: false
+  when: ra_node_exporter_transport == 'mtls'
+
+- name: Require systemd with LoadCredential support
+  ansible.builtin.assert:
+    that:
+      - ra_systemd_version.stdout.split()[1] | int >= 247
+  when: ra_node_exporter_transport == 'mtls'
+
+- name: Check TLS input files before target writes
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop: "{{ ra_node_exporter_tls_files.values() | list }}"
+  delegate_to: localhost
+  become: false
+  register: ra_tls_inputs
+  no_log: true
+  when: ra_node_exporter_transport == 'mtls'
+
+- name: Reject missing or nonregular TLS inputs
+  ansible.builtin.assert:
+    that:
+      - item.stat.isreg | default(false)
+      - item.stat.size | default(0) > 0
+  loop: "{{ ra_tls_inputs.results | default([]) }}"
+  no_log: true
+  when: ra_node_exporter_transport == 'mtls'
 
 - name: Check verified control-host binary bytes
   ansible.builtin.stat:
@@ -75,7 +116,35 @@
         group: root
         mode: "0755"
       notify: Restart dedicated node exporter
-    - name: Verify installed binary bytes
+    - name: Create root-only TLS source directory
+      ansible.builtin.file:
+        path: "{{ ra_node_exporter_prefix }}/tls"
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
+      when: ra_node_exporter_transport == 'mtls'
+    - name: Install only server credentials and the client trust anchor
+      ansible.builtin.copy:
+        src: "{{ ra_node_exporter_tls_files[item] }}"
+        dest: "{{ ra_node_exporter_prefix }}/tls/{{ item }}.pem"
+        owner: root
+        group: root
+        mode: "0600"
+      loop: [ca, server_cert, server_key]
+      when: ra_node_exporter_transport == 'mtls'
+      no_log: true
+      notify: Restart dedicated node exporter
+    - name: Configure mandatory verified client authentication
+      ansible.builtin.template:
+        src: web.yml.j2
+        dest: "{{ ra_node_exporter_prefix }}/web.yml"
+        owner: root
+        group: root
+        mode: "0644"
+      when: ra_node_exporter_transport == 'mtls'
+      notify: Restart dedicated node exporter
+    - name: Recheck installed binary bytes
       ansible.builtin.stat:
         path: "{{ ra_node_exporter_prefix }}/{{ ra_node_exporter_version }}/node_exporter"
         checksum_algorithm: sha256
@@ -98,11 +167,18 @@
         name: resource-advisor-node-exporter.service
         enabled: true
         state: started
-    - name: Read actual host telemetry from the loopback listener
+    - name: Read actual telemetry through the configured verified transport
       ansible.builtin.uri:
-        url: "http://{{ ra_node_exporter_listen }}/metrics"
+        url: "{{ 'https' if ra_node_exporter_transport == 'mtls' else 'http' }}://{{ ra_node_exporter_listen }}/metrics"
+        ca_path: "{{ ra_node_exporter_tls_files.ca | default(omit) if ra_node_exporter_transport == 'mtls' else omit }}"
+        client_cert: "{{ ra_node_exporter_tls_files.client_cert | default(omit) if ra_node_exporter_transport == 'mtls' else omit }}"
+        client_key: "{{ ra_node_exporter_tls_files.client_key | default(omit) if ra_node_exporter_transport == 'mtls' else omit }}"
+        validate_certs: true
+        use_proxy: false
         return_content: true
         timeout: 10
+      delegate_to: "{{ 'localhost' if ra_node_exporter_transport == 'mtls' else inventory_hostname }}"
+      become: "{{ ra_node_exporter_transport != 'mtls' }}"
       register: ra_metrics
       retries: 5
       delay: 2

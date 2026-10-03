@@ -12,7 +12,7 @@
         fail_msg: Use the private allowlisted lab inventory; production nodes are excluded.
     - name: Gather required operating system facts
       ansible.builtin.setup:
-        gather_subset: ["!all", min, hardware]
+        gather_subset: ["!all", min, hardware, network]
     - name: Refuse active Kubernetes or KubeEdge host management
       ansible.builtin.command:
         # show returns status data for absent/inactive units without treating

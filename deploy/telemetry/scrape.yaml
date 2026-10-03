@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: ra-slurm-hosts
+  labels:
+    release: prometheus
+spec:
+  jobName: resource-advisor-slurm-hosts
+  scheme: HTTPS
+  metricsPath: /metrics
+  scrapeInterval: 15s
+  scrapeTimeout: 10s
+  sampleLimit: 3000
+  honorLabels: false
+  honorTimestamps: false
+  staticConfigs:
+    # Documentation address; private Argo rendering replaces this entire list.
+    - targets: ['192.0.2.1:19100']
+      labels:
+        node_ref: unconfigured
+        cluster_ref: lab-slurm
+        backend: slurm
+  tlsConfig:
+    minVersion: TLS12
+    insecureSkipVerify: false
+    ca:
+      secret:
+        name: ra-node-telemetry-client
+        key: ca.crt
+    cert:
+      secret:
+        name: ra-node-telemetry-client
+        key: client.crt
+    keySecret:
+      name: ra-node-telemetry-client
+      key: client.key
