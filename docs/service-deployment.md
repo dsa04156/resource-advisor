@@ -159,3 +159,11 @@ an isolated PostgreSQL test database.
 
 References: [Kubernetes ServiceAccount projection](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
 and [kubectl version-specific binary verification](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/).
+
+## Current static GitOps ownership
+
+A subsequent [Argo CD adoption](gitops-adoption.md) placed the same API/inventory,
+worker and PostgreSQL objects under three pinned manual-sync Applications.
+Use the [release workflow](../deploy/argocd/README.md) when updating their desired
+images/revision; private kubectl overlays must agree with that state. Runtime
+compute Jobs, Secrets and cluster bootstrap permissions are outside those sources.

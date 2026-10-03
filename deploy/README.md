@@ -32,7 +32,11 @@ uv run resource-advisor worker --config /run/resource-advisor/routes.json
 ```
 
 Do not use a production database for tests: `RA_TEST_DATABASE_URL` targets only
-a disposable `ra_test_*` database. Schema migration, release image build,
-production deployment manifests and complete backend qualification remain
-subsequent milestones. See [the Kubeflow launch guide](../docs/kubeflow-pipeline.md)
+a disposable `ra_test_*` database. Versioned schema migrations and complete backend qualification remain open.
+Qualified image builders and scoped static service manifests are implemented;
+the linked runbooks document their actual deployment and verification scope. See [the Kubeflow launch guide](../docs/kubeflow-pipeline.md)
 for a rootless launcher build and the TLS/Secret contract.
+
+The [Argo CD runbook](argocd/README.md) now provides revision-pinned static
+service adoption. See [live GitOps evidence](../docs/gitops-adoption.md); compute
+Jobs remain outside GitOps, and host provisioning remains separately scoped.

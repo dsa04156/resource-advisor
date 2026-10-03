@@ -1,0 +1,178 @@
+{
+  "schema_version": "gitops-adoption-v1",
+  "argocd_version": "3.2.3",
+  "kubernetes_version": "1.31.14",
+  "implementation_commit": "2e9d3bdaf080d544185fc5686437b678697ab584",
+  "applications": {
+    "services": {
+      "sync": "Synced",
+      "health": "Healthy",
+      "operation": {
+        "phase": "Succeeded",
+        "started_at": "2026-10-03T00:08:19Z",
+        "finished_at": "2026-10-03T00:08:20Z",
+        "revision": "2e9d3bdaf080d544185fc5686437b678697ab584",
+        "prune": false
+      },
+      "resources": [
+        {
+          "group": "",
+          "kind": "Service",
+          "name": "ra-api",
+          "status": "Synced"
+        },
+        {
+          "group": "apps",
+          "kind": "Deployment",
+          "name": "ra-api",
+          "status": "Synced"
+        },
+        {
+          "group": "apps",
+          "kind": "Deployment",
+          "name": "ra-inventory",
+          "status": "Synced"
+        }
+      ],
+      "auto_sync_enabled": false,
+      "cascading_finalizers": false
+    },
+    "worker": {
+      "sync": "Synced",
+      "health": "Healthy",
+      "operation": {
+        "phase": "Succeeded",
+        "started_at": "2026-10-03T00:06:26Z",
+        "finished_at": "2026-10-03T00:06:26Z",
+        "revision": "2e9d3bdaf080d544185fc5686437b678697ab584",
+        "prune": false
+      },
+      "resources": [
+        {
+          "group": "",
+          "kind": "ServiceAccount",
+          "name": "ra-worker",
+          "status": "Synced"
+        },
+        {
+          "group": "apps",
+          "kind": "Deployment",
+          "name": "ra-worker",
+          "status": "Synced"
+        },
+        {
+          "group": "rbac.authorization.k8s.io",
+          "kind": "Role",
+          "name": "ra-worker",
+          "status": "Synced"
+        },
+        {
+          "group": "rbac.authorization.k8s.io",
+          "kind": "RoleBinding",
+          "name": "ra-worker",
+          "status": "Synced"
+        }
+      ],
+      "auto_sync_enabled": false,
+      "cascading_finalizers": false
+    },
+    "postgres": {
+      "sync": "Synced",
+      "health": "Healthy",
+      "operation": {
+        "phase": "Succeeded",
+        "started_at": "2026-10-03T00:06:26Z",
+        "finished_at": "2026-10-03T00:06:26Z",
+        "revision": "2e9d3bdaf080d544185fc5686437b678697ab584",
+        "prune": false
+      },
+      "resources": [
+        {
+          "group": "",
+          "kind": "Service",
+          "name": "ra-postgres",
+          "status": "Synced"
+        },
+        {
+          "group": "apps",
+          "kind": "StatefulSet",
+          "name": "ra-postgres",
+          "status": "Synced"
+        }
+      ],
+      "auto_sync_enabled": false,
+      "cascading_finalizers": false
+    }
+  },
+  "before_after_identical_fingerprints": {
+    "ra_jobs": {
+      "rows": 320,
+      "sha256": "c81b6c7055c59d19a04580c48f795b56017c4805dd6ef8a47e3591e8bdcb4fdd"
+    },
+    "ra_outbox": {
+      "rows": 1276,
+      "sha256": "2fcfb4cd528f809ad55f8ee0e5920100712caf1fcd64f8fded4df73385361b72"
+    },
+    "ra_studies": {
+      "rows": 24,
+      "sha256": "0bdc721a1491f3804c2bc8b58744541e1356233df75a765ba0aaa5b1b98ad7a1"
+    },
+    "ra_usage": {
+      "rows": 320,
+      "sha256": "1060942dfd897d02f80422e87c5ef8ec4d164e6086fd0c4c96d8f7f35f607bd4"
+    },
+    "stable_entities": {
+      "rows": 2194,
+      "sha256": "5a28197af3eb666e9861dac22f6c36c612d31068f06d4d57245a90f6f8115e86"
+    }
+  },
+  "managed_objects": 9,
+  "unchanged_service_pods": 4,
+  "inventory_new_records": 6,
+  "health_http": 200,
+  "checks": {
+    "all_apps_synced_healthy": true,
+    "nine_resource_uids_specs_unchanged": true,
+    "four_service_pod_uids_unchanged": true,
+    "secret_pvc_resource_versions_unchanged": true,
+    "compute_job_metadata_unchanged_unmanaged": true,
+    "all_stable_db_fingerprints_identical": true,
+    "inventory_continues": true,
+    "metadata_drift_detected_and_recovered": true,
+    "manual_nonpruning_operations": true,
+    "authenticated_result_artifact_readback": true
+  },
+  "drift": {
+    "scope": "API Deployment metadata release marker only; no Pod template change",
+    "started_at": "2026-10-03T00:08:17.369706+00:00",
+    "detected_at": "2026-10-03T00:08:19.647915+00:00",
+    "restored_at": "2026-10-03T00:08:21.852426+00:00",
+    "detected_status": "OutOfSync",
+    "restored_status": "Synced",
+    "recovery_operation": {
+      "phase": "Succeeded",
+      "started_at": "2026-10-03T00:08:19Z",
+      "finished_at": "2026-10-03T00:08:20Z",
+      "revision": "2e9d3bdaf080d544185fc5686437b678697ab584",
+      "prune": false
+    }
+  },
+  "implementation_ci": {
+    "run_id": 37080337607,
+    "status": "success",
+    "python": [
+      "3.11",
+      "3.13"
+    ],
+    "sqlite_passed": 531,
+    "postgres_only_skipped_on_sqlite": 2,
+    "postgres_passed": 533
+  },
+  "limitations": [
+    "Manual sync only; no automatic self-heal, pruning or HA claim",
+    "Cluster bootstrap RBAC, Secrets, namespaces, queues and accelerator storage remain prerequisites",
+    "No Argo ownership of runtime compute Jobs",
+    "No VM/cloud provisioner selected, so Terraform not applicable yet",
+    "Slurm controller remained unreachable; host provisioning and full Slurm path still open"
+  ]
+}
