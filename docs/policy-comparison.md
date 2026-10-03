@@ -32,7 +32,8 @@ The same guard rejected the preceding artifact-only image with exit 2. Database
 fingerprints, other core processes, Secrets/PVC and compute ownership were
 preserved. See [repair evidence](evidence/optimizer-repair.json). This calculation
 submitted no GPU Jobs, created no study observations and does not complete or
-retroactively repair the stopped comparison. A new prospective trial is pending.
+retroactively repair the stopped comparison. A [new prospective trial](policy-comparison-v2.md)
+is registered separately; its execution and evaluation remain pending.
 
 API and worker now run the source of `ca253134ab96b5486b53bf66a493982b3bb484b3`.
 Their running package hashes match the source-only image build. Four core Argo

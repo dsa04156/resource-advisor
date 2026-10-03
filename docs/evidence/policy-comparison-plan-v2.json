@@ -1,0 +1,184 @@
+{
+  "schema_version": "v2",
+  "created_at": "2026-10-03T03:34:09.753520+00:00",
+  "seed": 2026100301,
+  "scope": "prospective repeated S0/S1/S2 GPU comparison; not a powered superiority study",
+  "question": "Which feasible configuration does each policy confirm, and what does history, exploration and confirmation cost?",
+  "workload": {
+    "runner": "resource_advisor.transfer_gpu_benchmark",
+    "input_shape": [
+      1,
+      3,
+      256,
+      256
+    ],
+    "seed": 20261003,
+    "work_units": 12,
+    "forwards_per_unit": 32,
+    "warmup": 3,
+    "precision": "fp32",
+    "task": "generated fixed-weight CNN numerical inference; not trained-model accuracy"
+  },
+  "candidate_cpu_cores": [
+    0.5,
+    1,
+    2
+  ],
+  "gpu_count": 1,
+  "host_memory_mib": 2048,
+  "baseline": "cpu1",
+  "cpu_threads": "max(1,int(requested_cpu)); fractional limit enforced by cgroup",
+  "quality": {
+    "numerical_agreement_minimum": 1.0,
+    "maximum_peak_memory_mib": 2048,
+    "independent_confirmation_repeats": 3
+  },
+  "history": {
+    "strategy": "grid_characterization",
+    "probe_blocks": 2,
+    "confirmation_repeats_per_candidate": 3,
+    "frozen_lookup_profile_count": 9,
+    "policy": "Freeze this new same-workload cohort before all comparisons. S0 uses only these IDs/digest; later results and oracle are excluded. S1/S2 deliberately start without historical observations. Report that information difference and the full cost to acquire S0 history."
+  },
+  "schedule": [
+    {
+      "order": 1,
+      "block": 0,
+      "strategy": "random",
+      "seed": 2026100301
+    },
+    {
+      "order": 2,
+      "block": 0,
+      "strategy": "lookup",
+      "seed": 2026100301
+    },
+    {
+      "order": 3,
+      "block": 0,
+      "strategy": "qlognei",
+      "seed": 2026100301
+    },
+    {
+      "order": 4,
+      "block": 1,
+      "strategy": "qlognei",
+      "seed": 2026100302
+    },
+    {
+      "order": 5,
+      "block": 1,
+      "strategy": "lookup",
+      "seed": 2026100302
+    },
+    {
+      "order": 6,
+      "block": 1,
+      "strategy": "random",
+      "seed": 2026100302
+    },
+    {
+      "order": 7,
+      "block": 2,
+      "strategy": "qlognei",
+      "seed": 2026100303
+    },
+    {
+      "order": 8,
+      "block": 2,
+      "strategy": "random",
+      "seed": 2026100303
+    },
+    {
+      "order": 9,
+      "block": 2,
+      "strategy": "lookup",
+      "seed": 2026100303
+    }
+  ],
+  "randomization": {
+    "method": "complete blocks; NumPy default_rng(seed).permutation(arms) per block",
+    "numpy_version": "2.5.3",
+    "unit": "policy study within temporal block; confirmation Jobs nested; forward iterations are subsamples"
+  },
+  "budgets": {
+    "per_study_max_probes": 8,
+    "per_study_wall_seconds": 1200,
+    "per_study_device_seconds": 900,
+    "final_validation_reserved_seconds": 360,
+    "queue_seconds": 90,
+    "run_seconds": 30,
+    "collection_seconds": 60,
+    "whole_protocol_wall_seconds": 7200,
+    "policy": "Equal first-use total caps: 1200 wall seconds and 900 physical GPU reservation seconds, including S0 history acquisition plus its target study. Before S0, require measured history cost plus the 360-second confirmation reserve to fit both caps; otherwise stop. Later reuse never double-charges history. S1/S2 have no historical acquisition cost. Caps are not equal realized spending."
+  },
+  "maximum_jobs": {
+    "qualification": 3,
+    "history": 15,
+    "lookup": 18,
+    "random": 42,
+    "qlognei": 42,
+    "oracle": 15,
+    "total": 135
+  },
+  "oracle": {
+    "strategy": "grid_characterization",
+    "when": "after every comparison is terminal",
+    "use": "evaluation only; unavailable to historical or online selection"
+  },
+  "analysis": {
+    "primary": "raw block-paired chosen-configuration oracle regret and independent confirmation",
+    "secondary": [
+      "quality failures, abstention and baseline preservation",
+      "queue, execution, collection and study wall time",
+      "GPU reservation seconds by history, tuning, confirmation, oracle and F0",
+      "optimizer planning time",
+      "first-use cost including history; reuse across the three observed blocks",
+      "no production break-even claim without measured comparable repeated savings"
+    ],
+    "inference": "descriptive block differences/ranges and all failures; no p-value superiority claim",
+    "sample_size_basis": "bounded operational comparison; repetitions are not independent devices/workloads",
+    "illustrative_paired_t_sensitivity": {
+      "assumptions": "independent normal block differences; illustrative, not the planned inferential analysis",
+      "blocks": 3,
+      "two_sided_alpha_three_pairs": 0.016666666666666666,
+      "target_power": 0.8,
+      "standardized_difference_mde": 5.667476062885731,
+      "power_by_standardized_difference": {
+        "0.5": 0.02878066610275469,
+        "1": 0.0642345782002377,
+        "2": 0.19357183194369412,
+        "5": 0.7153202605101632
+      }
+    }
+  },
+  "failure_policy": "Retain every failure/abstention. Stop on pressure, lost qualification, failed thermal eligibility or protocol deadline. Never expand quota, extend budget, relax gates or replace failed runs after seeing results.",
+  "limits": [
+    "one GPU and one numerical workload; no cross-accelerator superiority",
+    "three meaningful candidates; no artificial space inflation",
+    "same code/data/output contract; no training convergence claim",
+    "NVML brackets are not continuous energy measurement",
+    "realized cost may differ with selected confirmation path"
+  ],
+  "trial": "new-policy-trial-after-optimizer-runtime-repair",
+  "predecessor": {
+    "plan_digest": "sha256:8f3b75634cda50438d6097673f1af94e8b184c565bf237da42030253cca6467a",
+    "stop_report_digest": "sha256:56c3662d6fb4cb54fbd329924570753ceb27d2f68dd969f9d7d010aa1f364712",
+    "repair_report_digest": "sha256:341505eea1561211390555bc5a84e15a2dd82cc966d2f0753bf11842e2c35ef1",
+    "reason": "WORKER_OPTIMIZER_DEPENDENCIES_MISSING",
+    "retained_application_jobs": 48,
+    "retained_qualification_jobs": 3,
+    "retained_gpu_reservation_seconds": 140.0,
+    "policy": "Retain the incomplete predecessor separately. Never merge its observations into this comparison or hide its cost. Report cumulative project cost including both trials."
+  },
+  "runtime_requirements": {
+    "worker_image_digest": "sha256:71b21cd269fbee835457dfdd4960ba4369388e3a74274009294cc569ed950e2f",
+    "worker_source_tree_sha256": "eae7022dd244c8568906007966f8995d032ee83e59fab3a267e12854233bc290",
+    "optimizer_required": true,
+    "torch_version": "2.8.0+cpu",
+    "botorch_version": "0.16.1",
+    "preflight": "Check the actual mounted worker configuration, image/source digest, and a bounded qLogNEI calculation before new F0 or study submission. This software check never becomes a trial observation.",
+    "failure_policy": "Stop on changed worker image or missing optimizer dependency. Preserve and report numerical model fallback as a policy outcome; never relabel fallback as a BO acquisition or replace it."
+  },
+  "design_preservation": "Same original seeds, temporal-block order, candidates, workload, quality gates, sample-size rationale and budgets. Fresh F0, fresh history, fresh study/attempt IDs; no old measurements supplied to any policy."
+}
