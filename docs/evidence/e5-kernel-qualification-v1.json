@@ -1,0 +1,606 @@
+{
+  "schema_version": "e5-kernel-qualification-v1",
+  "status": "STOPPED_QUALIFICATION_FAILED",
+  "source_commit": "eabecff98089a053397f996fb187a73f6ddbac7a",
+  "plan_sha256": "dc18a1d203784003504c85261e1c8c51c7cd94345fa3dcb012b26ae1d62db4de",
+  "schedule_sha256": "54ca08117a6a015719c832272a8725dac5c3757edf4be805306292a5f0f87d7c",
+  "started_at": "2026-10-03T09:56:59.549958+00:00",
+  "stopped_at": "2026-10-03T09:58:06.191436+00:00",
+  "identity": {
+    "code_digest": "sha256:e5594ea2fc4459d548dcaf8847feefc21d8540bf80c6f3c9abbe82a44b39bf67",
+    "model_digest": "sha256:e55fd68114b0484452c4848acfa937aca532d6b937132914aa5f21fd70a20109",
+    "dataset_version": "generated-e5-cnn-batch32-128-v1",
+    "config_digest": "sha256:951b06bd5a42f8272d71e576c50312f5405381488aa8eb8bc8ca6d703d66e9e1",
+    "task_type": "inference",
+    "input_shape": [
+      32,
+      3,
+      128,
+      128
+    ],
+    "batch_size": 32,
+    "global_batch_size": null,
+    "gradient_accumulation": 1,
+    "precision": "fp32",
+    "seed": 20261009,
+    "work_units": 12,
+    "quality_contract_digest": "sha256:6b99f576ffccb0aafad4d98064bb6b5ce7c001a8cbb044ec7aff9ed828a5f88d",
+    "measurement_boundary": "cnn-batch32-serial-input-transfer-4-forwards-v1"
+  },
+  "context": {
+    "arch": "amd64",
+    "environment_digest": "sha256:e61b117fc737546490a7126399cb551947f78e4de88de78220f8e77f35382396",
+    "runtime_versions": {
+      "pytorch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "driver": "595.84"
+    },
+    "accelerator_model": "NVIDIA GeForce RTX 5080",
+    "memory_model": "discrete",
+    "power_mode": "unmanaged-default",
+    "allocation_mode": "physical_device",
+    "resources": {
+      "host_cpu": 1,
+      "host_memory_mib": 2048,
+      "accelerator_count": 1
+    },
+    "parameters": {}
+  },
+  "thermal_policy": {
+    "provider": "nvml-brackets-v1",
+    "driver_version": "595.84",
+    "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+    "maximum_temperature_c": 80,
+    "maximum_gap_seconds": 0.5,
+    "maximum_query_seconds": 0.05
+  },
+  "planned_jobs": 14,
+  "submitted_jobs": 2,
+  "scheduled_comparison_jobs_submitted": 0,
+  "qualification": [
+    {
+      "arm": "cache-plain",
+      "passed": true,
+      "envelope": {
+        "result": {
+          "schema_version": "v1",
+          "job_id": "ra-e5-kernel-v1-f0-plain",
+          "attempt_id": "ra-e5-kernel-v1-f0-plain-attempt",
+          "epoch": 1,
+          "workload_signature": "sha256:c830e90032a468a1c084725225c39990a2f8d95036b31de8bf05d250f829fe52",
+          "context_signature": "sha256:5058ee274a954a2d9e512f5b1ab42cc0d043b04e8d8351f46766704e4428f9cd",
+          "outcome": "COMPLETED",
+          "measured": true,
+          "evidence_kind": "hardware",
+          "measurements": {
+            "elapsed_seconds": 0.12341639795340598,
+            "peak_memory_mib": 158.1025390625,
+            "quality_value": 1.0,
+            "sample_count": 12,
+            "work_units": 12,
+            "latency_p50_ms": null,
+            "latency_p95_ms": null,
+            "latency_p99_ms": null,
+            "throughput": 97.23181197145635,
+            "gpu_utilization": null,
+            "power_watts": null,
+            "temperature_celsius": null
+          },
+          "error_code": null
+        },
+        "digest": "sha256:56470fc77f7c9e89ad61668fa3688f0c16bd2f28dffe8f60cd809b5cf619423c",
+        "phase_profile": {
+          "schema_version": "v1",
+          "job_id": "ra-e5-kernel-v1-f0-plain",
+          "attempt_id": "ra-e5-kernel-v1-f0-plain-attempt",
+          "result_digest": "sha256:56470fc77f7c9e89ad61668fa3688f0c16bd2f28dffe8f60cd809b5cf619423c",
+          "measurement_boundary": "cnn-batch32-serial-input-transfer-4-forwards-v1",
+          "instrumentation": "cooperative_serial",
+          "samples": [
+            {
+              "wall_seconds": 0.01889170298818499,
+              "phases_seconds": {
+                "cpu_processing": 0.009044977952726185,
+                "host_to_device": 0.0012869490310549736,
+                "accelerator_compute": 0.00855977600440383
+              }
+            },
+            {
+              "wall_seconds": 0.009659417963121086,
+              "phases_seconds": {
+                "cpu_processing": 9.719515219330788e-07,
+                "host_to_device": 0.001106614014133811,
+                "accelerator_compute": 0.008551831997465342
+              }
+            },
+            {
+              "wall_seconds": 0.009691643004771322,
+              "phases_seconds": {
+                "cpu_processing": 6.939517334103584e-07,
+                "host_to_device": 0.0011361310025677085,
+                "accelerator_compute": 0.008554818050470203
+              }
+            },
+            {
+              "wall_seconds": 0.009497868013568223,
+              "phases_seconds": {
+                "cpu_processing": 5.110050551593304e-07,
+                "host_to_device": 0.0009338239906355739,
+                "accelerator_compute": 0.00856353301787749
+              }
+            },
+            {
+              "wall_seconds": 0.009441656991839409,
+              "phases_seconds": {
+                "cpu_processing": 6.129848770797253e-07,
+                "host_to_device": 0.00089438003487885,
+                "accelerator_compute": 0.00854666397208348
+              }
+            },
+            {
+              "wall_seconds": 0.009439894987735897,
+              "phases_seconds": {
+                "cpu_processing": 4.4796615839004517e-07,
+                "host_to_device": 0.0008876560023054481,
+                "accelerator_compute": 0.00855179101927206
+              }
+            },
+            {
+              "wall_seconds": 0.009429387981072068,
+              "phases_seconds": {
+                "cpu_processing": 3.589666448533535e-07,
+                "host_to_device": 0.0008845370030030608,
+                "accelerator_compute": 0.008544492011424154
+              }
+            },
+            {
+              "wall_seconds": 0.00944435503333807,
+              "phases_seconds": {
+                "cpu_processing": 3.750319592654705e-07,
+                "host_to_device": 0.0008876299834810197,
+                "accelerator_compute": 0.008556350017897785
+              }
+            },
+            {
+              "wall_seconds": 0.009495276026427746,
+              "phases_seconds": {
+                "cpu_processing": 4.630419425666332e-07,
+                "host_to_device": 0.0009386969613842666,
+                "accelerator_compute": 0.008556116023100913
+              }
+            },
+            {
+              "wall_seconds": 0.009518940991256386,
+              "phases_seconds": {
+                "cpu_processing": 4.220055416226387e-07,
+                "host_to_device": 0.000956997973844409,
+                "accelerator_compute": 0.008561521011870354
+              }
+            },
+            {
+              "wall_seconds": 0.00944905000505969,
+              "phases_seconds": {
+                "cpu_processing": 4.469766281545162e-07,
+                "host_to_device": 0.0008831840241327882,
+                "accelerator_compute": 0.008565419004298747
+              }
+            },
+            {
+              "wall_seconds": 0.009457203967031091,
+              "phases_seconds": {
+                "cpu_processing": 5.469773896038532e-07,
+                "host_to_device": 0.0008919690153561532,
+                "accelerator_compute": 0.008564687974285334
+              }
+            }
+          ]
+        },
+        "thermal_trace": {
+          "job_id": "ra-e5-kernel-v1-f0-plain",
+          "attempt_id": "ra-e5-kernel-v1-f0-plain-attempt",
+          "result_digest": "sha256:56470fc77f7c9e89ad61668fa3688f0c16bd2f28dffe8f60cd809b5cf619423c",
+          "policy_digest": "sha256:a1243c4bc3e4764d8cdf6d39fbe3341fb06cbc8ab569f9926221a2a29c524fb2",
+          "driver_version": "595.84",
+          "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+          "method": "nvml-brackets-v1",
+          "windows": [
+            {
+              "sample_ref": "iteration-0000",
+              "before": {
+                "started": 0.5600637189927511,
+                "finished": 0.5623901429935358,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              },
+              "forward_started": 0.5624227650114335,
+              "forward_finished": 0.5813144679996185,
+              "after": {
+                "started": 0.5813152740010992,
+                "finished": 0.5813468800042756,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              }
+            },
+            {
+              "sample_ref": "iteration-0001",
+              "before": {
+                "started": 0.5817130059585907,
+                "finished": 0.5817290659761056,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              },
+              "forward_started": 0.5817370470031165,
+              "forward_finished": 0.5913964649662375,
+              "after": {
+                "started": 0.591397114971187,
+                "finished": 0.5914182330016047,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              }
+            },
+            {
+              "sample_ref": "iteration-0002",
+              "before": {
+                "started": 0.5916052190004848,
+                "finished": 0.5916145090013742,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              },
+              "forward_started": 0.591619590006303,
+              "forward_finished": 0.6013112330110744,
+              "after": {
+                "started": 0.6013115759706125,
+                "finished": 0.6013274809811264,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              }
+            },
+            {
+              "sample_ref": "iteration-0003",
+              "before": {
+                "started": 0.6014795849914663,
+                "finished": 0.6014889089856297,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              },
+              "forward_started": 0.6014932229882106,
+              "forward_finished": 0.6109910910017788,
+              "after": {
+                "started": 0.6109913819818757,
+                "finished": 0.6110039940103889,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              }
+            },
+            {
+              "sample_ref": "iteration-0004",
+              "before": {
+                "started": 0.6111287290113978,
+                "finished": 0.6111370970029384,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              },
+              "forward_started": 0.6111410069861449,
+              "forward_finished": 0.6205826639779843,
+              "after": {
+                "started": 0.6205829759710468,
+                "finished": 0.6205945629626513,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              }
+            },
+            {
+              "sample_ref": "iteration-0005",
+              "before": {
+                "started": 0.6207108529633842,
+                "finished": 0.6207183999940753,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              },
+              "forward_started": 0.6207218460040167,
+              "forward_finished": 0.6301617409917526,
+              "after": {
+                "started": 0.6301619629957713,
+                "finished": 0.6301727269892581,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              }
+            },
+            {
+              "sample_ref": "iteration-0006",
+              "before": {
+                "started": 0.6302858339622617,
+                "finished": 0.6302938699955121,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              },
+              "forward_started": 0.6302973220008425,
+              "forward_finished": 0.6397267099819146,
+              "after": {
+                "started": 0.639726925001014,
+                "finished": 0.6397373549989425,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              }
+            },
+            {
+              "sample_ref": "iteration-0007",
+              "before": {
+                "started": 0.6398489800048992,
+                "finished": 0.6398561379755847,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              },
+              "forward_started": 0.6398597419611178,
+              "forward_finished": 0.6493040969944559,
+              "after": {
+                "started": 0.6493043469963595,
+                "finished": 0.6493143779807724,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              }
+            },
+            {
+              "sample_ref": "iteration-0008",
+              "before": {
+                "started": 0.6494351309956983,
+                "finished": 0.6494426889694296,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              },
+              "forward_started": 0.6494461539550684,
+              "forward_finished": 0.6589414299814962,
+              "after": {
+                "started": 0.6589416799833998,
+                "finished": 0.6589515329687856,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              }
+            },
+            {
+              "sample_ref": "iteration-0009",
+              "before": {
+                "started": 0.6590623540105298,
+                "finished": 0.6590693249600008,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              },
+              "forward_started": 0.6590725679998286,
+              "forward_finished": 0.668591508991085,
+              "after": {
+                "started": 0.6685917779686861,
+                "finished": 0.6686023679794744,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              }
+            },
+            {
+              "sample_ref": "iteration-0010",
+              "before": {
+                "started": 0.6687158559798263,
+                "finished": 0.668723227980081,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              },
+              "forward_started": 0.668726728996262,
+              "forward_finished": 0.6781757790013216,
+              "after": {
+                "started": 0.6781761900056154,
+                "finished": 0.6781944579561241,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              }
+            },
+            {
+              "sample_ref": "iteration-0011",
+              "before": {
+                "started": 0.6783504899940453,
+                "finished": 0.6783630019635893,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              },
+              "forward_started": 0.6783678029896691,
+              "forward_finished": 0.6878250069567002,
+              "after": {
+                "started": 0.6878252209862694,
+                "finished": 0.687836859957315,
+                "temperature_c": 33.0,
+                "power_w": 5.77,
+                "sm_clock_mhz": 180,
+                "event_reasons": 0,
+                "supported_reasons": 511,
+                "errors": {}
+              }
+            }
+          ]
+        }
+      },
+      "fixture": {
+        "model_recipe": "conv3-32-relu-conv32-32-relu-conv32-32-relu-globalavg-v1",
+        "model_weights_digest": "sha256:e55fd68114b0484452c4848acfa937aca532d6b937132914aa5f21fd70a20109",
+        "input_digest": "sha256:04f5cebd72178d37c956e3fc6614707f90a4e8e7978dd8d2a5689455c316326f",
+        "prepared_input_digest": "sha256:1d68fa4ea3412a57790c0f6e9d2e0809d3c13768b96a0651d74e0d0b61c1490c",
+        "shape": [
+          32,
+          3,
+          128,
+          128
+        ],
+        "seed": 20261009,
+        "blocks": 12,
+        "forwards_per_block": 4,
+        "profiler_enabled": false,
+        "input_strategy": "cache",
+        "quality_scope": "generated deterministic CNN numerical agreement, not label accuracy"
+      },
+      "thermal_assessment": {
+        "status": "ELIGIBLE_TRACE",
+        "reasons": [],
+        "trace_digest": "sha256:49709c43d3c601bc072b53db54f8b7f4ef80da902ec0944f9490f890c9dbe81c",
+        "maximum_observed_temperature_c": 33.0,
+        "sensor_query_seconds": 0.002601022890303284,
+        "maximum_query_seconds": 0.0023264240007847548,
+        "maximum_unobserved_gap_seconds": 0.018925131007563323,
+        "reading_count": 24,
+        "scope": "sampled points bracketing timed forwards; not continuous or long-duration thermal qualification"
+      },
+      "diagnosis": {
+        "policy_version": "serial-phases-v1",
+        "status": "HYPOTHESIS",
+        "hypothesis": "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "auto_apply": false,
+        "resource_change": null,
+        "reasons": [
+          "SERIAL_PHASE_SHARE_GE_60_PERCENT",
+          "DOMINANT_IN_GE_80_PERCENT_STEPS"
+        ],
+        "phase_shares": {
+          "cpu_processing": 0.07333570710429606,
+          "host_to_device": 0.09470839556661594,
+          "accelerator_compute": 0.831955897329088
+        },
+        "coverage": 1.0,
+        "limitations": [
+          "Phase wall time includes software/launch/wait overhead; it is not kernel busy time.",
+          "One run suggests a hypothesis; independent one-variable trials are required.",
+          "Missing phases are unknown, not zero; overlapping pipelines need separate analysis."
+        ],
+        "attempt_id": "ra-e5-kernel-v1-f0-plain-attempt",
+        "result_digest": "sha256:56470fc77f7c9e89ad61668fa3688f0c16bd2f28dffe8f60cd809b5cf619423c",
+        "profile_digest": "sha256:3fe4a114f13d89eedae1c68f1d6650c2c395f17ab3b7c1c1d56e6127cd128a9f",
+        "sample_count": 12,
+        "unclassified_share": 0.0,
+        "dominant_share": 0.831955897329088,
+        "next_action": "Request an approved one-variable trial; preserve GPU count."
+      },
+      "cost": {
+        "gpu_reservation_seconds": 3.0,
+        "container_seconds": 2.0
+      },
+      "verified_at": "2026-10-03T09:57:16.426132+00:00"
+    },
+    {
+      "arm": "cache-profiler",
+      "passed": false,
+      "exit_code": 1,
+      "failure_stage": "parse_exported_trace",
+      "error_type": "ValueError",
+      "error": "duplicate or incomplete forward marker",
+      "raw_trace_retained": false,
+      "quality_result_available": false,
+      "cost": {
+        "gpu_reservation_seconds": 3.0,
+        "container_seconds": 2.0
+      }
+    }
+  ],
+  "total_gpu_reservation_seconds": 6,
+  "preservation": {
+    "original_records_preserved": true,
+    "static_specs_secrets_pvc_quota_unchanged": true,
+    "existing_running_pods_preserved": 193,
+    "ready_nodes_without_pressure": 10,
+    "GPU_jobs": 2,
+    "GPU_reservation_seconds": 6,
+    "normal_api_jobs": 0,
+    "worker_bindings_added": 0,
+    "protocol_stopped": true
+  },
+  "limitations": [
+    "The original failing trace was deleted by temporary-directory cleanup; category collision is not yet an observed root cause.",
+    "No performance comparison, profiler-overhead estimate or compute-dominance acceptance is available.",
+    "Failed profiler execution is not converted to a successful performance record."
+  ]
+}

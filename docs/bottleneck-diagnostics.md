@@ -117,3 +117,6 @@ The [CUDA kernel follow-up protocol](e5-kernel-plan.md) separates uninstrumented
 performance from profiler-on kernel evidence and freezes its schedule and budget
 before execution. Its preregistration and synthetic contract tests are not GPU
 execution results; the original eight-Job evidence above remains unchanged.
+The first CUDA trace [qualification stopped](e5-kernel-qualification.md) at a
+parser error; its six GPU reservation seconds and unexecuted comparison are
+reported separately.
