@@ -159,3 +159,8 @@ exhaustive search. More models, datasets, runtimes and method blocks are needed
 before generalizing effectiveness. Live harmful-transfer injection, source
 amortization over repeated production work, real task accuracy and different
 accelerators remain unverified. GPU sharing and NPU training are not covered.
+
+A subsequent [offline workload/forecast audit](workload-holdout.md) reuses these
+results without new Jobs. It separates source-only whole-shape rank holdout
+from target-adapted chronological intervals; all four saved RGPE intervals missed
+their subsequent observations. No operational uncertainty guarantee is established.

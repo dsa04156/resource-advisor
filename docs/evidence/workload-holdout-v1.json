@@ -1,0 +1,1680 @@
+{
+  "schema_version": "workload-holdout-v1",
+  "source_capture_digest": "sha256:a75ba71d8c91c7e57434f168f7166a145765f22a9bff37927417024090ff13e9",
+  "analysis_status": "RETROSPECTIVE_DESCRIPTIVE",
+  "new_gpu_jobs": 0,
+  "reused_source_characterization_cost": {
+    "all_jobs": 30,
+    "gpu_reservation_seconds": 82.0,
+    "study_wall_seconds": 729.91209,
+    "selected_profile_job_wall_seconds": 150.03092999999998,
+    "selected_profile_jobs": 18
+  },
+  "reused_application_gpu_reservation_seconds": 437.0,
+  "cost_scope": "Existing 157 application Jobs; qualification is reported in transfer-gpu.md; no savings claimed",
+  "whole_workload_rank_holdout": [
+    {
+      "held_out": "source-0",
+      "workload_signature": "sha256:6a000686347cede44a92c54913cbb492f87d967138a07be0f6d6c7ea3401326c",
+      "input_shape": [
+        1,
+        3,
+        128,
+        128
+      ],
+      "source_workload_signatures": [
+        "sha256:dca651b71224f7185c26beedc141cdfdfabbc4bdb001397910e15539c26738bd",
+        "sha256:8ef9a3ff87a6de63234f76109dec97a7a3f6957d163efa979a93dbf54210a501"
+      ],
+      "prior": {
+        "method": "history_guided_warm_start",
+        "candidate_order": [
+          "cpu1",
+          "cpu2",
+          "cpu0-5"
+        ],
+        "mean_source_ranks": {
+          "cpu0-5": 2,
+          "cpu1": 0,
+          "cpu2": 0
+        },
+        "source_run_ids": [
+          "a-a36925004fe944d49ca9d744ca15cd2f",
+          "a-9c67e3b9a7244f85a68a5b756d897568",
+          "a-a6afc51b3d30460ea81d08505499818c",
+          "a-77fd3b0a91af4f52b4f94d54aff10652",
+          "a-58324744c070426c82b2137bdf687981",
+          "a-49b7646a95ac4f1081485c2a32e39c2f",
+          "a-0d3abd7b2fb34b6986ea60a65ca179a7",
+          "a-314da6bab9024cb8afb6bb90461cefe2",
+          "a-bff436463c0043488bb4981d51ed1d6c",
+          "a-af941a56010a407699c289e4fe4b881e",
+          "a-b22e86711aa84de08813dbeee3057b99",
+          "a-1301018c563b4797b37bc449a39be6d4",
+          "a-4364b05e3eb54c28955bda194f3a2d22",
+          "a-e0e2e97897a34ab1822c1e62db489c61",
+          "a-e1a408a1af3a45e6b353d6427aefaea1",
+          "a-6eeedc5b341d4ac4b7d31d47b18ef303",
+          "a-0bbe04d085234457a4854113b638d06a",
+          "a-1ad8848fb7254fb3b79b94a5d53bce19"
+        ],
+        "target_run_ids": [],
+        "measured": false,
+        "execution_authorized": false
+      },
+      "selected_candidate": "cpu1",
+      "held_out_samples": {
+        "cpu0-5": {
+          "attempt_ids": [
+            "a-093e66f2582b447c93d9f6cab3134ffc",
+            "a-12095efa6402455ab36a1f91fba34e25",
+            "a-3647af607ed34a5191bdf7d472ef291a"
+          ],
+          "raw_seconds": [
+            0.19548259919974953,
+            0.18954038812080398,
+            0.14683303306810558
+          ],
+          "mean_seconds": 0.17728534012955302,
+          "sample_sd_seconds": 0.026539305231113294,
+          "median_seconds": 0.18954038812080398
+        },
+        "cpu1": {
+          "attempt_ids": [
+            "a-9c954a861ec94b9db394bf7bde7d85b7",
+            "a-5b190e1f1db34f55977a5f1586156af5",
+            "a-946ab85f05e04a0f81cf77d6224f3e67"
+          ],
+          "raw_seconds": [
+            0.09734216204378754,
+            0.09732951101614162,
+            0.09739961411105469
+          ],
+          "mean_seconds": 0.09735709572366129,
+          "sample_sd_seconds": 3.7361371428604965e-05,
+          "median_seconds": 0.09734216204378754
+        },
+        "cpu2": {
+          "attempt_ids": [
+            "a-dcce1c2448934b6b934bd863f42275fb",
+            "a-c38b348a8d544356ad6a78c2760f5fb7",
+            "a-9288f5fbec4f46ab86f27c7ccd400cc2"
+          ],
+          "raw_seconds": [
+            0.09792569204000756,
+            0.0986046670586802,
+            0.09769543405855075
+          ],
+          "mean_seconds": 0.09807526438574617,
+          "sample_sd_seconds": 0.0004727103522120262,
+          "median_seconds": 0.09792569204000756
+        }
+      },
+      "held_out_attempt_ids": [
+        "a-dcce1c2448934b6b934bd863f42275fb",
+        "a-093e66f2582b447c93d9f6cab3134ffc",
+        "a-12095efa6402455ab36a1f91fba34e25",
+        "a-9c954a861ec94b9db394bf7bde7d85b7",
+        "a-5b190e1f1db34f55977a5f1586156af5",
+        "a-3647af607ed34a5191bdf7d472ef291a",
+        "a-c38b348a8d544356ad6a78c2760f5fb7",
+        "a-9288f5fbec4f46ab86f27c7ccd400cc2",
+        "a-946ab85f05e04a0f81cf77d6224f3e67"
+      ],
+      "finite_sample_regret_fraction": 0.0,
+      "selected_constraint_violations": 0,
+      "latest_source_available_at": "2026-10-02T19:21:02.177552+00:00",
+      "earliest_target_backend_submitted_at": "2026-10-02T18:18:59+00:00",
+      "source_precedes_target": false,
+      "time_prediction": null,
+      "interval_coverage": null,
+      "interval_reason": "Rank prior produces an ordering, not target seconds or intervals",
+      "execution_authorized": false
+    },
+    {
+      "held_out": "source-1",
+      "workload_signature": "sha256:dca651b71224f7185c26beedc141cdfdfabbc4bdb001397910e15539c26738bd",
+      "input_shape": [
+        1,
+        3,
+        192,
+        192
+      ],
+      "source_workload_signatures": [
+        "sha256:6a000686347cede44a92c54913cbb492f87d967138a07be0f6d6c7ea3401326c",
+        "sha256:8ef9a3ff87a6de63234f76109dec97a7a3f6957d163efa979a93dbf54210a501"
+      ],
+      "prior": {
+        "method": "history_guided_warm_start",
+        "candidate_order": [
+          "cpu1",
+          "cpu2",
+          "cpu0-5"
+        ],
+        "mean_source_ranks": {
+          "cpu0-5": 2,
+          "cpu1": 0,
+          "cpu2": 0
+        },
+        "source_run_ids": [
+          "a-dcce1c2448934b6b934bd863f42275fb",
+          "a-093e66f2582b447c93d9f6cab3134ffc",
+          "a-12095efa6402455ab36a1f91fba34e25",
+          "a-9c954a861ec94b9db394bf7bde7d85b7",
+          "a-5b190e1f1db34f55977a5f1586156af5",
+          "a-3647af607ed34a5191bdf7d472ef291a",
+          "a-c38b348a8d544356ad6a78c2760f5fb7",
+          "a-9288f5fbec4f46ab86f27c7ccd400cc2",
+          "a-946ab85f05e04a0f81cf77d6224f3e67",
+          "a-af941a56010a407699c289e4fe4b881e",
+          "a-b22e86711aa84de08813dbeee3057b99",
+          "a-1301018c563b4797b37bc449a39be6d4",
+          "a-4364b05e3eb54c28955bda194f3a2d22",
+          "a-e0e2e97897a34ab1822c1e62db489c61",
+          "a-e1a408a1af3a45e6b353d6427aefaea1",
+          "a-6eeedc5b341d4ac4b7d31d47b18ef303",
+          "a-0bbe04d085234457a4854113b638d06a",
+          "a-1ad8848fb7254fb3b79b94a5d53bce19"
+        ],
+        "target_run_ids": [],
+        "measured": false,
+        "execution_authorized": false
+      },
+      "selected_candidate": "cpu1",
+      "held_out_samples": {
+        "cpu0-5": {
+          "attempt_ids": [
+            "a-a36925004fe944d49ca9d744ca15cd2f",
+            "a-9c67e3b9a7244f85a68a5b756d897568",
+            "a-a6afc51b3d30460ea81d08505499818c"
+          ],
+          "raw_seconds": [
+            0.2976554871420376,
+            0.29288665601052344,
+            0.2546541001065634
+          ],
+          "mean_seconds": 0.2817320810863748,
+          "sample_sd_seconds": 0.02357113124242228,
+          "median_seconds": 0.29288665601052344
+        },
+        "cpu1": {
+          "attempt_ids": [
+            "a-58324744c070426c82b2137bdf687981",
+            "a-0d3abd7b2fb34b6986ea60a65ca179a7",
+            "a-314da6bab9024cb8afb6bb90461cefe2"
+          ],
+          "raw_seconds": [
+            0.16430104500614107,
+            0.16440918599255383,
+            0.16437602695077658
+          ],
+          "mean_seconds": 0.16436208598315716,
+          "sample_sd_seconds": 5.540199607600478e-05,
+          "median_seconds": 0.16437602695077658
+        },
+        "cpu2": {
+          "attempt_ids": [
+            "a-77fd3b0a91af4f52b4f94d54aff10652",
+            "a-49b7646a95ac4f1081485c2a32e39c2f",
+            "a-bff436463c0043488bb4981d51ed1d6c"
+          ],
+          "raw_seconds": [
+            0.16285763104679063,
+            0.16355932608712465,
+            0.1629940039711073
+          ],
+          "mean_seconds": 0.16313698703500754,
+          "sample_sd_seconds": 0.00037205792536789274,
+          "median_seconds": 0.1629940039711073
+        }
+      },
+      "held_out_attempt_ids": [
+        "a-a36925004fe944d49ca9d744ca15cd2f",
+        "a-9c67e3b9a7244f85a68a5b756d897568",
+        "a-a6afc51b3d30460ea81d08505499818c",
+        "a-77fd3b0a91af4f52b4f94d54aff10652",
+        "a-58324744c070426c82b2137bdf687981",
+        "a-49b7646a95ac4f1081485c2a32e39c2f",
+        "a-0d3abd7b2fb34b6986ea60a65ca179a7",
+        "a-314da6bab9024cb8afb6bb90461cefe2",
+        "a-bff436463c0043488bb4981d51ed1d6c"
+      ],
+      "finite_sample_regret_fraction": 0.007509633286820083,
+      "selected_constraint_violations": 0,
+      "latest_source_available_at": "2026-10-02T19:21:02.177552+00:00",
+      "earliest_target_backend_submitted_at": "2026-10-02T18:25:09+00:00",
+      "source_precedes_target": false,
+      "time_prediction": null,
+      "interval_coverage": null,
+      "interval_reason": "Rank prior produces an ordering, not target seconds or intervals",
+      "execution_authorized": false
+    },
+    {
+      "held_out": "oracle",
+      "workload_signature": "sha256:8ef9a3ff87a6de63234f76109dec97a7a3f6957d163efa979a93dbf54210a501",
+      "input_shape": [
+        1,
+        3,
+        256,
+        256
+      ],
+      "source_workload_signatures": [
+        "sha256:6a000686347cede44a92c54913cbb492f87d967138a07be0f6d6c7ea3401326c",
+        "sha256:dca651b71224f7185c26beedc141cdfdfabbc4bdb001397910e15539c26738bd"
+      ],
+      "prior": {
+        "method": "history_guided_warm_start",
+        "candidate_order": [
+          "cpu1",
+          "cpu2",
+          "cpu0-5"
+        ],
+        "mean_source_ranks": {
+          "cpu0-5": 2,
+          "cpu1": 0,
+          "cpu2": 0
+        },
+        "source_run_ids": [
+          "a-dcce1c2448934b6b934bd863f42275fb",
+          "a-093e66f2582b447c93d9f6cab3134ffc",
+          "a-12095efa6402455ab36a1f91fba34e25",
+          "a-9c954a861ec94b9db394bf7bde7d85b7",
+          "a-5b190e1f1db34f55977a5f1586156af5",
+          "a-3647af607ed34a5191bdf7d472ef291a",
+          "a-c38b348a8d544356ad6a78c2760f5fb7",
+          "a-9288f5fbec4f46ab86f27c7ccd400cc2",
+          "a-946ab85f05e04a0f81cf77d6224f3e67",
+          "a-a36925004fe944d49ca9d744ca15cd2f",
+          "a-9c67e3b9a7244f85a68a5b756d897568",
+          "a-a6afc51b3d30460ea81d08505499818c",
+          "a-77fd3b0a91af4f52b4f94d54aff10652",
+          "a-58324744c070426c82b2137bdf687981",
+          "a-49b7646a95ac4f1081485c2a32e39c2f",
+          "a-0d3abd7b2fb34b6986ea60a65ca179a7",
+          "a-314da6bab9024cb8afb6bb90461cefe2",
+          "a-bff436463c0043488bb4981d51ed1d6c"
+        ],
+        "target_run_ids": [],
+        "measured": false,
+        "execution_authorized": false
+      },
+      "selected_candidate": "cpu1",
+      "held_out_samples": {
+        "cpu0-5": {
+          "attempt_ids": [
+            "a-af941a56010a407699c289e4fe4b881e",
+            "a-4364b05e3eb54c28955bda194f3a2d22",
+            "a-1ad8848fb7254fb3b79b94a5d53bce19"
+          ],
+          "raw_seconds": [
+            0.3892162140691653,
+            0.38613777613500133,
+            0.41796804894693196
+          ],
+          "mean_seconds": 0.3977740130503662,
+          "sample_sd_seconds": 0.017556153034547887,
+          "median_seconds": 0.3892162140691653
+        },
+        "cpu1": {
+          "attempt_ids": [
+            "a-b22e86711aa84de08813dbeee3057b99",
+            "a-1301018c563b4797b37bc449a39be6d4",
+            "a-e1a408a1af3a45e6b353d6427aefaea1"
+          ],
+          "raw_seconds": [
+            0.2637039550463669,
+            0.2637141030863859,
+            0.2634533820091747
+          ],
+          "mean_seconds": 0.2636238133806425,
+          "sample_sd_seconds": 0.00014768508714272874,
+          "median_seconds": 0.2637039550463669
+        },
+        "cpu2": {
+          "attempt_ids": [
+            "a-e0e2e97897a34ab1822c1e62db489c61",
+            "a-6eeedc5b341d4ac4b7d31d47b18ef303",
+            "a-0bbe04d085234457a4854113b638d06a"
+          ],
+          "raw_seconds": [
+            0.2617144749383442,
+            0.2612371269497089,
+            0.2607538420124911
+          ],
+          "mean_seconds": 0.26123514796684805,
+          "sample_sd_seconds": 0.0004803195205674661,
+          "median_seconds": 0.2612371269497089
+        }
+      },
+      "held_out_attempt_ids": [
+        "a-af941a56010a407699c289e4fe4b881e",
+        "a-b22e86711aa84de08813dbeee3057b99",
+        "a-1301018c563b4797b37bc449a39be6d4",
+        "a-4364b05e3eb54c28955bda194f3a2d22",
+        "a-e0e2e97897a34ab1822c1e62db489c61",
+        "a-e1a408a1af3a45e6b353d6427aefaea1",
+        "a-6eeedc5b341d4ac4b7d31d47b18ef303",
+        "a-0bbe04d085234457a4854113b638d06a",
+        "a-1ad8848fb7254fb3b79b94a5d53bce19"
+      ],
+      "finite_sample_regret_fraction": 0.00914373671531199,
+      "selected_constraint_violations": 0,
+      "latest_source_available_at": "2026-10-02T18:28:33.939731+00:00",
+      "earliest_target_backend_submitted_at": "2026-10-02T19:17:28+00:00",
+      "source_precedes_target": true,
+      "time_prediction": null,
+      "interval_coverage": null,
+      "interval_reason": "Rank prior produces an ordering, not target seconds or intervals",
+      "execution_authorized": false
+    }
+  ],
+  "chronological_forecasts": {
+    "groups": {
+      "history_warm_start": {
+        "count": 10,
+        "study_count": 2,
+        "covered": 8,
+        "coverage_fraction": 0.8,
+        "mean_width_seconds": 0.02053333331854777,
+        "mean_absolute_relative_error": 0.004926949652164167,
+        "constraint_violations": 0
+      },
+      "qlognei": {
+        "count": 10,
+        "study_count": 2,
+        "covered": 8,
+        "coverage_fraction": 0.8,
+        "mean_width_seconds": 0.03493293477517993,
+        "mean_absolute_relative_error": 0.023406144816747163,
+        "constraint_violations": 0
+      },
+      "rgpe": {
+        "count": 4,
+        "study_count": 2,
+        "covered": 0,
+        "coverage_fraction": 0,
+        "mean_width_seconds": 0.0006949518195129151,
+        "mean_absolute_relative_error": 0.006590027677799577,
+        "constraint_violations": 0
+      }
+    },
+    "accepted": [
+      {
+        "attempt_id": "a-b020fcd8d82c4ef3ad9267207a2b19dd",
+        "study_ref": "study-d0f9b0a0af774947aa1d8399aeb7287c",
+        "strategy": "qlognei",
+        "plan_ref": "plan-1e093f7203b74b9cbf6805fcf4d9ff71",
+        "forecast_at": "2026-10-02T18:30:00.673208+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:30:05Z",
+        "target_training_ids": [
+          "a-dc19bcb379484377a68adaf8efa92dd3",
+          "a-9c9822c7d7c640689d36117694316b4f",
+          "a-a2ecae8c442e4b2b862bac676a6b71be"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.26871925860759727,
+        "interval_seconds": [
+          0.22424333811295255,
+          0.3220164333722331
+        ],
+        "actual_seconds": 0.26363620691699907,
+        "covered": true,
+        "width_seconds": 0.09777309525928057,
+        "absolute_relative_error": 0.019280552356750066,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-cf13b20a2cfb4385b27d65dcec4cfef5",
+        "study_ref": "study-d0f9b0a0af774947aa1d8399aeb7287c",
+        "strategy": "qlognei",
+        "plan_ref": "plan-7d918d17ab1e4398afc07b715ac0b4cc",
+        "forecast_at": "2026-10-02T18:30:26.642447+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:30:31Z",
+        "target_training_ids": [
+          "a-dc19bcb379484377a68adaf8efa92dd3",
+          "a-9c9822c7d7c640689d36117694316b4f",
+          "a-a2ecae8c442e4b2b862bac676a6b71be",
+          "a-b020fcd8d82c4ef3ad9267207a2b19dd"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.2635964170807837,
+        "interval_seconds": [
+          0.26308027856205396,
+          0.2641135682142634
+        ],
+        "actual_seconds": 0.2636122340336442,
+        "covered": true,
+        "width_seconds": 0.001033289652209446,
+        "absolute_relative_error": 6.0000830077165025e-05,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-82d9f2913c124eb0958ebf8d9c1273f9",
+        "study_ref": "study-d0f9b0a0af774947aa1d8399aeb7287c",
+        "strategy": "qlognei",
+        "plan_ref": "plan-e9a905fe364e4a96b8f1cb2237d67ad6",
+        "forecast_at": "2026-10-02T18:30:52.646417+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:30:57Z",
+        "target_training_ids": [
+          "a-dc19bcb379484377a68adaf8efa92dd3",
+          "a-9c9822c7d7c640689d36117694316b4f",
+          "a-a2ecae8c442e4b2b862bac676a6b71be",
+          "a-b020fcd8d82c4ef3ad9267207a2b19dd",
+          "a-cf13b20a2cfb4385b27d65dcec4cfef5"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.2636018783379119,
+        "interval_seconds": [
+          0.263085729125906,
+          0.2641190401856466
+        ],
+        "actual_seconds": 0.2633217189577408,
+        "covered": true,
+        "width_seconds": 0.0010333110597405826,
+        "absolute_relative_error": 0.0010639433058540254,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-d9c10843f5ca40b8a36bc6c3bf7244f3",
+        "study_ref": "study-d0f9b0a0af774947aa1d8399aeb7287c",
+        "strategy": "qlognei",
+        "plan_ref": "plan-dce963ee49f24e7696e3b5f9bfb63205",
+        "forecast_at": "2026-10-02T18:31:13.652965+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:31:18Z",
+        "target_training_ids": [
+          "a-dc19bcb379484377a68adaf8efa92dd3",
+          "a-9c9822c7d7c640689d36117694316b4f",
+          "a-a2ecae8c442e4b2b862bac676a6b71be",
+          "a-b020fcd8d82c4ef3ad9267207a2b19dd",
+          "a-cf13b20a2cfb4385b27d65dcec4cfef5",
+          "a-82d9f2913c124eb0958ebf8d9c1273f9"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.2635319527689768,
+        "interval_seconds": [
+          0.2630159404729889,
+          0.2640489774320826
+        ],
+        "actual_seconds": 0.2630658140988089,
+        "covered": true,
+        "width_seconds": 0.001033036959093736,
+        "absolute_relative_error": 0.0017719469622639234,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-7d9391d3eafe46a898356733e0e8c4f3",
+        "study_ref": "study-d0f9b0a0af774947aa1d8399aeb7287c",
+        "strategy": "qlognei",
+        "plan_ref": "plan-ef13e405415c4d24b179df2972eb692f",
+        "forecast_at": "2026-10-02T18:31:34.640042+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:31:39Z",
+        "target_training_ids": [
+          "a-dc19bcb379484377a68adaf8efa92dd3",
+          "a-9c9822c7d7c640689d36117694316b4f",
+          "a-a2ecae8c442e4b2b862bac676a6b71be",
+          "a-b020fcd8d82c4ef3ad9267207a2b19dd",
+          "a-cf13b20a2cfb4385b27d65dcec4cfef5",
+          "a-82d9f2913c124eb0958ebf8d9c1273f9",
+          "a-d9c10843f5ca40b8a36bc6c3bf7244f3"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.2634387730545087,
+        "interval_seconds": [
+          0.2629229432067442,
+          0.263955614911452
+        ],
+        "actual_seconds": 0.26358082093065605,
+        "covered": true,
+        "width_seconds": 0.0010326717047077771,
+        "absolute_relative_error": 0.0005389158272055231,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-5bd4fcbca8d64125b1434dd4dde1a424",
+        "study_ref": "study-9c70cd0a26114020ae45d22b74d7e9c0",
+        "strategy": "rgpe",
+        "plan_ref": "plan-b3c7129362384bf58fe01c0e8ab254b8",
+        "forecast_at": "2026-10-02T18:36:56.286805+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:37:01Z",
+        "target_training_ids": [
+          "a-7f3849a82e9145ada8855a65678f3682",
+          "a-12cfecb3d72e4999bc98d71dc8f1bbb8",
+          "a-cdeb9dcc016c41fa91f7608efa677d7d",
+          "a-d2f0fc9a25e24c418ad22570bad8d639",
+          "a-5f59300e8af7475eb40688b5441bdd1b",
+          "a-82813a9cf6584440a24e41cf8bdb99de"
+        ],
+        "source_training_ids": [
+          "a-9288f5fbec4f46ab86f27c7ccd400cc2",
+          "a-12095efa6402455ab36a1f91fba34e25",
+          "a-c38b348a8d544356ad6a78c2760f5fb7",
+          "a-3647af607ed34a5191bdf7d472ef291a",
+          "a-093e66f2582b447c93d9f6cab3134ffc",
+          "a-dcce1c2448934b6b934bd863f42275fb",
+          "a-5b190e1f1db34f55977a5f1586156af5",
+          "a-9c954a861ec94b9db394bf7bde7d85b7",
+          "a-946ab85f05e04a0f81cf77d6224f3e67",
+          "a-a6afc51b3d30460ea81d08505499818c",
+          "a-77fd3b0a91af4f52b4f94d54aff10652",
+          "a-49b7646a95ac4f1081485c2a32e39c2f",
+          "a-a36925004fe944d49ca9d744ca15cd2f",
+          "a-bff436463c0043488bb4981d51ed1d6c",
+          "a-0d3abd7b2fb34b6986ea60a65ca179a7",
+          "a-314da6bab9024cb8afb6bb90461cefe2",
+          "a-58324744c070426c82b2137bdf687981",
+          "a-9c67e3b9a7244f85a68a5b756d897568"
+        ],
+        "predicted_seconds": 0.26178154587430824,
+        "interval_seconds": [
+          0.26145026599956267,
+          0.2621132455090223
+        ],
+        "actual_seconds": 0.26379159290809184,
+        "covered": false,
+        "width_seconds": 0.0006629795094596491,
+        "absolute_relative_error": 0.007619829774044112,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-4e0314e6af4e4dd186a0597964e87dfc",
+        "study_ref": "study-9c70cd0a26114020ae45d22b74d7e9c0",
+        "strategy": "rgpe",
+        "plan_ref": "plan-0ecd1adda1b140a5979eb0625e6ed452",
+        "forecast_at": "2026-10-02T18:37:22.880267+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:37:28Z",
+        "target_training_ids": [
+          "a-7f3849a82e9145ada8855a65678f3682",
+          "a-12cfecb3d72e4999bc98d71dc8f1bbb8",
+          "a-cdeb9dcc016c41fa91f7608efa677d7d",
+          "a-d2f0fc9a25e24c418ad22570bad8d639",
+          "a-5f59300e8af7475eb40688b5441bdd1b",
+          "a-82813a9cf6584440a24e41cf8bdb99de",
+          "a-5bd4fcbca8d64125b1434dd4dde1a424"
+        ],
+        "source_training_ids": [
+          "a-9288f5fbec4f46ab86f27c7ccd400cc2",
+          "a-12095efa6402455ab36a1f91fba34e25",
+          "a-c38b348a8d544356ad6a78c2760f5fb7",
+          "a-3647af607ed34a5191bdf7d472ef291a",
+          "a-093e66f2582b447c93d9f6cab3134ffc",
+          "a-dcce1c2448934b6b934bd863f42275fb",
+          "a-5b190e1f1db34f55977a5f1586156af5",
+          "a-9c954a861ec94b9db394bf7bde7d85b7",
+          "a-946ab85f05e04a0f81cf77d6224f3e67",
+          "a-a6afc51b3d30460ea81d08505499818c",
+          "a-77fd3b0a91af4f52b4f94d54aff10652",
+          "a-49b7646a95ac4f1081485c2a32e39c2f",
+          "a-a36925004fe944d49ca9d744ca15cd2f",
+          "a-bff436463c0043488bb4981d51ed1d6c",
+          "a-0d3abd7b2fb34b6986ea60a65ca179a7",
+          "a-314da6bab9024cb8afb6bb90461cefe2",
+          "a-58324744c070426c82b2137bdf687981",
+          "a-9c67e3b9a7244f85a68a5b756d897568"
+        ],
+        "predicted_seconds": 0.2618317015194733,
+        "interval_seconds": [
+          0.2615004771661851,
+          0.26216334541146913
+        ],
+        "actual_seconds": 0.26334971288451925,
+        "covered": false,
+        "width_seconds": 0.000662868245284054,
+        "absolute_relative_error": 0.005764241579832604,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-9574f8c2794c4d1893f5b3916aebb561",
+        "study_ref": "study-60a0dda85cfa48ff815882e66114e0de",
+        "strategy": "history_warm_start",
+        "plan_ref": "plan-30c2570be5984b2d8dd20f2ffdc52353",
+        "forecast_at": "2026-10-02T18:41:29.301548+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:41:34Z",
+        "target_training_ids": [
+          "a-42be431c8b8b49ec92be04c1748e84e0",
+          "a-c80464ac473a4df7bae3b2ebdab6121c",
+          "a-4a006a803cf2490991a4577c27efd360"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.2656331166344437,
+        "interval_seconds": [
+          0.22130182629344605,
+          0.31884487279090146
+        ],
+        "actual_seconds": 0.26023156981682405,
+        "covered": true,
+        "width_seconds": 0.0975430464974554,
+        "absolute_relative_error": 0.02075669305388966,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-4b0d9d8555a448f0a042e53e355f3ced",
+        "study_ref": "study-60a0dda85cfa48ff815882e66114e0de",
+        "strategy": "history_warm_start",
+        "plan_ref": "plan-7a917fdb703246f2b140089a19080139",
+        "forecast_at": "2026-10-02T18:41:50.570323+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:41:55Z",
+        "target_training_ids": [
+          "a-42be431c8b8b49ec92be04c1748e84e0",
+          "a-c80464ac473a4df7bae3b2ebdab6121c",
+          "a-4a006a803cf2490991a4577c27efd360",
+          "a-9574f8c2794c4d1893f5b3916aebb561"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.2602482838033697,
+        "interval_seconds": [
+          0.2597387006016353,
+          0.2607588667600073
+        ],
+        "actual_seconds": 0.26057395193492994,
+        "covered": true,
+        "width_seconds": 0.0010201661583720267,
+        "absolute_relative_error": 0.001249810770193903,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-71b276be885a41cf8b0dd737da2c5ef8",
+        "study_ref": "study-60a0dda85cfa48ff815882e66114e0de",
+        "strategy": "history_warm_start",
+        "plan_ref": "plan-47d250fa09ca466aaff39ed1bf5cff34",
+        "forecast_at": "2026-10-02T18:42:16.705608+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:42:21Z",
+        "target_training_ids": [
+          "a-42be431c8b8b49ec92be04c1748e84e0",
+          "a-c80464ac473a4df7bae3b2ebdab6121c",
+          "a-4a006a803cf2490991a4577c27efd360",
+          "a-9574f8c2794c4d1893f5b3916aebb561",
+          "a-4b0d9d8555a448f0a042e53e355f3ced"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.26035698846410466,
+        "interval_seconds": [
+          0.2598471924153122,
+          0.2608677846853791
+        ],
+        "actual_seconds": 0.2609731610864401,
+        "covered": false,
+        "width_seconds": 0.0010205922700669001,
+        "absolute_relative_error": 0.002361057435064525,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-3d976188d8954190a0b715bf608b2b15",
+        "study_ref": "study-60a0dda85cfa48ff815882e66114e0de",
+        "strategy": "history_warm_start",
+        "plan_ref": "plan-4c19b2388f904b2c90db69648688b53e",
+        "forecast_at": "2026-10-02T18:42:37.964481+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:42:43Z",
+        "target_training_ids": [
+          "a-42be431c8b8b49ec92be04c1748e84e0",
+          "a-c80464ac473a4df7bae3b2ebdab6121c",
+          "a-4a006a803cf2490991a4577c27efd360",
+          "a-9574f8c2794c4d1893f5b3916aebb561",
+          "a-4b0d9d8555a448f0a042e53e355f3ced",
+          "a-71b276be885a41cf8b0dd737da2c5ef8"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.2605110401152826,
+        "interval_seconds": [
+          0.26000094242868926,
+          0.2610221385661325
+        ],
+        "actual_seconds": 0.26072209095582366,
+        "covered": true,
+        "width_seconds": 0.0010211961374432255,
+        "absolute_relative_error": 0.0008094858389918011,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-4f454bd85ea14de7baaad9c20d4d36be",
+        "study_ref": "study-60a0dda85cfa48ff815882e66114e0de",
+        "strategy": "history_warm_start",
+        "plan_ref": "plan-2da4a05c27284764bb6947a0888ac3d4",
+        "forecast_at": "2026-10-02T18:42:59.268102+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:43:04Z",
+        "target_training_ids": [
+          "a-42be431c8b8b49ec92be04c1748e84e0",
+          "a-c80464ac473a4df7bae3b2ebdab6121c",
+          "a-4a006a803cf2490991a4577c27efd360",
+          "a-9574f8c2794c4d1893f5b3916aebb561",
+          "a-4b0d9d8555a448f0a042e53e355f3ced",
+          "a-71b276be885a41cf8b0dd737da2c5ef8",
+          "a-3d976188d8954190a0b715bf608b2b15"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.26055335287943104,
+        "interval_seconds": [
+          0.26004317234315555,
+          0.2610645343425036
+        ],
+        "actual_seconds": 0.2607505770283751,
+        "covered": true,
+        "width_seconds": 0.0010213619993480472,
+        "absolute_relative_error": 0.0007563709012333768,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-84ddb241ae454829a57723b888da227f",
+        "study_ref": "study-5428e2cd18a64bd888af5a40d484385f",
+        "strategy": "rgpe",
+        "plan_ref": "plan-f49f34afc60f4dc0a4881ef75bb9736c",
+        "forecast_at": "2026-10-02T18:53:58.723493+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:54:03Z",
+        "target_training_ids": [
+          "a-34cdc41fe6aa45b684a44e58849ece29",
+          "a-157e0c01978645c1984de9c2f3b2ab4f",
+          "a-36642769b79445969779174aabf84d97",
+          "a-c99fa8c25c464923b74593f44bf80bce",
+          "a-587c097440994c0aa68f92cd77fd8390",
+          "a-d4cd296af857475bba9df3ea5d96424b"
+        ],
+        "source_training_ids": [
+          "a-9288f5fbec4f46ab86f27c7ccd400cc2",
+          "a-12095efa6402455ab36a1f91fba34e25",
+          "a-c38b348a8d544356ad6a78c2760f5fb7",
+          "a-3647af607ed34a5191bdf7d472ef291a",
+          "a-093e66f2582b447c93d9f6cab3134ffc",
+          "a-dcce1c2448934b6b934bd863f42275fb",
+          "a-5b190e1f1db34f55977a5f1586156af5",
+          "a-9c954a861ec94b9db394bf7bde7d85b7",
+          "a-946ab85f05e04a0f81cf77d6224f3e67",
+          "a-a6afc51b3d30460ea81d08505499818c",
+          "a-77fd3b0a91af4f52b4f94d54aff10652",
+          "a-49b7646a95ac4f1081485c2a32e39c2f",
+          "a-a36925004fe944d49ca9d744ca15cd2f",
+          "a-bff436463c0043488bb4981d51ed1d6c",
+          "a-0d3abd7b2fb34b6986ea60a65ca179a7",
+          "a-314da6bab9024cb8afb6bb90461cefe2",
+          "a-58324744c070426c82b2137bdf687981",
+          "a-9c67e3b9a7244f85a68a5b756d897568"
+        ],
+        "predicted_seconds": 0.26222773784290637,
+        "interval_seconds": [
+          0.26184299481179646,
+          0.26261304620210574
+        ],
+        "actual_seconds": 0.2642785239731893,
+        "covered": false,
+        "width_seconds": 0.0007700513903092787,
+        "absolute_relative_error": 0.007759942425329164,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-cbd5c1a4924f46158fe5b017d52e239c",
+        "study_ref": "study-5428e2cd18a64bd888af5a40d484385f",
+        "strategy": "rgpe",
+        "plan_ref": "plan-63b9fe7827204f3db5e6bb904e0f71e7",
+        "forecast_at": "2026-10-02T18:54:25.084473+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:54:30Z",
+        "target_training_ids": [
+          "a-34cdc41fe6aa45b684a44e58849ece29",
+          "a-157e0c01978645c1984de9c2f3b2ab4f",
+          "a-36642769b79445969779174aabf84d97",
+          "a-c99fa8c25c464923b74593f44bf80bce",
+          "a-587c097440994c0aa68f92cd77fd8390",
+          "a-d4cd296af857475bba9df3ea5d96424b",
+          "a-84ddb241ae454829a57723b888da227f"
+        ],
+        "source_training_ids": [
+          "a-9288f5fbec4f46ab86f27c7ccd400cc2",
+          "a-12095efa6402455ab36a1f91fba34e25",
+          "a-c38b348a8d544356ad6a78c2760f5fb7",
+          "a-3647af607ed34a5191bdf7d472ef291a",
+          "a-093e66f2582b447c93d9f6cab3134ffc",
+          "a-dcce1c2448934b6b934bd863f42275fb",
+          "a-5b190e1f1db34f55977a5f1586156af5",
+          "a-9c954a861ec94b9db394bf7bde7d85b7",
+          "a-946ab85f05e04a0f81cf77d6224f3e67",
+          "a-a6afc51b3d30460ea81d08505499818c",
+          "a-77fd3b0a91af4f52b4f94d54aff10652",
+          "a-49b7646a95ac4f1081485c2a32e39c2f",
+          "a-a36925004fe944d49ca9d744ca15cd2f",
+          "a-bff436463c0043488bb4981d51ed1d6c",
+          "a-0d3abd7b2fb34b6986ea60a65ca179a7",
+          "a-314da6bab9024cb8afb6bb90461cefe2",
+          "a-58324744c070426c82b2137bdf687981",
+          "a-9c67e3b9a7244f85a68a5b756d897568"
+        ],
+        "predicted_seconds": 0.2622950726642923,
+        "interval_seconds": [
+          0.26195334150044364,
+          0.2626372496334423
+        ],
+        "actual_seconds": 0.2636704030446708,
+        "covered": false,
+        "width_seconds": 0.0006839081329986785,
+        "absolute_relative_error": 0.005216096931992428,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-ee1bb80282ee4ef8add7ec21d6d9756b",
+        "study_ref": "study-be9a539147b54c57b2e6a3b6fe873df1",
+        "strategy": "qlognei",
+        "plan_ref": "plan-3cdf49cde0654221b0f7b2b2d8893e7d",
+        "forecast_at": "2026-10-02T18:58:29.931205+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:58:35Z",
+        "target_training_ids": [
+          "a-a22b10ddac6c44f0aedd61c8f20fad0f",
+          "a-cd95b55058304503bd7b4eb3a2e7dd19",
+          "a-0f36bf485aa54d2d903a049e101a07d9"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.38017959311810257,
+        "interval_seconds": [
+          0.31731588252854265,
+          0.45549728513965876
+        ],
+        "actual_seconds": 0.41691749705933034,
+        "covered": true,
+        "width_seconds": 0.1381814026111161,
+        "absolute_relative_error": 0.08811792309114748,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-f205c81c3dfe4eabaa5256e8eb343153",
+        "study_ref": "study-be9a539147b54c57b2e6a3b6fe873df1",
+        "strategy": "qlognei",
+        "plan_ref": "plan-ef6448e53cf141c89c689b8df0f49d01",
+        "forecast_at": "2026-10-02T18:58:56.089567+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:59:01Z",
+        "target_training_ids": [
+          "a-a22b10ddac6c44f0aedd61c8f20fad0f",
+          "a-cd95b55058304503bd7b4eb3a2e7dd19",
+          "a-0f36bf485aa54d2d903a049e101a07d9",
+          "a-ee1bb80282ee4ef8add7ec21d6d9756b"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.4052864739627035,
+        "interval_seconds": [
+          0.38563317198350716,
+          0.4259413813709629
+        ],
+        "actual_seconds": 0.3964815179933794,
+        "covered": true,
+        "width_seconds": 0.04030820938745572,
+        "absolute_relative_error": 0.02220773370190525,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-acd80827c1ed4f238d821063729e874e",
+        "study_ref": "study-be9a539147b54c57b2e6a3b6fe873df1",
+        "strategy": "qlognei",
+        "plan_ref": "plan-48b05c72fbf84f6db68e9ff080358eb1",
+        "forecast_at": "2026-10-02T18:59:22.092390+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:59:27Z",
+        "target_training_ids": [
+          "a-a22b10ddac6c44f0aedd61c8f20fad0f",
+          "a-cd95b55058304503bd7b4eb3a2e7dd19",
+          "a-0f36bf485aa54d2d903a049e101a07d9",
+          "a-ee1bb80282ee4ef8add7ec21d6d9756b",
+          "a-f205c81c3dfe4eabaa5256e8eb343153"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.40257753084697084,
+        "interval_seconds": [
+          0.3895103225392735,
+          0.41608311504120077
+        ],
+        "actual_seconds": 0.41171026782831177,
+        "covered": true,
+        "width_seconds": 0.02657279250192729,
+        "absolute_relative_error": 0.022182436764364086,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-53d3d73861704bbabdc8b36cf64a16c1",
+        "study_ref": "study-be9a539147b54c57b2e6a3b6fe873df1",
+        "strategy": "qlognei",
+        "plan_ref": "plan-0f6fadde3f354b3693740ca01444f7e7",
+        "forecast_at": "2026-10-02T18:59:48.182276+00:00",
+        "target_backend_submitted_at": "2026-10-02T18:59:53Z",
+        "target_training_ids": [
+          "a-a22b10ddac6c44f0aedd61c8f20fad0f",
+          "a-cd95b55058304503bd7b4eb3a2e7dd19",
+          "a-0f36bf485aa54d2d903a049e101a07d9",
+          "a-ee1bb80282ee4ef8add7ec21d6d9756b",
+          "a-f205c81c3dfe4eabaa5256e8eb343153",
+          "a-acd80827c1ed4f238d821063729e874e"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.40492150239901087,
+        "interval_seconds": [
+          0.3947064782323057,
+          0.41540089192195156
+        ],
+        "actual_seconds": 0.3866325931157917,
+        "covered": false,
+        "width_seconds": 0.020694413689645863,
+        "absolute_relative_error": 0.04730307172458657,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-cb5eaefa351d4ded8f2711e849483705",
+        "study_ref": "study-be9a539147b54c57b2e6a3b6fe873df1",
+        "strategy": "qlognei",
+        "plan_ref": "plan-c35f8f75518c42b881d59582d04288ce",
+        "forecast_at": "2026-10-02T19:00:14.181519+00:00",
+        "target_backend_submitted_at": "2026-10-02T19:00:19Z",
+        "target_training_ids": [
+          "a-a22b10ddac6c44f0aedd61c8f20fad0f",
+          "a-cd95b55058304503bd7b4eb3a2e7dd19",
+          "a-0f36bf485aa54d2d903a049e101a07d9",
+          "a-ee1bb80282ee4ef8add7ec21d6d9756b",
+          "a-f205c81c3dfe4eabaa5256e8eb343153",
+          "a-acd80827c1ed4f238d821063729e874e",
+          "a-53d3d73861704bbabdc8b36cf64a16c1"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.40109452299386306,
+        "interval_seconds": [
+          0.3904072411089589,
+          0.4120743660355812
+        ],
+        "actual_seconds": 0.41415486502228305,
+        "covered": false,
+        "width_seconds": 0.02166712492662226,
+        "absolute_relative_error": 0.031534923603317555,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-c2afb47cd615400aab44744b1f2a8f03",
+        "study_ref": "study-7238b4307aa747afac5442ad2c2ef988",
+        "strategy": "history_warm_start",
+        "plan_ref": "plan-9eeca8cfb78449838db6a3b51dba7f55",
+        "forecast_at": "2026-10-02T19:10:08.651487+00:00",
+        "target_backend_submitted_at": "2026-10-02T19:10:13Z",
+        "target_training_ids": [
+          "a-5cd4954a08414f2b8af9dae3d2218f91",
+          "a-cbb3a91a0c58420690a55a3bbab6b04b",
+          "a-ed75427092b64741a3dd3717e0eec7bc"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.268243973888838,
+        "interval_seconds": [
+          0.22339975615234095,
+          0.32209000925949144
+        ],
+        "actual_seconds": 0.2640120319556445,
+        "covered": true,
+        "width_seconds": 0.09869025310715049,
+        "absolute_relative_error": 0.016029352533086558,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-586296792f934820800c76324a103133",
+        "study_ref": "study-7238b4307aa747afac5442ad2c2ef988",
+        "strategy": "history_warm_start",
+        "plan_ref": "plan-a6fee7b79388495b80d48ccd04b9397c",
+        "forecast_at": "2026-10-02T19:10:34.990711+00:00",
+        "target_backend_submitted_at": "2026-10-02T19:10:40Z",
+        "target_training_ids": [
+          "a-5cd4954a08414f2b8af9dae3d2218f91",
+          "a-cbb3a91a0c58420690a55a3bbab6b04b",
+          "a-ed75427092b64741a3dd3717e0eec7bc",
+          "a-c2afb47cd615400aab44744b1f2a8f03"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.2635743440866904,
+        "interval_seconds": [
+          0.2627156053390825,
+          0.2644358897944547
+        ],
+        "actual_seconds": 0.26301633490948007,
+        "covered": true,
+        "width_seconds": 0.0017202844553722008,
+        "absolute_relative_error": 0.002121576127210399,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-2001993fb641426187ee195a58ca2136",
+        "study_ref": "study-7238b4307aa747afac5442ad2c2ef988",
+        "strategy": "history_warm_start",
+        "plan_ref": "plan-a9901d9cace64274a0b64c302f7aa796",
+        "forecast_at": "2026-10-02T19:11:01.314234+00:00",
+        "target_backend_submitted_at": "2026-10-02T19:11:06Z",
+        "target_training_ids": [
+          "a-5cd4954a08414f2b8af9dae3d2218f91",
+          "a-cbb3a91a0c58420690a55a3bbab6b04b",
+          "a-ed75427092b64741a3dd3717e0eec7bc",
+          "a-c2afb47cd615400aab44744b1f2a8f03",
+          "a-586296792f934820800c76324a103133"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.26338797482003984,
+        "interval_seconds": [
+          0.26277343578705625,
+          0.26400395105394114
+        ],
+        "actual_seconds": 0.2637673399876803,
+        "covered": true,
+        "width_seconds": 0.0012305152668848907,
+        "absolute_relative_error": 0.0014382567897079158,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-54429ad8009a4b72af621fc708fcc3a6",
+        "study_ref": "study-7238b4307aa747afac5442ad2c2ef988",
+        "strategy": "history_warm_start",
+        "plan_ref": "plan-c4303e20b0324df08b924749c1b22f9f",
+        "forecast_at": "2026-10-02T19:11:27.703514+00:00",
+        "target_backend_submitted_at": "2026-10-02T19:11:32Z",
+        "target_training_ids": [
+          "a-5cd4954a08414f2b8af9dae3d2218f91",
+          "a-cbb3a91a0c58420690a55a3bbab6b04b",
+          "a-ed75427092b64741a3dd3717e0eec7bc",
+          "a-c2afb47cd615400aab44744b1f2a8f03",
+          "a-586296792f934820800c76324a103133",
+          "a-2001993fb641426187ee195a58ca2136"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.26348272831640196,
+        "interval_seconds": [
+          0.2629668117598085,
+          0.26399965705355
+        ],
+        "actual_seconds": 0.2637714758166112,
+        "covered": true,
+        "width_seconds": 0.00103284529374148,
+        "absolute_relative_error": 0.0010946881171108682,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      },
+      {
+        "attempt_id": "a-f8f11a60ee3941c79f096bb380cbcc6c",
+        "study_ref": "study-7238b4307aa747afac5442ad2c2ef988",
+        "strategy": "history_warm_start",
+        "plan_ref": "plan-ad8442e36dc84f58b831134ecf482166",
+        "forecast_at": "2026-10-02T19:11:54.173506+00:00",
+        "target_backend_submitted_at": "2026-10-02T19:11:59Z",
+        "target_training_ids": [
+          "a-5cd4954a08414f2b8af9dae3d2218f91",
+          "a-cbb3a91a0c58420690a55a3bbab6b04b",
+          "a-ed75427092b64741a3dd3717e0eec7bc",
+          "a-c2afb47cd615400aab44744b1f2a8f03",
+          "a-586296792f934820800c76324a103133",
+          "a-2001993fb641426187ee195a58ca2136",
+          "a-54429ad8009a4b72af621fc708fcc3a6"
+        ],
+        "source_training_ids": [],
+        "predicted_seconds": 0.2635405627880964,
+        "interval_seconds": [
+          0.2630245329896354,
+          0.26405760498927844
+        ],
+        "actual_seconds": 0.2642413850990124,
+        "covered": false,
+        "width_seconds": 0.0010330719996430315,
+        "absolute_relative_error": 0.002652204955152668,
+        "constraint_violation": false,
+        "whole_workload_holdout": false
+      }
+    ],
+    "excluded": [
+      {
+        "attempt_id": "a-a9a09920fc0044d2aa86106d39398eb7",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-ff771ce2f1e74e4daf0af88947d8c257",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-ce2fe773d3d24883b011cbdbd8e638dc",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-fe5a993df2834dc3a7059aa82002f92d",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-9cb4f9910df94be28ef4f493c7a6701f",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-be3c5508c53649d788af1e3b62013294",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-dcce1c2448934b6b934bd863f42275fb",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-093e66f2582b447c93d9f6cab3134ffc",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-12095efa6402455ab36a1f91fba34e25",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-9c954a861ec94b9db394bf7bde7d85b7",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-5b190e1f1db34f55977a5f1586156af5",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-3647af607ed34a5191bdf7d472ef291a",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-c38b348a8d544356ad6a78c2760f5fb7",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-9288f5fbec4f46ab86f27c7ccd400cc2",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-946ab85f05e04a0f81cf77d6224f3e67",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-f2c418e01fa449e786606ba5fa5f5bb0",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-6bf29745a8244e68a9ba35b5819bda42",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-941dbebdbc40418ab5c7d6f558182968",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-1c0f3aad879e4274a5ff3170d199c2aa",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-142130ad7df546cd97ef5857eaccebae",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-300757f49b4f43c08c703d6f142182df",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-a36925004fe944d49ca9d744ca15cd2f",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-9c67e3b9a7244f85a68a5b756d897568",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-a6afc51b3d30460ea81d08505499818c",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-77fd3b0a91af4f52b4f94d54aff10652",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-58324744c070426c82b2137bdf687981",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-49b7646a95ac4f1081485c2a32e39c2f",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-0d3abd7b2fb34b6986ea60a65ca179a7",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-314da6bab9024cb8afb6bb90461cefe2",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-bff436463c0043488bb4981d51ed1d6c",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-dc19bcb379484377a68adaf8efa92dd3",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-9c9822c7d7c640689d36117694316b4f",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-a2ecae8c442e4b2b862bac676a6b71be",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-fe279a98fb93430cb60e3e6725c09d4c",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-c9b8cefe78e746ec80792026f48349bf",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-f13d98450d804b38a7f52329da75ad40",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-85874b20a765427a8f192345683b50e6",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-1fb34ed145ce4640a012b993c63c38c5",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-c0bec347eaf24b0dabf7d48898bcfed6",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-7f3849a82e9145ada8855a65678f3682",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-12cfecb3d72e4999bc98d71dc8f1bbb8",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-cdeb9dcc016c41fa91f7608efa677d7d",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-d2f0fc9a25e24c418ad22570bad8d639",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-5f59300e8af7475eb40688b5441bdd1b",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-82813a9cf6584440a24e41cf8bdb99de",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-21e3ea0214fc44d391c4b61517d274fc",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-a6d5f572dd064989b6efef3539801d6b",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-62675b38f3c04c9bb685530ade1a49ce",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-d92d5d50dd574ac2a33d04e78b4d43ad",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-a47822732c1a4c11ab62989ae61aa031",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-5d745968f90b411b891b15c1e3b579a2",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-42be431c8b8b49ec92be04c1748e84e0",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-c80464ac473a4df7bae3b2ebdab6121c",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-4a006a803cf2490991a4577c27efd360",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-51f3f00c638c4bd29ac98fdd705ed9a1",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-91e38f77fd8f479d95d31f11b0a88de6",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-a7e21579c5124527b8dfaa39597cc66a",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-314a468c3974466aa673753bebbb5220",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-5c23d82bd8af43eebc361edd9fc79599",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-277f180655d64cee9d0ac61a9981753c",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-35a001a40f224be88a845ecbcaeeb9cc",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-f53797bc7bff41598335d53ce2831040",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-bd772995591d4c4a916710d8dc0e5f05",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-8f99b4902f2f4f3d858a9c1365f3c474",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-6cb5d8828e6f41e1beeb9d83dbb791b2",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-da69bd1218024fc4b3fe1bc04ae015ce",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-c6a1b50f95824cafbcc5d1cd21979856",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-617d0267af2c4681b9ae19f41faaeb7a",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-8e509f415caa4ea7b38f5b8d3b7525f5",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-682bac7530ba4d019b767c3f94504f37",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-f9ed796dfc1b49dcab043d8f80003ddf",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-0c6dbf4b2e734378b74b6d68954f04c8",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-08ce6e1177904a61ab2b3e64a42a9714",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-94ba64720b4247bdbaa4f31c2c90a447",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-34cdc41fe6aa45b684a44e58849ece29",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-157e0c01978645c1984de9c2f3b2ab4f",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-36642769b79445969779174aabf84d97",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-c99fa8c25c464923b74593f44bf80bce",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-587c097440994c0aa68f92cd77fd8390",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-d4cd296af857475bba9df3ea5d96424b",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-6135854bf69a450c94b5248a29366506",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-6c0b1450278941feb83f7514157e094a",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-bd4d9ccfea4d464dbb40987b9931e153",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-b192b95d219446789e40d18a3fc12419",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-a5e3b59d076d476b8e6da870a9f3e7ba",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-3574abdc4858480b911a48777ab0bf59",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-a22b10ddac6c44f0aedd61c8f20fad0f",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-cd95b55058304503bd7b4eb3a2e7dd19",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-0f36bf485aa54d2d903a049e101a07d9",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-026adfe0d47e46d0b6e74797babb594e",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-8ebde35689034cbdab860f35efbe1677",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-9e017af63ff143c686beb76bb4c24307",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-e3755f1eb3bf43c4ab009cc765e1e6b0",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-11d3740b1106479aa19a68eb13a2bdc0",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-d9adfcd9e4e241cdb5e0f38c572b28ee",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-51995a11cf33475c88e6414de07e172c",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-10243596db6940c29ac9bb803e3198be",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-134a9786114946bca0cfbf1f619f4f28",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-d96de7a8191642b5a947ed6a03c3e214",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-9564dd13c6bc4732abfe5250ec66f2c0",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-12997fe09f8b4be48e68e06388595c2a",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-3c81ae05123543d48dfed41a16a660fe",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-6647ede973734776abb4cf7fa64d9b66",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-840cfc447a9d4274895b0529e7332987",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-5dc25abd65ad4657bb44579c9421c2ec",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-030e8cab100a471295f336e2133ddf2b",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-e1e5539c103441599223d3c102755ac6",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-6d04ce7e64fc493ab59b733fb90f71ef",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-6715905a1f12452e915ebdc61e85f39e",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-5cd4954a08414f2b8af9dae3d2218f91",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-cbb3a91a0c58420690a55a3bbab6b04b",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-ed75427092b64741a3dd3717e0eec7bc",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-efc8776910f647858972681c9f040b82",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-ffbcba7813944ac19d80b3c8d102e50f",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-80979d5b72f1447291970a0710fc17d7",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-334390a3a9854d92b34c5a537b60bc79",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-769149b0df754f00aadb0fe057b877f5",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-663a90f968f94a42b31facbd4bea2326",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-937e05151dbc4c619879d1ab110b07d0",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-d61cb36a3de7413bb29a7c1d78e884b9",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-fa35acee3d6d424a852560897ddc5565",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-080588a9980e47fb804faa07bc9ee052",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-7a32777a85854e4d82bcc34f9a3a7582",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-170d1ce72c624be0b9b5c2914fae635a",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-af941a56010a407699c289e4fe4b881e",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-b22e86711aa84de08813dbeee3057b99",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-1301018c563b4797b37bc449a39be6d4",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-4364b05e3eb54c28955bda194f3a2d22",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-e0e2e97897a34ab1822c1e62db489c61",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-e1a408a1af3a45e6b353d6427aefaea1",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-6eeedc5b341d4ac4b7d31d47b18ef303",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-0bbe04d085234457a4854113b638d06a",
+        "reason": "NO_SAVED_PREDICTION"
+      },
+      {
+        "attempt_id": "a-1ad8848fb7254fb3b79b94a5d53bce19",
+        "reason": "NO_SAVED_PREDICTION"
+      }
+    ],
+    "exclusion_counts": {
+      "NO_SAVED_PREDICTION": 133
+    },
+    "semantics": "Saved latent posterior intervals vs later completed Jobs; not calibrated prediction intervals"
+  },
+  "limits": [
+    "Three input shapes of one generated CNN on one GPU, not three model families",
+    "All repetitions of a shape stay in one fold; source folds overlap and are not independent",
+    "Rank prior only: the first probe is not a confirmed production recommendation",
+    "All folds are retrospective; only source_precedes_target folds also preserve chronology",
+    "RGPE/time forecasts use target pilots and cannot establish zero-shot workload interval coverage",
+    "No refitting, hyperparameter selection, p-values, superiority or operational coverage guarantee"
+  ]
+}

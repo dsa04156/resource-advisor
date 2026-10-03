@@ -76,9 +76,12 @@ into timing observations, and the exclusions remain visible.
 This is a chronological audit of the model snapshots that actually selected
 probes. It is not a random train/test split of repetitions or a retrospective fit
 that has already seen the target. The existing model is workload-scoped, so the
-report explicitly marks cross-workload holdout `NOT_QUALIFIED`. Leave-one-workload-
-out model evaluation and qualified transfer remain required future work; a time
-split on one workload does not establish generalization to another.
+report explicitly marks cross-workload holdout `NOT_QUALIFIED`. The separately
+qualified transfer loop uses target pilots; a time split on one workload does
+not establish zero-shot generalization to another. The offline
+[workload-holdout evaluation](workload-holdout.md) now tests the source-only rank
+prior on complete withheld shapes and audits 24 additional saved forecasts.
+That bounded rank evaluation does not provide cross-workload numerical intervals.
 
 ## Actual historical GPU audit
 
@@ -108,7 +111,8 @@ submission recheck, quality regression, profile aging, project isolation and
 training/target time or identity leakage. Their injected drift scenarios are
 synthetic tests, not hardware performance evidence.
 
-Open R4 gates include workload holdout, calibrated intervals with enough samples,
+Open R4 gates include unseen-family numerical workload holdout, calibrated intervals with enough samples,
 load/temperature/storage-context observation, live induced-drift trials and
-broader unseen-environment evaluation. This increment does not qualify R2/R3
-multi-fidelity or transfer algorithms.
+broader unseen-environment evaluation. The historical two-forecast audit itself
+does not qualify R2/R3 algorithms; subsequent transfer evidence is documented
+separately in [transfer-gpu.md](transfer-gpu.md).
