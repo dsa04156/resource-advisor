@@ -142,6 +142,7 @@ class ArtifactDelivery:
                 training = self.store.get(conn, "training_receipt", body["attempt_id"])
                 sampling = self.store.get(conn, "sampling_receipt", body["attempt_id"])
                 thermal = self.store.get(conn, "thermal_trace", body["attempt_id"])
+                load = self.store.get(conn, "load_trace", body["attempt_id"])
                 if (
                     row["state"] not in {State.SUCCEEDED, State.FAILED}
                     or signature(result) != body["result_digest"]
@@ -166,6 +167,9 @@ class ArtifactDelivery:
                 payload["thermal_trace"] = thermal["body"]
                 payload["thermal_assessment"] = body["thermal_assessment"]
                 payload["thermal_policy"] = body["variant"]["thermal_policy"]
+            if load:
+                payload["load_trace"] = load["body"]
+                payload["load_context"] = body["load_context"]
             if training:
                 payload["training_receipt"] = training["body"]
                 payload["training_isolation"] = body["training_isolation"]

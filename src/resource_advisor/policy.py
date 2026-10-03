@@ -16,6 +16,8 @@ def context_signature(candidate: Candidate, variant: RuntimeVariant) -> str:
     }
     if variant.thermal_policy is not None:
         value["thermal_policy"] = variant.thermal_policy.model_dump(mode="json")
+    if variant.load_context_policy is not None:
+        value["load_context_policy"] = variant.load_context_policy
     return signature(value)
 
 

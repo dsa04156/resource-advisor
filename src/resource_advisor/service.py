@@ -331,6 +331,7 @@ class Service:
         training_receipt=None,
         sampling_receipt=None,
         thermal_trace=None,
+        load_trace=None,
     ):
         """Trusted collector only. Require backend completion before result acceptance."""
         with self.store.transaction() as conn:
@@ -343,6 +344,11 @@ class Service:
             digest = signature(result)
             if row["state"] in TERMINAL:
                 if body.get("result_digest") == digest:
+                    load = self.store.get(conn, "load_trace", result.attempt_id)
+                    if load_trace is not None and (
+                        load is None or signature(load["body"]) != signature(load_trace)
+                    ):
+                        raise Conflict("terminal load trace is immutable")
                     thermal = self.store.get(conn, "thermal_trace", result.attempt_id)
                     if thermal_trace is not None and (
                         thermal is None or signature(thermal["body"]) != signature(thermal_trace)
@@ -436,6 +442,20 @@ class Service:
                     body["thermal_assessment"] = assess(thermal, body["variant"]["thermal_policy"])
             elif thermal_trace is not None:
                 raise Rejected("thermal trace without completed qualified telemetry workload")
+            if body["variant"].get("load_context_policy") and result.outcome == "COMPLETED":
+                from .load_context import summarize, validate_trace
+
+                try:
+                    load = validate_trace(load_trace, result, body)
+                except ValueError as exc:
+                    raise Rejected("verified container load trace required") from exc
+                if not problems:
+                    self.store.put(
+                        conn, "load_trace", result.attempt_id, project, load.model_dump(mode="json")
+                    )
+                    body["load_context"] = summarize(load)
+            elif load_trace is not None:
+                raise Rejected("load trace without completed qualified telemetry workload")
             if phase_profile is not None:
                 from .diagnostics import validate_profile
 

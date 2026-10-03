@@ -350,6 +350,18 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
             evidence_kind=result["body"]["evidence_kind"] if result else None,
         )
 
+    @app.get(PREFIX + "/jobs/{job_id}/load-context")
+    def load_context(job_id: str, p=Depends(principal)):
+        job = service.get_job(p.project, job_id)
+        with service.store.transaction() as conn:
+            load = service.store.get(conn, "load_trace", job["attempt_id"])
+            row = service.store.job(conn, job_id)
+        return {
+            "trace": load["body"] if load else None,
+            "summary": row["body"].get("load_context"),
+            "status": "RECORDED" if load else "NOT_MEASURED",
+        }
+
     @app.get(PREFIX + "/jobs/{job_id}/artifacts")
     def artifacts(job_id: str, p=Depends(principal)):
         service.get_job(p.project, job_id)

@@ -370,6 +370,7 @@ class Worker:
                 training_receipt=envelope.get("training_receipt"),
                 sampling_receipt=envelope.get("sampling_receipt"),
                 thermal_trace=envelope.get("thermal_trace"),
+                load_trace=envelope.get("load_trace"),
             )
 
 
@@ -471,6 +472,12 @@ class MLflowDelivery:
                 tags["thermal.status"] = thermal["status"]
                 tags["thermal.trace_digest"] = thermal["trace_digest"]
                 tags["thermal.reasons"] = ",".join(thermal["reasons"])
+            if job.get("load_context"):
+                tags["load_context.trace_digest"] = job["load_context"]["trace_digest"]
+                tags["load_context.scope"] = job["load_context"]["scope"]
+                tags["load_context.missing_counters"] = ",".join(
+                    job["load_context"]["missing_counters"]
+                )
             if job["request"].get("study_ref"):
                 tags["resource_advisor.study_id"] = job["request"]["study_ref"]
             if training:
@@ -547,6 +554,17 @@ class MLflowDelivery:
                         "maximum_unobserved_gap_seconds",
                     )
                     if job["thermal_assessment"].get(k) is not None
+                )
+            if job.get("load_context") and result:
+                metrics.extend(
+                    {
+                        "key": "load_context." + key,
+                        "value": value,
+                        "timestamp": timestamp,
+                        "step": 0,
+                    }
+                    for key, value in job["load_context"].items()
+                    if type(value) in (int, float)
                 )
             if phases and result:
                 from .diagnostics import diagnose

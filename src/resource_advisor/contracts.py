@@ -130,12 +130,15 @@ class RuntimeVariant(Contract):
     supported_shapes: tuple[tuple[int, ...], ...]
     runtime_versions: dict[str, str]
     thermal_policy: ThermalPolicy | None = None
+    load_context_policy: Literal["linux-cgroup-v2-brackets-v1"] | None = None
 
     @model_serializer(mode="wrap")
     def preserve_legacy_signature(self, handler):
         value = handler(self)
         if self.thermal_policy is None:
             value.pop("thermal_policy", None)
+        if self.load_context_policy is None:
+            value.pop("load_context_policy", None)
         return value
 
     @model_validator(mode="after")

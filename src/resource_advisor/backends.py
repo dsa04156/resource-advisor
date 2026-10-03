@@ -124,6 +124,8 @@ def identity_environment(job):
         values["RA_THERMAL_POLICY_JSON"] = json.dumps(
             b["variant"]["thermal_policy"], separators=(",", ":")
         )
+    if b["variant"].get("load_context_policy"):
+        values["RA_LOAD_CONTEXT_POLICY"] = b["variant"]["load_context_policy"]
     return values
 
 

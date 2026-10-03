@@ -116,3 +116,10 @@ load/temperature/storage-context observation, live induced-drift trials and
 broader unseen-environment evaluation. The historical two-forecast audit itself
 does not qualify R2/R3 algorithms; subsequent transfer evidence is documented
 separately in [transfer-gpu.md](transfer-gpu.md).
+
+The optional [container load trace](load-context.md) now implements CPU quota,
+throttling and cgroup I/O/PSI collection with result ownership and artifact
+propagation. Software tests and a read-only service-container probe are verified;
+the separately [preregistered GPU drift sequence](load-drift-plan.md) has not
+yet supplied hardware acceptance. Container counters are not host-wide load or
+a causal diagnosis, and do not change the existing drift heuristic.
