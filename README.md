@@ -9,7 +9,10 @@ experiment has run on a physical RTX 5080 through Kueue, with measured results
 in PostgreSQL and MLflow. See the [hardware report](docs/gpu-experiment.md) for
 failures, raw measurements and limits. Separate [Slurm CUDA qualification](docs/slurm-verification.md)
 and [quota/priority enforcement](docs/slurm-policy.md) now have live evidence;
-its model/API path and NPU qualification remain open.
+its model/API path remains open. A separately qualified
+[Hailo-8 ResNet-50 API path](docs/hailo-resnet50.md) now completes three
+observations, measured lookup, approval and a fourth verification, with matching
+PostgreSQL/S3/MLflow evidence. Earlier NPU model failures remain visible.
 The [uncached Kubeflow workflow](docs/kubeflow-pipeline.md) has also completed
 the API → Kueue → GPU → result path and a duplicate-free replay.
 The [Kueue policy trial](docs/kueue-policy.md) also verifies real GPU queueing,
@@ -59,7 +62,7 @@ a later reference grid. All 129 application results plus three F0 Jobs are accou
 for; no BO selection advantage is demonstrated. Raw data, cost-aware figures,
 [offline uncertainty replay](docs/uncertainty-ablation.md), and the retained
 failed predecessor are published. The [full acceptance audit](docs/goal-audit.md)
-still lists required Slurm/NPU, operational comparison and holdout gaps.
+still lists required Slurm, broader failure scenarios and numerical holdout gaps.
 
 ## Responsibility
 

@@ -113,6 +113,9 @@ until a qualified telemetry source supplies them. It does not implement CNN,
 transformer or NPU model benchmarks itself. A separate generated CNN fixture
 has qualified CUDA execution and [execution-bound thermal evidence](policy-comparison-v2.md);
 its exact numerical agreement is not trained-model accuracy. Two separate
-real Hailo model qualifications [failed their fixed quality gates](hailo-efficientformer.md),
-so the presence of a working device/runtime has not enabled NPU recommendation
-or service execution.
+real Hailo model qualifications [failed their fixed quality gates](hailo-efficientformer.md).
+A third, separately preregistered [ResNet-50 contract](hailo-resnet50.md) passed
+and completed four API Jobs with Kueue allocation, measured lookup/approval and
+PostgreSQL/S3/MLflow delivery. Its runner checks all quality gates on every run;
+host RSS and unknown NPU memory remain distinct. No arbitrary-NPU qualification
+or cross-device optimization is inferred from this single contract.
