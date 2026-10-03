@@ -112,14 +112,16 @@ training/target time or identity leakage. Their injected drift scenarios are
 synthetic tests, not hardware performance evidence.
 
 Open R4 gates include unseen-family numerical workload holdout, calibrated intervals with enough samples,
-load/temperature/storage-context observation, live induced-drift trials and
-broader unseen-environment evaluation. The historical two-forecast audit itself
+broader load/storage conditions and unseen-environment evaluation. The historical two-forecast audit itself
 does not qualify R2/R3 algorithms; subsequent transfer evidence is documented
 separately in [transfer-gpu.md](transfer-gpu.md).
 
 The optional [container load trace](load-context.md) now implements CPU quota,
 throttling and cgroup I/O/PSI collection with result ownership and artifact
 propagation. Software tests and a read-only service-container probe are verified;
-the separately [preregistered GPU drift sequence](load-drift-plan.md) has not
-yet supplied hardware acceptance. Container counters are not host-wide load or
-a causal diagnosis, and do not change the existing drift heuristic.
+the separately [preregistered GPU drift sequence](load-drift-plan.md) has now
+completed [ten actual CUDA Jobs](load-drift.md), including qualification.
+Three consecutive competitor residuals invalidated the saved recommendation;
+recovery did not revive it, and its old approval was rejected before submission.
+Container counters are not host-wide load or a causal diagnosis, and do not
+change the existing drift heuristic or establish broader interval calibration.

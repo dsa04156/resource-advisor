@@ -74,8 +74,10 @@ A read-only probe of the existing service container verified a private cgroup-v2
 namespace, visible own PID and all eight required/optional interface files. The
 actual new reader obtained two observations under its existing two-CPU quota;
 the later read took approximately 0.366 ms. No stress or GPU work was submitted,
-and this does not qualify the GPU runner's cgroup layout. The GPU end-to-end
-acceptance and [prospective drift trial](load-drift-plan.md) remain pending.
+and this probe alone does not qualify the GPU runner's cgroup layout. The subsequent
+[ten-Job CUDA acceptance](load-drift.md) now verifies the actual GPU container,
+API/SQL/S3/MLflow trace propagation and stale-approval rejection under the
+[prospectively fixed protocol](load-drift-plan.md).
 
 ```sh
 uv run pytest -q tests/test_load_context.py tests/test_load_observed_benchmark.py
@@ -86,3 +88,8 @@ qualify the exact source/runtime and container cgroup behavior, and freeze a new
 RuntimeVariant and workload context. Never activate the policy on old immutable
 variants or assume that a successful service-container probe qualifies Slurm,
 EdgeCore or every container runtime.
+
+The qualified lab API and worker now run source commit `5a7d5dc`; the
+[rollout record](evidence/load-context-deployment.json) retains the image/source
+digests and preservation checks. Existing uninstrumented jobs still return
+`NOT_MEASURED`; no old variant was rewritten.

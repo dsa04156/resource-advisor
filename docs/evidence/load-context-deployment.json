@@ -1,0 +1,32 @@
+{
+  "verified_at": "2026-10-03T08:21:16.502049+00:00",
+  "source_commit": "5a7d5dce91e9c1ec7b2530a3952788a9320ce1cf",
+  "source_tree_sha256": "4f7d6c8c7c4c83e89786bd6bba8f283d916a5efdbc0072e89ccf10bb830f7515",
+  "images": {
+    "api": "sha256:28523b621c7dd83079d56a84fbc06e26534ce5913f006ec2b926aad45df027dc",
+    "worker": "sha256:7080baead7c506939d5c3d293bdba1ce798a0c6a638d7b6e6e50158fff708c8c"
+  },
+  "allowed_changes": [
+    "API image",
+    "worker image",
+    "static GitOps revision annotations"
+  ],
+  "unchanged_stable_database": true,
+  "unchanged_secrets_and_pvc": true,
+  "unchanged_queue_quota": true,
+  "preserved_other_running_pod_uids": 191,
+  "nodes_ready_without_pressure": 10,
+  "static_applications_synced_healthy": 4,
+  "anonymous_load_context_status": 401,
+  "historical_job_load_context_status": "NOT_MEASURED",
+  "gpu_trials_submitted": 0,
+  "scope": "source-only API/collector rollout; GPU load-context qualification remains pending",
+  "predeployment_failures": [
+    "private build helper incorrectly parsed registry port as tag; rejected before deployment",
+    "private snapshot comparison used tuple/list mismatch after JSON serialization; actual Secret/PVC identities unchanged"
+  ],
+  "verification_interruptions": [
+    "First HTTPS check hit the deleted API Pod; existing systemd tunnel automatically restarted and subsequent verified TLS read passed",
+    "Local overlay reader expected JSON but file was YAML; loader corrected and both rendered image pins matched GitOps"
+  ]
+}
