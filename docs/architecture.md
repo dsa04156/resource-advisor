@@ -48,6 +48,10 @@ remains explicitly unqualified; preparation, energy and utilization coverage is 
 
 ## Current operational limits
 
+The [completion audit](goal-audit.md) maps each required gate to its current
+evidence. A bounded live test qualifies only its stated workload and failure
+window; it does not qualify the whole backend or a production deployment.
+
 - The independent Kubernetes/Kueue GPU path and uncached KFP/API launch/replay
   have real hardware evidence. Bounded Kueue and Slurm quota/priority trials also
   passed; none establishes comprehensive cross-user/device isolation.
@@ -61,15 +65,32 @@ remains explicitly unqualified; preparation, energy and utilization coverage is 
 - Compute Pods use scoped credentials and operator-qualified read-only runtime
   mounts. This is not a device-isolation or Pod-security certification.
 - Bounded JSON results have conditional S3 storage, authenticated API readback
-  and MLflow artifacts. Large models, dataset transfer, checkpoint isolation,
+  and MLflow artifacts. [Isolated deterministic training](training-isolation.md)
+  also verifies unchanged input/checkpoint originals and separate restored
+  outputs. General training, large checkpoints/models, dataset transfer,
   retention, object backup and production storage availability remain open.
-- MLflow delivery is retryable, not globally exactly-once. Server-side project
-  authorization and failure-run tracking remain deployment/implementation work.
-- PostgreSQL backup/restore and fault tests pass. Multi-worker contention,
-  real process-crash recovery, disconnects and the complete E0–E7 evaluation
-  require further live evidence.
-- A small actual GPU random/qLogNEI experiment retained the baseline. Wider
-  equal-budget comparisons, MF-KG, RGPE, interference and dashboards remain open.
+- MLflow delivery is retryable, not globally exactly-once.
+  [Resultless failure/cancellation tracking](failure-tracking.md), connection
+  refusal and accepted-create response loss have live evidence. Direct
+  server-side tenant authorization and model registration remain open.
+- [Independent PostgreSQL restore](restore-rehearsal.md),
+  [accepted-submit crash recovery](worker-recovery.md),
+  [cancellation evidence retention](termination-retention.md) and
+  [two concurrent workers](concurrent-workers.md) have bounded live evidence.
+  Expired-lease external-service fencing, disconnected-node accounting, Slurm
+  recovery and the complete E0–E7 scenario matrix still need verification.
+- Actual fixed-fidelity qLogNEI and [RGPE/warm-start transfer](transfer-gpu.md)
+  loops have live evidence; the transfer comparison did not demonstrate a
+  selection advantage. A [new equal-budget S0/S1/S2 comparison](policy-comparison-v2.md)
+  is in progress after a stopped trial exposed missing optimizer dependencies.
+  The repaired worker now requires those dependencies before startup. Physical
+  multi-fidelity qualification, broad transfer effectiveness, calibrated
+  uncertainty and shared-device interference remain open.
+- The [four-view console](console.md) exposes scoped inventory, jobs, queues,
+  accounting and recommendation evidence. [Slurm host telemetry](slurm-inventory.md)
+  is live independently of controller availability; controller queues and
+  reservations remain unknown, not zero. Broad production observability and
+  direct MLflow/S3 tenant access controls remain open.
 
 Use separate service accounts, namespaces, LocalQueues, allowlisted node pools,
 Slurm accounts/QOS and an independent database. Runtime jobs stay outside GitOps.
@@ -88,4 +109,9 @@ runner. It refuses CPU fallback, checks device/runtime identity, synchronizes
 the GPU, checks numerical agreement, and emits the result envelope. It has been hardware-validated on one qualified RTX 5080 runtime. Memory means PyTorch peak allocated device memory;
 it is not total board memory. Power, temperature and utilization remain null
 until a qualified telemetry source supplies them. It does not implement CNN,
-transformer or NPU model benchmarks yet.
+transformer or NPU model benchmarks itself. A separate generated CNN fixture
+has qualified CUDA execution and [execution-bound thermal evidence](policy-comparison-v2.md);
+its exact numerical agreement is not trained-model accuracy. Two separate
+real Hailo model qualifications [failed their fixed quality gates](hailo-efficientformer.md),
+so the presence of a working device/runtime has not enabled NPU recommendation
+or service execution.

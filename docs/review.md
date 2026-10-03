@@ -1,6 +1,8 @@
-# Initial engineering review
+# Engineering review and remaining acceptance gates
 
 This review records scope and remaining gaps, not production certification.
+The first-implementation fixes below are historical. Current claims are bounded
+by their linked evidence and the [full completion audit](goal-audit.md).
 
 ## Fixed during the first implementation
 
@@ -34,6 +36,12 @@ complete cancellation/cost evidence remain required.
 independent confirmation, including real GPU runs. Complete failed-run cost
 accounting and randomized equal-budget trials remain production/evaluation gates.
 The small smoke experiment does not prove BO superiority or hard physical budget bounds.
+The first preregistered comparison exposed a shallow deployment integration:
+optimizer tests passed with local dependencies, but the deployed worker lacked
+them and made random fallback choices. That trial stopped and retained its costs.
+The [repaired worker and new trial](policy-comparison-v2.md) bind the actual image,
+require optimizer dependencies at startup and verify a real model calculation
+before new GPU work. CI with optimizer packages alone is not deployment proof.
 Recommendation reuse now rechecks source age/scope and post-recommendation
 residuals before approval and submission. A historical chronological audit found
 both eligible later GPU results outside their saved posterior intervals. The
@@ -49,13 +57,18 @@ this does not qualify arbitrary training programs or larger checkpoint formats.
 
 **Accounting:** terminal outcomes now have an atomic, unit-separated ledger,
 including collector failures, pre-submit cancellation and preflight rejection.
-Unknown allocation remains null. Complete preparation, utilization and energy
-costs and durable cancellation timing remain open.
+Unknown allocation remains null. [Durable cancellation timing](termination-retention.md)
+now has actual worker-interruption and completed-before-cancel evidence using
+retained kubelet termination records. Complete preparation, utilization, energy
+costs and disconnected-node accounting remain open.
 
 **MLflow and observability:** real hardware results were delivered to a
 dedicated experiment, with project-to-experiment routing and durable run links.
-Result-bundle artifact upload is verified. Server-side multi-tenant authorization, circuit breakers,
-comprehensive event metrics and dashboards remain to implement. Experiment routing
+Result-bundle artifact upload and the [four-view console](console.md) are verified.
+The console also consumes actual [Slurm host telemetry](slurm-inventory.md),
+while controller-dependent queue/reservation values remain unknown.
+Server-side multi-tenant authorization, circuit breakers and comprehensive event
+metrics remain open. Experiment routing
 alone is not an MLflow authorization boundary.
 Terminal tracking now includes resultless failures/cancellations atomically with
 the usage ledger. Six historical live attempts recovered through real MLflow,
@@ -67,18 +80,28 @@ times remain unknown. These checks do not prove global exactly-once creation.
 on a PVC with a restricted app role. All five tables matched before/after new-Pod
 recreation, and 46 existing artifact objects matched restored metadata. The source
 and private backup were retained. This establishes Pod-replacement persistence,
-not node-loss recovery, HA, schema migration, key rotation or full app supervision.
+not node-loss recovery, HA, schema migration or key rotation. A later
+[independent online restore rehearsal](restore-rehearsal.md) verified exact
+metadata and artifact/tracking links while source writers stayed running; it
+still does not establish off-site or whole-object-store recovery.
 CI uses disposable databases; no real cluster access is required.
 The API, inventory and single Kubernetes worker now run as scoped Deployments.
 An actual worker SIGKILL between GPU Job acceptance and external-ID persistence
 recovered without another create call; Job/Pod UIDs, ledger and MLflow identities
-were retained. This closes that one crash window, not concurrent-worker fencing,
-Slurm recovery, node loss or production ingress. The namespace Job-creation role
+were retained. This closes that one crash window. A separate [two-worker trial](concurrent-workers.md)
+also verifies one actual Job/Pod/ledger/MLflow run under concurrent execution;
+it does not prove expired-lease external-service fencing, Slurm recovery, node
+loss or production ingress. [Pinned manual-sync Argo applications](gitops-adoption.md)
+manage static services, leaving compute Jobs outside GitOps. The namespace Job-creation role
 also remains a trusted controller permission, not hostile-tenant sandboxing.
 
 **Hardware:** an unresolved NPU PCIe link blocks model/runtime qualification on
 that device. It is not registered as an executable candidate based only on an
 installed driver or device plugin.
+Separate Hailo hardware did execute two classification models, but
+[both qualifications failed a preregistered quality gate](hailo-efficientformer.md).
+Their measured failures and costs are retained; neither has been converted into
+a successful model qualification or claimed platform NPU execution.
 
 ## Execution-boundary fixes
 

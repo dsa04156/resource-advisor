@@ -1,6 +1,12 @@
 # Initial verification — 2026-10-02
 
 This is implementation verification, not a GPU performance evaluation.
+The sections below preserve the early increments and their test counts as
+historical evidence; wording such as "current" applies to that increment's
+revision. For present coverage, use the [completion audit](goal-audit.md), its
+linked live reports, and the exact commit's
+[CI run](https://github.com/dsa04156/resource-advisor/actions). A green software
+suite does not substitute for a deployed-runtime or physical-device test.
 
 | Check | Evidence | What it does not prove |
 |---|---|---|
