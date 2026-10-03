@@ -1,0 +1,15 @@
+{
+  "job": "ra-hailo-resnet50-model-01",
+  "uid": "9ccecdcc-dd47-46a8-984f-6019eecc78a7",
+  "image_digest": "sha256:138c4d1b99aec84614b7827fef6ed41349a9381ced9921bce81bc5ee1035de66",
+  "created_at": "2026-10-03T06:59:31Z",
+  "admitted_at": "2026-10-03T06:59:31Z",
+  "scheduled_at": "2026-10-03T06:59:31Z",
+  "exitCode": 0,
+  "finishedAt": "2026-10-03T06:59:39Z",
+  "reason": "Completed",
+  "startedAt": "2026-10-03T06:59:38Z",
+  "scheduled_to_container_finished_seconds": 8.0,
+  "queue_to_admission_seconds": 0.0,
+  "measurement_boundaries_separate": true
+}
