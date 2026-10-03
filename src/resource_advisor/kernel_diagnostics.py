@@ -5,9 +5,45 @@ FLOPs, or proof of arithmetic versus memory-bandwidth saturation. Profiler-on
 durations never substitute for profiler-off performance measurements.
 """
 
+import json
 import math
 
 PREFIX = "ra-e5-forward-"
+
+
+def trace_evidence(trace):
+    """Retain bounded parser input without host/process/path metadata."""
+    events = trace.get("traceEvents")
+    if not isinstance(events, list) or len(events) > 100000:
+        raise ValueError("missing or oversized trace")
+    selected = []
+    for event in events:
+        if not isinstance(event, dict):
+            raise ValueError("invalid trace event")
+        name = event.get("name", "")
+        if not (
+            (isinstance(name, str) and name.startswith(PREFIX)) or event.get("cat") == "kernel"
+        ):
+            continue
+        if not isinstance(name, str) or len(name) > 4096:
+            raise ValueError("invalid trace name")
+        _interval(event)
+        row = {k: event[k] for k in ("name", "cat", "ph", "ts", "dur") if k in event}
+        args = event.get("args", {})
+        if not isinstance(args, dict):
+            raise ValueError("invalid trace arguments")
+        if "device" in args:
+            row["args"] = {"device": args["device"]}
+        selected.append(row)
+    if not selected or len(selected) > 20000:
+        raise ValueError("empty or oversized selected trace")
+    origin = min(e["ts"] for e in selected)
+    for event in selected:
+        event["ts"] -= origin
+    evidence = {"traceEvents": selected}
+    if len(json.dumps(evidence, allow_nan=False).encode()) > 2 * 1024 * 1024:
+        raise ValueError("selected trace exceeds two MiB")
+    return evidence
 
 
 def _interval(event):
@@ -45,11 +81,18 @@ def summarize_trace(trace, units):
         raise ValueError("missing or oversized trace")
     markers = {}
     kernels = []
+    ignored_gpu_annotations = 0
     for event in events:
         if not isinstance(event, dict):
             raise ValueError("invalid trace event")
         name = event.get("name", "")
         if isinstance(name, str) and name.startswith(PREFIX):
+            # Kineto emits a GPU-correlated annotation with the same name as
+            # the CPU record_function range. It is neither another host range
+            # nor a kernel; only actual kernel events contribute activity time.
+            if event.get("cat") == "gpu_user_annotation":
+                ignored_gpu_annotations += 1
+                continue
             if name in markers or event.get("ph") != "X" or event.get("cat") != "user_annotation":
                 raise ValueError("duplicate or incomplete forward marker")
             markers[name] = _interval(event)
@@ -112,6 +155,7 @@ def summarize_trace(trace, units):
         "profiler_enabled": True,
         "performance_profile_eligible": False,
         "kernel_count": len(kernels),
+        "ignored_gpu_annotations": ignored_gpu_annotations,
         "samples": rows,
         "kernel_union_seconds": active,
         "forward_span_seconds": span,

@@ -45,3 +45,24 @@ must not enter the planned performance comparison. Apply any supported parser
 fix to the saved trace offline first. A later comparison needs a separately
 frozen protocol, must retain v1 and probe costs, and cannot change scientific
 acceptance thresholds merely to obtain success.
+
+## Probe outcome and offline correction
+
+The one-shot probe reproduced the original exception. Its saved trace contains
+12 CPU `user_annotation` ranges, 12 same-named `gpu_user_annotation` ranges and
+480 CUDA kernel events. This directly confirms the category collision; the
+[complete whitelisted input](evidence/e5-kernel-trace-probe-v1.json) is a public
+regression fixture. The new regression failed before the fix and passed after it.
+
+The parser now counts GPU-correlated annotations separately and excludes them
+from both host ranges and kernel activity. Duplicate CPU ranges, missing actual
+kernels, wrong devices and out-of-range kernels still reject the trace. The
+runner prints bounded, whitelisted trace evidence before parsing, so a parser
+exception can be replayed without another hardware run.
+
+The probe exited 1 as expected from the unchanged old parser and consumed
+3 GPU reservation seconds (2 container seconds). Combined v1 qualification and
+probe cost is **9 GPU reservation seconds in three Jobs**. Offline replay with
+the corrected parser succeeds, but does not convert the failed Job into a
+successful benchmark or supply the six missing plain comparisons. A separately
+registered [v2 protocol](e5-kernel-plan-v2.md) retains these failures and costs.

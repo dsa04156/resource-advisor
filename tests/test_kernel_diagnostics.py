@@ -8,7 +8,12 @@ import pytest
 
 from resource_advisor import e5_benchmark
 from resource_advisor.contracts import ThermalPolicy, signature
-from resource_advisor.kernel_diagnostics import PREFIX, summarize_trace, union_duration
+from resource_advisor.kernel_diagnostics import (
+    PREFIX,
+    summarize_trace,
+    trace_evidence,
+    union_duration,
+)
 
 
 @pytest.fixture
@@ -63,6 +68,59 @@ def test_overlapping_kernels_use_interval_union_not_sum(trace):
 
 def test_nested_and_disjoint_intervals():
     assert union_duration([(5, 8), (1, 10), (12, 15), (15, 17)]) == 14
+
+
+def test_real_cuda_cpu_and_gpu_annotations_do_not_collide():
+    captured = json.loads(
+        (Path(__file__).parents[1] / "docs/evidence/e5-kernel-trace-probe-v1.json").read_text()
+    )
+    trace = captured["trace"]
+    report = summarize_trace(trace, trace["expected_units"])
+    assert report["kernel_count"] == 480
+    assert report["ignored_gpu_annotations"] == 12
+    assert len(report["samples"]) == 12
+    stripped = deepcopy(trace)
+    stripped["traceEvents"] = [
+        e for e in stripped["traceEvents"] if e["cat"] != "gpu_user_annotation"
+    ]
+    plain = summarize_trace(stripped, 12)
+    assert plain["ignored_gpu_annotations"] == 0
+    assert plain["samples"] == report["samples"]
+    assert plain["kernel_union_seconds"] == report["kernel_union_seconds"]
+
+
+def test_trace_capture_preserves_replay_and_removes_private_metadata(trace):
+    before = deepcopy(trace)
+    trace["traceEvents"][1]["args"].update(path="private-path", hostname="private-host")
+    trace["traceEvents"][1].update(pid=1234, tid=4567)
+    captured = trace_evidence(trace)
+    assert min(e["ts"] for e in captured["traceEvents"]) == 0
+    assert summarize_trace(captured, 3) == summarize_trace(before, 3)
+    encoded = json.dumps(captured)
+    assert "private" not in encoded and "pid" not in encoded and "tid" not in encoded
+    assert set(captured) == {"traceEvents"}
+
+
+def test_gpu_annotations_cannot_replace_cpu_forward_ranges(trace):
+    for event in trace["traceEvents"]:
+        if event["cat"] == "user_annotation":
+            event["cat"] = "gpu_user_annotation"
+    with pytest.raises(ValueError, match="missing block"):
+        summarize_trace(trace, 3)
+
+
+@pytest.mark.parametrize("mutation", ["empty", "too_many", "large_name", "invalid_args"])
+def test_trace_capture_bounds(trace, mutation):
+    if mutation == "empty":
+        trace["traceEvents"] = []
+    elif mutation == "too_many":
+        trace["traceEvents"] *= 9000
+    elif mutation == "large_name":
+        trace["traceEvents"][1]["name"] = "x" * 4097
+    else:
+        trace["traceEvents"][1]["args"] = []
+    with pytest.raises(ValueError):
+        trace_evidence(trace)
 
 
 def test_cpu_only_trace_rejected(trace):

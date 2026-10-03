@@ -12,7 +12,7 @@ from contextlib import nullcontext
 
 from .contracts import ExecutionResult, Measurements, ThermalPolicy, signature
 from .diagnostics import PhaseProfile, PhaseSample
-from .kernel_diagnostics import PREFIX, summarize_trace
+from .kernel_diagnostics import PREFIX, summarize_trace, trace_evidence
 from .thermal import NvmlReader, ThermalTrace, Window
 
 BOUNDARY = "cnn-batch32-serial-input-transfer-4-forwards-v1"
@@ -223,6 +223,12 @@ def run(*, kernel_profile=False):
                 profiler.export_chrome_trace(path)
                 with open(path) as stream:
                     raw_trace = json.load(stream)
+                # Persist a bounded, whitelisted input before parsing so an
+                # exception does not erase the only replayable trace evidence.
+                print(
+                    "RA_E5_TRACE_INPUT " + json.dumps(trace_evidence(raw_trace), allow_nan=False),
+                    flush=True,
+                )
                 envelope["kernel_diagnostics"] = summarize_trace(raw_trace, BLOCKS)
             # Deliberately no normal result envelope: diagnostic timings cannot
             # accidentally enter a plain execution's profile/MLflow/result path.
