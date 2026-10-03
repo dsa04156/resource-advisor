@@ -43,9 +43,11 @@ that artifact's origin. Hardware and synthetic records remain explicitly labeled
 The import creates no scheduler Job, usage entry, recommendation, capability,
 RuntimeVariant, MLflow run or S3 object. Historical reservation intervals are
 shown as source evidence and are not added to the normal usage ledger, preventing
-double counting. These imported experiments do not satisfy the still-open NPU
-platform-submission/artifact-delivery acceptance gate. Ordinary execution and
-recommendation eligibility continue to use their existing verification checks.
+double counting. Imports alone do not satisfy NPU platform-submission or artifact
+delivery acceptance. The later [ResNet-50 integration](hailo-resnet50.md) separately
+verified four actual API Jobs and imported their full classification evidence.
+Ordinary execution and recommendation eligibility continue to use their existing
+verification checks.
 
 An inference report can contain all expected outputs while the external
 container exits 2 to reject quality. The console preserves that exit code and

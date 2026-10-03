@@ -228,6 +228,8 @@ Gram matrices with different values do not establish a useful fidelity axis for
 real model workloads. The declared two-stratum population is not a real dataset
 distribution; thermal/load evidence and ranking stability remain unqualified.
 No strategy, energy, utilization or cost superiority is claimed. Independent
-Slurm/NPU qualification and the full v0.3 completion audit remain open. The
+Slurm and broader runtime qualification and the full v0.3 completion audit remain
+open. A later [Hailo ResNet-50 contract](hailo-resnet50.md) independently passed
+qualification; it does not establish a fidelity axis for this sampling trial. The
 qualified package manifest and pinned image are recorded; this runner did not
 capture a host-driver version, so its report does not establish driver parity.

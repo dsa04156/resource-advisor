@@ -42,8 +42,10 @@ they will not be upgraded. Queue API is v1beta2. Slurm is 24.11.5 and currently
 has historical one-GPU Jetson F0, SlurmDBD and QOS enforcement evidence.
 The controller is currently unreachable, so its current scheduler health and
 complete model/API path are not asserted. The DEEPX worker has a PCIe link failure.
-Other Hailo hardware did execute classification models, but both preregistered
-model qualifications failed a fixed quality gate; those failed results do not
-authorize platform execution. Runtime job submission
+Other Hailo hardware executed two classification models whose preregistered
+qualifications failed fixed gates; those failures remain unqualified. A third,
+separately preregistered [ResNet-50 contract](hailo-resnet50.md) passed and completed
+three API observations plus one approved verification with accounting/artifact
+delivery. That single contract does not qualify other models or Slurm. Runtime job submission
 must remain separate from GitOps. Site endpoints and credentials stay outside
 this repository. New data has its own database and artifact namespace.

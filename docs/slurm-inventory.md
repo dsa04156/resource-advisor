@@ -88,7 +88,9 @@ also verified both desktop and narrow layouts; private cluster screens were not
 published.
 
 Live controller schema/queue/resource validation, end-to-end Slurm model execution,
-accelerator telemetry and NPU qualification remain open. These two hosts currently
+accelerator telemetry and NPU qualification on these Slurm hosts remain open.
+The separately qualified [Kubernetes Hailo contract](hailo-resnet50.md) does not
+change their status. These two hosts currently
 provide host CPU/memory observations, not full static hardware discovery. Credential
 renewal, inventory retention, production ingress and HA require separate acceptance.
 The [full goal audit](goal-audit.md) remains incomplete.

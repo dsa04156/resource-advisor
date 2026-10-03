@@ -123,12 +123,15 @@ project token, set a 390px viewport and run
 The checks require a real inventory with at least one live meter, override API
 responses only within that browser, and end by disconnecting the UI.
 
-The console is not proof that all platform acceptance gates are complete. Slurm
-live inventory, integrated quota utilization/priority reasons, pipeline service
-health, durable supervision/token rotation and inventory retention remain open.
+The console is not proof that all platform acceptance gates are complete.
+Slurm host telemetry and integrated Kueue quota views now have separate live
+evidence; controller-backed Slurm queue data, pipeline service health, token
+rotation and inventory retention still require further acceptance.
 The [subsequent approved GPU demo](approved-gpu-demo.md) verified the live
-approval→new-result comparison with independent hardware results. There is no invented GPU/NPU
-normalization, per-job utilization attribution or NPU model qualification.
+approval→new-result comparison with independent hardware results. The later
+[Hailo ResNet-50 integration](hailo-resnet50.md) also supplies one qualified NPU
+contract and five visible classification records. Cross-device normalization
+and per-job utilization attribution remain unimplemented.
 
 Execution results now include expandable [phase diagnostics](bottleneck-diagnostics.md).
 These show possible bottlenecks and measured wall-time shares, with explicit missing

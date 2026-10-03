@@ -105,6 +105,12 @@ Separate Hailo hardware did execute two classification models, but
 [both qualifications failed a preregistered quality gate](hailo-efficientformer.md).
 Their measured failures and costs are retained; neither has been converted into
 a successful model qualification or claimed platform NPU execution.
+A third independently preregistered [ResNet-50 trial](hailo-resnet50.md) passed
+80% accuracy and 97% reference agreement, then completed the bounded four-Job
+API/approval/accounting/S3/MLflow path. The same input subset is repeated across
+Jobs; NPU memory/utilization/power remain unknown. Its later verification fell
+outside the lookup mean interval. This supports one execution contract, not
+cross-device optimization or calibrated performance prediction.
 
 ## Execution-boundary fixes
 
