@@ -1,4 +1,4 @@
-"""Bounded Hailo-8 ResNet18 qualification; no CPU inference fallback.
+"""Bounded Hailo-8 classification qualification; no CPU inference fallback.
 
 This command produces a qualification report, not a platform ExecutionResult.
 The original ONNX CPU reference is prepared independently before this command.
@@ -57,8 +57,17 @@ def load_fixture(directory, manifest_digest):
             raise ValueError("fixture digest mismatch: " + name)
     inputs = np.load(directory / "inputs.npy", allow_pickle=False)
     reference = np.load(directory / "reference.npy", allow_pickle=False)
-    if inputs.dtype != np.uint8 or inputs.shape != (100, 224, 224, 3):
-        raise ValueError("fixture requires exactly 100 uint8 NHWC images")
+    expected_dtype = manifest.get("input_dtype", "uint8")
+    if expected_dtype not in {"uint8", "float32"}:
+        raise ValueError("unqualified input dtype")
+    if (
+        inputs.dtype != np.dtype(expected_dtype)
+        or inputs.shape != (100, 224, 224, 3)
+        or not np.isfinite(inputs).all()
+        or inputs.min() < 0
+        or inputs.max() > 255
+    ):
+        raise ValueError("fixture requires 100 finite NHWC images in the declared pixel format")
     if reference.shape != (100, 1000) or not np.isfinite(reference).all():
         raise ValueError("invalid original model reference")
     rows = manifest["samples"]
