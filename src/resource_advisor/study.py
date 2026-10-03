@@ -42,7 +42,7 @@ class Studies:
             request_body.pop("fidelity_space_ref")
         if request.fidelity_qualification_ref is None:
             request_body.pop("fidelity_qualification_ref")
-        for field in ("transfer_space_ref", "transfer_evidence_ref"):
+        for field in ("transfer_space_ref", "transfer_evidence_ref", "lookup_profile_refs"):
             if request_body[field] is None:
                 request_body.pop(field)
         request_digest = signature(request_body)
@@ -103,6 +103,18 @@ class Studies:
             if spec.baseline_candidate_ref not in eligible:
                 raise Rejected("baseline is not a qualified consented pilot: " + str(excluded))
             eligible = eligible[: policy.max_candidates]
+            lookup_history = None
+            if request.strategy == "lookup":
+                profiles = self.service.lookup_profiles(
+                    conn, project, spec, request.lookup_profile_refs
+                )
+                if len(profiles) > 4096:
+                    raise Rejected("lookup cohort exceeds 4096 profiles; select an explicit cohort")
+                lookup_history = {
+                    "profile_refs": [p["ref"] for p in profiles],
+                    "cohort_digest": self.service.lookup_cohort_digest(profiles),
+                    "frozen_at": now().isoformat(),
+                }
             grid_schedule = None
             if request.strategy == "grid_characterization":
                 if policy.max_probes < 2 * len(eligible):
@@ -226,6 +238,8 @@ class Studies:
                 )
             if grid_schedule is not None:
                 body["grid_schedule"] = grid_schedule
+            if lookup_history is not None:
+                body["lookup_history"] = lookup_history
             if transfer_space is not None:
                 body.update(
                     transfer_space=transfer_space,
@@ -750,7 +764,19 @@ class Studies:
                     else "REPLICATION_TOTAL_BUDGET_LIMIT"
                 )
             if strategy == "lookup":
-                rec = self.service.recommend(row["project"], spec.ref)
+                history = body.get("lookup_history")
+                if history is None:
+                    return self._abstain(ref, token, body, "LOOKUP_HISTORY_NOT_FROZEN")
+                try:
+                    rec = self.service.recommend(
+                        row["project"],
+                        spec.ref,
+                        profile_refs=history["profile_refs"],
+                        cohort_digest=history["cohort_digest"],
+                    )
+                except (NotFound, Rejected):
+                    return self._abstain(ref, token, body, "LOOKUP_HISTORY_UNAVAILABLE")
+                body["lookup_recommendation_ref"] = rec["ref"]
                 finalist = rec["candidate_ref"]
             elif good:
                 grouped = {

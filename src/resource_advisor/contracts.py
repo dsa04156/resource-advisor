@@ -347,9 +347,15 @@ class StudyRequest(Contract):
     fidelity_qualification_ref: Ref | None = None
     transfer_space_ref: Ref | None = None
     transfer_evidence_ref: Ref | None = None
+    lookup_profile_refs: tuple[Ref, ...] | None = Field(default=None, max_length=4096)
 
     @model_validator(mode="after")
     def strategy_options(self):
+        if self.lookup_profile_refs is not None:
+            if self.strategy != "lookup":
+                raise ValueError("lookup profile references require lookup strategy")
+            if len(set(self.lookup_profile_refs)) != len(self.lookup_profile_refs):
+                raise ValueError("duplicate lookup profile reference")
         if (self.transfer_space_ref is None) != (self.transfer_evidence_ref is None):
             raise ValueError("transfer space and evidence must be provided together")
         if self.transfer_space_ref and self.strategy not in {"rgpe", "history_warm_start"}:

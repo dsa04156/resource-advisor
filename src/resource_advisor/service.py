@@ -499,12 +499,39 @@ class Service:
                 )
             return self.public_job(self.store.job(conn, row["id"]))
 
-    def recommend(self, project, workload_ref):
+    def lookup_profiles(self, conn, project, spec, profile_refs=None):
+        """Resolve immutable same-workload observations without changing their validity."""
+        if profile_refs is None:
+            profiles = [
+                item
+                for item in self.store.list(conn, "profile", project)
+                if item["body"]["result"]["workload_signature"] == signature(spec.identity)
+            ]
+        else:
+            profiles = []
+            for ref in profile_refs:
+                item = self.store.get(conn, "profile", ref)
+                if item is None or item["project"] != project:
+                    raise NotFound("lookup profile not found")
+                if item["body"]["result"]["workload_signature"] != signature(spec.identity):
+                    raise Rejected("lookup profile belongs to a different workload signature")
+                profiles.append(item)
+        return sorted(profiles, key=lambda item: item["ref"])
+
+    @staticmethod
+    def lookup_cohort_digest(profiles):
+        return signature(
+            [{"ref": item["ref"], "digest": signature(item["body"])} for item in profiles]
+        )
+
+    def recommend(self, project, workload_ref, *, profile_refs=None, cohort_digest=None):
         with self.store.transaction() as conn:
             spec = WorkloadSpec.model_validate(
                 required(self.store, conn, "workload", workload_ref, project)
             )
-            profiles = self.store.list(conn, "profile", project)
+            profiles = self.lookup_profiles(conn, project, spec, profile_refs)
+            if cohort_digest is not None and self.lookup_cohort_digest(profiles) != cohort_digest:
+                raise Rejected("lookup profile cohort changed")
             candidates, rejected, drift_evidence = [], {}, {}
             for candidate in spec.candidates:
                 try:
@@ -599,6 +626,12 @@ class Service:
                     "mean +/- 3 standard errors, not a predictive interval"
                 ),
             }
+            if profile_refs is not None:
+                rec["lookup_history"] = {
+                    "profile_refs": [item["ref"] for item in profiles],
+                    "cohort_digest": self.lookup_cohort_digest(profiles),
+                    "scope": "explicit immutable cohort; current validity checks still apply",
+                }
             self.store.put(conn, "recommendation", rec["ref"], project, rec)
             return dict(rec, digest=signature(rec))
 
