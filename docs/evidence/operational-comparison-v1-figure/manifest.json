@@ -1,0 +1,7 @@
+{
+  "source_capture_digest": "sha256:c28d534a7b20d3e60e4530eca1c3648a05b797128beb399d219639b35da137d5",
+  "matplotlib": "3.10.7",
+  "raw_points": 18,
+  "cumulative_points": 18,
+  "interpretation": "Panel A points are individual Jobs; black lines are means, not uncertainty intervals. Panel B connects actual repeat counts, not forecasts. Shared qualification is reported separately. Platform delivery time and the recorded collector interruption are not substituted for the common raw-result endpoint."
+}

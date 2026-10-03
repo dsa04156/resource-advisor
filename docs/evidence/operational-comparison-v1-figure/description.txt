@@ -1,0 +1,1 @@
+B0 raw-result wall times cluster near seven seconds. B1 and B2 vary more; each shows six actual Jobs. B2's cumulative curve remains far above both controls through all six uses because approximately354seconds of profiling and approval preparation are charged once. No break-even is observed. One device and generated workload do not establish general effectiveness.

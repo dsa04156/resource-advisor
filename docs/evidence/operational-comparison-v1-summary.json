@@ -1,0 +1,502 @@
+{
+  "scope": "one generated CNN/GPU; descriptive blocked operational comparison",
+  "source_capture_digest": "sha256:c28d534a7b20d3e60e4530eca1c3648a05b797128beb399d219639b35da137d5",
+  "selected_candidate": "cpu2",
+  "actual_qlognei_choices": 5,
+  "random_fallbacks": 0,
+  "profiling_jobs": 14,
+  "main_jobs": 18,
+  "qualification_jobs": 3,
+  "whole_protocol_wall_seconds": 888.373739,
+  "whole_protocol_gpu_seconds": 102.0,
+  "shared_qualification_gpu_seconds": 8.0,
+  "B2_setup_wall_seconds": 354.439165,
+  "profiling_gpu_seconds": 49.0,
+  "profiling_cpu_core_seconds": 48.5,
+  "arms": {
+    "B0": {
+      "count": 6,
+      "raw_mean_seconds": 7.0108793333333335,
+      "compute_mean_seconds": 0.2637617296810883,
+      "gpu_seconds": 16.0,
+      "cpu_core_seconds": 16.0
+    },
+    "B1": {
+      "count": 6,
+      "raw_mean_seconds": 10.0615455,
+      "compute_mean_seconds": 0.26373782848046784,
+      "gpu_seconds": 15.0,
+      "cpu_core_seconds": 15.0
+    },
+    "B2": {
+      "count": 6,
+      "raw_mean_seconds": 9.8260055,
+      "compute_mean_seconds": 0.2611063733735743,
+      "gpu_seconds": 14.0,
+      "cpu_core_seconds": 28.0
+    }
+  },
+  "main_timings": [
+    {
+      "index": 0,
+      "block": 0,
+      "arm": "B1",
+      "candidate_ref": "cpu1",
+      "raw_result_wall_seconds": 11.067605,
+      "validated_wall_seconds": 199.896318,
+      "delivery_wall_seconds": 199.922837,
+      "platform_recorded_validation_seconds": 13.786614,
+      "platform_recorded_delivery_seconds": 14.166979,
+      "compute_seconds": 0.26382858509896323,
+      "gpu_seconds": 3.0,
+      "cpu_core_seconds": 3.0
+    },
+    {
+      "index": 1,
+      "block": 0,
+      "arm": "B2",
+      "candidate_ref": "cpu2",
+      "raw_result_wall_seconds": 7.097119,
+      "validated_wall_seconds": 7.136851,
+      "delivery_wall_seconds": 7.148559,
+      "platform_recorded_validation_seconds": 6.344957,
+      "platform_recorded_delivery_seconds": 6.689533,
+      "compute_seconds": 0.2613139209570363,
+      "gpu_seconds": 2.0,
+      "cpu_core_seconds": 4.0
+    },
+    {
+      "index": 2,
+      "block": 0,
+      "arm": "B0",
+      "candidate_ref": "cpu1",
+      "raw_result_wall_seconds": 6.890441,
+      "validated_wall_seconds": null,
+      "delivery_wall_seconds": null,
+      "platform_recorded_validation_seconds": null,
+      "platform_recorded_delivery_seconds": null,
+      "compute_seconds": 0.2637553720269352,
+      "gpu_seconds": 3.0,
+      "cpu_core_seconds": 3.0
+    },
+    {
+      "index": 3,
+      "block": 1,
+      "arm": "B0",
+      "candidate_ref": "cpu1",
+      "raw_result_wall_seconds": 7.028092,
+      "validated_wall_seconds": null,
+      "delivery_wall_seconds": null,
+      "platform_recorded_validation_seconds": null,
+      "platform_recorded_delivery_seconds": null,
+      "compute_seconds": 0.263327278138604,
+      "gpu_seconds": 3.0,
+      "cpu_core_seconds": 3.0
+    },
+    {
+      "index": 4,
+      "block": 1,
+      "arm": "B2",
+      "candidate_ref": "cpu2",
+      "raw_result_wall_seconds": 6.920161,
+      "validated_wall_seconds": 12.990069,
+      "delivery_wall_seconds": 12.999881,
+      "platform_recorded_validation_seconds": 10.96017,
+      "platform_recorded_delivery_seconds": 11.326864,
+      "compute_seconds": 0.26026940008159727,
+      "gpu_seconds": 2.0,
+      "cpu_core_seconds": 4.0
+    },
+    {
+      "index": 5,
+      "block": 1,
+      "arm": "B1",
+      "candidate_ref": "cpu1",
+      "raw_result_wall_seconds": 11.054338,
+      "validated_wall_seconds": 15.094597,
+      "delivery_wall_seconds": 15.102526,
+      "platform_recorded_validation_seconds": 13.929395,
+      "platform_recorded_delivery_seconds": 14.226088,
+      "compute_seconds": 0.2638631689478643,
+      "gpu_seconds": 2.0,
+      "cpu_core_seconds": 2.0
+    },
+    {
+      "index": 6,
+      "block": 2,
+      "arm": "B1",
+      "candidate_ref": "cpu1",
+      "raw_result_wall_seconds": 11.097719,
+      "validated_wall_seconds": 11.118034,
+      "delivery_wall_seconds": 11.123618,
+      "platform_recorded_validation_seconds": 9.402256,
+      "platform_recorded_delivery_seconds": 9.792255,
+      "compute_seconds": 0.26315058703767136,
+      "gpu_seconds": 2.0,
+      "cpu_core_seconds": 2.0
+    },
+    {
+      "index": 7,
+      "block": 2,
+      "arm": "B2",
+      "candidate_ref": "cpu2",
+      "raw_result_wall_seconds": 11.377552,
+      "validated_wall_seconds": 15.418779,
+      "delivery_wall_seconds": 15.424775,
+      "platform_recorded_validation_seconds": 14.086659,
+      "platform_recorded_delivery_seconds": 14.545117,
+      "compute_seconds": 0.261695291090291,
+      "gpu_seconds": 2.0,
+      "cpu_core_seconds": 4.0
+    },
+    {
+      "index": 8,
+      "block": 2,
+      "arm": "B0",
+      "candidate_ref": "cpu1",
+      "raw_result_wall_seconds": 7.039499,
+      "validated_wall_seconds": null,
+      "delivery_wall_seconds": null,
+      "platform_recorded_validation_seconds": null,
+      "platform_recorded_delivery_seconds": null,
+      "compute_seconds": 0.26318542880471796,
+      "gpu_seconds": 3.0,
+      "cpu_core_seconds": 3.0
+    },
+    {
+      "index": 9,
+      "block": 3,
+      "arm": "B0",
+      "candidate_ref": "cpu1",
+      "raw_result_wall_seconds": 6.989758,
+      "validated_wall_seconds": null,
+      "delivery_wall_seconds": null,
+      "platform_recorded_validation_seconds": null,
+      "platform_recorded_delivery_seconds": null,
+      "compute_seconds": 0.2640287931426428,
+      "gpu_seconds": 2.0,
+      "cpu_core_seconds": 2.0
+    },
+    {
+      "index": 10,
+      "block": 3,
+      "arm": "B2",
+      "candidate_ref": "cpu2",
+      "raw_result_wall_seconds": 13.212854,
+      "validated_wall_seconds": 17.274481,
+      "delivery_wall_seconds": 17.284939,
+      "platform_recorded_validation_seconds": 15.465295,
+      "platform_recorded_delivery_seconds": 15.759417,
+      "compute_seconds": 0.2612340190098621,
+      "gpu_seconds": 2.0,
+      "cpu_core_seconds": 4.0
+    },
+    {
+      "index": 11,
+      "block": 3,
+      "arm": "B1",
+      "candidate_ref": "cpu1",
+      "raw_result_wall_seconds": 11.081128,
+      "validated_wall_seconds": 11.099108,
+      "delivery_wall_seconds": 11.111011,
+      "platform_recorded_validation_seconds": 8.842792,
+      "platform_recorded_delivery_seconds": 9.159303,
+      "compute_seconds": 0.26350351294968277,
+      "gpu_seconds": 2.0,
+      "cpu_core_seconds": 2.0
+    },
+    {
+      "index": 12,
+      "block": 4,
+      "arm": "B2",
+      "candidate_ref": "cpu2",
+      "raw_result_wall_seconds": 9.274729,
+      "validated_wall_seconds": 15.3309,
+      "delivery_wall_seconds": 15.341029,
+      "platform_recorded_validation_seconds": 13.401239,
+      "platform_recorded_delivery_seconds": 13.698301,
+      "compute_seconds": 0.26132695004343987,
+      "gpu_seconds": 3.0,
+      "cpu_core_seconds": 6.0
+    },
+    {
+      "index": 13,
+      "block": 4,
+      "arm": "B0",
+      "candidate_ref": "cpu1",
+      "raw_result_wall_seconds": 6.950103,
+      "validated_wall_seconds": null,
+      "delivery_wall_seconds": null,
+      "platform_recorded_validation_seconds": null,
+      "platform_recorded_delivery_seconds": null,
+      "compute_seconds": 0.2642764849588275,
+      "gpu_seconds": 2.0,
+      "cpu_core_seconds": 2.0
+    },
+    {
+      "index": 14,
+      "block": 4,
+      "arm": "B1",
+      "candidate_ref": "cpu1",
+      "raw_result_wall_seconds": 9.113054,
+      "validated_wall_seconds": 9.136872,
+      "delivery_wall_seconds": 9.14941,
+      "platform_recorded_validation_seconds": 6.803422,
+      "platform_recorded_delivery_seconds": 7.092921,
+      "compute_seconds": 0.2637159207952209,
+      "gpu_seconds": 3.0,
+      "cpu_core_seconds": 3.0
+    },
+    {
+      "index": 15,
+      "block": 5,
+      "arm": "B2",
+      "candidate_ref": "cpu2",
+      "raw_result_wall_seconds": 11.073618,
+      "validated_wall_seconds": 15.116227,
+      "delivery_wall_seconds": 15.122906,
+      "platform_recorded_validation_seconds": 13.394112,
+      "platform_recorded_delivery_seconds": 13.709048,
+      "compute_seconds": 0.26079865905921906,
+      "gpu_seconds": 3.0,
+      "cpu_core_seconds": 6.0
+    },
+    {
+      "index": 16,
+      "block": 5,
+      "arm": "B0",
+      "candidate_ref": "cpu1",
+      "raw_result_wall_seconds": 7.167383,
+      "validated_wall_seconds": null,
+      "delivery_wall_seconds": null,
+      "platform_recorded_validation_seconds": null,
+      "platform_recorded_delivery_seconds": null,
+      "compute_seconds": 0.26399702101480216,
+      "gpu_seconds": 3.0,
+      "cpu_core_seconds": 3.0
+    },
+    {
+      "index": 17,
+      "block": 5,
+      "arm": "B1",
+      "candidate_ref": "cpu1",
+      "raw_result_wall_seconds": 6.955429,
+      "validated_wall_seconds": 6.968841,
+      "delivery_wall_seconds": 9.001521,
+      "platform_recorded_validation_seconds": 6.767292,
+      "platform_recorded_delivery_seconds": 7.109873,
+      "compute_seconds": 0.26436519605340436,
+      "gpu_seconds": 3.0,
+      "cpu_core_seconds": 3.0
+    }
+  ],
+  "paired_differences": [
+    {
+      "block": 0,
+      "B1_minus_B0_raw_seconds": 4.177164,
+      "B2_minus_B1_raw_seconds": -3.970486,
+      "B2_minus_B1_compute_seconds": -0.0025146641419269145
+    },
+    {
+      "block": 1,
+      "B1_minus_B0_raw_seconds": 4.0262459999999995,
+      "B2_minus_B1_raw_seconds": -4.134176999999999,
+      "B2_minus_B1_compute_seconds": -0.0035937688662670553
+    },
+    {
+      "block": 2,
+      "B1_minus_B0_raw_seconds": 4.0582199999999995,
+      "B2_minus_B1_raw_seconds": 0.279833,
+      "B2_minus_B1_compute_seconds": -0.001455295947380364
+    },
+    {
+      "block": 3,
+      "B1_minus_B0_raw_seconds": 4.0913699999999995,
+      "B2_minus_B1_raw_seconds": 2.1317260000000005,
+      "B2_minus_B1_compute_seconds": -0.002269493939820677
+    },
+    {
+      "block": 4,
+      "B1_minus_B0_raw_seconds": 2.1629509999999996,
+      "B2_minus_B1_raw_seconds": 0.16167500000000068,
+      "B2_minus_B1_compute_seconds": -0.0023889707517810166
+    },
+    {
+      "block": 5,
+      "B1_minus_B0_raw_seconds": -0.21195400000000042,
+      "B2_minus_B1_raw_seconds": 4.118189,
+      "B2_minus_B1_compute_seconds": -0.0035665369941852987
+    }
+  ],
+  "actual_serial_cumulative": [
+    {
+      "arm": "B0",
+      "uses": 1,
+      "raw_wall_seconds_including_profile": 6.890441,
+      "observed_completion_seconds_including_profile": 6.890441,
+      "platform_recorded_delivery_seconds_including_profile": null,
+      "gpu_seconds_including_profile": 3.0,
+      "cpu_core_seconds_including_profile": 3.0
+    },
+    {
+      "arm": "B0",
+      "uses": 2,
+      "raw_wall_seconds_including_profile": 13.918533,
+      "observed_completion_seconds_including_profile": 13.918533,
+      "platform_recorded_delivery_seconds_including_profile": null,
+      "gpu_seconds_including_profile": 6.0,
+      "cpu_core_seconds_including_profile": 6.0
+    },
+    {
+      "arm": "B0",
+      "uses": 3,
+      "raw_wall_seconds_including_profile": 20.958032,
+      "observed_completion_seconds_including_profile": 20.958032,
+      "platform_recorded_delivery_seconds_including_profile": null,
+      "gpu_seconds_including_profile": 9.0,
+      "cpu_core_seconds_including_profile": 9.0
+    },
+    {
+      "arm": "B0",
+      "uses": 4,
+      "raw_wall_seconds_including_profile": 27.94779,
+      "observed_completion_seconds_including_profile": 27.94779,
+      "platform_recorded_delivery_seconds_including_profile": null,
+      "gpu_seconds_including_profile": 11.0,
+      "cpu_core_seconds_including_profile": 11.0
+    },
+    {
+      "arm": "B0",
+      "uses": 5,
+      "raw_wall_seconds_including_profile": 34.897893,
+      "observed_completion_seconds_including_profile": 34.897893,
+      "platform_recorded_delivery_seconds_including_profile": null,
+      "gpu_seconds_including_profile": 13.0,
+      "cpu_core_seconds_including_profile": 13.0
+    },
+    {
+      "arm": "B0",
+      "uses": 6,
+      "raw_wall_seconds_including_profile": 42.065276,
+      "observed_completion_seconds_including_profile": 42.065276,
+      "platform_recorded_delivery_seconds_including_profile": null,
+      "gpu_seconds_including_profile": 16.0,
+      "cpu_core_seconds_including_profile": 16.0
+    },
+    {
+      "arm": "B1",
+      "uses": 1,
+      "raw_wall_seconds_including_profile": 11.067605,
+      "observed_completion_seconds_including_profile": 199.922837,
+      "platform_recorded_delivery_seconds_including_profile": 14.166979,
+      "gpu_seconds_including_profile": 3.0,
+      "cpu_core_seconds_including_profile": 3.0
+    },
+    {
+      "arm": "B1",
+      "uses": 2,
+      "raw_wall_seconds_including_profile": 22.121943,
+      "observed_completion_seconds_including_profile": 215.025363,
+      "platform_recorded_delivery_seconds_including_profile": 28.393067000000002,
+      "gpu_seconds_including_profile": 5.0,
+      "cpu_core_seconds_including_profile": 5.0
+    },
+    {
+      "arm": "B1",
+      "uses": 3,
+      "raw_wall_seconds_including_profile": 33.219662,
+      "observed_completion_seconds_including_profile": 226.148981,
+      "platform_recorded_delivery_seconds_including_profile": 38.185322,
+      "gpu_seconds_including_profile": 7.0,
+      "cpu_core_seconds_including_profile": 7.0
+    },
+    {
+      "arm": "B1",
+      "uses": 4,
+      "raw_wall_seconds_including_profile": 44.30079,
+      "observed_completion_seconds_including_profile": 237.25999199999998,
+      "platform_recorded_delivery_seconds_including_profile": 47.344625,
+      "gpu_seconds_including_profile": 9.0,
+      "cpu_core_seconds_including_profile": 9.0
+    },
+    {
+      "arm": "B1",
+      "uses": 5,
+      "raw_wall_seconds_including_profile": 53.413844,
+      "observed_completion_seconds_including_profile": 246.409402,
+      "platform_recorded_delivery_seconds_including_profile": 54.437546,
+      "gpu_seconds_including_profile": 12.0,
+      "cpu_core_seconds_including_profile": 12.0
+    },
+    {
+      "arm": "B1",
+      "uses": 6,
+      "raw_wall_seconds_including_profile": 60.369273,
+      "observed_completion_seconds_including_profile": 255.410923,
+      "platform_recorded_delivery_seconds_including_profile": 61.547419,
+      "gpu_seconds_including_profile": 15.0,
+      "cpu_core_seconds_including_profile": 15.0
+    },
+    {
+      "arm": "B2",
+      "uses": 1,
+      "raw_wall_seconds_including_profile": 361.536284,
+      "observed_completion_seconds_including_profile": 361.587724,
+      "platform_recorded_delivery_seconds_including_profile": 361.128698,
+      "gpu_seconds_including_profile": 51.0,
+      "cpu_core_seconds_including_profile": 52.5
+    },
+    {
+      "arm": "B2",
+      "uses": 2,
+      "raw_wall_seconds_including_profile": 368.45644500000003,
+      "observed_completion_seconds_including_profile": 374.587605,
+      "platform_recorded_delivery_seconds_including_profile": 372.455562,
+      "gpu_seconds_including_profile": 53.0,
+      "cpu_core_seconds_including_profile": 56.5
+    },
+    {
+      "arm": "B2",
+      "uses": 3,
+      "raw_wall_seconds_including_profile": 379.833997,
+      "observed_completion_seconds_including_profile": 390.01238,
+      "platform_recorded_delivery_seconds_including_profile": 387.000679,
+      "gpu_seconds_including_profile": 55.0,
+      "cpu_core_seconds_including_profile": 60.5
+    },
+    {
+      "arm": "B2",
+      "uses": 4,
+      "raw_wall_seconds_including_profile": 393.046851,
+      "observed_completion_seconds_including_profile": 407.297319,
+      "platform_recorded_delivery_seconds_including_profile": 402.760096,
+      "gpu_seconds_including_profile": 57.0,
+      "cpu_core_seconds_including_profile": 64.5
+    },
+    {
+      "arm": "B2",
+      "uses": 5,
+      "raw_wall_seconds_including_profile": 402.32158,
+      "observed_completion_seconds_including_profile": 422.638348,
+      "platform_recorded_delivery_seconds_including_profile": 416.458397,
+      "gpu_seconds_including_profile": 60.0,
+      "cpu_core_seconds_including_profile": 70.5
+    },
+    {
+      "arm": "B2",
+      "uses": 6,
+      "raw_wall_seconds_including_profile": 413.395198,
+      "observed_completion_seconds_including_profile": 437.761254,
+      "platform_recorded_delivery_seconds_including_profile": 430.167445,
+      "gpu_seconds_including_profile": 63.0,
+      "cpu_core_seconds_including_profile": 76.5
+    }
+  ],
+  "limits": [
+    "one workload and one device, with one B2 tuning episode reused across blocks",
+    "baseline cpu1 is reasonable; cpu2 can use more CPU for little or no measured improvement",
+    "B0 direct client and B1/B2 worker have different control-plane paths; decompose them rather than label every difference validator overhead",
+    "scheduler timestamps have whole-second resolution; zero recorded queue seconds is not exactly zero waiting",
+    "no integrated energy or job-attributed GPU utilization inferred from bracketing telemetry"
+  ]
+}

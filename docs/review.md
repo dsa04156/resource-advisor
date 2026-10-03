@@ -36,8 +36,8 @@ complete cancellation/cost evidence remain required.
 independent confirmation, including real GPU runs. A completed three-block
 [S0/S1/S2 comparison](policy-comparison-v2.md) now retains the stopped predecessor
 and full measured allocation costs without demonstrating BO superiority.
-Complete phase/utilization accounting, the separate B0–B2 operational comparison
-and workload holdout remain evaluation gates.
+Complete phase/utilization accounting, broader B0–B2 operational effectiveness
+and unseen-family numerical uncertainty remain evaluation gates; a bounded source-only rank holdout is now published.
 The small smoke experiment does not prove BO superiority or hard physical budget bounds.
 The first preregistered comparison exposed a shallow deployment integration:
 optimizer tests passed with local dependencies, but the deployed worker lacked
@@ -119,3 +119,8 @@ a successful model qualification or claimed platform NPU execution.
 
 These fixes have regression tests and real ARM guard evidence. They do not prove
 an end-to-end Slurm model execution while its controller is unavailable.
+
+The bounded B0/B1/B2 GPU operational trial is now published in
+[operational-comparison.md](operational-comparison.md): approximately 1% shorter
+compute did not recover profiling cost over six actual uses. Collector recovery
+remains visible; this does not establish fleet or cross-backend benefit.
