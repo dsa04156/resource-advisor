@@ -102,6 +102,44 @@ def test_optional_integrations_remain_explicitly_disabled():
     assert report["status"] == "PASS"
     assert report["api_artifacts_enabled"] is report["worker_artifacts_enabled"] is False
     assert report["mlflow_enabled"] is False
+    assert report["optimizer_required"] is False
+
+
+@pytest.mark.parametrize("missing", ["torch", "botorch"])
+def test_required_optimizer_missing_fails_before_backend_construction(monkeypatch, missing):
+    import resource_advisor.configuration as configuration
+
+    original = configuration.importlib.import_module
+
+    def import_module(name):
+        if name == missing:
+            raise ModuleNotFoundError("private library path must not escape")
+        return original(name)
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("missing required runtime must not construct a backend")
+
+    monkeypatch.setattr(configuration.importlib, "import_module", import_module)
+    monkeypatch.setattr(configuration, "KubernetesBackend", forbidden)
+    _, _, worker = deployment()
+    worker["optimizer_required"] = True
+    with pytest.raises(ConfigurationError, match="^OPTIMIZER_RUNTIME_UNAVAILABLE$"):
+        worker_configuration(worker)
+
+
+def test_explicit_optimizer_requirement_with_installed_runtime():
+    pytest.importorskip("torch")
+    pytest.importorskip("botorch")
+    assert (
+        check_configuration(worker={"routes": [], "optimizer_required": True})["optimizer_required"]
+        is True
+    )
+
+
+@pytest.mark.parametrize("value", ["true", "false", 1, 0, None])
+def test_optimizer_requirement_rejects_ambiguous_flags(value):
+    with pytest.raises(ConfigurationError, match="INVALID_OPTIMIZER_REQUIREMENT"):
+        worker_configuration({"routes": [], "optimizer_required": value})
 
 
 def test_distinct_backend_pools_and_invalid_route_options():

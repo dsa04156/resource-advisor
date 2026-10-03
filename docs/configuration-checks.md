@@ -45,6 +45,17 @@ scoped; this is not proof of direct storage-service user isolation. Disabled
 optional integrations remain supported and are explicitly reported as disabled.
 Checking only one service's files cannot establish cross-service consistency.
 
+Workers expected to run model-based studies must also set
+`"optimizer_required": true` in their private worker JSON. Startup and
+`check-config` then import PyTorch and BoTorch before constructing any backend or
+database connection. A missing/broken import exits with
+`OPTIMIZER_RUNTIME_UNAVAILABLE`; non-boolean flags are rejected. This prevents an
+artifact-only service image from silently serving an intended BO deployment via
+random fallback. Lightweight workers can leave this option false; numerical model
+failures can still use the explicitly recorded fallback after successful startup.
+Import success is not a successful model fit: qualify a bounded model calculation
+in the actual worker image before launching a comparative experiment.
+
 | Error code | Correction |
 |---|---|
 | `ARTIFACT_PROJECT_MAPPING_MISSING` | Add the project's intended bucket to that service's artifact map. |

@@ -1,5 +1,6 @@
 """Local deployment checks; never contact schedulers, storage, MLflow or the DB."""
 
+import importlib
 import json
 import re
 
@@ -87,6 +88,14 @@ def api_configuration(credentials, artifacts=None):
 
 def worker_configuration(config):
     require(isinstance(config, dict), "CONFIG_OBJECT_REQUIRED")
+    optimizer_required = config.get("optimizer_required", False)
+    require(type(optimizer_required) is bool, "INVALID_OPTIMIZER_REQUIREMENT")
+    if optimizer_required:
+        try:
+            importlib.import_module("torch")
+            importlib.import_module("botorch")
+        except (ImportError, OSError, RuntimeError):
+            raise ConfigurationError("OPTIMIZER_RUNTIME_UNAVAILABLE") from None
     routes = config.get("routes")
     require(isinstance(routes, list), "WORKER_ROUTES_REQUIRED")
     keys, projects = set(), set()
@@ -155,4 +164,7 @@ def check_configuration(*, credentials=None, artifacts=None, worker=None):
         if worker is not None
         else None,
         "mlflow_enabled": bool(worker.get("mlflow_url")) if worker is not None else None,
+        "optimizer_required": worker.get("optimizer_required", False)
+        if worker is not None
+        else None,
     }

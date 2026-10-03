@@ -1,8 +1,30 @@
 # Repeated GPU policy comparison
 
-The [prospective protocol](policy-comparison-plan.md) is now executing. The
-[launch evidence](evidence/policy-launch.json) is a dated intermediate snapshot,
-not the completed nine-study comparison or a policy effectiveness claim.
+The [prospective protocol](policy-comparison-plan.md) was stopped after the first
+BO study exposed missing optimizer dependencies in the worker image. The
+[launch evidence](evidence/policy-launch.json) remains a dated historical snapshot.
+The [stopped-run evidence](evidence/policy-stop.json) supersedes its running status.
+This is not the completed nine-study comparison or a policy effectiveness claim.
+
+The image inherited `artifacts` dependencies without the `optimizer` extra.
+Actual GPU benchmark containers had their qualified CUDA/PyTorch runtime, but
+the CPU service responsible for choosing configurations could not import torch.
+The study recorded three initial-design choices followed by five explicit
+`MODEL_FAILURE_RANDOM_FALLBACK` choices; it never executed a qLogNEI acquisition.
+This is an infrastructure failure, not evidence about BO's effectiveness.
+
+The experiment driver was stopped and the active study canceled through the API.
+It became terminal with 13 completed observations; none was replayed. History,
+random search and lookup completed 15, 14 and six Jobs respectively. All 48
+application results were checked against their unique ledger/MLflow records and
+identical S3/API/MLflow artifact bytes. Three F0 Jobs remain separate. No later
+block or post-hoc oracle was submitted. The stopped protocol must not resume with
+a changed image or be silently replaced; a new run needs a new preregistration.
+
+The deployment guard now supports `optimizer_required: true`, which rejects
+missing PyTorch/BoTorch before worker backend or database construction. The lab
+worker runtime repair and a bounded calculation in that exact image must be
+verified before another GPU protocol starts; unit tests alone are insufficient.
 
 API and worker now run the source of `ca253134ab96b5486b53bf66a493982b3bb484b3`.
 Their running package hashes match the source-only image build. Four core Argo
@@ -61,6 +83,6 @@ block's selection, finite-oracle regret, raw paired differences, accounting cost
 unknown queue intervals and actual model-based choices. The later finite oracle
 is an estimate under potentially different load, not ground truth.
 
-Synthetic negative tests validate these audit rules. They do not prove the live
-protocol is complete. Final results, all nine comparisons and post-hoc oracle
+Synthetic negative tests validate these audit rules. The stopped capture correctly
+fails the complete-protocol audit. All nine valid comparisons and post-hoc oracle
 verification remain pending; the full [v0.3 audit](goal-audit.md) stays open.

@@ -1,0 +1,48 @@
+{
+  "status": "stopped",
+  "reason": "WORKER_OPTIMIZER_DEPENDENCIES_MISSING",
+  "evidence_kind": "hardware",
+  "captured_at": "2026-10-03T03:15:07.251410+00:00",
+  "studies": [
+    {
+      "label": "history",
+      "state": "COMPLETED",
+      "observations": 15
+    },
+    {
+      "label": "target-0-random",
+      "state": "COMPLETED",
+      "observations": 14
+    },
+    {
+      "label": "target-0-lookup",
+      "state": "COMPLETED",
+      "observations": 6
+    },
+    {
+      "label": "target-0-qlognei",
+      "state": "CANCELED",
+      "observations": 13
+    }
+  ],
+  "application_jobs": 48,
+  "qualification_jobs": 3,
+  "application_gpu_reservation_seconds": 132.0,
+  "qualification_gpu_reservation_seconds": 8.0,
+  "qlognei_choice_reasons": [
+    "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+    "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+    "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+    "MODEL_FAILURE_RANDOM_FALLBACK",
+    "MODEL_FAILURE_RANDOM_FALLBACK",
+    "MODEL_FAILURE_RANDOM_FALLBACK",
+    "MODEL_FAILURE_RANDOM_FALLBACK",
+    "MODEL_FAILURE_RANDOM_FALLBACK"
+  ],
+  "qlognei_model_based_choices": 0,
+  "results_ledger_api_s3_mlflow_verified": 48,
+  "queue_idle": true,
+  "no_later_blocks_or_oracle": true,
+  "trial_must_not_resume": true,
+  "scope": "retained incomplete experiment; not a completed method comparison"
+}
