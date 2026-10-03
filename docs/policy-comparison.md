@@ -23,8 +23,16 @@ a changed image or be silently replaced; a new run needs a new preregistration.
 
 The deployment guard now supports `optimizer_required: true`, which rejects
 missing PyTorch/BoTorch before worker backend or database construction. The lab
-worker runtime repair and a bounded calculation in that exact image must be
-verified before another GPU protocol starts; unit tests alone are insufficient.
+worker has been repaired through CI-gated manual Argo sync, using the qualified
+optimizer runtime and the current source. Its mounted configuration requires the
+optimizer; the running package hash matches the image build. A bounded read-only
+calculation on the first three retained observations returned actual
+`CONSTRAINED_QLOGNEI` output in 3.35 seconds (PyTorch 2.8.0+cpu, BoTorch 0.16.1).
+The same guard rejected the preceding artifact-only image with exit 2. Database
+fingerprints, other core processes, Secrets/PVC and compute ownership were
+preserved. See [repair evidence](evidence/optimizer-repair.json). This calculation
+submitted no GPU Jobs, created no study observations and does not complete or
+retroactively repair the stopped comparison. A new prospective trial is pending.
 
 API and worker now run the source of `ca253134ab96b5486b53bf66a493982b3bb484b3`.
 Their running package hashes match the source-only image build. Four core Argo

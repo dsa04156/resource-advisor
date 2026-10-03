@@ -1,0 +1,39 @@
+{
+  "verified_at": "2026-10-03T03:27:21.252966+00:00",
+  "revision": "02cd907c1eda3875bfbd4bd1c98f2883ae793ab0",
+  "worker_image_digest": "sha256:71b21cd269fbee835457dfdd4960ba4369388e3a74274009294cc569ed950e2f",
+  "worker_source_tree_sha256": "eae7022dd244c8568906007966f8995d032ee83e59fab3a267e12854233bc290",
+  "required_extras": [
+    "artifacts",
+    "optimizer"
+  ],
+  "optimizer_required": true,
+  "missing_runtime_negative_exit_code": 2,
+  "missing_runtime_negative_error": "OPTIMIZER_RUNTIME_UNAVAILABLE",
+  "actual_model_check": {
+    "reason": "CONSTRAINED_QLOGNEI",
+    "training_observations": 3,
+    "torch_version": "2.8.0+cpu",
+    "botorch_version": "0.16.1",
+    "wall_seconds": 3.3476019370136783,
+    "scope": "read-only offline calculation from three retained pilot observations; no submission or persistence"
+  },
+  "database_fingerprints_unchanged": true,
+  "nonworker_processes_preserved": [
+    "api",
+    "inventory",
+    "postgres"
+  ],
+  "existing_static_uids_preserved": 9,
+  "other_secrets_and_pvc_preserved": true,
+  "compute_job_ownership_preserved": true,
+  "healthy_synced_applications": [
+    "services",
+    "worker",
+    "postgres",
+    "slurm-inventory"
+  ],
+  "queue_idle": true,
+  "new_gpu_jobs": 0,
+  "stopped_experiment_resumed": false
+}

@@ -95,3 +95,19 @@ artifact denial. No GPU work was resubmitted, and no outbox item or retained tri
 finalizer remained. HTTPS health returned 200 after the existing lab access
 supervisor reconnected to the new API Pod. Local tests passed 508 cases.
 See the [sanitized deployment evidence](evidence/configuration-checks.json).
+
+## Optimizer runtime repair — 2026-10-03 UTC
+
+The later policy comparison exposed a distinct packaging failure: an artifact-only
+worker image passed the earlier project-mapping checks but lacked PyTorch/BoTorch.
+Five requested BO steps recorded random fallback. The trial was stopped and all
+48 application results retained; it is not a successful BO comparison.
+
+With `optimizer_required: true`, the new guard rejected that actual incomplete
+image with exit 2. A CI-qualified worker-only Argo rollout now uses the unchanged
+lock with both artifact and optimizer dependencies. The mounted configuration
+passes, and an actual bounded qLogNEI calculation on three preserved measurements
+returns model-based output without submitting or persisting new work. Existing
+database fingerprints and nonworker core processes were unchanged. See the
+[deployment and calculation evidence](evidence/optimizer-repair.json). A new
+prospective GPU trial is still required; this is runtime repair verification.
