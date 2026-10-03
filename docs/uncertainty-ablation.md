@@ -55,6 +55,8 @@ decision used uncertainty-triggered baseline retention, so this null difference
 does not show that the gate is unnecessary. The third qLogNEI study confirmed
 only its predicted baseline; later reference runs cannot retroactively add an
 untested finalist to its selection. No new GPU Job was created, and the existing
-361 GPU reservation seconds remain attributed to the original experiment. Cross-workload holdout, forecast-interval
-calibration and induced-drift evaluation remain separate open R4 requirements;
-this one-workload replay cannot close them.
+361 GPU reservation seconds remain attributed to the original experiment.
+Numerical cross-workload holdout and forecast-interval calibration remain open
+R4 requirements; this one-workload replay cannot close them. The later
+[bounded induced-drift trial](load-drift.md) verifies stale-approval rejection
+without changing this offline ablation or calibrating its intervals.

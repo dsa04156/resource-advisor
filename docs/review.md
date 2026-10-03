@@ -49,7 +49,10 @@ Recommendation reuse now rechecks source age/scope and post-recommendation
 residuals before approval and submission. A historical chronological audit found
 both eligible later GPU results outside their saved posterior intervals. The
 heuristic drift gate and this two-point report are not calibrated uncertainty;
-workload holdout and live drift validation remain open.
+numerical workload holdout and interval calibration remain open. The later
+[bounded live drift trial](load-drift.md) verifies latching and stale-approval
+rejection; its [completion-state follow-up](kubernetes-completion.md) fixes a
+transient requeue observation and the resulting false queue-timeout risk.
 
 **Artifacts and environments:** bounded JSON result bundles now have conditional
 S3 writes, verified API downloads and live MLflow artifact copies. Large-model
