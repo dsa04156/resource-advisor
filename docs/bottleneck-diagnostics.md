@@ -120,3 +120,6 @@ execution results; the original eight-Job evidence above remains unchanged.
 The first CUDA trace [qualification stopped](e5-kernel-qualification.md) at a
 parser error; its six GPU reservation seconds and unexecuted comparison are
 reported separately.
+The corrected [v2 trial](e5-kernel-results.md) subsequently completed its fixed
+14-Job schedule. Actual kernel traces and profiler-off comparisons pass the
+bounded E5 input-supply/kernel-path acceptance; all predecessor costs remain.

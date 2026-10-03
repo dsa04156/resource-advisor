@@ -1,0 +1,120 @@
+{
+  "scope": "three-block functional E5 acceptance; not a powered superiority study",
+  "criteria": {
+    "input_supply_hypothesis_all_three": true,
+    "accelerator_path_hypothesis_all_three": true,
+    "cache_kernel_span_ge_60_percent_all_three": true
+  },
+  "accepted": true,
+  "groups": {
+    "recompute-plain": {
+      "jobs": 3,
+      "elapsed_seconds": [
+        0.5166736939572729,
+        0.5127898969803937,
+        0.5159758619265631
+      ],
+      "mean_seconds": 0.5151464842880765,
+      "sd_seconds": 0.002070475836569988,
+      "hypotheses": [
+        "POSSIBLE_INPUT_SUPPLY_BOUND",
+        "POSSIBLE_INPUT_SUPPLY_BOUND",
+        "POSSIBLE_INPUT_SUPPLY_BOUND"
+      ],
+      "kernel_span_fractions": []
+    },
+    "cache-plain": {
+      "jobs": 3,
+      "elapsed_seconds": [
+        0.12234385206829756,
+        0.12252586695831269,
+        0.1227679630392231
+      ],
+      "mean_seconds": 0.12254589402194445,
+      "sd_seconds": 0.00021276358093699687,
+      "hypotheses": [
+        "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "POSSIBLE_ACCELERATOR_PATH_BOUND"
+      ],
+      "kernel_span_fractions": []
+    },
+    "recompute-profiler": {
+      "jobs": 3,
+      "elapsed_seconds": [
+        0.5153116948786192,
+        0.5133048639399931,
+        0.5081593821523711
+      ],
+      "mean_seconds": 0.5122586469903277,
+      "sd_seconds": 0.0036891491922715317,
+      "hypotheses": [
+        "POSSIBLE_INPUT_SUPPLY_BOUND",
+        "POSSIBLE_INPUT_SUPPLY_BOUND",
+        "POSSIBLE_INPUT_SUPPLY_BOUND"
+      ],
+      "kernel_span_fractions": [
+        0.9870388231262112,
+        0.9887178311571525,
+        0.9892914729965319
+      ]
+    },
+    "cache-profiler": {
+      "jobs": 3,
+      "elapsed_seconds": [
+        0.125606426037848,
+        0.12616004305891693,
+        0.12589452689280733
+      ],
+      "mean_seconds": 0.12588699866319075,
+      "sd_seconds": 0.00027688527802174526,
+      "hypotheses": [
+        "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "POSSIBLE_ACCELERATOR_PATH_BOUND"
+      ],
+      "kernel_span_fractions": [
+        0.9916951390123062,
+        0.9916229444032479,
+        0.9919535074413518
+      ]
+    }
+  },
+  "paired_differences": [
+    {
+      "block": 0,
+      "plain_recompute_minus_cache_seconds": 0.39432984188897535,
+      "profiler_minus_plain_seconds": {
+        "cache": 0.0032625739695504308,
+        "recompute": -0.0013619990786537528
+      }
+    },
+    {
+      "block": 1,
+      "plain_recompute_minus_cache_seconds": 0.390264030022081,
+      "profiler_minus_plain_seconds": {
+        "cache": 0.003634176100604236,
+        "recompute": 0.0005149669595994055
+      }
+    },
+    {
+      "block": 2,
+      "plain_recompute_minus_cache_seconds": 0.39320789888734,
+      "profiler_minus_plain_seconds": {
+        "cache": 0.00312656385358423,
+        "recompute": -0.007816479774191976
+      }
+    }
+  ],
+  "GPU_count_changed": false,
+  "v2_gpu_reservation_seconds": 45.0,
+  "prior_failed_qualification_and_probe_gpu_seconds": 9,
+  "all_protocol_gpu_reservation_seconds": 54.0,
+  "v2_wall_seconds": 400.745096,
+  "total_jobs_including_prior_protocol": 17,
+  "limitations": [
+    "CUDA kernel union is not SM occupancy or arithmetic-versus-memory saturation.",
+    "Repeated generated input does not justify caching changing datasets.",
+    "Profiler-on measurements are not ordinary performance profiles."
+  ]
+}

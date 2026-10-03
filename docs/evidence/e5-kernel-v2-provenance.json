@@ -1,0 +1,37 @@
+{
+  "scope": "public raw capture, frozen protocol, benchmark/parser and independent evaluator files",
+  "files": {
+    "docs/evidence/e5-kernel-v2.json": {
+      "sha256": "a564cdf24e765df075f92c36ca11446c8b485a0250f5becad95d9e033312007b",
+      "bytes": 4305510
+    },
+    "docs/evidence/e5-kernel-v2-report.json": {
+      "sha256": "5107d6ea5a65e9f526cefec210c936b63e54271c2cf410b00d6837f7b4cf60bb",
+      "bytes": 3455
+    },
+    "docs/e5-kernel-results.md": {
+      "sha256": "069ae5e0e49c23d0b632dbcdd6cae75866846a0352391627a92895c6503ad612",
+      "bytes": 5711
+    },
+    "docs/e5-kernel-plan-v2.md": {
+      "sha256": "0464332fdf158ef9557a69b92c779b26c9ce5ab6b3d2174743d05915cf76ad26",
+      "bytes": 1973
+    },
+    "docs/evidence/e5-kernel-plan-v2.json": {
+      "sha256": "fa4b7fe1339aa3c3e438e0e8017980e4b7efc0587b64738c343abe5ff769e8f3",
+      "bytes": 1618
+    },
+    "src/resource_advisor/e5_benchmark.py": {
+      "sha256": "632e028a56504e3a2c9e49bd48d092e97edbae8268749b2d77cc5382122d1462",
+      "bytes": 10566
+    },
+    "src/resource_advisor/kernel_diagnostics.py": {
+      "sha256": "bd5eaf8713db0bd9b97d189c9f5d70d1bc7641d56b328f2aeee8af388accc144",
+      "bytes": 7061
+    },
+    "examples/evaluate_e5_kernels.py": {
+      "sha256": "3f6c7d49fdcbc280011dfcccd1d20b7e67958862cb2e3001686f55f72db6e1f0",
+      "bytes": 9829
+    }
+  }
+}
