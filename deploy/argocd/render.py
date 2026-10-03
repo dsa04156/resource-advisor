@@ -64,8 +64,9 @@ class Site(BaseModel):
     @field_validator("images")
     @classmethod
     def image_pins(cls, value):
-        if set(value) != {"api", "inventory", "worker", "postgres"}:
-            raise ValueError("exactly four qualified component images required")
+        required = {"api", "inventory", "worker", "postgres"}
+        if not required <= set(value) or set(value) - required - {"slurm-inventory"}:
+            raise ValueError("four core images and optional slurm-inventory image required")
         for image in value.values():
             if (
                 not re.fullmatch(r"[^\s@]+@sha256:[0-9a-f]{64}", image)
@@ -109,11 +110,14 @@ def render(site: Site):
         },
     }
     apps = []
-    for group, components in [
+    groups = [
         ("services", ["api", "inventory"]),
         ("worker", ["worker"]),
         ("postgres", ["postgres"]),
-    ]:
+    ]
+    if "slurm-inventory" in site.images:
+        groups.append(("slurm-inventory", ["slurm-inventory"]))
+    for group, components in groups:
         patches = []
         for component in components:
             ops = [

@@ -38,6 +38,9 @@ const labels = {
   invalid_time: "시각 오류",
   collector_unhealthy: "수집기 이상",
   missing: "미측정",
+  not_configured: "연결 미설정",
+  unclassified: "자원 종류 미분류",
+  partial: "일부 확인",
 };
 const states = {
   SUCCEEDED: "완료",
@@ -245,36 +248,37 @@ function pager(kind, info) {
   );
 }
 function resourcePanel(snapshot) {
+  const slurm = snapshot.backend === "slurm";
   const rows = snapshot.nodes.map((n) => {
     const cpu = n.resources.cpu || {},
       mem = n.resources.memory || {};
-    const ready = observed(n.ready, snapshot);
+    const ready = observed(slurm ? n.scheduler_state : n.ready, snapshot);
     const node = add(
       el("td", null, "node"),
       code(n.node_ref),
       el("small", n.hardware?.architecture || "구조 미확인"),
       badge(
-        ready.status !== "ok"
-          ? labels[ready.status]
-          : ready.value
-            ? "Ready 보고됨"
-            : "NotReady",
-        ready.status === "ok" && ready.value ? "" : "warn",
+        slurm
+          ? "Slurm: " + (ready.status === "ok" && Array.isArray(ready.value)
+            ? ready.value.join(" + ") : labels[ready.status] || "확인 불가")
+          : ready.status !== "ok" ? labels[ready.status] || "확인 불가"
+            : ready.value ? "Ready 보고됨" : "NotReady",
+        ready.status === "ok" && (slurm ? !n.scheduling_blockers.length : ready.value) ? "" : "warn",
       ),
     );
-    if (n.scheduling_blockers.length)
+    if (!slurm && n.scheduling_blockers.length)
       node.append(el("small", n.scheduling_blockers.join(" · ")));
     const cpuCell = add(
       el("td", null, "metric"),
       measure(
         "실측 CPU 사용",
-        n.telemetry.cpu_usage_cores,
+        slurm ? n.telemetry["node:cpu_non_idle_cores"] : n.telemetry.cpu_usage_cores,
         snapshot,
-        value(cpu.capacity, snapshot),
+        value(slurm ? n.telemetry["node:cpu_count"] : cpu.capacity, snapshot),
         "cores",
       ),
       measure(
-        "CPU 예약 여유",
+        slurm ? "Slurm 미예약 CPU" : "CPU 예약 여유",
         cpu.request_headroom,
         snapshot,
         value(cpu.allocatable, snapshot),
@@ -287,12 +291,12 @@ function resourcePanel(snapshot) {
         "실측 메모리 여유",
         n.telemetry["node:memory_available_bytes"],
         snapshot,
-        value(mem.capacity, snapshot),
+        value(slurm ? n.telemetry["node:memory_total_bytes"] : mem.capacity, snapshot),
         "GiB",
         2 ** 30,
       ),
       measure(
-        "메모리 예약 여유",
+        slurm ? "Slurm 미예약 메모리" : "메모리 예약 여유",
         mem.request_headroom,
         snapshot,
         value(mem.allocatable, snapshot),
@@ -323,7 +327,9 @@ function resourcePanel(snapshot) {
       );
     if (!utils.length)
       deviceCell.append(
-        el("small", resources.length ? "사용률 미측정" : "등록된 가속기 없음"),
+        el("small", resources.length ? "사용률 미측정"
+          : slurm && observed(n.accelerator_inventory, snapshot).status !== "ok"
+            ? "가속기 등록 상태 확인 불가" : "등록된 가속기 없음"),
       );
     const extras = Object.fromEntries(
       Object.entries(n.telemetry)
@@ -335,8 +341,8 @@ function resourcePanel(snapshot) {
     return [node, cpuCell, memCell, deviceCell];
   });
   const box = panel(
-    snapshot.cluster_ref + ` · ${snapshot.nodes.length}개 노드`,
-    `수집 ${stamp(snapshot.collected_at)} · 예약 여유는 즉시 실행 승인이나 쿼터 잔량을 뜻하지 않습니다.`,
+    snapshot.cluster_ref + ` · ${slurm ? "Slurm" : "Kubernetes"} · ${snapshot.nodes.length}개 노드`,
+    `수집 ${stamp(snapshot.collected_at)} · ${slurm ? "실측 막대는 호스트 총량 기준입니다. " : ""}예약 차감값은 즉시 실행 승인이나 쿼터 잔량을 뜻하지 않습니다.`,
     rows.length
       ? table(["노드 / 상태", "CPU", "메모리", "GPU · NPU"], rows)
       : empty("허용된 노드가 없습니다."),
@@ -636,6 +642,21 @@ function queuePolicyView(q, title) {
 function historyView() {
   const root = el("div");
   let queues = 0;
+  for (const s of data.inventory) {
+    if (s.backend !== "slurm") continue;
+    queues++;
+    const q = observed(s.slurm_queue, s);
+    root.append(panel(
+      "Slurm / " + s.cluster_ref,
+      "계정·파티션으로 제한한 작업 레코드입니다. 배열 작업의 개별 태스크 수와 다를 수 있습니다.",
+      q.status !== "ok"
+        ? empty("Slurm 큐 상태: " + (labels[q.status] || "확인 불가"))
+        : add(el("div"), table(
+          ["계정", "파티션", "대기 레코드", "실행 레코드", "전체 레코드"],
+          [[q.value.account, q.value.partition, fmt(q.value.pending_records, 0), fmt(q.value.running_records, 0), fmt(q.value.record_count, 0)]],
+        ), details("관측 시각 · 상태별 집계", {observed_at: q.observed_at, states: q.value.states})),
+    ));
+  }
   for (const s of data.inventory)
     for (const q of s.queues) {
       queues++;

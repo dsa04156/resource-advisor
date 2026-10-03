@@ -14,6 +14,11 @@ zero until its routes, credentials and runtime have passed the existing
 [worker](../../docs/worker-recovery.md) checks. One qualified replica is supported;
 this is not an HA deployment.
 
+An optional fifth image key, `slurm-inventory`, adds a fourth Application for
+`deploy/slurm-inventory`. It leaves the core Applications and project permissions
+unchanged. Omit it when no separate Slurm observation collector is configured.
+See its [configuration and controller qualification gates](../slurm-inventory/README.md).
+
 ```sh
 uv run python deploy/argocd/render.py \
   --site /secure/resource-advisor-site.json \

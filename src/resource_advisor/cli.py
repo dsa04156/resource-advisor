@@ -66,6 +66,15 @@ def main():
     inventory.add_argument(
         "--heartbeat-path", help="private readiness timestamp after a saved snapshot"
     )
+    slurm_inventory = sub.add_parser("collect-slurm-inventory")
+    slurm_inventory.add_argument(
+        "--config", required=True, help="private Slurm observation sources"
+    )
+    slurm_inventory.add_argument("--once", action="store_true")
+    slurm_inventory.add_argument("--interval-seconds", type=int, default=30)
+    slurm_inventory.add_argument(
+        "--heartbeat-path", help="readiness timestamp after a saved snapshot"
+    )
     heartbeat = sub.add_parser("check-heartbeat")
     heartbeat.add_argument("--path", required=True)
     heartbeat.add_argument("--max-age", type=float, default=120)
@@ -116,7 +125,10 @@ def main():
         from .health import heartbeat_fresh
 
         raise SystemExit(0 if heartbeat_fresh(Path(args.path), args.max_age) else 1)
-    if args.action == "collect-inventory" and args.interval_seconds < 5:
+    if (
+        args.action in {"collect-inventory", "collect-slurm-inventory"}
+        and args.interval_seconds < 5
+    ):
         parser.error("inventory polling interval must be at least 5 seconds")
     if args.action == "serve" and bool(args.ssl_keyfile) != bool(args.ssl_certfile):
         parser.error("--ssl-keyfile and --ssl-certfile must be provided together")
@@ -149,11 +161,17 @@ def main():
         finally:
             target.engine.dispose()
         raise SystemExit(0 if report["matches"] else 1)
-    if args.action == "collect-inventory":
+    if args.action in {"collect-inventory", "collect-slurm-inventory"}:
         from .inventory import InventoryCollector, InventoryConfig, save_inventory
 
-        config = InventoryConfig.model_validate_json(Path(args.config).read_text())
-        collector = InventoryCollector(config)
+        if args.action == "collect-slurm-inventory":
+            from .slurm_inventory import SlurmInventoryCollector, SlurmInventoryConfig
+
+            config = SlurmInventoryConfig.model_validate_json(Path(args.config).read_text())
+            collector = SlurmInventoryCollector(config)
+        else:
+            config = InventoryConfig.model_validate_json(Path(args.config).read_text())
+            collector = InventoryCollector(config)
         stopping = Event()
         signal.signal(signal.SIGTERM, lambda *_: stopping.set())
         signal.signal(signal.SIGINT, lambda *_: stopping.set())

@@ -29,6 +29,13 @@ labeled password input for project token, no custom keyboard widget.
 Responsive: navigation becomes horizontal; tables keep local overflow wrappers;
 page itself must fit a 390px viewport. No animated data transitions.
 
+Slurm rows reuse the same table and meter components. Label the backend explicitly;
+host CPU/memory meters use measured host totals, while reservation rows use Slurm
+configured allocatable capacity. A fresh exporter must coexist with an amber
+unknown scheduler badge. Unknown registration must never say no accelerators.
+The history view separates Slurm account/partition record counts from Kueue
+admission policy. Array-job records are not presented as expanded task counts.
+
 Transfer evidence reuses the recommendation panel's tables and native details.
 Lead with strategy and plain-language interpretation, then source provenance and
 separate historical/target costs. Individual recorded choices expand to model

@@ -44,15 +44,10 @@ class MetricBinding(Contract):
         return self
 
 
-class InventoryConfig(Contract):
+class TelemetryConfig(Contract):
     project_ref: Ref
     cluster_ref: Ref
     node_refs: tuple[Ref, ...] = Field(min_length=1, max_length=1000)
-    kubeconfig: str | None = None
-    queue_namespaces: tuple[Ref, ...] = ()
-    cluster_queue_refs: tuple[Ref, ...] = Field(default=(), max_length=64)
-    resource_types: dict[str, ResourceType] = Field(default_factory=dict)
-    node_resource_types: dict[str, dict[str, ResourceType]] = Field(default_factory=dict)
     stale_after_seconds: int = Field(default=120, ge=5, le=3600)
     prometheus_url: str | None = None
     prometheus_token_env: str | None = None
@@ -62,8 +57,6 @@ class InventoryConfig(Contract):
     def bound_sources(self):
         if len(set(self.node_refs)) != len(self.node_refs):
             raise ValueError("duplicate inventory node")
-        if len(set(self.cluster_queue_refs)) != len(self.cluster_queue_refs):
-            raise ValueError("duplicate authorized ClusterQueue")
         if any(m.node_ref not in self.node_refs for m in self.metrics):
             raise ValueError("metric outside authorized node pool")
         keys = [(m.node_ref, m.device_ref, m.name) for m in self.metrics]
@@ -75,6 +68,20 @@ class InventoryConfig(Contract):
             url = httpx.URL(self.prometheus_url)
             if url.scheme not in {"http", "https"} or url.userinfo:
                 raise ValueError("HTTP(S) endpoint without embedded credentials required")
+        return self
+
+
+class InventoryConfig(TelemetryConfig):
+    kubeconfig: str | None = None
+    queue_namespaces: tuple[Ref, ...] = ()
+    cluster_queue_refs: tuple[Ref, ...] = Field(default=(), max_length=64)
+    resource_types: dict[str, ResourceType] = Field(default_factory=dict)
+    node_resource_types: dict[str, dict[str, ResourceType]] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def queue_scope(self):
+        if len(set(self.cluster_queue_refs)) != len(self.cluster_queue_refs):
+            raise ValueError("duplicate authorized ClusterQueue")
         return self
 
 
@@ -185,17 +192,9 @@ def fresh_view(snapshot, *, at=None):
     return snapshot
 
 
-class InventoryCollector:
-    def __init__(self, config: InventoryConfig, *, execute=run, client=None):
-        self.config, self.execute, self.client = config, execute, client
-        self.prefix = ["kubectl"] + (
-            ["--kubeconfig", config.kubeconfig] if config.kubeconfig else []
-        )
-
-    def read(self, *arguments):
-        import json
-
-        return json.loads(self.execute(self.prefix + list(arguments), timeout=15))
+class PrometheusReader:
+    def __init__(self, config: TelemetryConfig, *, client=None):
+        self.config, self.client = config, client
 
     def metric(self, binding, client):
         source = "prometheus"
@@ -232,6 +231,42 @@ class InventoryCollector:
         except (httpx.HTTPError, ValueError, KeyError, TypeError, OverflowError):
             return signal(source=source, status="unavailable", unit=binding.unit)
 
+    def metric_samples(self):
+        cfg = self.config
+        if not cfg.metrics:
+            return []
+        token = os.environ.get(cfg.prometheus_token_env) if cfg.prometheus_token_env else None
+        if cfg.prometheus_token_env and not token:
+            samples = [
+                signal(source="prometheus", status="unavailable", unit=b.unit) for b in cfg.metrics
+            ]
+        else:
+            headers = {"Authorization": "Bearer " + token} if token else {}
+            client = self.client or httpx.Client(
+                base_url=cfg.prometheus_url, headers=headers, timeout=10
+            )
+            try:
+                with ThreadPoolExecutor(max_workers=4) as pool:
+                    samples = list(pool.map(lambda b: self.metric(b, client), cfg.metrics))
+            finally:
+                if self.client is None:
+                    client.close()
+        return samples
+
+
+class InventoryCollector(PrometheusReader):
+    def __init__(self, config: InventoryConfig, *, execute=run, client=None):
+        super().__init__(config, client=client)
+        self.execute = execute
+        self.prefix = ["kubectl"] + (
+            ["--kubeconfig", config.kubeconfig] if config.kubeconfig else []
+        )
+
+    def read(self, *arguments):
+        import json
+
+        return json.loads(self.execute(self.prefix + list(arguments), timeout=15))
+
     def collect(self):
         from .queue_inventory import queue_view, workload_view
 
@@ -241,6 +276,7 @@ class InventoryCollector:
             "schema_version": "v1",
             "ref": "inv-" + uuid4().hex,
             "cluster_ref": cfg.cluster_ref,
+            "backend": "kubernetes",
             "collected_at": observed,
             "stale_after_seconds": cfg.stale_after_seconds,
             "status": "ok",
@@ -426,23 +462,7 @@ class InventoryCollector:
                 observed_queue = signal(observed_at=observed, source="kueue", status="unavailable")
             snapshot["cluster_queues"].append({"ref": ref, "observation": observed_queue})
         if cfg.metrics:
-            token = os.environ.get(cfg.prometheus_token_env) if cfg.prometheus_token_env else None
-            if cfg.prometheus_token_env and not token:
-                samples = [
-                    signal(source="prometheus", status="unavailable", unit=b.unit)
-                    for b in cfg.metrics
-                ]
-            else:
-                headers = {"Authorization": "Bearer " + token} if token else {}
-                client = self.client or httpx.Client(
-                    base_url=cfg.prometheus_url, headers=headers, timeout=10
-                )
-                try:
-                    with ThreadPoolExecutor(max_workers=4) as pool:
-                        samples = list(pool.map(lambda b: self.metric(b, client), cfg.metrics))
-                finally:
-                    if self.client is None:
-                        client.close()
+            samples = self.metric_samples()
             for binding, sample in zip(cfg.metrics, samples, strict=True):
                 target = next(n for n in snapshot["nodes"] if n["node_ref"] == binding.node_ref)
                 target["telemetry"][binding.device_ref + ":" + binding.name] = sample

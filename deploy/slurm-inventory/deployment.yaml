@@ -1,0 +1,96 @@
+# Optional read-only host/scheduler observations; no Kubernetes token or execution role.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ra-slurm-inventory
+  labels: &id001
+    app.kubernetes.io/name: ra-slurm-inventory
+    app.kubernetes.io/part-of: resource-advisor
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ra-slurm-inventory
+  template:
+    metadata:
+      labels: *id001
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        resource-advisor.io/services: 'true'
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: slurm-inventory
+        image: example.invalid/resource-advisor/services:site-must-pin-digest
+        command:
+        - python
+        - -m
+        - resource_advisor.cli
+        args:
+        - collect-slurm-inventory
+        - --config
+        - /config/inventory.json
+        - --interval-seconds
+        - '30'
+        - --heartbeat-path
+        - /tmp/heartbeat
+        env:
+        - name: RA_DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ra-service-db
+              key: url
+        - name: PYTHONDONTWRITEBYTECODE
+          value: '1'
+        - name: HOME
+          value: /tmp
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: '1'
+            memory: 512Mi
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+        readinessProbe:
+          exec:
+            command:
+            - python
+            - -m
+            - resource_advisor.cli
+            - check-heartbeat
+            - --path
+            - /tmp/heartbeat
+            - --max-age
+            - '120'
+          periodSeconds: 10
+          timeoutSeconds: 5
+      volumes:
+      - name: config
+        secret:
+          secretName: ra-slurm-inventory-config
+          defaultMode: 288
+      - name: tmp
+        emptyDir:
+          sizeLimit: 64Mi

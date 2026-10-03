@@ -85,3 +85,29 @@ def test_static_sources_exclude_runtime_jobs_secrets_and_cluster_privileges():
     worker = next(a for a in apps if a["metadata"]["name"].endswith("-worker"))
     ops = json.loads(worker["spec"]["source"]["kustomize"]["patches"][0]["patch"])
     assert next(o["value"] for o in ops if o["path"] == "/spec/replicas") == 0
+
+
+def test_optional_slurm_observer_does_not_expand_project_scope_or_change_core_apps():
+    config = site_config()
+    original = render(Site.model_validate(config))["items"]
+    image = "registry.test/services@sha256:" + "c" * 64
+    config["images"]["slurm-inventory"] = image
+    extended = render(Site.model_validate(config))["items"]
+    assert extended[:-1] == original
+    app = extended[-1]
+    assert app["metadata"]["name"] == "resource-advisor-slurm-inventory"
+    assert app["spec"]["source"]["path"] == "deploy/slurm-inventory"
+    assert "automated" not in app["spec"]["syncPolicy"]
+    patch = app["spec"]["source"]["kustomize"]["patches"][0]
+    assert patch["target"] == {"kind": "Deployment", "name": "ra-slurm-inventory"}
+    assert (
+        next(
+            op["value"]
+            for op in json.loads(patch["patch"])
+            if op["path"] == "/spec/template/spec/containers/0/image"
+        )
+        == image
+    )
+    config["images"]["slurm-inventory"] = "registry.test/services:latest"
+    with pytest.raises(ValidationError):
+        Site.model_validate(config)
