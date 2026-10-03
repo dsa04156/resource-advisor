@@ -1,0 +1,178 @@
+{
+  "status": "PASS_SCOPED_LAB_SYSTEM_TELEMETRY",
+  "implementation_commit": "81b290432a379bb2d675eb1b613316279aec100c",
+  "ansible_core_version": "2.19.13",
+  "node_exporter_version": "1.10.2",
+  "archive_sha256": "de69ec8341c8068b7c8e4cfe3eb85065d24d984a3b33007f575d307d13eb89a6",
+  "nodes": {
+    "arm-npu-lab": {
+      "architecture": "aarch64",
+      "python_version": "3.13.5",
+      "slurm_version": "slurm-wlm 24.11.5",
+      "observed_at_utc": "2026-10-03T00:42:04.670871+00:00",
+      "loopback_only": true,
+      "dynamic_user": true,
+      "capability_set_empty": true,
+      "memory_limit_bytes": 134217728,
+      "cpu_quota_fraction_of_one_core": 0.1,
+      "tasks_limit": 64,
+      "preserved_slurm_files_driver_identity_boot_and_daemon": true,
+      "same_exporter_pid_since_corrected_apply": true,
+      "cpu_counter_delta_seconds": 8.01,
+      "scrape_interval_seconds": 2.005929,
+      "cpu_count": 4,
+      "memory": [
+        {
+          "available_bytes": 3599302656.0,
+          "total_bytes": 4241620992.0
+        },
+        {
+          "available_bytes": 3527622656.0,
+          "total_bytes": 4241620992.0
+        }
+      ],
+      "collector_success_count": 8,
+      "binary_sha256": "123faecd856ab0aa317b2916fdb2cf09089a487930beca2956c6d3bb13e49a03"
+    },
+    "arm-gpu-lab": {
+      "architecture": "aarch64",
+      "python_version": "3.12.3",
+      "slurm_version": "slurm 24.11.5",
+      "observed_at_utc": "2026-10-03T00:42:07.748894+00:00",
+      "loopback_only": true,
+      "dynamic_user": true,
+      "capability_set_empty": true,
+      "memory_limit_bytes": 134217728,
+      "cpu_quota_fraction_of_one_core": 0.1,
+      "tasks_limit": 64,
+      "preserved_slurm_files_driver_identity_boot_and_daemon": true,
+      "same_exporter_pid_since_corrected_apply": true,
+      "cpu_counter_delta_seconds": 12.56,
+      "scrape_interval_seconds": 2.098369,
+      "cpu_count": 6,
+      "memory": [
+        {
+          "available_bytes": 6635565056.0,
+          "total_bytes": 7849181184.0
+        },
+        {
+          "available_bytes": 6638112768.0,
+          "total_bytes": 7849181184.0
+        }
+      ],
+      "collector_success_count": 8,
+      "binary_sha256": "123faecd856ab0aa317b2916fdb2cf09089a487930beca2956c6d3bb13e49a03"
+    }
+  },
+  "play_checks": {
+    "syntax-final": {
+      "exit_code": 0,
+      "recap": {}
+    },
+    "syntax-netlink": {
+      "exit_code": 0,
+      "recap": {}
+    },
+    "negative-unapproved": {
+      "exit_code": 2,
+      "recap": {
+        "arm-npu-lab": {
+          "ok": 0,
+          "changed": 0,
+          "unreachable": 0,
+          "failed": 1
+        }
+      }
+    },
+    "negative-binary": {
+      "exit_code": 2,
+      "recap": {
+        "arm-npu-lab": {
+          "ok": 9,
+          "changed": 0,
+          "unreachable": 0,
+          "failed": 1
+        }
+      }
+    },
+    "apply-first": {
+      "exit_code": 0,
+      "recap": {
+        "arm-gpu-lab": {
+          "ok": 28,
+          "changed": 6,
+          "unreachable": 0,
+          "failed": 0
+        },
+        "arm-npu-lab": {
+          "ok": 28,
+          "changed": 6,
+          "unreachable": 0,
+          "failed": 0
+        }
+      }
+    },
+    "apply-netlink": {
+      "exit_code": 0,
+      "recap": {
+        "arm-gpu-lab": {
+          "ok": 29,
+          "changed": 2,
+          "unreachable": 0,
+          "failed": 0
+        },
+        "arm-npu-lab": {
+          "ok": 29,
+          "changed": 2,
+          "unreachable": 0,
+          "failed": 0
+        }
+      }
+    },
+    "apply-repeat": {
+      "exit_code": 0,
+      "recap": {
+        "arm-gpu-lab": {
+          "ok": 28,
+          "changed": 0,
+          "unreachable": 0,
+          "failed": 0
+        },
+        "arm-npu-lab": {
+          "ok": 28,
+          "changed": 0,
+          "unreachable": 0,
+          "failed": 0
+        }
+      }
+    },
+    "check-after": {
+      "exit_code": 0,
+      "recap": {
+        "arm-gpu-lab": {
+          "ok": 19,
+          "changed": 0,
+          "unreachable": 0,
+          "failed": 0
+        },
+        "arm-npu-lab": {
+          "ok": 19,
+          "changed": 0,
+          "unreachable": 0,
+          "failed": 0
+        }
+      }
+    }
+  },
+  "preserved_failed_trials": [
+    "Initial preflight stopped with zero changes when an expected inactive-service exit code surfaced as an SSH transport error; status reading changed to systemctl show.",
+    "First installation returned success but independent scrape verification failed: netdev=0 on both hosts. Journal showed unsupported socket address family. Scoped AF_NETLINK allowance and all-collector assertions corrected this; only the dedicated exporter restarted."
+  ],
+  "limitations": [
+    "Loopback scrapes through SSH; central Prometheus and dashboard ingestion not verified.",
+    "Read-only Slurm discovery; no scheduler configuration provisioning or controller admission qualification.",
+    "No GPU/NPU utilization, model qualification, hardware driver or firmware changes.",
+    "No AMD64, production-node, HA or reboot-persistence qualification.",
+    "CPU counter deltas include idle time and are not CPU utilization percentages."
+  ]
+}

@@ -85,3 +85,5 @@ then remove only that unit and `/opt/resource-advisor/node-exporter`, followed b
 `systemctl daemon-reload`. Never remove another exporter's files or Slurm units.
 
 See the [acceptance plan](../../docs/ansible-lab-plan.md) for the evidence boundary.
+The [actual two-host report](../../docs/ansible-lab.md) includes the initial
+collector failure, correction, preserved configuration and zero-change rerun.
