@@ -192,8 +192,8 @@ def summarize(report, plan):
         all(number(r["allocated_device_seconds"]) for r in profile_rows),
         "unknown profiling allocation",
     )
-    profile_gpu = sum(r["allocated_device_seconds"] for r in profile_rows)
-    profile_cpu = sum(
+    profile_gpu = math.fsum(r["allocated_device_seconds"] for r in profile_rows)
+    profile_cpu = math.fsum(
         candidate_cpus[r["candidate_ref"]] * r["allocated_device_seconds"] for r in profile_rows
     )
     require(profile_gpu <= plan["profiling"]["physical_gpu_seconds"], "profiling GPU cap exceeded")
@@ -338,7 +338,7 @@ def summarize(report, plan):
         ),
         "unknown or failed qualification",
     )
-    qualification_gpu = sum(q["gpu_reservation_seconds"] for q in report["qualification"])
+    qualification_gpu = math.fsum(q["gpu_reservation_seconds"] for q in report["qualification"])
     require(
         len({q["job_ref"] for q in report["qualification"]}) == len(report["qualification"])
         and sorted(q["host_cpu"] for q in report["qualification"])
@@ -349,7 +349,7 @@ def summarize(report, plan):
         len(report["qualification"]) == plan["budgets"]["qualification_jobs"],
         "qualification cohort changed",
     )
-    total_gpu = qualification_gpu + profile_gpu + sum(t["gpu_seconds"] for t in timings)
+    total_gpu = qualification_gpu + profile_gpu + math.fsum(t["gpu_seconds"] for t in timings)
     require(
         total_gpu
         == report["whole_protocol_gpu_seconds"]
@@ -369,33 +369,34 @@ def summarize(report, plan):
             "count": len(group),
             "raw_mean_seconds": statistics.mean(t["raw_result_wall_seconds"] for t in group),
             "compute_mean_seconds": statistics.mean(t["compute_seconds"] for t in group),
-            "gpu_seconds": sum(t["gpu_seconds"] for t in group),
-            "cpu_core_seconds": sum(t["cpu_core_seconds"] for t in group),
+            "gpu_seconds": math.fsum(t["gpu_seconds"] for t in group),
+            "cpu_core_seconds": math.fsum(t["cpu_core_seconds"] for t in group),
         }
+        # Explicit fsum keeps persisted totals stable across Python's sum implementations.
         for n in range(1, len(group) + 1):
             cumulative.append(
                 {
                     "arm": arm,
                     "uses": n,
                     "raw_wall_seconds_including_profile": (setup_wall if arm == "B2" else 0)
-                    + sum(t["raw_result_wall_seconds"] for t in group[:n]),
+                    + math.fsum(t["raw_result_wall_seconds"] for t in group[:n]),
                     "observed_completion_seconds_including_profile": (
                         setup_wall if arm == "B2" else 0
                     )
-                    + sum(
+                    + math.fsum(
                         t["raw_result_wall_seconds"] if arm == "B0" else t["delivery_wall_seconds"]
                         for t in group[:n]
                     ),
                     "platform_recorded_delivery_seconds_including_profile": (
                         (setup_wall if arm == "B2" else 0)
-                        + sum(t["platform_recorded_delivery_seconds"] for t in group[:n])
+                        + math.fsum(t["platform_recorded_delivery_seconds"] for t in group[:n])
                         if arm != "B0"
                         else None
                     ),
                     "gpu_seconds_including_profile": (profile_gpu if arm == "B2" else 0)
-                    + sum(t["gpu_seconds"] for t in group[:n]),
+                    + math.fsum(t["gpu_seconds"] for t in group[:n]),
                     "cpu_core_seconds_including_profile": (profile_cpu if arm == "B2" else 0)
-                    + sum(t["cpu_core_seconds"] for t in group[:n]),
+                    + math.fsum(t["cpu_core_seconds"] for t in group[:n]),
                 }
             )
     for block in range(plan["blocks"]):
