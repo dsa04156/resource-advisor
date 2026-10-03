@@ -1,0 +1,342 @@
+{
+  "source_commit": "8397fc015a7d9fbf58d23dcb1b015ee5808d129e",
+  "ci": {
+    "run_id": 37088065208,
+    "conclusion": "success",
+    "python_versions": [
+      "3.11",
+      "3.13"
+    ],
+    "sqlite": {
+      "passed": 569,
+      "skipped": 2
+    },
+    "postgresql": {
+      "passed": 571
+    }
+  },
+  "scope": "actual independent Slurm host observations through mTLS Prometheus, collector, persistent PostgreSQL, authenticated HTTPS API and existing console; controller explicitly unconfigured",
+  "controller_live_qualification": false,
+  "slurm_submission_tested_in_this_increment": false,
+  "source_hashes": {
+    "api": "1a0f51f7e1081779753326b4e88cca723e671fe040a13c5d7f0957c1983cd5e5",
+    "slurm-inventory": "1a0f51f7e1081779753326b4e88cca723e671fe040a13c5d7f0957c1983cd5e5"
+  },
+  "rollout_checks": {
+    "stable_database_fingerprints_preserved": true,
+    "existing_inventory_worker_database_pods_preserved": true,
+    "existing_nine_static_object_uids_preserved": true,
+    "existing_secrets_pvc_preserved": true,
+    "existing_compute_ownership_preserved": true,
+    "four_apps_synced_exact_revision": true
+  },
+  "gitops": {
+    "services": {
+      "sync": "Synced",
+      "health": "Healthy",
+      "operation": "Succeeded"
+    },
+    "worker": {
+      "sync": "Synced",
+      "health": "Healthy",
+      "operation": "Succeeded"
+    },
+    "postgres": {
+      "sync": "Synced",
+      "health": "Healthy",
+      "operation": "Succeeded"
+    },
+    "slurm-inventory": {
+      "sync": "Synced",
+      "health": "Healthy",
+      "operation": "Succeeded"
+    }
+  },
+  "api_checks": {
+    "https_verified": true,
+    "project_denial": 404,
+    "anonymous_denial": 401,
+    "other_project_overview_excludes_slurm": true,
+    "kubernetes_nodes_preserved": 10,
+    "assets_match": true
+  },
+  "two_snapshots_advance_all_eight_source_times": true,
+  "actual_samples": [
+    {
+      "schema_version": "v1",
+      "backend": "slurm",
+      "ref": "inv-9f918485135248dc932e159e50baa8fe",
+      "cluster_ref": "lab-slurm",
+      "collected_at": "2026-10-03T02:03:41.617823+00:00",
+      "stale_after_seconds": 120,
+      "status": "partial",
+      "sources": {
+        "slurm_nodes": "not_configured",
+        "slurm_queue": "not_configured",
+        "prometheus": "ok"
+      },
+      "nodes": [
+        {
+          "node_ref": "slurm-npu-lab",
+          "hardware": null,
+          "resources": {},
+          "telemetry": {
+            "node:memory_available_bytes": {
+              "value": 3668934656.0,
+              "observed_at": "2026-10-03T02:03:31.450000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "bytes"
+            },
+            "node:memory_total_bytes": {
+              "value": 4241620992.0,
+              "observed_at": "2026-10-03T02:03:31.450000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "bytes"
+            },
+            "node:cpu_non_idle_cores": {
+              "value": 0.013333333332816388,
+              "observed_at": "2026-10-03T02:03:31.450000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "cores"
+            },
+            "node:cpu_count": {
+              "value": 4.0,
+              "observed_at": "2026-10-03T02:03:31.450000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "count"
+            }
+          },
+          "scheduler_state": {
+            "value": null,
+            "observed_at": null,
+            "source": "slurm-controller",
+            "status": "not_configured",
+            "unit": null
+          },
+          "accelerator_inventory": {
+            "value": null,
+            "observed_at": null,
+            "source": "slurm-controller",
+            "status": "not_configured",
+            "unit": null
+          },
+          "scheduling_blockers": []
+        },
+        {
+          "node_ref": "slurm-gpu-lab",
+          "hardware": null,
+          "resources": {},
+          "telemetry": {
+            "node:memory_available_bytes": {
+              "value": 6685081600.0,
+              "observed_at": "2026-10-03T02:03:41.376000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "bytes"
+            },
+            "node:memory_total_bytes": {
+              "value": 7849181184.0,
+              "observed_at": "2026-10-03T02:03:41.376000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "bytes"
+            },
+            "node:cpu_non_idle_cores": {
+              "value": 0.03799999999981951,
+              "observed_at": "2026-10-03T02:03:41.376000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "cores"
+            },
+            "node:cpu_count": {
+              "value": 6.0,
+              "observed_at": "2026-10-03T02:03:41.376000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "count"
+            }
+          },
+          "scheduler_state": {
+            "value": null,
+            "observed_at": null,
+            "source": "slurm-controller",
+            "status": "not_configured",
+            "unit": null
+          },
+          "accelerator_inventory": {
+            "value": null,
+            "observed_at": null,
+            "source": "slurm-controller",
+            "status": "not_configured",
+            "unit": null
+          },
+          "scheduling_blockers": []
+        }
+      ],
+      "queues": [],
+      "cluster_queues": [],
+      "slurm_queue": {
+        "value": null,
+        "observed_at": null,
+        "source": "slurm-controller",
+        "status": "not_configured",
+        "unit": null
+      },
+      "execution_qualification": "inventory never grants runtime qualification or admission"
+    },
+    {
+      "schema_version": "v1",
+      "backend": "slurm",
+      "ref": "inv-0cad5ac5552b4675b6a1efd208a14e20",
+      "cluster_ref": "lab-slurm",
+      "collected_at": "2026-10-03T02:05:11.764275+00:00",
+      "stale_after_seconds": 120,
+      "status": "partial",
+      "sources": {
+        "slurm_nodes": "not_configured",
+        "slurm_queue": "not_configured",
+        "prometheus": "ok"
+      },
+      "nodes": [
+        {
+          "node_ref": "slurm-npu-lab",
+          "hardware": null,
+          "resources": {},
+          "telemetry": {
+            "node:memory_available_bytes": {
+              "value": 3672276992.0,
+              "observed_at": "2026-10-03T02:05:01.450000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "bytes"
+            },
+            "node:memory_total_bytes": {
+              "value": 4241620992.0,
+              "observed_at": "2026-10-03T02:05:01.450000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "bytes"
+            },
+            "node:cpu_non_idle_cores": {
+              "value": 0.013333333333463204,
+              "observed_at": "2026-10-03T02:05:01.450000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "cores"
+            },
+            "node:cpu_count": {
+              "value": 4.0,
+              "observed_at": "2026-10-03T02:05:01.450000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "count"
+            }
+          },
+          "scheduler_state": {
+            "value": null,
+            "observed_at": null,
+            "source": "slurm-controller",
+            "status": "not_configured",
+            "unit": null
+          },
+          "accelerator_inventory": {
+            "value": null,
+            "observed_at": null,
+            "source": "slurm-controller",
+            "status": "not_configured",
+            "unit": null
+          },
+          "scheduling_blockers": []
+        },
+        {
+          "node_ref": "slurm-gpu-lab",
+          "hardware": null,
+          "resources": {},
+          "telemetry": {
+            "node:memory_available_bytes": {
+              "value": 6685089792.0,
+              "observed_at": "2026-10-03T02:05:11.376000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "bytes"
+            },
+            "node:memory_total_bytes": {
+              "value": 7849181184.0,
+              "observed_at": "2026-10-03T02:05:11.376000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "bytes"
+            },
+            "node:cpu_non_idle_cores": {
+              "value": 0.03622222222297311,
+              "observed_at": "2026-10-03T02:05:11.376000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "cores"
+            },
+            "node:cpu_count": {
+              "value": 6.0,
+              "observed_at": "2026-10-03T02:05:11.376000+00:00",
+              "source": "prometheus",
+              "status": "ok",
+              "unit": "count"
+            }
+          },
+          "scheduler_state": {
+            "value": null,
+            "observed_at": null,
+            "source": "slurm-controller",
+            "status": "not_configured",
+            "unit": null
+          },
+          "accelerator_inventory": {
+            "value": null,
+            "observed_at": null,
+            "source": "slurm-controller",
+            "status": "not_configured",
+            "unit": null
+          },
+          "scheduling_blockers": []
+        }
+      ],
+      "queues": [],
+      "cluster_queues": [],
+      "slurm_queue": {
+        "value": null,
+        "observed_at": null,
+        "source": "slurm-controller",
+        "status": "not_configured",
+        "unit": null
+      },
+      "execution_qualification": "inventory never grants runtime qualification or admission"
+    }
+  ],
+  "browser_checks": {
+    "host_meters": true,
+    "no_ready_claim": true,
+    "unknown_accelerator": true,
+    "unknown_queue": true,
+    "mobile_no_page_overflow": true,
+    "one_host_outage_keeps_peer": true,
+    "stale_hides_meters": true,
+    "expires_without_polling": true,
+    "inert_labels": true
+  },
+  "browser_scope": "existing public assets and private read-only localhost proxy to certificate-verified HTTPS; faults are response overrides only; project authorization separately checked on real API",
+  "retained_observations": [
+    "Initial access after API Pod replacement failed TLS while the old port-forward target was gone; supervised tunnel recovered in three seconds without manual restart.",
+    "First three collector snapshots withheld GPU-host CPU rate because the combined health query failed at collection time; other seven measurements remained valid. Later original snapshots and two API reads contain eight healthy observations. Subsequent historical queries are healthy and do not establish which realtime subcondition failed.",
+    "Initial browser harness unregistered routes before responses completed; corrected to wait for network completion and rendering, then all nine checks passed."
+  ],
+  "remaining_gates": [
+    "live Slurm controller schema, account/partition queue and resource qualification",
+    "real Slurm model/API/result execution",
+    "NPU hardware presence and execution qualification",
+    "host architecture/vendor inventory and accelerator utilization providers",
+    "production ingress, HA, credential renewal and retention policy"
+  ]
+}

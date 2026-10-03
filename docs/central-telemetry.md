@@ -4,8 +4,9 @@ Two existing ARM lab workers now supply real CPU/memory/system counters to the
 existing Prometheus through certificate-verified HTTPS with mandatory client
 authentication. The independent Resource Advisor metric reader consumes these
 series with health and source-time checks. This qualifies the central telemetry
-path; publication through Slurm backend inventory, the project API and the
-console remains a required subsequent integration.
+path. The subsequent [Slurm inventory integration](slurm-inventory.md) now
+publishes these observations through the project API and console; controller
+reservations, queues and accelerator state remain explicitly unconfigured.
 
 The [acceptance plan](central-telemetry-plan.md) preceded the trial.
 [Observed results](evidence/central-telemetry.json) contain actual values,
