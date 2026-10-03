@@ -1,0 +1,14 @@
+{
+  "repo_url": "https://github.com/dsa04156/resource-advisor.git",
+  "revision": "<full reviewed Git commit id>",
+  "argocd_namespace": "argocd",
+  "service_node_selector": {"resource-advisor.io/services": "true", "kubernetes.io/arch": "amd64"},
+  "postgres_node_selector": {"resource-advisor.io/metadata": "true"},
+  "images": {
+    "api": "example.invalid/resource-advisor/services@sha256:<qualified digest>",
+    "inventory": "example.invalid/resource-advisor/services@sha256:<qualified digest>",
+    "worker": "example.invalid/resource-advisor/worker@sha256:<qualified digest>",
+    "postgres": "public.ecr.aws/docker/library/postgres@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94"
+  },
+  "worker_replicas": 0
+}
