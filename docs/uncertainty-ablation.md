@@ -56,7 +56,10 @@ does not show that the gate is unnecessary. The third qLogNEI study confirmed
 only its predicted baseline; later reference runs cannot retroactively add an
 untested finalist to its selection. No new GPU Job was created, and the existing
 361 GPU reservation seconds remain attributed to the original experiment.
-Numerical cross-workload holdout and forecast-interval calibration remain open
-R4 requirements; this one-workload replay cannot close them. The later
+This one-workload replay cannot establish numerical cross-workload coverage or
+forecast-interval calibration. The separate
+[numerical shape holdout](numerical-workload-holdout.md) now measures bounded
+interpolation coverage and out-of-range abstention; its broad intervals do not
+establish calibration. The later
 [bounded induced-drift trial](load-drift.md) verifies stale-approval rejection
 without changing this offline ablation or calibrating its intervals.

@@ -113,9 +113,11 @@ original trial's 38 qualification seconds remain in its separate accounting,
 for 475 seconds overall. Reuse is not a claim of saved runtime or free history.
 
 This closes a bounded **source-only rank** workload-holdout check and expands
-chronological forecast evidence. R4 remains incomplete for zero-shot numerical
-uncertainty, unseen model/runtime families, independently calibrated future
-intervals. A later [bounded live drift trial](load-drift.md) independently verifies
+chronological forecast evidence. A separate
+[numerical shadow holdout](numerical-workload-holdout.md) now predicts the middle
+shape with wide intervals and explicitly abstains on both outer shapes. It does
+not validate unseen model/runtime families or calibrated future intervals.
+A later [bounded live drift trial](load-drift.md) independently verifies
 stale-recommendation latching and old-approval rejection; it does not calibrate
 these saved intervals. This holdout audit does not activate stale qualifications,
 approve execution, remove confirmation gates or modify the running platform.

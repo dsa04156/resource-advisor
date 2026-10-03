@@ -82,6 +82,11 @@ not establish zero-shot generalization to another. The offline
 [workload-holdout evaluation](workload-holdout.md) now tests the source-only rank
 prior on complete withheld shapes and audits 24 additional saved forecasts.
 That bounded rank evaluation does not provide cross-workload numerical intervals.
+A separate [numerical shadow evaluation](numerical-workload-holdout.md) now
+withholds all outcomes of each shape and fits only on the other source shapes.
+It covers nine in-range Jobs with wide intervals, abstains on 18 out-of-range
+Jobs and preserves the chronological audit separately. The live endpoint still
+reports its own workload-scoped model; it does not substitute this offline GP.
 
 ## Actual historical GPU audit
 
@@ -111,8 +116,10 @@ submission recheck, quality regression, profile aging, project isolation and
 training/target time or identity leakage. Their injected drift scenarios are
 synthetic tests, not hardware performance evidence.
 
-Open R4 gates include unseen-family numerical workload holdout, calibrated intervals with enough samples,
-broader load/storage conditions and unseen-environment evaluation. The historical two-forecast audit itself
+Prospective source-only prediction, calibrated intervals and broader load/storage
+evaluation remain unproven. Unseen families, runtimes and out-of-range inputs
+must abstain, rather than acquire unsupported performance predictions.
+The historical two-forecast audit itself
 does not qualify R2/R3 algorithms; subsequent transfer evidence is documented
 separately in [transfer-gpu.md](transfer-gpu.md).
 

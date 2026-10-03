@@ -37,7 +37,9 @@ independent confirmation, including real GPU runs. A completed three-block
 [S0/S1/S2 comparison](policy-comparison-v2.md) now retains the stopped predecessor
 and full measured allocation costs without demonstrating BO superiority.
 Complete phase/utilization accounting, broader B0–B2 operational effectiveness
-and unseen-family numerical uncertainty remain evaluation gates; a bounded source-only rank holdout is now published.
+and wider numerical uncertainty evaluation remain open; bounded source-only
+rank and [numerical shape holdouts](numerical-workload-holdout.md) are now published.
+Unseen families and inputs outside source bounds abstain.
 The small smoke experiment does not prove BO superiority or hard physical budget bounds.
 The first preregistered comparison exposed a shallow deployment integration:
 optimizer tests passed with local dependencies, but the deployed worker lacked
@@ -49,7 +51,9 @@ Recommendation reuse now rechecks source age/scope and post-recommendation
 residuals before approval and submission. A historical chronological audit found
 both eligible later GPU results outside their saved posterior intervals. The
 heuristic drift gate and this two-point report are not calibrated uncertainty;
-numerical workload holdout and interval calibration remain open. The later
+the new numerical holdout covers nine in-range Jobs with wide intervals and
+14.71% point error, while 18 out-of-range Jobs abstain. It is retrospective;
+prospective source-only accuracy and interval calibration remain unproven. The later
 [bounded live drift trial](load-drift.md) verifies latching and stale-approval
 rejection; its [completion-state follow-up](kubernetes-completion.md) fixes a
 transient requeue observation and the resulting false queue-timeout risk.

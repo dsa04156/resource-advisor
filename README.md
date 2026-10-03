@@ -62,7 +62,11 @@ a later reference grid. All 129 application results plus three F0 Jobs are accou
 for; no BO selection advantage is demonstrated. Raw data, cost-aware figures,
 [offline uncertainty replay](docs/uncertainty-ablation.md), and the retained
 failed predecessor are published. The [full acceptance audit](docs/goal-audit.md)
-still lists required Slurm, broader failure scenarios and numerical holdout gaps.
+still lists required Slurm and broader failure scenarios. The new
+[numerical workload holdout](docs/numerical-workload-holdout.md) reuses existing
+GPU results: 18 out-of-range Jobs abstain; nine in-range Jobs are covered by
+wide, uncalibrated intervals with 14.71% point error. It is an offline shadow
+evaluation and grants no execution authority.
 
 ## Responsibility
 
