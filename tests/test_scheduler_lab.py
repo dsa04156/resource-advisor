@@ -65,3 +65,85 @@ def test_registered_workload_poc_uses_runner_project_only(scenario):
     with pytest.raises(Rejected):
         lab.start("team-b", LabRequest(scenario=scenario), "other-project")
     assert lab.start("team-a", LabRequest(scenario=scenario), "own-project")["state"] == "REQUESTED"
+
+
+def test_node_history_is_project_scoped_frozen_and_samples_resource_changes(monkeypatch):
+    from datetime import timedelta
+
+    from resource_advisor.contracts import now
+    from resource_advisor.inventory import save_inventory
+
+    clock = now()
+    monkeypatch.setattr("resource_advisor.scheduler_lab.now", lambda: clock)
+    store = Store("sqlite://")
+    store.initialize()
+    lab = SchedulerLab(store)
+    lab.heartbeat({"scenarios": ["gang"]})
+    ref = lab.start("team-a", LabRequest(scenario="gang"), "history")["ref"]
+
+    def inventory(ref, cpu, collected=None):
+        stamp = (collected or clock).isoformat()
+        return {
+            "ref": ref,
+            "cluster_ref": "cluster-a",
+            "collected_at": stamp,
+            "stale_after_seconds": 120,
+            "status": "ok",
+            "nodes": [
+                {
+                    "node_ref": "node-a",
+                    "resources": {},
+                    "telemetry": {
+                        "cpu_usage_cores": {
+                            "value": cpu,
+                            "source": "metrics",
+                            "observed_at": stamp,
+                            "status": "ok",
+                        }
+                    },
+                }
+            ],
+            "queues": [{"private": "not needed in node history"}],
+        }
+
+    save_inventory(store, "team-a", inventory("inventory-1", 1))
+    save_inventory(store, "team-b", inventory("inventory-other-team", 99))
+    report = LabReport(state="RUNNING", snapshot={"jobs": []}, event={"title": "running"})
+    lab.report(ref, report)
+    first = lab.listing("team-a")["items"][0]["body"]["events"][0]
+    saved = first["snapshot"]["resource_observation"]
+    assert saved["observed_at"] == first["observed_at"]
+    assert len(saved["inventory"]) == 1
+    assert "queues" not in saved["inventory"][0]
+    sample = saved["inventory"][0]["nodes"][0]["telemetry"]["cpu_usage_cores"]
+    assert sample["value"] == 1 and sample["status"] == "ok"
+
+    # Node changes also get a replay sample when native job state is unchanged.
+    clock += timedelta(seconds=16)
+    save_inventory(store, "team-a", inventory("inventory-2", 2))
+    lab.report(ref, LabReport(state="RUNNING", snapshot={"jobs": []}))
+    body = lab.listing("team-a")["items"][0]["body"]
+    assert len(body["events"]) == 2
+    assert body["events"][1]["title"] == "노드 자원 관측 갱신"
+    assert body["events"][0]["snapshot"]["resource_observation"] == saved
+
+    # The next read cannot age a historical sample or backfill it from current data.
+    clock += timedelta(minutes=5)
+    lab.report(ref, LabReport(state="RUNNING", snapshot={}, event={"title": "later"}))
+    body = lab.listing("team-a")["items"][0]["body"]
+    stale = body["snapshot"]["resource_observation"]["inventory"][0]
+    assert stale["status"] == "stale"
+    assert stale["nodes"][0]["telemetry"]["cpu_usage_cores"]["value"] is None
+    assert body["events"][0]["snapshot"]["resource_observation"] == saved
+
+
+def test_missing_inventory_stays_missing_in_node_history():
+    store = Store("sqlite://")
+    store.initialize()
+    lab = SchedulerLab(store)
+    lab.heartbeat({"scenarios": ["gang"]})
+    ref = lab.start("team-a", LabRequest(scenario="gang"), "missing")["ref"]
+    lab.report(ref, LabReport(state="RUNNING", event={"title": "started"}))
+    observation = lab.listing("team-a")["items"][0]["body"]["snapshot"]["resource_observation"]
+    assert observation["status"] == "missing"
+    assert observation["inventory"] == []

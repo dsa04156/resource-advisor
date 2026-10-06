@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import JSON, Column, Integer, String, Table, select, update
 
 from .contracts import now
+from .inventory import latest_inventory_views
 from .service import NotFound, Rejected
 from .store import Conflict, metadata
 
@@ -169,18 +170,78 @@ class SchedulerLab:
             r = self._get(conn, ref)
             if r["state"] in TERMINAL:
                 return dict(r)
-            body = {**r["body"], "snapshot": report.snapshot, "observed_at": now().isoformat()}
-            if report.event:
+            observed_at = now()
+            inventory = latest_inventory_views(conn, r["project"], at=observed_at)
+            # Freeze source timestamps and freshness at observation time. Keep
+            # aggregate node facts, never other projects' jobs or queue payloads.
+            inventory = [
+                {
+                    **{
+                        k: v
+                        for k, v in s.items()
+                        if k != "nodes"
+                        and k
+                        in {
+                            "ref",
+                            "cluster_ref",
+                            "backend",
+                            "collected_at",
+                            "stale_after_seconds",
+                            "status",
+                        }
+                    },
+                    "nodes": [
+                        {
+                            k: v
+                            for k, v in n.items()
+                            if k
+                            in {
+                                "node_ref",
+                                "hardware",
+                                "ready",
+                                "scheduler_state",
+                                "scheduling_blockers",
+                                "resources",
+                                "telemetry",
+                            }
+                        }
+                        for n in s["nodes"]
+                    ],
+                }
+                for s in inventory
+            ]
+            observation = {
+                "observed_at": observed_at.isoformat(),
+                "status": "recorded" if inventory else "missing",
+                "inventory": inventory,
+            }
+            snapshot = {**report.snapshot, "resource_observation": observation}
+            body = {**r["body"], "snapshot": snapshot, "observed_at": observed_at.isoformat()}
+            event = report.event
+            last_sample = body.get("resource_sample_at")
+            previous = r["body"].get("snapshot", {}).get("resource_observation", {})
+            changed = inventory != previous.get("inventory", [])
+            if (
+                not event
+                and changed
+                and (
+                    not last_sample
+                    or (observed_at - datetime.fromisoformat(last_sample)).total_seconds() >= 15
+                )
+            ):
+                event = {"title": "노드 자원 관측 갱신"}
+            if event:
                 body["events"] = (
                     body.get("events", [])
                     + [
                         {
-                            **report.event,
-                            "observed_at": now().isoformat(),
-                            "snapshot": report.snapshot,
+                            **event,
+                            "observed_at": observed_at.isoformat(),
+                            "snapshot": snapshot,
                         }
                     ]
                 )[-100:]
+                body["resource_sample_at"] = observed_at.isoformat()
             state = (
                 r["state"]
                 if r["state"] == "CANCEL_REQUESTED" and report.state == "RUNNING"

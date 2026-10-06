@@ -12,7 +12,7 @@ from uuid import uuid4
 
 import httpx
 from pydantic import Field, model_validator
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from .backends import BackendError, run
 from .contracts import Contract, Ref, now
@@ -493,3 +493,26 @@ def latest_inventory(store, project, cluster):
             .first()
         )
         return fresh_view(row["body"]) if row else None
+
+
+def latest_inventory_views(conn, project, *, at=None):
+    """Latest authorized cluster observations, evaluated at the requested time."""
+    ranked = (
+        select(
+            entities.c.ref,
+            func.row_number()
+            .over(
+                partition_by=entities.c.body["cluster_ref"].as_string(),
+                order_by=(entities.c.created_at.desc(), entities.c.ref.desc()),
+            )
+            .label("rank"),
+        )
+        .where(entities.c.kind == "inventory", entities.c.project == project)
+        .subquery()
+    )
+    snapshots = conn.execute(
+        select(entities.c.body)
+        .join(ranked, entities.c.ref == ranked.c.ref)
+        .where(entities.c.kind == "inventory", entities.c.project == project, ranked.c.rank == 1)
+    ).scalars()
+    return sorted((fresh_view(s, at=at) for s in snapshots), key=lambda s: s["cluster_ref"])

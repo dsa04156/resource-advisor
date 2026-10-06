@@ -6,7 +6,7 @@ from sqlalchemy import func, or_, select
 
 from .contracts import WorkloadSpec, now, signature
 from .diagnostics import diagnose
-from .inventory import fresh_view
+from .inventory import latest_inventory_views
 from .policy import compatibility, execution_compatibility
 from .service import NotFound, Rejected
 from .store import entities, jobs, usage
@@ -124,29 +124,7 @@ def overview(
 ):
     store = service.store
     with store.transaction() as conn:
-        # Rank in SQL so polling does not read the entire append-only inventory history.
-        cluster = entities.c.body["cluster_ref"].as_string()
-        ranked = (
-            select(
-                entities.c.ref,
-                func.row_number()
-                .over(
-                    partition_by=cluster,
-                    order_by=(entities.c.created_at.desc(), entities.c.ref.desc()),
-                )
-                .label("rank"),
-            )
-            .where(entities.c.kind == "inventory", entities.c.project == project)
-            .subquery()
-        )
-        snapshots = conn.execute(
-            select(entities.c.body)
-            .join(ranked, entities.c.ref == ranked.c.ref)
-            .where(
-                entities.c.kind == "inventory", entities.c.project == project, ranked.c.rank == 1
-            )
-        ).scalars()
-        inventory = sorted((fresh_view(s) for s in snapshots), key=lambda s: s["cluster_ref"])
+        inventory = latest_inventory_views(conn, project)
         job_query = (
             select(jobs)
             .where(jobs.c.project == project)
