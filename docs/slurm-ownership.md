@@ -46,7 +46,14 @@ uv run pytest -q tests/test_slurm_ownership.py tests/test_backends.py
 These are software regression tests, not a live multi-user Slurm acceptance test.
 No fake scheduler output is published as a physical accelerator result.
 
-## Current lab observation — 2026-10-03 KST
+## Current recovery — 2026-10-06
+
+Controller connectivity and both worker registrations have recovered; the two
+allocation-free nodes now report `IDLE`. Fresh MUNGE authentication passed in both
+directions. See [the recovery evidence and remaining gates](slurm-recovery.md).
+The Pi accelerator is still absent, and full model/API execution is still pending.
+
+## Previous lab observation — 2026-10-03 KST
 
 A read-only recheck found the controller unreachable from both the platform host
 and the Slurm Raspberry Pi. Both compute nodes accepted SSH and reported active

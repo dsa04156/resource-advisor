@@ -1,0 +1,75 @@
+{
+  "schema_version": "v1",
+  "scope": "Live scheduler recovery; not model qualification or end-to-end API acceptance",
+  "observed_at": "2026-10-06T01:53:33.066296+00:00",
+  "slurm_version": "24.11.5",
+  "before": [
+    {
+      "role": "pi-npu-candidate",
+      "state": "DOWN+NOT_RESPONDING",
+      "allocated_cpus": 0,
+      "allocated_memory_mib": 0,
+      "gres": null
+    },
+    {
+      "role": "orin-gpu",
+      "state": "DOWN+NOT_RESPONDING",
+      "allocated_cpus": 0,
+      "allocated_memory_mib": 0,
+      "gres": "gpu:orin_nano:1"
+    }
+  ],
+  "after": [
+    {
+      "role": "pi-npu-candidate",
+      "state": "IDLE",
+      "allocated_cpus": 0,
+      "allocated_memory_mib": 0,
+      "gres": null
+    },
+    {
+      "role": "orin-gpu",
+      "state": "IDLE",
+      "allocated_cpus": 0,
+      "allocated_memory_mib": 0,
+      "gres": "gpu:orin_nano:1"
+    }
+  ],
+  "fresh_bidirectional_munge": [
+    {
+      "direction": "pi",
+      "exit_code": 0,
+      "success": true
+    },
+    {
+      "direction": "pi_reverse",
+      "exit_code": 0,
+      "success": true
+    },
+    {
+      "direction": "orin",
+      "exit_code": 0,
+      "success": true
+    },
+    {
+      "direction": "orin_reverse",
+      "exit_code": 0,
+      "success": true
+    }
+  ],
+  "queue_empty_after": true,
+  "controller_configuration_unchanged": true,
+  "recovery_action": "RESUME only the two allocation-free DOWN+NOT_RESPONDING nodes whose reason was Not responding; scheduler registration returned IDLE",
+  "daemon_restart": false,
+  "driver_changes": false,
+  "reboots": false,
+  "pi_accelerator_pci_detected": false,
+  "pi_accelerator_device_files": [],
+  "remaining": [
+    "qualified Orin PyTorch model environment",
+    "Pi accelerator physical detection and runtime qualification",
+    "actual API/model/result/usage path",
+    "cross-user authorization and Slurm failure recovery",
+    "reproducible Slurm configuration management"
+  ]
+}
