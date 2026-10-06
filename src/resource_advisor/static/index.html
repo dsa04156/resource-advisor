@@ -10,41 +10,29 @@
   </head>
   <body>
     <a href="#main" class="skip">본문으로 이동</a>
-    <header>
-      <a href="/console" class="brand"
-        >RA <span>Resource Advisor<small>연구실 공동 자원 관리</small></span></a
-      >
-      <div id="identity">프로젝트 연결 전</div>
-      <button id="logout" hidden>연결 해제</button>
-    </header>
     <div class="layout">
-      <aside>
-        <p class="eyebrow">WORKSPACE</p>
+      <aside class="sidebar">
+        <a href="#execution" class="brand"><span class="brand-mark" aria-hidden="true">▥</span><span>Research Workspace<small>Resource Advisor · GPU / NPU</small></span></a>
         <nav aria-label="작업과 자원 관리">
-          <a href="#submit" data-view="submit"
-            ><span>＋</span>작업 제출</a
-          >
-          <a href="#execution" data-view="execution" aria-current="page"
-            ><span>01</span>자원 현황</a
-          >
-          <a href="#jobs" data-view="jobs"
-            ><span>02</span>작업 현황</a
-          >
-          <a href="#history" data-view="history"
-            ><span>03</span>큐 · 사용량</a
-          >
-          <details class="advanced-nav"><summary>고급 · 검증</summary>
-          <a href="#compatibility" data-view="compatibility"
-            >가속기 호환성</a>
-          <a href="#recommendations" data-view="recommendations"
-            >추천 근거 · 결과</a
-          >
-          </details>
+          <a href="#execution" data-view="execution" aria-current="page"><span>◫</span>자원 현황</a>
+          <a href="#jobs" data-view="jobs"><span>≡</span>작업 현황 <b id="nav-job-count" class="nav-count">—</b></a>
+          <a href="#submit" data-view="submit"><span>＋</span>새 작업</a>
+          <a href="#history" data-view="history"><span>⌘</span>큐 · 사용량</a>
         </nav>
-        <p class="aside-note">
-          등록된 장비, 예약 여유,<br />검증된 실행환경을 구분합니다.
-        </p>
+        <nav class="related-nav" aria-label="분석과 검증">
+          <p class="eyebrow">ANALYSIS</p>
+          <a href="#compatibility" data-view="compatibility"><span>◇</span>가속기 호환성</a>
+          <a href="#recommendations" data-view="recommendations"><span>⌁</span>추천 근거 · 결과</a>
+        </nav>
+        <div class="sidebar-spacer"></div>
+        <section class="tenant-card"><span class="connection-dot" aria-hidden="true"></span><div><small>워크스페이스</small><strong id="identity">연결 전</strong></div></section>
+        <button id="logout" hidden>연결 해제</button>
       </aside>
+      <div class="content-shell">
+        <header class="topbar">
+          <div><p class="eyebrow" id="section-label">WORKSPACE</p><h1 id="view-title">자원 현황</h1></div>
+          <div class="refresh"><small id="updated"></small><label><input id="auto" type="checkbox" checked />15초 자동 갱신</label><button id="refresh" aria-label="지금 갱신" title="지금 갱신">↻</button><a class="action-link" href="#submit">새 작업</a></div>
+        </header>
       <main id="main" tabindex="-1">
         <section id="connect" class="connect panel">
           <p class="eyebrow">PROJECT ACCESS</p>
@@ -69,23 +57,11 @@
         </section>
         <div id="notice" role="status" aria-live="polite"></div>
         <div id="workspace" hidden>
-          <div class="view-head">
-            <div>
-              <p class="eyebrow" id="section-label">OBSERVATION</p>
-              <h1 id="view-title">실행 현황</h1>
-              <p id="view-description"></p>
-            </div>
-            <div class="refresh">
-              <button id="refresh">지금 갱신</button
-              ><label
-                ><input id="auto" type="checkbox" checked />15초 자동
-                갱신</label
-              ><small id="updated"></small>
-            </div>
-          </div>
+          <p id="view-description" class="view-description"></p>
           <div id="content"></div>
         </div>
       </main>
+      </div>
     </div>
     <dialog id="job-dialog" aria-labelledby="job-dialog-title">
       <div class="panel-head"><h2 id="job-dialog-title">작업 상세</h2><button id="close-job-dialog" aria-label="상세 닫기">닫기 ×</button></div>

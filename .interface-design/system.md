@@ -21,33 +21,34 @@ row pairs measured utilization with scheduler reservations and a source-age labe
 Rejected defaults: a summed heterogeneous GPU number, green zero for missing
 telemetry, and giant equal-sized statistic cards without evidence provenance.
 
-Hierarchy: a dedicated job submission section precedes the four inspection sections.
-The main navigation emphasizes submission, resources/jobs, and queue/usage.
-Resource and job views are now separate. The user's mini-science-ai-os reference
-informs the dark fleet summary, green status accents, compact summary cards, and
-node cards with measured CPU/memory bars. Implemented independently against this
-platform's existing data; no reference deployment details are copied.
-Job view has project-wide server-side search/status/backend filters, a compact
-table, and a native dialog for structured results and cancellation. Preserve
-search focus across polling. Nodes filter locally across the full inventory.
-Dark fleet tokens: rack #102822, panel #18372f, muted #a1c0b4, signal #79e4b7.
-Node cards use a responsive three/two/one-column grid and 16–20px padding.
-Compatibility and recommendation evidence are grouped in native advanced details.
+Hierarchy: match the user's mini-science-ai-os reference structurally, not just
+with a dark hero. Fixed 244px sidebar contains the brand, primary navigation and
+workspace identity; the sticky 90px topbar holds page title, refresh and new job.
+The resource view orders fleet hero, project job-state flow, a joined KPI strip,
+physical GPU/NPU observations alongside logical reservations, then full node cards.
+The four-stage flow shows aggregate counts, not a fabricated per-job trace or an
+unverified Kubeflow/MLflow health claim. Missing signals stay unknown.
+Jobs use one search/filter/table panel beneath an execution heading; details and
+cancellation retain the existing native dialog and scoped API. Search still runs
+server-side across project records; node filtering remains local.
+Palette follows the reference: neutral #f5f5f7 canvas, #1d1d1f text, #0071e3 actions,
+#0b1716 rack, #102321 instrument and #58ddb2 signals. Cards use 22px radii, the
+fleet hero 28px, a 4px spacing grid, subtle borders and a minimal panel shadow.
+At mobile widths the four primary routes move to a bottom navigation bar; analysis
+links remain accessible above the topbar, tables expose extra facts in details.
+Compatibility and recommendation evidence remain secondary sidebar links.
 An operator-selected submission catalog is the default; historical experimental
 templates are opt-in. Expired capability evidence in operational mode is an amber
 warning, never relabeled as freshly verified; execution and qualification are distinct.
-Execution starts with a prominent new-job link, then the node table,
-then attempt history. Compatibility and evidence use dense comparison tables with
+Resources and jobs remain separate routes. Compatibility and evidence use dense comparison tables with
 expandable provenance. Counts are secondary and name their scope.
 Submission uses labeled native selectors for registered workload and execution
 candidate, followed by a resource/time/priority summary and explicit submit action.
 Selection persists across refreshes; focusing the form pauses automatic refresh.
 Incompatible candidates remain inspectable with reasons and a disabled submit.
 A secondary details panel imports WorkloadSpec JSON without starting compute.
-Palette: slate text #192d3a on #f4f7f8, white panels, teal #006d69,
-amber #805500, red #a12e39. No remote fonts or assets.
-Depth: subtle borders only. Sidebar shares the canvas, panels are white, inputs
-are inset #edf2f4. Typography: system sans, Korean fallbacks; 14px base, 12/14/18/24/30px
+Amber #805500 and red #a12e39 retain warning/error semantics. No remote fonts or assets.
+Depth and layout use the reference tokens above; controls remain native. Typography: system sans, Korean fallbacks; 14px base, 12/14/18/24/30px
 scale; 600 weight for values and tabular numbers; monospace for shortened IDs.
 Spacing: 4px base; 16px panel padding, 24px section gaps, 36px minimum buttons.
 Resource bars: native meter element, value and units always visible; unavailable
@@ -57,7 +58,7 @@ Native controls: links for navigation, buttons for actions, details for provenan
 labeled password input for authenticated installs; shared-lab mode auto-connects
 to the server-selected project and hides login/logout. No credential is embedded
 in assets. No custom keyboard widget.
-Responsive: navigation becomes horizontal; tables keep local overflow wrappers;
+Responsive: primary navigation becomes a bottom bar; tables keep local overflow wrappers;
 page itself must fit a 390px viewport. No animated data transitions.
 
 Slurm rows reuse the same table and meter components. Label the backend explicitly;
