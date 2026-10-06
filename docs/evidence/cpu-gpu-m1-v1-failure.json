@@ -1,0 +1,47 @@
+{
+  "schema_version": "cpu-gpu-m1-v1-failure",
+  "status": "FAILED_QUALIFICATION_CONTRACT_GATE",
+  "source_commit": "b8d24f57bf42f18c40506a9d561f6569a5724639",
+  "source_ci": {
+    "run_id": 37498428045,
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "native_compute_jobs": 2,
+  "api_compute_jobs": 0,
+  "kfp_runs": 0,
+  "stages": {
+    "cpu": {
+      "native_phase": "Succeeded",
+      "exit_code": 0,
+      "job_uid_digest": "sha256:9e518312f013c950c7365c47f93280201d704196e15fc6ba4ce59390fcda1b37",
+      "scheduled_at": "2026-10-06T16:55:52Z",
+      "finished_at": "2026-10-06T16:56:01Z",
+      "cpu_core_reservation_proxy_seconds": 9.0,
+      "gpu_reservation_proxy_seconds": 0,
+      "numerical_agreement": 1.0,
+      "result_digest": "sha256:1f3034db163f341fcce2465be75b911abaf75ba53a1eafc7601c13a6224d1bd8",
+      "declared_quality_digest": "sha256:21eeb6fd3e2227d87b2ad21d0de0aa1905d6cbe8cf9ce0e06a5751c50d771e7a",
+      "required_quality_digest": "sha256:177afbcf3cabb1729fd90e5b29077080884967e147c3056fc2ac2597576ca3a4",
+      "accepted_for_registration": false
+    },
+    "gpu": {
+      "native_phase": "Succeeded",
+      "exit_code": 0,
+      "job_uid_digest": "sha256:f65b5b7bed65740cd16213b6ff74e0f7febad6420ae0c5729d90f8e5a1ba2178",
+      "scheduled_at": "2026-10-06T16:56:45Z",
+      "finished_at": "2026-10-06T16:56:47Z",
+      "cpu_core_reservation_proxy_seconds": 2.0,
+      "gpu_reservation_proxy_seconds": 2.0,
+      "numerical_agreement": 1.0,
+      "result_digest": "sha256:8d9bab191f3a4e11c8a349375c7ae470a7a0e87600f5ac33c84d8a51246e68d4",
+      "declared_quality_digest": "sha256:6cfa20d341f5502fd4aafe0c6bac25344b24859d53ec2e490d00b87b1becc290",
+      "required_quality_digest": "sha256:008d9521082bcebc03fbd33711a41639ce627981dae0e22edd44f7f85f273877",
+      "accepted_for_registration": false
+    }
+  },
+  "cause": "Private preparation signed only metric/minimum rather than the entire canonical QualityPolicy; WorkloadSpec validation failed. No API contracts/jobs were registered. Native numerical computation is not full acceptance.",
+  "preserved_existing_metadata": true,
+  "cost_scope": "Scheduled Pod requests through container termination; physical utilization and exact quota release remain unknown.",
+  "replacement_jobs_in_this_trial": 0
+}
