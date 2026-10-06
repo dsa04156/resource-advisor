@@ -1,0 +1,48 @@
+{
+  "status": "PASS",
+  "protocol_commit": "33dc4a6",
+  "source_commit": "d64226c",
+  "single_api_job": true,
+  "same_key_same_attempt": true,
+  "native_pods": 1,
+  "native_pod_restarts": 0,
+  "new_variant_uses_existing_explicit_bundle": true,
+  "runtime_source_mounts_read_only": true,
+  "cuda_hardware_result": true,
+  "numerical_agreement": 1,
+  "sample_count": 20,
+  "unique_ledger": true,
+  "unique_finished_mlflow_run": true,
+  "sql_api_s3_mlflow_result_matches": true,
+  "artifact_sha256": "b1df1bb97a1766812b2b284d40c13815e44012e7c59bf756dbab1420db7a1628",
+  "preexisting_immutable_records_preserved": true,
+  "preexisting_native_jobs_preserved": true,
+  "single_new_native_job": true,
+  "tracking_outbox_pending": 0,
+  "allocation": {
+    "gpu_reservation_seconds": 2.0,
+    "cpu_reservation_seconds": 2.0,
+    "reservation_is_not_utilization": true
+  },
+  "measurement": {
+    "numerical_agreement": 1,
+    "sample_count": 20,
+    "elapsed_seconds": 0.000269003096036613,
+    "peak_memory_mib": 9.125,
+    "gpu_utilization": null,
+    "power_watts": null,
+    "temperature_celsius": null
+  },
+  "retained_prior_failure": {
+    "trial": "mlflow-server-outage-v1",
+    "state": "FAILED",
+    "gpu_reservation_seconds": 1,
+    "not_replaced": true
+  },
+  "limitations": [
+    "one existing operator-approved runtime bundle",
+    "not an MLflow server-outage test",
+    "not a performance comparison",
+    "original HAIRP remains incomplete"
+  ]
+}

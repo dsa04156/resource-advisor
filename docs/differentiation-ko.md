@@ -76,6 +76,10 @@ BO의 선택 우위가 확인되지 않았다. [운영 비교](operational-compa
 실행환경 검증의 [실제 Hailo 변환물 시험](hailo-artifact.md)에서는 정상
 ResNet50은 통과하고 다른 ResNet18 HEF는 결과 생성 전에 거절됐다.
 큐 입장·장치 등록과 모델 실행 가능성을 별도로 검증한 근거다.
+또한 [실행환경 연결 수정](kubernetes-runtime-bundles.md)은 새 작업 정의에서
+승인된 런타임 mount가 빠지던 실제 실패를 해결했다. 새 variant가 기존
+승인 bundle을 명시적으로 참조하고, GPU 실행·결과·MLflow·사용량까지
+같은 attempt로 확인했다. 새 알고리즘의 성능 향상과는 별개의 운영 기능이다.
 
 ## 원래 설계의 완료 판정
 

@@ -31,8 +31,11 @@ two Kueue Jobs, with no negative result/history and 8 NPU-seconds total.
 The [actual MLflow server interruption](mlflow-server-outage.md) is retained
 as INCOMPLETE: the new variant lacked its mounted runtime, consumed1GPU-second
 and recovered exactly one FAILED tracking run with no fabricated result.
-The [explicit bundle reference](kubernetes-runtime-bundles.md) fixes the new-ID
-attachment contract in code; its live deployment/qualification remains pending.
+The [explicit bundle reference](kubernetes-runtime-bundles.md) is now deployed
+and qualified by one actual CUDA API Job: existing bundle/read-only mounts,
+numerical agreement1, one ledger/FINISHED run and matching SQL/API/S3/MLflow
+bytes. Its2GPU reservation seconds are recorded alongside the original failed
+outage allocation; this does not complete the separate server-outage gate.
 
 | Gate | Required authoritative evidence | Current state |
 |---|---|---|

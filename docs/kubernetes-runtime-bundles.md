@@ -70,3 +70,28 @@ without new compute. Stop on an unexpected result and retain its original IDs
 and all allocation cost. No replacement Job, MLflow outage, quota/driver change
 or new performance comparison is part of this qualification. Preserve the
 previous failed server-outage attempt and its1GPU-second cost.
+
+## Live result
+
+The protocol was frozen in `33dc4a6` before the single accepted Job.
+[Sanitized evidence](evidence/kubernetes-runtime-bundle-v1.json) records PASS:
+the new variant used the existing explicit bundle without a variant-ID mapping,
+one native Pod completed without restarts, runtime/source mounts were read-only,
+and20 actual CUDA matmul measurements passed numerical agreement1. The same
+result bytes matched SQL/API/S3/MLflow, with one ledger and one FINISHED run.
+Reusing the API key returned the original job/attempt; exactly one new native
+Job existed. Existing immutable entities,589 ledgers,589 terminal Jobs and
+native Job specifications remained unchanged.
+
+The new allocation cost is2GPU reservation seconds and2CPU core-seconds.
+Together with the separately retained failed outage allocation, this repair
+has3GPU reservation seconds; reservations are not measured utilization or
+energy. A preparation-script datetime-serialization error occurred before
+registration/submission; a readback assertion initially used incorrect mount
+names. Corrected read-only reconciliation inspected the SAME successful Job,
+without a replacement allocation. Neither error is hidden as GPU work.
+
+This closes the explicit mounted-runtime qualification for this fixture.
+It does not turn the previous server-outage trial into a pass, qualify arbitrary
+images/bundles or complete the original HAIRP scope. Temporary DB/S3/MLflow
+verification forwards were closed; the persistent HTTPS API was preserved.
