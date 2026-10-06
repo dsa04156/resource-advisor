@@ -2090,11 +2090,12 @@ async function openPipeline(ref) {
   const session=generation;const run=await researchRequest("/pipelines/"+encodeURIComponent(ref));if(session!==generation)return;
   const body=el("div",null,"job-detail-content");body.append(el("h3",run.display_name),badge(run.state));
   body.append(pipelineDag(run));
-  body.append(table(["단계","상태","시작","종료"],run.tasks.map(t=>[el("span",t.display_name),badge(t.state),el("span",stamp(t.start_time)),el("span",stamp(t.end_time))])));
   if(run.linked_jobs?.length)body.append(panel("단계별 컴퓨트 작업","KFP 단계 상태와 실제 계산 작업의 상태를 따로 확인합니다.",table(["단계","자원 · 백엔드","계산 상태","작업"],run.linked_jobs.map(j=>[
     el("span",run.graph.find(t=>t.name===j.task_name)?.display_name||j.task_name),el("span",`${(j.device_class||"미관측").toUpperCase()} · ${j.backend||"미관측"}`),stateBadge(j.state),researchButton("계산 작업 보기 · "+(j.device_class||j.task_name).toUpperCase(),()=>openPipelineComputeJob(run,j.job_id))
   ]))));
   else if(run.job_id)body.append(researchButton("연결된 컴퓨트 작업 보기",()=>openPipelineComputeJob(run,run.job_id)));
+  const taskLog=el("details"),summary=el("summary","KFP 전체 단계 · driver 기록");
+  taskLog.append(summary,table(["단계","상태","시작","종료"],run.tasks.map(t=>[el("span",t.display_name),badge(t.state),el("span",stamp(t.start_time)),el("span",stamp(t.end_time))])));body.append(taskLog);
   if(!["SUCCEEDED","FAILED","CANCELED","CANCELLED","SKIPPED"].includes(run.state)){
     const stop=researchButton("파이프라인 중지",async()=>{if(stop.dataset.confirm!=="yes"){stop.dataset.confirm="yes";stop.textContent="중지 확인 · 연결 작업도 정리됩니다";return;}await researchRequest("/pipelines/"+encodeURIComponent(ref)+"/terminate",{});$("notice").textContent="중지를 요청했습니다. 실제 종료 상태는 갱신 후 확인하세요.";$("job-dialog").close();researchUpdated=0;await refreshResearch();});body.append(stop);
   }
