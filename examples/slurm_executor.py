@@ -72,12 +72,26 @@ def batch(config, script):
     context = json.loads(exports["RA_CONTEXT_JSON"])
     if context["resources"] != {"host_cpu": 1, "host_memory_mib": 1024, "accelerator_count": 1}:
         raise ValueError("unqualified resource request")
+    priority_qos = config.get("qos_by_priority", {})
+    if (
+        not isinstance(priority_qos, dict)
+        or set(priority_qos) - {"normal", "high"}
+        or any(
+            not isinstance(value, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+", value)
+            for value in priority_qos.values()
+        )
+        or priority_qos.get("normal", config["qos"]) != config["qos"]
+    ):
+        raise ValueError("invalid configured priority QOS mapping")
+    selected_qos = directives.get("--qos")
+    if selected_qos not in {config["qos"], *priority_qos.values()}:
+        raise ValueError("QOS outside configured priority scope")
     expected = {
         "--job-name": exports["RA_ATTEMPT_ID"],
         "--comment": "resource-advisor:" + exports["RA_JOB_ID"],
         "--partition": config["partition"],
         "--account": config["account"],
-        "--qos": config["qos"],
+        "--qos": selected_qos,
         "--nodelist": config["node"],
         "--nodes": "1",
         "--ntasks": "1",

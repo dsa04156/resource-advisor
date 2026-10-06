@@ -62,6 +62,9 @@ resources/jobs, compatibility, queue/allocation history, and recommendation evid
 Compatible candidates offer observed execution; active jobs offer cancellation.
 [Actual Slurm cancellation](docs/slurm-cancellation.md) now verifies terminal
 confirmation, retained costs and project/owner filtering.
+The [high-priority Slurm profile](docs/slurm-priority-gateway.md) also now reaches
+the scoped native gateway and an actual completed GPU/result/MLflow path;
+cross-project priority ordering remains unverified.
 
 The [approved GPU demo](docs/approved-gpu-demo.md) now connects fresh qualification,
 three observations, recommendation, approval and independent measured comparison.

@@ -59,6 +59,23 @@ def test_real_adapter_script_is_scoped_and_injected_values_remain_literal(servic
     with pytest.raises(ValueError, match="not enabled"):
         gateway.plan(dict(config, native_bindings=[]), "sbatch --parsable", script)
 
+    high = script.replace("--qos=normal", "--qos=research-high")
+    with pytest.raises(ValueError, match="QOS outside"):
+        gateway.plan(config, "sbatch --parsable", high)
+    mapped = dict(config, qos_by_priority={"normal": "normal", "high": "research-high"})
+    assert gateway.plan(mapped, "sbatch --parsable", high)[1] == high
+    assert gateway.plan(mapped, "sbatch --parsable", script)[1] == script
+    with pytest.raises(ValueError, match="QOS outside"):
+        gateway.plan(mapped, "sbatch --parsable", script.replace("--qos=normal", "--qos=foreign"))
+    for invalid in [
+        {"normal": "different-default"},
+        {"urgent": "research-high"},
+        {"high": "research-high; id"},
+        {"high": None},
+    ]:
+        with pytest.raises(ValueError, match="priority QOS mapping"):
+            gateway.plan(dict(config, qos_by_priority=invalid), "sbatch --parsable", script)
+
 
 def test_adapter_queries_and_cancel_are_forced_to_linux_owner(service):
     job = row(service)

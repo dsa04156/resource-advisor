@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "scope": "one high-priority API profile \u2192 scoped gateway \u2192 native Orin CNN \u2192 publication; not cross-project priority order",
+  "backend": "slurm",
+  "device": "Jetson Orin Nano GPU",
+  "requested_priority_grade": "high",
+  "actual_qos": "ra-high",
+  "actual_priority": 1000,
+  "native_terminal_state": "COMPLETED",
+  "api_terminal_state": "SUCCEEDED",
+  "requested_resources": {
+    "host_cpu": 1,
+    "host_memory_mib": 1024,
+    "accelerator_count": 1
+  },
+  "allocated_gpu_seconds": 72.0,
+  "measurements": {
+    "elapsed_seconds": 0.011055069277063012,
+    "peak_memory_mib": 33.05615234375,
+    "quality_value": 1.0,
+    "sample_count": 10,
+    "work_units": 10,
+    "latency_p50_ms": 1.0817400179803371,
+    "latency_p95_ms": 1.137885032221675,
+    "latency_p99_ms": 1.137885032221675,
+    "throughput": 904.5624002327997,
+    "gpu_utilization": null,
+    "power_watts": null,
+    "temperature_celsius": null
+  },
+  "checks": {
+    "same_profile_adapter_qos": true,
+    "actual_native_qos": true,
+    "one_native_parent": true,
+    "one_ledger": true,
+    "one_mlflow_run": true,
+    "matching_s3_api_mlflow_bytes": true,
+    "idempotent_replay": true,
+    "queue_empty": true,
+    "scheduler_configuration_unchanged": true,
+    "account_association_unchanged": true,
+    "existing_user_already_authorized_for_high": true,
+    "root_owned_gateway_backup_created": true,
+    "native_runtime_bindings_preserved": true
+  },
+  "gateway_source_sha256": "740b4483e9b36b953cc6a509260ccc8d667a03750e2a25fc90b36adaa8354ebe",
+  "bundle_sha256": "489f603ee89390c9432caf1e3475afb1762dcc36ff0f7127ae06b10f89c5e7e6",
+  "result_digest": "sha256:77b45296bb7ee457a1a6f0fe4c9fdc24489c9d040c6aef1643cd94cef1c07fd4",
+  "limitations": [
+    "No cross-project priority/fairness or preemption experiment.",
+    "Fixed numerical CNN fixture, not trained-model accuracy.",
+    "GPU allocation is distinct from active utilization/power/energy; those remain unmeasured."
+  ]
+}

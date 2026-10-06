@@ -89,6 +89,30 @@ class/QOS must already exist and be authorized. An unmapped high request fails
 before backend submission. No application-supplied numeric scheduler priority is
 accepted. Route mapping is tested separately from this direct-`sbatch` live trial.
 
+### Scoped gateway priority configuration
+
+The root-owned forced gateway defaults to its single configured `qos`. To enable
+both API priority grades, configure `qos_by_priority` in **both** the worker route
+and controller gateway scope, for example:
+
+```json
+{"qos":"research-normal","qos_by_priority":{"normal":"research-normal","high":"research-high"}}
+```
+
+These QOS records must already exist and be authorized for that route's Slurm
+user/account. The gateway accepts only the default QOS and the administrator's
+explicit normal/high mapping. It rejects unknown grades, unsafe values,
+inconsistent normal defaults and unlisted QOS. Account, partition, Linux owner,
+resource ceiling and qualified native runtime restrictions remain in force.
+Restart an idle dedicated worker after changing its route; running workloads must
+not be interrupted to refresh configuration. Configuring the map does not create
+QOS, change scheduler priority weights or override native admission limits.
+
+The subsequent [actual high-profile API trial](slurm-priority-gateway.md) now
+verifies plan → scoped gateway → ra-high/priority1000 → native GPU CNN → durable
+result/ledger/MLflow with 72 GPU reservation seconds. This is end-to-end mapping
+evidence; two-project ordering/fairness remains a separate unverified gate.
+
 References: [Slurm QOS](https://slurm.schedmd.com/qos.html),
 [Slurm limits](https://slurm.schedmd.com/resource_limits.html),
 [Kueue WorkloadPriorityClass](https://kueue.sigs.k8s.io/docs/concepts/workload_priority_class/).
