@@ -365,3 +365,38 @@ platform result `COLLECTING` also belong in execution, not preparation or queue.
 Verification: eight runner cases passed; all four affected transitions in the
 existing private run history mapped to the execution lane. The priority replay
 was inspected in the browser at the affected event. No GPU rerun was needed.
+
+### Replay node observations (2026-10-06)
+
+Each native observation now saves the latest authorized inventory for that
+experiment's project into PostgreSQL. Node readiness, scheduler reservations,
+CPU, memory and available accelerator telemetry retain their source timestamps
+and freshness evaluated at the observation time. Resource-only changes add a
+replay event at most once per 15 seconds when no job-state event was emitted.
+The existing limit of 100 recent events remains; this is bounded lab history.
+Source collection is asynchronous: this is the latest available evidence at the
+event, not a claim that every exporter sampled simultaneously.
+
+The default resource rail follows the selected recorded event. **현재 상태 보기**
+switches to current inventory; **실험 시점 보기** returns to recorded evidence.
+GPU, NPU, CPU-only and Slurm nodes are available through the filter. A node opens
+a modal with that observation's detailed readings and original collection time.
+Historical freshness is frozen at the recorded time; stale or unavailable
+measurements at that time stay unknown. Old experiments have no node history
+and explicitly say so; their resource states are never reconstructed from today.
+
+Scenario selection and launch share one row. Playback/seek sits directly above
+node state and the four workload lanes. Guides, event logs, worker proof and
+native evidence are collapsed by default. Lanes scroll locally when many jobs
+are present, without squeezing job cards. At 1366×768 the live node rail and
+workload board fit in the viewport; at 390px the page has no horizontal overflow.
+
+One additional real quota run succeeded and cleaned up its native resources.
+All 15 events had project-scoped node observations (10 Kubernetes and 2 Slurm
+nodes); all observation timestamps matched their corresponding events. Forty-four
+node-metric series changed across the saved records. Browser replay showed an
+early snapshot's original meters after later observations arrived, and historical
+node detail stayed available. No missing accelerator telemetry was fabricated.
+Sixteen focused scheduler-lab/console tests passed, including project isolation,
+latest-record selection, stale hiding and immutable historical readings.
+Raw node identifiers, timestamps, screenshots and exporter values remain private.

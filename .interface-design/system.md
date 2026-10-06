@@ -183,3 +183,16 @@ include state. Expected failed/canceled children remain visible in the terminal
 lane even when their enclosing scenario succeeds. Priority cards expose the actual
 Kueue priority value. Native admitted jobs with Pending pods stay in preparation,
 not execution. Opening lab guides/evidence must not disable inventory auto-refresh.
+
+Compact observation workspace supersedes the always-current rail above: default
+node cards follow the selected event's frozen project-scoped observation. An
+explicit recorded/current toggle names the time basis; legacy absence remains
+empty. All nodes are accessible, with GPU/NPU/CPU-only/Slurm filters. The signature
+is seek → recorded node meters → observed job lanes in one workspace. Keep the
+existing blue/amber/teal semantics and 4px grid; 8–14px panel padding, 10–14px
+rail/board labels and native 40px controls. Scenario is a labeled selector with
+latest outcome, not eleven large cards. Guides/event log/evidence collapse by
+default; node detail uses the existing native dialog. Card lists scroll locally
+and never flex-shrink their contents. At desktop heights below 800px tighten
+row gaps and meter margins to keep the board within 1366×768. Freeze freshness
+only for server-recorded observation views; live inventory continues aging.

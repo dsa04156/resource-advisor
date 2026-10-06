@@ -1745,7 +1745,7 @@ function render() {
   if (["operations","experiments","pipelines","notebooks","jobs"].includes(active) && !researchPending && Date.now()-researchUpdated>30000) refreshResearch();
   const motionBefore = active === "scheduler-lab" ? captureLabMotion() : null;
   const focused = document.activeElement;
-  const keepFocus = ["job-search", "resource-search", "poc-gpu-count", "lab-history", "lab-replay-speed", "lab-replay-toggle", "lab-replay-seek", "lab-resource-filter"].includes(focused?.id)
+  const keepFocus = ["job-search", "resource-search", "poc-gpu-count", "lab-scenario", "lab-resource-mode", "lab-history", "lab-replay-speed", "lab-replay-toggle", "lab-replay-seek", "lab-resource-filter"].includes(focused?.id)
     ? { id: focused.id, start: focused.selectionStart, end: focused.selectionEnd } : null;
   const [label, title, description] = views[active];
   $("section-label").textContent = label;
@@ -2362,6 +2362,7 @@ async function startLab(){
 function labTone(state){return ["SUCCEEDED","COMPLETED","Succeeded"].includes(state)?"done":["RUNNING","Running","ADMITTED","FINALIZING","COMPLETING","COLLECTING"].includes(state)?"active":["FAILED","Failed","CANCELED","CANCELLED"].includes(state)?"failed":"waiting";}
 function schedulerLabView(){
   const root=el("div",null,"lab-page"),items=labData?.items||[],run=items.find(r=>r.ref===labRef),kind=labKinds[labKind];
+  root.dataset.labContext=labRef+":"+labKind;
   const header=add(el("div",null,"lab-heading"),add(el("div"),el("span","NATIVE SCHEDULING LAB","eyebrow"),el("h2","스케줄러의 결정을 눈으로 보다"),el("p","실제 자원 · 대기열 · 할당과 실행을 한 화면에서","muted")),badge(labData?.agent?.online&&Date.now()-Date.parse(labData.agent.seen_at)<40000?"실행기 연결됨":"실행기 연결 확인 필요",labData?.agent?.online&&Date.now()-Date.parse(labData.agent.seen_at)<40000?"good":"warn"));
   root.append(el("div",labCursor!==null?`기록 ${labReplay?"자동 재생 중":"재생 정지"} · 과거 관측을 보는 중입니다.`:labError||Date.now()-labReceivedAt>15000?"라이브 연결 지연 · 이전 관측값입니다. 자동으로 다시 연결합니다.":"● 라이브 · 3초마다 조회 · 응답 "+stamp(new Date(labReceivedAt).toISOString()),"lab-mode"+(labCursor!==null?" replay":labError?" delayed":"")));
   const choices=el("div",null,"lab-setup lab-controls"),scenario=el("select"),scenarioLabel=el("label","시나리오");
@@ -2540,7 +2541,7 @@ function labResourceRack(snap){
   filter.onchange=()=>{labResourceFilter=filter.value;render();};
     const mode=el("button",source.historical?"현재 상태 보기":"실험 시점 보기");mode.id="lab-resource-mode";mode.disabled=!Object.keys(snap).length;mode.onclick=()=>{labResourceMode=source.historical?"live":"recorded";labResource="";render();};
   add(head,el("h3",source.historical?"이 시점의 노드 상태":"현재 노드 상태"),el("small",source.at?stamp(source.at):"노드 상태 기록 없음","lab-fleet-clock"),mode,filter);box.append(head);
-  if(source.missing)box.append(el("p","이 실험은 노드 상태를 저장하기 전에 실행됐습니다. 새 실험부터 시점별 상태가 함께 기록됩니다.","lab-fleet-note"));
+  if(source.missing)box.append(el("p",snap.resource_observation?"해당 시점에 조회할 수 있는 노드 관측이 없습니다. 현재 상태는 별도로 확인할 수 있습니다.":"이 실험은 노드 상태를 저장하기 전에 실행됐습니다. 새 실험부터 시점별 상태가 함께 기록됩니다.","lab-fleet-note"));
   const selected=labFlowJobs(snap).find(j=>j.id===labSelected),linked=selected?labJobNodes(selected):[],rail=el("div",null,"lab-resource-rail");rail.dataset.labScroll="resources";
   const entries=source.inventory.flatMap(s=>(s.nodes||[]).map(n=>({n,s:{...s,backend:s.backend||"kubernetes",...(source.historical?{view_at:source.at}:{})}}))).filter(({n,s})=>labResourceFilter==="all"||labResourceFilter===s.backend||(labResourceFilter==="cpu"?!Object.values(n.resources||{}).some(r=>["gpu","npu"].includes(r.device_class)):Object.values(n.resources||{}).some(r=>r.device_class===labResourceFilter)));
   for(const {n,s} of entries){
@@ -2565,7 +2566,7 @@ function labFlowBoard(run,snap){
   for(let index=0;index<stages.length;index++){
     const [step,title,desc]=stages[index],items=jobs.filter(j=>labJobLane(j)===index),lane=el("section",null,"lab-flow-lane lane-"+index),head=el("div",null,"lab-flow-lane-head");
     add(head,el("span",step,"eyebrow"),el("strong",title),el("b",String(items.length)),el("small",desc));lane.append(head);
-    const stack=el("div",null,"lab-flow-stack");
+    const stack=el("div",null,"lab-flow-stack");stack.dataset.labScroll="lane-"+index;
     for(const j of items){
       const displayState=labDisplayState(j),card=el("button",null,"lab-flow-job "+labTone(displayState)+(labSelected===j.id?" selected":""));card.dataset.flowId=run.ref+":"+j.id;card.id="lab-flow-"+j.id;card.setAttribute("aria-pressed",String(labSelected===j.id));
       add(card,el("span",(j.backend||(run.scenario==="backfill"?"slurm":"kubernetes")).toUpperCase()+" · "+(j.device_class||"gpu").toUpperCase(),"eyebrow"),el("strong",j.label),stateBadge(displayState));
@@ -2589,11 +2590,15 @@ function labFlowBoard(run,snap){
 }
 function captureLabMotion(){
   const cards=new Map([...document.querySelectorAll("[data-flow-id]")].map(n=>[n.dataset.flowId,n.getBoundingClientRect()]));
-  const scrolls=new Map([...document.querySelectorAll("[data-lab-scroll]")].map(n=>[n.dataset.labScroll,n.scrollLeft]));
-  return {cards,scrolls,focus:document.activeElement?.id};
+  const scrolls=new Map([...document.querySelectorAll("[data-lab-scroll]")].map(n=>[n.dataset.labScroll,{left:n.scrollLeft,top:n.scrollTop}]));
+  const panels=new Map([...document.querySelectorAll(".lab-page details")].map(n=>[n.firstElementChild?.textContent,n.open]));
+  return {cards,scrolls,panels,context:document.querySelector(".lab-page")?.dataset.labContext,focus:document.activeElement?.id};
 }
 function animateLabMotion(before){
-  for(const n of document.querySelectorAll("[data-lab-scroll]"))n.scrollLeft=before.scrolls.get(n.dataset.labScroll)||0;
+  if(before.context===document.querySelector(".lab-page")?.dataset.labContext){
+    for(const n of document.querySelectorAll(".lab-page details"))n.open=before.panels.get(n.firstElementChild?.textContent)||false;
+    for(const n of document.querySelectorAll("[data-lab-scroll]")){const saved=before.scrolls.get(n.dataset.labScroll);n.scrollLeft=saved?.left||0;n.scrollTop=saved?.top||0;}
+  }
   if(before.focus?.startsWith("lab-flow-")||before.focus?.startsWith("lab-resource-"))$(before.focus)?.focus({preventScroll:true});
   const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
   for(const n of document.querySelectorAll("[data-flow-id]")){
