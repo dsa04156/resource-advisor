@@ -457,9 +457,6 @@ class Agent:
             if len(jobs) == 2 and all(j["state"] == "COMPLETED" for j in jobs.values()):
                 if not seen_backfill or not jobs["short"]["start"] < jobs["long"]["start"]:
                     raise RuntimeError("jobs completed but backfill ordering was not observed")
-                self.snapshot["verdict"] = (
-                    "늦게 제출한 짧은 GPU 작업이 예약 전 빈 시간에 먼저 완료; 긴 작업은 예약 창 이후 실행"
-                )
                 self.snapshot["sdiag_after"] = self.slurm("sdiag")
                 counts = []
                 for key in ("sdiag_before", "sdiag_during"):
@@ -473,6 +470,9 @@ class Agent:
                 if counts[1] <= counts[0]:
                     raise RuntimeError("start ordering observed without backfill counter increment")
                 self.snapshot["backfill_counter"] = {"before": counts[0], "during": counts[1]}
+                self.snapshot["verdict"] = (
+                    "늦게 제출한 짧은 GPU 작업이 예약 전 빈 시간에 먼저 완료; 긴 작업은 예약 창 이후 실행"
+                )
                 return
 
     def cleanup(self):

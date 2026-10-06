@@ -2331,7 +2331,7 @@ const labKinds={
 };
 async function refreshLab(){
   if(labPending||!data)return;labPending=true;const session=generation;
-  try{const r=await scenarioFetch("/scheduler-labs");if(session!==generation)return;labData=r;if(!labRef)labRef=r.items[0]?.ref||"";labError="";}
+  try{const r=await scenarioFetch("/scheduler-labs");if(session!==generation)return;labData=r;if(!labRef){labRef=r.items[0]?.ref||"";labKind=r.items[0]?.scenario||labKind;}labError="";}
   catch(e){if(session===generation)labError=e.message;}
   finally{if(session===generation){labPending=false;labUpdated=Date.now();if(active==="scheduler-lab"&&!document.activeElement?.closest(".lab-controls"))render();}}
 }
@@ -2354,14 +2354,14 @@ function schedulerLabView(){
   if(!run){root.append(el("div","실험을 시작하면 실제 승인·대기·배치 기록이 이 보드에 나타납니다.","lab-empty"));return root;}
   const events=run.body.events||[],index=labCursor===null?events.length-1:Math.min(labCursor,events.length-1),event=events[index];
   const snap=labCursor===null?run.body.snapshot:(event?.snapshot||{}),jobs=snap.jobs||[],selected=jobs.find(j=>j.id===labSelected)||jobs[0],spec=labKinds[run.scenario];
-  const controls=el("div",null,"lab-controls lab-toolbar"),select=el("select");select.setAttribute("aria-label","실험 기록 선택");items.forEach(r=>{const o=el("option",labKinds[r.scenario].name+" · "+stamp(r.created_at));o.value=r.ref;o.selected=r.ref===labRef;select.append(o);});select.onchange=()=>{labRef=select.value;labCursor=null;labSelected="";render();};
+  const controls=el("div",null,"lab-controls lab-toolbar"),select=el("select");select.setAttribute("aria-label","실험 기록 선택");items.forEach(r=>{const o=el("option",labKinds[r.scenario].name+" · "+stamp(r.created_at));o.value=r.ref;o.selected=r.ref===labRef;select.append(o);});select.onchange=()=>{labRef=select.value;labKind=items.find(r=>r.ref===labRef)?.scenario||labKind;labCursor=null;labSelected="";render();};
   const live=el("button",labCursor===null?(["SUCCEEDED","FAILED","CANCELED"].includes(run.state)?"최종 기록":"● LIVE"):"최신 기록으로");live.onclick=()=>{labCursor=null;render();};
   add(controls,select,badge(run.state,labTone(run.state)==="done"?"good":"warn"),live);
   if(!["SUCCEEDED","FAILED","CANCELED"].includes(run.state)){const cancel=el("button","실험 중지");cancel.disabled=run.state==="CANCEL_REQUESTED";cancel.onclick=async()=>{cancel.disabled=true;try{const r=await fetch(API+"/scheduler-labs/"+run.ref+"/cancel",{method:"POST",headers:authHeaders()});if(!r.ok)throw new Error("취소 접수 실패");await refreshLab();}catch(e){labError=e.message;render();}};controls.append(cancel);}root.append(controls);
-  const stage=el("div",null,"lab-stage"),top=add(el("div",null,"lab-stage-title"),el("span",spec.name.toUpperCase(),"eyebrow"),el("strong",snap.phase==="FINISHED"?(snap.verdict||(snap.error?"실험 실행 오류 · 아래 네이티브 기록 확인":run.state)):snap.explanation||"실험 접수 완료"),el("small",(labCursor===null?"마지막 관측 ":"기록 재생 ")+stamp(labCursor===null?run.body.observed_at:event?.observed_at)));stage.append(top);
+  const stage=el("div",null,"lab-stage"),top=add(el("div",null,"lab-stage-title"),el("span",spec.name.toUpperCase(),"eyebrow"),el("strong",snap.phase==="FINISHED"?((snap.error||snap.cleanup_error)?"실험 실행 오류 · 아래 네이티브 기록 확인":(snap.verdict||run.state)):snap.explanation||"실험 접수 완료"),el("small",(labCursor===null?"마지막 관측 ":"기록 재생 ")+stamp(labCursor===null?run.body.observed_at:event?.observed_at)));stage.append(top);
   const layout=el("div",null,"lab-allocation");
   const queue=add(el("section",null,"lab-queue"),el("div","01 / WORKLOAD QUEUE","eyebrow"));
-  for(const j of jobs){const b=el("button",null,"lab-job "+labTone(j.state)+(selected?.id===j.id?" selected":""));add(b,el("span",j.label,"lab-job-name"),badge(j.state,labTone(j.state)==="done"?"good":"warn"),el("small",`${j.gpu} GPU${j.time_limit?" · "+j.time_limit:""}`),el("span",j.reason&&j.reason!=="None"?j.reason:labTone(j.state)==="done"?"네이티브 실행 완료":"실행 상태 관측","lab-job-reason"));b.onclick=()=>{labSelected=j.id;render();};queue.append(b);}
+  for(const j of jobs){const b=el("button",null,"lab-job "+labTone(j.state)+(selected?.id===j.id?" selected":""));add(b,el("span",j.label,"lab-job-name"),badge(j.state,labTone(j.state)==="done"?"good":"warn"),el("small",`${j.gpu} GPU${j.time_limit?" · "+j.time_limit:""}`),el("span",j.reason&&j.reason!=="None"?(labTone(j.state)==="done"?"이전 대기 사유 · ":"")+j.reason:labTone(j.state)==="done"?"네이티브 실행 완료":"실행 상태 관측","lab-job-reason"));b.onclick=()=>{labSelected=j.id;render();};queue.append(b);}
   if(!jobs.length)queue.append(el("p","네이티브 작업 제출 준비 중","muted"));layout.append(queue);
   const middle=add(el("div",null,"lab-admission"),el("span","02 / ADMISSION","eyebrow"),el("div",run.scenario==="backfill"?"SLURM":"KUEUE","lab-scheduler-core"),el("strong",snap.policy||spec.name),el("p",run.scenario==="topology"?"hostname domain":run.scenario==="gang"?"All workers · quota reservation":"Time window · walltime"),el("span","→","lab-arrow"));layout.append(middle);
   const pool=add(el("section",null,"lab-pool"),el("div","03 / GPU PLACEMENT","eyebrow"));
@@ -2372,7 +2372,7 @@ function schedulerLabView(){
   const range=el("input");range.type="range";range.min="0";range.max=String(Math.max(events.length-1,0));range.value=String(Math.max(index,0));range.setAttribute("aria-label","네이티브 관측 시점 탐색");range.disabled=!events.length;range.oninput=()=>{labCursor=Number(range.value);render();};timeline.append(range);
   events.slice(-12).reverse().forEach((e,offset)=>{const idx=events.length-1-offset,b=el("button",null,"lab-event"+(index===idx?" selected":""));add(b,el("time",stamp(e.observed_at)),el("span",e.title));b.onclick=()=>{labCursor=idx;render();};timeline.append(b);});bottom.append(timeline);
   const inspector=add(el("section",null,"lab-inspector"),el("span","NATIVE EVIDENCE","eyebrow"),el("h3",selected?selected.label:"스케줄러 관측"));
-  if(selected){add(inspector,el("p","ID · "+selected.id),el("p","상태 · "+selected.state),el("p",selected.reason||"대기 사유 없음"));for(const p of selected.pods||[]){inspector.append(el("p",(p.node||"노드 미정")+" · "+p.state));for(const e of p.events||[])inspector.append(el("small",e.phase+(e.correctness?" · CUDA 검증 통과":"")));}}
+  if(selected){add(inspector,el("p","ID · "+selected.id),el("p","상태 · "+selected.state),el("p",selected.reason&&selected.reason!=="None"?(labTone(selected.state)==="done"?"이전 대기 사유 · ":"")+selected.reason:"대기 사유 없음"));for(const p of selected.pods||[]){inspector.append(el("p",(p.node||"노드 미정")+" · "+p.state));for(const e of p.events||[])inspector.append(el("small",e.phase+(e.correctness?" · CUDA 검증 통과":"")));}}
   if(snap.queue_evidence){const d=el("details");add(d,el("summary","기록된 대기 사유"),el("pre",JSON.stringify(snap.queue_evidence,null,2)));inspector.append(d);}if(selected?.admission){const d=el("details");add(d,el("summary","실제 Kueue admission / topologyAssignment"),el("pre",JSON.stringify(selected.admission,null,2)));inspector.append(d);}if(snap.reservation){const d=el("details");add(d,el("summary","실제 Slurm 예약 창"),el("pre",snap.reservation));inspector.append(d);}if(snap.error)inspector.append(el("p",snap.error,"error"));if(snap.verdict)inspector.append(el("p",snap.verdict,"lab-verdict"));bottom.append(inspector);root.append(bottom);return root;
 }
 
@@ -2388,7 +2388,7 @@ function backfillWindow(run,snap){
   if(!Number.isFinite(reservedStart)||!Number.isFinite(reservedEnd))return panel;
   const jobs=snap.jobs||[],starts=jobs.map(j=>Date.parse(j.start)).filter(Number.isFinite),ends=jobs.map(j=>Date.parse(j.end)).filter(Number.isFinite);
   const min=Math.min(reservedStart-120000,...starts),max=Math.max(reservedEnd+30000,...ends),span=max-min;
-  panel.append(el("p","사선 = 미래 예약 · 막대 = 실제 시작–종료 기록. 아직 시작하지 않은 작업은 막대를 만들지 않습니다.","muted"));
+  panel.append(el("p","Slurm 컨트롤러 기록 시간 · 사선 = 예약 · 막대 = 실제 실행. 아직 시작하지 않은 작업은 막대를 만들지 않습니다.","muted"));
   const row=(label,start,end,kind,text)=>{const r=add(el("div",null,"lab-time-row"),el("strong",label)),track=el("div",null,"lab-time-track"),bar=el("div",null,"lab-time-bar "+kind);bar.style.left=((start-min)/span*100)+"%";bar.style.width=(Math.max(end-start,1000)/span*100)+"%";bar.title=text;bar.setAttribute("aria-label",text);track.append(bar);r.append(track,el("small",text));return r;};
   panel.append(row("예약 창",reservedStart,reservedEnd,"reserved",match[1].slice(11)+" → "+match[2].slice(11)));
   for(const j of jobs){const start=Date.parse(j.start),end=Date.parse(j.end);if(Number.isFinite(start)&&Number.isFinite(end))panel.append(row(j.label,start,end,"executed",j.start.slice(11)+" → "+j.end.slice(11)));else panel.append(add(el("div",null,"lab-time-row"),el("strong",j.label),el("span",Number.isFinite(start)?"실행 중 · "+j.start.slice(11)+" 시작":"시작 대기 · "+(j.reason&&j.reason!=="None"?j.reason:"네이티브 사유 확인 중"),"muted")));}
