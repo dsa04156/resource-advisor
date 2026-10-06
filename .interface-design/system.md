@@ -108,3 +108,12 @@ flow (six/three/two columns) uses blue completed observations and neutral future
 steps, with explicit failure text. Job details and the latest submitted job reuse
 this flow and an expandable candidate decision table. Unknown capacity is text,
 never fabricated green headroom. Actual backend timestamps determine progress.
+
+Research operations extension: HAIRP names the unified workspace. A three-service
+connection strip links experiments, workflows and notebooks; unknown/unavailable
+stays amber. MLflow rows support four-run selection and a comparison table above
+results. KFP shows actual task states and dependency labels, plus linked compute
+jobs. Notebook cards expose resource requests, readiness and explicit controller
+actions; stop requires an inline second click. Reuse existing native tables,
+dialogs and blue action tokens. Research navigation wraps on narrow viewports.
+References and scope: docs/research-console.md.

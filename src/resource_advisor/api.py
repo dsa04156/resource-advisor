@@ -9,6 +9,7 @@ from typing import Literal
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Response
 from fastapi.responses import FileResponse, JSONResponse
 from prometheus_client import CollectorRegistry, Gauge, generate_latest
+from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 
 from .contracts import (
@@ -31,7 +32,6 @@ from .store import Conflict, jobs, outbox, usage
 PREFIX = "/api/v1/compute"
 
 
-
 @dataclass(frozen=True)
 class Principal:
     project: str
@@ -44,6 +44,7 @@ def create_app(
     *,
     artifact_storage=None,
     anonymous_project=None,
+    research_config=None,
 ):
     if not credentials:
         raise ValueError("at least one external credential hash is required")
@@ -99,6 +100,97 @@ def create_app(
                 "frame-ancestors 'none'; form-action 'self'"
             )
         return response
+
+    from .research import ResearchServices, UpstreamUnavailable
+
+    research = ResearchServices(service.store, research_config or {})
+
+    @app.exception_handler(UpstreamUnavailable)
+    async def upstream_unavailable(_, exc):
+        return JSONResponse({"detail": str(exc)}, status_code=503)
+
+    class OperatorNote(BaseModel):
+        text: str = Field(max_length=2000)
+
+    class PipelineLaunch(BaseModel):
+        template_ref: str = Field(max_length=96)
+        workload_ref: str = Field(max_length=96)
+        profile_ref: str = Field(max_length=96)
+
+    @app.post(PREFIX + "/jobs/{job_id}/retry")
+    def retry_job(job_id: str, idempotency_key: str = Header(default=""), p=Depends(principal)):
+        with service.store.transaction() as conn:
+            row = service.store.job(conn, job_id)
+            if not row or row["project"] != p.project:
+                raise NotFound("job not found")
+            if row["state"] not in {"FAILED", "CANCELED", "RESULT_INVALID"}:
+                raise Rejected("Only failed or canceled jobs can be retried")
+            body = row["body"]
+            profile = body.get("scheduling_plan", {}).get("profile_ref")
+            request = JobRequest(
+                workload_ref=body["spec"]["ref"],
+                candidate_ref=None if profile else body["candidate"]["ref"],
+                scheduling_profile_ref=profile,
+                template_ref=body["request"].get("template_ref"),
+            )
+        return service.submit(p.project, request, idempotency_key)
+
+    @app.get(PREFIX + "/research/overview")
+    def research_overview(p=Depends(principal)):
+        return research.overview(p.project)
+
+    @app.get(PREFIX + "/research/runs")
+    def experiment_runs(
+        experiment_id: str | None = None,
+        page_token: str | None = Query(default=None, max_length=4096),
+        p=Depends(principal),
+    ):
+        return research.runs(p.project, experiment_id, page_token)
+
+    @app.get(PREFIX + "/research/runs/{ref}")
+    def experiment_run(ref: str, p=Depends(principal)):
+        return research.run(p.project, ref)
+
+    @app.get(PREFIX + "/research/runs/{ref}/artifacts")
+    def experiment_artifacts(
+        ref: str, path: str = Query(default="", max_length=1024), p=Depends(principal)
+    ):
+        return research.artifacts(p.project, ref, path)
+
+    @app.post(PREFIX + "/research/runs/{ref}/note")
+    def experiment_note(ref: str, value: OperatorNote, p=Depends(principal)):
+        return research.note(p.project, ref, value.text)
+
+    @app.get(PREFIX + "/research/pipelines")
+    def pipeline_runs(
+        page_token: str | None = Query(default=None, max_length=4096), p=Depends(principal)
+    ):
+        return research.pipeline_runs(p.project, page_token)
+
+    @app.get(PREFIX + "/research/pipelines/{ref}")
+    def pipeline_detail(ref: str, p=Depends(principal)):
+        return research.pipeline_view(p.project, research.pipeline_raw(p.project, ref))
+
+    @app.post(PREFIX + "/research/pipelines/{ref}/terminate")
+    def pipeline_terminate(ref: str, p=Depends(principal)):
+        return research.terminate(p.project, ref)
+
+    @app.post(PREFIX + "/research/pipelines")
+    def pipeline_launch(
+        value: PipelineLaunch, idempotency_key: str = Header(default=""), p=Depends(principal)
+    ):
+        return research.launch(
+            service,
+            p.project,
+            value.template_ref,
+            value.workload_ref,
+            value.profile_ref,
+            idempotency_key,
+        )
+
+    @app.post(PREFIX + "/research/notebooks/{name}/{action}")
+    def notebook_action(name: str, action: str, p=Depends(principal)):
+        return research.notebook_action(p.project, name, action)
 
     @app.get("/console", include_in_schema=False)
     def console_shell():

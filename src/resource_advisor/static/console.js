@@ -166,12 +166,15 @@ function approvalControls(recommendation) {
   return add(el("div"), button, el("small", "승인 시 현재 근거를 다시 검사합니다. 승인은 자원 예약이 아닙니다."));
 }
 const views = {
+  experiments: ["EXPERIMENT WORKSPACE", "실험 · 비교", "MLflow 실행 기록, 파라미터, 지표와 아티팩트를 함께 확인합니다."],
+  pipelines: ["WORKFLOW OPERATIONS", "파이프라인", "Kubeflow 단계 상태와 연결된 작업을 추적하고 실행·중지를 요청합니다."],
+  notebooks: ["RESEARCH WORKSPACES", "노트북", "개발 환경의 상태와 자원을 확인하고 시작·중지·접속합니다."],
   operations: ["COMPUTE OPERATIONS", "운영 현황", "자원 배분, 대기 사유, 장애와 사용량을 확인합니다."],
   usage: ["PROJECT ACCOUNTING", "프로젝트 사용량", "물리 장치와 공유 슬롯을 구분한 할당 원장입니다."],
   submit: [
     "SUBMIT JOB",
     "작업 제출",
-    "작업 템플릿과 실행 장비를 선택하면 Kubernetes 또는 Slurm에 새 작업을 제출합니다.",
+    "작업 요구사항을 보고 플랫폼이 호환 자원을 선택해 Kubernetes 또는 Slurm 큐에 제출합니다.",
   ],
   execution: [
     "OBSERVATION",
@@ -738,6 +741,7 @@ function jobAction(job) {
 }
 function operationsView() {
   const op=data.operations, root=el("div",null,"operations-page");
+  root.append(researchConnections());
   if(!op)return empty("운영 집계를 불러오지 못했습니다.");
   root.append(add(el("section",null,"operations-intro"),
     add(el("div"),el("p","SHARED COMPUTE · "+data.project_ref,"eyebrow"),el("h2","공동 자원 운영"),el("p","지금 기다리는 작업과 확인할 문제부터 살펴보세요.")),
@@ -857,6 +861,7 @@ function execution() {
   return root;
 }
 function showJob(job) {
+  $("job-dialog-title").textContent="작업 상세";
   const m = job.result?.measurements;
   const content = add(el("div", null, "job-detail-content"),
     el("p", job.template?.name || job.workload_ref, "detail-workload"),
@@ -877,6 +882,8 @@ function showJob(job) {
       ["p95 지연", m.latency_p95_ms == null ? "—" : fmt(m.latency_p95_ms) + " ms", "미측정은 — 표시"],
       ["처리량", m.throughput == null ? "—" : fmt(m.throughput), "측정값"],
     ])) : el("p", "아직 수집된 실행 결과가 없습니다."),
+    ["FAILED","CANCELED","RESULT_INVALID"].includes(job.state) ? retryJobButton(job) : null,
+    job.tracking?.run_id ? researchButton("MLflow 실험 기록 보기",()=>openExperiment(job.tracking.run_id)) : null,
     job.scheduling_plan ? schedulingProgress(job) : null,
     details("전체 기록 · 결과 · MLflow", job));
   const cancel = cancelButton(job);
@@ -1718,6 +1725,7 @@ function recommendationsView() {
 }
 function render() {
   if (!data) return;
+  if (["operations","experiments","pipelines","notebooks"].includes(active) && !researchPending && Date.now()-researchUpdated>30000) refreshResearch();
   const focused = document.activeElement;
   const keepFocus = ["job-search", "resource-search"].includes(focused?.id)
     ? { id: focused.id, start: focused.selectionStart, end: focused.selectionEnd } : null;
@@ -1731,6 +1739,9 @@ function render() {
   $("content").replaceChildren(
     {
       operations: operationsView,
+      experiments: experimentsView,
+      pipelines: pipelinesView,
+      notebooks: notebooksView,
       usage: usageView,
       execution,
       jobs: jobsView,
@@ -1768,6 +1779,7 @@ function render() {
 }
 function reset(message = "") {
   generation++;
+  researchData=null; researchRuns=null; researchPending=false; experimentSelection.clear(); researchUpdated=0;
   controller?.abort();
   controller = null;
   pending = false;
@@ -1899,3 +1911,133 @@ async function connectDefaultProject() {
   } catch (_) { /* Existing token login remains available if discovery fails. */ }
 }
 connectDefaultProject();
+
+
+// Research services remain independent from core scheduler polling.
+let researchData=null,researchRuns=null,researchPending=false,researchUpdated=0;
+let selectedExperiment="",pipelineDraft={workload:"",profile:"",template:""},pipelineRequestKey=null;
+const experimentSelection=new Map();
+async function researchRequest(path,body=null,key=null) {
+  const response=await fetch(API+"/research"+path,{method:body===null?"GET":"POST",headers:{...authHeaders(),...(body===null?{}:{"Content-Type":"application/json"}),...(key?{"Idempotency-Key":key}:{})},...(body===null?{}:{body:JSON.stringify(body)})});
+  const value=await response.json();if(!response.ok)throw new Error(typeof value.detail==="string"?value.detail:"연결과 프로젝트 권한을 확인해 주세요.");return value;
+}
+async function refreshResearch() {
+  if(researchPending)return;researchPending=true;const session=generation;
+  try {
+    const result=await researchRequest("/overview");
+    if(session!==generation)return;researchData=result;
+    if(result.mlflow.status==="connected"){const runs=await researchRequest("/runs"+(selectedExperiment?"?experiment_id="+encodeURIComponent(selectedExperiment):""));if(session!==generation)return;researchRuns=runs;}
+  }catch(error){if(session===generation)$("notice").textContent=error.message;}
+  finally{if(session===generation){researchPending=false;researchUpdated=Date.now();render();}}
+}
+function researchButton(text,handler,primary=false) {
+  const b=el("button",text,primary?"primary":"");b.type="button";b.onclick=async()=>{b.disabled=true;const session=generation;try{await handler();}catch(error){if(session===generation)$("notice").textContent=error.message;}finally{b.disabled=false;}};return b;
+}
+function researchLink(text,url) {
+  if(!url || !/^https?:\/\//.test(url))return null;
+  const a=el("a",text,"action-link");a.href=url;a.target="_blank";a.rel="noopener noreferrer";return a;
+}
+function researchConnections() {
+  const row=el("div",null,"research-connections");
+  for(const [key,name,route] of [["mlflow","MLflow · 실험","experiments"],["kubeflow","Kubeflow · 워크플로","pipelines"],["notebooks","Jupyter · 노트북","notebooks"]]) {
+    const state=researchData?.[key]?.status;
+    const a=el("a",null,"service-connection");a.href="#"+route;
+    a.append(el("strong",name),badge(state==="connected"?"연결됨":state==="unconfigured"?"미설정":state==="unavailable"?"연결 확인 필요":"연결 확인 중",state==="connected"?"good":"warn"));row.append(a);
+  }
+  return row;
+}
+function researchEmpty(key) {
+  const state=researchData?.[key]?.status;
+  return empty(!state?"서비스 상태를 불러오는 중입니다…":state==="unconfigured"?"이 프로젝트에 서비스 연결이 설정되지 않았습니다.":"서비스 API 연결 또는 권한을 확인해야 합니다. 기존 작업 운영은 계속 사용할 수 있습니다.");
+}
+function experimentsView() {
+  const root=el("div");root.append(researchConnections());
+  if(researchData?.mlflow.status!=="connected"){root.append(researchEmpty("mlflow"));return root;}
+  const controls=el("div",null,"view-toolbar");const selector=el("select");selector.setAttribute("aria-label","MLflow 실험 선택");selector.append(new Option("프로젝트 전체 실험",""));
+  for(const e of researchData.mlflow.items)selector.append(new Option(e.name,e.experiment_id));selector.value=selectedExperiment;
+  selector.onchange=async()=>{selectedExperiment=selector.value;experimentSelection.clear();researchUpdated=0;await refreshResearch();};
+  controls.append(selector,researchButton("새로고침",async()=>{researchUpdated=0;await refreshResearch();}),researchLink("MLflow 열기 ↗",researchData.mlflow.ui_url));
+  const runs=researchRuns?.items || [];
+  root.append(panel("실험 워크스페이스","실행을 최대 4개 선택하면 파라미터와 지표를 나란히 비교합니다. 서로 다른 작업·측정 구간의 수치를 같은 성능으로 비교하지 마세요.",controls));
+  if(experimentSelection.size>0) {
+    const selected=[...experimentSelection.values()];const metrics=[...new Set(selected.flatMap(r=>Object.keys(r.metrics)))];const params=[...new Set(selected.flatMap(r=>Object.keys(r.params)))];
+    root.append(panel("선택한 실행 비교",`${selected.length}개 · 미측정 값은 —`,table(["지표 / 파라미터",...selected.map(r=>r.name)],
+      [...metrics.map(k=>[el("strong",k),...selected.map(r=>el("span",r.metrics[k]==null?"—":fmt(r.metrics[k])))]),...params.map(k=>[el("span",k),...selected.map(r=>el("span",r.params[k]??"—"))])])));
+  }
+  const rows=runs.map(r=>{
+    const check=el("input");check.type="checkbox";check.checked=experimentSelection.has(r.run_id);check.disabled=!check.checked && experimentSelection.size>=4;check.setAttribute("aria-label","비교 선택 · "+r.name);check.onchange=()=>{check.checked?experimentSelection.set(r.run_id,r):experimentSelection.delete(r.run_id);render();};
+    const metricEntries=Object.entries(r.metrics).filter(([k])=>/latency_p95|quality|throughput/.test(k)).slice(0,3);
+    return [check,add(el("div",null,"job-name"),el("strong",r.name),code(r.run_id)),badge(r.status,r.status==="FINISHED"?"good":r.status==="FAILED"?"warn":""),el("span",r.params.accelerator_model||r.params.backend||"—"),add(el("div"),...metricEntries.map(([k,v])=>el("small",`${k}: ${fmt(v)}`))),el("span",r.start_time?stamp(new Date(r.start_time).toISOString()):"—"),researchButton("상세 · 아티팩트",()=>openExperiment(r.run_id))];
+  });
+  root.append(panel("실행 기록",`${runs.length}개 표시 · 최신 실행 순`,rows.length?table(["비교","실행","상태","실행 환경","주요 지표","시작","관리"],rows):empty("해당 실험에 실행 기록이 없습니다.")));
+  if(researchRuns?.next_page_token)root.append(researchButton("다음 실행 보기",async()=>{researchRuns=await researchRequest("/runs?page_token="+encodeURIComponent(researchRuns.next_page_token)+(selectedExperiment?"&experiment_id="+encodeURIComponent(selectedExperiment):""));render();}));
+  return root;
+}
+async function openExperiment(ref) {
+  const session=generation;const r=await researchRequest("/runs/"+encodeURIComponent(ref));if(session!==generation)return;
+  const body=el("div",null,"job-detail-content");
+  body.append(el("h3",r.name),badge(r.status),code(r.run_id),table(["지표","값"],Object.entries(r.metrics).map(([k,v])=>[el("span",k),el("strong",fmt(v))])),details("파라미터와 출처",{params:r.params,tags:r.tags}));
+  const artifacts=el("div");body.append(artifacts);
+  const browse=async(path="")=>{const v=await researchRequest("/runs/"+encodeURIComponent(ref)+"/artifacts?path="+encodeURIComponent(path));if(session!==generation)return;artifacts.replaceChildren(el("h3","아티팩트"),path?researchButton("상위 폴더",()=>browse(path.split("/").slice(0,-1).join("/"))):el("small","기록된 결과 파일"));for(const f of v.items)artifacts.append(f.is_dir?researchButton("▸ "+f.path,()=>browse(f.path)):el("p",`${f.path} · ${f.file_size ?? "—"} bytes`));if(!v.items.length)artifacts.append(empty("아티팩트가 없습니다."));};
+  const note=el("textarea");note.rows=3;note.maxLength=2000;note.setAttribute("aria-label","실험 운영 메모");note.value=r.tags["hairp.operator_note"]||"";note.placeholder="실험 결과와 운영 조치 메모";
+  body.append(el("h3","운영 메모"),note,researchButton("메모 저장",async()=>{await researchRequest("/runs/"+encodeURIComponent(ref)+"/note",{text:note.value});$("notice").textContent="MLflow에 메모를 저장했습니다.";}));
+  const base=researchData?.mlflow.ui_url;body.append(researchLink("MLflow에서 전체 기록 열기 ↗",base?base.replace(/\/$/,"")+"/#/experiments/"+encodeURIComponent(r.experiment_id)+"/runs/"+encodeURIComponent(ref):null));
+  $("job-dialog-title").textContent="실험 상세";$("job-dialog-body").replaceChildren(body);$("job-dialog").showModal();await browse();
+}
+function pipelinesView() {
+  const root=el("div");root.append(researchConnections());const info=researchData?.kubeflow;
+  if(info?.status!=="connected"){root.append(researchEmpty("kubeflow"));return root;}
+  const form=el("div",null,"job-form");const makeSelect=(name,items,current)=>{const s=el("select");s.setAttribute("aria-label",name);for(const [value,label] of items)s.append(new Option(label,value));s.value=current || items[0]?.[0] || "";return s;};
+  const template=makeSelect("파이프라인 템플릿",(info.templates||[]).map(t=>[t.ref,t.name]),pipelineDraft.template);
+  const workload=makeSelect("파이프라인 작업",(data.submission_catalog||[]).map(w=>[w.workload_ref,w.workload_ref]),pipelineDraft.workload);
+  const profile=makeSelect("파이프라인 실행 정책",(data.scheduling_profiles||[]).map(p=>[p.ref,p.name]),pipelineDraft.profile || data.scheduling_profiles?.find(p=>p.policy.priority==="normal" && p.policy.backend_order[0]==="kubernetes")?.ref);
+  for(const [key,input] of [["template",template],["workload",workload],["profile",profile]]){pipelineDraft[key]=input.value;input.onchange=()=>{pipelineDraft[key]=input.value;pipelineRequestKey=null;};}
+  form.append(el("label","파이프라인"),template,el("label","실행할 작업"),workload,el("label","자동 배치 정책"),profile);
+  const submit=researchButton("Kubeflow 파이프라인 실행",async()=>{
+    pipelineRequestKey ||= "pipeline-console-"+crypto.randomUUID();
+    const run=await researchRequest("/pipelines",{template_ref:template.value,workload_ref:workload.value,profile_ref:profile.value},pipelineRequestKey);
+    pipelineRequestKey=null;researchUpdated=0;await refreshResearch();$("notice").textContent="Kubeflow에 실행을 요청했습니다: "+run.run_id;
+  },true);submit.disabled=!(info.templates?.length && workload.value && profile.value);
+  form.append(el("small","Kubeflow가 워크플로를 시작하고 플랫폼의 자동 배치 API가 실제 GPU/NPU 작업을 큐에 넣습니다."),submit,researchLink("Kubeflow 원본 열기 ↗",info.ui_url));
+  root.append(panel("워크플로 실행","등록된 실행 환경으로 파이프라인을 시작합니다.",form));
+  root.append(panel("파이프라인 실행 이력",`${info.items.length}개 표시 · 실제 KFP 상태`,info.items.length?table(["실행","상태","시작","연결 작업","관리"],info.items.map(r=>[
+    add(el("div",null,"job-name"),el("strong",r.display_name),code(r.run_id)),badge(r.state,r.state==="SUCCEEDED"?"good":r.state==="FAILED"?"warn":""),el("span",stamp(r.created_at)),el("span",r.job_id||"아직 연결된 작업 없음"),researchButton("단계 · 관리",()=>openPipeline(r.run_id))])):empty("파이프라인 실행이 없습니다.")));
+  if(info.next_page_token)root.append(researchButton("다음 실행 보기",async()=>{researchData.kubeflow={status:"connected",...await researchRequest("/pipelines?page_token="+encodeURIComponent(info.next_page_token))};render();}));return root;
+}
+async function openPipeline(ref) {
+  const session=generation;const run=await researchRequest("/pipelines/"+encodeURIComponent(ref));if(session!==generation)return;
+  const body=el("div",null,"job-detail-content");body.append(el("h3",run.display_name),badge(run.state));
+  const graph=el("div",null,"pipeline-graph");for(const task of run.graph){const observed=run.tasks.find(t=>t.display_name===task.name);graph.append(add(el("div",null,"pipeline-task"),el("small",task.dependencies.length?"선행: "+task.dependencies.join(" → "):"시작 단계"),el("strong",task.name),badge(observed?.state||"상태 미관측")));}body.append(graph);
+  body.append(table(["단계","상태","시작","종료"],run.tasks.map(t=>[el("span",t.display_name),badge(t.state),el("span",stamp(t.start_time)),el("span",stamp(t.end_time))])));
+  if(run.job_id)body.append(researchButton("연결된 컴퓨트 작업 보기",async()=>{
+    const response=await fetch(API+"/jobs/"+encodeURIComponent(run.job_id),{headers:authHeaders()});if(!response.ok)throw new Error("작업 기록을 조회하지 못했습니다.");const job=await response.json();
+    const known=data.jobs.items.find(j=>j.job_id===run.job_id);if(known)showJob(known);else{$("job-dialog-body").replaceChildren(details("연결된 작업",job));}
+  }));
+  if(!["SUCCEEDED","FAILED","CANCELED","CANCELLED","SKIPPED"].includes(run.state)){
+    const stop=researchButton("파이프라인 중지",async()=>{if(stop.dataset.confirm!=="yes"){stop.dataset.confirm="yes";stop.textContent="중지 확인 · 연결 작업도 정리됩니다";return;}await researchRequest("/pipelines/"+encodeURIComponent(ref)+"/terminate",{});$("notice").textContent="중지를 요청했습니다. 실제 종료 상태는 갱신 후 확인하세요.";$("job-dialog").close();researchUpdated=0;await refreshResearch();});body.append(stop);
+  }
+  body.append(details("전체 단계 기록",run));$("job-dialog-title").textContent="파이프라인 상세";$("job-dialog-body").replaceChildren(body);$("job-dialog").showModal();
+}
+function notebooksView() {
+  const root=el("div");root.append(researchConnections());const info=researchData?.notebooks;
+  if(info?.status!=="connected"){root.append(researchEmpty("notebooks"));return root;}
+  const grid=el("div",null,"notebook-grid");
+  for(const n of info.items){const card=el("section",null,"panel notebook-card");const title=el("h2",n.name);const state=n.stopped?(n.ready?"중지 처리 중":"중지됨"):n.ready?"사용 가능":"시작 대기";
+    card.append(el("p","JUPYTER WORKSPACE","eyebrow"),title,badge(state,n.ready&&!n.stopped?"good":""),el("small",n.namespace));
+    for(const r of n.resources)card.append(el("p",`CPU ${r.requests?.cpu||"—"} · 메모리 ${r.requests?.memory||"—"}`));
+    if(n.ready&&!n.stopped)card.append(researchLink("JupyterLab 열기 ↗",n.url));
+    const action=n.stopped?"start":"stop";const b=researchButton(action==="start"?"노트북 시작":"노트북 중지",async()=>{
+      if(action==="stop" && b.dataset.confirm!=="yes"){b.dataset.confirm="yes";b.textContent="중지 확인 · 실행 중인 커널 종료";return;}
+      await researchRequest("/notebooks/"+encodeURIComponent(n.name)+"/"+action,{});researchUpdated=0;await refreshResearch();$("notice").textContent="노트북 "+(action==="start"?"시작":"중지")+"을 요청했습니다. 컨트롤러가 상태를 반영합니다.";
+    });card.append(b,details("자원 요청 · 컨디션",{resources:n.resources,conditions:n.conditions}));grid.append(card);
+  }
+  root.append(panel("연구 노트북","노트북에서 코드를 정의하고, 파이프라인이나 작업 API로 실행합니다. 접속 시 Kubeflow 로그인이 필요할 수 있습니다.",info.items.length?grid:empty("현재 프로필에 노트북이 없습니다.")));return root;
+}
+
+function retryJobButton(job) {
+  let key=null;
+  return researchButton("같은 작업 다시 제출",async()=>{key ||= "retry-console-"+crypto.randomUUID();
+    const response=await fetch(API+"/jobs/"+encodeURIComponent(job.job_id)+"/retry",{method:"POST",headers:{...authHeaders(),"Idempotency-Key":key}});
+    const value=await response.json();if(!response.ok)throw new Error(value.detail||"재제출하지 못했습니다.");trackedJobId=value.job_id;$("job-dialog").close();$("auto").checked=true;await load();$("notice").textContent="새 실행으로 재제출했습니다: "+value.job_id;
+  });
+}

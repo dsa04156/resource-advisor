@@ -226,3 +226,5 @@ for transfer. Numerical failure tests remain explicitly synthetic; broader
 effectiveness and live harmful-transfer injection remain unverified.
 
 공통 정책 API와 웹 제출 흐름: [SchedulingProfile 가이드](docs/scheduling-profiles.md).
+
+연구 운영 화면과 MLflow/Kubeflow 연결: [Research Console](docs/research-console.md).

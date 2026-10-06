@@ -56,7 +56,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--api-url", required=True)
     parser.add_argument("--workload", required=True)
-    parser.add_argument("--candidate", required=True)
+    target = parser.add_mutually_exclusive_group(required=True)
+    target.add_argument("--candidate")
+    target.add_argument("--scheduling-profile")
     parser.add_argument("--idempotency-key", required=True)
     parser.add_argument("--deadline-seconds", type=int, default=3900)
     parser.add_argument("--owner-lease-seconds", type=int, default=60)
@@ -71,7 +73,11 @@ def main():
         os.environ["RA_API_TOKEN"],
         {
             "workload_ref": args.workload,
-            "candidate_ref": args.candidate,
+            **(
+                {"scheduling_profile_ref": args.scheduling_profile}
+                if args.scheduling_profile
+                else {"candidate_ref": args.candidate}
+            ),
             "mode": "observe",
             "owner_lease_seconds": args.owner_lease_seconds,
         },

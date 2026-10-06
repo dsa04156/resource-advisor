@@ -1,0 +1,67 @@
+"""Compile only: site URL, qualified image and Secret name are runtime inputs."""
+
+from kfp import compiler, dsl, kubernetes
+
+
+@dsl.container_component
+def launch(
+    api_url: str, image: str, workload: str, profile: str, run_key: str, owner_lease_seconds: int
+):
+    return dsl.ContainerSpec(
+        image=str(image),
+        command=["python", "-m", "resource_advisor.launcher"],
+        args=[
+            "--api-url",
+            api_url,
+            "--workload",
+            workload,
+            "--scheduling-profile",
+            profile,
+            "--idempotency-key",
+            run_key,
+            "--owner-lease-seconds",
+            owner_lease_seconds,
+        ],
+    )
+
+
+@dsl.pipeline(name="hairp-auto-workload")
+def automatic(
+    api_url: str,
+    launcher_image: str,
+    workload: str,
+    profile: str,
+    token_secret: str,
+    run_key: str,
+    owner_lease_seconds: int = 60,
+):
+    task = launch(
+        api_url=api_url,
+        image=launcher_image,
+        workload=workload,
+        profile=profile,
+        run_key=run_key,
+        owner_lease_seconds=owner_lease_seconds,
+    )
+    task.set_caching_options(False)
+    kubernetes.add_node_selector(task, "kubernetes.io/arch", "amd64")
+    kubernetes.use_secret_as_volume(
+        task,
+        secret_name=token_secret,
+        mount_path="/var/run/resource-advisor",
+    )
+    task.set_env_variable("SSL_CERT_FILE", "/var/run/resource-advisor/ca.crt")
+    task.set_cpu_request("100m").set_cpu_limit("1")
+    task.set_memory_request("128Mi").set_memory_limit("256Mi")
+    kubernetes.use_secret_as_env(
+        task, secret_name=token_secret, secret_key_to_env={"token": "RA_API_TOKEN"}
+    )
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    compiler.Compiler().compile(automatic, args.output)
