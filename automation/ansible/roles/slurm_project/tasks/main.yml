@@ -1,0 +1,203 @@
+- name: Require scoped standalone lab authorization and safe identity
+  ansible.builtin.assert:
+    that:
+      - ra_lab_authorized | default(false) | bool
+      - not (ra_existing_production | default(true) | bool)
+      - ra_slurm_project_authorized | default(false) | bool
+      - ra_executor_name is match('^ra-[a-z0-9][a-z0-9-]{0,30}$')
+      - ra_executor_uid | int >= 19000
+      - ra_executor_uid | int <= 60000
+      - ra_executor_gid | int == ra_executor_uid | int
+      - ra_executor_home is match('^/var/lib/resource-advisor-[a-z0-9-]+$')
+      - ra_executor_base is match('^/opt/resource-advisor/[a-z0-9-]+$')
+      - "ra_executor_public_key is match('^ssh-ed25519 [A-Za-z0-9+/=]+(?: [A-Za-z0-9_.-]+)?$')"
+      - ra_executor_scope.mode in ['controller', 'results']
+      - ra_executor_scope.user == ra_executor_name
+      - ra_executor_scope.output_dir == ra_executor_home + '/results'
+      - ra_executor_scope.account is match('^ra-[a-z0-9][a-z0-9-]{0,30}$')
+      - ra_executor_scope.partition is match('^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$')
+      - ra_executor_scope.qos_by_priority.keys() | sort == ['high', 'normal']
+      - ra_executor_scope.qos_by_priority.normal == ra_executor_scope.qos
+      - ra_executor_scope.native_bindings | length > 0 or ra_executor_scope.mode == 'results'
+  no_log: true
+
+- name: Require the qualified Slurm version
+  ansible.builtin.command:
+    argv: [/usr/bin/scontrol, --version]
+  register: ra_project_version
+  changed_when: false
+  check_mode: false
+  failed_when: ra_project_version.stdout != 'slurm 24.11.5'
+
+- name: Reject unmanaged names, UIDs, paths or Slurm associations
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/python3
+      - -c
+      - |
+        import json,pwd,grp,subprocess,sys
+        from pathlib import Path
+        c=json.loads(sys.argv[1]);base=Path(c['base']);home=Path(c['home'])
+        marker=base/'receipt.json';managed=marker.exists()
+        if managed:
+          assert marker.stat().st_uid==base.stat().st_uid==0
+          assert json.loads(marker.read_text())==c
+        else:
+          assert not base.exists() and not home.exists()
+        for u in pwd.getpwall():
+          if u.pw_name==c['name'] or u.pw_uid==c['uid']:
+            assert managed and u.pw_name==c['name'] and u.pw_uid==c['uid']
+            assert u.pw_gid==c['gid'] and u.pw_dir==c['home']
+        for g in grp.getgrall():
+          if g.gr_name==c['name'] or g.gr_gid==c['gid']:
+            assert managed and g.gr_name==c['name'] and g.gr_gid==c['gid']
+        if c['mode']=='controller':
+          args=['sacctmgr','-nP','show','assoc','where','account='+c['account'],
+                'format=Account,User,Partition']
+          rows=subprocess.check_output(args,text=True).splitlines()
+          assert managed or not rows
+          assert all(r.split('|')[1] in ['',c['name']] for r in rows)
+        print('ownership verified')
+      - "{{ {'name': ra_executor_name, 'uid': ra_executor_uid | int, 'gid': ra_executor_gid | int, 'home': ra_executor_home, 'base': ra_executor_base, 'account': ra_executor_scope.account, 'mode': ra_executor_scope.mode} | to_json }}"
+  changed_when: false
+  check_mode: false
+
+- name: Keep code, ownership marker and SSH authority root owned
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop: ["{{ ra_executor_base }}", "{{ ra_executor_home }}", "{{ ra_executor_home }}/.ssh"]
+  when: not ansible_check_mode
+
+- name: Persist ownership intent before creating managed identities
+  ansible.builtin.copy:
+    content: "{{ {'name': ra_executor_name, 'uid': ra_executor_uid | int, 'gid': ra_executor_gid | int, 'home': ra_executor_home, 'base': ra_executor_base, 'account': ra_executor_scope.account, 'mode': ra_executor_scope.mode} | to_nice_json }}\n"
+    dest: "{{ ra_executor_base }}/receipt.json"
+    owner: root
+    group: root
+    mode: '0600'
+  when: not ansible_check_mode
+
+- name: Create the dedicated numeric group
+  ansible.builtin.group:
+    name: "{{ ra_executor_name }}"
+    gid: "{{ ra_executor_gid }}"
+    system: true
+  when: not ansible_check_mode
+
+- name: Create only the locked project executor without sudo access
+  ansible.builtin.user:
+    name: "{{ ra_executor_name }}"
+    uid: "{{ ra_executor_uid }}"
+    group: "{{ ra_executor_name }}"
+    home: "{{ ra_executor_home }}"
+    create_home: false
+    shell: /bin/sh
+    password_lock: true
+    groups: "{{ 'video' if ra_executor_video_access | default(false) | bool else '' }}"
+    append: false
+  when: not ansible_check_mode
+
+- name: Keep each project's result files private to its UID
+  ansible.builtin.file:
+    path: "{{ ra_executor_home }}/results"
+    state: directory
+    owner: "{{ ra_executor_name }}"
+    group: "{{ ra_executor_name }}"
+    mode: '0700'
+  when: not ansible_check_mode
+
+- name: Install the reviewed bounded forced-command gateway
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../examples/slurm_executor.py"
+    dest: "{{ ra_executor_base }}/gateway.py"
+    owner: root
+    group: root
+    mode: '0555'
+  when: not ansible_check_mode
+
+- name: Install administrator-owned route and authorized key
+  ansible.builtin.copy:
+    content: "{{ item.content }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - {dest: "{{ ra_executor_base }}/scope.json", content: "{{ ra_executor_scope | to_nice_json }}\n"}
+    - {dest: "{{ ra_executor_home }}/.ssh/authorized_keys", content: 'restrict,command="/usr/bin/python3 -I {{ ra_executor_base }}/gateway.py --config {{ ra_executor_base }}/scope.json" {{ ra_executor_public_key }}'}
+  when: not ansible_check_mode
+  no_log: true
+
+- name: Create or verify only this project's native policy
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/python3
+      - -c
+      - |
+        import json,subprocess,sys
+        c=json.loads(sys.argv[1]);changed=False
+        def call(args):return subprocess.check_output(['sacctmgr',*args],text=True)
+        cluster=call(['-nP','show','cluster','format=Cluster']).strip()
+        assert cluster and '\n' not in cluster
+        q=sorted(set(c['qos_by_priority'].values()))
+        available={r.split('|')[0] for r in call(['-nP','show','qos','format=Name']).splitlines()}
+        assert set(q)<=available
+        fields='Cluster,Account,User,Partition,QOS,DefaultQOS,GrpTRES'
+        args=['-nP','show','assoc','where','account='+c['account'],'format='+fields]
+        rows=[r.split('|') for r in call(args).splitlines()]
+        if not rows:
+          call(['-i','add','account','name='+c['account'],'cluster='+cluster,
+                'Description=resource-advisor-lab-project','Organization=research-lab',
+                'QOS='+','.join(q),'DefaultQOS='+c['qos'],
+                'GrpTRES=cpu=1,mem=1024M,gres/gpu=1'])
+          changed=True
+        rows=[r.split('|') for r in call(args).splitlines()]
+        account=next(r for r in rows if r[2]=='')
+        assert account[0]==cluster and account[3]=='' and sorted(account[4].split(','))==q
+        assert account[5]==c['qos'] and set(account[6].split(','))=={'cpu=1','mem=1G','gres/gpu=1'}
+        if not any(r[2]==c['user'] for r in rows):
+          call(['-i','add','user','name='+c['user'],'account='+c['account'],
+                'cluster='+cluster,'partition='+c['partition'],
+                'DefaultAccount='+c['account'],'QOS='+','.join(q),'DefaultQOS='+c['qos']])
+          changed=True
+        rows=[r.split('|') for r in call(args).splitlines()]
+        user=next(r for r in rows if r[2]==c['user'])
+        assert len(rows)==2 and user[0]==cluster and user[3]==c['partition']
+        assert sorted(user[4].split(','))==q and user[5]==c['qos']
+        print(json.dumps({'changed':changed,'associations_verified':True}))
+      - "{{ ra_executor_scope | to_json }}"
+  register: ra_project_association
+  changed_when: (ra_project_association.stdout | from_json).changed
+  when: ra_executor_scope.mode == 'controller' and not ansible_check_mode
+  no_log: true
+
+- name: Validate explicitly qualified render-device ACL paths
+  ansible.builtin.assert:
+    that:
+      - item is match('^/dev/dri/renderD[0-9]+$')
+      - ra_executor_scope.mode == 'results'
+  loop: "{{ ra_executor_device_acl | default([]) }}"
+
+- name: Add a named-user ACL only on the qualified render device
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/python3
+      - -c
+      - |
+        import json,subprocess,sys
+        from pathlib import Path
+        name,path=sys.argv[1:];assert Path(path).is_char_device()
+        lines=subprocess.check_output(['getfacl','-cp',path],text=True).splitlines()
+        changed=('user:'+name+':rw-') not in lines
+        if changed:subprocess.run(['setfacl','-m','u:'+name+':rw',path],check=True)
+        print(json.dumps({'changed':changed}))
+      - "{{ ra_executor_name }}"
+      - "{{ item }}"
+  loop: "{{ ra_executor_device_acl | default([]) }}"
+  register: ra_project_acl
+  changed_when: (ra_project_acl.stdout | from_json).changed
+  when: not ansible_check_mode
