@@ -28,8 +28,11 @@ in PostgreSQL and MLflow. See the [hardware report](docs/gpu-experiment.md) for
 failures, raw measurements and limits. Separate [Slurm CUDA qualification](docs/slurm-verification.md)
 and [quota/priority enforcement](docs/slurm-policy.md) now have live evidence;
 a bounded [browser → API → Orin → S3/MLflow result path](docs/slurm-api-results.md)
-now also passes, with the initial failed attempt retained. Full Slurm multi-user
-and recovery qualification remains open. A separately qualified
+now also passes, with the initial failed attempt retained. Bounded
+[accepted-submit SIGKILL recovery](docs/slurm-response-recovery.md) now verifies
+the same native job/result/ledger/MLflow run; its lost direct-call counter is
+reported, so the stricter prospective protocol remains unpassed. Full Slurm
+multi-user and node-loss qualification remains open. A separately qualified
 [Hailo-8 ResNet-50 API path](docs/hailo-resnet50.md) now completes three
 observations, measured lookup, approval and a fourth verification, with matching
 PostgreSQL/S3/MLflow evidence. Earlier NPU model failures remain visible.

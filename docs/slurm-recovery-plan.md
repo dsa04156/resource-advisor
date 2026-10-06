@@ -31,3 +31,19 @@ where needed and restore the normal worker. Count every allocation, including
 invalid or failed attempts. Report startup/lease/recovery delay separately from
 forward latency. This test does not prove node-loss recovery, arbitrary-program
 execution, cross-project Slurm quota or distributed exactly-once behavior.
+
+## Recorded execution and verifier correction
+
+[Actual response/crash recovery](slurm-response-recovery.md) verifies the third
+attempt's accepted-without-ack boundary, same-Pod exit137/restart, same native ID,
+one parent job/ledger/MLflow run and identical artifacts. The direct submit-call
+counter was lost during cleanup after an evidence-query failure. Therefore this
+full protocol remains unpassed; three real allocations total 217 GPU reservation
+seconds, including both preceding invalid controller trials.
+
+For a repeat, persist crash exec return code/stdout/stderr before inspecting it;
+an exec's return code alone cannot establish container termination. Record the
+same Pod UID and exit137/restart before restoring the template. Collect the submit
+counter before any post-run assertion or cleanup, and query canonical
+attempt-derived tracking/artifact refs in addition to result bodies. Persist
+evidence before assertions so a verifier failure cannot erase the observation.

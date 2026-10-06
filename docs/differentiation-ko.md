@@ -20,6 +20,41 @@
 장치를 예측하는 알고리즘이라고 부르지 않는다. 성능 추천은 비교 가능한
 실측 프로파일, 품질·불확실성·예산 조건을 거치는 별도 과정이다.
 
+백필·갱 스케줄링·큐 우선순위 자체도 기존 스케줄러의 기능이다.
+우리의 개발 범위는 그 설정을 공통 정책으로 연결하고, 실제 입장·예약·실행
+결과와 대기 원인을 수집해 실험 화면에서 비교·재생하는 것이다. 특히
+Slurm의 시간 분할 gang scheduling과 여러 Pod의 동시 입장은 의미가 다르다.
+실험별로 사용한 네이티브 기능과 검증 범위를 명시한다.
+
+기존 도구의 역할은 공식 문서에서도 확인할 수 있다:
+[Kueue의 입장과 Pod 스케줄링 구분](https://kueue.sigs.k8s.io/docs/overview/),
+[Slurm의 백필](https://slurm.schedmd.com/sched_config.html),
+[Slurm gang scheduling](https://slurm.schedmd.com/gang_scheduling.html),
+[Kubeflow 파이프라인](https://www.kubeflow.org/docs/components/pipelines/concepts/pipeline/),
+[MLflow 실험 추적](https://mlflow.org/docs/latest/tracking).
+
+## 연구자가 사용하는 흐름
+
+1. Notebook·콘솔·KFP에서 작업과 요구 자원을 정의한다. 기본 제출은 GPU를
+   먼저 고르지 않고 등록된 작업과 공통 SchedulingProfile을 선택한다.
+2. API가 검증된 실행환경 후보와 현재 자원 정보를 확인한다. CUDA 작업을
+   NPU에 임의 변환하지 않으며, 처음 보는 모델은 실행환경 검증이 필요하다.
+3. 공통 정책을 해당 backend의 실제 Queue/Flavor/Priority 또는
+   Account/QOS/Partition으로 변환해 제출한다. 입장과 할당은 Kueue·Slurm이
+   결정한다. 자리가 없으면 실제 네이티브 큐에서 기다린다.
+4. 콘솔에서 대기 → 할당 → 실행 → 결과와 그 시점의 노드 상태를 확인한다.
+   실시간 관측과 기록 재생은 구분하며, 측정하지 못한 값은 알 수 없음으로
+   표시한다.
+5. 결과 검증 후 동일 attempt의 결과 파일·MLflow run·사용량을 연결한다.
+   실패·취소 작업의 예약 시간도 보존한다.
+6. 성능을 개선하려면 동의와 측정 예산을 정해 비교 가능한 관측을 모은다.
+   추천 근거를 동결하고 승인한 뒤 별도 최종 실행으로 확인한다.
+
+이 흐름의 개발 난점은 각각의 ID·상태·권한·재시도 의미가 다른 시스템을
+연결하면서, 큐 제출을 실행 완료로 오인하거나 응답 유실 후 작업을 중복
+제출하지 않게 만드는 것이다. 따라서 화면뿐 아니라 결과 서명, 권한 검사,
+상태 머신, outbox와 사용량 원장이 직접 만든 핵심 구성요소다.
+
 ## 성과로 말할 수 있는 것
 
 - Kubernetes/Kueue GPU, Hailo NPU, Slurm Orin GPU의 실제 실행과 결과 연결.
@@ -39,8 +74,11 @@ BO의 선택 우위가 확인되지 않았다. [운영 비교](operational-compa
 완료 여부의 기준이다. 화면이나 라이브러리 설치만으로 완료를 판단하지 않는다.
 
 현재 실행·추천·기록의 핵심 경로는 실장비 근거가 있다. 남은 필수 범위에는
-Slurm 두 프로젝트의 공동사용·응답 유실/worker 장애 복구 시험과 전체 E0–E7
-대조표 정리가 있다. Slurm Pi의 NPU는 실제 PCIe 탐지와 모델 실행 근거가
+Slurm 두 프로젝트의 공동사용과 전체 E0–E7 대조표 정리가 있다.
+[Slurm 접수 응답 유실·worker SIGKILL 복구](slurm-response-recovery.md)는 동일
+작업·결과·원장·MLflow 복구가 확인됐다. 직접 제출 호출 횟수 파일은 보존하지
+못해 더 엄격한 사전 시험 절차의 전체 통과로 표시하지 않는다.
+Slurm Pi의 NPU는 실제 PCIe 탐지와 모델 실행 근거가
 없으므로 미지원 상태를 유지한다. 이 장치의 가속기 실행은 소프트웨어만으로
 완료했다고 선언할 수 없다. 장비별 지원표와 실패 근거를 함께 남겨야 한다.
 
