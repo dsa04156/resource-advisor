@@ -14,7 +14,9 @@ from sqlalchemy import (
     Table,
     UniqueConstraint,
     create_engine,
+    false,
     insert,
+    or_,
     select,
     update,
 )
@@ -89,6 +91,17 @@ studies = Table(
 
 class Conflict(ValueError):
     pass
+
+
+def job_route_filter(routes):
+    """Match complete project/cluster pairs, never their Cartesian product."""
+    return or_(
+        false(),
+        *(
+            (jobs.c.project == project) & (jobs.c.body["backend_cluster_id"].as_string() == cluster)
+            for project, cluster in routes
+        ),
+    )
 
 
 class Store:
@@ -240,7 +253,7 @@ class Store:
             insert(outbox).values(id=event_id, kind=kind, status="PENDING", tries=0, body=body)
         )
 
-    def claim(self, kind: str, seconds: int = 120):
+    def claim(self, kind: str, seconds: int = 120, *, job_routes=None):
         with self.transaction() as conn:
             query = (
                 select(outbox)
@@ -257,6 +270,17 @@ class Store:
                 )
                 .order_by(outbox.c.id)
             )
+            if job_routes is not None:
+                # Filter before LIMIT and leasing. An unrelated pending event
+                # must not consume retries or starve work owned by this worker.
+                query = query.where(
+                    select(jobs.c.id)
+                    .where(
+                        jobs.c.id == outbox.c.body["job_id"].as_string(),
+                        job_route_filter(job_routes),
+                    )
+                    .exists()
+                )
             if self.engine.dialect.name == "postgresql":
                 query = query.with_for_update(skip_locked=True)
             row = conn.execute(query.limit(1)).mappings().first()

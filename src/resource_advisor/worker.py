@@ -10,7 +10,7 @@ from .backends import BackendError, SubmissionUnknown
 from .contracts import TERMINAL, ExecutionResult, State, now, signature
 from .policy import compatibility
 from .service import NotFound, Rejected, required
-from .store import Conflict, jobs
+from .store import Conflict, job_route_filter, jobs
 
 
 class Worker:
@@ -30,7 +30,7 @@ class Worker:
 
     def submit_one(self):
         self.expire_owner_leases()
-        event = self.store.claim("submit")
+        event = self.store.claim("submit", job_routes=self.backends)
         if not event:
             return False
         try:
@@ -160,6 +160,7 @@ class Worker:
             active = list(
                 conn.execute(
                     select(jobs).where(
+                        job_route_filter(self.backends),
                         jobs.c.state.in_(
                             [
                                 State.VALIDATED,
@@ -168,7 +169,7 @@ class Worker:
                                 State.QUEUED,
                                 State.RUNNING,
                             ]
-                        )
+                        ),
                     )
                 ).mappings()
             )
@@ -187,7 +188,7 @@ class Worker:
                 pass  # Retry the fresh persisted state on the next worker cycle.
 
     def cancel_one(self):
-        event = self.store.claim("cancel")
+        event = self.store.claim("cancel", job_routes=self.backends)
         if not event:
             return False
         try:
@@ -244,9 +245,10 @@ class Worker:
             active = list(
                 conn.execute(
                     select(jobs).where(
+                        job_route_filter(self.backends),
                         jobs.c.state.in_(
                             [State.QUEUED, State.RUNNING, State.COLLECTING, State.CANCEL_REQUESTED]
-                        )
+                        ),
                     )
                 ).mappings()
             )
@@ -295,7 +297,7 @@ class Worker:
         return body
 
     def release_one(self):
-        event = self.store.claim("release_termination")
+        event = self.store.claim("release_termination", job_routes=self.backends)
         if not event:
             return False
         try:

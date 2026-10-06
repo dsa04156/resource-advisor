@@ -190,7 +190,8 @@ def test_postgres_concurrent_collectors_commit_one_result_and_ledger(service, mo
         ]
 
 
-def test_postgres_claim_and_stale_finish_are_fenced(service):
+@pytest.mark.parametrize("routes", [None, {("team-a", "lab")}])
+def test_postgres_claim_and_stale_finish_are_fenced(service, routes):
     if service.store.engine.dialect.name != "postgresql":
         pytest.skip("Independent concurrent transactions require the PostgreSQL test job")
     service.submit("team-a", JobRequest(workload_ref="workload-1", candidate_ref="base"), "claims")
@@ -198,7 +199,7 @@ def test_postgres_claim_and_stale_finish_are_fenced(service):
 
     def claim(_):
         barrier.wait(timeout=10)
-        return service.store.claim("submit")
+        return service.store.claim("submit", job_routes=routes)
 
     with ThreadPoolExecutor(max_workers=8) as pool:
         claimed = [e for e in pool.map(claim, range(8)) if e]
@@ -210,7 +211,7 @@ def test_postgres_claim_and_stale_finish_are_fenced(service):
             .where(outbox.c.id == first["id"])
             .values(lease_until=(now() - timedelta(seconds=1)).isoformat())
         )
-    second = service.store.claim("submit")
+    second = service.store.claim("submit", job_routes=routes)
     assert second["tries"] == 2 and second["lease_token"] != first["lease_token"]
     service.store.finish(first)
     with service.store.transaction() as conn:
