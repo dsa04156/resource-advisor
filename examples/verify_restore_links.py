@@ -21,6 +21,8 @@ from resource_advisor.api import create_app
 from resource_advisor.artifacts import S3Artifacts
 from resource_advisor.backup import fingerprint
 from resource_advisor.configuration import api_configuration, read_config
+from resource_advisor.scheduler_lab import agent as lab_agent
+from resource_advisor.scheduler_lab import runs as lab_runs
 from resource_advisor.service import Service
 from resource_advisor.store import jobs, outbox, usage
 
@@ -36,7 +38,7 @@ def verify(store, config, report_path):
     if len(tokens) < 2:
         raise ValueError("two project tokens required for foreign-owner negative checks")
     before = fingerprint(store)
-    report = {"status": "INCOMPLETE", "artifacts": [], "tracking": []}
+    report = {"status": "INCOMPLETE", "artifacts": [], "tracking": [], "scheduler_history": []}
     started = time.monotonic()
 
     def save():
@@ -52,6 +54,40 @@ def verify(store, config, report_path):
             all_jobs = {r["id"]: dict(r) for r in conn.execute(select(jobs)).mappings()}
             assert all_jobs, "a restore acceptance requires existing execution history"
             assert app.get("/api/v1/compute/jobs").status_code == 401
+            assert app.get("/api/v1/compute/scheduler-labs").status_code == 401
+            histories = [dict(r) for r in conn.execute(select(lab_runs)).mappings()]
+            capability = conn.execute(select(lab_agent)).mappings().first()
+            for project, token in tokens.items():
+                response = app.get(
+                    "/api/v1/compute/scheduler-labs",
+                    headers={"Authorization": "Bearer " + token},
+                )
+                assert response.status_code == 200
+                payload = response.json()
+                owned = sorted(
+                    [r for r in histories if r["project"] == project],
+                    key=lambda r: r["created_at"],
+                    reverse=True,
+                )[:40]
+                expected = {r["ref"]: r for r in owned}
+                actual = {r["ref"]: r for r in payload["items"]}
+                assert actual == expected
+                assert not set(actual) & {r["ref"] for r in histories if r["project"] != project}
+                if capability:
+                    assert payload["agent"]["seen_at"] == capability["seen_at"]
+                    assert all(
+                        payload["agent"][key] == value for key, value in capability["body"].items()
+                    )
+                report["scheduler_history"].append(
+                    {
+                        "project": project,
+                        "api_replayed_runs": len(actual),
+                        "exact_recorded_bodies": True,
+                        "foreign_runs_hidden": True,
+                        "captured_agent_preserved": bool(capability),
+                    }
+                )
+            save()
             for row in store.list(conn, "artifact"):
                 artifact, project = row["body"], row["project"]
                 job = all_jobs[artifact["job_id"]]

@@ -102,7 +102,7 @@ Job/attempt/project ownership, restored result contents, S3 size/digest,
 authenticated API bytes, foreign-project rejection, MLflow experiment/run tags
 and original MLflow artifact bytes. Each execution has exactly one usage row.
 It refuses empty history, missing/duplicate link coverage or unfinished outbox
-work. All five restored table hashes must remain unchanged after the checks.
+work. All registered restored table hashes must remain unchanged after the checks.
 Keep its per-attempt report private; publish only reviewed aggregate evidence.
 
 ## Measured result — 2026-10-03 KST
@@ -139,13 +139,62 @@ same metadata node, so the evidence is not node-loss recovery. Original object
 storage and MLflow were read back, **not restored**. Object-store backup, PITR,
 off-site retention, HA, schema upgrades and disaster recovery remain separate
 work. All hardware and recovery operations here were assistant-executed.
-# Current scheduler-history schema
 
-The rehearsal below predates the native scheduler experiment tables. It remains
+## Current scheduler-history schema
+
+The rehearsal above predates the native scheduler experiment tables. It remains
 evidence for that five-table snapshot, not a restore of newer experiment history.
 The current schema also includes `ra_scheduler_labs` and `ra_scheduler_lab_agent`.
 Fresh backup CLI processes now register both before fingerprint/manifest checks;
 previously their inclusion depended on another module having initialized Store.
 Seven-table membership, JSON round-trip content and equal-count corruption in
-both history tables have focused regression coverage. A new actual seven-table
-dump/restore rehearsal remains required before claiming current-schema recovery.
+both history tables have focused regression coverage.
+
+## Seven-table rehearsal — 2026-10-06 KST
+
+The [updated plan](restore-rehearsal-plan.md) was frozen in commit `6ec4770`
+before capture. A fresh backup CLI process exported the same read-only snapshot
+to a custom archive and all seven fingerprints. It restored into a separately
+named PostgreSQL 17.6 instance with a new 5Gi PVC and a restricted application
+owner. The target had zero application tables before the transactional import.
+
+| Table | Restored records | Canonical contents |
+|---|---:|---|
+| `ra_entities` | 21,992 | Identical |
+| `ra_jobs` | 582 | Identical |
+| `ra_outbox` | 2,556 | Identical |
+| `ra_scheduler_lab_agent` | 1 | Identical |
+| `ra_scheduler_labs` | 18 | Identical |
+| `ra_studies` | 40 | Identical |
+| `ra_usage` | 582 | Identical |
+
+All **25,771 records** matched. The archive was **26,123,283 bytes**; capture
+took **12.037 seconds**, restore **3.820 seconds** and complete link readback
+**36.029 seconds**. These are individual observations excluding provisioning,
+not an RTO or fleet-scale performance claim. The actual public snapshot CLI
+returned exit 0. A copy with one changed archive byte returned exit 1 while
+all restored database fingerprints still matched; the original archive stayed
+unchanged.
+
+All **567 result bundles** matched original S3, restored project API and MLflow
+bytes. All **582 tracking links** retained the original attempt/experiment and
+exactly one usage row, including 15 resultless terminal attempts. The same
+TestClient read handlers returned all **18 recorded scheduler experiments**
+with exact saved bodies for their owning project and no foreign runs for the
+second project. The agent timestamp/body was preserved. The history endpoint
+returns the latest 40 owned runs; this trial's 18 runs were all covered.
+Unauthenticated reads returned 401, foreign artifact reads 404, and none of
+the seven table hashes changed during readback.
+
+Source database/service specifications, Pod/PVC identities and restart count
+were unchanged. Services stayed ready, HTTPS health returned 200, and inventory
+writes advanced beyond the saved snapshot. No GPU Job or MLflow run was created.
+Only this new target was scaled to zero; its Pod is absent and its PVC remains
+Bound with the same UID. The previous target remains stopped. The dump, manifest
+and both target PVCs were retained. Four task-owned temporary forwards were
+closed; persistent API access was untouched.
+
+See the [sanitized seven-table evidence](evidence/restore-rehearsal-v2.json).
+This closes the bounded current-schema metadata restoration and result/history
+reconnection gate. It does not restore the object store or MLflow, exercise a
+recovery ingress, prove node-loss recovery, or complete the full platform audit.

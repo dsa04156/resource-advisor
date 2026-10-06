@@ -1,0 +1,115 @@
+{
+  "schema_version": "v2",
+  "status": "PASS",
+  "date_kst": "2026-10-06",
+  "capture_protocol_commit": "6ec4770",
+  "protocol": "E7 isolated online seven-table PostgreSQL snapshot restore; assistant-executed",
+  "database_version": "17.6",
+  "snapshot_at": "2026-10-06T12:15:43.399376+00:00",
+  "archive": {
+    "size_bytes": 26123283,
+    "sha256": "8ec9db03053f11b6e1556453a2ad672932fd6eef5dcef5cb5d6c48e4f496ed64"
+  },
+  "tables": {
+    "ra_entities": {
+      "rows": 21992,
+      "sha256": "d48e763dc780e9fc8d7c04e1964995da45e9d9c8f0951489e173c7ea4781d6f5"
+    },
+    "ra_jobs": {
+      "rows": 582,
+      "sha256": "b9addcd1f23396374c5789872a63d2694e8864b51cb27c8b2df53b0d35b93e1a"
+    },
+    "ra_outbox": {
+      "rows": 2556,
+      "sha256": "bcc6654493f335bc0880fb445114bea22744cb916a38a7dd238fa0c7c8604ca8"
+    },
+    "ra_scheduler_lab_agent": {
+      "rows": 1,
+      "sha256": "4059c6044612f03a184347ed71a48304fddea1f3ceea86028ce5340b551e8877"
+    },
+    "ra_scheduler_labs": {
+      "rows": 18,
+      "sha256": "6b2b762733290fe8fde764a1b603100b1f4256d6c88f936464f3f311bdffefc1"
+    },
+    "ra_studies": {
+      "rows": 40,
+      "sha256": "bd882fb00461b2fd0182a4fd194075b27f6ac785c514656a5d939097c91de2b8"
+    },
+    "ra_usage": {
+      "rows": 582,
+      "sha256": "607ca48f52972c725d871ecdcac601d3ed675e2458fb133cf3d3ae3f3ac1d04b"
+    }
+  },
+  "total_records": 25771,
+  "durations_seconds": {
+    "capture": 12.036551406024955,
+    "restore_only": 3.8202235270291567,
+    "final_link_verification": 36.02913550694939
+  },
+  "verification": {
+    "all_table_contents_match": true,
+    "archive_digest_matches": true,
+    "restored_table_contents_unchanged_by_readback": true,
+    "executions": 582,
+    "result_bundles": 567,
+    "mlflow_links": 582,
+    "usage_rows": 582,
+    "s3_api_mlflow_bytes_match": true,
+    "unauthenticated_read_http": 401,
+    "foreign_project_artifact_http": 404,
+    "api_transport": "FastAPI TestClient against restored PostgreSQL; no recovery HTTP deployment",
+    "scheduler_history": [
+      {
+        "api_replayed_runs": 18,
+        "exact_recorded_bodies": true,
+        "foreign_runs_hidden": true,
+        "captured_agent_preserved": true
+      },
+      {
+        "api_replayed_runs": 0,
+        "exact_recorded_bodies": true,
+        "foreign_runs_hidden": true,
+        "captured_agent_preserved": true
+      }
+    ],
+    "projects_checked": 2,
+    "corrupted_archive_cli_exit": 1,
+    "corrupted_archive_rejected": true,
+    "new_gpu_jobs": 0
+  },
+  "source_preservation": {
+    "source-pod_same_uid": true,
+    "source_same_database_restart_count": true,
+    "source_database_ready": true,
+    "source-pvc_same_uid": true,
+    "source-statefulset_same_uid": true,
+    "source_database_spec_unchanged": true,
+    "source_service_specs_unchanged": true,
+    "source_services_ready": true,
+    "source_jobs_unchanged": true,
+    "source_outbox_drained": true,
+    "source_inventory_writes_continued": true,
+    "source_https_health200": true
+  },
+  "cleanup": {
+    "checks": {
+      "target_replicas_zero": true,
+      "target_pods_absent": true,
+      "target_pvc_same_uid": true,
+      "target_pvc_bound": true,
+      "source_pod_same_uid": true,
+      "source_database_ready": true,
+      "old_target_still_zero": true,
+      "private_dump_and_manifest_retained": true
+    },
+    "temporary_forwards_stopped": true,
+    "persistent_api_proxy_unchanged": true
+  },
+  "limits": [
+    "Same PostgreSQL version and qualified metadata node, separate target Pod/PVC.",
+    "Original object store and MLflow were read, not restored.",
+    "Recorded history endpoint returns latest 40 owned runs; all 18 current runs were covered.",
+    "No node-loss, PITR, off-site retention, HA or RTO guarantee.",
+    "Manifest is trusted operator evidence, not a signed authenticity claim."
+  ]
+}
