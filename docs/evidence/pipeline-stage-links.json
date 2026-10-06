@@ -1,0 +1,139 @@
+{
+  "scope": "Read-only projection of retained actual KFP runs; not a new compute trial or whole-platform completion",
+  "verified_date": "2026-10-07",
+  "source_commit": "75872c1c10320358f385f3f6619ab42474a2c281",
+  "api_image_digest": "sha256:fb800480da4f8678313b8abfe0b234269ab28722941417734ebfef594b8af934",
+  "ci": {
+    "conclusion": "success",
+    "headSha": "75872c1c10320358f385f3f6619ab42474a2c281",
+    "status": "completed",
+    "run_id": 37505608639
+  },
+  "deployment": {
+    "source_commit": "75872c1c10320358f385f3f6619ab42474a2c281",
+    "api_source_hash_match": true,
+    "unchanged_existing_entities": 4495,
+    "unchanged_terminal_jobs": 593,
+    "unchanged_job_identities": 594,
+    "unchanged_ledgers": 593,
+    "unchanged_other_static_specs_uids": true,
+    "unchanged_secrets_pvc_quota": true,
+    "gitops_synced_healthy": true,
+    "gpu_jobs_submitted": 0
+  },
+  "cases": {
+    "two_stage": {
+      "run_id": "0bcd7480-8a4d-4759-b155-37b26b46ad17",
+      "state": "SUCCEEDED",
+      "job_id": null,
+      "linked_jobs": [
+        {
+          "task_name": "launch",
+          "job_id": "j-d6192ec60fc9466dacf2ca12c2c417ac",
+          "state": "SUCCEEDED",
+          "attempt_id": "a-fef0cff016174214bf35127afad0b9da",
+          "backend": "kubernetes",
+          "device_class": "cpu",
+          "workload": "cpu-gpu-m1-v2-cpu"
+        },
+        {
+          "task_name": "launch-2",
+          "job_id": "j-f3a1568407c646c093bbefdf5a20ff2f",
+          "state": "SUCCEEDED",
+          "attempt_id": "a-674081d0c99148b6b08c3a782df0f820",
+          "backend": "kubernetes",
+          "device_class": "gpu",
+          "workload": "cpu-gpu-m1-v2-gpu"
+        }
+      ],
+      "graph": [
+        {
+          "name": "launch",
+          "display_name": "CPU compute · validate result",
+          "dependencies": []
+        },
+        {
+          "name": "launch-2",
+          "display_name": "GPU compute · validate result",
+          "dependencies": [
+            "launch"
+          ]
+        }
+      ]
+    },
+    "failed_before_compute": {
+      "run_id": "436b87e2-c0b7-4ad6-a26c-5bf9a442730f",
+      "state": "FAILED",
+      "job_id": null,
+      "linked_jobs": [],
+      "graph": [
+        {
+          "name": "launch",
+          "display_name": "CPU compute · validate result",
+          "dependencies": []
+        },
+        {
+          "name": "launch-2",
+          "display_name": "GPU compute · validate result",
+          "dependencies": [
+            "launch"
+          ]
+        }
+      ]
+    },
+    "legacy_replay": {
+      "run_id": "6bc98218-b879-4722-8700-7789e09dc05d",
+      "state": "SUCCEEDED",
+      "job_id": "j-ccfad02ad98945e4ba8d0edc5b7b786e",
+      "linked_jobs": [
+        {
+          "task_name": "launch",
+          "job_id": "j-ccfad02ad98945e4ba8d0edc5b7b786e",
+          "state": "SUCCEEDED",
+          "attempt_id": "a-e70c7c5dc27a4de3b8fe3e075713eb1b",
+          "backend": "kubernetes",
+          "device_class": "gpu",
+          "workload": "workload-pipeline-matmul-v1"
+        }
+      ],
+      "graph": [
+        {
+          "name": "launch",
+          "display_name": "launch",
+          "dependencies": []
+        }
+      ]
+    }
+  },
+  "project_boundary": {
+    "unconfigured_foreign_project_http_status": 422,
+    "configured_foreign_database_association": "contract test only; this live denial is not configured KFP multi-tenant isolation proof"
+  },
+  "browser": {
+    "desktop_viewport": [
+      1366,
+      768
+    ],
+    "mobile_viewport": [
+      390,
+      844
+    ],
+    "pipeline_canvas_height_px": 210,
+    "previous_canvas_height_px": 350,
+    "mobile_page_scroll_width_px": 390,
+    "mobile_dialog_width_px": 354,
+    "stage_compute_actions": 2,
+    "mobile_gpu_action_opened_original_job": true,
+    "desktop_both_actions_without_dialog_vertical_scroll": false,
+    "tables_use_local_horizontal_scroll": true,
+    "cpu_gpu_navigation_and_return": "exercised on preceding source7148675; mobile GPU open exercised again on deployed75872c1",
+    "immediate_return_probe": "zero controls observed before asynchronous loading settled; not counted as a passed return verification"
+  },
+  "new_compute_jobs": 0,
+  "limits": [
+    "Root DAG declared run_key bindings only; unresolved task outputs and nested DAGs are not inferred",
+    "Linked compute state is the current stored state, not historical as-of execution state",
+    "A link to an earlier Job is not proof of another compute submission",
+    "Original HAIRP and independent v0.3 M0-M6 remain incomplete"
+  ]
+}

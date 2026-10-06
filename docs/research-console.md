@@ -16,6 +16,8 @@ Its DAG keeps KFP dependencies and KFP state separate from compute state. Select
 a stage opens that stage's actual compute details, result, MLflow and accounting;
 a return action reopens the pipeline. A completed KFP task alone does not create
 a successful compute result. This read-only association submits no new workload.
+Retained actual CPU/GPU, failed-before-compute and legacy replay runs are verified
+in the [stage-link deployment report](pipeline-stage-links.md).
 
 HAIRP keeps native tools responsible for their own state and exposes scoped
 operational actions in one web console.

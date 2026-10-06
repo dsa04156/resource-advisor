@@ -36,6 +36,8 @@ CPU Job `j-d6192ec60fc9466dacf2ca12c2c417ac`과 GPU Job
 `j-f3a1568407c646c093bbefdf5a20ff2f`는 서로 다른 attempt/native Job이다.
 GPU API 생성 시각이 CPU 결과 검증 후 완료 시각보다 늦음을 확인했다.
 각 attempt에 원장 한 행과 MLflow run 한 개가 연결됐다.
+후속 [콘솔 연결 보고서](pipeline-stage-links.md)에서 두 단계의 개별 Job 링크와
+같은 key를 재사용한 과거 실패 실행의 연결 제외를 확인했다.
 
 CPU runner는 CUDA/PyTorch를 import하지 않고 가속기 요청도 하지 않는다.
 CPU 결과의 peak memory는 프로세스 host RSS이며 GPU 메모리가 아니다.

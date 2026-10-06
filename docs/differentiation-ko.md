@@ -70,6 +70,8 @@ Slurm의 시간 분할 gang scheduling과 여러 Pod의 동시 입장은 의미�
 - 큐·할당·실행 흐름과 그 시점의 노드 상태를 재생하는 운영 화면.
 - 연구 코드 수정 없이 기존 CUDA 프로세스·노드·GPU를 관측하고 프로젝트별로 기록 조회.
 - 캐시 없는 CPU 계산 완료 후 별도 GPU 계산을 실행하고, 단계별 결과·MLflow·사용량을 확인.
+- [다단계 추적](pipeline-stage-links.md)에서 각 KFP 단계의 실제 Job을 연결하고,
+  재시도의 새 Job이 과거 실패 실행에 잘못 붙는 문제를 방지.
 
 성능 우수성은 별도 실험 주장이다. [정책 비교](policy-comparison-v2.md)에서는
 BO의 선택 우위가 확인되지 않았다. [운영 비교](operational-comparison.md)에서도
