@@ -45,3 +45,18 @@ Stop if any prerequisite, digest, quality, resource or identity check fails.
 Restore service and inspect the original accepted IDs. This closes only the
 actual server-outage boundary; distributed exactly-once, all backend partitions,
 the unresolved Slurm attempt and full platform completion remain separate.
+
+## Preserved pre-submission tool failure
+
+The first administrative interruption stopped before any compute submission:
+the empty EndpointSlice encoded `endpoints: null`, and the verifier attempted
+to iterate that value. The finally restoration completed and the original
+MLflow Deployment is again1/1 Ready. SQL independently confirms zero Jobs for
+the frozen project/idempotency key; the original report is retained unchanged.
+
+Correct the predicate to treat null/absent endpoints as an empty sequence and
+save the raw endpoint observation before validating it. Continue the single
+unused compute slot in a separate report directory with the SAME key and SAME
+immutable registered contracts. This is not replacement compute or a replay
+of an accepted allocation. Include both administrative interruption records in
+the report; stop on any subsequent unexpected compute outcome.
