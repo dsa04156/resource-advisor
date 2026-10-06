@@ -8,6 +8,7 @@ A separate transport can hold SSH credentials; neither API nor UI receive them.
 import argparse
 import fcntl
 import json
+import re
 import ssl
 import subprocess
 import time
@@ -104,6 +105,8 @@ class Agent:
         if key != self.previous:
             self.report(title or "네이티브 스케줄러 상태 변경")
             self.previous = key
+        else:
+            self.report()  # Fresh observation without adding an identical replay event.
         time.sleep(3)
 
     def job(self, suffix, count, duration, required=False):
@@ -283,18 +286,18 @@ class Agent:
             explanation="먼저 GPU 1개를 사용합니다. GPU 2개 그룹은 전체 quota가 확보될 때까지 기다립니다.",
         )
         self.job("blocker", 1, 35)
-        self.wait_kube(lambda r: r["blocker"]["state"] == "RUNNING", "선행 작업이 GPU 1개 사용")
+        self.wait_kube(lambda r: r["blocker"]["state"] == "RUNNING", "선행 GPU 작업 상태 관측")
         self.job("group", 2, 15)
         self.snapshot["phase"] = "WAIT_ALL"
         pending = self.wait_kube(
             lambda r: r.get("group", {}).get("state") == "PENDING" and bool(r["group"]["reason"]),
-            "GPU 2개 그룹의 전체 입장 대기",
+            "GPU 2개 그룹 입장 상태 관측",
         )
         self.snapshot["queue_evidence"] = pending["group"]
         self.snapshot["phase"] = "GROUP_EXECUTION"
         result = self.wait_kube(
             lambda r: r.get("group", {}).get("state") == "SUCCEEDED",
-            "그룹 전체 입장과 worker barrier 관측",
+            "그룹의 승인·실행 상태 관측",
         )
         pods = result["group"]["pods"]
         if len(pods) != 2 or not all(
@@ -458,6 +461,18 @@ class Agent:
                     "늦게 제출한 짧은 GPU 작업이 예약 전 빈 시간에 먼저 완료; 긴 작업은 예약 창 이후 실행"
                 )
                 self.snapshot["sdiag_after"] = self.slurm("sdiag")
+                counts = []
+                for key in ("sdiag_before", "sdiag_during"):
+                    match = re.search(
+                        r"Total backfilled jobs \(since last slurm start\):\s*(\d+)",
+                        self.snapshot.get(key, ""),
+                    )
+                    if not match:
+                        raise RuntimeError("missing native backfill counter evidence")
+                    counts.append(int(match.group(1)))
+                if counts[1] <= counts[0]:
+                    raise RuntimeError("start ordering observed without backfill counter increment")
+                self.snapshot["backfill_counter"] = {"before": counts[0], "during": counts[1]}
                 return
 
     def cleanup(self):

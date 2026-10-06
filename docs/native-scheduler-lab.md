@@ -100,3 +100,40 @@ scheduler preemption settings are unchanged.
 - [Kueue 0.19 topology-aware scheduling](https://kueue.sigs.k8s.io/v0.19/docs/tasks/run/topology_aware_scheduling/)
 - [Kubernetes Indexed Job communication](https://kubernetes.io/docs/tasks/job/job-with-pod-to-pod-communication/)
 - [Slurm scheduling configuration](https://slurm.schedmd.com/sched_config.html)
+
+## Recorded lab execution — 2026-10-06
+
+All three real scenarios reached `SUCCEEDED`; this is a bounded lab observation,
+not a production qualification or a statistical performance comparison.
+
+- **Gang admission:** one GPU blocker ran first. Kueue reported
+  `insufficient unused quota for nvidia.com/gpu ... 1 more needed` for the two-GPU
+  group. After release, RTX 5060 Ti and RTX 5080 workers both recorded
+  `BARRIER_RELEASED`, `COMPUTE_STARTED`, and `COMPUTE_FINISHED` with CUDA correctness
+  checks. The native PodSet assignment reserved GPU count 2.
+- **Topology:** the required hostname request reported
+  `topology ... allows to fit only 1 out of 2 pod(s)`. After cancelling that owned
+  request, the relaxed comparison completed on two different nodes; Kueue recorded
+  a hostname `topologyAssignment` with two domains.
+- **Slurm backfill:** the long request was submitted first. Native controller times:
+  short **09:15:45–09:15:58**, reservation **09:17:15–09:18:15**, long
+  **09:18:15–09:18:28**. Both requested one GPU and completed. The native
+  `Total backfilled jobs (since last slurm start)` counter increased **8 → 9**
+  when the short job entered. Accounting plus the reserved gap demonstrates native
+  backfill in this run; it is not inferred solely from reversed completion order.
+
+Afterward the dedicated Kubernetes namespace had no experiment jobs/services;
+Slurm had no pending/running jobs and no remaining reservations. The dedicated lab
+queue/flavor/topology and probe ConfigMap remain available for the next request.
+
+Two setup failures remain in history: a supervisor initially picked the wrong
+kubeconfig (fixed with explicit external configuration), and a four-minute Slurm
+request exceeded the existing two-minute QoS (fixed by reducing the lab request;
+QoS was not relaxed). The successful Slurm run used the two-minute request.
+The subsequent collector reads live pending reasons from squeue and terminal times
+from sacct. This collector adjustment does not justify another GPU run.
+
+Focused validation: 10 API/console tests passed, JavaScript syntax and changed Python
+lint passed. Desktop layout, 390px mobile width without horizontal overflow, job-node
+selection and historical snapshot seeking were checked against the live console.
+Raw observations and screenshots are private, excluded from the public repository.
