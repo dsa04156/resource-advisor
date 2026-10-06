@@ -1014,6 +1014,7 @@ button { border-radius: 10px; min-height: 40px; }
 .ml-graph-controls button { background: #fff; min-width: 38px; min-height: 38px; padding: 6px 10px; font-size: 12px; }
 .ml-graph-controls small { margin-left: 6px; color: #697586; font-size: 11px; }
 .ml-graph-canvas { display: block; width: 100%; height: 350px; touch-action: pan-y; cursor: grab; }
+.ml-pipeline-dag .ml-graph-canvas { height: 210px; }
 .ml-graph-node { width: 198px; height: 94px; margin: 2px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 7px; text-align: left; padding: 12px 14px; border: 1.5px solid #d6dce4; border-radius: 12px; background: #fff; color: #273445; white-space: normal; cursor: pointer; }
 .ml-graph-node small { font: 600 10px/1.3 system-ui,sans-serif; color: #77818f; letter-spacing: .05em; }
 .ml-graph-node strong { font: 600 14px/1.3 system-ui,sans-serif; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }

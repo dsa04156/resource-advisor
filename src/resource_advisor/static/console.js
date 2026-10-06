@@ -2387,7 +2387,7 @@ function pipelineDag(run) {
     selected.replaceChildren(el("h3",task.display_name||id),el("p","선행 단계: "+(task.dependencies.map(d=>tasks.find(t=>t.name===d)?.display_name||d).join(", ")||"없음")),observations.length?table(["KFP 상태","시작","종료"],observations.map(t=>[badge(t.state),stamp(t.start_time),stamp(t.end_time)])):el("p","이 단계의 실행 상태는 아직 관측되지 않았습니다."));
     for(const job of run.linked_jobs?.filter(j=>j.task_name===id)||[])selected.append(add(el("div",null,"ml-node-actions"),stateBadge(job.state),code(job.job_id),researchButton("연결된 계산 작업 · "+(job.device_class||id).toUpperCase(),()=>openPipelineComputeJob(run,job.job_id))));
   },{width:Math.max(520,Math.max(...levels.values())*260+245),height:Math.max(230,Math.max(...rows.values())*125+40),label:"Kubeflow 실제 단계 의존관계 그래프"});
-  return add(el("div"),canvas,selected);
+  return add(el("div",null,"ml-pipeline-dag"),canvas,selected);
 }
 
 // Native scheduling lab: snapshots are collected from Kueue/Slurm, never simulated.
