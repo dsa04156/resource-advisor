@@ -58,7 +58,9 @@ window; it does not qualify the whole backend or a production deployment.
 - Slurm supports explicitly bound, hash-checked native runtimes. Container
   variants fail preflight until an actual container executor exists. Results
   use shared storage or a verified node-to-SSH mapping; see [the runtime boundary](slurm-runtime.md).
-  Its controller is currently unreachable and the complete model/API path is open.
+  The [native Orin browser/API path](slurm-api-results.md) now has actual result,
+  artifact and MLflow evidence; [console cancellation](slurm-cancellation.md) also
+  has bounded live evidence. Other runtime and recovery scenarios remain unverified.
 - Model/runtime qualification remains operator-attested. The native guard checks
   listed files/probes, not the completeness of that manifest or signed supply-chain
   provenance. GPU/NPU runtimes must be qualified independently.
@@ -89,8 +91,9 @@ window; it does not qualify the whole backend or a production deployment.
   uncertainty and shared-device interference remain open.
 - The [four-view console](console.md) exposes scoped inventory, jobs, queues,
   accounting and recommendation evidence. [Slurm host telemetry](slurm-inventory.md)
-  is live independently of controller availability; controller queues and
-  reservations remain unknown, not zero. Broad production observability and
+  is live independently of controller availability. The
+  [restricted controller collector](slurm-controller-results.md) also supplies
+  queue and reservation observations, which become unknown when stale. Broad production observability and
   direct MLflow/S3 tenant access controls remain open.
 
 Use separate service accounts, namespaces, LocalQueues, allowlisted node pools,

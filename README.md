@@ -1,5 +1,21 @@
 # Resource Advisor
 
+**GPU·NPU 자원을 보고, 작업을 실행하고, 결과와 사용 시간을 확인하는 연구용 프로젝트입니다.**
+
+처음이면 [한국어 사용 가이드](docs/quickstart-ko.md)부터 보세요.
+설정된 API 주소의 `/console`에서 다음 순서로 사용합니다.
+
+1. **실행 현황** — CPU·메모리·가속기 자원과 작업 상태 확인
+2. **가속기 호환성 → 관측 실행** — 실행 가능한 작업 선택·제출
+3. **실행 상세 · 결과 · MLflow** — 완료 결과 확인; 실행 중에는 **작업 취소** 가능
+4. **대기 · 할당 이력** — 기다린 시간과 실제 예약한 자원 시간 확인
+
+Kubernetes/Kueue 및 Slurm 실행을 연결한 실장비 데모입니다.
+장비·모델별 지원 범위는 다르며, 모든 가속기와 운영 환경의 검증이 끝난 상태는 아닙니다.
+
+<details>
+<summary>기존 실행 결과와 기술 보고서 펼치기</summary>
+
 An independent, evidence-based resource recommendation and execution service
 for heterogeneous Kubernetes/KubeEdge and Slurm compute pools.
 
@@ -82,6 +98,8 @@ still lists required Slurm and broader failure scenarios. The new
 GPU results: 18 out-of-range Jobs abstain; nine in-range Jobs are covered by
 wide, uncalibrated intervals with 14.71% point error. It is an offline shadow
 evaluation and grants no execution authority.
+
+</details>
 
 ## Responsibility
 
