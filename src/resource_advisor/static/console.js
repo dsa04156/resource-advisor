@@ -2495,7 +2495,7 @@ function labResourceRack(snap){
   add(head,add(el("div"),el("span","RESOURCE WATCH · 현재 자원","eyebrow"),el("h3","어디에 여유가 있을까?")),filter);box.append(head);
   box.append(el("p","현재 자원 관측 · "+stamp(data.generated_at)+" · 자원 조회 15초 / 실험 조회 3초 · 예약량과 실제 사용률은 다릅니다.","lab-fleet-note"));
   const selected=labFlowJobs(snap).find(j=>j.id===labSelected),linked=selected?labJobNodes(selected):[],rail=el("div",null,"lab-resource-rail");rail.dataset.labScroll="resources";
-  const entries=(data.inventory||[]).flatMap(s=>s.nodes.map(n=>({n,s}))).filter(({n,s})=>Object.values(n.resources||{}).some(r=>["gpu","npu"].includes(r.device_class)&&(labResourceFilter==="all"||labResourceFilter===s.backend||labResourceFilter===r.device_class)));
+  const entries=(data.inventory||[]).flatMap(s=>s.nodes.map(n=>({n,s:{...s,backend:s.backend||"kubernetes"}}))).filter(({n,s})=>Object.values(n.resources||{}).some(r=>["gpu","npu"].includes(r.device_class)&&(labResourceFilter==="all"||labResourceFilter===s.backend||labResourceFilter===r.device_class)));
   for(const {n,s} of entries){
     const key=s.backend+":"+n.node_ref,devices=Object.entries(n.resources||{}).filter(([,r])=>["gpu","npu"].includes(r.device_class)),status=nodeStatus(n,s),card=el("button",null,"lab-resource"+(linked.includes(n.node_ref)?" linked":"")+(labResource===key?" selected":""));
     card.id="lab-resource-"+key;card.setAttribute("aria-pressed",String(labResource===key));
@@ -2507,7 +2507,7 @@ function labResourceRack(snap){
     const slurm=s.backend==="slurm";
     card.append(measure("CPU 사용",slurm?n.telemetry["node:cpu_non_idle_cores"]:n.telemetry.cpu_usage_cores,s,value(slurm?n.telemetry["node:cpu_count"]:n.resources.cpu?.capacity,s),"cores"),measure("메모리 여유",n.telemetry["node:memory_available_bytes"],s,value(slurm?n.telemetry["node:memory_total_bytes"]:n.resources.memory?.capacity,s),"GiB",2**30));
     if(linked.includes(n.node_ref))card.append(el("span","↳ 선택 작업의 기록상 실행 노드","lab-resource-link"));
-    card.onclick=()=>{labResource=labResource===key?"":key;render();};rail.append(card);
+    card.append(el("small","수집 "+stamp(s.collected_at)+" · 클릭하여 상세 보기"));card.onclick=()=>{labResource=labResource===key?"":key;render();};rail.append(card);
   }
   box.append(rail);if(!entries.length)box.append(el("p","이 필터의 등록 자원이 없습니다."));
   const detail=entries.find(({n,s})=>s.backend+":"+n.node_ref===labResource);
@@ -2529,7 +2529,7 @@ function labFlowBoard(run,snap){
       if(index===0)card.append(el("small",j.reason&&j.reason!=="None"?String(j.reason):"스케줄러의 다음 상태 관측 대기","lab-flow-reason"));
       if(index===1)card.append(el("small",j.admission?"Kueue quota 승인 관측 · worker 시작 대기":"실행기 준비 상태 관측"));
       if(j.result)card.append(el("small","✓ 실행 결과 수집됨"));
-      card.onclick=()=>{labSelected=j.id;labWorker="";render();};stack.append(card);
+      card.onclick=()=>{labSelected=j.id;labWorker="";labResourceFilter="all";render();const target=document.querySelector(".lab-resource.linked"),rail=document.querySelector(".lab-resource-rail");if(target&&rail)rail.scrollTo({left:rail.scrollLeft+target.getBoundingClientRect().left-rail.getBoundingClientRect().left-2,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"});};stack.append(card);
     }
     if(!items.length)stack.append(el("div",index===0?"대기 작업 없음":"이 단계의 작업 없음","lab-flow-empty"));lane.append(stack);lanes.append(lane);
   }
