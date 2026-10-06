@@ -1,0 +1,30 @@
+{
+  "schema_version": "passive-gpu-observation-plan-v1",
+  "status": "PROSPECTIVE_NOT_EXECUTED",
+  "collector_api_source_commit": "c03c8db7ce05c87672a0458a90c49c84561acf0b",
+  "qualified_api_image_digest": "sha256:c9b47a2da68f8582c6ca9de2c0dd9d60937ceb0d33d9a9e59153d863a88650d7",
+  "program_path": "examples/passive-gpu/program.py",
+  "program_sha256": "2147eefa45ccb981ee990938af60e57063d49f9028a4580f54b4c90318ad574f",
+  "limits": {
+    "maximum_native_jobs": 1,
+    "retry_count": 0,
+    "gpu_count": 1,
+    "host_cpu": 1,
+    "host_memory_mib": 2048,
+    "program_seconds": 35,
+    "native_active_deadline_seconds": 120,
+    "queue_observation_deadline_seconds": 120,
+    "collection_window_seconds": 12,
+    "collection_interval_seconds": 1
+  },
+  "minimum_stable_process_samples": 5,
+  "minimum_physical_gpu_samples": 5,
+  "unchanged_program_required": true,
+  "collection_finishes_before_program_required": true,
+  "original_source_profile_accounting_preservation_required": true,
+  "model_quality_step_throughput_network_must_be_null": true,
+  "private_manifest_input_digest_must_be_frozen_before_submission": true,
+  "existing_queue_quota_must_not_change": true,
+  "replacement_trials_allowed": false,
+  "scope": "single native CUDA observation functional fixture; no performance/model/Slurm/NPU qualification"
+}

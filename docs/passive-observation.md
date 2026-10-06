@@ -102,5 +102,16 @@ Implementation and focused contract checks cover import ownership, exact replay,
 immutable conflicts, identity matching, missing metrics and PID reuse. An actual
 ordinary Python process survives collection with unchanged source and output.
 This is local process evidence, not Kubernetes/Slurm GPU hardware acceptance.
-Deployment, an unmodified GPU program's native/process association and the
-GPU sensor path still require direct evidence before closing section 7.1.
+The source-only API rollout now passes pinned ArgoCD sync and actual HTTPS
+read/ordinary-researcher denial checks. Existing 4,476 immutable entities,
+592 job identities, 591 terminal Jobs and 591 ledger records were unchanged;
+static service specifications/UIDs, Secrets, PVCs and quota were preserved.
+See [deployment evidence](evidence/passive-observation-deployment-v1.json).
+The exact source commit's CI passed Python 3.11/3.13, SQLite/PostgreSQL,
+lint/format, wheel/assets and Ansible syntax checks.
+
+An unmodified GPU program's native/process association and the GPU sensor path
+still require direct evidence before closing section 7.1. The
+[one-Job acceptance plan](passive-gpu-observation-plan.md) is prospective, with
+[frozen program/limits](evidence/passive-gpu-observation-plan-v1.json).
+No GPU Job was submitted by this implementation/deployment increment.

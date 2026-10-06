@@ -1,0 +1,66 @@
+{
+  "schema_version": "passive-observation-deployment-v1",
+  "recorded_at": "2026-10-06T16:13:23.960197+00:00",
+  "source_commit": "c03c8db7ce05c87672a0458a90c49c84561acf0b",
+  "ci": {
+    "run_id": 37492842661,
+    "conclusion": "SUCCESS",
+    "python_versions": [
+      "3.11",
+      "3.13"
+    ],
+    "sqlite_postgresql_tests": true,
+    "wheel_console_assets": true
+  },
+  "deployment": {
+    "source_commit": "c03c8db7ce05c87672a0458a90c49c84561acf0b",
+    "api_source_hash_match": true,
+    "unchanged_existing_entities": 4476,
+    "unchanged_terminal_jobs": 591,
+    "unchanged_job_identities": 592,
+    "unchanged_ledgers": 591,
+    "unchanged_other_static_specs_uids": true,
+    "unchanged_secrets_pvc_quota": true,
+    "gitops_synced_healthy": true,
+    "gpu_jobs_submitted": 0
+  },
+  "live_api": {
+    "observations_route_status": 200,
+    "ordinary_researcher_import_status": 403,
+    "denied_import_unchanged_records": true,
+    "overview_observations_match": true,
+    "served_console_source_sha256_match": true,
+    "registered_observations": 0
+  },
+  "focused_checks": {
+    "passed": 44,
+    "seconds": 3.43,
+    "scope": "passive observation, qualification, console, API and backup paths"
+  },
+  "local_browser": {
+    "data_kind": "synthetic",
+    "desktop_width": 1366,
+    "mobile_width": 390,
+    "viewport_overflow": false,
+    "missing_gpu_text": true,
+    "synthetic_label": true,
+    "valid_pagination": true,
+    "expanded_state_on_refresh": true,
+    "screenshots_visually_inspected": true
+  },
+  "local_actual_process": {
+    "source_unchanged": true,
+    "original_output_unchanged": true,
+    "continued_after_collection": true,
+    "model_metrics_unknown": true,
+    "scope": "ordinary local Python process; external backend IDs are test fixtures, not native execution proof"
+  },
+  "limitations": [
+    "No native GPU observation or NVML hardware acceptance in this report",
+    "No remote attestation of arbitrary external process binding",
+    "No Slurm process observation or Jetson/NPU sensor acceptance",
+    "No observation-derived model profile, usage allocation or quality claim",
+    "Full section7.1/M0-M6 and original HAIRP completion remain unproven"
+  ],
+  "additional_gpu_reservation_seconds": 0
+}
