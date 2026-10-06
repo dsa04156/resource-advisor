@@ -43,13 +43,14 @@ def memory_boundary(current, root):
     }
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--expected-torch", required=True)
     parser.add_argument("--expected-cuda", required=True)
     parser.add_argument("--require-native-arch", action="store_true")
     parser.add_argument("--enforced-memory-mib", type=int)
-    args = parser.parse_args()
+    parser.add_argument("--expected-device")
+    args = parser.parse_args(argv)
     if not os.environ.get("SLURM_JOB_ID") or os.environ.get("SLURM_CPUS_PER_TASK") != "1":
         raise RuntimeError("qualification requires a Slurm allocation with one CPU")
 
@@ -82,6 +83,8 @@ def main():
         raise RuntimeError("framework/CUDA version differs from the fixed qualification")
     if not torch.cuda.is_available() or torch.cuda.device_count() != 1:
         raise RuntimeError("exactly one CUDA device required; refusing CPU fallback")
+    if args.expected_device and torch.cuda.get_device_name(0) != args.expected_device:
+        raise RuntimeError("CUDA device differs from the approved context")
     if torch.cuda.get_device_capability(0) != (8, 7):
         raise RuntimeError("this qualification is fixed to the Orin compute capability")
     if args.require_native_arch and "sm_87" not in torch.cuda.get_arch_list():
@@ -162,6 +165,7 @@ def main():
         if result["peak_process_rss_kib"] * 1024 > args.enforced_memory_mib * 1024**2:
             raise RuntimeError("process RSS exceeds the fixed enforced memory request")
     print("RA_SLURM_TORCH_QUALIFICATION " + json.dumps(result, allow_nan=False))
+    return result
 
 
 if __name__ == "__main__":
