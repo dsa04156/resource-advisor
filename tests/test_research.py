@@ -7,6 +7,127 @@ from resource_advisor.service import NotFound
 from resource_advisor.store import Conflict
 
 
+def pipeline_job(store, ref, key, project="team-a", device="gpu"):
+    from sqlalchemy import insert
+
+    from resource_advisor.store import jobs
+
+    with store.transaction() as conn:
+        conn.execute(
+            insert(jobs).values(
+                id=ref,
+                project=project,
+                idempotency_key=key,
+                state="SUCCEEDED",
+                epoch=1,
+                version=1,
+                body={
+                    "attempt_id": "attempt-" + ref,
+                    "candidate": {"backend": "kubernetes"},
+                    "variant": {"device_class": device},
+                    "spec": {"ref": "workload-" + device},
+                },
+            )
+        )
+
+
+def test_pipeline_links_each_declared_stage_with_project_scope(database_store):
+    pipeline_job(database_store, "cpu-job", "cpu-key", device="cpu")
+    pipeline_job(database_store, "gpu-job", "gpu-key")
+    pipeline_job(database_store, "foreign-job", "cpu-key", project="team-b")
+    api = ResearchServices(database_store, config())
+    run = {
+        "runtime_config": {"parameters": {"cpu_run_key": "cpu-key", "gpu_run_key": "gpu-key"}},
+        "pipeline_spec": {
+            "pipeline_spec": {
+                "root": {
+                    "dag": {
+                        "tasks": {
+                            "cpu": {
+                                "taskInfo": {"name": "CPU result"},
+                                "inputs": {
+                                    "parameters": {
+                                        "run_key": {"componentInputParameter": "cpu_run_key"}
+                                    }
+                                },
+                            },
+                            "gpu": {
+                                "dependentTasks": ["cpu"],
+                                "inputs": {
+                                    "parameters": {
+                                        "run_key": {"componentInputParameter": "gpu_run_key"}
+                                    }
+                                },
+                            },
+                        }
+                    }
+                }
+            }
+        },
+    }
+    view = api.pipeline_view("team-a", run)
+    assert view["job_id"] is None  # Neither stage pretends to be the only Job.
+    assert [(j["task_name"], j["job_id"], j["device_class"]) for j in view["linked_jobs"]] == [
+        ("cpu", "cpu-job", "cpu"),
+        ("gpu", "gpu-job", "gpu"),
+    ]
+    assert view["graph"][0]["display_name"] == "CPU result"
+    assert view["graph"][1]["dependencies"] == ["cpu"]
+    assert api.pipeline_view("team-b", run)["linked_jobs"][0]["job_id"] == "foreign-job"
+    assert len(api.pipeline_view("team-b", run)["linked_jobs"]) == 1
+
+
+def test_pipeline_does_not_guess_links_from_parameter_names(database_store):
+    pipeline_job(database_store, "existing", "known")
+    api = ResearchServices(database_store, config())
+    run = {
+        "runtime_config": {"parameters": {"cpu_run_key": "known"}},
+        "pipeline_spec": {
+            "root": {
+                "dag": {
+                    "tasks": {
+                        "dynamic": {
+                            "inputs": {"parameters": {"run_key": {"taskOutputParameter": {}}}}
+                        }
+                    }
+                }
+            }
+        },
+    }
+    view = api.pipeline_view("team-a", run)
+    assert view["linked_jobs"] == [] and view["job_id"] is None
+
+
+def test_pipeline_constant_and_legacy_single_key_links(database_store):
+    pipeline_job(database_store, "existing", "known")
+    api = ResearchServices(database_store, config())
+    legacy = api.pipeline_view("team-a", {"runtime_config": {"parameters": {"run_key": "known"}}})
+    assert legacy["job_id"] == "existing"
+    assert legacy["linked_jobs"] == []
+    view = api.pipeline_view(
+        "team-a",
+        {
+            "pipeline_spec": {
+                "root": {
+                    "dag": {
+                        "tasks": {
+                            "constant": {
+                                "inputs": {
+                                    "parameters": {
+                                        "run_key": {"runtimeValue": {"constant": "known"}}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+    )
+    assert view["job_id"] == "existing"
+    assert view["linked_jobs"][0]["task_name"] == "constant"
+
+
 def config():
     return {
         "projects": {

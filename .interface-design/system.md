@@ -118,6 +118,11 @@ actions; stop requires an inline second click. Reuse existing native tables,
 dialogs and blue action tokens. Research navigation wraps on narrow viewports.
 References and scope: docs/research-console.md.
 
+Multi-stage KFP detail: retain task dependency nodes and show separate KFP/compute
+state labels. Each declared stage gets its own project-scoped CPU/GPU/NPU compute
+link and existing job detail/return action. Reuse native table, dialog and graph
+controls; missing links stay explicit. Count distinct Jobs, not stage aliases.
+
 Queue walkthrough: four request/queue/execution/terminal lanes display real job
 cards, with selected-request inspector and a compact observation replay slider.
 Resource request summary precedes explicit two-job launch. A/B are request labels,

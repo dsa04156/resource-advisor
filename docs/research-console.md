@@ -1,5 +1,18 @@
 # Research operations console
 
+Multi-stage KFP views resolve each root task's declared `run_key` input from its
+runtime parameter or literal constant, then look up only the authenticated
+project's stored compute Job. The CPU→GPU example therefore has two separate
+links; no stage is designated the sole Job. Parameter-name guesses and unresolved
+task-output expressions grant no association. The original top-level `run_key`
+link remains supported for single-launcher clients.
+
+The pipeline list reports distinct linked Job count and observed device classes.
+Its DAG keeps KFP dependencies and KFP state separate from compute state. Selecting
+a stage opens that stage's actual compute details, result, MLflow and accounting;
+a return action reopens the pipeline. A completed KFP task alone does not create
+a successful compute result. This read-only association submits no new workload.
+
 HAIRP keeps native tools responsible for their own state and exposes scoped
 operational actions in one web console.
 

@@ -2075,18 +2075,26 @@ function pipelinesView() {
   form.append(el("small","Kubeflow가 워크플로를 시작하고 플랫폼의 자동 배치 API가 실제 GPU/NPU 작업을 큐에 넣습니다."),submit,researchLink("Kubeflow 원본 열기 ↗",info.ui_url));
   root.append(panel("워크플로 실행","등록된 실행 환경으로 파이프라인을 시작합니다.",form));
   root.append(panel("파이프라인 실행 이력",`${info.items.length}개 표시 · 실제 KFP 상태`,info.items.length?table(["실행","상태","시작","연결 작업","관리"],info.items.map(r=>[
-    add(el("div",null,"job-name"),el("strong",r.display_name),code(r.run_id)),badge(r.state,r.state==="SUCCEEDED"?"good":r.state==="FAILED"?"warn":""),el("span",stamp(r.created_at)),el("span",r.job_id||"아직 연결된 작업 없음"),researchButton("단계 · 관리",()=>openPipeline(r.run_id))])):empty("파이프라인 실행이 없습니다.")));
+    add(el("div",null,"job-name"),el("strong",r.display_name),code(r.run_id)),badge(r.state,r.state==="SUCCEEDED"?"good":r.state==="FAILED"?"warn":""),el("span",stamp(r.created_at)),el("span",r.linked_jobs?.length?`${new Set(r.linked_jobs.map(j=>j.job_id)).size}개 · ${[...new Set(r.linked_jobs.map(j=>(j.device_class||"계산").toUpperCase()))].join(" / ")}`:r.job_id||"아직 연결된 작업 없음"),researchButton("단계 · 관리",()=>openPipeline(r.run_id))])):empty("파이프라인 실행이 없습니다.")));
   if(info.next_page_token)root.append(researchButton("다음 실행 보기",async()=>{researchData.kubeflow={status:"connected",...await researchRequest("/pipelines?page_token="+encodeURIComponent(info.next_page_token))};render();}));return root;
+}
+async function openPipelineComputeJob(run, jobId) {
+  const session=generation;
+  const response=await fetch(API+"/jobs/"+encodeURIComponent(jobId)+"/view",{headers:authHeaders()});
+  if(!response.ok)throw new Error("작업 기록을 조회하지 못했습니다.");
+  const job=await response.json();if(session!==generation)return;
+  showJob(job);
+  $("job-dialog-body").append(researchButton("파이프라인으로 돌아가기",()=>openPipeline(run.run_id)));
 }
 async function openPipeline(ref) {
   const session=generation;const run=await researchRequest("/pipelines/"+encodeURIComponent(ref));if(session!==generation)return;
   const body=el("div",null,"job-detail-content");body.append(el("h3",run.display_name),badge(run.state));
   body.append(pipelineDag(run));
   body.append(table(["단계","상태","시작","종료"],run.tasks.map(t=>[el("span",t.display_name),badge(t.state),el("span",stamp(t.start_time)),el("span",stamp(t.end_time))])));
-  if(run.job_id)body.append(researchButton("연결된 컴퓨트 작업 보기",async()=>{
-    const response=await fetch(API+"/jobs/"+encodeURIComponent(run.job_id)+"/view",{headers:authHeaders()});if(!response.ok)throw new Error("작업 기록을 조회하지 못했습니다.");const job=await response.json();
-    showJob(job);
-  }));
+  if(run.linked_jobs?.length)body.append(panel("단계별 컴퓨트 작업","KFP 단계 상태와 실제 계산 작업의 상태를 따로 확인합니다.",table(["단계","자원 · 백엔드","계산 상태","작업"],run.linked_jobs.map(j=>[
+    el("span",run.graph.find(t=>t.name===j.task_name)?.display_name||j.task_name),el("span",`${(j.device_class||"미관측").toUpperCase()} · ${j.backend||"미관측"}`),stateBadge(j.state),researchButton("계산 작업 보기 · "+(j.device_class||j.task_name).toUpperCase(),()=>openPipelineComputeJob(run,j.job_id))
+  ]))));
+  else if(run.job_id)body.append(researchButton("연결된 컴퓨트 작업 보기",()=>openPipelineComputeJob(run,run.job_id)));
   if(!["SUCCEEDED","FAILED","CANCELED","CANCELLED","SKIPPED"].includes(run.state)){
     const stop=researchButton("파이프라인 중지",async()=>{if(stop.dataset.confirm!=="yes"){stop.dataset.confirm="yes";stop.textContent="중지 확인 · 연결 작업도 정리됩니다";return;}await researchRequest("/pipelines/"+encodeURIComponent(ref)+"/terminate",{});$("notice").textContent="중지를 요청했습니다. 실제 종료 상태는 갱신 후 확인하세요.";$("job-dialog").close();researchUpdated=0;await refreshResearch();});body.append(stop);
   }
@@ -2321,7 +2329,7 @@ function mlJobsGraph() {
   const started=Boolean(job.started_at || running || job.result);
   const submitted=Boolean(job.external_id || job.queued_at);
   const tone=successful?"complete":["FAILED","RESULT_INVALID","CANCELED"].includes(job.state)?"problem":running?"active":"waiting";
-  const pipeline=researchData?.kubeflow?.items?.find(r=>r.job_id===job.job_id);
+  const pipeline=researchData?.kubeflow?.items?.find(r=>r.job_id===job.job_id || r.linked_jobs?.some(j=>j.job_id===job.job_id));
   const q=job.scheduling_plan?.adapter;
   const short=v=>v?String(v).replace(/^sha256:/,"").slice(0,16):"등록 정보 없음";
   const numerical=info.measurement_boundary?.startsWith("cuda-squares-");
@@ -2371,11 +2379,12 @@ function pipelineDag(run) {
   const tasks=run.graph, names=new Set(tasks.map(t=>t.name)), levels=new Map();
   for(let i=0;i<tasks.length;i++)for(const t of tasks)if(!levels.has(t.name) && t.dependencies.every(d=>!names.has(d)||levels.has(d)))levels.set(t.name,Math.max(-1,...t.dependencies.filter(d=>names.has(d)).map(d=>levels.get(d)))+1);
   if(levels.size!==tasks.length)return empty("의존관계에 순환 또는 미해결 연결이 있습니다. 원본 단계 기록을 확인하세요.");
-  const rows=new Map(),positions=tasks.map(t=>{const level=levels.get(t.name),row=rows.get(level)||0;rows.set(level,row+1);const state=run.tasks.find(r=>r.display_name===t.name)?.state||"미관측";
-    return {id:t.name,x:20+level*260,y:24+row*125,kicker:"KUBEFLOW TASK",label:t.name,caption:state,tone:state==="SUCCEEDED"?"complete":state==="RUNNING"?"active":state==="FAILED"?"problem":""};});
+  const rows=new Map(),positions=tasks.map(t=>{const level=levels.get(t.name),row=rows.get(level)||0;rows.set(level,row+1);const state=run.tasks.find(r=>r.display_name===t.name)?.state||"미관측",job=run.linked_jobs?.find(j=>j.task_name===t.name);
+    return {id:t.name,x:20+level*260,y:24+row*125,kicker:"KUBEFLOW"+(job?.device_class?" · "+job.device_class.toUpperCase():" TASK"),label:t.display_name||t.name,caption:`KFP ${states[state]||state}`+(job?` · 계산 ${states[job.state]||job.state}`:""),tone:state==="SUCCEEDED"?"complete":state==="RUNNING"?"active":state==="FAILED"?"problem":""};});
   const selected=el("div",null,"ml-task-inspector");selected.append(el("small","단계 노드를 누르면 실제 실행 상태와 선행 작업을 확인할 수 있습니다."));
   const canvas=workflowCanvas(positions,tasks.flatMap(t=>t.dependencies.filter(d=>names.has(d)).map(d=>[d,t.name])),id=>{const task=tasks.find(t=>t.name===id),observations=run.tasks.filter(t=>t.display_name===id);
-    selected.replaceChildren(el("h3",id),el("p","선행 단계: "+(task.dependencies.join(", ")||"없음")),observations.length?table(["상태","시작","종료"],observations.map(t=>[badge(t.state),stamp(t.start_time),stamp(t.end_time)])):el("p","이 단계의 실행 상태는 아직 관측되지 않았습니다."));
+    selected.replaceChildren(el("h3",task.display_name||id),el("p","선행 단계: "+(task.dependencies.map(d=>tasks.find(t=>t.name===d)?.display_name||d).join(", ")||"없음")),observations.length?table(["KFP 상태","시작","종료"],observations.map(t=>[badge(t.state),stamp(t.start_time),stamp(t.end_time)])):el("p","이 단계의 실행 상태는 아직 관측되지 않았습니다."));
+    for(const job of run.linked_jobs?.filter(j=>j.task_name===id)||[])selected.append(add(el("div",null,"ml-node-actions"),stateBadge(job.state),code(job.job_id),researchButton("연결된 계산 작업 · "+(job.device_class||id).toUpperCase(),()=>openPipelineComputeJob(run,job.job_id))));
   },{width:Math.max(520,Math.max(...levels.values())*260+245),height:Math.max(230,Math.max(...rows.values())*125+40),label:"Kubeflow 실제 단계 의존관계 그래프"});
   return add(el("div"),canvas,selected);
 }

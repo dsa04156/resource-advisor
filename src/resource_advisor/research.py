@@ -172,14 +172,60 @@ class ResearchServices:
 
     def pipeline_view(self, project, run):
         params = run.get("runtime_config", {}).get("parameters", {})
-        linked = None
-        if params.get("run_key"):
+        spec = run.get("pipeline_spec", {})
+        spec = spec.get("pipeline_spec", spec)
+        dag = spec.get("root", {}).get("dag", {}).get("tasks", {})
+
+        def input_value(task, field):
+            binding = task.get("inputs", {}).get("parameters", {}).get(field, {})
+            parameter = binding.get("componentInputParameter")
+            if parameter:
+                value = params.get(parameter)
+            else:
+                value = binding.get("runtimeValue", {}).get("constant")
+            return value if isinstance(value, str) and value else None
+
+        stage_keys = {name: input_value(task, "run_key") for name, task in dag.items()}
+        legacy_key = params.get("run_key")
+        if not isinstance(legacy_key, str):
+            legacy_key = None
+        keys = {key for key in stage_keys.values() if key}
+        if legacy_key:
+            keys.add(legacy_key)
+        by_key = {}
+        if keys:
             with self.store.transaction() as conn:
-                linked = conn.execute(
-                    select(jobs.c.id).where(
-                        jobs.c.project == project, jobs.c.idempotency_key == params["run_key"]
-                    )
-                ).scalar()
+                by_key = {
+                    row["idempotency_key"]: row
+                    for row in conn.execute(
+                        select(jobs).where(
+                            jobs.c.project == project, jobs.c.idempotency_key.in_(keys)
+                        )
+                    ).mappings()
+                }
+        linked_jobs = []
+        for name, key in stage_keys.items():
+            row = by_key.get(key)
+            if row is None:
+                continue
+            body = row["body"]
+            linked_jobs.append(
+                {
+                    "task_name": name,
+                    "job_id": row["id"],
+                    "state": row["state"],
+                    "attempt_id": body.get("attempt_id"),
+                    "backend": body.get("candidate", {}).get("backend"),
+                    "device_class": body.get("variant", {}).get("device_class"),
+                    "workload": body.get("spec", {}).get("ref"),
+                }
+            )
+        # Preserve single-launcher clients without inventing a primary stage.
+        legacy_job = by_key.get(legacy_key)
+        linked = legacy_job["id"] if legacy_job is not None else None
+        linked_ids = {row["job_id"] for row in linked_jobs}
+        if linked is None and len(linked_ids) == 1:
+            linked = next(iter(linked_ids))
         tasks = [
             {
                 k: t.get(k)
@@ -187,9 +233,6 @@ class ResearchServices:
             }
             for t in run.get("run_details", {}).get("task_details", [])
         ]
-        spec = run.get("pipeline_spec", {})
-        spec = spec.get("pipeline_spec", spec)
-        dag = spec.get("root", {}).get("dag", {}).get("tasks", {})
         return {
             **{
                 k: run.get(k)
@@ -205,10 +248,15 @@ class ResearchServices:
             },
             "tasks": tasks,
             "graph": [
-                {"name": name, "dependencies": task.get("dependentTasks", [])}
+                {
+                    "name": name,
+                    "display_name": task.get("taskInfo", {}).get("name", name),
+                    "dependencies": task.get("dependentTasks", []),
+                }
                 for name, task in dag.items()
             ],
             "job_id": linked,
+            "linked_jobs": linked_jobs,
             "workload": params.get("workload"),
             "scheduling_profile": params.get("profile"),
         }
