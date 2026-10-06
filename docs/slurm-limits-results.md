@@ -1,5 +1,9 @@
 # Slurm limits v1: actual GPU bypass detected
 
+This is the retained historical v1 failure. The subsequent
+[v2 correction and results](slurm-limits-v2-results.md) prove reserved execution
+and unreserved CUDA denial, while retaining a separate parent OOM state mismatch.
+
 The [fixed three-Job plan](slurm-limits-plan.md) stopped after its second Job.
 The Orin worker now sets real cgroup memory/swap/CPU bounds, but its existing
 GPU GRES mapping does **not** provide CUDA isolation. Preserve this failed

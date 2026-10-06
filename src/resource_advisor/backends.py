@@ -703,6 +703,31 @@ class SlurmBackend:
             raise BackendError("Slurm allocation does not match the attempt owner")
         return record
 
+    def failure_reason(self, output, job, allocation):
+        """Keep a contained step OOM when srun leaves the parent as FAILED."""
+        state = allocation[4]
+        if state != "FAILED" or not all(_aware(value) for value in allocation[6:8]):
+            return state
+        start, end = (datetime.fromisoformat(value) for value in allocation[6:8])
+        if end < start:
+            return state
+        jid = self.external_id(job)
+        for line in output.splitlines():
+            step = line.split("|")
+            if (
+                len(step) != 10
+                or not re.fullmatch(re.escape(jid) + r"\.(?:[0-9]+|batch|extern)", step[0])
+                or step[2] != self.account
+                or step[3] not in {"", self.partition}
+                or step[4] != "OUT_OF_MEMORY"
+                or not all(_aware(value) for value in step[6:8])
+            ):
+                continue
+            step_start, step_end = (datetime.fromisoformat(value) for value in step[6:8])
+            if start <= step_start <= step_end <= end:
+                return "OUT_OF_MEMORY"
+        return state
+
     def status(self, job):
         jid = self.external_id(job)
         # squeue --jobs exits nonzero after Slurm purges a completed ID from its
@@ -763,7 +788,12 @@ class SlurmBackend:
             "BOOT_FAIL",
         }:
             return Observation(
-                State.FAILED, start, end, state, allocation=allocation, submitted_at=submitted
+                State.FAILED,
+                start,
+                end,
+                self.failure_reason(output, job, parts),
+                allocation=allocation,
+                submitted_at=submitted,
             )
         raise BackendError("accounting has not confirmed a terminal state")
 

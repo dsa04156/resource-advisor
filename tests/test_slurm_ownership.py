@@ -128,6 +128,53 @@ def test_cancel_has_scheduler_side_identity_filters(job):
     ]
 
 
+def test_failed_parent_preserves_contained_step_oom(job):
+    # Mirrors the retained real limits-v2 shape; this test itself uses doubles.
+    output = accounting_record(job, state="FAILED", exit="1:0") + accounting_record(
+        job, id="42.0", attempt="python3", partition="", state="OUT_OF_MEMORY", exit="0:125"
+    )
+    observation = backend(lambda args, **kwargs: "" if args[0] == "squeue" else output).status(job)
+    assert observation.state == State.FAILED
+    assert observation.error == "OUT_OF_MEMORY"
+    assert observation.allocation["accelerator_count"] == 1
+    assert observation.started_at == "2026-10-02T05:00:00+0000"
+    assert observation.finished_at == "2026-10-02T05:00:02+0000"
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"id": "420.0"},
+        {"id": "42.0.extra"},
+        {"account": "other-team"},
+        {"partition": "other-pool"},
+        {"start": "2026-10-01T05:00:00+0000"},
+        {"end": "2026-10-03T05:00:00+0000"},
+        {"end": "2026-10-02T04:59:59+0000"},
+        {"start": "Unknown"},
+        {"end": "2026-10-02T05:00:02"},
+    ],
+)
+def test_unrelated_or_unbounded_step_does_not_relabel_failure(job, change):
+    fields = dict(id="42.0", attempt="python3", partition="", state="OUT_OF_MEMORY")
+    fields.update(change)
+    output = accounting_record(job, state="FAILED", exit="1:0") + accounting_record(job, **fields)
+    observation = backend(lambda args, **kwargs: "" if args[0] == "squeue" else output).status(job)
+    assert observation.error == "FAILED"
+
+
+@pytest.mark.parametrize(
+    "state, expected", [("COMPLETED", State.COLLECTING), ("CANCELLED", State.CANCELED)]
+)
+def test_step_oom_does_not_override_parent_success_or_cancel(job, state, expected):
+    output = accounting_record(job, state=state) + accounting_record(
+        job, id="42.0", attempt="python3", partition="", state="OUT_OF_MEMORY"
+    )
+    observation = backend(lambda args, **kwargs: "" if args[0] == "squeue" else output).status(job)
+    assert observation.state == expected
+    assert observation.error is None
+
+
 @pytest.mark.parametrize("external_id", ["--user=someone", "42.batch", "42_1", "42,43", "", "-1"])
 def test_invalid_cancel_id_never_reaches_scheduler(job, external_id):
     job["body"]["external_id"] = external_id

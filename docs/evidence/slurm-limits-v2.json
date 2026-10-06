@@ -1,0 +1,177 @@
+{
+  "schema_version": "v1",
+  "source_commit": "00614631094cb43a0aa013789833b1c8ad0261db",
+  "source_hashes": {
+    "slurm_limits_probe.py": "7f0382cb350d62cff099c4c7558eaec3fa63df195516eb5aa9bc6d2ec7634eab",
+    "cuda_driver_probe.py": "132102d06e779523fa80ec56bbae5227d684bceb9ba92322860202ddd8ab1235"
+  },
+  "trial_state": "STOPPED_AFTER_PARENT_OOM_STATE_MISMATCH",
+  "jobs": [
+    {
+      "mode": "gpu-positive",
+      "acceptance": "PASS",
+      "accounting": [
+        {
+          "step": "allocation",
+          "state": "COMPLETED",
+          "exit": "0:0",
+          "submit": "2026-10-06T02:36:14+0000",
+          "start": "2026-10-06T02:36:15+0000",
+          "end": "2026-10-06T02:36:16+0000",
+          "elapsed_seconds": 1,
+          "allocated_tres": "billing=1,cpu=1,gres/gpu=1,mem=512M,node=1",
+          "max_rss": null,
+          "total_cpu": "00:00.027"
+        },
+        {
+          "step": "batch",
+          "state": "COMPLETED",
+          "exit": "0:0",
+          "submit": "2026-10-06T02:36:15+0000",
+          "start": "2026-10-06T02:36:15+0000",
+          "end": "2026-10-06T02:36:16+0000",
+          "elapsed_seconds": 1,
+          "allocated_tres": "cpu=1,gres/gpu=1,mem=512M,node=1",
+          "max_rss": "4016K",
+          "total_cpu": "00:00.027"
+        },
+        {
+          "step": "0",
+          "state": "COMPLETED",
+          "exit": "0:0",
+          "submit": "2026-10-06T02:36:16+0000",
+          "start": "2026-10-06T02:36:16+0000",
+          "end": "2026-10-06T02:36:16+0000",
+          "elapsed_seconds": 0,
+          "allocated_tres": "cpu=1,gres/gpu=1,mem=512M,node=1",
+          "max_rss": null,
+          "total_cpu": "00:00:00"
+        }
+      ],
+      "log": "RA_SLURM_LIMITS {\"mode\": \"gpu-positive\", \"memory_max\": 536870912, \"swap_max\": 0, \"cpus\": 1}\n{\"phase\": \"F0\", \"performance_measurement\": false, \"cuda_devices\": 1, \"driver_api\": 13020, \"verified_elements\": 4096, \"result\": \"PASS\"}\n\n"
+    },
+    {
+      "mode": "gpu-denied",
+      "acceptance": "PASS",
+      "accounting": [
+        {
+          "step": "allocation",
+          "state": "COMPLETED",
+          "exit": "0:0",
+          "submit": "2026-10-06T02:36:23+0000",
+          "start": "2026-10-06T02:36:23+0000",
+          "end": "2026-10-06T02:36:24+0000",
+          "elapsed_seconds": 1,
+          "allocated_tres": "billing=1,cpu=1,mem=256M,node=1",
+          "max_rss": null,
+          "total_cpu": "00:00.027"
+        },
+        {
+          "step": "batch",
+          "state": "COMPLETED",
+          "exit": "0:0",
+          "submit": "2026-10-06T02:36:23+0000",
+          "start": "2026-10-06T02:36:23+0000",
+          "end": "2026-10-06T02:36:24+0000",
+          "elapsed_seconds": 1,
+          "allocated_tres": "cpu=1,mem=256M,node=1",
+          "max_rss": "4292K",
+          "total_cpu": "00:00.027"
+        },
+        {
+          "step": "0",
+          "state": "COMPLETED",
+          "exit": "0:0",
+          "submit": "2026-10-06T02:36:24+0000",
+          "start": "2026-10-06T02:36:24+0000",
+          "end": "2026-10-06T02:36:24+0000",
+          "elapsed_seconds": 0,
+          "allocated_tres": "cpu=1,mem=256M,node=1",
+          "max_rss": null,
+          "total_cpu": "00:00:00"
+        }
+      ],
+      "log": "RA_SLURM_LIMITS {\"mode\": \"gpu-denied\", \"memory_max\": 268435456, \"swap_max\": 0, \"cpus\": 1}\nRA_GPU_DENIED {\"device_errno\": 1, \"devices\": [\"/dev/nvidia0\", \"/dev/nvgpu/igpu0/ctrl\", \"/dev/dri/renderD128\"], \"cuda_error\": \"cuInit failed with CUDA error 801\"}\n\n"
+    },
+    {
+      "mode": "oom",
+      "acceptance": "FAIL",
+      "accounting": [
+        {
+          "step": "allocation",
+          "state": "FAILED",
+          "exit": "1:0",
+          "submit": "2026-10-06T02:36:34+0000",
+          "start": "2026-10-06T02:36:35+0000",
+          "end": "2026-10-06T02:36:35+0000",
+          "elapsed_seconds": 0,
+          "allocated_tres": "billing=1,cpu=1,mem=64M,node=1",
+          "max_rss": null,
+          "total_cpu": "00:00.027"
+        },
+        {
+          "step": "batch",
+          "state": "FAILED",
+          "exit": "1:0",
+          "submit": "2026-10-06T02:36:35+0000",
+          "start": "2026-10-06T02:36:35+0000",
+          "end": "2026-10-06T02:36:35+0000",
+          "elapsed_seconds": 0,
+          "allocated_tres": "cpu=1,mem=64M,node=1",
+          "max_rss": "4272K",
+          "total_cpu": "00:00.027"
+        },
+        {
+          "step": "0",
+          "state": "OUT_OF_MEMORY",
+          "exit": "0:125",
+          "submit": "2026-10-06T02:36:35+0000",
+          "start": "2026-10-06T02:36:35+0000",
+          "end": "2026-10-06T02:36:35+0000",
+          "elapsed_seconds": 0,
+          "allocated_tres": "cpu=1,mem=64M,node=1",
+          "max_rss": null,
+          "total_cpu": "00:00:00"
+        }
+      ],
+      "log": "RA_SLURM_LIMITS {\"mode\": \"oom\", \"memory_max\": 67108864, \"swap_max\": 0, \"cpus\": 1}\nslurmstepd: error: Detected 1 oom_kill event in StepId=oom-trial.0. Some of the step tasks have been OOM Killed.\nsrun: error: gpu-worker: task 0: Out Of Memory\n\n"
+    }
+  ],
+  "job_count": 3,
+  "gpu_reservation_seconds": 1,
+  "allocation_seconds": 2,
+  "actual_gpu_busy_seconds": null,
+  "timing_resolution": "sacct whole seconds; zero duration is not proof of zero work",
+  "gpu_reserved_kernel_pass": true,
+  "gpu_unreserved_device_and_cuda_denial_pass": true,
+  "memory_cgroup_oom_observed": true,
+  "parent_oom_state_acceptance_pass": false,
+  "automatic_runtime_registered": false,
+  "adapter_oom_readback": {
+    "state": "FAILED",
+    "started_at": "2026-10-06T02:36:35+0000",
+    "finished_at": "2026-10-06T02:36:35+0000",
+    "error": "OUT_OF_MEMORY",
+    "allocation": {
+      "source": "slurm:sacct AllocTRES",
+      "accelerator_count": null,
+      "cpu": 1.0,
+      "memory_mib": 64.0
+    },
+    "submitted_at": "2026-10-06T02:36:34+0000",
+    "execution_started_at": null,
+    "backend_uid": null,
+    "termination": null
+  },
+  "configuration_verification": {
+    "physical_gpu_count": 1,
+    "grouped_device_count": 33,
+    "controller_and_other_worker_unchanged": true,
+    "qos_and_associations_unchanged": true,
+    "driver_and_boot_unchanged": true,
+    "limits_ansible_repeat_changed": 0,
+    "repeat_preserved_all_config_and_daemon_pids": true,
+    "queue_empty_after_trial": true,
+    "device_group_automation": "manual guarded correction; not yet managed by Ansible"
+  }
+}

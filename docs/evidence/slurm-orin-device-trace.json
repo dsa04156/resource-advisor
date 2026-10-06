@@ -1,0 +1,95 @@
+{
+  "schema_version": "v1",
+  "source_commit": "93ef5934ca7847f603451990b7b9abbe317b656f",
+  "scope": "only /dev openat records; process IDs and library/file paths excluded",
+  "reserved_gpu_count": 1,
+  "gpu_reservation_seconds": 2,
+  "state": "COMPLETED",
+  "verified_cuda_elements": 4096,
+  "device_opens": [
+    {
+      "path": "/dev/shm/cuda_injection_path_shm",
+      "result": "-1 ENOENT (No such file or directory)"
+    },
+    {
+      "path": "/dev/nvmap",
+      "result": "8"
+    },
+    {
+      "path": "/dev/dma_heap/video-protection-region",
+      "result": "-1 ENOENT (No such file or directory)"
+    },
+    {
+      "path": "/dev/dri/renderD128",
+      "result": "11"
+    },
+    {
+      "path": "/dev/dri/renderD128",
+      "result": "11"
+    },
+    {
+      "path": "/dev/nvgpu",
+      "result": "9"
+    },
+    {
+      "path": "/dev/nvgpu/igpu0/power",
+      "result": "10"
+    },
+    {
+      "path": "/dev/nvgpu/igpu0",
+      "result": "10"
+    },
+    {
+      "path": "/dev/nvidia-uvm",
+      "result": "-1 ENOENT (No such file or directory)"
+    },
+    {
+      "path": "/dev/nvgpu",
+      "result": "9"
+    },
+    {
+      "path": "/dev/nvgpu/igpu0/power",
+      "result": "10"
+    },
+    {
+      "path": "/dev/nvgpu/igpu0",
+      "result": "10"
+    },
+    {
+      "path": "/dev/nvgpu/igpu0/ctrl",
+      "result": "9"
+    },
+    {
+      "path": "/dev/nvgpu/igpu0/ctrl",
+      "result": "9"
+    },
+    {
+      "path": "/dev/nvgpu/igpu0/prof",
+      "result": "-1 EACCES (Permission denied)"
+    },
+    {
+      "path": "/dev/dri/renderD128",
+      "result": "13"
+    },
+    {
+      "path": "/dev/dri/renderD128",
+      "result": "13"
+    },
+    {
+      "path": "/dev/host1x-fence",
+      "result": "10"
+    },
+    {
+      "path": "/dev/host1x-fence",
+      "result": "22"
+    },
+    {
+      "path": "/dev/host1x-fence",
+      "result": "28"
+    },
+    {
+      "path": "/dev/host1x-fence",
+      "result": "34"
+    }
+  ]
+}
