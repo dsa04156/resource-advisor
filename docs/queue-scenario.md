@@ -40,3 +40,22 @@ unavailable although the queues existed. The named read-only resource allowlist
 in `deploy/inventory-rbac.yaml` now matches those six lab queue references. Keep
 this list aligned with `InventoryConfig.cluster_queue_refs` in other deployments;
 do not grant unrestricted queue listing to solve a named-resource mismatch.
+
+## Observed lab run (2026-10-06)
+
+The browser submitted the registered Slurm Orin CNN workload twice through the
+normal scheduling profile. Both jobs completed successfully and each has a
+separate result and MLflow run. B's observed pending reason was
+`AssocGrpCpuLimit`: the account CPU allocation limit, not an inferred GPU hardware
+failure. Native accounting recorded 71 seconds from B's submission to start.
+The saved event stream retained A running while B waited and B starting after A
+completed. The existing cluster quotas were not changed for this demonstration.
+
+All six configured Kueue ClusterQueues now return `ok` observations following the
+named read-only RBAC repair. Focused scenario/console checks passed (11), including
+partial-submission retry and durable queue-reason retention. The two scenario
+checks passed again after preflight rejection handling changed. Desktop and 390px
+mobile views were inspected; explicit playback and historical event selection
+worked, mobile document width remained 390px, and the final browser session had
+no console errors. This run validates the Slurm walkthrough; a two-job Kueue
+walkthrough has not been separately executed in this increment.
