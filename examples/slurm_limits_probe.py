@@ -35,6 +35,7 @@ def main():
     parser.add_argument("--mode", choices=["gpu-positive", "gpu-denied", "oom"], required=True)
     parser.add_argument("--cuda-probe")
     parser.add_argument("--cuda-probe-sha256")
+    parser.add_argument("--denied-device", action="append")
     args = parser.parse_args()
     if not os.environ.get("SLURM_JOB_ID"):
         raise RuntimeError("a real Slurm allocation is required")
@@ -75,14 +76,19 @@ def main():
     if args.mode == "gpu-positive":
         runpy.run_path(str(source), run_name="__main__")
         return
-    try:
-        fd = os.open("/dev/nvidia0", os.O_RDWR)
-    except OSError as exc:
-        if exc.errno != errno.EPERM:
-            raise RuntimeError("GPU denial was not a cgroup permission denial") from exc
-    else:
-        os.close(fd)
-        raise RuntimeError("unallocated managed GPU device was accessible")
+    denied_devices = args.denied_device or ["/dev/nvidia0"]
+    for name in denied_devices:
+        path = Path(name)
+        if not path.is_relative_to("/dev") or ".." in path.parts:
+            raise RuntimeError("only explicit device paths are accepted")
+        try:
+            fd = os.open(name, os.O_RDWR)
+        except OSError as exc:
+            if exc.errno != errno.EPERM:
+                raise RuntimeError("GPU denial was not a cgroup permission denial") from exc
+        else:
+            os.close(fd)
+            raise RuntimeError("unallocated managed GPU device was accessible")
     try:
         runpy.run_path(str(source), run_name="__main__")
     except RuntimeError as exc:
@@ -94,7 +100,12 @@ def main():
             or text == "F0 requires exactly one visible physical CUDA device"
         ):
             raise
-        print("RA_GPU_DENIED " + json.dumps({"device_errno": errno.EPERM, "cuda_error": text}))
+        print(
+            "RA_GPU_DENIED "
+            + json.dumps(
+                {"device_errno": errno.EPERM, "devices": denied_devices, "cuda_error": text}
+            )
+        )
     else:
         raise RuntimeError("CUDA kernel executed without a GPU reservation")
 

@@ -1,4 +1,7 @@
+import errno
+import hashlib
 import importlib.util
+import json
 from pathlib import Path
 
 import pytest
@@ -44,3 +47,55 @@ def test_memory_probe_refuses_to_run_outside_slurm(monkeypatch):
     monkeypatch.setattr("sys.argv", ["probe", "--mode", "oom"])
     with pytest.raises(RuntimeError, match="real Slurm allocation"):
         probe.main()
+
+
+@pytest.mark.parametrize("failure", [None, "missing", "accessible", "unrelated-cuda"])
+def test_negative_requires_each_device_denied_and_a_relevant_cuda_failure(
+    monkeypatch, tmp_path, capsys, failure
+):
+    source = tmp_path / "cuda.py"
+    source.write_bytes(b"# scheduler-output double; no CUDA execution\n")
+    paths = ["/dev/nvidia0", "/dev/nvgpu/igpu0/ctrl", "/dev/dri/renderD128"]
+    args = [
+        "probe",
+        "--mode",
+        "gpu-denied",
+        "--cuda-probe",
+        str(source),
+        "--cuda-probe-sha256",
+        hashlib.sha256(source.read_bytes()).hexdigest(),
+    ]
+    for name in paths:
+        args.extend(["--denied-device", name])
+    monkeypatch.setattr("sys.argv", args)
+    monkeypatch.setenv("SLURM_JOB_ID", "test")
+    monkeypatch.setattr(probe.os, "sched_getaffinity", lambda _: {0})
+    monkeypatch.setattr(
+        probe, "effective_limit", lambda _p, _r, f: 256 * 1024**2 if f == "memory.max" else 0
+    )
+    opened = []
+
+    def fake_open(name, flags):
+        opened.append(name)
+        if name == paths[1] and failure == "accessible":
+            return 123
+        error = errno.ENOENT if name == paths[1] and failure == "missing" else errno.EPERM
+        raise OSError(error, "test device outcome")
+
+    def fake_cuda(*args, **kwargs):
+        if failure == "unrelated-cuda":
+            raise RuntimeError("GPU kernel result differs from reference")
+        raise RuntimeError("cuInit failed with CUDA error 100")
+
+    monkeypatch.setattr(probe.os, "open", fake_open)
+    monkeypatch.setattr(probe.os, "close", lambda _fd: None)
+    monkeypatch.setattr(probe.runpy, "run_path", fake_cuda)
+    if failure:
+        with pytest.raises(RuntimeError):
+            probe.main()
+        assert "RA_GPU_DENIED " not in capsys.readouterr().out
+    else:
+        probe.main()
+        assert opened == paths
+        payload = capsys.readouterr().out.split("RA_GPU_DENIED ")[1]
+        assert json.loads(payload)["devices"] == paths
