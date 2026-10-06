@@ -1,0 +1,93 @@
+[
+  {
+    "component": "cuda_cudart",
+    "version": "12.6.77",
+    "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cudart/linux-aarch64/cuda_cudart-linux-aarch64-12.6.77-archive.tar.xz",
+    "sha256": "d5b8f6f5a2ab34066c267daf5f73f25d2f24ea25d8fa3dce427c196ff07504e7",
+    "size": 1175528
+  },
+  {
+    "component": "cuda_cupti",
+    "version": "12.6.80",
+    "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cupti/linux-aarch64/cuda_cupti-linux-aarch64-12.6.80-archive.tar.xz",
+    "sha256": "9a3945219e5cf98c8df612681bd1984a9fdad6d86226bb0e99a515d18f736b4b",
+    "size": 4093644
+  },
+  {
+    "component": "cuda_nvrtc",
+    "version": "12.6.85",
+    "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvrtc/linux-aarch64/cuda_nvrtc-linux-aarch64-12.6.85-archive.tar.xz",
+    "sha256": "9debdacfd445d7c8c2bb79e90088e45544f3ed194f614d2904ab6a749b7997ca",
+    "size": 33069060
+  },
+  {
+    "component": "cuda_nvtx",
+    "version": "12.6.77",
+    "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_nvtx/linux-aarch64/cuda_nvtx-linux-aarch64-12.6.77-archive.tar.xz",
+    "sha256": "38cafee61f9cf1001e3c2b03de3c85fbea1b4c1b5d84f7fdac72ed7c98cb314a",
+    "size": 51720
+  },
+  {
+    "component": "cuda_cuobjdump",
+    "version": "12.6.77",
+    "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cuobjdump/linux-aarch64/cuda_cuobjdump-linux-aarch64-12.6.77-archive.tar.xz",
+    "sha256": "c75d148dca4d4672a81a83601f06ae7466367ea5c9a4e61cf74fa7396a437eb4",
+    "size": 196188
+  },
+  {
+    "component": "libcublas",
+    "version": "12.6.4.1",
+    "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcublas/linux-aarch64/libcublas-linux-aarch64-12.6.4.1-archive.tar.xz",
+    "sha256": "3324e0a995794704874c71397964c4739667c279d3e3cb183e482476df9b57ed",
+    "size": 186089704
+  },
+  {
+    "component": "libcufft",
+    "version": "11.3.0.4",
+    "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcufft/linux-aarch64/libcufft-linux-aarch64-11.3.0.4-archive.tar.xz",
+    "sha256": "beafc176148563833a4271a6913bc318a004037a8b4f5b73904667a33fe6ecb1",
+    "size": 476526352
+  },
+  {
+    "component": "libcurand",
+    "version": "10.3.7.77",
+    "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcurand/linux-aarch64/libcurand-linux-aarch64-10.3.7.77-archive.tar.xz",
+    "sha256": "eab273ca1d30659f026600d15cd0492d511408ae2141349cdf2edadd3da2661d",
+    "size": 83949508
+  },
+  {
+    "component": "libcusolver",
+    "version": "11.7.1.2",
+    "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcusolver/linux-aarch64/libcusolver-linux-aarch64-11.7.1.2-archive.tar.xz",
+    "sha256": "d7e578143ebd90582873cb4c84f0f29ae1b3f086104a7660f5a63a28a115b9e6",
+    "size": 174581012
+  },
+  {
+    "component": "libcusparse",
+    "version": "12.5.4.2",
+    "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcusparse/linux-aarch64/libcusparse-linux-aarch64-12.5.4.2-archive.tar.xz",
+    "sha256": "fc790c3d0d194fc96212bde94c8a22016e63a07d048ac6e9e49fdc8cf2a2dfcc",
+    "size": 253390908
+  },
+  {
+    "component": "libnvjitlink",
+    "version": "12.6.85",
+    "url": "https://developer.download.nvidia.com/compute/cuda/redist/libnvjitlink/linux-aarch64/libnvjitlink-linux-aarch64-12.6.85-archive.tar.xz",
+    "sha256": "65497b5bf4abd81fa993bf89996e7e9678a801284d8df798ddceb00502972ed6",
+    "size": 27881168
+  },
+  {
+    "component": "cudnn",
+    "version": "9.3.0.75",
+    "url": "https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-aarch64/cudnn-linux-aarch64-9.3.0.75_cuda12-archive.tar.xz",
+    "sha256": "1aae4bfced63f930b4677f9e928e197878dece2edd51ca8fa7ab8363d0e6ed60",
+    "size": 796357916
+  },
+  {
+    "component": "libcusparse_lt",
+    "version": "0.6.3.2",
+    "url": "https://developer.download.nvidia.com/compute/cusparselt/redist/libcusparse_lt/linux-aarch64/libcusparse_lt-linux-aarch64-0.6.3.2-archive.tar.xz",
+    "sha256": "91501d0c05d1ff0dd67399ecd7c1bf76a620e842dce54ae4c8a1f07cec0673e5",
+    "size": 19000276
+  }
+]

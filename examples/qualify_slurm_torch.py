@@ -11,15 +11,70 @@ import os
 import resource
 import statistics
 import time
+import warnings
+from pathlib import Path
+
+
+def memory_boundary(current, root):
+    """Observe the tightest ancestor limit, including an unlimited step's job."""
+    current, root = current.resolve(), root.resolve()
+    if not current.is_relative_to(root):
+        raise RuntimeError("cgroup escaped the unified hierarchy")
+    limits, swaps = [], []
+    for path in (current, *current.parents):
+        if not path.is_relative_to(root):
+            break
+        for filename, values in [("memory.max", limits), ("memory.swap.max", swaps)]:
+            file = path / filename
+            if file.exists() and (value := file.read_text().strip()) != "max":
+                number = int(value)
+                if number < 0:
+                    raise RuntimeError("negative cgroup limit")
+                values.append((number, path))
+    if not limits or not swaps:
+        raise RuntimeError("finite memory and swap boundaries required")
+    limit, path = min(limits, key=lambda item: item[0])
+    peak = path / "memory.peak"
+    return {
+        "memory_max_bytes": limit,
+        "swap_max_bytes": min(item[0] for item in swaps),
+        "memory_peak_bytes": int(peak.read_text().strip()) if peak.exists() else None,
+        "cpu_affinity_count": len(os.sched_getaffinity(0)),
+    }
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--expected-torch", required=True)
     parser.add_argument("--expected-cuda", required=True)
+    parser.add_argument("--require-native-arch", action="store_true")
+    parser.add_argument("--enforced-memory-mib", type=int)
     args = parser.parse_args()
     if not os.environ.get("SLURM_JOB_ID") or os.environ.get("SLURM_CPUS_PER_TASK") != "1":
         raise RuntimeError("qualification requires a Slurm allocation with one CPU")
+
+    cgroup = None
+    if args.enforced_memory_mib is not None:
+        membership = [
+            line[3:]
+            for line in Path("/proc/self/cgroup").read_text().splitlines()
+            if line.startswith("0::")
+        ]
+        if len(membership) != 1 or ".." in Path(membership[0]).parts:
+            raise RuntimeError("unified cgroup membership is ambiguous")
+        cgroup = Path("/sys/fs/cgroup") / membership[0].lstrip("/")
+        boundary = memory_boundary(cgroup, Path("/sys/fs/cgroup"))
+        if (
+            args.enforced_memory_mib <= 0
+            or boundary["memory_max_bytes"] != args.enforced_memory_mib * 1024**2
+            or boundary["swap_max_bytes"] != 0
+            or boundary["cpu_affinity_count"] != 1
+        ):
+            raise RuntimeError("actual memory/swap/CPU boundaries differ from the fixed plan")
+        print("RA_SLURM_TORCH_BOUNDARY " + json.dumps(boundary), flush=True)
+    if args.require_native_arch:
+        # The strict trial must not hide unsupported-device or other runtime warnings.
+        warnings.simplefilter("error", UserWarning)
 
     import torch
 
@@ -29,6 +84,8 @@ def main():
         raise RuntimeError("exactly one CUDA device required; refusing CPU fallback")
     if torch.cuda.get_device_capability(0) != (8, 7):
         raise RuntimeError("this qualification is fixed to the Orin compute capability")
+    if args.require_native_arch and "sm_87" not in torch.cuda.get_arch_list():
+        raise RuntimeError("explicit native sm_87 code is required by this qualification")
     torch.set_num_threads(1)
     torch.manual_seed(20261006)
     torch.use_deterministic_algorithms(True)
@@ -100,6 +157,10 @@ def main():
         "peak_process_rss_kib": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
         "cpu_fallback": False,
     }
+    if cgroup is not None:
+        result["enforced_boundary"] = memory_boundary(cgroup, Path("/sys/fs/cgroup"))
+        if result["peak_process_rss_kib"] * 1024 > args.enforced_memory_mib * 1024**2:
+            raise RuntimeError("process RSS exceeds the fixed enforced memory request")
     print("RA_SLURM_TORCH_QUALIFICATION " + json.dumps(result, allow_nan=False))
 
 
