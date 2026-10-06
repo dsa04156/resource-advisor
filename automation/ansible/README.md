@@ -11,6 +11,10 @@ allocation-free standalone worker's configuration under explicit ownership guard
 It is not included in `site.yml`; see its
 [bounded adoption and acceptance plan](../../docs/slurm-limits-plan.md).
 
+The separate [controller observer play](slurm-observer.yml) provisions only a
+restricted read-only SSH identity. See its
+[scope, ownership and verification contract](../../docs/slurm-observer-transport.md).
+
 ## Operator environment
 
 Use a separate Python 3.11–3.13 environment; the application runtime does not need

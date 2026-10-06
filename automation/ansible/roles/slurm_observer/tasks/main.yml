@@ -1,0 +1,122 @@
+- name: Require explicit controller observer authorization
+  ansible.builtin.assert:
+    that:
+      - ra_lab_authorized | default(false) | bool
+      - not (ra_existing_production | default(true) | bool)
+      - ra_slurm_observer_authorized | default(false) | bool
+      - "ra_observer_public_key is match('^ssh-ed25519 [A-Za-z0-9+/=]+(?: [A-Za-z0-9_.-]+)?$')"
+      - ra_observer_scope.account is match('^[A-Za-z0-9_][A-Za-z0-9_.-]{0,95}$')
+      - ra_observer_scope.partition is match('^[A-Za-z0-9_][A-Za-z0-9_.-]{0,95}$')
+      - ra_observer_scope.nodes | length > 0
+      - ra_observer_scope.nodes | length <= 100
+      - ra_observer_scope.nodes | unique | length == ra_observer_scope.nodes | length
+  no_log: true
+
+- name: Validate each allowed node name
+  ansible.builtin.assert:
+    that:
+      - item is match('^[A-Za-z0-9_][A-Za-z0-9_.-]{0,95}$')
+  loop: "{{ ra_observer_scope.nodes }}"
+  no_log: true
+
+- name: Require the qualified controller version
+  ansible.builtin.command:
+    argv: [/usr/bin/scontrol, --version]
+  register: ra_observer_version
+  changed_when: false
+  check_mode: false
+  failed_when: ra_observer_version.stdout != 'slurm 24.11.5'
+
+- name: Reject takeover of an existing unmanaged account or directory
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/python3
+      - -c
+      - |
+        import json,pwd
+        from pathlib import Path
+        base=Path('/opt/resource-advisor/slurm-observer')
+        marker=base/'receipt.json'
+        try: account=pwd.getpwnam('ra-observer')
+        except KeyError: account=None
+        if marker.exists():
+          record=json.loads(marker.read_text())
+          assert account and record['uid']==account.pw_uid
+          assert account.pw_dir=='/var/lib/resource-advisor-observer'
+          assert marker.stat().st_uid==0 and base.stat().st_uid==0
+        else:
+          assert account is None and not base.exists()
+          assert not Path('/var/lib/resource-advisor-observer').exists()
+        print('ownership verified')
+  changed_when: false
+  check_mode: false
+
+- name: Create only the dedicated locked observer account
+  ansible.builtin.user:
+    name: ra-observer
+    system: true
+    home: /var/lib/resource-advisor-observer
+    create_home: true
+    shell: /bin/sh
+    password_lock: true
+    groups: ''
+    append: false
+  when: not ansible_check_mode
+
+- name: Keep observer code and authorized keys under root ownership
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  loop:
+    - {path: /opt/resource-advisor/slurm-observer, mode: '0755'}
+    - {path: /var/lib/resource-advisor-observer, mode: '0755'}
+    - {path: /var/lib/resource-advisor-observer/.ssh, mode: '0755'}
+  when: not ansible_check_mode
+
+- name: Install the reviewed standard-library observer
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../examples/slurm_observer.py"
+    dest: /opt/resource-advisor/slurm-observer/observer.py
+    owner: root
+    group: root
+    mode: '0555'
+  when: not ansible_check_mode
+
+- name: Install the exact read-only scope
+  ansible.builtin.copy:
+    content: "{{ ra_observer_scope | to_nice_json }}\n"
+    dest: /opt/resource-advisor/slurm-observer/scope.json
+    owner: root
+    group: root
+    mode: '0644'
+  when: not ansible_check_mode
+  no_log: true
+
+- name: Restrict the key to the observer with no shell forwarding or PTY
+  ansible.builtin.copy:
+    content: 'restrict,command="/usr/bin/python3 -I /opt/resource-advisor/slurm-observer/observer.py --config /opt/resource-advisor/slurm-observer/scope.json" {{ ra_observer_public_key }}'
+    dest: /var/lib/resource-advisor-observer/.ssh/authorized_keys
+    owner: root
+    group: root
+    mode: '0644'
+  when: not ansible_check_mode
+  no_log: true
+
+- name: Read the dedicated UID
+  ansible.builtin.command:
+    argv: [id, -u, ra-observer]
+  register: ra_observer_uid
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Persist account ownership receipt
+  ansible.builtin.copy:
+    content: "{{ {'schema_version': 'v1', 'uid': ra_observer_uid.stdout | int} | to_nice_json }}\n"
+    dest: /opt/resource-advisor/slurm-observer/receipt.json
+    owner: root
+    group: root
+    mode: '0600'
+  when: not ansible_check_mode
