@@ -1,0 +1,11 @@
+{
+  "mode": "controller",
+  "user": "research-cpu",
+  "partition": "compute",
+  "account": "research-a",
+  "qos": "normal",
+  "node": "qualified-arm-worker",
+  "cpu_only": true,
+  "output_dir": "/opt/research/results",
+  "native_bindings": []
+}

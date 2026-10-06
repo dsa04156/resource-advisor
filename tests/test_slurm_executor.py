@@ -131,3 +131,60 @@ def test_result_scope_is_separate_from_controller_commands():
     ]:
         with pytest.raises(ValueError):
             gateway.plan(config, command)
+
+
+def test_explicit_cpu_gateway_requires_zero_gres_and_qualified_runtime(service):
+    job = row(service)
+    body = job["body"]
+    body["candidate"]["context"].update(allocation_mode="cpu_only", memory_model="host")
+    body["candidate"]["context"]["resources"].update(
+        host_cpu=1, host_memory_mib=1024, accelerator_count=0
+    )
+    body["capability"].update(device_class="cpu", resource_key=None)
+    body["variant"]["device_class"] = "cpu"
+    body["execution_limits"]["max_run_seconds"] = 120
+    backend = SlurmBackend(
+        partition="compute",
+        account="lab",
+        qos="normal",
+        output_dir="/opt/results",
+        native_runtimes=native_runtime(job),
+    )
+    script = backend.script(job)
+    config = {
+        "mode": "controller",
+        "user": "executor",
+        "partition": "compute",
+        "account": "lab",
+        "qos": "normal",
+        "node": body["capability"]["node_ref"],
+        "cpu_only": True,
+        "output_dir": "/opt/results",
+        "native_bindings": [
+            {
+                "environment_digest": body["variant"]["environment_digest"],
+                "tail": script[script.index("printf ") :],
+            }
+        ],
+    }
+    assert "#SBATCH --gres" not in script
+    assert gateway.plan(config, "sbatch --parsable", script)[1] == script
+    # CPU permission is not a fallback or a grant to alter resource bounds.
+    for bad in [
+        script.replace("#SBATCH --export=NONE", "#SBATCH --export=NONE\n#SBATCH --gres=gpu:1"),
+        script.replace("--cpus-per-task=1", "--cpus-per-task=2"),
+        script.replace("--mem=1024M", "--mem=2048M"),
+        script.replace('"accelerator_count":0', '"accelerator_count":1'),
+        script.replace('"allocation_mode":"cpu_only"', '"allocation_mode":"physical_device"'),
+    ]:
+        assert bad != script
+        with pytest.raises(ValueError):
+            gateway.plan(config, "sbatch --parsable", bad)
+    for invalid in [
+        dict(config, cpu_only=False, gres="gpu:orin_nano"),
+        dict(config, cpu_only="true"),
+        dict(config, gres="gpu:orin_nano"),
+        dict(config, native_bindings=[]),
+    ]:
+        with pytest.raises(ValueError):
+            gateway.plan(invalid, "sbatch --parsable", script)

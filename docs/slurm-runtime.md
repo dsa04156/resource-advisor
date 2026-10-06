@@ -84,6 +84,35 @@ terminal accounting and cancellation: account/partition/attempt are checked,
 ambiguous accounting IDs are rejected, and controller-side cancellation filters
 limit the requested operation. Live multi-user verification remains open.
 
+## Explicit CPU-only gateway scope
+
+The adapter already omits GRES for a zero-accelerator request. The forced SSH
+gateway formerly accepted only the fixed one-accelerator fixture, so it rejected
+that CPU script before `sbatch`. An operator-owned gateway configuration can now
+set `cpu_only: true` for a separate CPU route. Existing configurations default to
+the original accelerator scope; a job cannot choose this setting.
+
+The CPU scope fixes one CPU, 1024MiB host memory and zero accelerators, requires
+`allocation_mode: cpu_only` and `memory_model: host`, and forbids a configured or
+submitted GRES. The same fixed node/account/partition/QOS/output path, time bounds,
+identity exports and exact qualified runtime tail remain required. This grants
+neither automatic CUDA fallback nor permission to run arbitrary commands.
+
+[`slurm-cpu-gateway.example.json`](../examples/slurm-cpu-gateway.example.json)
+is an intentionally inactive configuration: its empty native bindings refuse
+all submissions until an operator qualifies the CPU environment and fills the
+exact guarded tail. Use a separate SSH identity/configuration for each qualified
+CPU node; do not replace the existing GPU route. Package/driver installation and
+root gateway deployment are not performed by the example.
+
+The original CPU-script rejection was reproduced, then the CPU scope and resource,
+GRES, allocation-mode, runtime and opt-in negatives passed alongside existing GPU
+adapter/gateway checks (36 focused tests). These are software contract tests,
+not actual Slurm CPU executions. The same six retained two-project identities
+were rechecked read-only on October 7; controller observations remain unavailable,
+with zero submit/cancel calls. Two-node CPU execution and Pi NPU qualification
+remain incomplete. No live gateway, scheduler configuration or old Job was changed.
+
 ## Evidence and open gate
 
 The controller and both workers [recovered on October 6](slurm-recovery.md).

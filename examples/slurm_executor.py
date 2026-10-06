@@ -70,7 +70,17 @@ def batch(config, script):
     if not re.fullmatch(r"[1-9][0-9]*", exports["RA_EPOCH"]):
         raise ValueError("invalid epoch")
     context = json.loads(exports["RA_CONTEXT_JSON"])
-    if context["resources"] != {"host_cpu": 1, "host_memory_mib": 1024, "accelerator_count": 1}:
+    cpu_only = config.get("cpu_only", False)
+    if type(cpu_only) is not bool:
+        raise ValueError("cpu_only must be an operator-configured boolean")
+    if cpu_only and (
+        config.get("gres") is not None
+        or context.get("allocation_mode") != "cpu_only"
+        or context.get("memory_model") != "host"
+    ):
+        raise ValueError("CPU-only scope cannot request accelerator resources")
+    resources = {"host_cpu": 1, "host_memory_mib": 1024, "accelerator_count": 0 if cpu_only else 1}
+    if context["resources"] != resources:
         raise ValueError("unqualified resource request")
     priority_qos = config.get("qos_by_priority", {})
     if (
@@ -101,8 +111,9 @@ def batch(config, script):
         "--time": directives.get("--time"),
         "--output": config["output_dir"] + "/" + exports["RA_ATTEMPT_ID"] + ".log",
         "--export": "NONE",
-        "--gres": config["gres"] + ":1",
     }
+    if not cpu_only:
+        expected["--gres"] = config["gres"] + ":1"
     if directives != expected or directives["--time"] not in {"1", "2"}:
         raise ValueError("batch escaped configured scope")
     tail = "\n".join(lines[index:]) + "\n"

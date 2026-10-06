@@ -20,6 +20,12 @@ No private design document or site configuration belongs in this repository.
 
 ## Implementation sequence
 
+M2's [explicit CPU gateway scope](slurm-runtime.md#explicit-cpu-only-gateway-scope)
+now accepts a separately operator-enabled zero-GRES adapter script while retaining
+the original GPU scope and all runtime/resource/owner restrictions. The CPU
+rejection and opt-in negatives have software regression evidence only; both-node
+native CPU execution remains pending controller recovery and CPU qualification.
+
 M6's [live terminal replay](result-replay.md) additionally verifies exact-result
 idempotency, terminal/epoch/attempt rejection and project/operator authorization
 through nine actual API requests. Both original Slurm attempts' DB rows, result
