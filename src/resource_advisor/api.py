@@ -142,7 +142,7 @@ def create_app(
 
     @app.post(PREFIX + "/scheduler-lab-agent/heartbeat")
     def scheduler_lab_heartbeat(value: dict, p=Depends(operator)):
-        return labs.heartbeat(value)
+        return labs.heartbeat({**value, "project_ref": p.project})
 
     @app.post(PREFIX + "/scheduler-lab-agent/{ref}")
     def scheduler_lab_report(ref: str, value: LabReport, p=Depends(operator)):

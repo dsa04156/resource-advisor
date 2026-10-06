@@ -31,14 +31,15 @@ class Agent:
         self.slurm_ids = []
         self.reservation = None
 
-    def api(self, path, body):
+    def api(self, path, body=None, key=None):
         credential = json.loads(Path(self.c["credentials_file"]).read_text())
         req = urllib.request.Request(
             credential["api_url"].rstrip("/") + "/api/v1/compute" + path,
-            data=json.dumps(body).encode(),
+            data=json.dumps(body).encode() if body is not None else None,
             headers={
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + credential["operator_token"],
+                **({"Idempotency-Key": key} if key else {}),
             },
         )
         with urllib.request.urlopen(req, context=self.context, timeout=15) as response:
@@ -49,7 +50,9 @@ class Agent:
             "/scheduler-lab-agent/heartbeat",
             {
                 "scenarios": ["backfill", "gang", "topology"]
-                + (["multi_gpu"] if self.c.get("multi_gpu") else []),
+                + (["multi_gpu"] if self.c.get("multi_gpu") else [])
+                + (["heterogeneous"] if self.c.get("heterogeneous") else []),
+                "heterogeneous": self.c.get("heterogeneous", []),
                 "multi_gpu": self.c.get("multi_gpu", {}),
                 "kubernetes": "Kueue native admission + hostname topology",
                 "slurm": "Native sched/backfill + bounded reservation window",
@@ -381,6 +384,65 @@ class Agent:
             f"물리 GPU {count}개에서 {count}개 worker 모두 CUDA 계산 완료 · 결과 {count}/{count} 검증"
         )
 
+    def heterogeneous(self):
+        self.snapshot.update(
+            backend="Platform adapters",
+            policy="GPU + NPU workloads",
+            heterogeneous=True,
+            phase="SUBMIT",
+            platform_jobs=[],
+            jobs=[],
+            explanation="GPU용 CUDA/CNN 작업과 NPU용 ResNet-50을 각 검증된 실행 경로로 제출합니다. 공통 큐가 아니라 장치별 네이티브 큐에서 실행합니다.",
+        )
+        for i, task in enumerate(self.c["heterogeneous"]):
+            result = self.api(
+                "/jobs",
+                {
+                    "workload_ref": task["workload_ref"],
+                    "scheduling_profile_ref": task["profile_ref"],
+                    "mode": "observe",
+                },
+                key=f"{self.ref}-registered-{i}",
+            )
+            self.snapshot["platform_jobs"].append({**task, "job_id": result["job_id"]})
+            self.report("등록된 " + task["device_class"].upper() + " 작업 접수")
+        self.snapshot["phase"] = "EXECUTION"
+        while True:
+            jobs = []
+            for task in self.snapshot["platform_jobs"]:
+                view = self.api("/jobs/" + task["job_id"] + "/view")
+                jobs.append(
+                    {
+                        "id": task["job_id"],
+                        "label": task["name"],
+                        "state": view["state"],
+                        "device_class": task["device_class"],
+                        "workload_ref": task["workload_ref"],
+                        "backend": view.get("backend"),
+                        "reason": view.get("scheduler_reason") or view.get("error"),
+                        "native_id": view.get("external_id"),
+                        "node": view.get("node_ref"),
+                        "requested": view.get("requested_resources"),
+                        "tracking": view.get("tracking"),
+                        "result": view.get("result"),
+                        "started_at": view.get("started_at"),
+                        "finished_at": view.get("finished_at"),
+                        "lifecycle_events": view.get("lifecycle_events", []),
+                        "pods": [],
+                    }
+                )
+            self.snapshot["jobs"] = jobs
+            self.tick("GPU·NPU 네이티브 작업 상태와 결과 관측")
+            if any(j["state"] in {"FAILED", "CANCELED", "RESULT_INVALID"} for j in jobs):
+                raise RuntimeError(
+                    "이기종 작업 중 실패가 있습니다. 작업 상세의 실제 오류를 확인하세요"
+                )
+            if all(j["state"] == "SUCCEEDED" for j in jobs):
+                self.snapshot["verdict"] = (
+                    f"GPU·NPU {len(jobs)}개 등록 작업 모두 실제 실행 성공 · 작업별 결과와 MLflow 기록 확인 가능"
+                )
+                return
+
     def topology(self):
         self.snapshot.update(
             backend="Kueue",
@@ -551,6 +613,28 @@ class Agent:
     def cleanup(self):
         # Attempt both backends even if one is unavailable. Never delete by a broad name.
         errors = []
+        pending = []
+        for task in self.snapshot.get("platform_jobs", []):
+            try:
+                view = self.api("/jobs/" + task["job_id"] + "/view")
+                if view["state"] not in {"SUCCEEDED", "FAILED", "CANCELED", "RESULT_INVALID"}:
+                    self.api("/jobs/" + task["job_id"] + "/cancel", {})
+                    pending.append(task["job_id"])
+            except (OSError, RuntimeError, ValueError) as exc:
+                errors.append(str(exc)[:300])
+        until = time.monotonic() + 25
+        while pending and time.monotonic() < until:
+            self.heartbeat()
+            pending = [
+                ident
+                for ident in pending
+                if self.api("/jobs/" + ident + "/view")["state"]
+                not in {"SUCCEEDED", "FAILED", "CANCELED", "RESULT_INVALID"}
+            ]
+            if pending:
+                time.sleep(2)
+        if pending:
+            errors.append("Cancellation pending; inspect platform jobs: " + ",".join(pending))
         try:
             self.kube(
                 "delete",

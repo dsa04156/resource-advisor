@@ -150,3 +150,10 @@ per worker. The three worker cards show actual CUDA model and architecture and
 select worker evidence. Waiting workers keep readable empty states. On mobile,
 counters use two columns and workers stack; configured physical capacity is never
 presented as current fleet availability or a performance speedup.
+
+Native timeline playback: completed history auto-plays once on initial open or
+explicit history selection; running experiments remain live. Playback uses saved
+snapshots every two seconds at 1×, labelled compressed observation intervals.
+Pause/resume, restart, 0.5/1/2/4×, seek, and latest-record controls are explicit.
+Seek and event clicks pause. Playback stops at the end, on page navigation, on
+project reset and when the browser tab becomes hidden. No new workload is submitted.
