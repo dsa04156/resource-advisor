@@ -27,6 +27,20 @@
     "/usr/local/libexec/hairp-lab-slurm-transport"
   ],
   "lock_file": "/var/lib/hairp/scheduler-lab.lock",
+  "heterogeneous": [
+    {
+      "name": "GPU CUDA workload",
+      "device_class": "gpu",
+      "workload_ref": "REPLACE_WITH_QUALIFIED_GPU_WORKLOAD",
+      "profile_ref": "REPLACE_WITH_PROJECT_PROFILE"
+    },
+    {
+      "name": "NPU inference workload",
+      "device_class": "npu",
+      "workload_ref": "REPLACE_WITH_QUALIFIED_NPU_WORKLOAD",
+      "profile_ref": "REPLACE_WITH_PROJECT_PROFILE"
+    }
+  ],
   "multi_gpu": {
     "max_gpus": 3,
     "queue": "multi-gpu-poc",

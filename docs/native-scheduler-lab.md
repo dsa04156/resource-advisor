@@ -1,10 +1,11 @@
-# Native GPU scheduling lab
+# Native accelerator scheduling lab
 
 Open **Console → 스케줄링 실험실** (`/console#scheduler-lab`). Select a scenario,
 then **실제 GPU로 실험 시작**. The server persists a request; an external bounded
 runner submits real native jobs and publishes observed snapshots every few seconds.
 Closing the browser does not stop the experiment. **실험 중지** cancels this run.
 The history selector and timeline replay stored observations, not synthetic progress.
+For GPU and NPU workloads together, choose **GPU + NPU PoC** and its execution button.
 
 ## What the three experiments actually demonstrate
 
@@ -184,3 +185,56 @@ The count-1 and count-2 options were not separately replayed as new full experim
 대기 중에는 네이티브 quota 사유를, 입장 후에는 worker별 실제 GPU 모델과
 아키텍처를 보여주세요. 마지막에는 3/3 결과를 확인하고 타임라인으로 대기
 시점에 돌아가면 됩니다. 다시 실행하지 않아도 완료한 기록으로 설명할 수 있습니다.
+
+## GPU + NPU PoC: registered workloads, normal scheduler routing
+
+Configure `heterogeneous` with existing, qualified workload/profile references.
+The runner submits these through the ordinary Job API without selecting a physical
+device. Each workload retains its compatible runtime, native queue, result collection
+and experiment tracking. The UI displays each actual job's state, placement, pending
+reason and result link. Device registration alone does not qualify a model for this
+scenario: other discovered NPUs remain visible with their reported allocation and
+missing-template explanation.
+
+This scenario is restricted to the authenticated runner's project. Its configured
+operator credential must not submit jobs on behalf of an unrelated project. Known
+child job IDs are persisted after submission; cancellation requests their ordinary
+API cancellation and waits for terminal states. Unconfirmed cleanup remains an error.
+A crash or lost response between acceptance and recording a child ID leaves a small
+orphan-observation window. Existing ordinary job limits bound execution; this is not
+an exactly-once transaction or a highly available orchestration service.
+
+On 2026-10-06, a browser-launched run completed three real jobs: CUDA on RTX 5060 Ti,
+CNN inference on RTX 5080, and ResNet-50 on Hailo-8. All three reported `SUCCEEDED`
+with collected result objects. These are independent workloads on compatible
+accelerators, not one GPU/NPU distributed training group. Different models and
+measurement boundaries do not establish a cross-device performance ranking.
+
+## Automatic playback and live updates
+
+Completed history automatically plays once when opened. Pause, seek and select
+0.5×, 1×, 2× or 4× speed; 1× advances one recorded snapshot every two seconds.
+Intervals are compressed for presentation: use recorded timestamps for execution
+duration. Playback stops at the end, when leaving the page or when the tab is hidden.
+Newly launched runs stay live rather than rewinding on completion.
+
+The banner distinguishes historical playback from live polling every three seconds,
+and shows the last successful response time. **최신 기록으로** exits playback and
+requests fresh data. Network requests time out after eight seconds; stale API or
+runner heartbeats disable launch. Focusing a selector no longer blocks live rendering.
+
+The lab's former long-running `kubectl port-forward` could remain active while its
+streams timed out, causing HTTPS and runner heartbeat stalls. The private lab host
+now uses a systemd socket and `systemd-socket-proxyd` TCP passthrough to the stable
+Kubernetes Service TLS port. The public-facing URL and TLS termination are unchanged.
+This requires host-to-Service routing and is a lab access arrangement, not a general
+production ingress. Recreating the Service with a different ClusterIP requires an
+operator to update the private proxy destination. Host addresses and unit files are
+kept outside the public repository.
+
+Focused verification covered automatic advancement, speed change, pause, returning
+to live mode, and response timestamps changing while a selector retained focus.
+The same HTTPS endpoint responded after API pod replacement without reconnecting
+the proxy. Desktop and 390px layouts were inspected. Eleven existing focused
+API/console tests passed; after adding the project-isolation regression, all three
+scheduler-lab tests passed. Raw run evidence and screenshots remain private.
