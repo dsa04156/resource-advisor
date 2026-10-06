@@ -34,9 +34,19 @@ class Principal:
     operator: bool = False
 
 
-def create_app(service: Service, credentials: dict[str, Principal], *, artifact_storage=None):
+def create_app(
+    service: Service,
+    credentials: dict[str, Principal],
+    *,
+    artifact_storage=None,
+    anonymous_project=None,
+):
     if not credentials:
         raise ValueError("at least one external credential hash is required")
+    if anonymous_project is not None and anonymous_project not in {
+        identity.project for identity in credentials.values()
+    }:
+        raise ValueError("anonymous project must be an existing configured project")
     app = FastAPI(title="Resource Advisor", version="0.1.0")
     from .study import Studies
 
@@ -44,6 +54,8 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
     model_qualifications = Qualifications(service.store)
 
     def principal(authorization: str = Header(default="")):
+        if not authorization and anonymous_project is not None:
+            return Principal(anonymous_project)
         if not authorization.startswith("Bearer "):
             raise HTTPException(401, "Bearer token required")
         digest = hashlib.sha256(authorization[7:].encode()).hexdigest()
@@ -87,6 +99,13 @@ def create_app(service: Service, credentials: dict[str, Principal], *, artifact_
     @app.get("/console", include_in_schema=False)
     def console_shell():
         return FileResponse(Path(__file__).parent / "static" / "index.html")
+
+    @app.get("/console/session", include_in_schema=False)
+    def console_session():
+        return {
+            "authentication_required": anonymous_project is None,
+            "project_ref": anonymous_project,
+        }
 
     @app.get("/console/{asset}", include_in_schema=False)
     def console_asset(asset: str):

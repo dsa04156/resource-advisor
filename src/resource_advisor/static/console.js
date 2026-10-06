@@ -1,5 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const API = "/api/v1/compute";
+let anonymousConnected = false;
+function authHeaders() { return token ? { Authorization: "Bearer " + token } : {}; }
 let token = "",
   generation = 0,
   controller = null,
@@ -12,13 +14,14 @@ const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, quali
 const submitting = new Set();
 const requestKeys = new Map();
 
-function submitButton(workload, candidate) {
-  const key = `ra-submit:${data.project_ref}:${workload.workload_ref}:${candidate.candidate_ref}`;
+function submitButton(workload, candidate, approval = null) {
+  const label = approval ? "승인한 구성 실행" : "관측 실행";
+  const key = `ra-submit:${data.project_ref}:${workload.workload_ref}:${candidate.candidate_ref}${approval ? ":" + approval.ref : ""}`;
   let saved = requestKeys.get(key);
   try { saved ||= sessionStorage.getItem(key); } catch (_) { /* Memory fallback. */ }
   if (saved) requestKeys.set(key, saved);
-  const button = el("button", submitting.has(key) ? "제출 중…" : saved ? "제출 확인 재시도" : "관측 실행", "primary");
-  button.setAttribute("aria-label", `관측 실행 · ${workload.workload_ref} · ${candidate.candidate_ref}`);
+  const button = el("button", submitting.has(key) ? "제출 중…" : saved ? "제출 확인 재시도" : label, "primary");
+  button.setAttribute("aria-label", `${label} · ${workload.workload_ref} · ${candidate.candidate_ref}`);
   button.disabled = !candidate.contract_compatible_now || submitting.has(key);
   button.onclick = async () => {
     if (submitting.has(key)) return;
@@ -34,8 +37,9 @@ function submitButton(workload, candidate) {
     try {
       const response = await fetch(API + "/jobs", {
         method: "POST",
-        headers: { Authorization: "Bearer " + token, "Content-Type": "application/json", "Idempotency-Key": requestKeys.get(key) },
-        body: JSON.stringify({ workload_ref: workload.workload_ref, candidate_ref: candidate.candidate_ref, mode: "observe" }),
+        headers: { ...authHeaders(), "Content-Type": "application/json", "Idempotency-Key": requestKeys.get(key) },
+        body: JSON.stringify({ workload_ref: workload.workload_ref, candidate_ref: candidate.candidate_ref,
+          mode: approval ? "fixed" : "observe", ...(approval ? { approval_ref: approval.ref } : {}) }),
       });
       if (!response.ok) throw new Error("작업을 제출하지 못했습니다. 계약 상태와 프로젝트 권한을 확인해 주세요.");
       const job = await response.json();
@@ -58,6 +62,80 @@ function submitButton(workload, candidate) {
   const resources = candidate.resources;
   return add(el("div"), button, resources ? el("small",
     `가속기 ${resources.accelerator_count} · CPU ${resources.host_cpu} · ${resources.host_memory_mib} MiB · 최대 ${workload.max_run_seconds}초`) : null);
+}
+const recommending = new Set(), approving = new Set(), approvals = new Map();
+function recommendButton(workload) {
+  const key = `${data.project_ref}:${workload.workload_ref}`;
+  const button = el("button", recommending.has(key) ? "추천 확인 중…" : "추천 받기");
+  button.setAttribute("aria-label", `추천 받기 · ${workload.workload_ref}`);
+  button.disabled = recommending.has(key);
+  button.onclick = async () => {
+    if (recommending.has(key)) return;
+    const session = generation;
+    recommending.add(key); button.disabled = true;
+    try {
+      const response = await fetch(API + "/recommendations", {
+        method: "POST", headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ workload_ref: workload.workload_ref }),
+      });
+      if (!response.ok) throw new Error("추천을 확인하지 못했습니다. 작업 등록과 접근 권한을 확인해 주세요.");
+      const recommendation = await response.json();
+      if (session !== generation) return;
+      pages.recommendations = 0; active = "recommendations"; location.hash = active;
+      await load();
+      $("notice").textContent = recommendation.candidate_ref
+        ? "추천을 만들었습니다. 근거와 요청 자원을 확인한 뒤 승인해 주세요."
+        : "지금은 추천을 보류했습니다. 근거 보기에서 부족한 조건을 확인해 주세요.";
+    } catch (error) {
+      if (session === generation) $("notice").textContent = error.message;
+    } finally {
+      recommending.delete(key);
+      if (session === generation) render();
+    }
+  };
+  return add(el("div"), button, el("small", "기록된 실행 이력으로 추천합니다. 새 계산 작업은 실행하지 않습니다."));
+}
+function approvalControls(recommendation) {
+  const r = recommendation, c = r.selected_context;
+  if (!r.measured || !r.candidate_ref || !c) return el("small", "추천 보류 상태에서는 승인·실행할 수 없습니다.");
+  if (Date.parse(r.expires_at) <= effectiveNow()) return el("small", "승인 기한이 지났습니다. 가속기 호환성에서 추천을 다시 받아 주세요.");
+  const key = `ra-approval:${data.project_ref}:${r.ref}`;
+  if (!approvals.has(key)) {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(key));
+      if (saved?.ref && saved.recommendation_digest === r.digest && saved.candidate_ref === r.candidate_ref)
+        approvals.set(key, saved);
+    } catch (_) { /* Memory fallback; server revalidates every approval. */ }
+  }
+  const approved = approvals.get(key);
+  if (approved) return add(el("div"), el("small", "구성 승인됨 · 실행 버튼을 눌러야 새 작업이 생성됩니다."),
+    submitButton({ workload_ref: r.workload_ref, max_run_seconds: c.max_run_seconds },
+      { candidate_ref: r.candidate_ref, contract_compatible_now: true, resources: c.resources }, approved));
+  const button = el("button", approving.has(key) ? "승인 확인 중…" : "이 구성 승인");
+  button.setAttribute("aria-label", `이 구성 승인 · ${r.ref}`);
+  button.disabled = approving.has(key);
+  button.onclick = async () => {
+    if (approving.has(key)) return;
+    const session = generation;
+    approving.add(key); button.disabled = true;
+    try {
+      const response = await fetch(API + "/recommendations/" + encodeURIComponent(r.ref) + "/approve", {
+        method: "POST", headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ recommendation_digest: r.digest, candidate_ref: r.candidate_ref }),
+      });
+      if (!response.ok) throw new Error("승인하지 못했습니다. 추천의 유효기간·근거·실행 환경을 다시 확인해 주세요.");
+      const approval = await response.json();
+      approvals.set(key, approval);
+      try { sessionStorage.setItem(key, JSON.stringify(approval)); } catch (_) { /* No credential stored. */ }
+      if (session === generation) $("notice").textContent = "구성을 승인했습니다. 실행은 아직 시작하지 않았습니다.";
+    } catch (error) {
+      if (session === generation) $("notice").textContent = error.message;
+    } finally {
+      approving.delete(key);
+      if (session === generation) render();
+    }
+  };
+  return add(el("div"), button, el("small", "승인 시 현재 근거를 다시 검사합니다. 승인은 자원 예약이 아닙니다."));
 }
 const views = {
   execution: [
@@ -422,7 +500,7 @@ function cancelButton(job) {
     try {
       const response = await fetch(API + "/jobs/" + encodeURIComponent(job.job_id) + "/cancel", {
         method: "POST",
-        headers: { Authorization: "Bearer " + token },
+        headers: authHeaders(),
       });
       if (!response.ok) throw new Error("취소 요청을 확인하지 못했습니다. 같은 작업에서 다시 요청할 수 있습니다.");
       const current = await response.json();
@@ -620,7 +698,8 @@ function compatibilityView() {
           " · " +
           w.precision +
           " · 최종 자원 승인은 Kueue / Slurm이 결정합니다.",
-        table(["실행 후보", "장비 / 백엔드", "검증 단계", "현재 검사", "작업 제출"], rows),
+        add(el("div"), recommendButton(w),
+          table(["실행 후보", "장비 / 백엔드", "검증 단계", "현재 검사", "작업 제출"], rows)),
       ),
     );
   }
@@ -1088,7 +1167,7 @@ function recommendationsView() {
       content.append(
         el(
           "p",
-          `${c.accelerator_model} · ${c.device_class.toUpperCase()} ${c.resources.accelerator_count} · CPU ${c.resources.host_cpu} cores`,
+          `${c.accelerator_model} · ${c.device_class.toUpperCase()} ${c.resources.accelerator_count} · CPU ${c.resources.host_cpu} · 메모리 ${c.resources.host_memory_mib} MiB · 최대 ${c.max_run_seconds}초`,
           "muted",
         ),
       );
@@ -1104,7 +1183,7 @@ function recommendationsView() {
         const response = await fetch(
           API + "/recommendations/" + encodeURIComponent(r.ref) + "/evidence",
           {
-            headers: { Authorization: "Bearer " + token },
+            headers: authHeaders(),
             signal: controller.signal,
             cache: "no-store",
           },
@@ -1125,7 +1204,7 @@ function recommendationsView() {
         if (session === generation) b.disabled = false;
       }
     };
-    add(content, b, target);
+    add(content, b, target, approvalControls(r));
     root.append(
       panel(
         r.workload_ref,
@@ -1153,7 +1232,7 @@ function render() {
   $("section-label").textContent = label;
   $("view-title").textContent = title;
   $("view-description").textContent = description;
-  $("identity").textContent = data.project_ref;
+  $("identity").textContent = data.project_ref + (anonymousConnected ? " · 토큰 없이 연결" : "");
   $("updated").textContent = "조회 " + stamp(data.generated_at);
   $("content").replaceChildren(
     {
@@ -1165,7 +1244,7 @@ function render() {
   );
   $("workspace").hidden = false;
   $("connect").hidden = true;
-  $("logout").hidden = false;
+  $("logout").hidden = anonymousConnected;
   clearTimeout(expiryTimer);
   const expirations = data.inventory
     .flatMap((s) => [
@@ -1191,6 +1270,7 @@ function reset(message = "") {
   controller = null;
   pending = false;
   token = "";
+  anonymousConnected = false;
   data = null;
   clearTimeout(expiryTimer);
   $("content").replaceChildren();
@@ -1203,7 +1283,7 @@ function reset(message = "") {
   Object.keys(pages).forEach((k) => (pages[k] = 0));
 }
 async function load() {
-  if (!token || pending) return;
+  if ((!token && !anonymousConnected) || pending) return;
   pending = true;
   const session = generation;
   $("refresh").disabled = true;
@@ -1212,7 +1292,7 @@ async function load() {
   );
   try {
     const response = await fetch(API + "/overview?" + query, {
-      headers: { Authorization: "Bearer " + token },
+      headers: authHeaders(),
       signal: controller.signal,
       cache: "no-store",
     });
@@ -1282,6 +1362,22 @@ function navigate(event) {
 window.addEventListener("hashchange", navigate);
 navigate();
 setInterval(() => {
-  if ($("auto").checked && token) load();
+  if ($("auto").checked && (token || anonymousConnected)) load();
 }, 15000);
 window.addEventListener("pagehide", () => reset());
+
+async function connectDefaultProject() {
+  const session = generation;
+  try {
+    const response = await fetch("/console/session", { cache: "no-store" });
+    if (!response.ok) return;
+    const config = await response.json();
+    if (session !== generation || token || config.authentication_required || !config.project_ref) return;
+    anonymousConnected = true;
+    controller = new AbortController();
+    $("connect").hidden = true;
+    $("notice").textContent = "기본 프로젝트에 연결하는 중…";
+    await load();
+  } catch (_) { /* Existing token login remains available if discovery fails. */ }
+}
+connectDefaultProject();

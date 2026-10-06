@@ -7,7 +7,11 @@ rows offer an observe-run button with accelerator/CPU/memory/time limits. Pendin
 requests disable repeat clicks; uncertain responses reuse the same idempotency
 key across refreshes without storing credentials. Active job rows offer explicit
 cancellation; requested cancellation remains pending until backend termination is
-observed. Terminal rows offer no cancellation control. Approval remains a distinct API operation.
+observed. Terminal rows offer no cancellation control. Workload panels offer
+recommendation creation without starting compute. Recommendation panels separate
+evidence review, configuration approval and a later explicit execution action.
+Abstained or expired recommendations cannot be approved. Approval references may
+persist within the tab; credentials never do.
 
 Domain: accelerator inventory, scheduler reservations, device sharing, source
 freshness, runtime qualification, independent confirmation, allocation ledger.
@@ -30,7 +34,9 @@ Resource bars: native meter element, value and units always visible; unavailable
 and stale states have text and no filled bar. Green never denotes qualification
 unless the existing compatibility check passes for that specific candidate.
 Native controls: links for navigation, buttons for actions, details for provenance,
-labeled password input for project token, no custom keyboard widget.
+labeled password input for authenticated installs; shared-lab mode auto-connects
+to the server-selected project and hides login/logout. No credential is embedded
+in assets. No custom keyboard widget.
 Responsive: navigation becomes horizontal; tables keep local overflow wrappers;
 page itself must fit a 390px viewport. No animated data transitions.
 

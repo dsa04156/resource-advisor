@@ -5,7 +5,13 @@ this project's own API and database; it does not embed or copy another platform'
 application. The console ships as static assets inside the Python package and
 needs no separate Node server or frontend build to run.
 
-Connect with a project API bearer token. Use HTTPS beyond localhost. The token
+Operators can set `RA_ANONYMOUS_PROJECT` to an existing configured project for a
+shared lab console. The browser discovers this mode at `/console/session` and
+connects without a token. Unauthenticated API calls then have that project’s
+ordinary user rights, including submission and cancellation. They cannot register
+operator-qualified capabilities or access another project. Explicit invalid
+tokens still fail. No credential is embedded in assets or returned by discovery.
+Leave the setting unset to require project API bearer tokens. Use HTTPS beyond localhost. The token
 is held only in this tab's module memory, cleared from the password field after
 connection, and sent in the Authorization header. It is not stored in browser
 storage, cookies, URL parameters or an asset. Refreshing or disconnecting clears
@@ -36,8 +42,15 @@ expired candidates cannot be submitted through this control. Active execution ro
 offer **작업 취소**, using the same project-authenticated cancellation API. Repeated
 requests are idempotent. A cancellation request remains **백엔드 종료 확인 중** until
 the scheduler confirms termination; completion racing cancellation can still be
-reported as completed. Terminal rows have no cancellation control. Approval,
-migration and restart remain separate API operations.
+reported as completed. Terminal rows have no cancellation control. Workload panels also offer
+**추천 받기**, which records a recommendation without submitting compute. Each
+recommendation exposes the stored body digest for exact approval, selected
+resources and run-time limit. Users inspect evidence, select **이 구성 승인**,
+then separately select **승인한 구성 실행** to submit fixed mode with the returned
+approval reference. Abstained/expired recommendations have no approval action.
+Approval references persist in tab session storage to retain submission identity
+after an uncertain response; they are not credentials and the API rechecks them.
+Migration and restart remain separate API operations.
 
 Submission disables duplicate clicks. An uncertain response retains its
 idempotency key in tab session storage; retrying the same candidate uses that key

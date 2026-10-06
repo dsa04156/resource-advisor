@@ -79,6 +79,7 @@ def selected_context(store, conn, project, rec):
         "resources": context["resources"],
         "allocation_mode": context["allocation_mode"],
         "device_class": variant["device_class"] if variant else "unknown",
+        "max_run_seconds": spec["execution"]["max_run_seconds"],
     }
 
 
@@ -186,7 +187,11 @@ def overview(
             conn, entity_query("recommendation", project), recommendations_page
         )
         recommendations["items"] = [
-            {**r["body"], "selected_context": selected_context(store, conn, project, r["body"])}
+            {
+                **r["body"],
+                "digest": r["digest"],
+                "selected_context": selected_context(store, conn, project, r["body"]),
+            }
             for r in rows
         ]
         from .qualifications import list_page as qualification_page

@@ -55,6 +55,9 @@ def test_console_auth_and_project_isolation_without_side_effects(service):
         assert a.json()["jobs"]["total"] == 1
         assert a.json()["history"]["total"] == 1
         assert a.json()["recommendations"]["total"] == 1
+        displayed = a.json()["recommendations"]["items"][0]
+        assert displayed["digest"] == rec["digest"]
+        assert displayed["selected_context"] is None  # Insufficient history abstains.
         assert a.json()["inventory"][0]["ref"] == snapshot["ref"]
         b = client.get("/api/v1/compute/overview", headers={"Authorization": "Bearer b"}).json()
         assert b["inventory"] == [] and b["job_counts"] == {}
@@ -100,6 +103,50 @@ def test_overview_pagination_and_latest_inventory(service):
     assert fresh_view(old)["status"] == "stale"
 
 
+def test_optional_anonymous_project_keeps_operator_and_other_projects_protected(service):
+    credentials = {
+        hashlib.sha256(b"a").hexdigest(): Principal("team-a", operator=True),
+        hashlib.sha256(b"b").hexdigest(): Principal("team-b"),
+    }
+    with TestClient(create_app(service, credentials, anonymous_project="team-a")) as client:
+        assert client.get("/console/session").json() == {
+            "authentication_required": False,
+            "project_ref": "team-a",
+        }
+        assert client.get("/api/v1/compute/overview").json()["project_ref"] == "team-a"
+        assert (
+            client.get("/api/v1/compute/overview", headers={"Authorization": "Bearer b"}).json()[
+                "project_ref"
+            ]
+            == "team-b"
+        )
+        assert (
+            client.get(
+                "/api/v1/compute/overview", headers={"Authorization": "Bearer wrong"}
+            ).status_code
+            == 401
+        )
+        assert client.post("/api/v1/compute/capabilities", json={}).status_code == 403
+        response = client.post(
+            "/api/v1/compute/jobs",
+            json={"workload_ref": "workload-1", "candidate_ref": "base"},
+            headers={"Idempotency-Key": "anonymous"},
+        )
+        assert response.status_code == 200
+        job_id = response.json()["job_id"]
+        assert (
+            client.get(
+                f"/api/v1/compute/jobs/{job_id}", headers={"Authorization": "Bearer b"}
+            ).status_code
+            == 404
+        )
+    with TestClient(create_app(service, credentials)) as client:
+        assert client.get("/console/session").json()["authentication_required"] is True
+        assert client.get("/api/v1/compute/overview").status_code == 401
+    with pytest.raises(ValueError):
+        create_app(service, credentials, anonymous_project="unconfigured")
+
+
 def test_contract_view_rechecks_expiry_without_promoting_inventory(service, monkeypatch):
     before = overview(service, "team-a")["compatibility"]["items"][0]["candidates"][0]
     assert before["contract_compatible_now"] is True
@@ -115,6 +162,9 @@ def test_recommendation_comparison_requires_approved_independent_measured_result
     for i in range(3):
         complete(service, str(i), elapsed=2)
     rec = service.recommend("team-a", "workload-1")
+    displayed = overview(service, "team-a")["recommendations"]["items"][0]
+    assert displayed["digest"] == rec["digest"]
+    assert displayed["selected_context"]["max_run_seconds"] > 0
     initial = recommendation_evidence(service, "team-a", rec["ref"])
     assert len(initial["evidence_runs"]) == 3 and initial["approved_executions"] == []
     approval = service.approve(

@@ -212,7 +212,12 @@ def main():
 
             artifact_storage = S3Artifacts(**artifact_config)
         uvicorn.run(
-            create_app(service, credentials, artifact_storage=artifact_storage),
+            create_app(
+                service,
+                credentials,
+                artifact_storage=artifact_storage,
+                anonymous_project=os.getenv("RA_ANONYMOUS_PROJECT") or None,
+            ),
             host=args.host,
             port=args.port,
             ssl_keyfile=args.ssl_keyfile,
