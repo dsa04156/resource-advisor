@@ -1,5 +1,10 @@
 # Orin PyTorch F0: numerical pass, execution gate blocked
 
+This is the retained first CNN qualification. Subsequent
+[cgroup/device enforcement](slurm-limits-v2-results.md) now limits the worker;
+the unset TaskPlugin observation below describes the original run. The framework
+compatibility finding and lack of automatic runtime registration still apply.
+
 The [fixed plan](slurm-torch-plan.md) executed exactly one real Slurm GPU Job on
 October 6. It completed with exit `0:0`, and all 400 compared CNN outputs agreed
 with the CPU reference. The runtime is **not registered for automatic execution**:

@@ -1,0 +1,1151 @@
+{
+  "schema_version": "v1",
+  "collector_source_commit": "0812263f9aa1c549d9f2b5d33523f724a5b016ba",
+  "observer_source_commit": "868bb7e8134dafe8fd0c76d8734b17a81655834f",
+  "trial_state": "PASS",
+  "snapshots": {
+    "baseline": {
+      "schema_version": "v1",
+      "backend": "slurm",
+      "ref": "inv-f5fcc497ee624a328dfb03aac2796255",
+      "cluster_ref": "lab-slurm",
+      "collected_at": "2026-10-06T02:51:01.859146+00:00",
+      "stale_after_seconds": 120,
+      "status": "partial",
+      "sources": {
+        "slurm_nodes": "ok",
+        "slurm_queue": "ok",
+        "prometheus": "not_configured"
+      },
+      "nodes": [
+        {
+          "node_ref": "slurm-npu-lab",
+          "hardware": {
+            "architecture": "aarch64",
+            "operatingSystem": "Linux 6.18.34+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.18.34-1+rpt1 (2026-06-09)",
+            "slurmdVersion": "24.11.5"
+          },
+          "resources": {
+            "cpu": {
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "capacity": {
+                "value": 4,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 4,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 4,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            },
+            "memory": {
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "capacity": {
+                "value": 4089446400,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 4089446400,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 4089446400,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            }
+          },
+          "telemetry": {},
+          "scheduler_state": {
+            "value": [
+              "IDLE"
+            ],
+            "observed_at": "2026-10-06T02:51:01.859146+00:00",
+            "source": "slurm-controller",
+            "status": "ok",
+            "unit": null
+          },
+          "accelerator_inventory": {
+            "value": {
+              "reported_gres": false,
+              "mapped_resources": []
+            },
+            "observed_at": "2026-10-06T02:51:01.859146+00:00",
+            "source": "slurm-controller",
+            "status": "ok",
+            "unit": null
+          },
+          "scheduling_blockers": []
+        },
+        {
+          "node_ref": "slurm-gpu-lab",
+          "hardware": {
+            "architecture": "aarch64",
+            "operatingSystem": "Linux 6.8.12-1021-tegra #1 SMP PREEMPT Thu Aug  6 21:56:04 PDT 2026",
+            "slurmdVersion": "24.11.5"
+          },
+          "resources": {
+            "cpu": {
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "capacity": {
+                "value": 6,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 6,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 6,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            },
+            "memory": {
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "capacity": {
+                "value": 7549747200,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 7549747200,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 7549747200,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            },
+            "gres/gpu": {
+              "device_class": "gpu",
+              "allocation_mode": "physical_device",
+              "capacity": {
+                "value": 1,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 1,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 1,
+                "observed_at": "2026-10-06T02:51:01.859146+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            }
+          },
+          "telemetry": {},
+          "scheduler_state": {
+            "value": [
+              "IDLE"
+            ],
+            "observed_at": "2026-10-06T02:51:01.859146+00:00",
+            "source": "slurm-controller",
+            "status": "ok",
+            "unit": null
+          },
+          "accelerator_inventory": {
+            "value": {
+              "reported_gres": true,
+              "mapped_resources": [
+                "gres/gpu"
+              ]
+            },
+            "observed_at": "2026-10-06T02:51:01.859146+00:00",
+            "source": "slurm-controller",
+            "status": "ok",
+            "unit": null
+          },
+          "scheduling_blockers": []
+        }
+      ],
+      "queues": [],
+      "cluster_queues": [],
+      "slurm_queue": {
+        "value": {
+          "scope": "configured_account_partition_records",
+          "account": "ra-lab",
+          "partition": "compute",
+          "record_count": 0,
+          "states": {},
+          "pending_records": 0,
+          "running_records": 0,
+          "array_tasks_expanded": false
+        },
+        "observed_at": "2026-10-06T02:51:01.859146+00:00",
+        "source": "slurm-controller",
+        "status": "ok",
+        "unit": null
+      },
+      "execution_qualification": "inventory never grants runtime qualification or admission"
+    },
+    "during": {
+      "schema_version": "v1",
+      "backend": "slurm",
+      "ref": "inv-ccfaf2050a76485b8f275e7c4de91429",
+      "cluster_ref": "lab-slurm",
+      "collected_at": "2026-10-06T02:51:15.329841+00:00",
+      "stale_after_seconds": 120,
+      "status": "partial",
+      "sources": {
+        "slurm_nodes": "ok",
+        "slurm_queue": "ok",
+        "prometheus": "not_configured"
+      },
+      "nodes": [
+        {
+          "node_ref": "slurm-npu-lab",
+          "hardware": {
+            "architecture": "aarch64",
+            "operatingSystem": "Linux 6.18.34+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.18.34-1+rpt1 (2026-06-09)",
+            "slurmdVersion": "24.11.5"
+          },
+          "resources": {
+            "cpu": {
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "capacity": {
+                "value": 4,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 4,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 4,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            },
+            "memory": {
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "capacity": {
+                "value": 4089446400,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 4089446400,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 4089446400,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            }
+          },
+          "telemetry": {},
+          "scheduler_state": {
+            "value": [
+              "IDLE"
+            ],
+            "observed_at": "2026-10-06T02:51:15.329841+00:00",
+            "source": "slurm-controller",
+            "status": "ok",
+            "unit": null
+          },
+          "accelerator_inventory": {
+            "value": {
+              "reported_gres": false,
+              "mapped_resources": []
+            },
+            "observed_at": "2026-10-06T02:51:15.329841+00:00",
+            "source": "slurm-controller",
+            "status": "ok",
+            "unit": null
+          },
+          "scheduling_blockers": []
+        },
+        {
+          "node_ref": "slurm-gpu-lab",
+          "hardware": {
+            "architecture": "aarch64",
+            "operatingSystem": "Linux 6.8.12-1021-tegra #1 SMP PREEMPT Thu Aug  6 21:56:04 PDT 2026",
+            "slurmdVersion": "24.11.5"
+          },
+          "resources": {
+            "cpu": {
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "capacity": {
+                "value": 6,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 6,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 1,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 5,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            },
+            "memory": {
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "capacity": {
+                "value": 7549747200,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 7549747200,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 536870912,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 7012876288,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            },
+            "gres/gpu": {
+              "device_class": "gpu",
+              "allocation_mode": "physical_device",
+              "capacity": {
+                "value": 1,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 1,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 1,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:51:15.329841+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            }
+          },
+          "telemetry": {},
+          "scheduler_state": {
+            "value": [
+              "MIXED"
+            ],
+            "observed_at": "2026-10-06T02:51:15.329841+00:00",
+            "source": "slurm-controller",
+            "status": "ok",
+            "unit": null
+          },
+          "accelerator_inventory": {
+            "value": {
+              "reported_gres": true,
+              "mapped_resources": [
+                "gres/gpu"
+              ]
+            },
+            "observed_at": "2026-10-06T02:51:15.329841+00:00",
+            "source": "slurm-controller",
+            "status": "ok",
+            "unit": null
+          },
+          "scheduling_blockers": []
+        }
+      ],
+      "queues": [],
+      "cluster_queues": [],
+      "slurm_queue": {
+        "value": {
+          "scope": "configured_account_partition_records",
+          "account": "ra-lab",
+          "partition": "compute",
+          "record_count": 2,
+          "states": {
+            "RUNNING": 1,
+            "PENDING": 1
+          },
+          "pending_records": 1,
+          "running_records": 1,
+          "array_tasks_expanded": false
+        },
+        "observed_at": "2026-10-06T02:51:15.329841+00:00",
+        "source": "slurm-controller",
+        "status": "ok",
+        "unit": null
+      },
+      "execution_qualification": "inventory never grants runtime qualification or admission"
+    },
+    "after": {
+      "schema_version": "v1",
+      "backend": "slurm",
+      "ref": "inv-5140e0ce3e014cabb62cee6985857185",
+      "cluster_ref": "lab-slurm",
+      "collected_at": "2026-10-06T02:52:31.837190+00:00",
+      "stale_after_seconds": 120,
+      "status": "partial",
+      "sources": {
+        "slurm_nodes": "ok",
+        "slurm_queue": "ok",
+        "prometheus": "not_configured"
+      },
+      "nodes": [
+        {
+          "node_ref": "slurm-npu-lab",
+          "hardware": {
+            "architecture": "aarch64",
+            "operatingSystem": "Linux 6.18.34+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.18.34-1+rpt1 (2026-06-09)",
+            "slurmdVersion": "24.11.5"
+          },
+          "resources": {
+            "cpu": {
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "capacity": {
+                "value": 4,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 4,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 4,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            },
+            "memory": {
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "capacity": {
+                "value": 4089446400,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 4089446400,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 4089446400,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            }
+          },
+          "telemetry": {},
+          "scheduler_state": {
+            "value": [
+              "IDLE"
+            ],
+            "observed_at": "2026-10-06T02:52:31.837190+00:00",
+            "source": "slurm-controller",
+            "status": "ok",
+            "unit": null
+          },
+          "accelerator_inventory": {
+            "value": {
+              "reported_gres": false,
+              "mapped_resources": []
+            },
+            "observed_at": "2026-10-06T02:52:31.837190+00:00",
+            "source": "slurm-controller",
+            "status": "ok",
+            "unit": null
+          },
+          "scheduling_blockers": []
+        },
+        {
+          "node_ref": "slurm-gpu-lab",
+          "hardware": {
+            "architecture": "aarch64",
+            "operatingSystem": "Linux 6.8.12-1021-tegra #1 SMP PREEMPT Thu Aug  6 21:56:04 PDT 2026",
+            "slurmdVersion": "24.11.5"
+          },
+          "resources": {
+            "cpu": {
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "capacity": {
+                "value": 6,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 6,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 6,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            },
+            "memory": {
+              "device_class": "unknown",
+              "allocation_mode": "unknown",
+              "capacity": {
+                "value": 7549747200,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 7549747200,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 7549747200,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            },
+            "gres/gpu": {
+              "device_class": "gpu",
+              "allocation_mode": "physical_device",
+              "capacity": {
+                "value": 1,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "allocatable": {
+                "value": 1,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "requested": {
+                "value": 0,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              },
+              "request_headroom": {
+                "value": 1,
+                "observed_at": "2026-10-06T02:52:31.837190+00:00",
+                "source": "slurm-controller",
+                "status": "ok",
+                "unit": null
+              }
+            }
+          },
+          "telemetry": {},
+          "scheduler_state": {
+            "value": [
+              "IDLE"
+            ],
+            "observed_at": "2026-10-06T02:52:31.837190+00:00",
+            "source": "slurm-controller",
+            "status": "ok",
+            "unit": null
+          },
+          "accelerator_inventory": {
+            "value": {
+              "reported_gres": true,
+              "mapped_resources": [
+                "gres/gpu"
+              ]
+            },
+            "observed_at": "2026-10-06T02:52:31.837190+00:00",
+            "source": "slurm-controller",
+            "status": "ok",
+            "unit": null
+          },
+          "scheduling_blockers": []
+        }
+      ],
+      "queues": [],
+      "cluster_queues": [],
+      "slurm_queue": {
+        "value": {
+          "scope": "configured_account_partition_records",
+          "account": "ra-lab",
+          "partition": "compute",
+          "record_count": 0,
+          "states": {},
+          "pending_records": 0,
+          "running_records": 0,
+          "array_tasks_expanded": false
+        },
+        "observed_at": "2026-10-06T02:52:31.837190+00:00",
+        "source": "slurm-controller",
+        "status": "ok",
+        "unit": null
+      },
+      "execution_qualification": "inventory never grants runtime qualification or admission"
+    }
+  },
+  "observer_snapshot": {
+    "schema_version": "v1",
+    "backend": "slurm",
+    "ref": "inv-6030b94257744437acf144246ab1cb50",
+    "cluster_ref": "lab-slurm",
+    "collected_at": "2026-10-06T02:59:57.555231+00:00",
+    "stale_after_seconds": 120,
+    "status": "partial",
+    "sources": {
+      "slurm_nodes": "ok",
+      "slurm_queue": "ok",
+      "prometheus": "not_configured"
+    },
+    "nodes": [
+      {
+        "node_ref": "slurm-npu-lab",
+        "hardware": {
+          "architecture": "aarch64",
+          "operatingSystem": "Linux 6.18.34+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.18.34-1+rpt1 (2026-06-09)",
+          "slurmdVersion": "24.11.5"
+        },
+        "resources": {
+          "cpu": {
+            "device_class": "unknown",
+            "allocation_mode": "unknown",
+            "capacity": {
+              "value": 4,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "allocatable": {
+              "value": 4,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "requested": {
+              "value": 0,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "request_headroom": {
+              "value": 4,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            }
+          },
+          "memory": {
+            "device_class": "unknown",
+            "allocation_mode": "unknown",
+            "capacity": {
+              "value": 4089446400,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "allocatable": {
+              "value": 4089446400,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "requested": {
+              "value": 0,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "request_headroom": {
+              "value": 4089446400,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            }
+          }
+        },
+        "telemetry": {},
+        "scheduler_state": {
+          "value": [
+            "IDLE"
+          ],
+          "observed_at": "2026-10-06T02:59:57.555231+00:00",
+          "source": "slurm-controller",
+          "status": "ok",
+          "unit": null
+        },
+        "accelerator_inventory": {
+          "value": {
+            "reported_gres": false,
+            "mapped_resources": []
+          },
+          "observed_at": "2026-10-06T02:59:57.555231+00:00",
+          "source": "slurm-controller",
+          "status": "ok",
+          "unit": null
+        },
+        "scheduling_blockers": []
+      },
+      {
+        "node_ref": "slurm-gpu-lab",
+        "hardware": {
+          "architecture": "aarch64",
+          "operatingSystem": "Linux 6.8.12-1021-tegra #1 SMP PREEMPT Thu Aug  6 21:56:04 PDT 2026",
+          "slurmdVersion": "24.11.5"
+        },
+        "resources": {
+          "cpu": {
+            "device_class": "unknown",
+            "allocation_mode": "unknown",
+            "capacity": {
+              "value": 6,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "allocatable": {
+              "value": 6,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "requested": {
+              "value": 0,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "request_headroom": {
+              "value": 6,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            }
+          },
+          "memory": {
+            "device_class": "unknown",
+            "allocation_mode": "unknown",
+            "capacity": {
+              "value": 7549747200,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "allocatable": {
+              "value": 7549747200,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "requested": {
+              "value": 0,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "request_headroom": {
+              "value": 7549747200,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            }
+          },
+          "gres/gpu": {
+            "device_class": "gpu",
+            "allocation_mode": "physical_device",
+            "capacity": {
+              "value": 1,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "allocatable": {
+              "value": 1,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "requested": {
+              "value": 0,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            },
+            "request_headroom": {
+              "value": 1,
+              "observed_at": "2026-10-06T02:59:57.555231+00:00",
+              "source": "slurm-controller",
+              "status": "ok",
+              "unit": null
+            }
+          }
+        },
+        "telemetry": {},
+        "scheduler_state": {
+          "value": [
+            "IDLE"
+          ],
+          "observed_at": "2026-10-06T02:59:57.555231+00:00",
+          "source": "slurm-controller",
+          "status": "ok",
+          "unit": null
+        },
+        "accelerator_inventory": {
+          "value": {
+            "reported_gres": true,
+            "mapped_resources": [
+              "gres/gpu"
+            ]
+          },
+          "observed_at": "2026-10-06T02:59:57.555231+00:00",
+          "source": "slurm-controller",
+          "status": "ok",
+          "unit": null
+        },
+        "scheduling_blockers": []
+      }
+    ],
+    "queues": [],
+    "cluster_queues": [],
+    "slurm_queue": {
+      "value": {
+        "scope": "configured_account_partition_records",
+        "account": "ra-lab",
+        "partition": "compute",
+        "record_count": 0,
+        "states": {},
+        "pending_records": 0,
+        "running_records": 0,
+        "array_tasks_expanded": false
+      },
+      "observed_at": "2026-10-06T02:59:57.555231+00:00",
+      "source": "slurm-controller",
+      "status": "ok",
+      "unit": null
+    },
+    "execution_qualification": "inventory never grants runtime qualification or admission"
+  },
+  "accounting": [
+    {
+      "job": "holder",
+      "step": "allocation",
+      "state": "COMPLETED",
+      "exit": "0:0",
+      "submit": "2026-10-06T02:51:14+0000",
+      "start": "2026-10-06T02:51:15+0000",
+      "end": "2026-10-06T02:51:46+0000",
+      "elapsed_seconds": 31,
+      "allocated_tres": "billing=1,cpu=1,gres/gpu=1,mem=512M,node=1",
+      "max_rss": null,
+      "total_cpu": "00:00.022"
+    },
+    {
+      "job": "holder",
+      "step": "batch",
+      "state": "COMPLETED",
+      "exit": "0:0",
+      "submit": "2026-10-06T02:51:15+0000",
+      "start": "2026-10-06T02:51:15+0000",
+      "end": "2026-10-06T02:51:46+0000",
+      "elapsed_seconds": 31,
+      "allocated_tres": "cpu=1,gres/gpu=1,mem=512M,node=1",
+      "max_rss": "4036K",
+      "total_cpu": "00:00.022"
+    },
+    {
+      "job": "holder",
+      "step": "0",
+      "state": "COMPLETED",
+      "exit": "0:0",
+      "submit": "2026-10-06T02:51:16+0000",
+      "start": "2026-10-06T02:51:16+0000",
+      "end": "2026-10-06T02:51:46+0000",
+      "elapsed_seconds": 30,
+      "allocated_tres": "cpu=1,gres/gpu=1,mem=512M,node=1",
+      "max_rss": null,
+      "total_cpu": "00:00:00"
+    },
+    {
+      "job": "waiter",
+      "step": "allocation",
+      "state": "CANCELLED",
+      "exit": "0:0",
+      "submit": "2026-10-06T02:51:14+0000",
+      "start": null,
+      "end": "2026-10-06T02:51:16+0000",
+      "elapsed_seconds": 0,
+      "allocated_tres": null,
+      "max_rss": null,
+      "total_cpu": "00:00:00"
+    }
+  ],
+  "logs": {
+    "holder": "{\"phase\": \"F0\", \"performance_measurement\": false, \"cuda_devices\": 1, \"driver_api\": 13020, \"verified_elements\": 4096, \"result\": \"PASS\"}\n",
+    "waiter": null
+  },
+  "pending_reason": "(AssocGrpCpuLimit)",
+  "gpu_reservation_seconds": 31,
+  "waiter_allocated": false,
+  "job_count": 2,
+  "new_model_qualification": false,
+  "observer_transport": {
+    "nodes": {
+      "exit": 0,
+      "stdout_bytes": 998,
+      "rejected": false
+    },
+    "queue": {
+      "exit": 0,
+      "stdout_bytes": 186,
+      "rejected": false
+    },
+    "submit-denied": {
+      "exit": 1,
+      "stdout_bytes": 0,
+      "rejected": true
+    },
+    "cancel-denied": {
+      "exit": 1,
+      "stdout_bytes": 0,
+      "rejected": true
+    },
+    "shell-denied": {
+      "exit": 1,
+      "stdout_bytes": 0,
+      "rejected": true
+    },
+    "foreign-scope-denied": {
+      "exit": 1,
+      "stdout_bytes": 0,
+      "rejected": true
+    }
+  },
+  "automation": {
+    "apply_changed_tasks": 6,
+    "repeat_changed_tasks": 0,
+    "unapproved_preflight_changed_tasks": 0,
+    "initial_ssh_auth_preflight_changed_tasks": 0,
+    "protected_controller_dbd_ssh_pids_and_configs_unchanged": true,
+    "existing_scheduler_accounts_and_qos_unchanged": true
+  },
+  "live_console_controller_deployed": false
+}

@@ -1,5 +1,10 @@
 # Slurm host observations in the research console
 
+October 6 update: the recovered controller now has a verified
+[live queue/resource trial and dedicated read-only SSH identity](slurm-controller-results.md).
+Continuous controller deployment is still pending; the console boundary described
+below remains host telemetry only.
+
 Two standalone ARM lab hosts now publish actual CPU and memory observations
 through mTLS Prometheus ingestion, an independent inventory collector, persistent
 PostgreSQL, the authenticated project API and the existing console. The collector
