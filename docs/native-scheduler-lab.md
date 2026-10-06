@@ -65,6 +65,36 @@ click a waiting card for the native reason, then follow admission/execution/resu
 Finish by replaying the saved observations. Short states may fall between polls;
 the UI does not invent them. No destructive hardware-failure scenarios are included.
 
+### Scenario pack execution record — 2026-10-06
+
+All six newly added scenarios were executed against real lab resources and reached
+`SUCCEEDED`, with their cleanup recorded as completed:
+
+- **Quota:** three one-GPU requests were simultaneously pending while the two-GPU
+  blocker ran. The first evaluated request had the native insufficient-quota reason;
+  the other reasons were unreported. After releasing the blocker, all three CUDA
+  requests completed.
+- **Priority:** low priority **10** was submitted before high priority **100**.
+  After releasing the blocker, high was admitted while low remained pending.
+  High finished, then low ran and finished. Both retained native priority evidence.
+- **Cancellation:** the queued request's Job deletion was confirmed and its canceled
+  card retained. The blocker was separately released; the replacement completed.
+- **Failure/resubmission:** the first container exited **42**, its failed Job stayed
+  visible, and a new Job completed the CUDA numerical correctness probe.
+- **NPU:** the qualified Hailo-8 ResNet-50 workload succeeded with collected results.
+- **Mixed:** Kubernetes CUDA, Kubernetes CNN, Kubernetes Hailo inference and Slurm
+  Orin CNN all succeeded, with both backend identities and four results observed.
+
+The first quota attempt was canceled after discovering that Kueue does not attach
+a scheduling reason to every pending request. That record remains in history;
+the subsequent run used the corrected evidence condition and succeeded. A regression
+check preserves missing reasons rather than synthesizing them. Seventeen focused
+API/runner/console checks passed initially; all four runner checks passed after the
+quota fix. Browser checks covered all eleven four-step guides, live polling with
+an open guide, priority cards, desktop rendering and 390px width without overflow.
+Raw observations and screenshots remain private. Existing gang/topology/backfill/
+multi-GPU/heterogeneous results above are prior runs, not rerun claims for this pack.
+
 ## What the three experiments actually demonstrate
 
 | Scenario | Native mechanism | Evidence required for success |
