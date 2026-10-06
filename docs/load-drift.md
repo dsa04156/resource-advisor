@@ -104,3 +104,8 @@ this CUDA/cgroup/runtime path, not every device or scheduler.
 A transient `RUNNING` → `QUEUED` observation during container exit led to a
 separate [Job-completion handling fix](kubernetes-completion.md). Its regression
 tests and worker rollout do not change this trial's results or add GPU runs.
+
+The subsequent [S5 chronological offline replay](uncertainty-drift-ablation.md)
+uses the same saved traces without new compute. It shows the three-result
+trigger's delay and retained abstention after normal recovery; it does not
+retroactively describe the trigger as preventing the earlier large errors.

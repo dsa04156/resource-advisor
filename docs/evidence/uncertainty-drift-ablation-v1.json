@@ -1,0 +1,262 @@
+{
+  "schema_version": "offline-uncertainty-drift-ablation-v1",
+  "source_capture_digest": "sha256:ce0a3795b173c129a2fa4c75e0f06cce275a243f10aff37115dab47d38e4692f",
+  "scope": "Exploratory chronological replay of one recorded reuse reason; no new workload or search trajectory",
+  "only_removed_reason": "CONSECUTIVE_RESIDUAL_DRIFT",
+  "baseline_support_attempt_ids": [
+    "a-8f7e7e6692d34d058e56bf6187b20da3",
+    "a-35e16e44a2084107bb3c69c26b488898",
+    "a-435d12fd1705476bbbed50230372fae3"
+  ],
+  "decisions": [
+    {
+      "target_index": 3,
+      "target_attempt_id": "a-9959fb66532a4a0fbd64f82a05cc624a",
+      "condition": "cpu-competitor",
+      "target_started_at": "2026-10-03T08:32:00.301867+00:00",
+      "assessment_available_at": "2026-10-03T08:31:59.985073+00:00",
+      "available_followup_attempt_ids": [],
+      "strict_reasons": [],
+      "without_drift_reasons": [],
+      "strict_reuse": true,
+      "without_drift_reuse": true,
+      "actual_seconds": 0.75233056320576,
+      "predicted_seconds": 0.43020749402542907,
+      "interval_seconds": [
+        0.3759805502807806,
+        0.48443443777007755
+      ],
+      "covered": false,
+      "relative_residual": 0.7487621058532526,
+      "absolute_relative_error": 0.4281669321099099,
+      "forecast_tolerance_exceeded": true,
+      "quality_value": 1.0,
+      "peak_memory_mib": 33.79248046875
+    },
+    {
+      "target_index": 4,
+      "target_attempt_id": "a-4e00f32debc84760b0fac1cf70f7d9db",
+      "condition": "cpu-competitor",
+      "target_started_at": "2026-10-03T08:32:31.930198+00:00",
+      "assessment_available_at": "2026-10-03T08:32:31.663398+00:00",
+      "available_followup_attempt_ids": [
+        "a-9959fb66532a4a0fbd64f82a05cc624a"
+      ],
+      "strict_reasons": [],
+      "without_drift_reasons": [],
+      "strict_reuse": true,
+      "without_drift_reuse": true,
+      "actual_seconds": 0.6417118650279008,
+      "predicted_seconds": 0.43020749402542907,
+      "interval_seconds": [
+        0.3759805502807806,
+        0.48443443777007755
+      ],
+      "covered": false,
+      "relative_residual": 0.491633395372629,
+      "absolute_relative_error": 0.3295939852900737,
+      "forecast_tolerance_exceeded": true,
+      "quality_value": 1.0,
+      "peak_memory_mib": 33.79248046875
+    },
+    {
+      "target_index": 5,
+      "target_attempt_id": "a-e04f1b0fb4f44ac789341e49c29290cc",
+      "condition": "cpu-competitor",
+      "target_started_at": "2026-10-03T08:33:02.090298+00:00",
+      "assessment_available_at": "2026-10-03T08:33:01.832257+00:00",
+      "available_followup_attempt_ids": [
+        "a-9959fb66532a4a0fbd64f82a05cc624a",
+        "a-4e00f32debc84760b0fac1cf70f7d9db"
+      ],
+      "strict_reasons": [],
+      "without_drift_reasons": [],
+      "strict_reuse": true,
+      "without_drift_reuse": true,
+      "actual_seconds": 0.9731224490096793,
+      "predicted_seconds": 0.43020749402542907,
+      "interval_seconds": [
+        0.3759805502807806,
+        0.48443443777007755
+      ],
+      "covered": false,
+      "relative_residual": 1.261983955472796,
+      "absolute_relative_error": 0.55791021524245,
+      "forecast_tolerance_exceeded": true,
+      "quality_value": 1.0,
+      "peak_memory_mib": 33.79248046875
+    },
+    {
+      "target_index": 6,
+      "target_attempt_id": "a-ebb6d49cb61d4fcbb9b99026fc7004fb",
+      "condition": "normal",
+      "target_started_at": "2026-10-03T08:33:33.436190+00:00",
+      "assessment_available_at": "2026-10-03T08:33:33.144692+00:00",
+      "available_followup_attempt_ids": [
+        "a-9959fb66532a4a0fbd64f82a05cc624a",
+        "a-4e00f32debc84760b0fac1cf70f7d9db",
+        "a-e04f1b0fb4f44ac789341e49c29290cc"
+      ],
+      "strict_reasons": [
+        "CONSECUTIVE_RESIDUAL_DRIFT"
+      ],
+      "without_drift_reasons": [],
+      "strict_reuse": false,
+      "without_drift_reuse": true,
+      "actual_seconds": 0.40447943593608215,
+      "predicted_seconds": 0.43020749402542907,
+      "interval_seconds": [
+        0.3759805502807806,
+        0.48443443777007755
+      ],
+      "covered": true,
+      "relative_residual": -0.059803835234507004,
+      "absolute_relative_error": 0.06360782725530846,
+      "forecast_tolerance_exceeded": false,
+      "quality_value": 1.0,
+      "peak_memory_mib": 33.79248046875
+    },
+    {
+      "target_index": 7,
+      "target_attempt_id": "a-7360340a65be435e87b9ffa592d56467",
+      "condition": "normal",
+      "target_started_at": "2026-10-03T08:34:05.290982+00:00",
+      "assessment_available_at": "2026-10-03T08:34:05.001227+00:00",
+      "available_followup_attempt_ids": [
+        "a-9959fb66532a4a0fbd64f82a05cc624a",
+        "a-4e00f32debc84760b0fac1cf70f7d9db",
+        "a-e04f1b0fb4f44ac789341e49c29290cc",
+        "a-ebb6d49cb61d4fcbb9b99026fc7004fb"
+      ],
+      "strict_reasons": [
+        "CONSECUTIVE_RESIDUAL_DRIFT"
+      ],
+      "without_drift_reasons": [],
+      "strict_reuse": false,
+      "without_drift_reuse": true,
+      "actual_seconds": 0.4158880210015923,
+      "predicted_seconds": 0.43020749402542907,
+      "interval_seconds": [
+        0.3759805502807806,
+        0.48443443777007755
+      ],
+      "covered": true,
+      "relative_residual": -0.03328503855163059,
+      "absolute_relative_error": 0.034431078320916506,
+      "forecast_tolerance_exceeded": false,
+      "quality_value": 1.0,
+      "peak_memory_mib": 33.79248046875
+    },
+    {
+      "target_index": 8,
+      "target_attempt_id": "a-5cced7ea36414e8c975536e478c24c44",
+      "condition": "normal",
+      "target_started_at": "2026-10-03T08:34:36.943245+00:00",
+      "assessment_available_at": "2026-10-03T08:34:36.647531+00:00",
+      "available_followup_attempt_ids": [
+        "a-9959fb66532a4a0fbd64f82a05cc624a",
+        "a-4e00f32debc84760b0fac1cf70f7d9db",
+        "a-e04f1b0fb4f44ac789341e49c29290cc",
+        "a-ebb6d49cb61d4fcbb9b99026fc7004fb",
+        "a-7360340a65be435e87b9ffa592d56467"
+      ],
+      "strict_reasons": [
+        "CONSECUTIVE_RESIDUAL_DRIFT"
+      ],
+      "without_drift_reasons": [],
+      "strict_reuse": false,
+      "without_drift_reuse": true,
+      "actual_seconds": 0.3892276489059441,
+      "predicted_seconds": 0.43020749402542907,
+      "interval_seconds": [
+        0.3759805502807806,
+        0.48443443777007755
+      ],
+      "covered": true,
+      "relative_residual": -0.09525600015945497,
+      "absolute_relative_error": 0.10528503109856842,
+      "forecast_tolerance_exceeded": false,
+      "quality_value": 1.0,
+      "peak_memory_mib": 33.79248046875
+    }
+  ],
+  "rates": {
+    "strict": {
+      "denominator_followups": 6,
+      "reuse_count": 3,
+      "abstention_count": 3,
+      "reuse_fraction": 0.5,
+      "forecast_tolerance_exceedance_count": 3,
+      "heuristic_interval_coverage": 0,
+      "mean_absolute_relative_error": 0.43855704421414454,
+      "accepted_subset_denominator": 3
+    },
+    "without_drift": {
+      "denominator_followups": 6,
+      "reuse_count": 6,
+      "abstention_count": 0,
+      "reuse_fraction": 1.0,
+      "forecast_tolerance_exceedance_count": 3,
+      "heuristic_interval_coverage": 0.5,
+      "mean_absolute_relative_error": 0.2531658448862045,
+      "accepted_subset_denominator": 6
+    }
+  },
+  "changed_decisions": 3,
+  "all_followup_evaluation": {
+    "n": 6,
+    "heuristic_interval_coverage": 0.5,
+    "mean_absolute_relative_error": 0.2531658448862045,
+    "forecast_tolerance_exceedance_count": 3,
+    "quality_memory_violations": 0
+  },
+  "phase_descriptives": {
+    "support": {
+      "n": 3,
+      "raw_seconds": [
+        0.40201408904977143,
+        0.46390103502199054,
+        0.4247073580045253
+      ],
+      "mean_seconds": 0.43020749402542907,
+      "sample_sd_seconds": 0.0313079405683035,
+      "median_seconds": 0.4247073580045253,
+      "missing_values": 0
+    },
+    "competitor": {
+      "n": 3,
+      "raw_seconds": [
+        0.75233056320576,
+        0.6417118650279008,
+        0.9731224490096793
+      ],
+      "mean_seconds": 0.7890549590811133,
+      "sample_sd_seconds": 0.16872982763309252,
+      "median_seconds": 0.75233056320576,
+      "missing_values": 0
+    },
+    "recovery": {
+      "n": 3,
+      "raw_seconds": [
+        0.40447943593608215,
+        0.4158880210015923,
+        0.3892276489059441
+      ],
+      "mean_seconds": 0.4031983686145395,
+      "sample_sd_seconds": 0.013376274151696638,
+      "median_seconds": 0.40447943593608215,
+      "missing_values": 0
+    }
+  },
+  "new_gpu_jobs": 0,
+  "original_gpu_reservation_seconds_not_saved": 197.0,
+  "quality_memory_and_other_reasons_preserved": true,
+  "limitations": [
+    "One fixed-order workload/device sequence is confounded with time; no significance test or causal superiority estimate.",
+    "The target's result is evaluation-only. Its drift assessment can affect only subsequent targets.",
+    "A forecast-tolerance exceedance is not proof of a wrong resource configuration; no alternative candidate or resource regret is evaluated.",
+    "Accepted-subset error rates have different denominators and are not a paired effectiveness estimate.",
+    "Hypothetical reuse/abstention masks are not extra deployments, prevented failures or measured resource savings.",
+    "The original mean +/- 3 standard-error interval is not calibrated future-Job coverage."
+  ]
+}

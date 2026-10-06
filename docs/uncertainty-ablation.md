@@ -63,3 +63,8 @@ interpolation coverage and out-of-range abstention; its broad intervals do not
 establish calibration. The later
 [bounded induced-drift trial](load-drift.md) verifies stale-approval rejection
 without changing this offline ablation or calibrating its intervals.
+The separate [chronological drift-gate replay](uncertainty-drift-ablation.md)
+now covers all six later targets using only prior assessments. It changes
+three recovery decisions, but admits all three large-error competitor targets
+before the drift trigger becomes available. That cohort does not demonstrate
+forecast-error reduction; its reuse masks and original costs remain separate.
