@@ -1,0 +1,121 @@
+{
+  "status": "PASS",
+  "protocol": "docs/result-replay-plan.md",
+  "source_parent_commit": "890bff6",
+  "verifier_sha256": "62d5e44d053975009ba027fabb1beee543f439bdfd3922001f14ba6849aa5a63",
+  "scope": "live API terminal result replay against two retained Slurm hardware attempts; no new computation",
+  "cases": [
+    {
+      "name": "original-result-replay-1",
+      "http": 200,
+      "detail": null,
+      "expected": 200
+    },
+    {
+      "name": "original-result-replay-2",
+      "http": 200,
+      "detail": null,
+      "expected": 200
+    },
+    {
+      "name": "wrong-epoch",
+      "http": 409,
+      "detail": "stale or unrelated attempt",
+      "expected": 409
+    },
+    {
+      "name": "wrong-attempt_id",
+      "http": 409,
+      "detail": "stale or unrelated attempt",
+      "expected": 409
+    },
+    {
+      "name": "terminal-content-change",
+      "http": 409,
+      "detail": "terminal result is immutable",
+      "expected": 409
+    },
+    {
+      "name": "late-after-confirmed-cancel",
+      "http": 409,
+      "detail": "terminal result is immutable",
+      "expected": 409
+    },
+    {
+      "name": "late-cancel-wrong-epoch",
+      "http": 409,
+      "detail": "stale or unrelated attempt",
+      "expected": 409
+    },
+    {
+      "name": "foreign-operator",
+      "http": 404,
+      "detail": "job not found",
+      "expected": 404
+    },
+    {
+      "name": "researcher-ingestion",
+      "http": 403,
+      "detail": "Operator qualification required",
+      "expected": 403
+    }
+  ],
+  "original_attempts": [
+    {
+      "state": "SUCCEEDED",
+      "epoch": 1,
+      "version_before_after": 17,
+      "result_digest": "sha256:e8aaee29bcba9d62fde42679aaed925b4d17635b5006fe1b5dc290efaa8666c0",
+      "original_gpu_reservation_seconds": 73.0,
+      "mlflow_status": "FINISHED",
+      "mlflow_run_count": 1,
+      "usage_count": 1
+    },
+    {
+      "state": "CANCELED",
+      "epoch": 1,
+      "version_before_after": 12,
+      "result_digest": null,
+      "original_gpu_reservation_seconds": 27.0,
+      "mlflow_status": "KILLED",
+      "mlflow_run_count": 1,
+      "usage_count": 1
+    }
+  ],
+  "checks": {
+    "db_target_rows_identical": true,
+    "global_job_usage_outbox_result_profile_counts_identical": true,
+    "api_target_jobs_identical": true,
+    "artifact_bytes_identical": true,
+    "mlflow_original_runs_identical": true,
+    "one_usage_and_original_mlflow_run_per_attempt": true,
+    "canceled_attempt_still_resultless": true,
+    "all_target_outbox_delivered": true
+  },
+  "counts_before": {
+    "ra_jobs": 589,
+    "ra_usage": 588,
+    "ra_outbox": 2582,
+    "result": 573,
+    "profile": 330
+  },
+  "counts_after": {
+    "ra_jobs": 589,
+    "ra_usage": 588,
+    "ra_outbox": 2582,
+    "result": 573,
+    "profile": 330
+  },
+  "new_compute_requests": 0,
+  "new_gpu_reservation_seconds": 0,
+  "negative_envelope": "synthetic FAILED rejection probe, no performance measurements, never accepted",
+  "remaining_limits": [
+    "external-service lease fencing not tested",
+    "not a new cancellation or collector-crash trial",
+    "disconnected Slurm cohort final attempt remains unresolved",
+    "full E7/platform acceptance remains open"
+  ],
+  "artifact_sha256": [
+    "d284aa7f530c5cb72099822a91d08f76fd34c8cc53448cb475ca3aa55a38f772"
+  ]
+}

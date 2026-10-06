@@ -19,6 +19,9 @@ and the specified real-backend failure scenarios still need direct evidence.
 See [the milestone map](implementation.md) for the implementation sequence.
 The [E0–E7 scenario matrix](scenario-acceptance.md) maps each design experiment
 to its actual report and separates partial failure boundaries from passed fixtures.
+The [live terminal replay trial](result-replay.md) now verifies nine actual API
+requests: unchanged original result replay, stale/late/modified result rejection,
+project/operator authorization and unchanged DB/artifact/MLflow without new compute.
 
 | Gate | Required authoritative evidence | Current state |
 |---|---|---|

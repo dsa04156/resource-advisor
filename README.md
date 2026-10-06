@@ -43,6 +43,9 @@ The [Kueue policy trial](docs/kueue-policy.md) also verifies real GPU queueing,
 oversized admission refusal and high-before-normal execution.
 [Terminal accounting](docs/accounting.md) retains failed/cancelled attempts and
 distinguishes observed allocation from requested resources and unknown data.
+The [terminal-result replay trial](docs/result-replay.md) also verifies nine
+actual API replay/rejection requests with unchanged DB/artifact/MLflow records
+and no new compute, including late-result denial after confirmed cancellation.
 
 [Read-only inventory](docs/inventory.md) now separates scheduler requests from
 measured CPU/memory/GPU/NPU telemetry and returns unknown for stale data.
