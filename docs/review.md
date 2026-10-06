@@ -28,15 +28,19 @@ by their linked evidence and the [full completion audit](goal-audit.md).
 
 **Live execution:** scoped Kubernetes/Kueue CUDA and PyTorch jobs now have actual
 hardware evidence, including actual uncached KFP launch and replay. Historical
-Slurm CUDA/accounting/QOS trials passed, but its full service/model path remains
-open and the controller is currently unreachable. Disconnection recovery and
-complete cancellation/cost evidence remain required.
+Slurm CUDA/accounting/QOS trials passed. The controller recovered on October 6;
+the [Orin browser/API model path](slurm-api-results.md),
+[native cancellation](slurm-cancellation.md) and
+[accepted-response-loss/SIGKILL recovery](slurm-response-recovery.md) now have
+bounded live evidence. Two-project Slurm admission/isolation and the complete
+backend failure matrix remain open. Earlier disconnected-controller observations
+are historical, not the current live-service state.
 
 **Optimization:** consented lab pilot/BO execution has durable reservation and
 independent confirmation, including real GPU runs. A completed three-block
 [S0/S1/S2 comparison](policy-comparison-v2.md) now retains the stopped predecessor
 and full measured allocation costs without demonstrating BO superiority.
-Complete phase/utilization accounting, broader B0–B2 operational effectiveness
+Complete phase/utilization accounting and broader operational effectiveness
 and wider numerical uncertainty evaluation remain open; bounded source-only
 rank and [numerical shape holdouts](numerical-workload-holdout.md) are now published.
 Unseen families and inputs outside source bounds abstain.
@@ -76,7 +80,9 @@ costs and disconnected-node accounting remain open.
 dedicated experiment, with project-to-experiment routing and durable run links.
 Result-bundle artifact upload and the [four-view console](console.md) are verified.
 The console also consumes actual [Slurm host telemetry](slurm-inventory.md),
-while controller-dependent queue/reservation values remain unknown.
+and the [restricted controller collector](slurm-controller-results.md) supplies
+live queue/reservation values. Missing or stale observations remain unknown;
+this does not qualify physical accelerator utilization on every node.
 Server-side multi-tenant authorization, circuit breakers and comprehensive event
 metrics remain open. Experiment routing
 alone is not an MLflow authorization boundary.
@@ -131,7 +137,8 @@ cross-device optimization or calibrated performance prediction.
 - Same-name jobs in another Slurm account cannot satisfy response-loss recovery.
 
 These fixes have regression tests and real ARM guard evidence. They do not prove
-an end-to-end Slurm model execution while its controller is unavailable.
+arbitrary Slurm model execution. The later qualified Orin model/API result path
+and bounded recovery are linked above; broader runtime support remains open.
 
 The bounded B0/B1/B2 GPU operational trial is now published in
 [operational-comparison.md](operational-comparison.md): approximately 1% shorter
