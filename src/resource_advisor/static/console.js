@@ -14,6 +14,16 @@ const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, quali
 const submitting = new Set();
 const requestKeys = new Map();
 const submissionDraft = { workload: "", candidate: "" };
+let showAllTemplates = false;
+const canSubmit = (candidate) => candidate.submittable_now ?? candidate.contract_compatible_now;
+function reasonText(reason) {
+  return ({ CAPABILITY_STALE: "장비 확인 기록이 오래됨", NODE_UNAVAILABLE: "노드 연결 확인 필요",
+    INSUFFICIENT_CAPACITY: "장비 용량보다 많은 자원을 요청함", APPROVAL_REQUIRED: "추천 구성 승인 필요",
+    ARCH_MISMATCH: "CPU 아키텍처가 실행 환경과 다름", RUNTIME_MISMATCH: "런타임 버전이 다름",
+    LOGICAL_WORKLOAD_MISMATCH: "모델·입력 조건이 등록된 실행 환경과 다름",
+    PRECISION_MISMATCH: "모델 정밀도 설정이 다름", INPUT_SHAPE_UNVERIFIED: "입력 크기가 실행 환경과 다름",
+    ENVIRONMENT_MISMATCH: "등록된 실행 환경이 다름" })[reason] || reason;
+}
 
 function submitButton(workload, candidate, approval = null) {
   const label = approval ? "승인한 구성 실행" : "작업 제출";
@@ -23,7 +33,7 @@ function submitButton(workload, candidate, approval = null) {
   if (saved) requestKeys.set(key, saved);
   const button = el("button", submitting.has(key) ? "제출 중…" : saved ? "제출 확인 재시도" : label, "primary");
   button.setAttribute("aria-label", `${label} · ${workload.workload_ref} · ${candidate.candidate_ref}`);
-  button.disabled = !candidate.contract_compatible_now || submitting.has(key);
+  button.disabled = !canSubmit(candidate) || submitting.has(key);
   button.onclick = async () => {
     if (submitting.has(key)) return;
     const session = generation;
@@ -42,7 +52,11 @@ function submitButton(workload, candidate, approval = null) {
         body: JSON.stringify({ workload_ref: workload.workload_ref, candidate_ref: candidate.candidate_ref,
           mode: approval ? "fixed" : "observe", ...(approval ? { approval_ref: approval.ref } : {}) }),
       });
-      if (!response.ok) throw new Error("작업을 제출하지 못했습니다. 계약 상태와 프로젝트 권한을 확인해 주세요.");
+      if (!response.ok) {
+        const failure = await response.json().catch(() => ({}));
+        const message = typeof failure.detail === "string" ? failure.detail.split(",").map(reasonText).join(" · ") : "요청 조건과 프로젝트 권한을 확인해 주세요.";
+        throw new Error("제출 실패: " + message);
+      }
       const job = await response.json();
       requestKeys.delete(key);
       try { sessionStorage.removeItem(key); } catch (_) { /* No credential is stored. */ }
@@ -146,7 +160,7 @@ const views = {
   ],
   execution: [
     "OBSERVATION",
-    "실행 현황",
+    "자원 · 작업 현황",
     "실측 사용량과 스케줄러 예약량을 나란히 확인합니다.",
   ],
   compatibility: [
@@ -156,7 +170,7 @@ const views = {
   ],
   history: [
     "ALLOCATION LEDGER",
-    "대기 · 할당 이력",
+    "큐 · 사용량",
     "현재 프로젝트의 큐 상태와 완료·실패·취소를 포함한 사용 이력입니다.",
   ],
   recommendations: [
@@ -653,7 +667,11 @@ function execution() {
 }
 function submissionView() {
   const root = el("div");
-  const items = data.compatibility.items;
+  const catalogMode = !showAllTemplates && data.submission_catalog !== null && data.submission_catalog !== undefined;
+  const items = catalogMode ? data.submission_catalog : data.compatibility.items;
+  const showAll = el("input"); showAll.type = "checkbox"; showAll.checked = showAllTemplates;
+  showAll.onchange = () => { showAllTemplates = showAll.checked; render(); };
+  root.append(add(el("label", null, "template-filter"), showAll, document.createTextNode(" 고급: 전체 실험·테스트 템플릿 보기")));
   const form = el("div", null, "job-form");
   const workloadSelect = el("select");
   workloadSelect.id = "submit-workload";
@@ -677,7 +695,7 @@ function submissionView() {
     const candidates = el("select"); candidates.id = "submit-candidate";
     candidates.append(new Option("실행 장비를 선택하세요", ""));
     for (const c of workload.candidates) candidates.append(new Option(
-      `${c.backend === "slurm" ? "Slurm" : "Kubernetes"} · ${c.model || c.candidate_ref} · ${c.candidate_ref}${c.contract_compatible_now ? "" : " · 현재 실행 불가"}`, c.candidate_ref));
+      `${c.backend === "slurm" ? "Slurm" : "Kubernetes"} · ${c.model || c.candidate_ref} · ${c.candidate_ref}${canSubmit(c) ? "" : " · 설정 확인 필요"}`, c.candidate_ref));
     candidates.value = submissionDraft.candidate;
     candidates.onchange = () => {
       submissionDraft.candidate = candidates.value;
@@ -693,8 +711,9 @@ function submissionView() {
         el("p", `${candidate.model || candidate.candidate_ref} · ${candidate.node_ref || "노드 미확인"}`),
         el("p", `가속기 ${r.accelerator_count}개 (${modes[candidate.allocation_mode] || "단위 미확인"}) · CPU ${r.host_cpu}코어 · 메모리 ${r.host_memory_mib} MiB`),
         el("p", `실행 제한 ${workload.max_run_seconds}초 · 대기 제한 ${workload.max_queue_seconds ?? "—"}초 · 우선순위 ${workload.priority === "high" ? "높음" : "보통"}`),
-        badge(candidate.contract_compatible_now ? "실행 조건 확인됨" : "현재 실행 불가", candidate.contract_compatible_now ? "good" : "warn"),
-        ...candidate.reasons.map(reason => el("p", reason, "reason")),
+        badge(canSubmit(candidate) ? "제출 가능" : "설정 확인 필요", canSubmit(candidate) ? "good" : "warn"),
+        ...(candidate.submission_reasons || candidate.reasons).map(reason => el("p", reasonText(reason), "reason")),
+        ...(candidate.submission_warnings || []).map(reason => el("small", reasonText(reason) + " · 일반 실행은 허용됩니다. 검증 기록은 갱신하지 않습니다.")),
         el("small", candidate.backend === "slurm"
           ? "Slurm이 자원과 우선순위에 따라 실행합니다. 여유 자원이 없으면 큐에서 기다립니다."
           : "Kueue 승인 후 Kubernetes에서 실행합니다. 여유 자원이나 할당량이 없으면 큐에서 기다립니다."),
@@ -705,7 +724,7 @@ function submissionView() {
   }
   root.append(panel("새 작업 만들기", "제출 후 실행 현황에서 대기·실행·결과를 확인하고 작업을 취소할 수 있습니다.",
     items.length ? form : empty("등록된 작업 템플릿이 없습니다. 아래에서 작업 명세를 등록하세요.")));
-  root.append(pager("compatibility", data.compatibility));
+  if (!catalogMode) root.append(pager("compatibility", data.compatibility));
   root.append(workloadImport());
   return root;
 }
@@ -741,6 +760,7 @@ function workloadImport() {
       if (!response.ok) throw new Error("등록하지 못했습니다. 작업 명세 형식, 프로젝트와 기존 ref 중복을 확인해 주세요.");
       if (session !== generation) return;
       importedWorkload = null; submissionDraft.workload = value.ref; submissionDraft.candidate = "";
+      showAllTemplates = true;
       pages.compatibility = 0; await load();
       $("notice").textContent = "작업 템플릿을 등록했습니다. 실행 장비를 선택하고 작업을 제출하세요.";
     } catch (error) { if (session === generation) $("notice").textContent = error.message; }

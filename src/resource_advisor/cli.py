@@ -139,7 +139,11 @@ def main():
         store.initialize()
         print("Independent Resource Advisor schema initialized.")
         return
-    service = Service(store)
+    service = Service(
+        store,
+        operational_mode=os.getenv("RA_OPERATIONAL_MODE") == "1",
+        console_workloads=tuple(filter(None, os.getenv("RA_CONSOLE_WORKLOADS", "").split(","))),
+    )
     if args.action == "verify-db-snapshot":
         from .backup import verify_snapshot
 

@@ -517,6 +517,9 @@ pre {
 }
 .job-form input[type="file"] { max-width: 100%; }
 .job-form p { overflow-wrap: anywhere; }
+.template-filter { display: block; margin-bottom: 16px; color: var(--secondary); }
+.advanced-nav { margin: 8px 0; }
+.advanced-nav > summary { padding: 12px; color: var(--muted); }
 .submission-summary {
   margin-top: 24px;
   padding: 16px;

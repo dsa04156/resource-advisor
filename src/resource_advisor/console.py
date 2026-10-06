@@ -7,7 +7,7 @@ from sqlalchemy import func, select
 from .contracts import WorkloadSpec, now, signature
 from .diagnostics import diagnose
 from .inventory import fresh_view
-from .policy import compatibility
+from .policy import compatibility, execution_compatibility
 from .service import NotFound, Rejected
 from .store import entities, jobs, usage
 
@@ -133,6 +133,15 @@ def overview(
             ).all()
         )
         rows, compat_page = page_rows(conn, entity_query("workload", project), compatibility_page)
+        page_refs = {r["ref"] for r in rows}
+        catalog = []
+        if service.console_workloads:
+            extra = conn.execute(
+                entity_query("workload", project).where(
+                    entities.c.ref.in_(service.console_workloads), entities.c.ref.not_in(page_refs)
+                )
+            ).mappings()
+            rows += list(extra)
         compat_page["items"] = []
         for row in rows:
             spec = WorkloadSpec.model_validate(row["body"])
@@ -158,12 +167,22 @@ def overview(
                         validation_refs=list(variant.validation_refs),
                         capability_observed_at=cap.observed_at.isoformat(),
                         reasons=compatibility(spec, candidate, variant, cap),
+                        submission_reasons=execution_compatibility(
+                            spec, candidate, variant, cap, operational=service.operational_mode
+                        ),
                     )
                 except NotFound:
                     base["reasons"] = ["REGISTRY_ENTRY_MISSING"]
                 except Rejected:
                     base["reasons"] = ["QUALIFICATION_REJECTED"]
                 base["contract_compatible_now"] = not base["reasons"]
+                base["submission_reasons"] = base.get("submission_reasons", base["reasons"])
+                if not service.operational_mode and candidate.ref != spec.baseline_candidate_ref:
+                    base["submission_reasons"] = [*base["submission_reasons"], "APPROVAL_REQUIRED"]
+                base["submittable_now"] = not base["submission_reasons"]
+                base["submission_warnings"] = [
+                    r for r in base["reasons"] if r not in base["submission_reasons"]
+                ]
                 candidates.append(base)
             compat_page["items"].append(
                 {
@@ -178,6 +197,10 @@ def overview(
                     "candidates": candidates,
                 }
             )
+        catalog = [
+            w for w in compat_page["items"] if w["workload_ref"] in service.console_workloads
+        ]
+        compat_page["items"] = [w for w in compat_page["items"] if w["workload_ref"] in page_refs]
         history_query = (
             select(usage)
             .where(usage.c.project == project)
@@ -208,6 +231,8 @@ def overview(
         "job_counts": counts,
         "jobs": job_page,
         "compatibility": compat_page,
+        "operational_mode": service.operational_mode,
+        "submission_catalog": catalog if service.console_workloads else None,
         "history": history,
         "recommendations": recommendations,
         "qualifications": qualifications,

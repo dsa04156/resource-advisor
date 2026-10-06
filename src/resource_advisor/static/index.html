@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Resource Advisor · 연구 자원 콘솔</title>
+    <title>Resource Advisor · 연구실 공동 자원 관리</title>
     <link rel="icon" type="image/svg+xml" href="/console/mark.svg" />
     <link rel="stylesheet" href="/console/console.css" />
     <script type="module" src="/console/console.js"></script>
@@ -12,7 +12,7 @@
     <a href="#main" class="skip">본문으로 이동</a>
     <header>
       <a href="/console" class="brand"
-        >RA <span>Resource Advisor<small>연구 자원 콘솔</small></span></a
+        >RA <span>Resource Advisor<small>연구실 공동 자원 관리</small></span></a
       >
       <div id="identity">프로젝트 연결 전</div>
       <button id="logout" hidden>연결 해제</button>
@@ -25,17 +25,18 @@
             ><span>＋</span>작업 제출</a
           >
           <a href="#execution" data-view="execution" aria-current="page"
-            ><span>01</span>실행 현황</a
-          >
-          <a href="#compatibility" data-view="compatibility"
-            ><span>02</span>가속기 호환성</a
+            ><span>01</span>자원 · 작업 현황</a
           >
           <a href="#history" data-view="history"
-            ><span>03</span>대기 · 할당 이력</a
+            ><span>02</span>큐 · 사용량</a
           >
+          <details class="advanced-nav"><summary>고급 · 검증</summary>
+          <a href="#compatibility" data-view="compatibility"
+            >가속기 호환성</a>
           <a href="#recommendations" data-view="recommendations"
-            ><span>04</span>추천 근거 · 결과</a
+            >추천 근거 · 결과</a
           >
+          </details>
         </nav>
         <p class="aside-note">
           등록된 장비, 예약 여유,<br />검증된 실행환경을 구분합니다.

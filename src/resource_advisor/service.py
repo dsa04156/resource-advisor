@@ -20,7 +20,7 @@ from .contracts import (
     now,
     signature,
 )
-from .policy import compatibility, context_signature
+from .policy import compatibility, context_signature, execution_compatibility
 from .store import Conflict, jobs
 
 
@@ -40,9 +40,13 @@ def required(store, conn, kind, ref, project):
 
 
 class Service:
-    def __init__(self, store, *, accept_synthetic=False):
+    def __init__(
+        self, store, *, accept_synthetic=False, operational_mode=False, console_workloads=()
+    ):
         self.store = store
         self.accept_synthetic = accept_synthetic
+        self.operational_mode = operational_mode
+        self.console_workloads = tuple(console_workloads)
 
     def register(self, kind, model, project):
         if hasattr(model, "project_ref") and model.project_ref != project:
@@ -114,7 +118,12 @@ class Service:
                 spec, candidate, variant, cap = self.bundle(
                     conn, project, request.workload_ref, request.candidate_ref
                 )
-                errors = compatibility(spec, candidate, variant, cap)
+                operational = (
+                    self.operational_mode and request.mode == "observe" and not request.approval_ref
+                )
+                errors = execution_compatibility(
+                    spec, candidate, variant, cap, operational=operational
+                )
                 if errors:
                     raise Rejected(",".join(errors))
                 plan = None
@@ -160,6 +169,7 @@ class Service:
                     candidate.ref != spec.baseline_candidate_ref
                     and plan is None
                     and not request.approval_ref
+                    and not operational
                 ):
                     raise Rejected("non-baseline execution requires an immutable approval")
                 # Baseline runs need no approval, but a supplied reference must be
@@ -186,6 +196,10 @@ class Service:
                     "capability": cap.model_dump(mode="json"),
                     "created_at": now().isoformat(),
                     "external_id": None,
+                    "operational_submission": operational,
+                    "submission_warnings": compatibility(spec, candidate, variant, cap)
+                    if operational
+                    else [],
                     "backend_cluster_id": cap.backend_cluster_id,
                     "execution_limits": plan["execution_limits"]
                     if plan
@@ -272,6 +286,8 @@ class Service:
                     "cancel_acknowledged_at",
                     "owner_lease_expires_at",
                     "owner_last_heartbeat_at",
+                    "operational_submission",
+                    "submission_warnings",
                 ]
             },
         }

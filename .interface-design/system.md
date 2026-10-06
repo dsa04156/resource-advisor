@@ -22,6 +22,11 @@ Rejected defaults: a summed heterogeneous GPU number, green zero for missing
 telemetry, and giant equal-sized statistic cards without evidence provenance.
 
 Hierarchy: a dedicated job submission section precedes the four inspection sections.
+The main navigation emphasizes submission, resources/jobs, and queue/usage.
+Compatibility and recommendation evidence are grouped in native advanced details.
+An operator-selected submission catalog is the default; historical experimental
+templates are opt-in. Expired capability evidence in operational mode is an amber
+warning, never relabeled as freshly verified; execution and qualification are distinct.
 Execution starts with a prominent new-job link, then the node table,
 then attempt history. Compatibility and evidence use dense comparison tables with
 expandable provenance. Counts are secondary and name their scope.

@@ -27,6 +27,19 @@ Existing API credentials and project ownership checks remain authoritative.
 | 대기 · 할당 이력 | Project Kueue observations and terminal attempt ledger | Queue admission is reported separately from recorded reservations, actual compute and missing timing |
 | 추천 근거 · 실제 결과 | Immutable recommendations, referenced results, approval-linked jobs and MLflow run references | Historical summaries are separate from a new independent, quality-passing hardware measurement |
 
+The shared-lab operational mode is enabled explicitly with `RA_OPERATIONAL_MODE=1`.
+Manual `observe` submissions may use expired capability observations and select
+registered non-baseline candidates without a recommendation approval. Expiration
+is recorded as a submission warning; the original observation is never renewed.
+Node-unavailable, architecture/runtime/model mismatch, capacity and project checks
+remain enforced. Fixed recommendations and study probes retain strict validation.
+The worker honors the policy recorded by the API for that submission.
+
+`RA_CONSOLE_WORKLOADS` is a comma-separated list of project-owned workload refs for
+the default submission catalog. Other definitions remain available behind the
+advanced template checkbox. If unset, the existing paginated list is used.
+Compatibility and recommendation screens remain under **고급 · 검증**.
+
 The overview is `GET /api/v1/compute/overview`. Jobs, workload definitions,
 terminal history and recommendations have independent zero-based page parameters
 (`jobs_page`, `compatibility_page`, `history_page`, `recommendations_page`), each

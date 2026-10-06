@@ -80,3 +80,11 @@ def compatibility(
         if failed:
             errors.append(reason)
     return errors
+
+
+def execution_compatibility(spec, candidate, variant, cap, *, operational=False):
+    """Manual lab runs may use older observations; never forge renewed evidence."""
+    errors = compatibility(spec, candidate, variant, cap)
+    if operational and cap.observed_at <= now():
+        errors = [reason for reason in errors if reason != "CAPABILITY_STALE"]
+    return errors

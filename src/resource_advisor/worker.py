@@ -8,7 +8,7 @@ from sqlalchemy import select
 
 from .backends import BackendError, SubmissionUnknown
 from .contracts import TERMINAL, ExecutionResult, State, now, signature
-from .policy import compatibility
+from .policy import execution_compatibility
 from .service import NotFound, Rejected, required
 from .store import Conflict, job_route_filter, jobs
 
@@ -53,7 +53,12 @@ class Worker:
                         row["body"]["spec"]["ref"],
                         row["body"]["candidate"]["ref"],
                     )
-                    errors = compatibility(*args)
+                    errors = execution_compatibility(
+                        *args,
+                        operational=row["body"].get("operational_submission", False)
+                        and row["body"]["request"]["mode"] == "observe"
+                        and not row["body"]["request"].get("approval_ref"),
+                    )
                     if row["body"]["request"].get("study_ref"):
                         study = self.store.study(conn, row["body"]["request"]["study_ref"])
                         if study and study["body"]["request"]["strategy"] == "mfkg":
