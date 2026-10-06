@@ -1,0 +1,8 @@
+- name: Enable cgroup limits on an explicitly approved standalone Slurm lab worker
+  hosts: ra_slurm_limit_nodes
+  gather_facts: false
+  serial: 1
+  any_errors_fatal: true
+  become: true
+  roles:
+    - slurm_limits

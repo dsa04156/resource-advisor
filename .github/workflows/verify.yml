@@ -16,6 +16,9 @@ jobs:
       - run: /tmp/ra-ansible/bin/ansible-playbook -i automation/ansible/inventory.example.yml automation/ansible/site.yml --syntax-check
         env:
           ANSIBLE_CONFIG: automation/ansible/ansible.cfg
+      - run: /tmp/ra-ansible/bin/ansible-playbook -i automation/ansible/inventory.example.yml automation/ansible/slurm-limits.yml --syntax-check
+        env:
+          ANSIBLE_CONFIG: automation/ansible/ansible.cfg
   contracts:
     runs-on: ubuntu-24.04
     strategy:

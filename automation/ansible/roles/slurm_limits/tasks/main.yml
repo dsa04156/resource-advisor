@@ -1,0 +1,259 @@
+- name: Require explicit lab configuration ownership and controller identity
+  ansible.builtin.assert:
+    that:
+      - ra_lab_authorized | default(false) | bool
+      - not (ra_existing_production | default(true) | bool)
+      - ra_slurm_limits_authorized | default(false) | bool
+      - ra_slurm_controller in hostvars
+      - ra_slurm_node_name is match('^[A-Za-z0-9_.-]+$')
+      - ra_slurm_original_sha256 is match('^[a-f0-9]{64}$')
+
+- name: Reject active edge management on this worker
+  ansible.builtin.command:
+    argv: [systemctl, show, kubelet.service, edgecore.service, -p, ActiveState, --value]
+  register: ra_limit_edge
+  changed_when: false
+  failed_when: "'active' in ra_limit_edge.stdout_lines"
+  check_mode: false
+
+- name: Read actual cgroup controllers
+  ansible.builtin.slurp:
+    src: /sys/fs/cgroup/cgroup.controllers
+  register: ra_limit_controllers
+
+- name: Require CPU and memory enforcement support
+  ansible.builtin.assert:
+    that:
+      - "'memory' in (ra_limit_controllers.content | b64decode).split()"
+      - "'cpuset' in (ra_limit_controllers.content | b64decode).split()"
+      - "'cpu' in (ra_limit_controllers.content | b64decode).split()"
+
+- name: Read installed Slurm version
+  ansible.builtin.command:
+    argv: [/usr/sbin/slurmd, -V]
+  register: ra_limit_version
+  changed_when: false
+  check_mode: false
+
+- name: Require the reviewed Slurm release
+  ansible.builtin.assert:
+    that:
+      - ra_limit_version.stdout == 'slurm 24.11.5'
+
+- name: Capture protected driver and boot identities
+  ansible.builtin.stat:
+    path: "{{ item }}"
+    checksum_algorithm: sha256
+  loop:
+    - /etc/nv_tegra_release
+    - /proc/driver/nvidia/version
+    - /proc/sys/kernel/random/boot_id
+    - /etc/slurm/gres.conf
+  register: ra_limit_protected_before
+
+- name: Read worker configuration and previous ownership receipt
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/python3
+      - -c
+      - |
+        import hashlib,json
+        from pathlib import Path
+        p=Path('/etc/slurm/slurm.conf')
+        marker=Path('/opt/resource-advisor/slurm-limits/receipt.json')
+        cg=Path('/etc/slurm/cgroup.conf')
+        print(json.dumps({'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),
+          'config':p.read_text(),
+          'receipt':json.loads(marker.read_text()) if marker.exists() else None,
+          'cgroup_sha256':hashlib.sha256(cg.read_bytes()).hexdigest() if cg.exists() else None}))
+  register: ra_limit_existing
+  changed_when: false
+  check_mode: false
+  no_log: true
+
+- name: Validate initial ownership or exact previously managed bytes
+  ansible.builtin.assert:
+    that:
+      - >-
+        (data.receipt is none and data.sha256 == ra_slurm_original_sha256 and
+        data.cgroup_sha256 is none) or
+        (data.receipt is not none and data.receipt.original_sha256 == ra_slurm_original_sha256 and
+        data.sha256 == data.receipt.slurm_sha256 and
+        data.cgroup_sha256 == data.receipt.cgroup_sha256)
+      - >-
+        data.receipt is not none or
+        not (data.config | regex_search('(?im)^\s*(TaskPlugin|ProctrackType|JobAcctGatherType|JobAcctGatherFrequency)\s*='))
+      - "(data.config | regex_search('(?im)^SelectTypeParameters=CR_Core_Memory\\s*$')) is not none"
+    fail_msg: Configuration changed or has existing limit ownership; inspect before applying.
+  vars:
+    data: "{{ ra_limit_existing.stdout | from_json }}"
+  no_log: true
+
+- name: Check the controller queue and exact selected node state
+  ansible.builtin.command:
+    argv:
+      - /usr/bin/python3
+      - -c
+      - |
+        import subprocess,re,sys,json
+        node=sys.argv[1]
+        def run(args):
+          return subprocess.check_output(args,text=True,timeout=15)
+        assert not run(['squeue','-h']).strip(), 'lab queue must be empty'
+        text=run(['scontrol','show','node',node,'-o'])
+        rows=text.strip().splitlines()
+        assert len(rows)==1
+        d=dict(re.findall(r'(?:^|\s)(\w+)=([^\s]+)',rows[0]))
+        assert d['NodeName']==node and d['State']=='IDLE', 'node must be healthy and idle'
+        assert d['CPUAlloc']=='0' and d['AllocMem']=='0'
+        print(json.dumps({'idle':True,'empty_queue':True}))
+      - "{{ ra_slurm_node_name }}"
+  delegate_to: "{{ ra_slurm_controller }}"
+  changed_when: false
+  check_mode: false
+
+- name: Apply limits only on first adoption
+  when:
+    - not ansible_check_mode
+    - (ra_limit_existing.stdout | from_json).receipt is none
+  block:
+    - name: Drain only the approved idle worker to prevent new allocations
+      ansible.builtin.command:
+        argv: [scontrol, update, "NodeName={{ ra_slurm_node_name }}", State=DRAIN, Reason=resource-advisor-limits]
+      delegate_to: "{{ ra_slurm_controller }}"
+      changed_when: true
+
+    - name: Recheck absence of allocations after drain
+      ansible.builtin.command:
+        argv: [squeue, --noheader, "--nodelist={{ ra_slurm_node_name }}"]
+      delegate_to: "{{ ra_slurm_controller }}"
+      register: ra_limit_drained_jobs
+      failed_when: ra_limit_drained_jobs.rc != 0 or ra_limit_drained_jobs.stdout | trim != ''
+      changed_when: false
+
+    - name: Create dedicated ownership directory
+      ansible.builtin.file:
+        path: /opt/resource-advisor/slurm-limits
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+
+    - name: Retain the exact original worker configuration
+      ansible.builtin.copy:
+        src: /etc/slurm/slurm.conf
+        dest: /opt/resource-advisor/slurm-limits/slurm.conf.before
+        remote_src: true
+        owner: root
+        group: root
+        mode: '0600'
+        force: false
+
+    - name: Install reviewed cgroup-v2 limits
+      ansible.builtin.copy:
+        dest: /etc/slurm/cgroup.conf
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          # Resource Advisor standalone lab worker limits; Slurm 24.11.5
+          CgroupPlugin=cgroup/v2
+          ConstrainCores=yes
+          ConstrainRAMSpace=yes
+          AllowedRAMSpace=100
+          ConstrainSwapSpace=yes
+          AllowedSwapSpace=0
+          ConstrainDevices=yes
+
+    - name: Activate worker enforcement and task accounting plugins
+      ansible.builtin.blockinfile:
+        path: /etc/slurm/slurm.conf
+        marker: '# {mark} Resource Advisor lab limits'
+        block: |
+          ProctrackType=proctrack/cgroup
+          TaskPlugin=task/cgroup,task/affinity
+          JobAcctGatherType=jobacct_gather/cgroup
+          JobAcctGatherFrequency=task=1
+        validate: /usr/sbin/slurmd -G -f %s
+
+    - name: Restart only this drained and allocation-free worker daemon
+      ansible.builtin.systemd_service:
+        name: slurmd
+        state: restarted
+
+    - name: Check the daemon before releasing the drain
+      ansible.builtin.command:
+        argv: [systemctl, is-active, slurmd]
+      changed_when: false
+
+    - name: Verify registration and release only our own drain
+      ansible.builtin.command:
+        argv:
+          - /usr/bin/python3
+          - -c
+          - |
+            import subprocess,re,sys,time
+            node=sys.argv[1]
+            def run(args):
+              return subprocess.check_output(args,text=True,timeout=15)
+            for _ in range(15):
+              text=run(['scontrol','show','node',node,'-o'])
+              d=dict(re.findall(r'(?:^|\s)(\w+)=([^\s]+)',text))
+              if d.get('State') in {'IDLE+DRAIN','DRAIN+IDLE'}:
+                break
+              time.sleep(1)
+            assert d['State'] in {'IDLE+DRAIN','DRAIN+IDLE'}
+            assert d['CPUAlloc']=='0' and d['AllocMem']=='0'
+            assert d.get('Reason')=='resource-advisor-limits'
+            run(['scontrol','update','NodeName='+node,'State=RESUME'])
+            for _ in range(15):
+              text=run(['scontrol','show','node',node,'-o'])
+              if re.search(r'\bState=IDLE(?:\s|$)',text):
+                break
+              time.sleep(1)
+            assert re.search(r'\bState=IDLE(?:\s|$)',text)
+          - "{{ ra_slurm_node_name }}"
+      delegate_to: "{{ ra_slurm_controller }}"
+      changed_when: true
+
+    - name: Persist exact managed configuration ownership
+      ansible.builtin.command:
+        argv:
+          - /usr/bin/python3
+          - -c
+          - |
+            import hashlib,json,sys
+            from pathlib import Path
+            def sha(p):
+              return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+            p=Path('/opt/resource-advisor/slurm-limits/receipt.json')
+            with p.open('x') as f:
+              json.dump({'original_sha256':sys.argv[1],
+                'slurm_sha256':sha('/etc/slurm/slurm.conf'),
+                'cgroup_sha256':sha('/etc/slurm/cgroup.conf')},f)
+            p.chmod(0o600)
+          - "{{ ra_slurm_original_sha256 }}"
+      changed_when: true
+  rescue:
+    - name: Stop with retained evidence and an unreleased drain on apply failure
+      ansible.builtin.fail:
+        msg: Inspect the failed task, node state and retained original config. Do not blindly resume or replay.
+
+- name: Recheck protected files and host boot identity
+  ansible.builtin.stat:
+    path: "{{ item.item }}"
+    checksum_algorithm: sha256
+  loop: "{{ ra_limit_protected_before.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  register: ra_limit_protected_after
+
+- name: Require preserved drivers, GRES and boot identity
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - item.stat.exists == item.item.stat.exists
+      - item.stat.checksum | default('absent') == item.item.stat.checksum | default('absent')
+  loop: "{{ ra_limit_protected_after.results }}"
+  loop_control:
+    label: "{{ item.item.item }}"

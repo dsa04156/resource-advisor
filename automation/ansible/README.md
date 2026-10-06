@@ -6,6 +6,11 @@ is **read-only discovery**. It does not provision a scheduler, change Slurm
 configuration, install drivers, qualify accelerators, or enroll nodes in Kubernetes.
 Active Kubernetes/EdgeCore hosts and production inventory are rejected.
 
+The separately invoked [Slurm limits play](slurm-limits.yml) changes a reviewed,
+allocation-free standalone worker's configuration under explicit ownership guards.
+It is not included in `site.yml`; see its
+[bounded adoption and acceptance plan](../../docs/slurm-limits-plan.md).
+
 ## Operator environment
 
 Use a separate Python 3.11–3.13 environment; the application runtime does not need
