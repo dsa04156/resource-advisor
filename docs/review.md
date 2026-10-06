@@ -33,8 +33,13 @@ the [Orin browser/API model path](slurm-api-results.md),
 [native cancellation](slurm-cancellation.md) and
 [accepted-response-loss/SIGKILL recovery](slurm-response-recovery.md) now have
 bounded live evidence. Two-project Slurm admission/isolation and the complete
-backend failure matrix remain open. Earlier disconnected-controller observations
-are historical, not the current live-service state.
+backend failure matrix remain open. The [new two-project trial](slurm-project-isolation.md)
+provisions independent owners/accounts and observes eight native rejections and
+high-first ordering in both directions. Six completed attempts have matching
+publication and 438 known GPU reservation seconds. A new controller transport
+loss leaves the last attempt CANCEL_REQUESTED with termination/cost unknown.
+The acceptance verifier now retries the same IDs without canceling on observation
+loss; it does not retroactively repair that incomplete trial.
 
 **Optimization:** consented lab pilot/BO execution has durable reservation and
 independent confirmation, including real GPU runs. A completed three-block

@@ -1,0 +1,270 @@
+{
+  "status": "PARTIAL",
+  "protocol": "docs/slurm-project-isolation-plan.md",
+  "scope": "two dedicated lab project identities, one physical Orin GPU, immutable numerical CNN fixture",
+  "provisioning": {
+    "independent_linux_owners_and_accounts": true,
+    "independent_forced_ssh_keys": true,
+    "result_directory_mode": "0700",
+    "existing_project_gateway_and_native_config_preserved_at_provision": true,
+    "zero_change_repeat": true,
+    "original_qos_unchanged": true,
+    "per_project_aggregate_ceiling": {
+      "cpu": 1,
+      "memory_mib": 1024,
+      "gpu": 1
+    }
+  },
+  "native_limits": {
+    "status": "PASS",
+    "rejections": [
+      {
+        "project": "a",
+        "case": "cpu",
+        "native_policy_rejection_verified": true
+      },
+      {
+        "project": "a",
+        "case": "memory",
+        "native_policy_rejection_verified": true
+      },
+      {
+        "project": "a",
+        "case": "qos",
+        "native_policy_rejection_verified": true
+      },
+      {
+        "project": "a",
+        "case": "account",
+        "native_policy_rejection_verified": true
+      },
+      {
+        "project": "b",
+        "case": "cpu",
+        "native_policy_rejection_verified": true
+      },
+      {
+        "project": "b",
+        "case": "memory",
+        "native_policy_rejection_verified": true
+      },
+      {
+        "project": "b",
+        "case": "qos",
+        "native_policy_rejection_verified": true
+      },
+      {
+        "project": "b",
+        "case": "account",
+        "native_policy_rejection_verified": true
+      }
+    ]
+  },
+  "priority_rounds": [
+    {
+      "round": 1,
+      "both_pending_observed": true,
+      "later_high_running_older_normal_pending_observed": true
+    },
+    {
+      "round": 2,
+      "both_pending_observed": true,
+      "later_high_running_older_normal_pending_observed": true
+    }
+  ],
+  "ownership": {
+    "foreign_api_job_read_cancel_http": 404,
+    "foreign_artifact_http": 404,
+    "foreign_gateway_queue_accounting_results_hidden": true,
+    "same_active_native_jobs_after_foreign_cancel_verified": true,
+    "project_job_usage_lists_isolated": true
+  },
+  "attempts": {
+    "round-1-holder": {
+      "project": "a",
+      "state": "SUCCEEDED",
+      "allocated_device_seconds": 73.0,
+      "queue_seconds": 0.0,
+      "one_ledger": true,
+      "one_mlflow_run": true,
+      "matching_s3_api_mlflow_bytes": true,
+      "foreign_artifact_http": 404,
+      "bundle_sha256": "d284aa7f530c5cb72099822a91d08f76fd34c8cc53448cb475ca3aa55a38f772",
+      "measurements": {
+        "elapsed_seconds": 0.011245980858802795,
+        "peak_memory_mib": 33.05615234375,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 1.0782669996842742,
+        "latency_p95_ms": 1.2041579466313124,
+        "latency_p99_ms": 1.2041579466313124,
+        "throughput": 889.2065641542059,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      }
+    },
+    "round-1-normal": {
+      "project": "b",
+      "state": "SUCCEEDED",
+      "allocated_device_seconds": 73.0,
+      "queue_seconds": 143.0,
+      "one_ledger": true,
+      "one_mlflow_run": true,
+      "matching_s3_api_mlflow_bytes": true,
+      "foreign_artifact_http": 404,
+      "bundle_sha256": "2f77571fd1f0409940e2d7c14e19e779fe80e6e38fe91ee4fa589878cc41dc23",
+      "measurements": {
+        "elapsed_seconds": 0.011125592165626585,
+        "peak_memory_mib": 33.05615234375,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 1.0667950264178216,
+        "latency_p95_ms": 1.2762240367010236,
+        "latency_p99_ms": 1.2762240367010236,
+        "throughput": 898.8285613143188,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      }
+    },
+    "round-1-high": {
+      "project": "a",
+      "state": "SUCCEEDED",
+      "allocated_device_seconds": 75.0,
+      "queue_seconds": 61.0,
+      "one_ledger": true,
+      "one_mlflow_run": true,
+      "matching_s3_api_mlflow_bytes": true,
+      "foreign_artifact_http": 404,
+      "bundle_sha256": "a094d716a4e976c10d059dc3ffe42eb36a7a0e55f8a51b975c915fee9b2e803c",
+      "measurements": {
+        "elapsed_seconds": 0.014231273089535534,
+        "peak_memory_mib": 33.05615234375,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 1.3887875247746706,
+        "latency_p95_ms": 1.4794290764257312,
+        "latency_p99_ms": 1.4794290764257312,
+        "throughput": 702.6778234867229,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      }
+    },
+    "round-2-holder": {
+      "project": "b",
+      "state": "SUCCEEDED",
+      "allocated_device_seconds": 72.0,
+      "queue_seconds": 1.0,
+      "one_ledger": true,
+      "one_mlflow_run": true,
+      "matching_s3_api_mlflow_bytes": true,
+      "foreign_artifact_http": 404,
+      "bundle_sha256": "c9149ce6ff357f6d4912728f058db1a23193e786e5229aeb7aaf34db574c8a6f",
+      "measurements": {
+        "elapsed_seconds": 0.015493543818593025,
+        "peak_memory_mib": 33.05615234375,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 1.5286309644579887,
+        "latency_p95_ms": 1.6880739713087678,
+        "latency_p99_ms": 1.6880739713087678,
+        "throughput": 645.4301299357672,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      }
+    },
+    "round-2-normal": {
+      "project": "a",
+      "state": "CANCEL_REQUESTED",
+      "ledger_count": 0,
+      "allocated_device_seconds": null,
+      "outbox_pending": 1,
+      "result_present": false,
+      "verification": "UNRESOLVED"
+    },
+    "round-2-high": {
+      "project": "b",
+      "state": "SUCCEEDED",
+      "allocated_device_seconds": 73.0,
+      "queue_seconds": 62.0,
+      "one_ledger": true,
+      "one_mlflow_run": true,
+      "matching_s3_api_mlflow_bytes": true,
+      "foreign_artifact_http": 404,
+      "bundle_sha256": "cc04eff8fd0712c72ad90395e4097b67c26762d58cecebb92fb788b2ca10e165",
+      "measurements": {
+        "elapsed_seconds": 0.017451064777560532,
+        "peak_memory_mib": 33.05615234375,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 1.4626765041612089,
+        "latency_p95_ms": 2.029202994890511,
+        "latency_p99_ms": 2.029202994890511,
+        "throughput": 573.0309369350637,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      }
+    },
+    "b-qualification": {
+      "project": "b",
+      "state": "SUCCEEDED",
+      "allocated_device_seconds": 72.0,
+      "queue_seconds": 1.0,
+      "one_ledger": true,
+      "one_mlflow_run": true,
+      "matching_s3_api_mlflow_bytes": true,
+      "foreign_artifact_http": 404,
+      "bundle_sha256": "6db317812929b18c925b595942a5acf9edb2f63776ba9ad1a5c9e10077fde7e9",
+      "measurements": {
+        "elapsed_seconds": 0.01416618307121098,
+        "peak_memory_mib": 33.05615234375,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 1.4236360439099371,
+        "latency_p95_ms": 1.4561970019713044,
+        "latency_p99_ms": 1.4561970019713044,
+        "throughput": 705.9064498695033,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      }
+    }
+  },
+  "cost": {
+    "verified_completed_gpu_reservation_seconds": 438.0,
+    "unresolved_attempt_gpu_reservation_seconds": null,
+    "full_trial_total_known": false,
+    "reservation_includes_runtime_verification_overhead": true
+  },
+  "stop": {
+    "original_trial_status": "INCOMPLETE",
+    "observer_transport": "SSH timeout, subsequent no route to host",
+    "last_attempt_state": "CANCEL_REQUESTED",
+    "confirmed_terminated": false,
+    "replacement_compute_submitted": false,
+    "native_queries_from_worker_routes_failed_on_readback": true
+  },
+  "acceptance_open": [
+    "same final attempt native termination and accounting",
+    "drain its delivery outbox",
+    "end-of-trial native idle and preservation check",
+    "complete six-result acceptance"
+  ],
+  "not_claimed": [
+    "hostile tenant isolation",
+    "global scheduler fairness",
+    "trained model accuracy",
+    "Pi NPU qualification",
+    "full E6 or HAIRP completion"
+  ]
+}

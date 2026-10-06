@@ -45,7 +45,7 @@ MLflow는 실험 파라미터·측정값·결과 파일을 기록한다
 | 1–2 책임 분리·전체 제어 흐름 | Kubernetes와 Slurm을 분리했고 KFP/API/실행/결과 경로가 있다. 기존 Edge 런타임은 보존 | 공통 연구 작업과 기존 stage 런타임의 버전 있는 연결 계약 및 실제 stage 실행·재계획 연결 |
 | 3–4 공통 작업 모델·라우터 | ComputeJob/Attempt/RuntimeVariant/SchedulingProfile과 네이티브 adapter 구현 | 최초 ResearchJob 요구의 SLA/dependency/다중 노드 HPC 의미를 현재 계약과 대조하고 실제 지원 여부 검증 |
 | 5 Kueue | 두 프로젝트 큐·쿼터·우선순위·실제 GPU 대기/입장 검증 | 예시 4/8 GPU 쿼터는 현재 장비 용량과 분리해 재현 가능한 lab 설정으로 제공; 대규모 공정성은 미검증 |
-| 6 Slurm | 실제 Orin GPU 제출·조회·취소·결과·QOS·응답 유실 복구 검증 | 두 프로젝트 Account/QOS 공동사용·접근 차단·순서 및 남은 장애 시나리오 |
+| 6 Slurm | 실제 Orin GPU 제출·조회·취소·결과·QOS·응답 유실 복구 검증 | [두 프로젝트 시험](slurm-project-isolation.md)의 제한·접근 차단·양방향 선행은 관측; 연결 장애 후 마지막 작업 종료·비용 및 전체 수용시험은 미완료 |
 | 7 Kubeflow | 실제 launcher 파이프라인과 콘솔 제출/상태 연결 | 최초 Benchmark/Training/Edge Deployment/Runtime Evaluation 네 종류 전체를 실제 용도로 실행·연결 |
 | 8 MLflow | 실제 실행 metadata·측정·artifact 및 실패/취소 tracking | 모든 요구 metric/환경 metadata의 장치별 수집, 모델 버전 lifecycle 및 전체 pipeline artifact 범위 |
 | 9–10 하드웨어/작업 프로파일·장치 탐지 | 정적 capability와 동적 inventory를 분리하고 검증된 GPU/Hailo/Orin 계약 제공 | 최초 공통 HardwareProfile/WorkloadProfile 대응, AMD 및 vendor NPU plugin의 지원표와 실제 장비별 검증 |
@@ -63,8 +63,11 @@ MLflow는 실험 파라미터·측정값·결과 파일을 기록한다
 | 31 최종 시연·시니어 리뷰 | 실제 GPU/NPU/Slurm/KFP 실행과 다수 보고서, 검토 문서 제공 | 최초 전체 구성요소와 위 미완료 항목의 시연/근거 연결 후 최종 완료 판정 |
 
 현재 독립 구현 v0.3의 필수 M0–M6도 전체 완료로 선언하지 않았다.
-현재 남은 수용시험에는 Slurm 두 프로젝트 공동사용과 전체 E0–E7 정리가
-있다. Pi의 DEEPX NPU는 PCIe 장치 탐지가 확인되지 않아 실행 후보로
+Slurm 두 프로젝트의 계정·제한·접근 차단과 양방향 선행은 실제로
+관측했다. [해당 시험](slurm-project-isolation.md)은 마지막 작업에서
+연결이 끊겨 부분 완료이며, 같은 작업의 종료·비용과 남은 호환성·장애
+시험이 남아 있다. [E0–E7 대조표](scenario-acceptance.md)는 작성했다.
+Pi의 DEEPX NPU는 PCIe 장치 탐지가 확인되지 않아 실행 후보로
 등록할 수 없다. 다른 Hailo에서 성공한 모델을 그 장치의 근거로 재사용하지 않는다.
 
 ## 성과를 설명하는 문장

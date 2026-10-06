@@ -19,6 +19,17 @@ import httpx
 TERMINAL = {"SUCCEEDED", "FAILED", "CANCELED", "RESULT_INVALID"}
 
 
+class NativeObservationUnavailable(RuntimeError):
+    """Transport loss is not evidence that the recorded native job failed."""
+
+
+def observe(argv):
+    try:
+        return json.loads(subprocess.check_output(argv, text=True, timeout=40))
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+        raise NativeObservationUnavailable(type(error).__name__) from error
+
+
 def verify(config, report):
     if set(config["projects"]) != {"a", "b"}:
         raise ValueError("two project identities required")
@@ -76,7 +87,7 @@ def verify(config, report):
         argv = list(config["observer_command"])
         for job in ids:
             argv += ["--job", job]
-        observed = json.loads(subprocess.check_output(argv, text=True, timeout=40))
+        observed = observe(argv)
         for entry in state["jobs"].values():
             current, scope = entry["latest"], config["projects"][entry["project"]]
             if not current.get("external_id"):
@@ -93,15 +104,29 @@ def verify(config, report):
                 assert row["JobName"] == entry["receipt"]["attempt_id"]
             entry["observation"] = item
         save()
+        return True
 
     def until(predicate, seconds=600):
         deadline = time.monotonic() + seconds
+        unavailable = None
         while time.monotonic() < deadline:
-            snapshot()
+            try:
+                snapshot()
+                unavailable = None
+            except NativeObservationUnavailable as error:
+                unavailable = error
+                state.setdefault("observer_errors", []).append(
+                    {"time": datetime.now().astimezone().isoformat(), "error": str(error)}
+                )
+                save()
+                time.sleep(3)
+                continue
             result = predicate()
             if result:
                 return result
             time.sleep(3)
+        if unavailable is not None:
+            raise unavailable
         raise TimeoutError("inspect the saved IDs; do not start another trial")
 
     def native(label):
@@ -165,6 +190,10 @@ def verify(config, report):
         state["status"] = "PASS"
         save()
         return state
+    except NativeObservationUnavailable:
+        state["stop_reason"] = "native observation unavailable; inspect the same IDs"
+        save()
+        raise
     except Exception:
         for entry in state["jobs"].values():
             if entry.get("latest", {}).get("state") not in TERMINAL:

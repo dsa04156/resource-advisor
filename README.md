@@ -64,7 +64,10 @@ Compatible candidates offer observed execution; active jobs offer cancellation.
 confirmation, retained costs and project/owner filtering.
 The [high-priority Slurm profile](docs/slurm-priority-gateway.md) also now reaches
 the scoped native gateway and an actual completed GPU/result/MLflow path;
-cross-project priority ordering remains unverified.
+a [two-project trial](docs/slurm-project-isolation.md) now observes high-first
+ordering in both directions and eight native quota/account rejections.
+The last attempt is unresolved after controller connectivity loss, so full
+acceptance remains open.
 
 The [approved GPU demo](docs/approved-gpu-demo.md) now connects fresh qualification,
 three observations, recommendation, approval and independent measured comparison.
