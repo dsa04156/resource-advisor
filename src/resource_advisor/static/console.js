@@ -221,6 +221,8 @@ const states = {
   CANCELED: "취소",
   RESULT_INVALID: "결과 검증 실패",
   RUNNING: "실행 중",
+  FINALIZING: "실행 마무리 중",
+  COMPLETING: "실행 마무리 중",
   QUEUED: "대기",
   VALIDATED: "접수됨",
   SUBMITTING: "제출 중",
@@ -2356,7 +2358,7 @@ async function startLab(){
   try{const r=await fetch(API+"/scheduler-labs",{method:"POST",headers:{...authHeaders(),"Content-Type":"application/json","Idempotency-Key":labKey},body:JSON.stringify({scenario:labKind,...(labKind==="multi_gpu"?{gpu_count:labGpuCount}:{})})});const v=await r.json();if(!r.ok)throw new Error(v.detail||"실험 접수 실패");labRef=v.ref;labReplaySeen.add(v.ref);labCursor=null;labSelected="";labWorker="";labKey=null;$("auto").checked=true;await refreshLab();}
   catch(e){labError=e.message;}finally{labBusy=false;render();}
 }
-function labTone(state){return ["SUCCEEDED","COMPLETED","Succeeded"].includes(state)?"done":["RUNNING","Running","ADMITTED"].includes(state)?"active":["FAILED","Failed","CANCELED","CANCELLED"].includes(state)?"failed":"waiting";}
+function labTone(state){return ["SUCCEEDED","COMPLETED","Succeeded"].includes(state)?"done":["RUNNING","Running","ADMITTED","FINALIZING","COMPLETING","COLLECTING"].includes(state)?"active":["FAILED","Failed","CANCELED","CANCELLED"].includes(state)?"failed":"waiting";}
 function schedulerLabView(){
   const root=el("div",null,"lab-page"),items=labData?.items||[],run=items.find(r=>r.ref===labRef),kind=labKinds[labKind];
   const header=add(el("div",null,"lab-heading"),add(el("div"),el("span","NATIVE SCHEDULING LAB","eyebrow"),el("h2","스케줄러의 결정을 눈으로 보다"),el("p","실제 자원 · 대기열 · 할당과 실행을 한 화면에서","muted")),badge(labData?.agent?.online&&Date.now()-Date.parse(labData.agent.seen_at)<40000?"실행기 연결됨":"실행기 연결 확인 필요",labData?.agent?.online&&Date.now()-Date.parse(labData.agent.seen_at)<40000?"good":"warn"));root.append(header);
@@ -2398,7 +2400,7 @@ function schedulerLabView(){
   const range=el("input");range.id="lab-replay-seek";range.type="range";range.min="0";range.max=String(Math.max(events.length-1,0));range.value=String(Math.max(index,0));range.setAttribute("aria-label","네이티브 관측 시점 탐색");range.disabled=!events.length;range.oninput=()=>{stopLabReplay();labReplaySeen.add(labRef);labCursor=Number(range.value);render();$("lab-replay-seek")?.focus();};timeline.append(range);
   events.slice(-12).reverse().forEach((e,offset)=>{const idx=events.length-1-offset,b=el("button",null,"lab-event"+(index===idx?" selected":""));add(b,el("time",stamp(e.observed_at)),el("span",e.title));b.onclick=()=>{stopLabReplay();labReplaySeen.add(labRef);labCursor=idx;render();};timeline.append(b);});bottom.append(timeline);
   const inspector=add(el("section",null,"lab-inspector"),el("span","NATIVE EVIDENCE","eyebrow"),el("h3",selected?selected.label:"스케줄러 관측"));
-  if(selected){add(inspector,el("p","ID · "+selected.id),el("p","상태 · "+selected.state),el("p",selected.reason&&selected.reason!=="None"?(labTone(selected.state)==="done"?"이전 대기 사유 · ":"")+selected.reason:"대기 사유 없음"));for(const p of (selected.pods||[]).filter(p=>!labWorker||p.name===labWorker)){inspector.append(el("p",(p.node||"노드 미정")+" · "+p.state));for(const e of p.events||[])inspector.append(el("small",e.phase+(e.correctness?" · CUDA 검증 통과":"")));}}
+  if(selected){add(inspector,el("p","ID · "+selected.id),el("p","상태 · "+(states[labDisplayState(selected)]||labDisplayState(selected))),labDisplayState(selected)!==selected.state?el("small","원본 관측 상태 · "+selected.state+" · worker 성공 종료, Job 완료 확인 대기"):null,el("p",selected.reason&&selected.reason!=="None"?(labTone(selected.state)==="done"?"이전 대기 사유 · ":"")+selected.reason:"대기 사유 없음"));for(const p of (selected.pods||[]).filter(p=>!labWorker||p.name===labWorker)){inspector.append(el("p",(p.node||"노드 미정")+" · "+p.state));for(const e of p.events||[])inspector.append(el("small",e.phase+(e.correctness?" · CUDA 검증 통과":"")));}}
   if(snap.queue_evidence){const d=el("details");add(d,el("summary","기록된 대기 사유"),el("pre",JSON.stringify(snap.queue_evidence,null,2)));inspector.append(d);}if(selected?.admission){const d=el("details");add(d,el("summary","실제 Kueue admission / topologyAssignment"),el("pre",JSON.stringify(selected.admission,null,2)));inspector.append(d);}if(snap.reservation){const d=el("details");add(d,el("summary","실제 Slurm 예약 창"),el("pre",snap.reservation));inspector.append(d);}if(snap.error)inspector.append(el("p",snap.error,"error"));if(snap.verdict)inspector.append(el("p",snap.verdict,"lab-verdict"));bottom.append(inspector);root.append(bottom);return root;
 }
 
@@ -2477,11 +2479,19 @@ function heterogeneousCatalog(){
 }
 // Native observations drive both the lane and its movement. Polling alone never
 // advances a card; completed history uses the same mapping as current runs.
-function labJobLane(j){
+function labDisplayState(j){
   const state=String(j.state||"").toUpperCase();
+  // Older native snapshots fell back to ADMITTED between pod success and
+  // Job Complete. Preserve raw evidence; do not mask retries or requeues.
+  const pods=j.pods||[],expected=Number(j.expected_completions??j.gpu);
+  if(state==="ADMITTED"&&expected>0&&pods.length>=expected&&pods.every(p=>p.state==="Succeeded"))return "FINALIZING";
+  return state;
+}
+function labJobLane(j){
+  const state=labDisplayState(j);
   if(["SUCCEEDED","COMPLETED","FAILED","CANCELED","CANCELLED","RESULT_INVALID","TIMEOUT","NODE_FAIL","OUT_OF_MEMORY"].includes(state))return 3;
-  if(state==="RUNNING")return 2;
-  if(["ADMITTED","STARTING","LAUNCHING","CONFIGURING","COMPLETING"].includes(state)||j.admission)return 1;
+  if(["RUNNING","FINALIZING","COMPLETING","COLLECTING"].includes(state))return 2;
+  if(["ADMITTED","STARTING","LAUNCHING","CONFIGURING"].includes(state)||j.admission)return 1;
   return 0;
 }
 function labScenarioGuide(kind){
@@ -2550,12 +2560,13 @@ function labFlowBoard(run,snap){
     add(head,el("span",step,"eyebrow"),el("strong",title),el("b",String(items.length)),el("small",desc));lane.append(head);
     const stack=el("div",null,"lab-flow-stack");
     for(const j of items){
-      const card=el("button",null,"lab-flow-job "+labTone(j.state)+(labSelected===j.id?" selected":""));card.dataset.flowId=run.ref+":"+j.id;card.id="lab-flow-"+j.id;card.setAttribute("aria-pressed",String(labSelected===j.id));
-      add(card,el("span",(j.backend||(run.scenario==="backfill"?"slurm":"kubernetes")).toUpperCase()+" · "+(j.device_class||"gpu").toUpperCase(),"eyebrow"),el("strong",j.label),stateBadge(j.state));
+      const displayState=labDisplayState(j),card=el("button",null,"lab-flow-job "+labTone(displayState)+(labSelected===j.id?" selected":""));card.dataset.flowId=run.ref+":"+j.id;card.id="lab-flow-"+j.id;card.setAttribute("aria-pressed",String(labSelected===j.id));
+      add(card,el("span",(j.backend||(run.scenario==="backfill"?"slurm":"kubernetes")).toUpperCase()+" · "+(j.device_class||"gpu").toUpperCase(),"eyebrow"),el("strong",j.label),stateBadge(displayState));
       if(j.gpu!=null)card.append(el("small",j.gpu+" GPU 요청"));if(j.priority!=null)card.append(el("small","네이티브 우선순위 "+j.priority));
       const nodes=labJobNodes(j);for(const node of nodes)card.append(el("span","↳ "+node,"lab-flow-target"));
       if(index===0)card.append(el("small",j.reason&&j.reason!=="None"?String(j.reason):"스케줄러의 다음 상태 관측 대기","lab-flow-reason"));
       if(index===1)card.append(el("small",j.admission?"Kueue quota 승인 관측 · worker 시작 대기":"실행기 준비 상태 관측"));
+      if(displayState==="FINALIZING")card.append(el("small","worker 성공 종료 · Job 완료 확인 대기"));
       if(j.result)card.append(el("small","✓ 실행 결과 수집됨"));
       card.onclick=()=>{labSelected=j.id;labWorker="";labResourceFilter="all";render();const target=document.querySelector(".lab-resource.linked"),rail=document.querySelector(".lab-resource-rail");if(target&&rail)rail.scrollTo({left:rail.scrollLeft+target.getBoundingClientRect().left-rail.getBoundingClientRect().left-2,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"});};stack.append(card);
     }

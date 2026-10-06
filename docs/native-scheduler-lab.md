@@ -350,3 +350,18 @@ The same HTTPS endpoint responded after API pod replacement without reconnecting
 the proxy. Desktop and 390px layouts were inspected. Eleven existing focused
 API/console tests passed; after adding the project-isolation regression, all three
 scheduler-lab tests passed. Raw run evidence and screenshots remain private.
+
+### Completion observation gap
+
+When every expected native worker pod has succeeded but the Job controller has
+not yet reported `Complete`, the observer emits `FINALIZING`. The card stays in
+the execution lane with “실행 마무리 중” until terminal Job evidence arrives.
+Previously the remaining Kueue admission flag caused this interval to appear
+as allocation again. Recorded snapshots with that exact pod evidence receive
+the same display mapping without rewriting their raw state. Pending or retrying
+workers do not qualify; real requeues remain visible. Slurm `COMPLETING` and
+platform result `COLLECTING` also belong in execution, not preparation or queue.
+
+Verification: eight runner cases passed; all four affected transitions in the
+existing private run history mapped to the execution lane. The priority replay
+was inspected in the browser at the affected event. No GPU rerun was needed.

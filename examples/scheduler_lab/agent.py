@@ -281,6 +281,8 @@ class Agent:
                 ),
                 None,
             )
+            expected = job["spec"].get("completions", job["spec"]["parallelism"])
+            finalizing = len(jp) >= expected and all(p["state"] == "Succeeded" for p in jp)
             result.append(
                 {
                     "id": name,
@@ -291,11 +293,14 @@ class Agent:
                     if complete
                     else "RUNNING"
                     if any(p["state"] == "Running" for p in jp)
+                    else "FINALIZING"
+                    if finalizing
                     else "ADMITTED"
                     if admitted
                     else "PENDING",
                     "reason": reason,
                     "gpu": job["spec"]["parallelism"],
+                    "expected_completions": expected,
                     "priority": w.get("spec", {}).get("priority"),
                     "pods": jp,
                     "admission": w.get("status", {}).get("admission"),

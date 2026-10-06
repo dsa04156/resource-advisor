@@ -31,7 +31,17 @@ def test_priority_and_failure_are_fixed_native_job_options():
     assert job["spec"]["backoffLimit"] == 0
 
 
-def test_admitted_pending_pod_is_not_running_and_retired_job_survives():
+@pytest.mark.parametrize(
+    "phase,condition,expected",
+    [
+        ("Pending", None, "ADMITTED"),
+        ("Running", None, "RUNNING"),
+        ("Succeeded", None, "FINALIZING"),
+        ("Succeeded", "Complete", "SUCCEEDED"),
+        ("Failed", "Failed", "FAILED"),
+    ],
+)
+def test_native_lifecycle_and_retired_job_survives(phase, condition, expected):
     a = runner()
     name = a.ref + "-new"
     a.snapshot["retired_jobs"] = [{"id": "old", "label": "old", "state": "CANCELED"}]
@@ -41,7 +51,7 @@ def test_admitted_pending_pod_is_not_running_and_retired_job_survives():
             {
                 "metadata": {"name": "new-pod", "labels": {"job-name": name}},
                 "spec": {"nodeName": "node-a"},
-                "status": {"phase": "Pending"},
+                "status": {"phase": phase},
             }
         ],
         "workloads.kueue.x-k8s.io": [
@@ -55,9 +65,13 @@ def test_admitted_pending_pod_is_not_running_and_retired_job_survives():
             }
         ],
     }
-    a.kube = lambda command, resource, *args: json.dumps({"items": fixtures[resource]})
+    if condition:
+        fixtures["jobs"][0]["status"]["conditions"] = [{"type": condition, "status": "True"}]
+    a.kube = lambda command, resource, *args: (
+        "" if command == "logs" else json.dumps({"items": fixtures[resource]})
+    )
     result = a.observe_kube()
-    assert result["new"]["state"] == "ADMITTED"
+    assert result["new"]["state"] == expected
     assert result["new"]["priority"] == 100
     assert result["old"]["state"] == "CANCELED"
 
