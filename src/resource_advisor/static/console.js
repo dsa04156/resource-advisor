@@ -9,7 +9,7 @@ let token = "",
   data = null;
 let receivedAt = 0,
   expiryTimer = null,
-  active = "execution";
+  active = "operations";
 const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, qualifications: 0, templates: 0 };
 const submitting = new Set();
 const requestKeys = new Map();
@@ -160,6 +160,8 @@ function approvalControls(recommendation) {
   return add(el("div"), button, el("small", "승인 시 현재 근거를 다시 검사합니다. 승인은 자원 예약이 아닙니다."));
 }
 const views = {
+  operations: ["COMPUTE OPERATIONS", "운영 현황", "자원 배분, 대기 사유, 장애와 사용량을 확인합니다."],
+  usage: ["PROJECT ACCOUNTING", "프로젝트 사용량", "물리 장치와 공유 슬롯을 구분한 할당 원장입니다."],
   submit: [
     "SUBMIT JOB",
     "작업 제출",
@@ -178,7 +180,7 @@ const views = {
   ],
   history: [
     "ALLOCATION LEDGER",
-    "큐 · 사용량",
+    "큐 · 쿼터",
     "현재 프로젝트의 큐 상태와 완료·실패·취소를 포함한 사용 이력입니다.",
   ],
   recommendations: [
@@ -671,6 +673,75 @@ function nodeCard(n, s) {
   if (Object.keys(facts).length) card.append(details("가속기 메모리 · 전력 · 온도", facts));
   return card;
 }
+function queueCards() {
+  const cards=el("div",null,"queue-cards");
+  for(const s of data.inventory) {
+    if(s.backend==="slurm") {
+      const q=observed(s.slurm_queue,s), v=q.value;
+      cards.append(add(el("article",null,"queue-card"),el("small","SLURM · "+s.cluster_ref),
+        el("h3",q.status==="ok"?`${v.account} / ${v.partition}`:"큐 상태 확인 필요"),
+        q.status==="ok"?add(el("div",null,"queue-numbers"),add(el("div"),el("strong",v.pending_records),el("small","대기 레코드")),add(el("div"),el("strong",v.running_records),el("small","실행 레코드"))):badge(labels[q.status]||"확인 불가","warn"),
+        el("small","설정된 계정·파티션 범위"),actionLink("큐 자세히 →","#history")));
+    } else for(const entry of s.cluster_queues || []) {
+      const q=observed(entry.observation,s),v=q.value;
+      cards.append(add(el("article",null,"queue-card"),el("small","KUEUE · CLUSTER QUEUE"),el("h3",entry.ref),
+        q.status==="ok"?add(el("div",null,"queue-numbers"),add(el("div"),el("strong",v.pending_workloads??"—"),el("small","대기")),add(el("div"),el("strong",v.admitted_workloads??"—"),el("small","승인"))):badge(labels[q.status]||"확인 불가","warn"),
+        el("small","ClusterQueue 전체 네임스페이스 합계"),actionLink("쿼터·승인 조건 →","#history")));
+    }
+  }
+  return cards.childElementCount?cards:empty("큐 관측 정보가 없습니다. 빈 큐로 판단하지 않습니다.");
+}
+function jobAction(job) {
+  const open=el("button","상세 · 조치");open.onclick=()=>showJob(job);
+  return add(el("div",null,"job-actions"),open,cancelButton(job));
+}
+function operationsView() {
+  const op=data.operations, root=el("div",null,"operations-page");
+  if(!op)return empty("운영 집계를 불러오지 못했습니다.");
+  root.append(add(el("section",null,"operations-intro"),
+    add(el("div"),el("p","SHARED COMPUTE · "+data.project_ref,"eyebrow"),el("h2","공동 자원 운영"),el("p","지금 기다리는 작업과 확인할 문제부터 살펴보세요.")),
+    add(el("div",null,"hero-actions"),actionLink("작업 제출 →","#submit"),actionLink("장비 사용량 보기","#execution"))));
+  const kpis=dashboardStats([["실행 중",op.running_total,"현재 프로젝트"],["접수 · 대기",op.waiting_total,"백엔드 대기 사유 확인"],["취소 확인 중",op.cancel_pending_total,"자원 반환 확인 전"],["최근 실패",op.failed_24h_total,"최근 24시간"],["장비 확인 필요",op.node_issues.length,"오래된 관측 포함"]]);
+  kpis.classList.add("ops-kpis");root.append(kpis,queueCards());
+  const activeRows=op.active_jobs.map(j=>[
+    add(el("div",null,"job-name"),el("strong",j.template?.name||j.workload_ref),code(j.job_id)),
+    add(el("div"),stateBadge(j.state),el("small",j.backend+" · "+(j.priority==="high"?"높음":"보통"))),
+    add(el("div"),el("strong",j.attention.title),el("small",j.attention.action),j.attention.reason_code?code(j.attention.reason_code):null),
+    duration(j.since_submission_seconds),jobAction(j)]);
+  root.append(panel("진행 중인 작업",`현재 프로젝트 ${op.active_total}개 · 오래된 접수 순으로 최대 ${op.active_limit}개 표시 · 경과 시간은 접수 이후 시간입니다.`,
+    activeRows.length?table(["작업","상태 · 우선순위","대기 사유 · 확인할 내용","접수 후 경과","조치"],activeRows):empty("현재 프로젝트에 진행 중인 작업이 없습니다.")));
+  const incidents=el("div",null,"incident-list");
+  for(const issue of op.node_issues) {
+    const open=el("button","장비 확인");open.onclick=()=>{resourceSearch=issue.node_ref;resourceBackend=issue.backend;location.hash="execution";};
+    incidents.append(add(el("article",null,"incident-row"),add(el("div"),badge(issue.title,"warn"),el("h3",issue.node_ref),el("p",issue.action),el("small",`${issue.backend} · ${stamp(issue.observed_at)}`)),open));
+  }
+  for(const j of op.recent_failures) incidents.append(add(el("article",null,"incident-row"),
+    add(el("div"),stateBadge(j.state),el("h3",j.template?.name||j.workload_ref),el("p",j.attention.title+" · "+j.attention.action),el("small",`${j.backend} · ${stamp(j.finished_at)}`)),jobAction(j)));
+  root.append(panel("확인할 문제", "현재 장비 관측과 최근 24시간 실패 작업입니다. 해결 완료를 자동 판정하지 않습니다.",incidents.childElementCount?incidents:empty("관측 범위에서 표시할 장비 문제나 최근 실패 작업이 없습니다.")));
+  root.append(add(el("div",null,"operations-links"),actionLink("할당량·우선순위 확인 →","#history"),actionLink("프로젝트 사용량 →","#usage")));
+  return root;
+}
+function usageView() {
+  const u=data.operations?.usage, root=el("div");if(!u)return empty("사용량 집계를 불러오지 못했습니다.");
+  root.append(panel("프로젝트 할당 사용량",`${data.project_ref} · 보관된 종료 작업 전체 · 다른 프로젝트의 기록은 포함하지 않습니다.`,
+    dashboardStats([["종료 작업",u.attempts,"완료·실패·취소 포함"],["평균 큐 대기",u.queue_mean_seconds==null?"—":duration(u.queue_mean_seconds),`${u.queue_known_attempts}개 측정 기록 기준`],["대기 시간 미확인",u.queue_unknown_attempts,"0초로 계산하지 않음"],["자원 구분",u.groups.length,"백엔드·장치·할당 방식별"]])));
+  const groups=u.groups;
+  const rows=groups.map(g=>[data.project_ref,add(el("div"),badge(g.backend),el("small",g.accelerator_model)),
+    add(el("div"),el("strong",g.device_class.toUpperCase()),el("small",modes[g.allocation_mode]||g.allocation_mode)),
+    g.attempts,g.device_class==="cpu"?"가속기 시간 해당 없음":g.unknown_allocation_attempts===g.attempts?"미확인":fmt(g.known_allocated_device_seconds/3600,4)+(g.allocation_mode==="virtual_slot"?" 슬롯·h":" 장치·h"),
+    g.unknown_allocation_attempts,details("종료 상태",g.outcomes)]);
+  const exportButton=el("button","사용량 CSV 내려받기");exportButton.disabled=!groups.length;
+  exportButton.onclick=()=>{
+    const fields=["project","backend","device_class","allocation_mode","accelerator_model","attempts","known_allocated_device_hours","unknown_allocation_attempts"];
+    const cell=v=>'"'+String(v??"").replace(/^[=+@-]/,"'$&").replaceAll('"','""')+'"';
+    const lines=[fields,...groups.map(g=>[data.project_ref,g.backend,g.device_class,g.allocation_mode,g.accelerator_model,g.attempts,g.known_allocated_device_seconds/3600,g.unknown_allocation_attempts])];
+    const url=URL.createObjectURL(new Blob(["\ufeff"+lines.map(row=>row.map(cell).join(",")).join("\r\n")],{type:"text/csv;charset=utf-8"}));
+    const a=el("a");a.href=url;a.download="project-usage.csv";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  };
+  root.append(panel("백엔드·장치별 집계", "실제로 관측된 예약 시간입니다. GPU·NPU·공유 슬롯을 서로 합산하거나 실제 사용률로 해석하지 않습니다.",
+    add(el("div"),add(el("div",null,"panel-head"),exportButton),groups.length?table(["프로젝트","백엔드 · 장비","할당 단위","작업 수","확인된 할당 시간","미확인 작업","종료 상태"],rows):empty("집계할 종료 기록이 없습니다."))));
+  root.append(ledgerView());return root;
+}
 function execution() {
   const root = el("div");
   const allNodes = data.inventory.flatMap(s => s.nodes.map(n => ({n,s})));
@@ -753,6 +824,10 @@ function showJob(job) {
     dashboardStats([["실행 노드", job.node_ref || "—", "대상 노드"], ["생성 시각", stamp(job.created_at), "서버 기록"]]),
     el("p", `CPU ${job.requested_resources?.host_cpu ?? "—"} · 메모리 ${job.requested_resources?.host_memory_mib ?? "—"} MiB · 가속기 ${job.requested_resources?.accelerator_count ?? "—"}`),
     el("p", "최근 백엔드 확인: " + stamp(job.backend_observed_at)),
+    job.attention ? panel(job.attention.title, job.attention.action,
+      add(el("div",null,"evidence"),job.scheduler_reason?code(job.scheduler_reason):null,
+        el("p",`우선순위 ${job.priority==="high"?"높음":"보통"} · 실행 제한 ${job.execution_limits?.max_run_seconds??"—"}초`),
+        table(["단계","관측 시각"],[["접수",stamp(job.created_at)],["백엔드 제출",stamp(job.queued_at)],["자원 할당 · 시작",stamp(job.started_at)],["종료 기록",stamp(job.finished_at)]]))) : null,
     job.error ? el("p",job.error,"error-message") : null,
     job.last_observation_error ? el("p", "최근 관측 오류: " + job.last_observation_error,"error-message") : null,
     m ? panel("실행 결과", "수집된 측정 구간의 값입니다.", dashboardStats([
@@ -787,7 +862,7 @@ function jobsView() {
   toolbar.append(filters);
   const rows = data.jobs.items.map(j => {
     const open = el("button", "상세 보기", "details-action"); open.setAttribute("aria-label", `상세 보기 · ${j.job_id}`); open.onclick = () => showJob(j);
-    return [add(el("div",null,"job-name"),el("strong",j.template?.name || j.workload_ref),code(j.job_id)),stateBadge(j.state),
+    return [add(el("div",null,"job-name"),el("strong",j.template?.name || j.workload_ref),code(j.job_id)),add(el("div"),stateBadge(j.state),j.scheduler_reason?el("small",j.attention?.title||j.scheduler_reason):null),
       add(el("div"),badge(j.backend),el("small",j.node_ref)),
       el("span",`CPU ${j.requested_resources?.host_cpu ?? "—"} · GPU/NPU ${j.requested_resources?.accelerator_count ?? "—"}`),
       stamp(j.created_at),add(el("div",null,"job-actions"),open,cancelButton(j))];
@@ -1217,6 +1292,10 @@ function historyView() {
         empty("연결된 큐 관측이 없습니다. 빈 큐로 판단하지 않습니다."),
       ),
     );
+  return root;
+}
+function ledgerView() {
+  const root = el("div");
   const rows = data.history.items.map((r) => {
     const b = r.body,
       known = b.schema_version === "v2";
@@ -1558,6 +1637,8 @@ function render() {
   $("updated").textContent = "조회 " + stamp(data.generated_at);
   $("content").replaceChildren(
     {
+      operations: operationsView,
+      usage: usageView,
       execution,
       jobs: jobsView,
       submit: submissionView,
@@ -1587,7 +1668,7 @@ function render() {
   if (expirations.length)
     expiryTimer = setTimeout(
       () => {
-        if (data && ["execution", "history"].includes(active)) render();
+        if (data && ["operations", "execution", "history"].includes(active)) render();
       },
       Math.max(1, Math.min(...expirations) - effectiveNow() + 10),
     );
@@ -1695,7 +1776,7 @@ $("refresh").onclick = () => load();
 function navigate(event) {
   const view = new URL(event?.newURL || location.href).hash.slice(1);
   if (view === "main") return; // The skip link must not change the selected view.
-  active = views[view] ? view : "execution";
+  active = views[view] ? view : "operations";
   document.querySelectorAll("nav a").forEach((a) => {
     if (a.dataset.view === active) a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");

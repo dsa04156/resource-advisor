@@ -45,7 +45,7 @@ def job_view(service, conn, row):
     result = owned(service.store, conn, row["project"], "result", body["attempt_id"])
     tracking = owned(service.store, conn, row["project"], "tracking", body["attempt_id"])
     phases = owned(service.store, conn, row["project"], "phase_profile", body["attempt_id"])
-    return {
+    view = {
         **service.public_job(row),
         "workload_ref": body["request"]["workload_ref"],
         "template": body.get("job_template"),
@@ -54,6 +54,10 @@ def job_view(service, conn, row):
         "cluster_ref": body["backend_cluster_id"],
         "node_ref": body["capability"]["node_ref"],
         "mode": body["request"]["mode"],
+        "scheduler_reason": body.get("scheduler_reason"),
+        "priority": body["spec"]["execution"].get("priority", "normal"),
+        "execution_limits": body.get("execution_limits", body["spec"]["execution"]),
+        "queued_at": body.get("scheduler_submitted_at") or body.get("queued_at"),
         "requested_resources": body["candidate"]["context"]["resources"],
         "allocation_mode": body["candidate"]["context"]["allocation_mode"],
         "observed_allocation": body.get("allocation"),
@@ -63,6 +67,11 @@ def job_view(service, conn, row):
         "diagnostics": diagnose(phases, evidence_kind=result["evidence_kind"] if result else None),
         **{k: body.get(k) for k in ("started_at", "finished_at", "backend_observed_at")},
     }
+
+    from .operations import job_attention
+
+    view["attention"] = job_attention(view)
+    return view
 
 
 def selected_context(store, conn, project, rec):
@@ -281,6 +290,9 @@ def overview(
             }
             for r in rows
         ]
+        from .operations import operations_snapshot
+
+        operations = operations_snapshot(service, conn, project, inventory, counts)
         from .qualifications import list_page as qualification_page
 
         qualifications = qualification_page(store, conn, project, qualifications_page)
@@ -294,6 +306,7 @@ def overview(
         "operational_mode": service.operational_mode,
         "submission_catalog": catalog if service.console_workloads else None,
         "templates": templates,
+        "operations": operations,
         "history": history,
         "recommendations": recommendations,
         "qualifications": qualifications,

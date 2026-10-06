@@ -31,6 +31,7 @@ class Observation:
     execution_started_at: str | None = None
     backend_uid: str | None = None
     termination: dict | None = None
+    scheduler_reason: str | None = None
 
 
 def memory_mib(value, *, slurm=False):
@@ -442,12 +443,29 @@ class KubernetesBackend:
                     submitted_at=submitted,
                     **retained,
                 )
+        scheduler_reason = None
+        if "running" not in container and "terminated" not in container:
+            scheduler_reason = container.get("waiting", {}).get("reason")
+            if not scheduler_reason:
+                scheduler_reason = next(
+                    (
+                        c.get("reason")
+                        for c in pod_status.get("conditions", [])
+                        if c.get("type") == "PodScheduled" and c.get("status") == "False"
+                    ),
+                    None,
+                )
+            if not scheduler_reason and obj.get("spec", {}).get("suspend"):
+                scheduler_reason = "AdmissionPending"
+            if scheduler_reason and not re.fullmatch(r"[A-Za-z0-9_.-]{1,128}", scheduler_reason):
+                scheduler_reason = None
         # Container exit can precede the controller's terminal Job condition.
         # Keep the attempt active until that condition arrives; requeueing here
         # would also incorrectly reapply the admission-wait deadline.
         return Observation(
             State.RUNNING if "running" in container or "terminated" in container else State.QUEUED,
             scheduled,
+            scheduler_reason=scheduler_reason,
             allocation=allocation,
             execution_started_at=execution_started,
             submitted_at=submitted,
@@ -741,13 +759,25 @@ class SlurmBackend:
                 self.account,
                 "--partition",
                 self.partition,
-                "--format=%i|%j|%a|%P|%T",
+                "--format=%i|%j|%a|%P|%T|%r",
             ]
         )
-        record = self.owned_record(queued, job, width=5, required=False)
+        # Older command wrappers may still emit five columns; reason remains unknown.
+        width = (
+            5
+            if queued.strip()
+            and all(len(line.split("|")) == 5 for line in queued.splitlines() if line.strip())
+            else 6
+        )
+        record = self.owned_record(queued, job, width=width, required=False)
         if record:
             return Observation(
-                State.RUNNING if record[4] in {"RUNNING", "COMPLETING"} else State.QUEUED
+                State.RUNNING if record[4] in {"RUNNING", "COMPLETING"} else State.QUEUED,
+                scheduler_reason=record[5]
+                if width == 6
+                and record[4] == "PENDING"
+                and re.fullmatch(r"[A-Za-z0-9_.-]{1,128}", record[5])
+                else None,
             )
         output = self.call(
             [

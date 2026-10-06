@@ -34,7 +34,7 @@ server-side across project records; node filtering remains local.
 Palette follows the reference: neutral #f5f5f7 canvas, #1d1d1f text, #0071e3 actions,
 #0b1716 rack, #102321 instrument and #58ddb2 signals. Cards use 22px radii, the
 fleet hero 28px, a 4px spacing grid, subtle borders and a minimal panel shadow.
-At mobile widths the four primary routes move to a bottom navigation bar; analysis
+At mobile widths the six primary routes move to a scrollable bottom navigation bar; analysis
 links remain accessible above the topbar, tables expose extra facts in details.
 Compatibility and recommendation evidence remain secondary sidebar links.
 An operator-selected submission catalog is the default; historical experimental
@@ -93,3 +93,10 @@ configuration, priority, run time and queue time. Resource/model/command values 
 inherited and shown before saving. Saving selects the durable template; execution
 requires the separate submit button. Collapse to one column on mobile. Draft text
 survives dependent selector changes; reset clears project-specific draft state.
+
+Operator-first home: Operations is the default route, with a compact shared-compute
+header, joined state counters, backend-scoped queue cards, active-job table and
+inspection list. Existing resource and job views stay separate. Usage has its own
+route with current-project terminal accounting grouped by backend/model/device/mode,
+CSV export and the existing ledger. Missing observations are amber, never an inferred
+hardware outage; pending codes and suggested checks remain separate from diagnosis.

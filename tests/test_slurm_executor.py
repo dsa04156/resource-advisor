@@ -76,6 +76,8 @@ def test_adapter_queries_and_cancel_are_forced_to_linux_owner(service):
         partition="compute", account="lab", qos="normal", output_dir="/opt/results", execute=execute
     )
     assert backend.reconcile(job) is None
+    with pytest.raises(BackendError):
+        backend.status(job)
     backend.cancel(job)
     # Empty accounting is correctly an observation failure, not a terminal job.
     with pytest.raises(BackendError):

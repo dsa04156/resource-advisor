@@ -127,7 +127,7 @@ def plan(config, original, script=""):
         return ["/usr/bin/sbatch", "--parsable"], batch(config, script)
     account, partition, user = (config[k] for k in ["account", "partition", "user"])
     queue = ["squeue", "--noheader", "--account", account, "--partition", partition]
-    if argv == queue + ["--format=%i|%j|%a|%P|%T"] or (
+    if argv in (queue + ["--format=%i|%j|%a|%P|%T"], queue + ["--format=%i|%j|%a|%P|%T|%r"]) or (
         len(argv) == len(queue) + 3
         and argv[: len(queue)] == queue
         and argv[-3] == "--name"

@@ -18,13 +18,37 @@ storage, cookies, URL parameters or an asset. Refreshing or disconnecting clears
 the session. A new authentication gateway is not implied by this small console.
 Existing API credentials and project ownership checks remain authoritative.
 
-## Four views
+## Operator-first navigation
+
+The default `/console#operations` screen brings together active jobs, observed
+scheduler reasons, recent failures and node observation problems. Resources,
+jobs, queue/quota, project usage and submission remain separate primary routes.
+Compatibility and recommendation evidence are secondary research tools.
+
+Operations queries are independent of job table filters and pagination: up to 50
+oldest active jobs and 12 failures from the last 24 hours, with full counts.
+Job detail includes recorded priority, time limits, scheduler reason and lifecycle
+timestamps. Kubernetes reasons come from owned Pod waiting/scheduling conditions
+or a suspended Job; Slurm reasons come from owned `squeue` records. Missing reasons
+remain unknown. Advice is a suggested inspection, not a root-cause diagnosis.
+
+`#usage` groups all retained terminal accounting records for the current project
+by backend, accelerator model, device class and allocation mode. CSV export uses
+the same groups. Reserved device-hours are not measured utilization or billing;
+GPU, NPU and virtual slots are never totaled together. Unknown allocation and
+queue times remain explicit. Existing attempt-level history remains on this page.
+This is not an organization-wide accounting or quota-editing console.
+
+See the [operator walkthrough](operations-ko.md) for a practical exercise.
+
+## Sources
 
 | View | Authoritative sources | Interpretation |
 |---|---|---|
 | 실행 현황 | Latest project inventory; own jobs and results | Measured CPU usage and memory availability beside scheduler request headroom; GPU/NPU units remain separate |
 | 가속기 호환성 | Registered workload candidates, runtime variants and capabilities; existing compatibility function | Historical model validation can coexist with an expired capability; neither telemetry nor detection makes a candidate executable |
-| 대기 · 할당 이력 | Project Kueue observations and terminal attempt ledger | Queue admission is reported separately from recorded reservations, actual compute and missing timing |
+| 큐 · 쿼터 | Project Kueue observations and configured Slurm account/partition | Queue admission and quota observations remain separate from device utilization |
+| 프로젝트 사용량 | Project terminal attempt ledger | Recorded reservations, actual compute and missing timing remain distinct |
 | 추천 근거 · 실제 결과 | Immutable recommendations, referenced results, approval-linked jobs and MLflow run references | Historical summaries are separate from a new independent, quality-passing hardware measurement |
 
 The shared-lab operational mode is enabled explicitly with `RA_OPERATIONAL_MODE=1`.

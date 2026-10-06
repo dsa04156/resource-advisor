@@ -287,6 +287,7 @@ class Worker:
     def observed_body(latest, observation):
         body = dict(latest["body"])
         body["backend_observed_at"] = now().isoformat()
+        body["scheduler_reason"] = observation.scheduler_reason
         for key, value in [
             ("started_at", observation.started_at),
             ("backend_finished_at", observation.finished_at),
