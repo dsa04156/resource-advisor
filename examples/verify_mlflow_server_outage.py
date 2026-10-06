@@ -18,7 +18,17 @@ from sqlalchemy import select
 
 from resource_advisor.artifacts import S3Artifacts
 from resource_advisor.contracts import TERMINAL, ExecutionResult, signature
+from resource_advisor.inventory import quantity
 from resource_advisor.store import Store, entities, jobs, outbox, usage
+
+
+def assert_gpu_requests(requests):
+    """Compare quantities, since the API canonicalizes 2048Mi to 2Gi."""
+    expected = {"cpu": "1", "memory": "2048Mi", "nvidia.com/gpu": "1"}
+    assert set(requests) == set(expected), "unexpected resource request keys"
+    assert all(quantity(requests[key]) == quantity(value) for key, value in expected.items()), (
+        "allocation differs from the frozen one-CPU/2GiB/one-GPU request"
+    )
 
 
 def run(config, directory):
@@ -466,11 +476,7 @@ def run(config, directory):
         )["items"]
         assert len(pods) == 1 and pods[0]["status"]["phase"] == "Succeeded"
         assert pods[0]["status"]["containerStatuses"][0]["restartCount"] == 0
-        assert pods[0]["spec"]["containers"][0]["resources"]["requests"] == {
-            "cpu": "1",
-            "memory": "2048Mi",
-            "nvidia.com/gpu": "1",
-        }
+        assert_gpu_requests(pods[0]["spec"]["containers"][0]["resources"]["requests"])
         state.update(
             native_job=job,
             native_pod=pods[0],

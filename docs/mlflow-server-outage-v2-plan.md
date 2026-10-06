@@ -43,3 +43,19 @@ Stop on an unexpected outcome; restore and reconcile the SAME accepted IDs.
 An interrupted verifier does not authorize replacement compute. A bounded pass
 closes this fixture's actual MLflow outage boundary, not tenant isolation,
 distributed exactly-once, disconnected Slurm accounting or full HAIRP completion.
+
+## Retained post-execution verifier interruption
+
+The single compute succeeded while the server was stopped. Its original
+outbox recorded PENDING/one attempt/`RemoteProtocolError`; restoration completed
+and the same outbox reached DONE after three attempts. Artifact/identity/metric
+checks had passed when the verifier stopped at a string comparison: Kubernetes
+returned the canonical memory quantity `2Gi` rather than requested `2048Mi`.
+The actual request and limit are still exactly one CPU/2GiB/one GPU.
+
+Retain the original exit1/report and accepted IDs. Correct only quantity
+comparison using the existing Decimal parser; retain exact resource keys and
+reject different CPU/GPU amounts, decimal2GB or1GiB. Freeze this correction
+before supplemental readback, and finish preservation/end-state checks in a
+separate report against the SAME completed Job. Do not rerun the outage,
+replace compute or rewrite the original report as an uninterrupted CLI pass.
