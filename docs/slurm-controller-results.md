@@ -67,15 +67,52 @@ QOS/associations, driver hashes, node inventory and the empty queue were also
 unchanged by provisioning. No scheduler association or sudo privilege was given
 to the observer, and no shared operator credential enters the collector.
 
-## Deployment boundary
+## Continuous collector and console acceptance
 
-**Continuous controller observations are not deployed to the console yet.**
-The existing inventory image has no SSH client or passwd entry for its numeric
-runtime UID. It still collects live Prometheus CPU/memory telemetry with controller
-observations explicitly unconfigured. A qualified client image, mounted private
-key/known-hosts, static GitOps rollout, API authorization/freshness and actual
-console readback remain necessary. This report does not substitute local Python
-output for that full delivery path.
+**Continuous controller observations are now deployed.** Only the optional
+inventory Argo Application was updated, at revision
+`99810ec04ed148353a0dbf92cd8f54c066538318`, with pruning disabled. Argo reported
+Synced/Healthy and the operation succeeded. The final image digest is
+`sha256:854df77b194f5f9244f57212a5d8c82c9ab3557d3081d527afeb26cad7a67af2`.
+
+The [image/mount procedure](slurm-observer-transport.md#collector-image-and-credential-mount)
+adds the qualified SSH payload to the existing locked Python runtime. Signed
+Debian package version `1:10.0p1-7+deb13u4` reports
+`OpenSSH_10.0p2 Debian-7+deb13u4`; both values and all ten dependency archive hashes
+are retained. The acceptance Pod ran with UID 10001, read-only root and no service
+account token. It read actual node/queue data with the dedicated key, retained all
+eight Prometheus metrics, and rejected shell/submit/cancel requests. The deployed
+collector's source hash matched the accepted source.
+
+Two distinct PostgreSQL/API snapshots advanced from 03:20:29 to 03:21:00 UTC on
+October 6. Each showed two IDLE nodes, an empty scoped queue and GPU capacity 1,
+allocation 0, reservation headroom 1. Anonymous access returned 401, another
+project returned 404 and its overview excluded the Slurm pool. The existing
+Kubernetes pool retained ten nodes. All six preexisting service Pods retained
+their identities, containers and restart counts, including API, worker and DB.
+
+Actual browser checks used a loopback, read-only authenticated proxy to the live
+TLS-verified API; no synthetic scheduler data or credentials entered the browser.
+The resource panel shows measured host bars separately from scheduler reservation
+headroom, and the queue panel shows scoped record counts. GPU utilization remains
+**unmeasured**; the Pi correctly shows no registered accelerator.
+
+![Live Slurm resources](evidence/slurm-controller-live-20261006.png)
+
+![Live scoped queue](evidence/slurm-queue-live-20261006.png)
+
+[Sanitized delivery evidence](evidence/slurm-controller-continuous-v1.json) retains
+image/source/package provenance, API snapshots, authorization checks and failures.
+Initial apt cache permissions were corrected inside the disposable build Pod;
+an inherited `local` transport setting was rejected before SSH and corrected to
+`ssh`. An initial browser request encountered an old port-forward's missing
+sandbox; its existing systemd retry reconnected without restarting the API.
+No Slurm Job was submitted by this rollout or its acceptance checks.
+
+The implementation's [CI run](https://github.com/dsa04156/resource-advisor/actions/runs/37408214255)
+passed Python 3.11/3.13 contracts, wheel/assets, lint and Ansible syntax. Both
+versions passed 894 tests with two DB tests skipped without a database, then all
+896 tests with PostgreSQL. The affected local suite passed 70 tests.
 
 The separate native PyTorch compatibility finding and complete Slurm
 API→model→artifact/usage path remain open. The current controller work neither

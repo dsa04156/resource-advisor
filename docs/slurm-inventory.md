@@ -1,9 +1,14 @@
 # Slurm host observations in the research console
 
 October 6 update: the recovered controller now has a verified
-[live queue/resource trial and dedicated read-only SSH identity](slurm-controller-results.md).
-Continuous controller deployment is still pending; the console boundary described
-below remains host telemetry only.
+[live queue/resource trial, restricted SSH collector and console deployment](slurm-controller-results.md).
+Two persisted API snapshots and actual browser views now show controller node
+state, reservation headroom and scoped queue counts alongside all eight host
+metrics. GPU utilization and Pi NPU execution remain unqualified.
+
+The following records the original **host-only acceptance**, before the controller
+recovery. Its unconfigured-controller observations are historical; current
+controller evidence is in the linked October 6 report.
 
 Two standalone ARM lab hosts now publish actual CPU and memory observations
 through mTLS Prometheus ingestion, an independent inventory collector, persistent

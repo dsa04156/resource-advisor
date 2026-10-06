@@ -23,8 +23,11 @@ distinguishes observed allocation from requested resources and unknown data.
 [Read-only inventory](docs/inventory.md) now separates scheduler requests from
 measured CPU/memory/GPU/NPU telemetry and returns unknown for stale data.
 Two standalone hosts now also reach the [Slurm inventory and console](docs/slurm-inventory.md)
-through actual mTLS Prometheus observations. Their scheduler reservations and queue
-remain unknown while the controller connection is unconfigured.
+through actual mTLS Prometheus observations. A
+[restricted controller collector](docs/slurm-controller-results.md) now also
+supplies live Slurm node state, CPU/memory/GPU reservations and scoped queue counts.
+GPU utilization and Pi NPU execution remain unqualified; registration is not model
+execution acceptance.
 
 Open `/console` on the API origin for the [four-view research console](docs/console.md):
 resources/jobs, compatibility, queue/allocation history, and recommendation evidence.
