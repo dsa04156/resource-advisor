@@ -65,6 +65,17 @@ no result/ledger and one undelivered outbox entry. The worker Pod itself was
 Ready with zero restarts. A cancellation request does not prove native
 termination. No new compute, reboot, driver or scheduler change was attempted.
 
+A subsequent read-only query reached the original GPU worker directly. Its
+Slurmd remained active with the same recorded process identity, while controller
+SSH and Slurmctld ports were unreachable from that worker. The final attempt's
+original-owner result file exists: one COMPLETED hardware envelope with quality
+1.0, matching job/attempt/epoch/workload/context and result digest. This proves
+the cooperative computation produced a valid output, not that the parent
+allocation ended or its accounting was delivered. The API still has no persisted
+result/ledger. The output was saved privately; no manual state change or result
+ingestion was used to bypass scheduler confirmation. Reconcile this same attempt
+when the controller returns, preserving completion if it won the cancel race.
+
 The verifier now retries observation on the same saved IDs within its bounded
 deadline, skips priority predicates on failed samples, and preserves jobs when
 native observation remains unavailable. Two targeted regression tests passed:
@@ -76,3 +87,20 @@ terminal native state/cost and delivery, then verify native idle and unchanged
 source state. If it was canceled, retain that outcome rather than claiming six
 successful results. Overall E6, the full failure matrix, physical Pi NPU and
 complete platform acceptance remain open.
+
+Read-only recovery uses the original private report and a new output path:
+
+```sh
+uv run python examples/verify_slurm_project_isolation.py \
+  --config /secure/original-priority-config.json \
+  --original-report /secure/original-priority-trial.json \
+  --report /secure/new-priority-readback.json
+```
+
+This mode refuses missing/duplicated original identities, checks all six scoped
+API IDs and queries only their original native IDs. It never submits or cancels,
+retains the original report byte-for-byte and reports INCOMPLETE on observer loss.
+An actual current-controller readback remains INCOMPLETE. Four targeted transport/
+recovery tests pass. Even NATIVE_RECONCILED would still require result/ledger
+publication, native idle and source preservation; command exit zero is not full
+acceptance. If the last native outcome is canceled, do not restart or relabel it.

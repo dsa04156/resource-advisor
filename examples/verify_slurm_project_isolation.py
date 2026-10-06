@@ -25,9 +25,145 @@ class NativeObservationUnavailable(RuntimeError):
 
 def observe(argv):
     try:
-        return json.loads(subprocess.check_output(argv, text=True, timeout=40))
+        return json.loads(
+            subprocess.check_output(argv, text=True, timeout=40, stderr=subprocess.PIPE)
+        )
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
         raise NativeObservationUnavailable(type(error).__name__) from error
+
+
+def saved_cohort(config, original):
+    """Refuse a partial/tampered identity set before any observation."""
+    expected = {
+        f"round-{number}-{role}": project
+        for number, holder, other in ((1, "a", "b"), (2, "b", "a"))
+        for role, project in (("holder", holder), ("normal", other), ("high", holder))
+    }
+    if set(original["jobs"]) != set(expected) or set(original["intents"]) != set(expected):
+        raise ValueError("require the original six submitted identities, never replacements")
+    ids, attempts, native_ids = set(), set(), set()
+    for label, project in expected.items():
+        entry, intent = original["jobs"][label], original["intents"][label]
+        scope = config["projects"][project]
+        priority = "high" if label.endswith("-high") else "normal"
+        if entry["project"] != project or intent["project"] != project:
+            raise ValueError("original project binding changed")
+        if intent["request"] != {
+            "workload_ref": scope["workload_ref"],
+            "scheduling_profile_ref": scope["profiles"][priority],
+            "mode": "observe",
+        }:
+            raise ValueError("original workload/profile binding changed")
+        receipt = entry["receipt"]
+        external = entry["latest"].get("external_id")
+        if not external or receipt["job_id"] in ids or receipt["attempt_id"] in attempts:
+            raise ValueError("missing or duplicated original identity")
+        if external in native_ids:
+            raise ValueError("duplicate native identity")
+        ids.add(receipt["job_id"])
+        attempts.add(receipt["attempt_id"])
+        native_ids.add(external)
+    return expected
+
+
+def resume(config, original_path, report):
+    """Read ONLY the six retained IDs; preserve the original report verbatim."""
+    import hashlib
+
+    data = original_path.read_bytes()
+    original = json.loads(data)
+    expected = saved_cohort(config, original)
+    with report.open("x"):
+        pass
+    report.chmod(0o600)
+    state = {
+        "status": "INCOMPLETE",
+        "original_report_sha256": hashlib.sha256(data).hexdigest(),
+        "jobs": {},
+        "new_submissions": 0,
+        "cancellations_sent": 0,
+    }
+
+    def save():
+        report.write_text(json.dumps(state, indent=2) + "\n")
+
+    save()
+    argv = list(config["observer_command"])
+    for label, project in expected.items():
+        entry = original["jobs"][label]
+        scope = config["projects"][project]
+        with httpx.Client(
+            base_url=config["api_url"].rstrip("/") + "/api/v1/compute",
+            verify=ssl.create_default_context(cafile=config["ca_file"]),
+            headers={"Authorization": "Bearer " + scope["token"]},
+            timeout=20,
+        ) as api:
+            response = api.get("/jobs/" + entry["receipt"]["job_id"])
+            response.raise_for_status()
+            current = response.json()
+        assert current["attempt_id"] == entry["receipt"]["attempt_id"]
+        assert current["external_id"] == entry["latest"]["external_id"]
+        assert current["project_ref"] == scope["project_ref"]
+        for key in ("epoch", "workload_signature", "context_signature"):
+            assert current[key] == entry["receipt"][key]
+        state["jobs"][label] = current
+        argv += ["--job", current["external_id"]]
+        save()
+    try:
+        observed = observe(argv)
+    except NativeObservationUnavailable as error:
+        state["observer_error"] = str(error)
+        save()
+        return state
+    state["native"] = observed
+    save()
+    complete = True
+    for label, project in expected.items():
+        job, scope = state["jobs"][label], config["projects"][project]
+        item = observed[job["external_id"]]
+        native = item["native"]
+        if native:
+            assert native["Account"] == scope["account"]
+            assert native["UserId"].split("(")[0] == scope["user"]
+            assert (
+                native["Partition"] == scope["partition"] and native["JobName"] == job["attempt_id"]
+            )
+        for row in item["accounting"]:
+            assert row["Account"] == scope["account"] and row["User"] == scope["user"]
+            assert row["Partition"] == scope["partition"] and row["JobName"] == job["attempt_id"]
+            assert row["QOS"] == ("ra-high" if label.endswith("-high") else "ra-normal")
+        rows = item["accounting"]
+        complete &= (
+            job["state"] == "SUCCEEDED"
+            and len(rows) == 1
+            and rows[0]["State"] == "COMPLETED"
+            and rows[0]["ExitCode"] == "0:0"
+        )
+    if complete:
+        for number in (1, 2):
+            original_round = next(r for r in original["rounds"] if r["number"] == number)
+            assert len(original_round["both_pending"]) == 2
+            live = original_round["high_running_normal_pending"]
+            high, normal = f"round-{number}-high", f"round-{number}-normal"
+            assert live[high]["JobState"] == "RUNNING" and live[normal]["JobState"] == "PENDING"
+            assert int(live[high]["Priority"]) > int(live[normal]["Priority"])
+            rows = {
+                role: observed[state["jobs"][f"round-{number}-{role}"]["external_id"]][
+                    "accounting"
+                ][0]
+                for role in ("holder", "high", "normal")
+            }
+            assert datetime.fromisoformat(rows["holder"]["End"]) <= datetime.fromisoformat(
+                rows["high"]["Start"]
+            )
+            assert datetime.fromisoformat(rows["high"]["End"]) <= datetime.fromisoformat(
+                rows["normal"]["Start"]
+            )
+        state["status"] = "NATIVE_RECONCILED"
+        state["remaining_checks"] = "publication/ledger, native idle and source preservation"
+    save()
+    assert original_path.read_bytes() == data
+    return state
 
 
 def verify(config, report):
@@ -214,5 +350,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--original-report", type=Path, help="read-only recovery; no submit/cancel")
     args = parser.parse_args()
-    verify(json.loads(args.config.read_text()), args.report)
+    config = json.loads(args.config.read_text())
+    if args.original_report:
+        result = resume(config, args.original_report, args.report)
+        print(result["status"], "same six identities; zero submission/cancellation requests")
+    else:
+        verify(config, args.report)

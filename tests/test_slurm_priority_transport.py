@@ -72,3 +72,83 @@ def test_observer_recovers_same_ids(monkeypatch):
         trial.observe(argv)
     assert trial.observe(argv) == {"1": {"native": {}}}
     assert seen == [argv, argv]
+
+
+def recovery_fixture():
+    config = {
+        "projects": {
+            key: {
+                "project_ref": key,
+                "workload_ref": "w-" + key,
+                "profiles": {"normal": "normal", "high": "high"},
+                "token": "test-only",
+            }
+            for key in ("a", "b")
+        },
+        "api_url": "https://lab",
+        "ca_file": "unused",
+        "observer_command": ["observer"],
+    }
+    original = {"jobs": {}, "intents": {}, "rounds": []}
+    i = 0
+    for number, holder, other in ((1, "a", "b"), (2, "b", "a")):
+        for role, project in (("holder", holder), ("normal", other), ("high", holder)):
+            i += 1
+            label = f"round-{number}-{role}"
+            job = {
+                "job_id": "job-" + str(i),
+                "attempt_id": "attempt-" + str(i),
+                "external_id": str(i),
+                "epoch": 1,
+                "workload_signature": "w",
+                "context_signature": "c",
+                "project_ref": project,
+                "state": "CANCEL_REQUESTED",
+            }
+            original["jobs"][label] = {"project": project, "receipt": job, "latest": job}
+            original["intents"][label] = {
+                "project": project,
+                "request": {
+                    "workload_ref": "w-" + project,
+                    "scheduling_profile_ref": "high" if role == "high" else "normal",
+                    "mode": "observe",
+                },
+            }
+    return config, original
+
+
+def test_read_only_resume_on_observer_loss_preserves_original(monkeypatch, tmp_path):
+    config, original = recovery_fixture()
+    path = tmp_path / "original.json"
+    path.write_text(json.dumps(original))
+    before = path.read_bytes()
+    requests = []
+    by_id = {e["latest"]["job_id"]: e["latest"] for e in original["jobs"].values()}
+
+    def get(self, url):
+        requests.append(url)
+        return httpx.Response(
+            200, json=by_id[url.split("/")[-1]], request=httpx.Request("GET", "https://lab" + url)
+        )
+
+    monkeypatch.setattr(httpx.Client, "get", get)
+    monkeypatch.setattr(trial.ssl, "create_default_context", lambda **kwargs: False)
+
+    def unavailable(argv):
+        assert {argv[i + 1] for i, x in enumerate(argv) if x == "--job"} == {
+            str(i) for i in range(1, 7)
+        }
+        raise trial.NativeObservationUnavailable("TimeoutExpired")
+
+    monkeypatch.setattr(trial, "observe", unavailable)
+    result = trial.resume(config, path, tmp_path / "readback.json")
+    assert result["status"] == "INCOMPLETE" and len(requests) == 6
+    assert result["new_submissions"] == result["cancellations_sent"] == 0
+    assert path.read_bytes() == before
+
+
+def test_resume_rejects_duplicate_native_id_before_requests():
+    config, original = recovery_fixture()
+    original["jobs"]["round-2-high"]["latest"]["external_id"] = "1"
+    with pytest.raises(ValueError, match="duplicate native identity"):
+        trial.saved_cohort(config, original)

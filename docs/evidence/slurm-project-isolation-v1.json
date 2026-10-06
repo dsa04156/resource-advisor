@@ -252,7 +252,9 @@
     "last_attempt_state": "CANCEL_REQUESTED",
     "confirmed_terminated": false,
     "replacement_compute_submitted": false,
-    "native_queries_from_worker_routes_failed_on_readback": true
+    "native_queries_from_worker_routes_failed_on_readback": true,
+    "worker_ssh_reachable": true,
+    "controller_ssh_and_slurmctld_unreachable_from_worker": true
   },
   "acceptance_open": [
     "same final attempt native termination and accounting",
@@ -266,5 +268,29 @@
     "trained model accuracy",
     "Pi NPU qualification",
     "full E6 or HAIRP completion"
-  ]
+  ],
+  "same_final_attempt_worker_readback": {
+    "worker_result_verified": true,
+    "schema_digest_and_identity_match": true,
+    "outcome": "COMPLETED",
+    "quality": 1.0,
+    "result_digest": "sha256:1703be48df852e28be41332ade8967f83e9361c6a57e883600cc97384a9ef640",
+    "file_sha256": "2eb94b9c6e0731c3f711557123f560655fa93fc1b4de806132c99fbdfe34b921",
+    "file_owner_matches_original_project": true,
+    "worker_slurmd_active": true,
+    "controller_ssh_and_slurmctld_unreachable_from_worker": true,
+    "native_parent_termination_confirmed": false,
+    "accounting_complete": false,
+    "platform_terminal_confirmed": false,
+    "api_ingestion_attempted": false,
+    "replacement_compute_submitted": false
+  },
+  "read_only_recovery": {
+    "status": "INCOMPLETE",
+    "same_six_api_identities_checked": true,
+    "original_report_preserved": true,
+    "new_submissions": 0,
+    "cancellations_sent": 0,
+    "observer_available": false
+  }
 }
