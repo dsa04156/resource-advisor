@@ -55,6 +55,7 @@ def job_view(service, conn, row):
         "node_ref": body["capability"]["node_ref"],
         "mode": body["request"]["mode"],
         "scheduler_reason": body.get("scheduler_reason"),
+        "lifecycle_events": body.get("lifecycle_events", []),
         "scheduling_plan": body.get("scheduling_plan"),
         "scheduling_plan_digest": body.get("scheduling_plan_digest"),
         "priority": body["spec"]["execution"].get("priority", "normal"),

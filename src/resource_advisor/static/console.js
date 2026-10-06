@@ -166,6 +166,7 @@ function approvalControls(recommendation) {
   return add(el("div"), button, el("small", "승인 시 현재 근거를 다시 검사합니다. 승인은 자원 예약이 아닙니다."));
 }
 const views = {
+  scenario: ["REQUEST → QUEUE → RUN", "자원 요청 시나리오", "두 연구 요청이 같은 실행 자원을 사용합니다. 실제 큐의 대기와 실행을 따라가고 기록을 다시 재생하세요."],
   experiments: ["EXPERIMENT WORKSPACE", "실험 · 비교", "MLflow 실행 기록, 파라미터, 지표와 아티팩트를 함께 확인합니다."],
   pipelines: ["WORKFLOW OPERATIONS", "파이프라인", "Kubeflow 단계 상태와 연결된 작업을 추적하고 실행·중지를 요청합니다."],
   notebooks: ["RESEARCH WORKSPACES", "노트북", "개발 환경의 상태와 자원을 확인하고 시작·중지·접속합니다."],
@@ -745,7 +746,7 @@ function operationsView() {
   if(!op)return empty("운영 집계를 불러오지 못했습니다.");
   root.append(add(el("section",null,"operations-intro"),
     add(el("div"),el("p","SHARED COMPUTE · "+data.project_ref,"eyebrow"),el("h2","공동 자원 운영"),el("p","지금 기다리는 작업과 확인할 문제부터 살펴보세요.")),
-    add(el("div",null,"hero-actions"),actionLink("작업 제출 →","#submit"),actionLink("장비 사용량 보기","#execution"))));
+    add(el("div",null,"hero-actions"),actionLink("자원 요청 시나리오 →","#scenario"),actionLink("작업 제출 →","#submit"),actionLink("장비 사용량 보기","#execution"))));
   const kpis=dashboardStats([["실행 중",op.running_total,"현재 프로젝트"],["접수 · 대기",op.waiting_total,"백엔드 대기 사유 확인"],["취소 확인 중",op.cancel_pending_total,"자원 반환 확인 전"],["최근 실패",op.failed_24h_total,"최근 24시간"],["장비 확인 필요",op.node_issues.length,"오래된 관측 포함"]]);
   kpis.classList.add("ops-kpis");root.append(kpis,queueCards());
   const activeRows=op.active_jobs.map(j=>[
@@ -1725,6 +1726,7 @@ function recommendationsView() {
 }
 function render() {
   if (!data) return;
+  if (active === "scenario" && !scenarioPending && Date.now()-scenarioUpdated > 3000) refreshScenario();
   if (["operations","experiments","pipelines","notebooks"].includes(active) && !researchPending && Date.now()-researchUpdated>30000) refreshResearch();
   const focused = document.activeElement;
   const keepFocus = ["job-search", "resource-search"].includes(focused?.id)
@@ -1739,6 +1741,7 @@ function render() {
   $("content").replaceChildren(
     {
       operations: operationsView,
+      scenario: scenarioView,
       experiments: experimentsView,
       pipelines: pipelinesView,
       notebooks: notebooksView,
@@ -1779,6 +1782,7 @@ function render() {
 }
 function reset(message = "") {
   generation++;
+  scenarioData=null; scenarioRecent=[]; scenarioRef=""; scenarioUpdated=0; scenarioPending=false; scenarioError=""; scenarioCursor=null; stopScenarioReplay();
   researchData=null; researchRuns=null; researchPending=false; experimentSelection.clear(); researchUpdated=0;
   controller?.abort();
   controller = null;
@@ -2041,3 +2045,151 @@ function retryJobButton(job) {
     const value=await response.json();if(!response.ok)throw new Error(value.detail||"재제출하지 못했습니다.");trackedJobId=value.job_id;$("job-dialog").close();$("auto").checked=true;await load();$("notice").textContent="새 실행으로 재제출했습니다: "+value.job_id;
   });
 }
+
+
+// Real queue walkthrough. Replay advances recorded observations only.
+let scenarioData=null, scenarioRecent=[], scenarioRef="", scenarioUpdated=0;
+let scenarioPending=false, scenarioStarting=false, scenarioError="", scenarioCursor=null;
+let scenarioSelected=1, scenarioReplay=null, scenarioWorkload="", scenarioProfile="";
+const scenarioTerminal = s => ["SUCCEEDED","FAILED","CANCELED","RESULT_INVALID"].includes(s);
+function stopScenarioReplay() { clearInterval(scenarioReplay); scenarioReplay=null; }
+function scenarioEvents() {
+  return (scenarioData?.jobs || []).flatMap((j,index)=>j ? [
+    {index,state:"VALIDATED",reason:null,observed_at:j.created_at},
+    ...(j.lifecycle_events || []).map(e=>({...e,index}))
+  ] : []).sort((a,b)=>Date.parse(a.observed_at)-Date.parse(b.observed_at) || a.index-b.index);
+}
+async function scenarioFetch(path) {
+  const response=await fetch(API+path,{headers:authHeaders(),cache:"no-store"});
+  const result=await response.json();if(!response.ok)throw new Error(typeof result.detail==="string"?result.detail:"상태를 불러오지 못했습니다.");return result;
+}
+async function refreshScenario() {
+  if(scenarioPending || !data)return;
+  const session=generation;scenarioPending=true;
+  try {
+    const list=await scenarioFetch("/queue-scenarios");
+    if(session!==generation)return;
+    scenarioRecent=list.items;
+    if(!scenarioRef)scenarioRef=scenarioRecent[0]?.ref || "";
+    const result=scenarioRef ? await scenarioFetch("/queue-scenarios/"+encodeURIComponent(scenarioRef)) : null;
+    if(session!==generation)return;
+    scenarioData=result;scenarioError="";
+  } catch(e) {if(session===generation)scenarioError=e.message;}
+  finally {if(session===generation){scenarioPending=false;scenarioUpdated=Date.now();if(active==="scenario" && !document.activeElement?.closest(".scenario-request, .scenario-toolbar select"))render();}}
+}
+async function startScenario(workload,profile) {
+  if(scenarioStarting)return;
+  scenarioStarting=true;scenarioError="";stopScenarioReplay();scenarioCursor=null;
+  const session=generation, storageKey="ra-queue-scenario:"+data.project_ref;
+  let saved;
+  try{saved=JSON.parse(sessionStorage.getItem(storageKey));}catch(_){/* Memory-free recovery uses server list. */}
+  const request={workload_ref:workload,profile_ref:profile};
+  if(saved && JSON.stringify(saved.request)!==JSON.stringify(request)) {
+    scenarioError="미확인 제출이 있습니다. 이전 작업·정책으로 같은 요청을 다시 확인해 주세요.";scenarioStarting=false;render();return;
+  }
+  saved ||= {request,key:"scenario-"+crypto.randomUUID()};
+  try{sessionStorage.setItem(storageKey,JSON.stringify(saved));}catch(_){}
+  render();
+  try {
+    const response=await fetch(API+"/queue-scenarios",{method:"POST",headers:{...authHeaders(),"Content-Type":"application/json","Idempotency-Key":saved.key},body:JSON.stringify(request)});
+    const result=await response.json();
+    if(!response.ok)throw new Error(typeof result.detail==="string"?result.detail:"시나리오를 접수하지 못했습니다.");
+    try{sessionStorage.removeItem(storageKey);}catch(_){}
+    if(session!==generation)return;
+    scenarioRef=result.ref;scenarioData=result;scenarioSelected=1;scenarioUpdated=Date.now();
+    $("auto").checked=true;await refreshScenario();
+  } catch(e) {if(session===generation)scenarioError=e.message+" · 같은 조건으로 다시 누르면 중복 없이 제출을 확인합니다.";}
+  finally {if(session===generation){scenarioStarting=false;render();}}
+}
+function scenarioLane(state) {
+  if(!state || ["VALIDATED","SUBMITTING","SUBMISSION_UNKNOWN"].includes(state))return 0;
+  if(["QUEUED","CANCEL_REQUESTED"].includes(state))return 1;
+  if(["RUNNING","COLLECTING"].includes(state))return 2;
+  return 3;
+}
+function scenarioReason(state,reason) {
+  if(reason)return ({AdmissionPending:"큐 승인 대기 · 아직 실행 자원을 배정받지 못했습니다.",Resources:"요청 자원 확보 대기",Priority:"먼저 처리할 작업이 있습니다.",ContainerCreating:"자원 배정 후 컨테이너 준비 중",Unschedulable:"배치 조건을 만족하는 노드 대기"})[reason] || reason;
+  return ({VALIDATED:"자원 요청을 접수했습니다.",SUBMITTING:"스케줄러에 요청을 전달하고 있습니다.",QUEUED:"스케줄러가 실행 시작을 보고할 때까지 대기합니다.",RUNNING:"백엔드에서 실행 중임을 확인했습니다.",COLLECTING:"실행 결과를 수집하고 있습니다.",SUCCEEDED:"실행과 결과 수집이 완료됐습니다.",FAILED:"실행 실패 · 상세 오류를 확인하세요.",CANCELED:"취소 완료",RESULT_INVALID:"결과 검증 실패",SUBMISSION_UNKNOWN:"제출 여부 재확인 중 · 재제출하지 않습니다.",CANCEL_REQUESTED:"취소 확인 중 · 자원 반환은 아직 미확인"})[state] || "아직 제출되지 않았습니다.";
+}
+function scenarioView() {
+  const root=el("div",null,"scenario-page");
+  const catalog=(data.submission_catalog || []).filter(w=>w.candidates.length===1 && w.candidates[0].device_class==="gpu" && canSubmit(w.candidates[0]));
+  scenarioWorkload ||= catalog.find(w=>w.candidates[0].backend==="slurm")?.workload_ref || catalog[0]?.workload_ref || "";
+  const profiles=(data.scheduling_profiles || []).filter(p=>p.policy.priority==="normal");
+  scenarioProfile ||= profiles.find(p=>p.policy.backend_order[0]==="kubernetes")?.ref || profiles[0]?.ref || "";
+  const work=catalog.find(w=>w.workload_ref===scenarioWorkload), resources=work?.candidates[0]?.resources;
+  const activeRun=scenarioData?.jobs.some(j=>j && !scenarioTerminal(j.state));
+  const hero=add(el("section",null,"scenario-hero"),el("p","LIVE QUEUE WALKTHROUGH","eyebrow"),el("h2","내 자원 요청은 지금 어디에 있을까?"),
+    el("p","같은 GPU 실행 환경을 요청하는 작업 A와 B를 제출합니다. 큐가 자원을 배분하고, 요청 카드는 관측된 상태에 따라 이동합니다."),
+    add(el("div",null,"scenario-story"),el("span","01  연구자가 요청"),el("span","02  큐에서 대기"),el("span","03  자원 확보 · 실행"),el("span","04  결과 확인")));
+  root.append(hero);
+  const controls=el("div",null,"scenario-request");
+  const workload=el("select");workload.setAttribute("aria-label","시나리오 작업");
+  for(const w of catalog)workload.append(new Option(workloadPurpose(w)+" · "+w.workload_ref,w.workload_ref));workload.value=scenarioWorkload;
+  workload.onchange=()=>{scenarioWorkload=workload.value;render();};
+  const profile=el("select");profile.setAttribute("aria-label","시나리오 정책");
+  for(const p of profiles)profile.append(new Option(p.name,p.ref));profile.value=scenarioProfile;
+  profile.onchange=()=>{scenarioProfile=profile.value;};
+  const launch=el("button",scenarioStarting?"요청 접수 중…":"두 작업으로 시나리오 실행","primary");
+  launch.disabled=scenarioStarting || activeRun || !work || !scenarioProfile;
+  launch.onclick=()=>startScenario(scenarioWorkload,scenarioProfile);
+  controls.append(add(el("label"),el("span","연구 작업"),workload),add(el("label"),el("span","실행 정책"),profile),launch);
+  root.append(panel("연구자의 자원 요청서","등록된 실행 환경을 재사용합니다. GPU 모델·노드를 직접 고르지 않습니다.",add(el("div"),controls,
+    resources ? add(el("div",null,"scenario-request-summary"),badge("요청당 GPU "+resources.accelerator_count),badge("CPU "+resources.host_cpu+" core"),badge("메모리 "+resources.host_memory_mib+" MiB"),badge("최대 실행 "+work.max_run_seconds+"초"),badge("요청 2건")) : empty("현재 실행 가능한 GPU 작업이 없습니다."),
+    el("small","실제 컴퓨트 작업 2개가 생성됩니다. 할당량·우선순위는 기존 정책을 따릅니다. 여유가 충분하거나 작업이 짧으면 대기를 관측하지 못할 수도 있습니다."))));
+  if(scenarioError)root.append(add(el("div",null,"scenario-error"),el("strong","최신 상태 확인 필요"),el("p",scenarioError),el("small","아래 기록은 마지막으로 성공한 조회 시점입니다.")));
+  const toolbar=el("div",null,"scenario-toolbar");
+  const recent=el("select");recent.setAttribute("aria-label","시나리오 실행 이력");
+  for(const r of scenarioRecent)recent.append(new Option(stamp(r.created_at)+" · "+r.workload_ref,r.ref));recent.value=scenarioRef;
+  recent.onchange=()=>{scenarioRef=recent.value;scenarioData=null;scenarioCursor=null;stopScenarioReplay();refreshScenario();};
+  const refresh=el("button","상태 갱신");refresh.disabled=scenarioPending;refresh.onclick=()=>refreshScenario();
+  toolbar.append(recent,refresh);root.append(toolbar);
+  if(!scenarioData){root.append(empty(scenarioPending?"시나리오 기록을 불러오는 중…":"위에서 실행하면 두 요청의 실제 진행 과정이 여기에 나타납니다."));return root;}
+  const events=scenarioEvents(), cursor=scenarioCursor===null?events.length-1:Math.min(scenarioCursor,events.length-1);
+  const visible=events.slice(0,cursor+1), snapshots=[0,1].map(i=>visible.filter(e=>e.index===i).at(-1));
+  const replay=el("button",scenarioReplay?"재생 일시정지":"기록 재생");replay.disabled=events.length<2;
+  replay.onclick=()=>{if(scenarioReplay){stopScenarioReplay();render();return;}scenarioCursor=0;scenarioReplay=setInterval(()=>{if(active!=="scenario"){stopScenarioReplay();return;}scenarioCursor++;if(scenarioCursor>=scenarioEvents().length-1)stopScenarioReplay();render();},1100);render();};
+  const live=el("button","실시간으로 돌아가기");live.onclick=()=>{stopScenarioReplay();scenarioCursor=null;refreshScenario();render();};
+  const slider=el("input");slider.type="range";slider.min=0;slider.max=Math.max(0,events.length-1);slider.value=Math.max(0,cursor);slider.setAttribute("aria-label","관측 기록 탐색");
+  slider.oninput=()=>{stopScenarioReplay();scenarioCursor=Number(slider.value);render();$("scenario-seek")?.focus();};slider.id="scenario-seek";
+  root.append(add(el("section",null,"scenario-playback"),add(el("div",null,"scenario-toolbar"),badge(scenarioError?"마지막 관측":scenarioCursor===null?"실시간 관측 · 3초 갱신":"기록 탐색",scenarioError?"warn":""),replay,live),slider,
+    el("small",`관측 ${Math.max(0,cursor+1)} / ${events.length} · ${stamp(visible.at(-1)?.observed_at)} · 재생은 저장된 관측 순서이며 실제 소요 시간과 다릅니다.`)));
+  const board=el("div",null,"scenario-board");
+  ["요청 접수","큐 · 실행 준비","실행 · 결과 수집","종료"].forEach((name,lane)=>{
+    const column=add(el("section",null,"scenario-lane"),add(el("div",null,"scenario-lane-title"),el("small",String(lane+1).padStart(2,"0")),el("h3",name)));
+    let count=0;
+    snapshots.forEach((snapshot,index)=>{
+      if(!snapshot || scenarioLane(snapshot.state)!==lane)return;count++;
+      const job=scenarioData.jobs[index], card=el("button",null,"scenario-job"+(scenarioSelected===index?" selected":""));
+      card.setAttribute("aria-label","요청 "+(index===0?"A":"B")+" 상세");card.setAttribute("aria-pressed",String(scenarioSelected===index));
+      card.onclick=()=>{scenarioSelected=index;render();};
+      add(card,el("small",index===0?"REQUEST A":"REQUEST B"),el("strong",index===0?"먼저 보낸 연구 요청":"뒤이어 보낸 연구 요청"),stateBadge(snapshot.state),
+        el("p",scenarioReason(snapshot.state,snapshot.reason)),el("small",`${job.backend} · GPU ${job.requested_resources?.accelerator_count ?? "—"}`));
+      column.append(card);
+    });
+    if(!count)column.append(el("p","이 단계의 요청 없음","scenario-lane-empty"));board.append(column);
+  });root.append(board);
+  const selected=scenarioData.jobs[scenarioSelected], snapshot=snapshots[scenarioSelected];
+  if(selected){
+    const detail=el("div",null,"scenario-inspector");
+    const plan=selected.scheduling_plan, queue=plan?.adapter?.local_queue || plan?.adapter?.partition || "—";
+    const observedWait=(selected.lifecycle_events || []).some(e=>e.state==="QUEUED" && ["AdmissionPending","Resources","Priority"].includes(e.reason));
+    const facts=add(el("div"),el("p","선택한 요청 · "+(scenarioSelected===0?"A":"B"),"eyebrow"),el("h2",scenarioReason(snapshot?.state,snapshot?.reason)),
+      el("p",`배정 경로: ${selected.backend} → ${queue}`),el("p",`선택 노드: ${selected.node_ref || "확인 중"}`),
+      el("p",`요청량: GPU ${selected.requested_resources?.accelerator_count ?? "—"} · CPU ${selected.requested_resources?.host_cpu ?? "—"} · 메모리 ${selected.requested_resources?.host_memory_mib ?? "—"} MiB`),
+      el("small",observedWait?"이 실행에서 스케줄러 대기 사유가 기록됐습니다.":"이 실행에는 자원·승인 대기 사유가 아직 기록되지 않았습니다. 컨테이너 준비와 자원 부족은 구분합니다."));
+    const actions=el("div",null,"scenario-toolbar");const open=el("button","현재 작업 상세");open.onclick=()=>showJob(selected);actions.append(open);
+    if(selected.tracking?.run_id){const ml=el("button","MLflow 결과");ml.onclick=()=>openExperiment(selected.tracking.run_id);actions.append(ml);}
+    const cancel=cancelButton(selected);if(cancel)actions.append(cancel);facts.append(actions);
+    const log=el("ol",null,"scenario-event-log");
+    events.forEach((e,i)=>{if(e.index!==scenarioSelected)return;const b=el("button",null,i===cursor?"selected":"");
+      b.onclick=()=>{stopScenarioReplay();scenarioCursor=i;render();};add(b,el("small",stamp(e.observed_at)),el("strong",states[e.state]||e.state),el("span",scenarioReason(e.state,e.reason)));log.append(add(el("li"),b));});
+    detail.append(facts,add(el("div"),el("h3","저장된 상태 변화"),log));root.append(detail);
+    if(scenarioCursor===null){
+      const matches=data.inventory.flatMap(s=>(s.cluster_queues || []).filter(q=>q.ref===queue).map(q=>({s,q})));const entry=matches[0];
+      if(entry){const observation=observed(entry.q.observation,entry.s);if(observation.status==="ok")root.append(panel("이 큐의 할당량","수집 시점: "+stamp(entry.q.observation.observed_at)+" · 예약량은 실제 GPU 사용률과 다릅니다.",table(["자원","명목 할당량","예약량","승인량"],observation.value.resources.map(r=>[r.resource,String(r.nominal_quota),String(r.reserved),String(r.admitted)]))));}
+    }
+  }
+  return root;
+}
+setInterval(()=>{if(active==="scenario" && data && !scenarioPending && !scenarioStarting)refreshScenario();},3000);

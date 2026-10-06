@@ -104,6 +104,23 @@ def create_app(
     from .research import ResearchServices, UpstreamUnavailable
 
     research = ResearchServices(service.store, research_config or {})
+    from .scenarios import QueueScenarioRequest, QueueScenarios
+
+    scenarios = QueueScenarios(service)
+
+    @app.get(PREFIX + "/queue-scenarios")
+    def list_queue_scenarios(p=Depends(principal)):
+        return scenarios.recent(p.project)
+
+    @app.get(PREFIX + "/queue-scenarios/{ref}")
+    def queue_scenario(ref: str, p=Depends(principal)):
+        return scenarios.view(p.project, ref)
+
+    @app.post(PREFIX + "/queue-scenarios")
+    def start_queue_scenario(
+        value: QueueScenarioRequest, idempotency_key: str = Header(default=""), p=Depends(principal)
+    ):
+        return scenarios.start(p.project, value, idempotency_key)
 
     @app.exception_handler(UpstreamUnavailable)
     async def upstream_unavailable(_, exc):

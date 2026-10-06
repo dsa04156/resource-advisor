@@ -117,3 +117,11 @@ jobs. Notebook cards expose resource requests, readiness and explicit controller
 actions; stop requires an inline second click. Reuse existing native tables,
 dialogs and blue action tokens. Research navigation wraps on narrow viewports.
 References and scope: docs/research-console.md.
+
+Queue walkthrough: four request/queue/execution/terminal lanes display real job
+cards, with selected-request inspector and a compact observation replay slider.
+Resource request summary precedes explicit two-job launch. A/B are request labels,
+not fabricated user identities. Replay is marked separately from live data;
+observation times and native reasons are retained. Board uses four desktop columns,
+two narrow columns; inspector and form collapse to one column. No automatic motion
+of cards: explicit recorded-event playback is user controlled and can pause.

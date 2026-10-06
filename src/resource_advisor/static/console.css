@@ -954,3 +954,40 @@ button { border-radius: 10px; min-height: 40px; }
 .job-detail-content textarea {width:100%;padding:12px;border:1px solid #d8d8dc;border-radius:10px;font:inherit;resize:vertical;}
 .job-detail-content table td {overflow-wrap:anywhere;max-width:360px;}
 @media(max-width:760px){.research-connections{grid-template-columns:1fr;gap:8px;}.service-connection{padding:12px 16px;}.related-nav{flex-wrap:wrap;}.pipeline-graph,.notebook-grid{grid-template-columns:minmax(0,1fr);}}
+
+/* A request's journey, with replay of recorded scheduler observations. */
+.scenario-page { display: grid; gap: 20px; }
+.scenario-hero { padding: 28px; border-radius: 22px; background: var(--ink, #1d1d1f); color: #fff; }
+.scenario-hero h2 { font-size: clamp(23px, 3vw, 34px); letter-spacing: -.04em; margin: 10px 0; }
+.scenario-hero p { max-width: 760px; color: #d1d8df; }
+.scenario-story { display: flex; flex-wrap: wrap; gap: 12px 28px; margin-top: 24px; color: #b9d9ff; font-size: 13px; }
+.scenario-request { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) auto; gap: 12px; align-items: end; }
+.scenario-request label { display: grid; gap: 8px; min-width: 0; }
+.scenario-request select { width: 100%; min-width: 0; }
+.scenario-request-summary, .scenario-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+.scenario-toolbar select { min-width: 0; max-width: 100%; flex: 1; }
+.scenario-playback { padding: 16px 20px; background: #fff; border-radius: 16px; border: 1px solid #e5e7eb; }
+.scenario-playback input[type=range] { width: 100%; accent-color: #0071e3; padding: 0; min-height: 32px; }
+.scenario-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.scenario-lane { padding: 14px; min-height: 244px; border-radius: 18px; background: #eef0f3; }
+.scenario-lane-title { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.scenario-lane-title h3 { margin: 0; font-size: 14px; }
+.scenario-lane-title small { color: #6b7280; font-variant-numeric: tabular-nums; }
+.scenario-job { display: grid; width: 100%; gap: 10px; text-align: left; padding: 16px; margin-bottom: 10px; min-height: 180px; background: #fff; border: 1px solid #dce0e5; border-radius: 12px; white-space: normal; }
+.scenario-job.selected { border-color: #0071e3; box-shadow: 0 0 0 2px #0071e31a; }
+.scenario-job strong { font-size: 15px; }
+.scenario-job .badge { justify-self: start; }
+.scenario-job p { font-size: 12px; line-height: 1.6; margin: 0; color: #5c6470; }
+.scenario-job small { color: #526176; font-size: 11px; }
+.scenario-lane-empty { color: #737b87; font-size: 12px; padding-top: 26px; text-align: center; }
+.scenario-inspector { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px; border: 1px solid #e5e7eb; background: #fff; border-radius: 20px; }
+.scenario-inspector h2 { font-size: 21px; line-height: 1.5; }
+.scenario-inspector p, .scenario-inspector small { overflow-wrap: anywhere; }
+.scenario-event-log { list-style: none; padding: 0; max-height: 340px; overflow: auto; }
+.scenario-event-log button { width: 100%; text-align: left; display: grid; grid-template-columns: 100px 1fr; gap: 4px 12px; white-space: normal; border: 0; border-bottom: 1px solid #edf0f3; border-radius: 0; padding: 12px; }
+.scenario-event-log button span { grid-column: 2; color: #666; font-size: 12px; }
+.scenario-event-log button small { font-variant-numeric: tabular-nums; font-size: 11px; }
+.scenario-error { padding: 16px; background: #fff7e8; border: 1px solid #ebd7ae; border-radius: 12px; color: #805500; }
+.scenario-page button:focus-visible, .scenario-page input:focus-visible { outline: 3px solid #0071e3; outline-offset: 3px; }
+@media (max-width: 1200px) { .scenario-request { grid-template-columns: 1fr 1fr; } .scenario-request > button { grid-column: 1 / -1; } .scenario-board { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 650px) { .scenario-request, .scenario-inspector { grid-template-columns: 1fr; } .scenario-hero { padding: 20px; } .scenario-lane { padding: 10px; min-height: 170px; } .scenario-job { padding: 12px; } .scenario-inspector { padding: 16px; } .scenario-lane-title { display: block; } .scenario-lane-title h3 { margin-top: 6px; } }

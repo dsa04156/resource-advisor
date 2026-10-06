@@ -166,6 +166,14 @@ class Store:
         return conn.execute(select(jobs).where(jobs.c.id == job_id)).mappings().first()
 
     def change_job(self, conn, row, state, body):
+        # Persist observed transitions, not browser polling samples. No invented
+        # admission timestamp: a QUEUED observation may include admission/startup.
+        body = dict(body)
+        events = list(body.get("lifecycle_events", []))
+        event = {"state": str(state), "reason": body.get("scheduler_reason")}
+        if not events or any(events[-1].get(k) != v for k, v in event.items()):
+            events.append({**event, "observed_at": now().isoformat()})
+        body["lifecycle_events"] = events[-64:]
         if body.get("termination"):
             self.put(conn, "termination", body["attempt_id"], row["project"], body["termination"])
         if state == State.CANCEL_REQUESTED and row["state"] != State.CANCEL_REQUESTED:
