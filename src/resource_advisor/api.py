@@ -122,6 +122,32 @@ def create_app(
     ):
         return scenarios.start(p.project, value, idempotency_key)
 
+    from .scheduler_lab import LabReport, LabRequest, SchedulerLab
+
+    labs = SchedulerLab(service.store)
+
+    @app.get(PREFIX + "/scheduler-labs")
+    def scheduler_labs(p=Depends(principal)):
+        return labs.listing(p.project)
+
+    @app.post(PREFIX + "/scheduler-labs")
+    def start_scheduler_lab(
+        value: LabRequest, idempotency_key: str = Header(default=""), p=Depends(principal)
+    ):
+        return labs.start(p.project, value, idempotency_key)
+
+    @app.post(PREFIX + "/scheduler-labs/{ref}/cancel")
+    def cancel_scheduler_lab(ref: str, p=Depends(principal)):
+        return labs.cancel(p.project, ref)
+
+    @app.post(PREFIX + "/scheduler-lab-agent/heartbeat")
+    def scheduler_lab_heartbeat(value: dict, p=Depends(operator)):
+        return labs.heartbeat(value)
+
+    @app.post(PREFIX + "/scheduler-lab-agent/{ref}")
+    def scheduler_lab_report(ref: str, value: LabReport, p=Depends(operator)):
+        return labs.report(ref, value)
+
     @app.exception_handler(UpstreamUnavailable)
     async def upstream_unavailable(_, exc):
         return JSONResponse({"detail": str(exc)}, status_code=503)

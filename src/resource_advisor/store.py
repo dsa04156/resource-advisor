@@ -114,6 +114,8 @@ class Store:
         self.engine = create_engine(url, **options)
 
     def initialize(self):
+        from . import scheduler_lab  # noqa: F401
+
         metadata.create_all(self.engine)
 
     @contextmanager

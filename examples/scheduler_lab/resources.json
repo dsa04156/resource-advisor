@@ -1,0 +1,105 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Namespace",
+      "metadata": {
+        "name": "hairp-scheduling-lab",
+        "labels": {
+          "mlops.jinuk.io/queue-managed": "true"
+        }
+      }
+    },
+    {
+      "apiVersion": "node.k8s.io/v1",
+      "kind": "RuntimeClass",
+      "metadata": {
+        "name": "hairp-lab-nvidia"
+      },
+      "handler": "nvidia"
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta1",
+      "kind": "Topology",
+      "metadata": {
+        "name": "hairp-lab-hostname"
+      },
+      "spec": {
+        "levels": [
+          {
+            "nodeLabel": "kubernetes.io/hostname"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta1",
+      "kind": "ResourceFlavor",
+      "metadata": {
+        "name": "hairp-lab-gpu"
+      },
+      "spec": {
+        "nodeLabels": {
+          "hairp.io/scheduling-lab": "gpu"
+        },
+        "topologyName": "hairp-lab-hostname"
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta1",
+      "kind": "ClusterQueue",
+      "metadata": {
+        "name": "hairp-scheduling-lab"
+      },
+      "spec": {
+        "namespaceSelector": {
+          "matchLabels": {
+            "kubernetes.io/metadata.name": "hairp-scheduling-lab"
+          }
+        },
+        "queueingStrategy": "BestEffortFIFO",
+        "resourceGroups": [
+          {
+            "coveredResources": [
+              "cpu",
+              "memory",
+              "nvidia.com/gpu"
+            ],
+            "flavors": [
+              {
+                "name": "hairp-lab-gpu",
+                "resources": [
+                  {
+                    "name": "cpu",
+                    "nominalQuota": "2"
+                  },
+                  {
+                    "name": "memory",
+                    "nominalQuota": "2Gi"
+                  },
+                  {
+                    "name": "nvidia.com/gpu",
+                    "nominalQuota": "2"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta1",
+      "kind": "LocalQueue",
+      "metadata": {
+        "name": "gpu-lab",
+        "namespace": "hairp-scheduling-lab"
+      },
+      "spec": {
+        "clusterQueue": "hairp-scheduling-lab"
+      }
+    }
+  ]
+}
