@@ -30,8 +30,9 @@ and [quota/priority enforcement](docs/slurm-policy.md) now have live evidence;
 a bounded [browser → API → Orin → S3/MLflow result path](docs/slurm-api-results.md)
 now also passes, with the initial failed attempt retained. Bounded
 [accepted-submit SIGKILL recovery](docs/slurm-response-recovery.md) now verifies
-the same native job/result/ledger/MLflow run; its lost direct-call counter is
-reported, so the stricter prospective protocol remains unpassed. Full Slurm
+the same native job/result/ledger/MLflow run. The corrected public verifier's
+fourth trial also retains one submit invocation and passes the prospective
+protocol, with all previous trial costs retained. Full Slurm
 multi-user and node-loss qualification remains open. A separately qualified
 [Hailo-8 ResNet-50 API path](docs/hailo-resnet50.md) now completes three
 observations, measured lookup, approval and a fourth verification, with matching

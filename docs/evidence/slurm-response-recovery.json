@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "scope": "bounded native Orin CNN accepted-response loss and same-Pod SIGKILL recovery; not full protocol or full E7",
+  "scope": "bounded native Orin CNN accepted-response loss and same-Pod SIGKILL recovery; prospective protocol PASS in trial4; not full E7",
   "backend": "slurm",
   "device": "Jetson Orin Nano GPU",
   "trials": [
@@ -96,9 +96,40 @@
       "crash_restart_verified": true,
       "predefined_protocol_passed": false,
       "instrumentation_issue": "Post-recovery entity query omitted attempt-derived refs. Independent publication verification passed; ephemeral submit-call counter was removed during restoration."
+    },
+    {
+      "trial": 4,
+      "accepted_at": "2026-10-06T11:42:53.273875+00:00",
+      "db_state_at_acceptance": "SUBMITTING",
+      "external_id_absent_at_acceptance": true,
+      "terminal_state": "SUCCEEDED",
+      "one_native_parent_verified": true,
+      "ledger_rows": 1,
+      "mlflow_runs": 1,
+      "matching_s3_api_mlflow_bytes": true,
+      "bundle_sha256": "8627ac98d632a70350bd5691c958f283694ebefd8905e914e5a628af9030c67f",
+      "result_digest": "sha256:f882043c49d3b09171c7b0812a4df06393178915aac91e5a149aeca12f0152e5",
+      "allocated_gpu_seconds": 73.0,
+      "measurements": {
+        "elapsed_seconds": 0.0152227379148826,
+        "peak_memory_mib": 33.05615234375,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 1.4753990108147264,
+        "latency_p95_ms": 1.5974820125848055,
+        "latency_p99_ms": 1.5974820125848055,
+        "throughput": 656.9120519524573,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "crash_restart_verified": true,
+      "predefined_protocol_passed": true,
+      "instrumentation_issue": "Post-run RowMapping serialization converted losslessly; body digests checked and original retained."
     }
   ],
-  "total_allocated_gpu_seconds": 217.0,
+  "total_allocated_gpu_seconds": 290.0,
   "trial3_recovery": {
     "verified_at": "2026-10-06T11:34:34.659183+00:00",
     "core_recovery_verified": true,
@@ -121,9 +152,28 @@
     "instrumentation_limitation": "post-recovery entity query omitted derived references; finally removed ephemeral submit counter before independent verification"
   },
   "limitations": [
-    "Direct submit invocation count not retained. Native parent count is independently verified.",
+    "Trials1-3 did not retain the direct submit counter. Trial4 retained exactly one invocation before cleanup.",
     "No node loss, two-project Slurm policy or arbitrary-program qualification.",
     "Numerical fixture correctness, not trained-model accuracy.",
     "GPU utilization/power/temperature unmeasured. Allocation time is not GPU-active time."
-  ]
+  ],
+  "trial4_recovery": {
+    "accepted_without_ack": true,
+    "same_pod_exit137_restart": true,
+    "one_submit_invocation": true,
+    "same_native_parent": true,
+    "one_ledger_and_mlflow": true,
+    "s3_api_mlflow_bytes_match": true,
+    "idempotent_replay": true,
+    "native_queue_empty": true,
+    "status": "PASS",
+    "worker_exit_code": 137,
+    "worker_termination_reason": "Error",
+    "same_pod_restart_count": 1,
+    "normal_template_restored": true,
+    "direct_submit_invocation_count": 1,
+    "prospective_protocol_complete": true,
+    "reservation_seconds": 73.0,
+    "queue_seconds": 1.0
+  }
 }
