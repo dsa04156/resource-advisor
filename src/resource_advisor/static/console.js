@@ -10,12 +10,15 @@ let token = "",
 let receivedAt = 0,
   expiryTimer = null,
   active = "execution";
-const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, qualifications: 0 };
+const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, qualifications: 0, templates: 0 };
 const submitting = new Set();
 const requestKeys = new Map();
 const jobFilters = { status: "all", backend: "all", search: "" };
 let resourceBackend = "all", resourceSearch = "", searchTimer = null, filterRevision = 0;
 const submissionDraft = { workload: "", candidate: "" };
+let templateEditorOpen = false, savingTemplate = false;
+let templateDraft = {};
+const selectionKey = w => w.template_ref ? "template:" + w.template_ref : w.workload_ref;
 let showAllTemplates = false;
 const canSubmit = (candidate) => candidate.submittable_now ?? candidate.contract_compatible_now;
 function reasonText(reason) {
@@ -29,7 +32,7 @@ function reasonText(reason) {
 
 function submitButton(workload, candidate, approval = null) {
   const label = approval ? "승인한 구성 실행" : "작업 제출";
-  const key = `ra-submit:${data.project_ref}:${workload.workload_ref}:${candidate.candidate_ref}${approval ? ":" + approval.ref : ""}`;
+  const key = `ra-submit:${data.project_ref}:${workload.workload_ref}:${candidate.candidate_ref}${approval ? ":" + approval.ref : ""}${workload.template_ref ? ":template:" + workload.template_ref : ""}`;
   let saved = requestKeys.get(key);
   try { saved ||= sessionStorage.getItem(key); } catch (_) { /* Memory fallback. */ }
   if (saved) requestKeys.set(key, saved);
@@ -52,6 +55,7 @@ function submitButton(workload, candidate, approval = null) {
         method: "POST",
         headers: { ...authHeaders(), "Content-Type": "application/json", "Idempotency-Key": requestKeys.get(key) },
         body: JSON.stringify({ workload_ref: workload.workload_ref, candidate_ref: candidate.candidate_ref,
+          ...(workload.template_ref ? { template_ref: workload.template_ref } : {}),
           mode: approval ? "fixed" : "observe", ...(approval ? { approval_ref: approval.ref } : {}) }),
       });
       if (!response.ok) {
@@ -743,7 +747,8 @@ function execution() {
 function showJob(job) {
   const m = job.result?.measurements;
   const content = add(el("div", null, "job-detail-content"),
-    el("p", job.workload_ref, "detail-workload"), code(job.job_id),
+    el("p", job.template?.name || job.workload_ref, "detail-workload"),
+    job.template ? el("small", "실행 환경: " + job.workload_ref) : null, code(job.job_id),
     add(el("div", null, "state-line"), stateBadge(job.state), badge(job.backend)),
     dashboardStats([["실행 노드", job.node_ref || "—", "대상 노드"], ["생성 시각", stamp(job.created_at), "서버 기록"]]),
     el("p", `CPU ${job.requested_resources?.host_cpu ?? "—"} · 메모리 ${job.requested_resources?.host_memory_mib ?? "—"} MiB · 가속기 ${job.requested_resources?.accelerator_count ?? "—"}`),
@@ -782,7 +787,7 @@ function jobsView() {
   toolbar.append(filters);
   const rows = data.jobs.items.map(j => {
     const open = el("button", "상세 보기", "details-action"); open.setAttribute("aria-label", `상세 보기 · ${j.job_id}`); open.onclick = () => showJob(j);
-    return [add(el("div",null,"job-name"),el("strong",j.workload_ref),code(j.job_id)),stateBadge(j.state),
+    return [add(el("div",null,"job-name"),el("strong",j.template?.name || j.workload_ref),code(j.job_id)),stateBadge(j.state),
       add(el("div"),badge(j.backend),el("small",j.node_ref)),
       el("span",`CPU ${j.requested_resources?.host_cpu ?? "—"} · GPU/NPU ${j.requested_resources?.accelerator_count ?? "—"}`),
       stamp(j.created_at),add(el("div",null,"job-actions"),open,cancelButton(j))];
@@ -793,7 +798,12 @@ function jobsView() {
 function submissionView() {
   const root = el("div");
   const catalogMode = !showAllTemplates && data.submission_catalog !== null && data.submission_catalog !== undefined;
-  const items = catalogMode ? data.submission_catalog : data.compatibility.items;
+  const sources = catalogMode ? data.submission_catalog : data.compatibility.items;
+  const items = [...(data.templates?.items || []), ...sources];
+  const create = el("button", templateEditorOpen ? "등록 폼 닫기" : "＋ 새 템플릿 등록", "primary");
+  create.type = "button"; create.onclick = () => { templateEditorOpen = !templateEditorOpen; $("auto").checked = false; render(); if(templateEditorOpen) $("template-name")?.focus(); };
+  root.append(add(el("div",null,"template-entry"),add(el("div"),el("h2","작업 템플릿"),el("p","실행 환경을 골라 템플릿을 저장하고, 필요할 때 다시 실행하세요.")),create));
+  if (templateEditorOpen) root.append(templateEditor(sources));
   const showAll = el("input"); showAll.type = "checkbox"; showAll.checked = showAllTemplates;
   showAll.onchange = () => { showAllTemplates = showAll.checked; render(); };
   root.append(add(el("label", null, "template-filter"), showAll, document.createTextNode(" 고급: 전체 실험·테스트 템플릿 보기")));
@@ -803,18 +813,19 @@ function submissionView() {
   workloadSelect.append(new Option("실행할 작업을 선택하세요", ""));
   const types = { inference: "추론", training: "학습", benchmark: "벤치마크", preprocessing: "전처리" };
   for (const w of items) workloadSelect.append(new Option(
-    `${w.workload_ref} · ${types[w.task_type] || w.task_type}`, w.workload_ref));
+    `${w.name || w.workload_ref} · ${types[w.task_type] || w.task_type}${w.template_ref ? " · 저장한 템플릿" : ""}`, selectionKey(w)));
   workloadSelect.value = submissionDraft.workload;
   workloadSelect.onchange = () => {
     submissionDraft.workload = workloadSelect.value;
-    submissionDraft.candidate = "";
+    submissionDraft.candidate = items.find(w => selectionKey(w) === workloadSelect.value)?.template_ref
+      ? items.find(w => selectionKey(w) === workloadSelect.value).candidates[0]?.candidate_ref || "" : "";
     render();
     $("submit-candidate")?.focus();
   };
   const label = el("label", "1. 작업 템플릿"); label.htmlFor = workloadSelect.id;
   form.append(label, workloadSelect,
     el("small", "템플릿에 등록된 모델·입력·실행 환경을 사용합니다. 제출할 때마다 새 실행 기록이 만들어집니다."));
-  const workload = items.find(w => w.workload_ref === submissionDraft.workload);
+  const workload = items.find(w => selectionKey(w) === submissionDraft.workload);
   if (workload) {
     form.append(el("p", `${types[workload.task_type] || workload.task_type} · ${workload.precision} · 배치 ${workload.batch_size ?? "—"} · 입력 ${(workload.input_shape || []).join(" × ")}`));
     const candidates = el("select"); candidates.id = "submit-candidate";
@@ -845,13 +856,64 @@ function submissionView() {
         submitButton(workload, candidate));
       form.append(summary);
     } else form.append(empty("장비를 선택하면 요청 자원과 제출 버튼이 표시됩니다."));
-    form.append(add(el("details"), el("summary", "어떤 장비를 선택할지 모르겠다면"), recommendButton(workload)));
+    if (!workload.template_ref) form.append(add(el("details"), el("summary", "어떤 장비를 선택할지 모르겠다면"), recommendButton(workload)));
   }
   root.append(panel("새 작업 만들기", "제출 후 실행 현황에서 대기·실행·결과를 확인하고 작업을 취소할 수 있습니다.",
     items.length ? form : empty("등록된 작업 템플릿이 없습니다. 아래에서 작업 명세를 등록하세요.")));
   if (!catalogMode) root.append(pager("compatibility", data.compatibility));
+  if (data.templates?.total > data.templates?.size) root.append(pager("templates", data.templates));
   root.append(workloadImport());
   return root;
+}
+function templateEditor(sources) {
+  const form = el("form", null, "job-form template-form");
+  function field(label, input) { const l=el("label",label); l.htmlFor=input.id; return add(el("div",null,"template-field"),l,input); }
+  const name=el("input"); name.id="template-name"; name.required=true; name.maxLength=100; name.placeholder="예: Orin 추론 테스트"; name.value=templateDraft.name || "";
+  name.oninput=()=>{templateDraft.name=name.value;};
+  const source=el("select"); source.id="template-source"; source.required=true;
+  source.append(new Option("모델 · 실행 환경 선택", ""));
+  for(const w of sources) source.append(new Option(w.workload_ref+" · "+w.task_type,w.workload_ref));
+  source.value=templateDraft.workload || "";
+  source.onchange=()=>{templateDraft.workload=source.value; templateDraft.candidate=""; delete templateDraft.run; delete templateDraft.queue; render(); $("template-device")?.focus();};
+  const w=sources.find(x=>x.workload_ref===templateDraft.workload);
+  const device=el("select"); device.id="template-device"; device.required=true;
+  device.append(new Option("장비 · 자원 구성 선택", ""));
+  for(const c of w?.candidates || []) device.append(new Option(`${c.backend} · ${c.model || c.candidate_ref} · CPU ${c.resources.host_cpu} / ${c.resources.host_memory_mib} MiB`,c.candidate_ref));
+  device.value=templateDraft.candidate || "";
+  device.onchange=()=>{templateDraft.candidate=device.value; render(); $("template-device")?.focus();};
+  const priority=el("select"); priority.id="template-priority";
+  priority.append(new Option("보통","normal"),new Option("높음 · 백엔드 정책 적용","high")); priority.value=templateDraft.priority || "normal";
+  priority.onchange=()=>{templateDraft.priority=priority.value;};
+  const number=(id,val,max)=>{const n=el("input");n.id=id;n.type="number";n.min=1;n.max=max;n.step=1;n.required=true;n.value=val;return n;};
+  const run=number("template-run",templateDraft.run || w?.max_run_seconds || 60,w?.max_run_seconds || 86400);
+  const queue=number("template-queue",templateDraft.queue || w?.max_queue_seconds || 600,w?.max_queue_seconds || 86400);
+  run.oninput=()=>{templateDraft.run=run.value;}; queue.oninput=()=>{templateDraft.queue=queue.value;};
+  const grid=add(el("div",null,"template-fields"),field("템플릿 이름",name),field("모델 · 실행 환경",source),field("장비 · 요청 자원",device),field("우선순위",priority),field("실행 시간 제한 (초)",run),field("대기 시간 제한 (초)",queue));
+  const selected=w?.candidates.find(c=>c.candidate_ref===templateDraft.candidate);
+  const summary=selected ? add(el("div",null,"template-runtime"),
+    el("strong",`${selected.model || selected.candidate_ref} · ${selected.backend}`),
+    el("p",`CPU ${selected.resources.host_cpu}코어 · 메모리 ${selected.resources.host_memory_mib} MiB · 가속기 ${selected.resources.accelerator_count} (${modes[selected.allocation_mode] || "등록 단위"})`),
+    el("small",`${w.precision} · 배치 ${w.batch_size} · 입력 ${(w.input_shape || []).join(" × ")}`),
+    el("small",`원본 한도: 실행 ${w.max_run_seconds}초 / 대기 ${w.max_queue_seconds}초`)) : null;
+  const save=el("button",savingTemplate?"저장 중…":"템플릿 저장 후 사용", "primary");save.type="submit";save.disabled=savingTemplate || !selected;
+  form.append(grid);if(summary) form.append(summary);
+  form.append(el("p","모델·명령·요청 자원은 선택한 실행 환경의 구성을 사용합니다. 저장만으로 작업이 실행되지는 않습니다.","muted"),save);
+  form.onsubmit=async e=>{
+    e.preventDefault();if(savingTemplate || !selected || !form.reportValidity()) return;
+    const session=generation; savingTemplate=true;save.disabled=true;save.textContent="저장 중…";
+    templateDraft.ref ||= "tpl-" + crypto.randomUUID();
+    const payload={ref:templateDraft.ref,name:name.value.trim(),workload_ref:w.workload_ref,candidate_ref:selected.candidate_ref,priority:priority.value,max_run_seconds:Number(run.value),max_queue_seconds:Number(queue.value)};
+    try {
+      const response=await fetch(API+"/job-templates",{method:"POST",headers:{...authHeaders(),"Content-Type":"application/json"},body:JSON.stringify(payload)});
+      if(!response.ok){const error=await response.json().catch(()=>({}));throw new Error(typeof error.detail==="string"?error.detail:"이름과 실행 조건을 확인해 주세요.");}
+      if(session!==generation)return;
+      submissionDraft.workload="template:"+payload.ref;submissionDraft.candidate=payload.candidate_ref;pages.templates=0;
+      templateDraft={};templateEditorOpen=false;await load();
+      $("notice").textContent="템플릿을 저장했습니다. 아래 요청 자원을 확인하고 작업 제출을 누르세요.";
+    } catch(error) {if(session===generation) $("notice").textContent="등록 실패: "+error.message;}
+    finally {savingTemplate=false;if(session===generation)render();}
+  };
+  return panel("새 작업 템플릿 등록","이름과 실행 조건을 저장하면 프로젝트에서 반복 사용할 수 있습니다.",form);
 }
 let importedWorkload = null, importingWorkload = false;
 function workloadImport() {
@@ -895,7 +957,7 @@ function workloadImport() {
   specLink.href = "https://github.com/dsa04156/resource-advisor/blob/main/docs/quickstart-ko.md#새-작업-템플릿-등록";
   body.append(label, upload, status, register,
     el("p", "기존에 등록된 실행 환경과 장비 후보를 참조하는 작업 명세를 등록합니다. 임의의 Python 파일이나 모델 파일을 업로드해 실행하는 기능은 아직 지원하지 않습니다."), specLink);
-  return add(el("details", null, "panel"), el("summary", "새 작업 템플릿 등록", "panel-head"), body);
+  return add(el("details", null, "panel"), el("summary", "고급: WorkloadSpec JSON 가져오기", "panel-head"), body);
 }
 function compatibilityView() {
   const root = el("div");
@@ -1537,6 +1599,7 @@ function reset(message = "") {
   pending = false;
   token = "";
   importedWorkload = null;
+  templateDraft = {}; templateEditorOpen = false;
   submissionDraft.workload = "";
   submissionDraft.candidate = "";
   anonymousConnected = false;

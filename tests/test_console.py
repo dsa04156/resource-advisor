@@ -266,3 +266,93 @@ def test_backend_confirmation_timestamp_is_recorded_only_after_success(service):
     current = overview(service, "team-a")["jobs"]["items"][0]
     assert current["backend_observed_at"] == first
     assert current["last_observation_error"] == "BackendError"
+
+
+def test_named_template_registration_submission_and_isolation(service, bundle):
+    from resource_advisor.contracts import JobTemplate
+
+    spec, candidate, variant, cap = bundle
+    service.console_workloads = ("workload-1",)
+    value = JobTemplate(
+        ref="tpl-demo",
+        name="내 GPU 추론",
+        workload_ref="workload-1",
+        candidate_ref="base",
+        priority="high",
+        max_run_seconds=30,
+        max_queue_seconds=40,
+    ).model_dump(mode="json")
+    with client_for(service) as client:
+        headers = {"Authorization": "Bearer a"}
+        url = "/api/v1/compute/job-templates"
+        assert client.post(url, json=value, headers=headers).status_code == 200
+        assert client.post(url, json=value, headers=headers).status_code == 200
+        page = client.get("/api/v1/compute/overview", headers=headers).json()
+        assert page["jobs"]["total"] == 0  # Saving must not enqueue compute.
+        saved = page["templates"]["items"][0]
+        assert saved["name"] == value["name"] and saved["priority"] == "high"
+        assert saved["candidates"][0]["variant_ref"] == variant.ref
+        assert (
+            client.post(url, json={**value, "name": "changed"}, headers=headers).status_code == 409
+        )
+        other = {"Authorization": "Bearer b"}
+        assert (
+            client.post(url, json={**value, "ref": "tpl-other"}, headers=other).status_code == 404
+        )
+        assert (
+            client.get("/api/v1/compute/overview", headers=other).json()["templates"]["total"] == 0
+        )
+        request = {
+            "template_ref": "tpl-demo",
+            "workload_ref": "workload-1",
+            "candidate_ref": "base",
+        }
+        headers["Idempotency-Key"] = "template-run"
+        result = client.post("/api/v1/compute/jobs", json=request, headers=headers)
+        assert result.status_code == 200, result.text
+        assert (
+            client.post("/api/v1/compute/jobs", json=request, headers=headers).json()
+            == result.json()
+        )
+        with service.store.transaction() as conn:
+            body = service.store.job(conn, result.json()["job_id"])["body"]
+            assert body["variant"] == variant.model_dump(mode="json")
+            assert body["candidate"] == candidate.model_dump(mode="json")
+            assert body["execution_limits"]["max_run_seconds"] == 30
+            assert body["spec"]["execution"]["priority"] == "high"
+            assert service.store.get(conn, "workload", spec.ref)["body"] == spec.model_dump(
+                mode="json"
+            )
+        rows = client.get(
+            "/api/v1/compute/overview", params={"jobs_search": value["name"]}, headers=headers
+        ).json()["jobs"]
+        assert rows["total"] == 1 and rows["items"][0]["template"]["name"] == value["name"]
+        assert (
+            client.post(
+                url, json={**value, "ref": "too-long", "max_run_seconds": 86400}, headers=headers
+            ).status_code
+            == 422
+        )
+        # The unchanged worker consumes the persisted execution policy and original runtime binding.
+        from test_worker import SchedulerDouble
+
+        from resource_advisor.worker import Worker
+
+        backend = SchedulerDouble()
+        seen = []
+        submit = backend.submit
+
+        def capture(row):
+            seen.append(row["body"])
+            return submit(row)
+
+        backend.submit = capture
+        Worker(service, {("team-a", "lab"): backend}).submit_one()
+        assert backend.submissions == 1
+        assert seen[0]["execution_limits"]["max_queue_seconds"] == 40
+        assert seen[0]["variant"]["ref"] == variant.ref
+        mismatch = {**request, "mode": "fixed"}
+        headers["Idempotency-Key"] = "wrong-mode"
+        assert (
+            client.post("/api/v1/compute/jobs", json=mismatch, headers=headers).status_code == 422
+        )

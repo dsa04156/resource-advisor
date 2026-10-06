@@ -299,7 +299,18 @@ class ExecutionResult(Contract):
         return self
 
 
+class JobTemplate(Contract):
+    ref: Ref
+    name: str = Field(min_length=1, max_length=100)
+    workload_ref: Ref
+    candidate_ref: Ref
+    priority: Literal["normal", "high"] = "normal"
+    max_run_seconds: int = Field(ge=1, le=86400)
+    max_queue_seconds: int = Field(ge=1, le=86400)
+
+
 class JobRequest(Contract):
+    template_ref: Ref | None = None
     workload_ref: Ref
     candidate_ref: Ref
     mode: Literal["fixed", "observe", "pilot", "confirmation"] = "observe"

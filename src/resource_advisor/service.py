@@ -14,6 +14,7 @@ from .contracts import (
     CapabilitySnapshot,
     ExecutionResult,
     JobRequest,
+    JobTemplate,
     RuntimeVariant,
     State,
     WorkloadSpec,
@@ -56,6 +57,32 @@ class Service:
                 "body"
             ]
 
+    @staticmethod
+    def template_spec(spec, template):
+        if (
+            template.max_run_seconds > spec.execution.max_run_seconds
+            or template.max_queue_seconds > spec.execution.max_queue_seconds
+        ):
+            raise Rejected("템플릿 시간 제한은 원본 실행 환경의 한도를 넘을 수 없습니다.")
+        body = spec.model_dump(mode="json")
+        body["execution"].update(
+            priority=template.priority,
+            max_run_seconds=template.max_run_seconds,
+            max_queue_seconds=template.max_queue_seconds,
+        )
+        return WorkloadSpec.model_validate(body)
+
+    def register_template(self, project, template):
+        with self.store.transaction() as conn:
+            spec, candidate, variant, cap = self.bundle(
+                conn, project, template.workload_ref, template.candidate_ref
+            )
+            self.template_spec(spec, template)
+            # Reference existing execution bindings; never synthesize verification or a new command.
+            return self.store.put(
+                conn, "job_template", template.ref, project, template.model_dump(mode="json")
+            )["body"]
+
     def bundle(self, conn, project, workload_ref, candidate_ref):
         spec = WorkloadSpec.model_validate(
             required(self.store, conn, "workload", workload_ref, project)
@@ -97,6 +124,8 @@ class Service:
     def submit(self, project: str, request: JobRequest, key: str):
         request_body = request.model_dump(mode="json")
         # Optional ownership must not invalidate pre-upgrade idempotency keys.
+        if request.template_ref is None:
+            request_body.pop("template_ref")
         if request.owner_lease_seconds is None:
             request_body.pop("owner_lease_seconds")
         request_digest = signature(request_body)
@@ -118,6 +147,21 @@ class Service:
                 spec, candidate, variant, cap = self.bundle(
                     conn, project, request.workload_ref, request.candidate_ref
                 )
+                template = None
+                if request.template_ref:
+                    template = JobTemplate.model_validate(
+                        required(self.store, conn, "job_template", request.template_ref, project)
+                    )
+                    if (
+                        request.mode != "observe"
+                        or request.approval_ref
+                        or request.study_ref
+                        or request.probe_plan_ref
+                        or template.workload_ref != request.workload_ref
+                        or template.candidate_ref != request.candidate_ref
+                    ):
+                        raise Rejected("템플릿과 작업 요청이 일치하지 않습니다.")
+                    spec = self.template_spec(spec, template)
                 operational = (
                     self.operational_mode and request.mode == "observe" and not request.approval_ref
                 )
@@ -212,6 +256,8 @@ class Service:
                     if request.mode == "pilot"
                     else list(variant.command),
                 }
+                if template:
+                    body["job_template"] = template.model_dump(mode="json")
                 if spec.identity.sampling_policy_digest is not None:
                     from .sampling import SamplingPolicies
 

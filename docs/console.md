@@ -58,7 +58,14 @@ Latest inventory selection is performed in SQL rather than loading all snapshots
 No command strings, backend credentials or object-store locations are added to
 these read models. The **작업 제출** page selects a registered workload and candidate,
 shows resource/time/priority limits, and submits a new execution. It also supports
-WorkloadSpec JSON registration through the existing project-scoped API. Arbitrary
+a form for named reusable job templates (`POST /job-templates`). A template binds
+an existing workload/candidate to a display name, priority and bounded run/queue
+time limits. It inherits model, command and requested resources; it never changes
+runtime verification or a Slurm native binding. Saving is idempotent, project-scoped,
+and does not enqueue work. Templates are paginated with `templates_page`; submitting
+uses `template_ref` on `POST /jobs`, persists the exact policy and name in the job,
+and preserves the original runtime refs. Existing requests retain their idempotency
+digests. JSON import remains in the advanced WorkloadSpec panel. Arbitrary
 Python/model uploads are not supported. Compatible candidate rows offer **작업 제출**
 button, with requested accelerator count, CPU, memory and run-time limit. It calls
 the existing project-authenticated `POST /jobs` endpoint in `observe` mode;

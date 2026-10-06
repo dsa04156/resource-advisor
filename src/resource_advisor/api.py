@@ -16,6 +16,7 @@ from .contracts import (
     CapabilitySnapshot,
     ExecutionResult,
     JobRequest,
+    JobTemplate,
     RecommendationRequest,
     RuntimeVariant,
     StudyRequest,
@@ -120,6 +121,7 @@ def create_app(
         compatibility_page: int = Query(default=0, ge=0, le=100000),
         history_page: int = Query(default=0, ge=0, le=100000),
         recommendations_page: int = Query(default=0, ge=0, le=100000),
+        templates_page: int = Query(default=0, ge=0, le=100000),
         qualifications_page: int = Query(default=0, ge=0, le=100000),
         jobs_status: Literal[
             "all", "running", "pending", "succeeded", "failed", "canceled"
@@ -138,6 +140,7 @@ def create_app(
             history_page=history_page,
             recommendations_page=recommendations_page,
             qualifications_page=qualifications_page,
+            templates_page=templates_page,
             jobs_status=jobs_status,
             jobs_backend=jobs_backend,
             jobs_search=jobs_search,
@@ -293,6 +296,10 @@ def create_app(
     @app.get(PREFIX + "/qualifications/{ref}")
     def get_qualification(ref: str, p=Depends(principal)):
         return model_qualifications.get(p.project, ref)
+
+    @app.post(PREFIX + "/job-templates")
+    def register_job_template(value: JobTemplate, p=Depends(principal)):
+        return service.register_template(p.project, value)
 
     @app.post(PREFIX + "/workloads")
     def register_workload(value: WorkloadSpec, p=Depends(principal)):

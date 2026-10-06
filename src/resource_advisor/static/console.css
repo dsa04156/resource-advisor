@@ -889,3 +889,14 @@ button { border-radius: 10px; min-height: 40px; }
   .jobs-panel .job-name code { overflow-wrap: anywhere; }
   .jobs-panel .job-actions { flex-wrap: wrap; }
 }
+
+.template-entry { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+.template-entry p { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+.template-entry button { flex-shrink: 0; }
+.template-form { max-width: none; padding: 4px 24px 24px; }
+.template-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+.template-field { min-width: 0; }
+.template-form input, .template-form select { width: 100%; min-height: 44px; padding: 10px 12px; margin: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); }
+.template-runtime { margin: 20px 0; padding: 16px; border-radius: 12px; background: var(--canvas); }
+.template-runtime p { font-size: 13px; margin: 8px 0; }
+@media (max-width: 650px) { .template-entry { align-items: flex-start; flex-direction: column; } .template-fields { grid-template-columns: 1fr; gap: 16px; } .template-form { padding: 0 20px 20px; } }

@@ -48,6 +48,7 @@ def job_view(service, conn, row):
     return {
         **service.public_job(row),
         "workload_ref": body["request"]["workload_ref"],
+        "template": body.get("job_template"),
         "candidate_ref": body["candidate"]["ref"],
         "backend": body["candidate"]["backend"],
         "cluster_ref": body["backend_cluster_id"],
@@ -92,6 +93,7 @@ def overview(
     history_page=0,
     recommendations_page=0,
     qualifications_page=0,
+    templates_page=0,
     jobs_status="all",
     jobs_backend="all",
     jobs_search="",
@@ -144,6 +146,9 @@ def overview(
             job_query = job_query.where(
                 or_(
                     func.lower(jobs.c.id).contains(term, autoescape=True),
+                    func.lower(jobs.c.body["job_template"]["name"].as_string()).contains(
+                        term, autoescape=True
+                    ),
                     func.lower(jobs.c.body["request"]["workload_ref"].as_string()).contains(
                         term, autoescape=True
                     ),
@@ -161,13 +166,18 @@ def overview(
                 .group_by(jobs.c.state)
             ).all()
         )
+        template_rows, templates = page_rows(
+            conn, entity_query("job_template", project), templates_page
+        )
+        template_sources = {r["body"]["workload_ref"] for r in template_rows}
         rows, compat_page = page_rows(conn, entity_query("workload", project), compatibility_page)
         page_refs = {r["ref"] for r in rows}
         catalog = []
-        if service.console_workloads:
+        if service.console_workloads or template_sources:
             extra = conn.execute(
                 entity_query("workload", project).where(
-                    entities.c.ref.in_(service.console_workloads), entities.c.ref.not_in(page_refs)
+                    entities.c.ref.in_(set(service.console_workloads) | template_sources),
+                    entities.c.ref.not_in(page_refs),
                 )
             ).mappings()
             rows += list(extra)
@@ -226,6 +236,27 @@ def overview(
                     "candidates": candidates,
                 }
             )
+        by_ref = {w["workload_ref"]: w for w in compat_page["items"]}
+        templates["items"] = []
+        for row in template_rows:
+            template = row["body"]
+            source = by_ref.get(template["workload_ref"])
+            if source:
+                templates["items"].append(
+                    {
+                        **source,
+                        "template_ref": template["ref"],
+                        "name": template["name"],
+                        "priority": template["priority"],
+                        "max_run_seconds": template["max_run_seconds"],
+                        "max_queue_seconds": template["max_queue_seconds"],
+                        "candidates": [
+                            c
+                            for c in source["candidates"]
+                            if c["candidate_ref"] == template["candidate_ref"]
+                        ],
+                    }
+                )
         catalog = [
             w for w in compat_page["items"] if w["workload_ref"] in service.console_workloads
         ]
@@ -262,6 +293,7 @@ def overview(
         "compatibility": compat_page,
         "operational_mode": service.operational_mode,
         "submission_catalog": catalog if service.console_workloads else None,
+        "templates": templates,
         "history": history,
         "recommendations": recommendations,
         "qualifications": qualifications,

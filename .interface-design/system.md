@@ -86,3 +86,10 @@ show measured percentages beside their thresholds, and accuracy loss in percenta
 points. Imported evidence has an amber provenance label. A passing imported report
 uses a neutral badge, because import never authorizes a runtime candidate. The page
 must retain both failures and an honest empty state without implying completion.
+
+Template registration: the submission page has an explicit New Template action.
+The inline two-column form collects a friendly name, registered workload and device
+configuration, priority, run time and queue time. Resource/model/command values are
+inherited and shown before saving. Saving selects the durable template; execution
+requires the separate submit button. Collapse to one column on mobile. Draft text
+survives dependent selector changes; reset clears project-specific draft state.
