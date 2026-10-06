@@ -110,8 +110,13 @@ See [deployment evidence](evidence/passive-observation-deployment-v1.json).
 The exact source commit's CI passed Python 3.11/3.13, SQLite/PostgreSQL,
 lint/format, wheel/assets and Ansible syntax checks.
 
-An unmodified GPU program's native/process association and the GPU sensor path
-still require direct evidence before closing section 7.1. The
-[one-Job acceptance plan](passive-gpu-observation-plan.md) is prospective, with
-[frozen program/limits](evidence/passive-gpu-observation-plan-v1.json).
-No GPU Job was submitted by this implementation/deployment increment.
+The subsequent [native CUDA acceptance](passive-gpu-observation-results.md)
+passed the [prospectively frozen one-Job plan](passive-gpu-observation-plan.md):
+12 process/node/NVML samples, unchanged ordinary program, collection ending
+while the program remained Running, later normal termination, project read/403/404,
+exact replay and unchanged existing metadata/settings. One actual Job consumed
+41 scheduled-Pod reservation proxy seconds, including 5s preparation and 36s
+container time; exact quota release timing remains bounded. Its owned Job/ConfigMap were removed and the queue
+released. Physical-device UUID matched the program's CUDA UUID. This closes the
+bounded native CUDA fixture, not Slurm/Jetson/NPU passive sensors, all researcher
+programs, per-process GPU utilization or the full platform acceptance scope.

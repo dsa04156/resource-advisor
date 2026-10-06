@@ -1,0 +1,62 @@
+# Substitute the qualified image, PVC, namespace, queue and allowed node locally.
+# Create a same-namespace immutable ConfigMap named passive-gpu-program containing
+# the unchanged program.py. This is a native fixture, not an ArgoCD runtime Job.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: passive-gpu-example
+  namespace: research-lab
+  labels:
+    kueue.x-k8s.io/queue-name: gpu-lab
+spec:
+  suspend: true
+  backoffLimit: 0
+  activeDeadlineSeconds: 120
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        kubernetes.io/hostname: allowed-gpu-node
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: research
+          image: QUALIFIED_DIGEST_PINNED_IMAGE
+          command: [python, /research/program.py]
+          args: [--seconds, '35']
+          env:
+            - name: PYTHONPATH
+              value: /opt/resource-advisor:/opt/qualified-runtime/site
+            - name: PYTHONDONTWRITEBYTECODE
+              value: '1'
+          resources:
+            requests:
+              cpu: '1'
+              memory: 2Gi
+              nvidia.com/gpu: '1'
+            limits:
+              cpu: '1'
+              memory: 2Gi
+              nvidia.com/gpu: '1'
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: program
+              mountPath: /research
+              readOnly: true
+            - name: qualified-runtime
+              mountPath: /opt/qualified-runtime
+              readOnly: true
+      volumes:
+        - name: program
+          configMap:
+            name: passive-gpu-program
+        - name: qualified-runtime
+          persistentVolumeClaim:
+            claimName: qualified-gpu-runtime
+            readOnly: true

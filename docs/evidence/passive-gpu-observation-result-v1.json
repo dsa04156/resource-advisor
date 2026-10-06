@@ -1,0 +1,443 @@
+{
+  "schema_version": "passive-gpu-observation-result-v1",
+  "status": "PASSED_BOUNDED_NATIVE_CUDA_FIXTURE",
+  "captured_at": "2026-10-06T16:31:17.646145+00:00",
+  "prospective_plan": "passive-gpu-observation-plan-v1.json",
+  "collector_api_source_commit": "c03c8db7ce05c87672a0458a90c49c84561acf0b",
+  "plan_freeze_commit": "81e56f86f5ee5fa17e37fc03f04e9c30b7343fae",
+  "plan_freeze_ci": {
+    "run_id": 37494786627,
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "program_sha256": "2147eefa45ccb981ee990938af60e57063d49f9028a4580f54b4c90318ad574f",
+  "private_manifest_sha256": "0543b4a39a67779a6fdf6e2eaa5336e7850cdbd5b67a100c38c824627a7feb34",
+  "native_jobs": 1,
+  "replacement_jobs": 0,
+  "backend": "kubernetes",
+  "accelerator_model": "NVIDIA GeForce RTX 5080",
+  "admission": "existing Kueue LocalQueue/ClusterQueue, unchanged one-GPU quota",
+  "collector": {
+    "requested_window_seconds": 12,
+    "interval_seconds": 1,
+    "stop_reason": "WINDOW_COMPLETE",
+    "sample_count": 12,
+    "observed_first_to_last_sample_seconds": 11.025220311945304,
+    "query_seconds": 0.02261692995671183,
+    "query_seconds_is_not_causal_overhead": true
+  },
+  "acceptance": {
+    "source_unchanged_before_during_after": true,
+    "stable_same_pid_identity": true,
+    "native_uid_admitted_workload_gpu_request_matched": true,
+    "physical_uuid_digest_matches_actual_cuda_device": true,
+    "collector_finished_while_original_program_running": true,
+    "program_normal_output_exit_zero": true,
+    "operator_import_and_reader_console": true,
+    "exact_replay_same_digest": true,
+    "researcher_import_403": true,
+    "foreign_project_read_404": true,
+    "only_new_entity_passive_observation": true,
+    "no_model_profile_execution_run_or_usage_created_by_import": true,
+    "static_service_specs_uids_secrets_pvc_quota_unchanged": true,
+    "only_owned_fixture_deleted_queue_free": true
+  },
+  "preserved": {
+    "unchanged_existing_entities": 4476,
+    "unchanged_job_identities": 592,
+    "unchanged_terminal_jobs": 591,
+    "unchanged_ledgers": 591
+  },
+  "record_digest": "sha256:c8ed2398c91f4551300fd28628307e1e757e8ac228740eb069fdc0282bc7a51d",
+  "private_original_report_file_sha256": "014ea6b4220712bfbf3a3fc3603a52374a70e82dde946211d5a22f0fc0fea155",
+  "assessment": {
+    "sample_count": 12,
+    "window_seconds": 11.025220311945304,
+    "collector_query_seconds": 0.02261692995671183,
+    "process_cpu_seconds": 0.17999999999999994,
+    "process_sampled_peak_rss_mib": 751.35546875,
+    "process_read_bytes": 0,
+    "process_write_bytes": 0,
+    "device_observed": true,
+    "quality_value": null,
+    "step_seconds": null,
+    "throughput": null,
+    "network_bytes": null,
+    "recommendation_authorized": false,
+    "scope": "One process thread group; sampled RSS; not child processes, model compute, GPU per-job utilization, native termination or allocation accounting."
+  },
+  "reservation_cost": {
+    "container_started_at": "2026-10-06T16:29:41Z",
+    "container_finished_at": "2026-10-06T16:30:17Z",
+    "container_elapsed_seconds": 36.0,
+    "pod_scheduled_at": "2026-10-06T16:29:36Z",
+    "node_requested_resource_interval_seconds": 41.0,
+    "node_gpu_reservation_proxy_seconds": 41.0,
+    "node_cpu_core_reservation_proxy_seconds": 41.0,
+    "scheduled_preparation_seconds": 5.0,
+    "quota_reserved_at": "2026-10-06T16:29:36Z",
+    "quota_release_observed_by": "2026-10-06T16:31:18.554468+00:00",
+    "quota_reservation_seconds_lower_bound": 41.0,
+    "quota_reservation_seconds_upper_bound": 102.554468,
+    "exact_quota_release_at": null,
+    "exact_quota_reservation_gpu_seconds": null,
+    "requested_gpu_count": 1,
+    "exit_code": 0,
+    "scope": "Container elapsed=36s. Scheduled Pod through container termination=41s, includes 5s setup; requested-resource reservation proxy, not device active time. Exact Kueue release transition was not retained; bounded by termination and final zero-queue observation, not zero. No timing interval implies actual CPU/GPU utilization."
+  },
+  "console": {
+    "actual_live_record": true,
+    "desktop_visually_inspected": [
+      1366,
+      768
+    ],
+    "mobile_visually_inspected": [
+      390,
+      844
+    ],
+    "mobile_page_horizontal_overflow": false,
+    "sample_rows": 12,
+    "unknown_model_metrics_and_device_inclusive_warning_visible": true,
+    "private_screenshots_not_published": true
+  },
+  "samples": [
+    {
+      "started_seconds": 8.069910109043121e-07,
+      "finished_seconds": 0.0024164109490811825,
+      "process": {
+        "cpu_seconds": 1.06,
+        "rss_bytes": 787853312,
+        "read_bytes": 1368064,
+        "write_bytes": 24576,
+        "errors": {}
+      },
+      "node": {
+        "scope": "observer-proc-view",
+        "cpu_total_ticks": 1783498994,
+        "cpu_idle_ticks": 1751786879,
+        "memory_total_bytes": 32873136128,
+        "memory_available_bytes": 26108305408
+      },
+      "device": {
+        "scope": "physical-device-inclusive",
+        "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+        "utilization_percent": 1.0,
+        "memory_used_bytes": 881000448,
+        "power_w": 42.376,
+        "temperature_c": 33.0,
+        "errors": {}
+      }
+    },
+    {
+      "started_seconds": 1.0025471979752183,
+      "finished_seconds": 1.0044956309720874,
+      "process": {
+        "cpu_seconds": 1.07,
+        "rss_bytes": 787853312,
+        "read_bytes": 1368064,
+        "write_bytes": 24576,
+        "errors": {}
+      },
+      "node": {
+        "scope": "observer-proc-view",
+        "cpu_total_ticks": 1783501387,
+        "cpu_idle_ticks": 1751789201,
+        "memory_total_bytes": 32873136128,
+        "memory_available_bytes": 26099720192
+      },
+      "device": {
+        "scope": "physical-device-inclusive",
+        "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+        "utilization_percent": 1.0,
+        "memory_used_bytes": 881000448,
+        "power_w": 42.101,
+        "temperature_c": 33.0,
+        "errors": {}
+      }
+    },
+    {
+      "started_seconds": 2.004708511987701,
+      "finished_seconds": 2.006614938029088,
+      "process": {
+        "cpu_seconds": 1.09,
+        "rss_bytes": 787853312,
+        "read_bytes": 1368064,
+        "write_bytes": 24576,
+        "errors": {}
+      },
+      "node": {
+        "scope": "observer-proc-view",
+        "cpu_total_ticks": 1783503781,
+        "cpu_idle_ticks": 1751791529,
+        "memory_total_bytes": 32873136128,
+        "memory_available_bytes": 26110906368
+      },
+      "device": {
+        "scope": "physical-device-inclusive",
+        "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+        "utilization_percent": 1.0,
+        "memory_used_bytes": 881000448,
+        "power_w": 41.86,
+        "temperature_c": 34.0,
+        "errors": {}
+      }
+    },
+    {
+      "started_seconds": 3.006877377978526,
+      "finished_seconds": 3.008820699993521,
+      "process": {
+        "cpu_seconds": 1.1,
+        "rss_bytes": 787853312,
+        "read_bytes": 1368064,
+        "write_bytes": 24576,
+        "errors": {}
+      },
+      "node": {
+        "scope": "observer-proc-view",
+        "cpu_total_ticks": 1783506173,
+        "cpu_idle_ticks": 1751793873,
+        "memory_total_bytes": 32873136128,
+        "memory_available_bytes": 26117058560
+      },
+      "device": {
+        "scope": "physical-device-inclusive",
+        "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+        "utilization_percent": 1.0,
+        "memory_used_bytes": 881000448,
+        "power_w": 42.098,
+        "temperature_c": 34.0,
+        "errors": {}
+      }
+    },
+    {
+      "started_seconds": 4.009091247920878,
+      "finished_seconds": 4.010515837930143,
+      "process": {
+        "cpu_seconds": 1.12,
+        "rss_bytes": 787853312,
+        "read_bytes": 1368064,
+        "write_bytes": 24576,
+        "errors": {}
+      },
+      "node": {
+        "scope": "observer-proc-view",
+        "cpu_total_ticks": 1783508570,
+        "cpu_idle_ticks": 1751796213,
+        "memory_total_bytes": 32873136128,
+        "memory_available_bytes": 26123866112
+      },
+      "device": {
+        "scope": "physical-device-inclusive",
+        "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+        "utilization_percent": 1.0,
+        "memory_used_bytes": 881000448,
+        "power_w": 42.187,
+        "temperature_c": 34.0,
+        "errors": {}
+      }
+    },
+    {
+      "started_seconds": 5.01101299491711,
+      "finished_seconds": 5.0132067699451,
+      "process": {
+        "cpu_seconds": 1.14,
+        "rss_bytes": 787853312,
+        "read_bytes": 1368064,
+        "write_bytes": 24576,
+        "errors": {}
+      },
+      "node": {
+        "scope": "observer-proc-view",
+        "cpu_total_ticks": 1783510966,
+        "cpu_idle_ticks": 1751798571,
+        "memory_total_bytes": 32873136128,
+        "memory_available_bytes": 26128470016
+      },
+      "device": {
+        "scope": "physical-device-inclusive",
+        "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+        "utilization_percent": 1.0,
+        "memory_used_bytes": 881000448,
+        "power_w": 41.936,
+        "temperature_c": 34.0,
+        "errors": {}
+      }
+    },
+    {
+      "started_seconds": 6.013360520941205,
+      "finished_seconds": 6.014763525919989,
+      "process": {
+        "cpu_seconds": 1.16,
+        "rss_bytes": 787853312,
+        "read_bytes": 1368064,
+        "write_bytes": 24576,
+        "errors": {}
+      },
+      "node": {
+        "scope": "observer-proc-view",
+        "cpu_total_ticks": 1783513360,
+        "cpu_idle_ticks": 1751800926,
+        "memory_total_bytes": 32873136128,
+        "memory_available_bytes": 26139828224
+      },
+      "device": {
+        "scope": "physical-device-inclusive",
+        "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+        "utilization_percent": 1.0,
+        "memory_used_bytes": 881000448,
+        "power_w": 42.169,
+        "temperature_c": 34.0,
+        "errors": {}
+      }
+    },
+    {
+      "started_seconds": 7.014958353014663,
+      "finished_seconds": 7.0154732370283455,
+      "process": {
+        "cpu_seconds": 1.17,
+        "rss_bytes": 787853312,
+        "read_bytes": 1368064,
+        "write_bytes": 24576,
+        "errors": {}
+      },
+      "node": {
+        "scope": "observer-proc-view",
+        "cpu_total_ticks": 1783515752,
+        "cpu_idle_ticks": 1751803276,
+        "memory_total_bytes": 32873136128,
+        "memory_available_bytes": 26152443904
+      },
+      "device": {
+        "scope": "physical-device-inclusive",
+        "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+        "utilization_percent": 1.0,
+        "memory_used_bytes": 881000448,
+        "power_w": 42.242,
+        "temperature_c": 34.0,
+        "errors": {}
+      }
+    },
+    {
+      "started_seconds": 8.015650733024813,
+      "finished_seconds": 8.017989564919844,
+      "process": {
+        "cpu_seconds": 1.18,
+        "rss_bytes": 787853312,
+        "read_bytes": 1368064,
+        "write_bytes": 24576,
+        "errors": {}
+      },
+      "node": {
+        "scope": "observer-proc-view",
+        "cpu_total_ticks": 1783518144,
+        "cpu_idle_ticks": 1751805646,
+        "memory_total_bytes": 32873136128,
+        "memory_available_bytes": 26158866432
+      },
+      "device": {
+        "scope": "physical-device-inclusive",
+        "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+        "utilization_percent": 1.0,
+        "memory_used_bytes": 881000448,
+        "power_w": 42.099,
+        "temperature_c": 34.0,
+        "errors": {}
+      }
+    },
+    {
+      "started_seconds": 9.018202253966592,
+      "finished_seconds": 9.02033875696361,
+      "process": {
+        "cpu_seconds": 1.2,
+        "rss_bytes": 787853312,
+        "read_bytes": 1368064,
+        "write_bytes": 24576,
+        "errors": {}
+      },
+      "node": {
+        "scope": "observer-proc-view",
+        "cpu_total_ticks": 1783520539,
+        "cpu_idle_ticks": 1751808016,
+        "memory_total_bytes": 32873136128,
+        "memory_available_bytes": 26166087680
+      },
+      "device": {
+        "scope": "physical-device-inclusive",
+        "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+        "utilization_percent": 1.0,
+        "memory_used_bytes": 881000448,
+        "power_w": 42.232,
+        "temperature_c": 34.0,
+        "errors": {}
+      }
+    },
+    {
+      "started_seconds": 10.020653791958466,
+      "finished_seconds": 10.022955470019951,
+      "process": {
+        "cpu_seconds": 1.22,
+        "rss_bytes": 787853312,
+        "read_bytes": 1368064,
+        "write_bytes": 24576,
+        "errors": {}
+      },
+      "node": {
+        "scope": "observer-proc-view",
+        "cpu_total_ticks": 1783522934,
+        "cpu_idle_ticks": 1751810381,
+        "memory_total_bytes": 32873136128,
+        "memory_available_bytes": 26169159680
+      },
+      "device": {
+        "scope": "physical-device-inclusive",
+        "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+        "utilization_percent": 1.0,
+        "memory_used_bytes": 881000448,
+        "power_w": 42.067,
+        "temperature_c": 34.0,
+        "errors": {}
+      }
+    },
+    {
+      "started_seconds": 11.02313124097418,
+      "finished_seconds": 11.025221118936315,
+      "process": {
+        "cpu_seconds": 1.24,
+        "rss_bytes": 787853312,
+        "read_bytes": 1368064,
+        "write_bytes": 24576,
+        "errors": {}
+      },
+      "node": {
+        "scope": "observer-proc-view",
+        "cpu_total_ticks": 1783525328,
+        "cpu_idle_ticks": 1751812721,
+        "memory_total_bytes": 32873136128,
+        "memory_available_bytes": 26172743680
+      },
+      "device": {
+        "scope": "physical-device-inclusive",
+        "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+        "utilization_percent": 1.0,
+        "memory_used_bytes": 881000448,
+        "power_w": 42.243,
+        "temperature_c": 35.0,
+        "errors": {}
+      }
+    }
+  ],
+  "limits": [
+    "External native/process association is operator-attested, not remote attestation.",
+    "Physical GPU samples include all users, not per-job utilization.",
+    "One bounded CUDA fixture does not qualify every researcher program or continuous monitoring.",
+    "No model quality, step time, throughput, network attribution or performance advantage.",
+    "No native Slurm/Jetson/NPU passive sensor acceptance.",
+    "Full M0-M6 and initial HAIRP remain incomplete.",
+    "Exact Kueue release timestamp unavailable; reservation duration remains bounded, not exactly the container interval."
+  ],
+  "preparation_issues": [
+    "API job summary does not include persisted backend identity; preparation switched to a narrow read-only DB query before any submission.",
+    "kubectl create List outputs separate JSON documents; preparation dry-run was split by object before submission.",
+    "Post-import preservation verifier assumed every RBAC object has spec; corrected optional fields and reran read/replay against the same observation, without new compute."
+  ]
+}
