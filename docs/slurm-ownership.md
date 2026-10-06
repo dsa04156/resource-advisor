@@ -55,6 +55,9 @@ The Pi accelerator is still absent, and full model/API execution is still pendin
 The first new Orin PyTorch CNN Job completed with correct output, but runtime
 support and host-memory findings prevent automatic execution registration
 ([results](slurm-torch-results.md)).
+The separate [Jetson runtime follow-up](slurm-jetson-runtime-results.md) now passes
+the fixed CNN with native GPU code and enforced memory; scoped executor identities
+and full platform model delivery are still pending.
 
 ## Previous lab observation — 2026-10-03 KST
 

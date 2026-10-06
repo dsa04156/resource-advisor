@@ -114,6 +114,6 @@ passed Python 3.11/3.13 contracts, wheel/assets, lint and Ansible syntax. Both
 versions passed 894 tests with two DB tests skipped without a database, then all
 896 tests with PostgreSQL. The affected local suite passed 70 tests.
 
-The separate native PyTorch compatibility finding and complete Slurm
-API→model→artifact/usage path remain open. The current controller work neither
-changes drivers nor promotes the unqualified PyTorch environment.
+A subsequent [isolated Jetson runtime](slurm-jetson-runtime-results.md) passes its
+fixed GPU CNN gate without changing drivers or promoting the earlier failed
+PyTorch candidate. The complete Slurm API→model→artifact/usage path remains open.

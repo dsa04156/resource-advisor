@@ -27,7 +27,9 @@ through actual mTLS Prometheus observations. A
 [restricted controller collector](docs/slurm-controller-results.md) now also
 supplies live Slurm node state, CPU/memory/GPU reservations and scoped queue counts.
 GPU utilization and Pi NPU execution remain unqualified; registration is not model
-execution acceptance.
+execution acceptance. An [isolated Orin runtime](docs/slurm-jetson-runtime-results.md)
+now passes its fixed GPU CNN gate under enforced memory limits; full Slurm
+API/model delivery remains open.
 
 Open `/console` on the API origin for the [four-view research console](docs/console.md):
 resources/jobs, compatibility, queue/allocation history, and recommendation evidence.

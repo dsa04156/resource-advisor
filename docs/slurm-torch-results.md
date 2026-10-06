@@ -1,5 +1,11 @@
 # Orin PyTorch F0: numerical pass, execution gate blocked
 
+October 6 follow-up: a separate
+[isolated Jetson runtime](slurm-jetson-runtime-results.md) now passes the fixed
+CNN with native `sm_87`, no runtime warnings and enforced 1 GiB memory. The first
+candidate's failed gates and costs below remain unchanged; neither trial alone
+establishes the full Slurm API/model delivery path.
+
 This is the retained first CNN qualification. Subsequent
 [cgroup/device enforcement](slurm-limits-v2-results.md) now limits the worker;
 the unset TaskPlugin observation below describes the original run. The framework

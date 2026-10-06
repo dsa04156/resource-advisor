@@ -1,0 +1,166 @@
+{
+  "schema_version": "v1",
+  "plan": "docs/slurm-jetson-runtime-plan.md",
+  "source_commit": "1e6653fa2e23aa8014b0222a40f7f12ac4a62273",
+  "source_sha256": "bfc21e32a7e4d9a07c9a4399f18c53d14e6b26241d5f896124e31e55c1d0c36e",
+  "implementation_ci_run": 37409827188,
+  "implementation_ci": "success",
+  "qualification": {
+    "strict_generated_cnn_gate": "PASS",
+    "runtime_user_warnings": [],
+    "native_sm_87_required": true,
+    "host_memory_enforcement_verified": true,
+    "vendor_supported_jetpack_combination": false,
+    "automatic_execution_registered": false,
+    "api_jobs_created": 0,
+    "trained_model_accuracy_qualified": false
+  },
+  "preflight": {
+    "missing_dynamic_libraries": {},
+    "import": {
+      "exit": 0,
+      "stdout": "{\"torch\": \"2.5.0a0+872d972e41.nv24.08\", \"cuda\": \"12.6\", \"compiled_archs\": \"sm_70 sm_72 sm_75 sm_80 sm_86 sm_87 compute_87\"}\n",
+      "stderr": ""
+    },
+    "gpu_hidden": true,
+    "static_architectures": [
+      "70",
+      "72",
+      "75",
+      "80",
+      "86",
+      "87"
+    ]
+  },
+  "boundary_before": {
+    "memory_max_bytes": 1073741824,
+    "swap_max_bytes": 0,
+    "memory_peak_bytes": 8339456,
+    "cpu_affinity_count": 1
+  },
+  "measurement": {
+    "schema_version": "v1",
+    "result": "PASS",
+    "scope": "deterministic generated CNN numerical qualification, not model accuracy",
+    "torch": "2.5.0a0+872d972e41.nv24.08",
+    "cuda": "12.6",
+    "device": "Orin",
+    "capability": [
+      8,
+      7
+    ],
+    "cuda_arch_list": [
+      "sm_70",
+      "sm_72",
+      "sm_75",
+      "sm_80",
+      "sm_86",
+      "sm_87",
+      "compute_87"
+    ],
+    "input_shape": [
+      4,
+      3,
+      32,
+      32
+    ],
+    "precision": "fp32",
+    "seed": 20261006,
+    "input_sha256": "878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+    "weights_sha256": "b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+    "warmup_forwards": 3,
+    "measured_forwards": 10,
+    "compared_elements": 400,
+    "reference_rtol": 0.0001,
+    "reference_atol": 0.0001,
+    "max_absolute_error": 1.4901161193847656e-08,
+    "samples_seconds": [
+      0.00179207295877859,
+      0.0024423279683105648,
+      0.001930156024172902,
+      0.001936491986270994,
+      0.0018752429750747979,
+      0.0018930670339614153,
+      0.001837706018704921,
+      0.001899627037346363,
+      0.0017293510027229786,
+      0.0017820249777287245
+    ],
+    "median_forward_ms": 1.8841550045181066,
+    "peak_tensor_allocation_mib": 33.05615234375,
+    "peak_process_rss_kib": 807516,
+    "cpu_fallback": false,
+    "enforced_boundary": {
+      "memory_max_bytes": 1073741824,
+      "swap_max_bytes": 0,
+      "memory_peak_bytes": 677924864,
+      "cpu_affinity_count": 1
+    }
+  },
+  "accounting": [
+    {
+      "job_id": "jetson-cnn-v2",
+      "job_name": "ra-torch-f0-v2",
+      "account": "ra-lab",
+      "partition": "compute",
+      "node": "gpu-worker",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "elapsed_seconds": 9,
+      "submit": "2026-10-06T03:47:16+0000",
+      "start": "2026-10-06T03:47:16+0000",
+      "end": "2026-10-06T03:47:25+0000",
+      "allocated_tres": "billing=1,cpu=1,gres/gpu=1,mem=1G,node=1",
+      "max_rss": null,
+      "total_cpu": "00:00.027"
+    },
+    {
+      "job_id": "jetson-cnn-v2.batch",
+      "job_name": "batch",
+      "account": "ra-lab",
+      "partition": "",
+      "node": "gpu-worker",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "elapsed_seconds": 9,
+      "submit": "2026-10-06T03:47:16+0000",
+      "start": "2026-10-06T03:47:16+0000",
+      "end": "2026-10-06T03:47:25+0000",
+      "allocated_tres": "cpu=1,gres/gpu=1,mem=1G,node=1",
+      "max_rss": "4308K",
+      "total_cpu": "00:00.027"
+    },
+    {
+      "job_id": "jetson-cnn-v2.0",
+      "job_name": "python",
+      "account": "ra-lab",
+      "partition": "",
+      "node": "gpu-worker",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "elapsed_seconds": 7,
+      "submit": "2026-10-06T03:47:18+0000",
+      "start": "2026-10-06T03:47:18+0000",
+      "end": "2026-10-06T03:47:25+0000",
+      "allocated_tres": "cpu=1,gres/gpu=1,mem=1G,node=1",
+      "max_rss": null,
+      "total_cpu": "00:00:00"
+    }
+  ],
+  "job_count": 1,
+  "gpu_reservation_seconds": 9,
+  "previous_cnn_candidate_gpu_reservation_seconds": 21,
+  "all_cnn_candidate_gpu_reservation_seconds": 30,
+  "queue_empty_after": true,
+  "both_nodes_idle_after": true,
+  "protected_scheduler_worker_driver_boot_qos_associations_unchanged": true,
+  "raw_log": "RA_SLURM_TORCH_BOUNDARY {\"memory_max_bytes\": 1073741824, \"swap_max_bytes\": 0, \"memory_peak_bytes\": 8339456, \"cpu_affinity_count\": 1}\nRA_SLURM_TORCH_QUALIFICATION {\"schema_version\": \"v1\", \"result\": \"PASS\", \"scope\": \"deterministic generated CNN numerical qualification, not model accuracy\", \"torch\": \"2.5.0a0+872d972e41.nv24.08\", \"cuda\": \"12.6\", \"device\": \"Orin\", \"capability\": [8, 7], \"cuda_arch_list\": [\"sm_70\", \"sm_72\", \"sm_75\", \"sm_80\", \"sm_86\", \"sm_87\", \"compute_87\"], \"input_shape\": [4, 3, 32, 32], \"precision\": \"fp32\", \"seed\": 20261006, \"input_sha256\": \"878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7\", \"weights_sha256\": \"b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347\", \"warmup_forwards\": 3, \"measured_forwards\": 10, \"compared_elements\": 400, \"reference_rtol\": 0.0001, \"reference_atol\": 0.0001, \"max_absolute_error\": 1.4901161193847656e-08, \"samples_seconds\": [0.00179207295877859, 0.0024423279683105648, 0.001930156024172902, 0.001936491986270994, 0.0018752429750747979, 0.0018930670339614153, 0.001837706018704921, 0.001899627037346363, 0.0017293510027229786, 0.0017820249777287245], \"median_forward_ms\": 1.8841550045181066, \"peak_tensor_allocation_mib\": 33.05615234375, \"peak_process_rss_kib\": 807516, \"cpu_fallback\": false, \"enforced_boundary\": {\"memory_max_bytes\": 1073741824, \"swap_max_bytes\": 0, \"memory_peak_bytes\": 677924864, \"cpu_affinity_count\": 1}}\n\n",
+  "limitations": [
+    "Generated CNN numerical qualification only; full Slurm API/model/artifact/accounting path remains open.",
+    "One Job with ten within-Job timings is not an independent performance comparison.",
+    "Process RSS, charged cgroup memory and Torch tensors measure different scopes; shared-page accounting can differ.",
+    "Slurm model-step MaxRSS is missing and recorded TotalCPU is zero; do not substitute batch-shell statistics for model resource use.",
+    "GPU reservations do not measure utilization or energy.",
+    "Pinned older Jetson wheel on current host is a locally verified experimental combination, not vendor certification."
+  ]
+}
