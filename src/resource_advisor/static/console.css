@@ -1050,3 +1050,6 @@ button { border-radius: 10px; min-height: 40px; }
   .ml-node-inspector { grid-template-columns: 1fr; padding: 16px; margin: 12px; }
   .ml-graph-legend, .ml-graph-hint { padding-inline: 16px; }
 }
+.ml-graph-legend span:nth-child(1) { color: #0071e3; }
+.ml-graph-legend span:nth-child(2) { color: #237151; }
+.ml-graph-legend span:nth-child(3) { color: #956922; }

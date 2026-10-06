@@ -2262,8 +2262,9 @@ function mlJobsGraph() {
   const pipeline=researchData?.kubeflow?.items?.find(r=>r.job_id===job.job_id);
   const q=job.scheduling_plan?.adapter;
   const short=v=>v?String(v).replace(/^sha256:/,"").slice(0,16):"등록 정보 없음";
+  const numerical=info.measurement_boundary?.startsWith("cuda-squares-");
   const nodes=[
-    {id:"model",x:20,y:108,kicker:"MODEL",label:"모델 · 실행 대상",caption:info.model_digest?short(info.model_digest):"모델 정보 미기록",tone:"configured"},
+    {id:"model",x:20,y:108,kicker:numerical?"CUDA KERNEL":"MODEL",label:numerical?"GPU 연산 검증 대상":"모델 · 실행 대상",caption:info.model_digest?short(info.model_digest):"모델 정보 미기록",tone:"configured"},
     {id:"input",x:20,y:242,kicker:"DATA / INPUT",label:"데이터 · 입력",caption:info.input_shape?.length?`입력 ${info.input_shape.join(" × ")}`:"입력 정보 미기록",tone:"configured"},
     {id:"workload",x:270,y:175,kicker:(info.task_type||"ML WORKLOAD").toUpperCase(),label:({training:"학습 작업",inference:"추론 작업",benchmark:"벤치마크 작업",preprocessing:"전처리 작업"})[info.task_type]||"ML 작업",caption:`배치 ${info.batch_size ?? "—"} · ${info.precision || "정밀도 미기록"}`,tone:"complete"},
     {id:"policy",x:520,y:30,kicker:"SCHEDULING POLICY",label:"자원 요청 · 정책",caption:job.scheduling_plan?.profile_ref||"기본 실행 설정",tone:"configured"},
@@ -2282,7 +2283,7 @@ function mlJobsGraph() {
   const inspector=el("div",null,"ml-node-inspector");
   const title=add(el("div"),el("p",selected.kicker,"eyebrow"),el("h3",selected.label));
   const content=el("div",null,"ml-node-content");
-  if(selected.id==="model")content.append(el("p","모델 식별자: "+(info.model_digest||"미기록")),el("p","정밀도: "+(info.precision||"미기록")),el("small","등록된 작업의 모델 식별자를 표시합니다. 모델 파일이나 학습 단계를 새로 만들지 않습니다."));
+  if(selected.id==="model")content.append(el("p","모델 식별자: "+(info.model_digest||"미기록")),el("p","정밀도: "+(info.precision||"미기록")),el("small",numerical?"CUDA 수치 연산 점검입니다. 학습된 AI 모델의 성능 검증이 아닙니다.":"등록된 작업의 모델 식별자를 표시합니다. 모델 파일이나 학습 단계를 새로 만들지 않습니다."));
   if(selected.id==="input")content.append(el("p","데이터 버전: "+(info.dataset_version||"미기록")),el("p","입력 크기: "+(info.input_shape?.join(" × ")||"미기록")),el("p","배치 크기: "+(info.batch_size??"미기록")));
   if(selected.id==="workload")content.append(el("p",job.workload_ref),el("p","측정 범위: "+(info.measurement_boundary||"미기록")),el("small","Notebook·웹·파이프라인이 제출한 실행 단위입니다. 이 그래프는 등록된 실행 정보를 보여줍니다."));
   if(selected.id==="policy")content.append(el("p",`요청 가속기 ${job.requested_resources?.accelerator_count ?? "—"} · CPU ${job.requested_resources?.host_cpu ?? "—"} · 메모리 ${job.requested_resources?.host_memory_mib ?? "—"} MiB`),el("p",`우선순위: ${job.priority==="high"?"높음":"보통"} · 실행 제한 ${job.execution_limits?.max_run_seconds ?? "—"}초`),job.scheduling_plan?details("후보 비교 · 선택 근거",job.scheduling_plan):el("small","공통 정책 적용 기록이 없는 실행입니다."));
@@ -2292,7 +2293,7 @@ function mlJobsGraph() {
     for(const e of waited)content.append(el("small",stamp(e.observed_at)+" · "+scenarioReason(e.state,e.reason)));
     content.append(actionLink("전체 큐 · 쿼터 보기 →","#history"));
   }
-  if(selected.id==="compute")content.append(el("p",`${job.backend} · ${modes[job.allocation_mode]||"할당 방식 미기록"}`),el("p",scenarioReason(job.state,job.scheduler_reason)),el("small","최근 실행 관측: "+stamp(job.backend_observed_at)),job.error?el("p",job.error,"error-message"):null);
+  if(selected.id==="compute")add(content,el("p",`${job.backend} · ${modes[job.allocation_mode]||"할당 방식 미기록"}`),el("p",scenarioReason(job.state,job.scheduler_reason)),el("small","최근 실행 관측: "+stamp(job.backend_observed_at)),job.error?el("p",job.error,"error-message"):null);
   if(selected.id==="pipeline")content.append(el("p",pipeline.display_name),researchButton("실제 파이프라인 DAG 열기",()=>openPipeline(pipeline.run_id)));
   if(selected.id==="result"){
     const m=job.result?.measurements;
