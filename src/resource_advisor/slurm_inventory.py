@@ -22,6 +22,7 @@ class SlurmController(Contract):
     account: str = Field(pattern=IDENTIFIER)
     partition: str = Field(pattern=IDENTIFIER)
     data_parser: Literal["v0.0.42"] = "v0.0.42"
+    release: Literal["24.11.5"] = "24.11.5"
 
     @model_validator(mode="after")
     def explicit_transport(self):
@@ -84,6 +85,29 @@ def tres_values(text):
     return result
 
 
+def gres_used_count(text, key):
+    """Read explicit GRES counts when cons_tres omits a zero TRES entry."""
+    if not isinstance(text, str) or not text or len(text) > 16384:
+        return None
+    counts, offset = {}, 0
+    pattern = r"([A-Za-z][A-Za-z0-9_.-]*(?::[A-Za-z0-9_.-]+)?):([0-9]{1,16})(?:\([^()]*\))?(?:,|$)"
+    for match in re.finditer(pattern, text):
+        name, value = match.group(1, 2)
+        if match.start() != offset or name in counts:
+            return None
+        counts[name], offset = int(value), match.end()
+    if offset != len(text):
+        return None
+    name = key.removeprefix("gres/")
+    family = name.split(":", 1)[0]
+    typed = {k: v for k, v in counts.items() if k.startswith(family + ":")}
+    if family in counts and typed:
+        return None  # An aggregate plus its members must not be counted twice.
+    if ":" in name or name in counts:
+        return counts.get(name)
+    return sum(typed.values()) if typed else None
+
+
 def resource(capacity, allocatable, allocated, observed, *, factor=1, kind=None):
     kind = kind or ResourceType()
     result = kind.model_dump()
@@ -131,10 +155,18 @@ class SlurmInventoryCollector(PrometheusReader):
             if len(raw) > 8 * 1024 * 1024:
                 raise ValueError("oversize scheduler response")
             payload = json.loads(raw)
+            # This exact warning is a successful empty result in 24.11.5,
+            # not a partial response. All other warnings remain unavailable.
+            empty_queue_warning = (
+                collection == "jobs"
+                and payload.get("jobs") == []
+                and payload.get("warnings") == [{"description": "Zero jobs to dump", "source": ""}]
+            )
             if (
                 payload.get("errors")
-                or payload.get("warnings")
+                or (payload.get("warnings") and not empty_queue_warning)
                 or payload["meta"]["plugin"]["data_parser"] != "data_parser/" + route.data_parser
+                or payload["meta"]["slurm"]["release"] != route.release
                 or not isinstance(payload[collection], list)
                 or len(payload[collection]) > 10000
             ):
@@ -211,10 +243,15 @@ class SlurmInventoryCollector(PrometheusReader):
                 return int(v) if isinstance(v, str) and re.fullmatch(r"[0-9]{1,16}", v) else None
 
             cap, used = count(capacities, key), count(allocations, key)
+            if key not in allocations:
+                used = gres_used_count(raw.get("gres_used"), key)
             allocatable = (
                 cap
                 if "gres_drained" in raw
-                and (raw["gres_drained"] is None or raw["gres_drained"] == "")
+                # In the explicitly pinned controller release, this function
+                # returns N/A unconditionally: per-GRES drain is not implemented.
+                # Node-level DRAIN/DOWN flags remain separate scheduling blockers.
+                and raw["gres_drained"] in (None, "", "N/A")
                 else None
             )
             node["resources"][key] = resource(cap, allocatable, used, observed, kind=kind)

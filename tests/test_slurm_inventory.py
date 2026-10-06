@@ -59,7 +59,10 @@ def node():
 
 def envelope(key, rows):
     return {
-        "meta": {"plugin": {"data_parser": "data_parser/v0.0.42"}},
+        "meta": {
+            "plugin": {"data_parser": "data_parser/v0.0.42"},
+            "slurm": {"release": "24.11.5"},
+        },
         "errors": [],
         "warnings": [],
         key: rows,
@@ -161,6 +164,69 @@ def test_explicit_zero_allocation_and_empty_queue_are_observations():
     s = SlurmInventoryCollector(config(), execute=execute).collect()
     assert s["nodes"][0]["resources"]["cpu"]["requested"]["value"] == 0
     assert s["slurm_queue"]["status"] == "ok" and s["slurm_queue"]["value"]["record_count"] == 0
+
+
+def test_actual_idle_controller_shape_retains_explicit_gpu_zero_and_empty_queue():
+    n = node()
+    n.update(state=["IDLE"], tres_used="", gres_used="gpu:model:0(IDX:N/A)", gres_drained="N/A")
+
+    def warning(p):
+        if "jobs" in p:
+            p["warnings"] = [{"description": "Zero jobs to dump", "source": ""}]
+
+    execute, _ = source(nodes=[n], mutate=warning)
+    s = SlurmInventoryCollector(config(), execute=execute).collect()
+    r = s["nodes"][0]["resources"]
+    assert r["gres/gpu"]["requested"]["value"] == 0
+    assert r["gres/gpu"]["request_headroom"]["value"] == 2
+    assert r["gres/npu"]["requested"]["value"] is None
+    assert s["slurm_queue"]["status"] == "ok"
+    assert s["slurm_queue"]["value"]["record_count"] == 0
+
+
+@pytest.mark.parametrize("changed", ["jobs", "warning", "release", "errors"])
+def test_empty_queue_warning_exception_cannot_hide_other_problems(changed):
+    def mutation(p):
+        if "jobs" not in p:
+            return
+        p["warnings"] = [{"description": "Zero jobs to dump", "source": ""}]
+        if changed == "jobs":
+            p["jobs"] = [job(1, ["RUNNING"])]
+        elif changed == "warning":
+            p["warnings"].append({"description": "Partial response", "source": ""})
+        elif changed == "release":
+            p["meta"]["slurm"]["release"] = "25.05.0"
+        else:
+            p["errors"] = [{"description": "failed"}]
+
+    execute, _ = source(mutate=mutation)
+    s = SlurmInventoryCollector(config(), execute=execute).collect()
+    assert s["slurm_queue"]["status"] == "unavailable"
+    assert s["slurm_queue"]["value"] is None
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        ("gpu:model:1(IDX:0,2)", 1),
+        ("gpu:a:1(IDX:0),gpu:b:2(IDX:1-2)", 3),
+        ("gpu:0", 0),
+        (None, None),
+        ("", None),
+        ("N/A", None),
+        ("gpu:model:0(IDX:N/A),gpu:model:1(IDX:0)", None),
+        ("gpu:1,gpu:model:1(IDX:0)", None),
+        ("gpu:model:0(IDX:N/A),bad", None),
+        ("gpu:model:-1", None),
+    ],
+)
+def test_gres_fallback_counts_are_explicit_and_unambiguous(text, expected):
+    n = node()
+    n.update(tres_used="", gres_used=text, gres_drained="N/A", state=["IDLE", "DRAIN"])
+    execute, _ = source(nodes=[n])
+    view = SlurmInventoryCollector(config(), execute=execute).collect()["nodes"][0]
+    assert view["resources"]["gres/gpu"]["requested"]["value"] == expected
+    assert view["scheduling_blockers"] == ["DRAIN"]
 
 
 @pytest.mark.parametrize("failure", ["nodes", "jobs"])
