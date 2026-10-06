@@ -1887,7 +1887,7 @@ $("login").onsubmit = (e) => {
 $("content").addEventListener(
   "toggle",
   (e) => {
-    if (e.target.tagName === "DETAILS" && e.target.open)
+    if (e.target.tagName === "DETAILS" && e.target.open && active !== "scheduler-lab")
       $("auto").checked = false;
   },
   true,
@@ -2375,7 +2375,7 @@ function schedulerLabView(){
   if(["heterogeneous","npu","mixed"].includes(labKind)){const catalog=el("details",null,"lab-catalog-details");catalog.append(el("summary","실행할 GPU·NPU 작업과 다른 장치 확인"),heterogeneousCatalog());root.append(catalog);}
   const running=items.some(r=>!["SUCCEEDED","FAILED","CANCELED"].includes(r.state));
   const launch=el("button",labBusy?"접수 중…":(labKind==="mixed"?"두 backend에 작업 실행 →":labKind==="npu"?"NPU 작업 실행 →":"시나리오 실행 →"),"primary");launch.disabled=labBusy||running||!labData?.agent?.online||Date.now()-labReceivedAt>15000||Date.now()-Date.parse(labData?.agent?.seen_at)>40000||!(labData?.agent?.scenarios||[]).includes(labKind);launch.onclick=startLab;
-  root.append(add(el("div",null,"lab-launch"),add(el("div"),el("h3",kind.title),el("p",kind.desc),el("small",["heterogeneous","npu","mixed"].includes(labKind)?"기존 검증 템플릿 사용 · 작업별 모델과 측정 구간이 달라 속도 우열 비교가 아닙니다.":labKind==="multi_gpu"?`약 1–2분 · GPU ${labGpuCount}개 · 독립 CUDA 검증 worker, DDP 학습은 아닙니다.`:labKind==="backfill"?"약 3–4분 · GPU 1개 · 실제 Slurm 예약은 실험 종료 시 정리됩니다.":"약 1–2분 · GPU 2개 · CUDA 수치 검증 작업, AI 모델 성능 벤치마크는 아닙니다.")),launch));
+  root.append(add(el("div",null,"lab-launch"),add(el("div"),el("h3",kind.title),el("p",kind.desc),el("small",["heterogeneous","npu","mixed"].includes(labKind)?"기존 검증 템플릿 사용 · 작업별 모델과 측정 구간이 달라 속도 우열 비교가 아닙니다.":labKind==="recovery"?"약 1분 · GPU 1개 · 의도한 컨테이너 실패 후 새 CUDA 작업 실행":labKind==="multi_gpu"?`약 1–2분 · GPU ${labGpuCount}개 · 독립 CUDA 검증 worker, DDP 학습은 아닙니다.`:labKind==="backfill"?"약 3–4분 · GPU 1개 · 실제 Slurm 예약은 실험 종료 시 정리됩니다.":"약 1–2분 · GPU 2개 · CUDA 수치 검증 작업, AI 모델 성능 벤치마크는 아닙니다.")),launch));
   if(labError)root.append(el("p",labError,"error"));
   if(!run){root.append(labResourceRack({}));root.append(el("div","실험을 시작하면 실제 승인·대기·배치 기록이 이 보드에 나타납니다.","lab-empty"));return root;}
   const events=run.body.events||[],index=labCursor===null?events.length-1:Math.min(labCursor,events.length-1),event=events[index];
@@ -2486,7 +2486,7 @@ function labJobLane(j){
 }
 function labScenarioGuide(kind){
   const guides={
-    quota:{needs:"Kueue 2 GPU 실험 풀",steps:["2 GPU 선행 점유","1 GPU 요청 3개 접수","실제 quota 대기 확인","점유 종료 → 요청 완료"],pass:"3개 요청의 quota 대기 근거와 모든 요청의 실행 완료",scope:"같은 프로젝트의 독립 요청입니다. 다중 사용자 공정성이나 FIFO 보장은 아닙니다."},
+    quota:{needs:"Kueue 2 GPU 실험 풀",steps:["2 GPU 선행 점유","1 GPU 요청 3개 접수","실제 quota 대기 확인","점유 종료 → 요청 완료"],pass:"3개 요청의 동시 대기, 네이티브 quota 부족 사유, 모든 요청 완료",scope:"같은 프로젝트의 독립 요청입니다. 다중 사용자 공정성이나 FIFO 보장은 아닙니다."},
     priority:{needs:"2 GPU 실험 풀 + low/high WorkloadPriorityClass",steps:["선행 점유","low 먼저, high 나중 접수","high 우선 입장 확인","high 완료 → low 실행"],pass:"네이티브 우선순위 값, high 승인·low 대기 동시 관측, 두 작업 완료",scope:"대기열 입장 우선순위 비교입니다. 실행 중 작업 선점 정책은 변경하지 않습니다."},
     cancel:{needs:"Kueue 2 GPU 실험 풀",steps:["선행 점유","요청의 대기 확인","해당 요청 삭제 확인","점유 해제 → 후속 실행"],pass:"취소 Job 삭제 확인과 후속 Job 완료",scope:"취소하는 대기 요청은 GPU를 점유하지 않았습니다. 실제 quota 반환은 선행 작업 종료에서 일어납니다."},
     recovery:{needs:"Kueue GPU 1개",steps:["테스트 작업 제출","종료 코드 42 실패","새 CUDA Job 제출","계산 결과 검증"],pass:"실패 코드 42와 새 작업의 CUDA correctness 성공",scope:"컨테이너 실패 후 새 작업 제출입니다. GPU 장애·노드 장애·체크포인트 복원 실험은 아닙니다."},
@@ -2521,7 +2521,7 @@ function labResourceRack(snap){
   for(const [id,name] of [["all","전체 가속기"],["gpu","GPU"],["npu","NPU"],["slurm","Slurm"]]){const o=el("option",name);o.value=id;o.selected=id===labResourceFilter;filter.append(o);}
   filter.onchange=()=>{labResourceFilter=filter.value;render();};
   add(head,add(el("div"),el("span","RESOURCE WATCH · 현재 자원","eyebrow"),el("h3","어디에 여유가 있을까?")),filter);box.append(head);
-  box.append(el("p","현재 자원 관측 · "+stamp(data.generated_at)+" · 자원 조회 15초 / 실험 조회 3초 · 예약량과 실제 사용률은 다릅니다.","lab-fleet-note"));
+  box.append(el("p","현재 자원 관측 · "+stamp(data.generated_at)+" · "+($("auto").checked?"자원 조회 15초":"자원 자동 조회 꺼짐")+" / 실험 조회 3초 · 예약량과 실제 사용률은 다릅니다.","lab-fleet-note"));
   const selected=labFlowJobs(snap).find(j=>j.id===labSelected),linked=selected?labJobNodes(selected):[],rail=el("div",null,"lab-resource-rail");rail.dataset.labScroll="resources";
   const entries=(data.inventory||[]).flatMap(s=>s.nodes.map(n=>({n,s:{...s,backend:s.backend||"kubernetes"}}))).filter(({n,s})=>Object.values(n.resources||{}).some(r=>["gpu","npu"].includes(r.device_class)&&(labResourceFilter==="all"||labResourceFilter===s.backend||labResourceFilter===r.device_class)));
   for(const {n,s} of entries){

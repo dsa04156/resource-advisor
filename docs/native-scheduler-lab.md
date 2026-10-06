@@ -16,7 +16,7 @@ History entries include their terminal status. Up to 40 recent runs are returned
 
 | Scenario | Real execution | Required evidence |
 |---|---|---|
-| Quota backlog | Two-GPU blocker, then three one-GPU requests; release blocker | All three observed pending with quota reasons, all three eventually succeed |
+| Quota backlog | Two-GPU blocker, then three one-GPU requests; release blocker | All three observed pending, native quota shortage reason observed, all three eventually succeed |
 | Priority | Two-GPU blocker; low priority submitted before high, both request two GPUs | Native high value > low, high admitted while low still waits, both succeed |
 | Queued cancellation | Occupy quota, enqueue and cancel one request, release blocker, submit replacement | Owned Job deletion confirmed; cancellation retained; replacement succeeds |
 | Failure / resubmission | GPU-requesting test container exits 42; submit a new CUDA Job | Native exit code 42 and successful new CUDA correctness result |
@@ -33,6 +33,9 @@ queue. Their blocker is intentionally canceled after queue evidence is saved; it
 `CANCELED` card is expected, and does not mean the experiment failed. A canceled
 pending request did not hold quota: releasing the blocker returns quota. These
 are requests in one lab project, not fabricated users or a fairness benchmark.
+Kueue can report a quota shortage only for the request it has evaluated, leaving
+other pending requests without a reason. The runner requires all requests pending
+and at least one native quota reason; it does not invent reasons for other jobs.
 
 Priority setup is additive: apply `examples/scheduler_lab/priority-resources.json`
 and configure `priorities.low` / `priorities.high` in the external runner config.

@@ -70,3 +70,32 @@ def test_recovery_allowlist_does_not_hide_unrelated_failure():
     a.observe_kube = lambda: {"recovered": {"label": "recovered", "state": "FAILED"}}
     with pytest.raises(RuntimeError, match="probe job failed"):
         a.wait_kube(lambda r: True, "observed", {"expected-failure"})
+
+
+def test_backlog_accepts_native_head_reason_without_fabricating_other_reasons():
+    a = runner()
+    labels = ["request-a", "request-b", "request-c"]
+    queued = {
+        label: {
+            "label": label,
+            "state": "PENDING",
+            "reason": "insufficient quota" if i == 0 else None,
+        }
+        for i, label in enumerate(labels)
+    }
+    observations = iter([queued, {label: {"state": "SUCCEEDED"} for label in labels}])
+    a.occupy_pool = lambda *args: None
+    a.job = lambda *args: None
+    a.observe_kube = lambda: queued
+    a.tick = lambda *args: None
+    a.retire = lambda *args: None
+
+    def wait(predicate, title):
+        result = next(observations)
+        assert predicate(result)
+        return result
+
+    a.wait_kube = wait
+    a.quota()
+    assert a.snapshot["queue_evidence"][1]["reason"] is None
+    assert "verdict" in a.snapshot

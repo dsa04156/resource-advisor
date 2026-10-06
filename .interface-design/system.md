@@ -175,3 +175,11 @@ replay seeking interrupts cleanly. Four columns become two below 760px. Keep all
 actions keyboard-operable; retain focus on selected job/resource after refresh.
 References: Run:ai allocation/utilization drilldown, KueueViz queue observations,
 Slurm-web node/queue operations. No third-party scheduler/UI dependency was added.
+
+Scenario catalog: eleven compact selectors show latest recorded outcome separately
+from configured runner readiness. The selected scenario has a four-step guide,
+prerequisites, evidence-based success criteria and scope limits. History labels
+include state. Expected failed/canceled children remain visible in the terminal
+lane even when their enclosing scenario succeeds. Priority cards expose the actual
+Kueue priority value. Native admitted jobs with Pending pods stay in preparation,
+not execution. Opening lab guides/evidence must not disable inventory auto-refresh.

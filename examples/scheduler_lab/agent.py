@@ -517,14 +517,12 @@ class Agent:
             self.observe_kube()
             self.tick("큐에 추가 접수: " + label)
         result = self.wait_kube(
-            lambda r: all(
-                r.get(label, {}).get("state") == "PENDING" and r[label]["reason"]
-                for label in labels
+            lambda r: (
+                all(r.get(label, {}).get("state") == "PENDING" for label in labels)
+                and any("quota" in (r[label].get("reason") or "").lower() for label in labels)
             ),
-            "세 요청의 실제 quota 대기 관측",
+            "세 요청의 동시 대기와 네이티브 quota 부족 근거 관측",
         )
-        if not all("quota" in result[label]["reason"].lower() for label in labels):
-            raise RuntimeError("three queued jobs observed without quota evidence")
         self.snapshot["queue_evidence"] = [result[label] for label in labels]
         self.snapshot["phase"] = "RELEASE"
         self.retire("blocker", "시나리오가 선행 작업을 종료하여 quota 반환")
@@ -544,8 +542,12 @@ class Agent:
         for label in ["low", "high"]:
             self.job(label, 2, 20, priority=self.c["priorities"][label])
         queued = self.wait_kube(
-            lambda r: all(
-                r.get(k, {}).get("state") == "PENDING" and r[k]["reason"] for k in ["low", "high"]
+            lambda r: (
+                all(
+                    r.get(k, {}).get("state") == "PENDING" and r[k].get("priority") is not None
+                    for k in ["low", "high"]
+                )
+                and any("quota" in (r[k].get("reason") or "").lower() for k in ["low", "high"])
             ),
             "두 우선순위 요청의 동시 대기 관측",
         )
