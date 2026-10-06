@@ -25,10 +25,13 @@
             ><span>＋</span>작업 제출</a
           >
           <a href="#execution" data-view="execution" aria-current="page"
-            ><span>01</span>자원 · 작업 현황</a
+            ><span>01</span>자원 현황</a
+          >
+          <a href="#jobs" data-view="jobs"
+            ><span>02</span>작업 현황</a
           >
           <a href="#history" data-view="history"
-            ><span>02</span>큐 · 사용량</a
+            ><span>03</span>큐 · 사용량</a
           >
           <details class="advanced-nav"><summary>고급 · 검증</summary>
           <a href="#compatibility" data-view="compatibility"
@@ -84,5 +87,9 @@
         </div>
       </main>
     </div>
+    <dialog id="job-dialog" aria-labelledby="job-dialog-title">
+      <div class="panel-head"><h2 id="job-dialog-title">작업 상세</h2><button id="close-job-dialog" aria-label="상세 닫기">닫기 ×</button></div>
+      <div id="job-dialog-body"></div>
+    </dialog>
   </body>
 </html>

@@ -40,7 +40,16 @@ the default submission catalog. Other definitions remain available behind the
 advanced template checkbox. If unset, the existing paginated list is used.
 Compatibility and recommendation screens remain under **고급 · 검증**.
 
-The overview is `GET /api/v1/compute/overview`. Jobs, workload definitions,
+The overview is `GET /api/v1/compute/overview`.
+The separate resource view presents node cards and a fleet summary inspired by
+the user's [mini-science-ai-os](https://github.com/dsa04156/mini-science-ai-os)
+reference. Its source was inspected; its linked live portal returned 404 at review.
+The job view uses `jobs_status`, `jobs_backend`, and `jobs_search` query parameters
+to filter across the whole project before pagination. Literal searches escape SQL
+wildcards and remain project-scoped. Job detail uses a native dialog, existing
+read models and the existing cancellation endpoint.
+
+Jobs, workload definitions,
 terminal history and recommendations have independent zero-based page parameters
 (`jobs_page`, `compatibility_page`, `history_page`, `recommendations_page`), each
 with 25 rows and an explicit total. Workload rows include their candidate lists.

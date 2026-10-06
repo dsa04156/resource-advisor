@@ -36,6 +36,27 @@ def client_for(service):
     )
 
 
+def test_job_filters_apply_before_pagination(service):
+    for i in range(26):
+        service.submit(
+            "team-a", JobRequest(workload_ref="workload-1", candidate_ref="base"), str(i)
+        )
+    with client_for(service) as client:
+        headers = {"Authorization": "Bearer a"}
+        url = "/api/v1/compute/overview"
+        pending = client.get(
+            url + "?jobs_status=pending&jobs_backend=kubernetes", headers=headers
+        ).json()
+        assert pending["jobs"]["total"] == 26
+        assert len(pending["jobs"]["items"]) == 25
+        job_id = pending["jobs"]["items"][0]["job_id"]
+        found = client.get(url, params={"jobs_search": job_id.upper()}, headers=headers).json()
+        assert found["jobs"]["total"] == 1
+        assert found["jobs"]["items"][0]["job_id"] == job_id
+        for query in ("jobs_status=failed", "jobs_backend=slurm", "jobs_search=%25"):
+            assert client.get(url + "?" + query, headers=headers).json()["jobs"]["total"] == 0
+
+
 def test_console_auth_and_project_isolation_without_side_effects(service):
     complete(service)
     rec = service.recommend("team-a", "workload-1")

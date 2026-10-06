@@ -23,6 +23,15 @@ telemetry, and giant equal-sized statistic cards without evidence provenance.
 
 Hierarchy: a dedicated job submission section precedes the four inspection sections.
 The main navigation emphasizes submission, resources/jobs, and queue/usage.
+Resource and job views are now separate. The user's mini-science-ai-os reference
+informs the dark fleet summary, green status accents, compact summary cards, and
+node cards with measured CPU/memory bars. Implemented independently against this
+platform's existing data; no reference deployment details are copied.
+Job view has project-wide server-side search/status/backend filters, a compact
+table, and a native dialog for structured results and cancellation. Preserve
+search focus across polling. Nodes filter locally across the full inventory.
+Dark fleet tokens: rack #102822, panel #18372f, muted #a1c0b4, signal #79e4b7.
+Node cards use a responsive three/two/one-column grid and 16–20px padding.
 Compatibility and recommendation evidence are grouped in native advanced details.
 An operator-selected submission catalog is the default; historical experimental
 templates are opt-in. Expired capability evidence in operational mode is an amber

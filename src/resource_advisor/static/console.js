@@ -13,6 +13,8 @@ let receivedAt = 0,
 const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, qualifications: 0 };
 const submitting = new Set();
 const requestKeys = new Map();
+const jobFilters = { status: "all", backend: "all", search: "" };
+let resourceBackend = "all", resourceSearch = "", searchTimer = null, filterRevision = 0;
 const submissionDraft = { workload: "", candidate: "" };
 let showAllTemplates = false;
 const canSubmit = (candidate) => candidate.submittable_now ?? candidate.contract_compatible_now;
@@ -62,8 +64,9 @@ function submitButton(workload, candidate, approval = null) {
       try { sessionStorage.removeItem(key); } catch (_) { /* No credential is stored. */ }
       if (session !== generation) return;
       pages.jobs = 0;
-      active = "execution";
-      location.hash = "execution";
+      jobFilters.status = "all"; jobFilters.backend = "all"; jobFilters.search = "";
+      active = "jobs";
+      location.hash = "jobs";
       await load();
       $("notice").textContent = "작업을 접수했습니다: " + job.job_id;
     } catch (error) {
@@ -160,9 +163,10 @@ const views = {
   ],
   execution: [
     "OBSERVATION",
-    "자원 · 작업 현황",
+    "자원 현황",
     "실측 사용량과 스케줄러 예약량을 나란히 확인합니다.",
   ],
+  jobs: ["EXECUTIONS", "작업 현황", "프로젝트의 전체 작업을 검색하고 실행 상태·결과를 확인합니다."],
   compatibility: [
     "QUALIFICATION",
     "가속기 호환성",
@@ -623,46 +627,133 @@ function diagnosticView(d) {
   box.append(details("진단 근거 · 한계", d));
   return box;
 }
+function dashboardStats(entries) {
+  return add(el("div", null, "dashboard-stats"), ...entries.map(([label, number, note, tone]) =>
+    add(el("article", null, "dashboard-stat " + (tone || "")), el("small", label),
+      el("strong", number), el("span", note))));
+}
+function actionLink(text, href) { const link = el("a", text, "action-link"); link.href = href; return link; }
+function nodeStatus(n, s) {
+  const slurm = s.backend === "slurm", sample = observed(slurm ? n.scheduler_state : n.ready, s);
+  const known = sample.status === "ok";
+  const ready = known && (slurm ? Array.isArray(sample.value) && !(n.scheduling_blockers || []).length : sample.value === true && !(n.scheduling_blockers || []).length);
+  return { ready, known, label: !known ? labels[sample.status] || "확인 불가" : slurm ? sample.value.join(" · ") : ready ? "Ready" : "스케줄 불가" };
+}
+function nodeCard(n, s) {
+  const slurm = s.backend === "slurm", status = nodeStatus(n, s), cpu = n.resources.cpu || {}, mem = n.resources.memory || {};
+  const devices = Object.entries(n.resources).filter(([,r]) => ["gpu", "npu"].includes(r.device_class));
+  const head = add(el("div", null, "node-card-head"),
+    add(el("div"), el("small", `${slurm ? "SLURM" : "KUBERNETES"} · ${n.hardware?.architecture || "ARCH —"}`), el("h3", n.node_ref)),
+    badge(status.label, status.ready ? "good" : "warn"));
+  const card = add(el("article", null, "node-card"), head);
+  const metrics = add(el("div", null, "node-metrics"),
+    measure("CPU 사용", slurm ? n.telemetry["node:cpu_non_idle_cores"] : n.telemetry.cpu_usage_cores, s,
+      value(slurm ? n.telemetry["node:cpu_count"] : cpu.capacity, s), "cores"),
+    measure("메모리 여유", n.telemetry["node:memory_available_bytes"], s,
+      value(slurm ? n.telemetry["node:memory_total_bytes"] : mem.capacity, s), "GiB", 2 ** 30));
+  card.append(metrics);
+  const allocation = el("div", null, "node-reservations");
+  allocation.append(el("span", `미예약 CPU ${fmt(value(cpu.request_headroom, s))} cores`),
+    el("span", `미예약 메모리 ${value(mem.request_headroom,s) == null ? "—" : fmt(value(mem.request_headroom,s) / 2 ** 30)} GiB`));
+  card.append(allocation);
+  for (const [key, r] of devices) card.append(add(el("div", null, "device-allocation"),
+    add(el("div"), badge(r.device_class.toUpperCase()), el("strong", key)),
+    el("span", `${fmt(value(r.requested,s))} 예약 / ${fmt(value(r.allocatable,s))} ${modes[r.allocation_mode] || "단위 미확인"}`)));
+  const utils = Object.entries(n.telemetry).filter(([k]) => k.endsWith(":utilization"));
+  for (const [key, sample] of utils) card.append(measure(key.split(":")[0] + " 사용률", sample, s, 100, "%"));
+  if (!utils.length) card.append(el("small", devices.length ? "가속기 사용률 미측정" : "가속기 등록 정보 없음", "node-note"));
+  const facts = Object.fromEntries(Object.entries(n.telemetry).filter(([k]) => /power|temperature|memory_used|memory_total/.test(k) && !k.startsWith("node:"))
+    .map(([k,sample]) => [k, observed(sample,s)]));
+  if (Object.keys(facts).length) card.append(details("가속기 메모리 · 전력 · 온도", facts));
+  return card;
+}
 function execution() {
-  const root = el("div"),
-    stats = el("div", null, "stats");
-  const start = el("a", "＋ 새 작업 제출", "action-link");
-  start.href = "#submit";
-  root.append(add(el("div", null, "submit-entry"), start,
-    el("span", "작업 선택 → 실행 장비 선택 → 제출 → 결과 확인")));
-  for (const [label, count] of [
-    [
-      "프로젝트 전체 기록",
-      Object.values(data.job_counts).reduce((a, b) => a + b, 0),
-    ],
-    ["실행 중으로 기록", data.job_counts.RUNNING || 0],
-    ["대기 기록", data.job_counts.QUEUED || 0],
-    ["실행 완료", data.job_counts.SUCCEEDED || 0],
-  ])
-    stats.append(
-      add(el("div", null, "stat"), el("strong", count), el("span", label)),
-    );
-  root.append(stats);
-  if (!data.inventory.length)
-    root.append(
-      panel(
-        "자원 관측",
-        "",
-        empty(
-          "이 프로젝트에 수집된 자원 스냅샷이 없습니다. 수집기 연결을 확인하세요.",
-        ),
-      ),
-    );
-  data.inventory.forEach((s) => root.append(resourcePanel(s)));
-  const attempts = panel(
-    "실행 기록",
-    "표는 저장된 작업 상태입니다. 백엔드 확인 시각이 없으면 현재 실행 여부를 보장하지 않습니다.",
-    data.jobs.items.length
-      ? table(["작업", "상태", "실행 대상", "시각", "실측 결과"], jobRows())
-      : empty("아직 제출된 작업이 없습니다."),
-  );
-  attempts.append(pager("jobs", data.jobs));
-  root.append(attempts);
+  const root = el("div");
+  const allNodes = data.inventory.flatMap(s => s.nodes.map(n => ({n,s})));
+  const ready = allNodes.filter(({n,s}) => nodeStatus(n,s).ready).length;
+  const gpu = allNodes.filter(({n}) => Object.values(n.resources).some(r => r.device_class === "gpu")).length;
+  const npu = allNodes.filter(({n}) => Object.values(n.resources).some(r => r.device_class === "npu")).length;
+  const strip = el("div", null, "fleet-strip");
+  for (const {n,s} of allNodes) {
+    const status = nodeStatus(n,s);
+    const item = add(el("div", null, "fleet-node " + (status.ready ? "ready" : "unknown")), el("small", s.backend === "slurm" ? "SLURM" : "K8S"), el("strong", n.node_ref));
+    item.title = `${n.node_ref} · ${status.label}`; strip.append(item);
+  }
+  root.append(add(el("section", null, "fleet-hero"),
+    add(el("div"), el("p", "RESEARCH INFRASTRUCTURE", "eyebrow"), el("h2", `${ready} / ${allNodes.length} 노드 준비됨`),
+      el("p", "연구실의 계산 자원과 작업 흐름을 한눈에 확인하세요."),
+      add(el("div", null, "hero-actions"), actionLink("＋ 새 작업 제출", "#submit"), actionLink("작업 현황 보기 →", "#jobs"))),
+    add(el("div", null, "fleet-instrument"), el("small", "FLEET · 노드별 최근 보고 상태"), strip,
+      el("small", "준비 상태는 최신 관측 기준이며, 자원 승인과 작업 실행을 보장하지 않습니다."))));
+  root.append(dashboardStats([
+    ["관측 노드", allNodes.length, `${data.inventory.length}개 클러스터`],
+    ["GPU 등록 노드", gpu, "공유 슬롯을 물리 GPU로 합산하지 않음"],
+    ["NPU 등록 노드", npu, "자원 등록 기준"],
+    ["실행 중 작업", data.job_counts.RUNNING || 0, "현재 프로젝트의 저장된 상태", "accent"],
+  ]));
+  const toolbar = el("div", null, "view-toolbar");
+  for (const [key,label] of [["all","전체 장비"],["kubernetes","Kubernetes"],["slurm","Slurm"]]) {
+    const b = el("button",label,resourceBackend === key ? "selected" : ""); b.setAttribute("aria-pressed", String(resourceBackend === key));
+    b.onclick = () => { resourceBackend = key; render(); }; toolbar.append(b);
+  }
+  const search = el("input"); search.id = "resource-search"; search.type = "search"; search.placeholder = "노드 · GPU · NPU 검색"; search.setAttribute("aria-label", "자원 검색"); search.value = resourceSearch;
+  search.oninput = () => { resourceSearch = search.value; render(); }; toolbar.append(search); root.append(toolbar);
+  const selected = allNodes.filter(({n,s}) => (resourceBackend === "all" || (s.backend || "kubernetes") === resourceBackend)
+    && (n.node_ref + " " + Object.keys(n.resources).join(" ")).toLowerCase().includes(resourceSearch.toLowerCase()));
+  const grid = add(el("div", null, "node-grid"), ...selected.map(({n,s}) => nodeCard(n,s)));
+  root.append(selected.length ? grid : empty("조건에 맞는 자원이 없습니다."));
+  root.append(el("p", "예약 여유와 실제 사용률은 다릅니다. 오래된 값·미측정 값은 막대를 표시하지 않습니다.", "muted"));
+  const raw = add(el("details", null, "panel"), el("summary", "클러스터별 상세 자원 표", "panel-head"));
+  data.inventory.forEach(s => raw.append(resourcePanel(s))); root.append(raw);
+  return root;
+}
+function showJob(job) {
+  const m = job.result?.measurements;
+  const content = add(el("div", null, "job-detail-content"),
+    el("p", job.workload_ref, "detail-workload"), code(job.job_id),
+    add(el("div", null, "state-line"), stateBadge(job.state), badge(job.backend)),
+    dashboardStats([["실행 노드", job.node_ref || "—", "대상 노드"], ["생성 시각", stamp(job.created_at), "서버 기록"]]),
+    el("p", `CPU ${job.requested_resources?.host_cpu ?? "—"} · 메모리 ${job.requested_resources?.host_memory_mib ?? "—"} MiB · 가속기 ${job.requested_resources?.accelerator_count ?? "—"}`),
+    el("p", "최근 백엔드 확인: " + stamp(job.backend_observed_at)),
+    job.error ? el("p",job.error,"error-message") : null,
+    job.last_observation_error ? el("p", "최근 관측 오류: " + job.last_observation_error,"error-message") : null,
+    m ? panel("실행 결과", "수집된 측정 구간의 값입니다.", dashboardStats([
+      ["실행 시간", duration(m.elapsed_seconds), "모델 측정 구간"],
+      ["p95 지연", m.latency_p95_ms == null ? "—" : fmt(m.latency_p95_ms) + " ms", "미측정은 — 표시"],
+      ["처리량", m.throughput == null ? "—" : fmt(m.throughput), "측정값"],
+    ])) : el("p", "아직 수집된 실행 결과가 없습니다."),
+    details("전체 기록 · 결과 · MLflow", job));
+  const cancel = cancelButton(job);
+  if (cancel) { const handler = cancel.onclick; cancel.onclick = async () => { await handler(); $("job-dialog").close(); }; content.append(cancel); }
+  $("job-dialog-body").replaceChildren(content); $("job-dialog").showModal();
+}
+function jobsView() {
+  const root = el("div"), counts = data.job_counts;
+  const total = Object.values(counts).reduce((a,b) => a+b,0);
+  const waiting = ["RECEIVED","VALIDATED","SUBMITTING","SUBMISSION_UNKNOWN","QUEUED"].reduce((sum,k) => sum+(counts[k]||0),0);
+  root.append(dashboardStats([["전체 작업",total,"프로젝트 전체"],["실행 중",counts.RUNNING||0,"백엔드 보고 기준","accent"],["대기 · 접수",waiting,"큐 진입 및 자원 대기"],["완료",counts.SUCCEEDED||0,"결과 수집 완료"]]));
+  const toolbar = el("div",null,"jobs-toolbar"), search = el("input");
+  search.id = "job-search"; search.type = "search"; search.maxLength = 128; search.placeholder = "작업 이름 · ID · 노드 검색"; search.setAttribute("aria-label","작업 검색"); search.value = jobFilters.search;
+  const refreshFilters = () => { pages.jobs = 0; filterRevision++; load(); };
+  search.oninput = () => { jobFilters.search = search.value; clearTimeout(searchTimer); searchTimer = setTimeout(refreshFilters,300); };
+  const backend = el("select"); backend.setAttribute("aria-label","작업 백엔드");
+  for (const [key,label] of [["all","모든 백엔드"],["kubernetes","Kubernetes"],["slurm","Slurm"]]) backend.append(new Option(label,key));
+  backend.value = jobFilters.backend; backend.onchange = () => { jobFilters.backend = backend.value; refreshFilters(); };
+  toolbar.append(search,backend,actionLink("＋ 새 작업", "#submit"));
+  const filters = el("div",null,"status-filters");
+  for (const [key,label] of [["all","전체"],["running","실행"],["pending","대기"],["succeeded","완료"],["failed","실패"],["canceled","취소"]]) {
+    const b = el("button",label,jobFilters.status===key ? "selected" : ""); b.setAttribute("aria-pressed",String(jobFilters.status===key));
+    b.onclick = () => { jobFilters.status=key; refreshFilters(); }; filters.append(b);
+  }
+  const rows = data.jobs.items.map(j => {
+    const open = el("button", "상세 보기", "details-action"); open.setAttribute("aria-label", `상세 보기 · ${j.job_id}`); open.onclick = () => showJob(j);
+    return [add(el("div",null,"job-name"),el("strong",j.workload_ref),code(j.job_id)),stateBadge(j.state),
+      add(el("div"),badge(j.backend),el("small",j.node_ref)),
+      el("span",`CPU ${j.requested_resources?.host_cpu ?? "—"} · GPU/NPU ${j.requested_resources?.accelerator_count ?? "—"}`),
+      stamp(j.created_at),add(el("div",null,"job-actions"),open,cancelButton(j))];
+  });
+  root.append(panel("작업 목록", "검색과 필터는 프로젝트 전체 기록에 적용됩니다.",
+    add(el("div"), toolbar,filters, rows.length ? table(["작업","상태","실행 대상","요청 자원","생성 시각","관리"],rows) : empty("조건에 맞는 작업이 없습니다."),pager("jobs",data.jobs))));
   return root;
 }
 function submissionView() {
@@ -1359,6 +1450,9 @@ function recommendationsView() {
 }
 function render() {
   if (!data) return;
+  const focused = document.activeElement;
+  const keepFocus = ["job-search", "resource-search"].includes(focused?.id)
+    ? { id: focused.id, start: focused.selectionStart, end: focused.selectionEnd } : null;
   const [label, title, description] = views[active];
   $("section-label").textContent = label;
   $("view-title").textContent = title;
@@ -1368,12 +1462,17 @@ function render() {
   $("content").replaceChildren(
     {
       execution,
+      jobs: jobsView,
       submit: submissionView,
       compatibility: compatibilityView,
       history: historyView,
       recommendations: recommendationsView,
     }[active](),
   );
+  if (keepFocus && $(keepFocus.id)) {
+    $(keepFocus.id).focus();
+    $(keepFocus.id).setSelectionRange(keepFocus.start, keepFocus.end);
+  }
   $("workspace").hidden = false;
   $("connect").hidden = true;
   $("logout").hidden = anonymousConnected;
@@ -1407,6 +1506,10 @@ function reset(message = "") {
   submissionDraft.candidate = "";
   anonymousConnected = false;
   data = null;
+  $("job-dialog").close();
+  $("job-dialog-body").replaceChildren();
+  clearTimeout(searchTimer);
+  jobFilters.status = "all"; jobFilters.backend = "all"; jobFilters.search = "";
   clearTimeout(expiryTimer);
   $("content").replaceChildren();
   $("workspace").hidden = true;
@@ -1421,10 +1524,12 @@ async function load() {
   if ((!token && !anonymousConnected) || pending) return;
   pending = true;
   const session = generation;
+  const requestedFilter = filterRevision;
   $("refresh").disabled = true;
   const query = new URLSearchParams(
     Object.entries(pages).map(([key, v]) => [key + "_page", v]),
   );
+  for (const [key, val] of Object.entries(jobFilters)) query.set("jobs_" + key, val);
   try {
     const response = await fetch(API + "/overview?" + query, {
       headers: authHeaders(),
@@ -1458,6 +1563,7 @@ async function load() {
     if (session === generation) {
       pending = false;
       $("refresh").disabled = false;
+      if (requestedFilter !== filterRevision) load();
     }
   }
 }
@@ -1480,8 +1586,9 @@ $("content").addEventListener(
   true,
 );
 $("content").addEventListener("focusin", (e) => {
-  if (e.target.closest(".job-form")) $("auto").checked = false;
+  if (e.target.closest(".job-form, .jobs-toolbar, .view-toolbar")) $("auto").checked = false;
 });
+$("close-job-dialog").onclick = () => $("job-dialog").close();
 $("logout").onclick = () => {
   reset("연결을 해제했습니다.");
   $("token").focus();

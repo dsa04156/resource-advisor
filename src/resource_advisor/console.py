@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 
 from .contracts import WorkloadSpec, now, signature
 from .diagnostics import diagnose
@@ -92,6 +92,9 @@ def overview(
     history_page=0,
     recommendations_page=0,
     qualifications_page=0,
+    jobs_status="all",
+    jobs_backend="all",
+    jobs_search="",
 ):
     store = service.store
     with store.transaction() as conn:
@@ -123,6 +126,32 @@ def overview(
             .where(jobs.c.project == project)
             .order_by(jobs.c.body["created_at"].as_string().desc(), jobs.c.id.desc())
         )
+        groups = {
+            "running": ["RUNNING", "COLLECTING", "CANCEL_REQUESTED"],
+            "pending": ["RECEIVED", "VALIDATED", "SUBMITTING", "SUBMISSION_UNKNOWN", "QUEUED"],
+            "succeeded": ["SUCCEEDED"],
+            "failed": ["FAILED", "RESULT_INVALID"],
+            "canceled": ["CANCELED"],
+        }
+        if jobs_status in groups:
+            job_query = job_query.where(jobs.c.state.in_(groups[jobs_status]))
+        if jobs_backend in {"kubernetes", "slurm"}:
+            job_query = job_query.where(
+                jobs.c.body["candidate"]["backend"].as_string() == jobs_backend
+            )
+        if jobs_search.strip():
+            term = jobs_search.strip().lower()
+            job_query = job_query.where(
+                or_(
+                    func.lower(jobs.c.id).contains(term, autoescape=True),
+                    func.lower(jobs.c.body["request"]["workload_ref"].as_string()).contains(
+                        term, autoescape=True
+                    ),
+                    func.lower(jobs.c.body["capability"]["node_ref"].as_string()).contains(
+                        term, autoescape=True
+                    ),
+                )
+            )
         rows, job_page = page_rows(conn, job_query, jobs_page)
         job_page["items"] = [job_view(service, conn, r) for r in rows]
         counts = dict(

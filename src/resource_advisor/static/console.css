@@ -12,6 +12,10 @@
   --warning-soft: #fff3d9;
   --danger: #a12e39;
   --danger-soft: #fcebef;
+  --rack: #102822;
+  --rack-panel: #18372f;
+  --rack-muted: #a1c0b4;
+  --phosphor: #79e4b7;
   --space: 4px;
   color-scheme: light;
   font-family:
@@ -520,6 +524,85 @@ pre {
 .template-filter { display: block; margin-bottom: 16px; color: var(--secondary); }
 .advanced-nav { margin: 8px 0; }
 .advanced-nav > summary { padding: 12px; color: var(--muted); }
+.fleet-hero {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px; padding: 32px; margin-bottom: 24px; border-radius: 20px;
+  background: var(--rack); color: var(--panel);
+}
+.fleet-hero .eyebrow, .fleet-hero small { color: var(--rack-muted); }
+.fleet-hero h2 { color: var(--phosphor); font-size: clamp(28px, 3vw, 44px); letter-spacing: -1.5px; line-height: 1.1; }
+.fleet-hero p:not(.eyebrow) { color: var(--rack-muted); max-width: 420px; margin: 16px 0 24px; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.hero-actions .action-link { background: var(--phosphor); color: var(--rack); }
+.hero-actions .action-link:last-child { background: var(--rack-panel); color: var(--panel); }
+.fleet-instrument { background: var(--rack-panel); padding: 16px; border-radius: 12px; align-self: center; min-width: 0; }
+.fleet-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+.fleet-node { min-width: 0; padding: 12px 8px; border: 1px solid var(--rack-muted); border-radius: 8px; }
+.fleet-node strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; margin-top: 4px; }
+.fleet-node::before { content: ""; display: block; width: 6px; height: 6px; margin-bottom: 8px; border-radius: 50%; background: var(--rack-muted); }
+.fleet-node.ready::before { background: var(--phosphor); }
+.dashboard-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+.dashboard-stat { min-width: 0; padding: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+.dashboard-stat strong { display: block; font-size: 32px; font-weight: 650; line-height: 1.2; margin: 12px 0 8px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.dashboard-stat span { color: var(--muted); font-size: 11px; }
+.dashboard-stat.accent { background: var(--accent-soft); }
+.dashboard-stat.accent strong { color: var(--accent); }
+.view-toolbar, .jobs-toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.view-toolbar input, .jobs-toolbar input, .jobs-toolbar select {
+  min-width: 0; min-height: 40px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel); color: var(--ink); font: inherit;
+}
+.view-toolbar input { margin-left: auto; width: min(100%, 280px); }
+button.selected { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+.node-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+.node-card { min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.node-card-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 20px; }
+.node-card-head > div { min-width: 0; }
+.node-card-head h3 { margin: 6px 0 0; font-size: 15px; overflow-wrap: anywhere; }
+.node-card-head .badge { flex-shrink: 0; }
+.node-card .source-age { font-size: 10px; }
+.node-metrics { display: grid; gap: 16px; }
+.node-reservations { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 12px 0; margin-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 11px; color: var(--secondary); }
+.device-allocation { padding: 12px; border-radius: 8px; background: var(--canvas); margin: 12px 0; }
+.device-allocation > div { display: flex; gap: 8px; align-items: center; }
+.device-allocation strong { font-size: 11px; overflow-wrap: anywhere; }
+.device-allocation > span { display: block; margin-top: 8px; font-size: 12px; }
+.node-note { padding: 8px 0; }
+.jobs-toolbar { margin: 0; padding: 16px; border-top: 1px solid var(--line); }
+.jobs-toolbar input { flex: 1; }
+.jobs-toolbar .action-link { min-height: 40px; padding: 8px 16px; }
+.status-filters { display: flex; gap: 8px; padding: 0 16px 16px; overflow-x: auto; }
+.status-filters button { flex-shrink: 0; }
+.job-name strong { display: block; max-width: 300px; overflow-wrap: anywhere; font-size: 13px; }
+.job-name code { display: block; color: var(--muted); margin-top: 4px; font-size: 10px; }
+.job-actions { display: flex; gap: 8px; align-items: center; }
+.job-actions button { white-space: nowrap; margin: 0; font-size: 12px; }
+#job-dialog { width: min(720px, calc(100% - 32px)); max-height: calc(100dvh - 40px); padding: 0; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--ink); }
+#job-dialog::backdrop { background: rgba(16, 40, 34, .4); }
+#job-dialog .panel-head { border-bottom: 1px solid var(--line); }
+.job-detail-content { padding: 24px; }
+.detail-workload { font-size: 20px; font-weight: 650; overflow-wrap: anywhere; }
+.job-detail-content .state-line { margin: 16px 0; }
+.job-detail-content .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.job-detail-content .dashboard-stat { padding: 12px; }
+.job-detail-content .dashboard-stat strong { font-size: 16px; }
+.job-detail-content > button { margin-top: 20px; }
+.error-message { color: var(--danger); overflow-wrap: anywhere; }
+@media (max-width: 1250px) { .node-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } .fleet-hero { grid-template-columns: 1fr; gap: 24px; } }
+@media (max-width: 650px) {
+  .fleet-hero { padding: 24px 20px; border-radius: 14px; }
+  .fleet-strip { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .fleet-hero h2 { font-size: 32px; }
+  .dashboard-stats { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+  .dashboard-stat { padding: 16px; }
+  .dashboard-stat strong { font-size: 28px; }
+  .node-grid { grid-template-columns: 1fr; }
+  .node-card { padding: 16px; }
+  .view-toolbar input { width: 100%; margin-left: 0; }
+  .jobs-toolbar input { flex-basis: 100%; }
+  .jobs-toolbar select { flex: 1; }
+  .job-detail-content { padding: 16px; }
+}
 .submission-summary {
   margin-top: 24px;
   padding: 16px;

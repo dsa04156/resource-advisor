@@ -4,6 +4,7 @@ import hashlib
 import hmac
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Response
 from fastapi.responses import FileResponse, JSONResponse
@@ -120,6 +121,11 @@ def create_app(
         history_page: int = Query(default=0, ge=0, le=100000),
         recommendations_page: int = Query(default=0, ge=0, le=100000),
         qualifications_page: int = Query(default=0, ge=0, le=100000),
+        jobs_status: Literal[
+            "all", "running", "pending", "succeeded", "failed", "canceled"
+        ] = "all",
+        jobs_backend: Literal["all", "kubernetes", "slurm"] = "all",
+        jobs_search: str = Query(default="", max_length=128),
         p=Depends(principal),
     ):
         from .console import overview
@@ -132,6 +138,9 @@ def create_app(
             history_page=history_page,
             recommendations_page=recommendations_page,
             qualifications_page=qualifications_page,
+            jobs_status=jobs_status,
+            jobs_backend=jobs_backend,
+            jobs_search=jobs_search,
         )
 
     @app.get(PREFIX + "/recommendations/{ref}/evidence")
