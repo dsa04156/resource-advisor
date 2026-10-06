@@ -245,7 +245,8 @@ def main():
         if args.heartbeat_path:
             Path(args.heartbeat_path).unlink(missing_ok=True)
         while not stopping.is_set():
-            study_runner.tick_all()
+            if config.get("coordinate_studies", True):
+                study_runner.tick_all()
             runner.submit_one()
             runner.cancel_one()
             runner.reconcile_all()

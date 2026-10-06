@@ -1,0 +1,67 @@
+# Operator provides scoped route and SSH Secrets after native runtime qualification.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ra-slurm-worker
+  labels:
+    app.kubernetes.io/name: ra-slurm-worker
+    app.kubernetes.io/part-of: resource-advisor
+spec:
+  replicas: 0
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ra-slurm-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ra-slurm-worker
+        app.kubernetes.io/part-of: resource-advisor
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 60
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        resource-advisor.io/services: 'true'
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: worker
+          image: example.invalid/resource-advisor/slurm-worker:site-must-pin-digest
+          command: [python, -m, resource_advisor.cli]
+          args: [worker, --config, /config/worker.json, --heartbeat-path, /tmp/heartbeat]
+          env:
+            - name: RA_DATABASE_URL
+              valueFrom:
+                secretKeyRef: {name: ra-service-db, key: url}
+            - {name: HOME, value: /tmp}
+            - {name: PYTHONDONTWRITEBYTECODE, value: '1'}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: '1', memory: 1Gi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          volumeMounts:
+            - {name: config, mountPath: /config, readOnly: true}
+            - {name: tmp, mountPath: /tmp}
+            - {name: ssh, mountPath: /tmp/.ssh, readOnly: true}
+          readinessProbe:
+            exec:
+              command: [python, -m, resource_advisor.cli, check-heartbeat, --path, /tmp/heartbeat, --max-age, '60']
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: config
+          secret: {secretName: ra-slurm-worker-config, defaultMode: 288}
+        - name: ssh
+          secret: {secretName: ra-slurm-executor-ssh, defaultMode: 288}
+        - name: tmp
+          emptyDir: {sizeLimit: 64Mi}
