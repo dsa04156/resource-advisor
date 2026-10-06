@@ -1,0 +1,120 @@
+{
+  "schema_version": "v1",
+  "source_commit": "046e22503c38bb3c93b0c2d5bffa72592fc809e7",
+  "source_hashes": {
+    "slurm_limits_probe.py": "ea7dbe547ff1774df8bfc82bee863f5dd130e475294dd25af8d47e22d6dfcc7f",
+    "cuda_driver_probe.py": "132102d06e779523fa80ec56bbae5227d684bceb9ba92322860202ddd8ab1235"
+  },
+  "trial_state": "STOPPED_AFTER_UNEXPECTED_GPU_ACCESS",
+  "jobs": [
+    {
+      "mode": "gpu-positive",
+      "acceptance": "PASS",
+      "accounting": [
+        {
+          "step": "allocation",
+          "state": "COMPLETED",
+          "exit": "0:0",
+          "submit": "2026-10-06T02:22:08+0000",
+          "start": "2026-10-06T02:22:08+0000",
+          "end": "2026-10-06T02:22:09+0000",
+          "elapsed_seconds": 1,
+          "allocated_tres": "billing=1,cpu=1,gres/gpu=1,mem=512M,node=1",
+          "max_rss": null,
+          "total_cpu": "00:00.032"
+        },
+        {
+          "step": "batch",
+          "state": "COMPLETED",
+          "exit": "0:0",
+          "submit": "2026-10-06T02:22:08+0000",
+          "start": "2026-10-06T02:22:08+0000",
+          "end": "2026-10-06T02:22:09+0000",
+          "elapsed_seconds": 1,
+          "allocated_tres": "cpu=1,gres/gpu=1,mem=512M,node=1",
+          "max_rss": "3996K",
+          "total_cpu": "00:00.032"
+        },
+        {
+          "step": "0",
+          "state": "COMPLETED",
+          "exit": "0:0",
+          "submit": "2026-10-06T02:22:08+0000",
+          "start": "2026-10-06T02:22:08+0000",
+          "end": "2026-10-06T02:22:09+0000",
+          "elapsed_seconds": 1,
+          "allocated_tres": "cpu=1,gres/gpu=1,mem=512M,node=1",
+          "max_rss": null,
+          "total_cpu": "00:00:00"
+        }
+      ],
+      "log": "RA_SLURM_LIMITS {\"mode\": \"gpu-positive\", \"memory_max\": 536870912, \"swap_max\": 0, \"cpus\": 1}\n{\"phase\": \"F0\", \"performance_measurement\": false, \"cuda_devices\": 1, \"driver_api\": 13020, \"verified_elements\": 4096, \"result\": \"PASS\"}\n\n"
+    },
+    {
+      "mode": "gpu-denied",
+      "acceptance": "FAIL",
+      "accounting": [
+        {
+          "step": "allocation",
+          "state": "FAILED",
+          "exit": "1:0",
+          "submit": "2026-10-06T02:22:38+0000",
+          "start": "2026-10-06T02:22:38+0000",
+          "end": "2026-10-06T02:22:41+0000",
+          "elapsed_seconds": 3,
+          "allocated_tres": "billing=1,cpu=1,mem=256M,node=1",
+          "max_rss": null,
+          "total_cpu": "00:00.028"
+        },
+        {
+          "step": "batch",
+          "state": "FAILED",
+          "exit": "1:0",
+          "submit": "2026-10-06T02:22:38+0000",
+          "start": "2026-10-06T02:22:38+0000",
+          "end": "2026-10-06T02:22:41+0000",
+          "elapsed_seconds": 3,
+          "allocated_tres": "cpu=1,mem=256M,node=1",
+          "max_rss": "4208K",
+          "total_cpu": "00:00.028"
+        },
+        {
+          "step": "0",
+          "state": "FAILED",
+          "exit": "1:0",
+          "submit": "2026-10-06T02:22:39+0000",
+          "start": "2026-10-06T02:22:39+0000",
+          "end": "2026-10-06T02:22:41+0000",
+          "elapsed_seconds": 2,
+          "allocated_tres": "cpu=1,mem=256M,node=1",
+          "max_rss": null,
+          "total_cpu": "00:00:00"
+        }
+      ],
+      "log": "RA_SLURM_LIMITS {\"mode\": \"gpu-denied\", \"memory_max\": 268435456, \"swap_max\": 0, \"cpus\": 1}\n{\"phase\": \"F0\", \"performance_measurement\": false, \"cuda_devices\": 1, \"driver_api\": 13020, \"verified_elements\": 4096, \"result\": \"PASS\"}\nTraceback (most recent call last):\n  File \"/opt/resource-advisor/qualifications/slurm-limits-v1/slurm_limits_probe.py\", line 103, in <module>\n    main()\n  File \"/opt/resource-advisor/qualifications/slurm-limits-v1/slurm_limits_probe.py\", line 99, in main\n    raise RuntimeError(\"CUDA kernel executed without a GPU reservation\")\nRuntimeError: CUDA kernel executed without a GPU reservation\nsrun: error: gpu-worker: task 0: Exited with exit code 1\n\n"
+    }
+  ],
+  "job_count": 2,
+  "gpu_reservation_seconds": 1,
+  "allocation_seconds": 4,
+  "unreserved_cuda_kernel_execution_observed": true,
+  "actual_total_gpu_busy_seconds": null,
+  "oom_probe_submitted": false,
+  "full_device_isolation_verified": false,
+  "verified_kernel_bounds": {
+    "positive_memory_bytes": 536870912,
+    "negative_memory_bytes": 268435456,
+    "swap_bytes": 0,
+    "affinity_cpus": 1
+  },
+  "configuration_apply": {
+    "changed_tasks": 8,
+    "controller_unchanged": true,
+    "other_worker_unchanged": true,
+    "qos_and_associations_unchanged": true,
+    "drivers_and_boot_preserved": true,
+    "gres_preserved": true
+  },
+  "unapproved_preflight_changed_tasks": 0,
+  "initial_strict_boolean_preflight_changed_tasks": 0
+}
