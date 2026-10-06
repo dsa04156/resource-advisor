@@ -212,6 +212,30 @@ measurement boundaries do not establish a cross-device performance ranking.
 
 ## Automatic playback and live updates
 
+The resource watch and execution board share one screen. Current inventory stays
+visible above four lanes: submitted/pending, admitted/preparing, running, terminal.
+Cards move only when recorded native state changes (or when seeking history), with
+reduced-motion support. Click a card to inspect its reason and highlight observed
+execution nodes; click a resource for detailed meters. A routing target before
+execution is not treated as an observed allocation. Lane counts cover this experiment,
+not every cluster job or a guaranteed queue ordering. Polling can skip short-lived
+states; no synthetic admission event is inserted to fill those gaps.
+
+The resource rail shows current inventory time, reservations/allocatable units,
+accelerator utilization where measured, CPU use and memory headroom. GPU/NPU/Slurm
+filters help inspect the heterogeneous fleet. Its current observations remain
+separate from historical experiment playback. Resource overview refreshes every
+15 seconds when automatic refresh is enabled; experiment observations every three
+seconds. Existing freshness rules hide stale metric values.
+
+UI references (design patterns only):
+- [Run:ai dashboard analysis](https://docs.run.ai/v2.18/platform-admin/performance/dashboard-analysis/): resource allocation versus utilization and drilldown.
+- [KueueViz](https://kueue.sigs.k8s.io/docs/tasks/manage/enable_kueueviz/): queue, workload and allocation monitoring.
+- [Slurm-web](https://slurm-web.com/): native HPC node and queue operations.
+
+The moving observed-state cards are a HAIRP presentation choice, not a claim that
+these references implement the same animation or support all local NPUs.
+
 Completed history automatically plays once when opened. Pause, seek and select
 0.5×, 1×, 2× or 4× speed; 1× advances one recorded snapshot every two seconds.
 Intervals are compressed for presentation: use recorded timestamps for execution

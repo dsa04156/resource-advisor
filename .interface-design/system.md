@@ -157,3 +157,21 @@ snapshots every two seconds at 1×, labelled compressed observation intervals.
 Pause/resume, restart, 0.5/1/2/4×, seek, and latest-record controls are explicit.
 Seek and event clicks pause. Playback stops at the end, on page navigation, on
 project reset and when the browser tab becomes hidden. No new workload is submitted.
+
+Live allocation board: compact scenario tabs precede a horizontal current-resource
+rail, then four observed-state lanes (queued, admitted/preparing, running, terminal).
+Resource cards pair reservations/capacity with actual utilization and CPU/memory
+meters; unavailable observations remain unknown. The rail stays current during
+history playback and explicitly shows its own timestamp. Card selection highlights
+recorded execution nodes and opens evidence; routing targets before execution do
+not count as observed allocations. Slot/quota totals are never summed across device
+types. Resource filter and horizontal scroll persist across refreshes.
+
+This board supersedes the earlier no-motion rule only for scheduler-lab state
+transitions: keyed cards move between observed lanes using 480ms transform/opacity
+FLIP animation, with 120ms opacity-only reduced motion. Same-state polling does not
+animate. Current presentation positions are captured before replacing the DOM so
+replay seeking interrupts cleanly. Four columns become two below 760px. Keep all
+actions keyboard-operable; retain focus on selected job/resource after refresh.
+References: Run:ai allocation/utilization drilldown, KueueViz queue observations,
+Slurm-web node/queue operations. No third-party scheduler/UI dependency was added.
