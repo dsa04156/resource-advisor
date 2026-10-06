@@ -64,5 +64,29 @@
         "gpu": 1
       }
     ]
-  }
+  },
+  "priorities": {
+    "low": "hairp-lab-low",
+    "high": "hairp-lab-high"
+  },
+  "mixed": [
+    {
+      "name": "GPU CUDA workload",
+      "device_class": "gpu",
+      "workload_ref": "REPLACE_WITH_QUALIFIED_GPU_WORKLOAD",
+      "profile_ref": "REPLACE_WITH_PROJECT_PROFILE"
+    },
+    {
+      "name": "NPU inference workload",
+      "device_class": "npu",
+      "workload_ref": "REPLACE_WITH_QUALIFIED_NPU_WORKLOAD",
+      "profile_ref": "REPLACE_WITH_PROJECT_PROFILE"
+    },
+    {
+      "name": "Slurm GPU model",
+      "device_class": "gpu",
+      "workload_ref": "REPLACE_WITH_QUALIFIED_SLURM_WORKLOAD",
+      "profile_ref": "REPLACE_WITH_PROJECT_PROFILE"
+    }
+  ]
 }

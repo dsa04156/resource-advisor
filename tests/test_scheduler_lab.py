@@ -56,14 +56,12 @@ def test_multi_gpu_request_capacity_and_idempotency():
         lab.start("team-a", LabRequest(scenario="multi_gpu", gpu_count=2), "multi")
 
 
-def test_registered_workload_poc_uses_runner_project_only():
+@pytest.mark.parametrize("scenario", ["heterogeneous", "npu", "mixed"])
+def test_registered_workload_poc_uses_runner_project_only(scenario):
     store = Store("sqlite://")
     store.initialize()
     lab = SchedulerLab(store)
-    lab.heartbeat({"scenarios": ["heterogeneous"], "project_ref": "team-a"})
+    lab.heartbeat({"scenarios": [scenario], "project_ref": "team-a"})
     with pytest.raises(Rejected):
-        lab.start("team-b", LabRequest(scenario="heterogeneous"), "other-project")
-    assert (
-        lab.start("team-a", LabRequest(scenario="heterogeneous"), "own-project")["state"]
-        == "REQUESTED"
-    )
+        lab.start("team-b", LabRequest(scenario=scenario), "other-project")
+    assert lab.start("team-a", LabRequest(scenario=scenario), "own-project")["state"] == "REQUESTED"

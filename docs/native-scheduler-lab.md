@@ -7,6 +7,61 @@ Closing the browser does not stop the experiment. **실험 중지** cancels this
 The history selector and timeline replay stored observations, not synthetic progress.
 For GPU and NPU workloads together, choose **GPU + NPU PoC** and its execution button.
 
+## Eleven runnable scenario definitions
+
+Each selector contains prerequisites, four observation steps, success criteria and
+the boundary of what the experiment demonstrates. The latest recorded outcome is
+shown on the selector; readiness from runner configuration is not a successful run.
+History entries include their terminal status. Up to 40 recent runs are returned.
+
+| Scenario | Real execution | Required evidence |
+|---|---|---|
+| Quota backlog | Two-GPU blocker, then three one-GPU requests; release blocker | All three observed pending with quota reasons, all three eventually succeed |
+| Priority | Two-GPU blocker; low priority submitted before high, both request two GPUs | Native high value > low, high admitted while low still waits, both succeed |
+| Queued cancellation | Occupy quota, enqueue and cancel one request, release blocker, submit replacement | Owned Job deletion confirmed; cancellation retained; replacement succeeds |
+| Failure / resubmission | GPU-requesting test container exits 42; submit a new CUDA Job | Native exit code 42 and successful new CUDA correctness result |
+| NPU inference | Registered qualified NPU workloads only | Every NPU job succeeds through its ordinary result path |
+| Kubernetes + Slurm | Registered Kubernetes GPU/NPU and Slurm GPU workloads | Both actual backend values observed and all jobs succeed |
+| GPU + NPU | Registered heterogeneous workloads | Actual execution and collected result for each |
+| Multi-GPU | One count-selected IndexedJob, one GPU per worker | Distinct worker results and startup barrier |
+| Gang | Block one GPU before submitting two-worker group | Whole admission, both workers pass barrier and finish |
+| Topology | Same-node request, then relaxed comparison | Native topology rejection reason and two-node completion |
+| Backfill | Long/short Slurm jobs around finite future reservation | Native start order, completion and increased backfill counter |
+
+The new quota/priority/cancellation experiments use the existing isolated **two-GPU**
+queue. Their blocker is intentionally canceled after queue evidence is saved; its
+`CANCELED` card is expected, and does not mean the experiment failed. A canceled
+pending request did not hold quota: releasing the blocker returns quota. These
+are requests in one lab project, not fabricated users or a fairness benchmark.
+
+Priority setup is additive: apply `examples/scheduler_lab/priority-resources.json`
+and configure `priorities.low` / `priorities.high` in the external runner config.
+The classes affect Kueue Workload ordering, not Pod priority. Existing controller
+preemption settings remain unchanged. The runner rejects a success verdict unless
+it observes high admission while low is still waiting.
+[Kueue WorkloadPriorityClass](https://kueue.sigs.k8s.io/docs/concepts/workload_priority_class/)
+documents this separation and label contract. The lab uses the already served
+v1beta1 CRD; no Kubernetes/Kueue upgrade is required.
+
+`npu` filters qualified entries from `heterogeneous`. `mixed` requires a separate
+operator-configured task list containing qualified routes to both native backends.
+Replace all example workload/profile placeholders before enabling these lists.
+These scenarios share the runner-authenticated project restriction. They use the
+ordinary Job API and its result/MLflow path, while native policy probes store
+evidence in the lab record. A mixed scenario never builds one cross-scheduler DDP job.
+
+Failure/resubmission terminates only its own test container. It does not inject a
+GPU Xid, disconnect a node, corrupt a driver or restore a training checkpoint.
+The expected failed child remains visible alongside the successful new child.
+An unexpected error in any other child still fails the experiment.
+
+Suggested hands-on sequence: **NPU → GPU+NPU → quota → priority → cancel → recovery
+→ Multi-GPU → gang → topology → mixed → backfill**. Run one at a time. For each:
+read the guide, inspect the current resource rail, press the scenario launch button,
+click a waiting card for the native reason, then follow admission/execution/result.
+Finish by replaying the saved observations. Short states may fall between polls;
+the UI does not invent them. No destructive hardware-failure scenarios are included.
+
 ## What the three experiments actually demonstrate
 
 | Scenario | Native mechanism | Evidence required for success |

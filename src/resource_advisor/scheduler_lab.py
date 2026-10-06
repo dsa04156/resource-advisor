@@ -33,7 +33,19 @@ TERMINAL = {"SUCCEEDED", "FAILED", "CANCELED"}
 
 
 class LabRequest(BaseModel):
-    scenario: Literal["backfill", "gang", "topology", "multi_gpu", "heterogeneous"]
+    scenario: Literal[
+        "backfill",
+        "gang",
+        "topology",
+        "multi_gpu",
+        "heterogeneous",
+        "quota",
+        "priority",
+        "cancel",
+        "recovery",
+        "npu",
+        "mixed",
+    ]
     gpu_count: int | None = Field(default=None, ge=1, le=8, strict=True)
 
     @model_validator(mode="after")
@@ -63,7 +75,7 @@ class SchedulerLab:
                 select(runs)
                 .where(runs.c.project == project)
                 .order_by(runs.c.created_at.desc())
-                .limit(12)
+                .limit(40)
             ).mappings()
             return {
                 "agent": {
@@ -100,7 +112,9 @@ class SchedulerLab:
                 "multi_gpu", {}
             ).get("max_gpus", 0):
                 raise Rejected("요청 GPU 수가 이 PoC에 등록된 물리 GPU 수를 초과합니다")
-            if request.scenario == "heterogeneous" and project != a["body"].get("project_ref"):
+            if request.scenario in {"heterogeneous", "npu", "mixed"} and project != a["body"].get(
+                "project_ref"
+            ):
                 raise Rejected("등록 작업 PoC는 실행기 인증 프로젝트에서만 실행할 수 있습니다")
             if conn.execute(select(runs.c.ref).where(~runs.c.state.in_(TERMINAL))).first():
                 raise Conflict("다른 스케줄링 실험이 실행 중입니다. 종료 후 시작해 주세요")

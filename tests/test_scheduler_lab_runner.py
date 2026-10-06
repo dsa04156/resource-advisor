@@ -1,0 +1,72 @@
+import json
+import runpy
+from pathlib import Path
+
+import pytest
+
+Agent = runpy.run_path(
+    str(Path(__file__).resolve().parents[1] / "examples/scheduler_lab/agent.py")
+)["Agent"]
+
+
+def runner():
+    a = Agent.__new__(Agent)
+    a.c = json.loads(Path("examples/scheduler_lab/config.example.json").read_text())
+    a.ref = "lab-owned-test"
+    a.snapshot = {}
+    return a
+
+
+def test_priority_and_failure_are_fixed_native_job_options():
+    a = runner()
+    applied = []
+    a.kube = lambda *args, value=None: applied.append(value)
+    a.job("failure", 1, 1, priority="hairp-lab-low", fail=True)
+    job = applied[-1]
+    assert job["metadata"]["labels"]["kueue.x-k8s.io/priority-class"] == "hairp-lab-low"
+    assert job["spec"]["suspend"] is True
+    container = job["spec"]["template"]["spec"]["containers"][0]
+    assert container["resources"]["limits"]["nvidia.com/gpu"] == 1
+    assert "sys.exit(42)" in container["command"][-1]
+    assert job["spec"]["backoffLimit"] == 0
+
+
+def test_admitted_pending_pod_is_not_running_and_retired_job_survives():
+    a = runner()
+    name = a.ref + "-new"
+    a.snapshot["retired_jobs"] = [{"id": "old", "label": "old", "state": "CANCELED"}]
+    fixtures = {
+        "jobs": [{"metadata": {"name": name}, "spec": {"parallelism": 1}, "status": {"active": 1}}],
+        "pods": [
+            {
+                "metadata": {"name": "new-pod", "labels": {"job-name": name}},
+                "spec": {"nodeName": "node-a"},
+                "status": {"phase": "Pending"},
+            }
+        ],
+        "workloads.kueue.x-k8s.io": [
+            {
+                "metadata": {"ownerReferences": [{"name": name}]},
+                "spec": {"priority": 100},
+                "status": {
+                    "conditions": [{"type": "Admitted", "status": "True"}],
+                    "admission": {"clusterQueue": "lab"},
+                },
+            }
+        ],
+    }
+    a.kube = lambda command, resource, *args: json.dumps({"items": fixtures[resource]})
+    result = a.observe_kube()
+    assert result["new"]["state"] == "ADMITTED"
+    assert result["new"]["priority"] == 100
+    assert result["old"]["state"] == "CANCELED"
+
+
+def test_recovery_allowlist_does_not_hide_unrelated_failure():
+    a = runner()
+    a.tick = lambda title: None
+    a.observe_kube = lambda: {"expected-failure": {"label": "expected-failure", "state": "FAILED"}}
+    assert a.wait_kube(lambda r: True, "observed", {"expected-failure"})
+    a.observe_kube = lambda: {"recovered": {"label": "recovered", "state": "FAILED"}}
+    with pytest.raises(RuntimeError, match="probe job failed"):
+        a.wait_kube(lambda r: True, "observed", {"expected-failure"})

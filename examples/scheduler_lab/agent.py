@@ -49,10 +49,18 @@ class Agent:
         return self.api(
             "/scheduler-lab-agent/heartbeat",
             {
-                "scenarios": ["backfill", "gang", "topology"]
+                "scenarios": ["backfill", "gang", "topology", "quota", "cancel", "recovery"]
                 + (["multi_gpu"] if self.c.get("multi_gpu") else [])
-                + (["heterogeneous"] if self.c.get("heterogeneous") else []),
+                + (["heterogeneous"] if self.c.get("heterogeneous") else [])
+                + (
+                    ["npu"]
+                    if any(t.get("device_class") == "npu" for t in self.c.get("heterogeneous", []))
+                    else []
+                )
+                + (["mixed"] if self.c.get("mixed") else [])
+                + (["priority"] if self.c.get("priorities") else []),
                 "heterogeneous": self.c.get("heterogeneous", []),
+                "mixed": self.c.get("mixed", []),
                 "multi_gpu": self.c.get("multi_gpu", {}),
                 "kubernetes": "Kueue native admission + hostname topology",
                 "slurm": "Native sched/backfill + bounded reservation window",
@@ -114,13 +122,15 @@ class Agent:
             self.report()  # Fresh observation without adding an identical replay event.
         time.sleep(3)
 
-    def job(self, suffix, count, duration, required=False):
+    def job(self, suffix, count, duration, required=False, priority=None, fail=False):
         pool = self.c.get("multi_gpu", {}) if self.snapshot.get("multi_gpu") else {}
         name = self.ref + "-" + suffix
         labels = {
             "hairp.io/lab-run": self.ref,
             "kueue.x-k8s.io/queue-name": pool.get("queue", self.c["queue"]),
         }
+        if priority:
+            labels["kueue.x-k8s.io/priority-class"] = priority
         service = {
             "apiVersion": "v1",
             "kind": "Service",
@@ -194,6 +204,13 @@ class Agent:
                 },
             },
         }
+        if fail:
+            job["spec"]["template"]["spec"]["containers"][0]["command"] = [
+                "python3",
+                "-u",
+                "-c",
+                'import json,sys; print(json.dumps({"phase":"EXPECTED_FAILURE","exit_code":42}),flush=True); sys.exit(42)',
+            ]
         self.kube("apply", "-f", "-", value=job)
         return name
 
@@ -244,6 +261,11 @@ class Agent:
                     .get("batch.kubernetes.io/job-completion-index"),
                     "node": p["spec"].get("nodeName"),
                     "state": p.get("status", {}).get("phase", "Pending"),
+                    "exit_codes": [
+                        c["state"]["terminated"]["exitCode"]
+                        for c in p.get("status", {}).get("containerStatuses", [])
+                        if "terminated" in c.get("state", {})
+                    ],
                 }
                 if item["state"] in {"Running", "Succeeded", "Failed"}:
                     lines = self.kube("logs", item["name"], "--tail=8").splitlines()
@@ -268,26 +290,31 @@ class Agent:
                     else "SUCCEEDED"
                     if complete
                     else "RUNNING"
-                    if js.get("active")
+                    if any(p["state"] == "Running" for p in jp)
                     else "ADMITTED"
                     if admitted
                     else "PENDING",
                     "reason": reason,
                     "gpu": job["spec"]["parallelism"],
+                    "priority": w.get("spec", {}).get("priority"),
                     "pods": jp,
                     "admission": w.get("status", {}).get("admission"),
                     "conditions": conditions,
                     "native_uid": w.get("metadata", {}).get("uid"),
                 }
             )
+        result.extend(self.snapshot.get("retired_jobs", []))
         self.snapshot["jobs"] = result
         return {j["label"]: j for j in result}
 
-    def wait_kube(self, predicate, title):
+    def wait_kube(self, predicate, title, expected_failures=()):
         while True:
             result = self.observe_kube()
             self.tick(title)
-            if any(j["state"] == "FAILED" for j in result.values()):
+            if any(
+                j["state"] == "FAILED" and j["label"] not in expected_failures
+                for j in result.values()
+            ):
                 raise RuntimeError("GPU probe job failed; inspect native pod logs")
             if predicate(result):
                 return result
@@ -385,16 +412,30 @@ class Agent:
         )
 
     def heterogeneous(self):
+        return self.registered_workloads(self.c["heterogeneous"], "GPU + NPU")
+
+    def npu(self):
+        return self.registered_workloads(
+            [t for t in self.c["heterogeneous"] if t["device_class"] == "npu"], "NPU"
+        )
+
+    def mixed(self):
+        return self.registered_workloads(self.c["mixed"], "Kubernetes + Slurm", mixed=True)
+
+    def registered_workloads(self, tasks, title, mixed=False):
+        if not tasks:
+            raise RuntimeError("no qualified registered workloads configured")
         self.snapshot.update(
             backend="Platform adapters",
-            policy="GPU + NPU workloads",
+            policy=title,
             heterogeneous=True,
             phase="SUBMIT",
             platform_jobs=[],
             jobs=[],
-            explanation="GPU용 CUDA/CNN 작업과 NPU용 ResNet-50을 각 검증된 실행 경로로 제출합니다. 공통 큐가 아니라 장치별 네이티브 큐에서 실행합니다.",
+            explanation=title
+            + " 등록 작업을 각각의 네이티브 큐에 제출합니다. 작업별 실제 backend·장치·결과를 관측합니다.",
         )
-        for i, task in enumerate(self.c["heterogeneous"]):
+        for i, task in enumerate(tasks):
             result = self.api(
                 "/jobs",
                 {
@@ -438,10 +479,155 @@ class Agent:
                     "이기종 작업 중 실패가 있습니다. 작업 상세의 실제 오류를 확인하세요"
                 )
             if all(j["state"] == "SUCCEEDED" for j in jobs):
+                if mixed and {j["backend"] for j in jobs} != {"kubernetes", "slurm"}:
+                    raise RuntimeError(
+                        "mixed execution completed without evidence of both backends"
+                    )
                 self.snapshot["verdict"] = (
-                    f"GPU·NPU {len(jobs)}개 등록 작업 모두 실제 실행 성공 · 작업별 결과와 MLflow 기록 확인 가능"
+                    f"{title} {len(jobs)}개 등록 작업 모두 실제 실행 성공 · 작업별 결과와 MLflow 기록 확인 가능"
                 )
                 return
+
+    def retire(self, label, reason):
+        record = self.observe_kube()[label]
+        self.kube("delete", "job", record["id"], "--wait=true", "--timeout=25s")
+        record = {**record, "state": "CANCELED", "reason": reason, "native_deleted": True}
+        self.snapshot.setdefault("retired_jobs", []).append(record)
+        self.observe_kube()
+        self.report(reason)
+
+    def occupy_pool(self, policy, explanation):
+        self.snapshot.update(
+            backend="Kueue", policy=policy, phase="OCCUPY", explanation=explanation
+        )
+        self.job("blocker", 2, 120)
+        self.wait_kube(
+            lambda r: r["blocker"]["state"] == "RUNNING" and len(r["blocker"]["pods"]) == 2,
+            "선행 작업의 2 GPU 점유 관측",
+        )
+
+    def quota(self):
+        self.occupy_pool(
+            "Quota backlog",
+            "2 GPU quota를 점유한 뒤 1 GPU 작업 3개를 접수합니다. 대기 사유를 기록하고 선행 작업을 종료합니다.",
+        )
+        labels = ["request-a", "request-b", "request-c"]
+        for label in labels:
+            self.job(label, 1, 20)
+            self.observe_kube()
+            self.tick("큐에 추가 접수: " + label)
+        result = self.wait_kube(
+            lambda r: all(
+                r.get(label, {}).get("state") == "PENDING" and r[label]["reason"]
+                for label in labels
+            ),
+            "세 요청의 실제 quota 대기 관측",
+        )
+        if not all("quota" in result[label]["reason"].lower() for label in labels):
+            raise RuntimeError("three queued jobs observed without quota evidence")
+        self.snapshot["queue_evidence"] = [result[label] for label in labels]
+        self.snapshot["phase"] = "RELEASE"
+        self.retire("blocker", "시나리오가 선행 작업을 종료하여 quota 반환")
+        self.wait_kube(
+            lambda r: all(r[label]["state"] == "SUCCEEDED" for label in labels),
+            "반환된 quota에 요청들이 입장·실행",
+        )
+        self.snapshot["verdict"] = (
+            "3개 요청의 quota 대기를 기록한 뒤 선행 작업 종료, 모든 GPU 요청 완료"
+        )
+
+    def priority(self):
+        self.occupy_pool(
+            "Workload priority",
+            "2 GPU 풀을 점유한 상태에서 낮은 우선순위 → 높은 우선순위 순서로 같은 크기 요청을 넣습니다.",
+        )
+        for label in ["low", "high"]:
+            self.job(label, 2, 20, priority=self.c["priorities"][label])
+        queued = self.wait_kube(
+            lambda r: all(
+                r.get(k, {}).get("state") == "PENDING" and r[k]["reason"] for k in ["low", "high"]
+            ),
+            "두 우선순위 요청의 동시 대기 관측",
+        )
+        if (
+            queued["high"].get("priority") is None
+            or queued["low"].get("priority") is None
+            or queued["high"]["priority"] <= queued["low"]["priority"]
+        ):
+            raise RuntimeError("native high/low workload priority evidence missing")
+        self.snapshot["queue_evidence"] = [queued["low"], queued["high"]]
+        self.retire("blocker", "선행 작업 종료 · Kueue가 다음 입장 요청 결정")
+        result = self.wait_kube(
+            lambda r: any(r[k].get("admission") for k in ["low", "high"]),
+            "실제 우선순위 입장 순서 관측",
+        )
+        if not result["high"].get("admission") or result["low"].get("admission"):
+            raise RuntimeError("higher priority first admission was not observed")
+        self.snapshot["priority_evidence"] = {
+            "first": "high",
+            "high": result["high"],
+            "low": result["low"],
+        }
+        self.report("나중에 제출한 높은 우선순위 작업이 먼저 입장")
+        self.wait_kube(
+            lambda r: all(r[k]["state"] == "SUCCEEDED" for k in ["low", "high"]),
+            "높은 우선순위 완료 후 낮은 우선순위 실행",
+        )
+        self.snapshot["verdict"] = (
+            "낮은 우선순위를 먼저 제출했지만 높은 우선순위가 먼저 승인·실행; 두 작업 모두 완료"
+        )
+
+    def cancel(self):
+        self.occupy_pool(
+            "Queued cancellation",
+            "quota를 점유한 상태에서 요청을 대기시킨 뒤 그 요청만 취소하고 후속 요청을 실행합니다.",
+        )
+        self.job("withdraw", 1, 15)
+        result = self.wait_kube(
+            lambda r: r.get("withdraw", {}).get("state") == "PENDING" and r["withdraw"]["reason"],
+            "취소할 요청의 실제 대기 관측",
+        )
+        self.snapshot["queue_evidence"] = result["withdraw"]
+        self.retire("withdraw", "대기 요청 취소 · 해당 Job 삭제 확인; 점유 quota는 없었음")
+        self.retire("blocker", "선행 작업 종료 · 후속 요청을 위한 quota 반환")
+        self.job("replacement", 1, 15)
+        self.wait_kube(
+            lambda r: r.get("replacement", {}).get("state") == "SUCCEEDED",
+            "후속 GPU 요청 실행 관측",
+        )
+        self.snapshot["verdict"] = "대기 요청 취소를 확인하고 선행 점유 해제 후 후속 요청 완료"
+
+    def recovery(self):
+        self.snapshot.update(
+            backend="Kueue",
+            policy="Failure and resubmission",
+            phase="EXPECTED_FAILURE",
+            explanation="GPU 자원을 요청한 테스트 컨테이너 하나를 종료 코드 42로 끝냅니다. 실패를 기록한 뒤 새 CUDA 검증 Job을 제출합니다.",
+        )
+        self.job("expected-failure", 1, 1, fail=True)
+        result = self.wait_kube(
+            lambda r: r.get("expected-failure", {}).get("state") == "FAILED",
+            "의도한 컨테이너 실패 관측",
+            expected_failures={"expected-failure"},
+        )
+        failed = result["expected-failure"]
+        if not any(42 in p.get("exit_codes", []) for p in failed["pods"]):
+            raise RuntimeError("failure occurred without expected exit code 42")
+        self.snapshot["failure_evidence"] = failed
+        self.snapshot["phase"] = "RESUBMIT"
+        self.job("recovered", 1, 15)
+        result = self.wait_kube(
+            lambda r: r.get("recovered", {}).get("state") == "SUCCEEDED",
+            "새 GPU Job의 정상 CUDA 실행 확인",
+            expected_failures={"expected-failure"},
+        )
+        if not any(
+            e.get("correctness") for p in result["recovered"]["pods"] for e in p.get("events", [])
+        ):
+            raise RuntimeError("successful recovery missing CUDA correctness evidence")
+        self.snapshot["verdict"] = (
+            "종료 코드 42 실패를 보존하고 새 Job에서 CUDA 검증 성공 · 자동 체크포인트 복구는 아님"
+        )
 
     def topology(self):
         self.snapshot.update(
