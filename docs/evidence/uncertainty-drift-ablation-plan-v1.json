@@ -1,0 +1,24 @@
+{
+  "schema_version": "s5-drift-ablation-plan-v1",
+  "source_file": "docs/evidence/load-drift-v1.json",
+  "source_file_sha256": "76f530365bd9500ef110c12784777c01f53ea9883427ea9f4924b3b92d719788",
+  "source_capture_digest": "sha256:ce0a3795b173c129a2fa4c75e0f06cce275a243f10aff37115dab47d38e4692f",
+  "target_indices": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "support_indices": [
+    0,
+    1,
+    2
+  ],
+  "only_removed_reason": "CONSECUTIVE_RESIDUAL_DRIFT",
+  "relative_error_limit": 0.25,
+  "new_gpu_jobs": 0,
+  "analysis_type": "exploratory chronological offline replay of an already observed fixed-order trial",
+  "documentation": "docs/uncertainty-drift-ablation-plan.md"
+}
