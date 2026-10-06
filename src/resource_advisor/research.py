@@ -3,6 +3,7 @@
 import hashlib
 import re
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import quote
 
@@ -186,6 +187,17 @@ class ResearchServices:
             return value if isinstance(value, str) and value else None
 
         stage_keys = {name: input_value(task, "run_key") for name, task in dag.items()}
+
+        def existed_before(row, cutoff):
+            if not cutoff:
+                return True
+            try:
+                created = datetime.fromisoformat(row["body"]["created_at"].replace("Z", "+00:00"))
+                ended = datetime.fromisoformat(cutoff.replace("Z", "+00:00"))
+                return created <= ended
+            except (KeyError, TypeError, ValueError):
+                return False
+
         legacy_key = params.get("run_key")
         if not isinstance(legacy_key, str):
             legacy_key = None
@@ -206,7 +218,20 @@ class ResearchServices:
         linked_jobs = []
         for name, key in stage_keys.items():
             row = by_key.get(key)
-            if row is None:
+            observations = [
+                t
+                for t in run.get("run_details", {}).get("task_details", [])
+                if t.get("display_name") == name
+            ]
+            if observations and not any(
+                t.get("state") not in {None, "SKIPPED"} for t in observations
+            ):
+                continue
+            if row is None or not existed_before(row, run.get("finished_at")):
+                continue
+            if observations and not any(
+                existed_before(row, t.get("end_time")) for t in observations
+            ):
                 continue
             body = row["body"]
             linked_jobs.append(
@@ -221,9 +246,17 @@ class ResearchServices:
                 }
             )
         # Preserve single-launcher clients without inventing a primary stage.
-        legacy_job = by_key.get(legacy_key)
-        linked = legacy_job["id"] if legacy_job is not None else None
         linked_ids = {row["job_id"] for row in linked_jobs}
+        legacy_job = by_key.get(legacy_key)
+        if legacy_job is not None and not existed_before(legacy_job, run.get("finished_at")):
+            legacy_job = None
+        if (
+            legacy_job is not None
+            and legacy_key in stage_keys.values()
+            and legacy_job["id"] not in linked_ids
+        ):
+            legacy_job = None
+        linked = legacy_job["id"] if legacy_job is not None else None
         if linked is None and len(linked_ids) == 1:
             linked = next(iter(linked_ids))
         tasks = [

@@ -6,6 +6,10 @@ project's stored compute Job. The CPU→GPU example therefore has two separate
 links; no stage is designated the sole Job. Parameter-name guesses and unresolved
 task-output expressions grant no association. The original top-level `run_key`
 link remains supported for single-launcher clients.
+Jobs created after a recorded task or workflow ended cannot be attached to that
+earlier execution, even when a later retry reuses its keys. Observed skipped or
+unexecuted tasks get no stage link. An actual later replay may still link an
+earlier existing Job; association does not imply another compute submission.
 
 The pipeline list reports distinct linked Job count and observed device classes.
 Its DAG keeps KFP dependencies and KFP state separate from compute state. Selecting

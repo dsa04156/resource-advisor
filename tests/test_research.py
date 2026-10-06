@@ -22,6 +22,7 @@ def pipeline_job(store, ref, key, project="team-a", device="gpu"):
                 epoch=1,
                 version=1,
                 body={
+                    "created_at": "2026-10-06T17:05:00Z",
                     "attempt_id": "attempt-" + ref,
                     "candidate": {"backend": "kubernetes"},
                     "variant": {"device_class": device},
@@ -126,6 +127,45 @@ def test_pipeline_constant_and_legacy_single_key_links(database_store):
     )
     assert view["job_id"] == "existing"
     assert view["linked_jobs"][0]["task_name"] == "constant"
+
+
+def test_pipeline_retry_cannot_backfill_prior_failed_workflow(database_store):
+    pipeline_job(database_store, "later-job", "reused-key")
+    api = ResearchServices(database_store, config())
+    run = {
+        "state": "FAILED",
+        "finished_at": "2026-10-06T17:03:25Z",
+        "runtime_config": {"parameters": {"run_key": "reused-key"}},
+        "pipeline_spec": {
+            "root": {
+                "dag": {
+                    "tasks": {
+                        "launch": {
+                            "inputs": {
+                                "parameters": {"run_key": {"componentInputParameter": "run_key"}}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+    }
+    assert api.pipeline_view("team-a", run)["linked_jobs"] == []
+    assert api.pipeline_view("team-a", run)["job_id"] is None
+    # An actual later replay may legitimately refer to an earlier compute Job.
+    run["state"] = "SUCCEEDED"
+    run["finished_at"] = "2026-10-06T17:06:00Z"
+    assert api.pipeline_view("team-a", run)["linked_jobs"][0]["job_id"] == "later-job"
+    run["run_details"] = {"task_details": [{"display_name": "launch", "state": "SKIPPED"}]}
+    assert api.pipeline_view("team-a", run)["linked_jobs"] == []
+    assert api.pipeline_view("team-a", run)["job_id"] is None
+    run["run_details"] = {
+        "task_details": [
+            {"display_name": "launch", "state": "FAILED", "end_time": "2026-10-06T17:04:00Z"}
+        ]
+    }
+    assert api.pipeline_view("team-a", run)["linked_jobs"] == []
+    assert api.pipeline_view("team-a", run)["job_id"] is None
 
 
 def config():
