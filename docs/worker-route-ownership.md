@@ -42,3 +42,26 @@ leaves its queued jobs, cancellations and workflow lease handling waiting for an
 owner. Restore the route or intentionally drain it; do not silently reroute its
 jobs. A deployment's live verification must check the worker image/source and
 current route map, plus regression execution, before claiming this gate complete.
+
+## Actual deployment — October 6
+
+[Evidence](evidence/worker-route-ownership.json) records commit `5cf6c7e`, the
+immutable image digest and actual installed source hashes. CI 37412163888 passed
+on Python 3.11 and 3.13: each ran 930 tests with four PostgreSQL-only skips, then
+all 934 tests against PostgreSQL, including both concurrent claim scenarios.
+
+An isolated non-root Pod first verified the built image, exact route-pair
+matching, untouched foreign events and empty-route refusal using SQLite. Then
+the existing worker was updated through its pinned Argo CD Application while no
+platform jobs or outbox deliveries were active. Argo reports
+Synced/Healthy/Succeeded; the worker is ready with zero restarts and fresh
+heartbeats. Its Deployment spec differs only in the container image. Six other
+running Pods retain their UIDs, container IDs and restart counts.
+
+The actual worker's new SQL predicate was also exercised read-only against the
+live PostgreSQL database: all 542 selected historical jobs belong to its three
+unchanged configured routes, and an empty route set selects none. No new API
+jobs or GPU allocations were created during this rollout. A new GPU regression
+and the full Slurm API submission path remain unverified; live rollout/source
+checks are not substituted for those execution gates. Slurm execution credentials
+and its compute route have not been enabled.

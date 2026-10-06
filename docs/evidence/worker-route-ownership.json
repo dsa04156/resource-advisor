@@ -1,0 +1,56 @@
+{
+  "schema_version": "v1",
+  "source_commit": "5cf6c7e6be7f8c31a4bbe6e38a2129d1dc8b1b8a",
+  "implementation_ci": {
+    "run_id": 37412163888,
+    "conclusion": "success",
+    "python_versions": [
+      "3.11",
+      "3.13"
+    ],
+    "sqlite_passed_each": 930,
+    "sqlite_skipped_each": 4,
+    "postgres_passed_each": 934
+  },
+  "image": {
+    "digest": "sha256:bd5458548396093f6449b46ac6ba53c9f38078cf7221ae7914d499a3c6c3c99d",
+    "base_digest": "sha256:a608787a696ca9a737ea8c72e59b1f70788fa1fa964d4e7785b641df50daadfc",
+    "source_tree_sha256": "d6894992be8973af44693307b8b3fcc8348feb362ca94fa4701e6ce2e500ee17",
+    "source_files": {
+      "store.py": "a1f5673fca93ff4d358ba9e7dedab84a131edad749274580c94babacab225f0b",
+      "worker.py": "608ff99250322bbb642eb25384d2b41ba2489decfba992e7a74c056a5f433336"
+    },
+    "dependency_lock_unchanged": true
+  },
+  "isolated_pod_preflight": {
+    "source_hashes": "PASS",
+    "sqlite_route_filter": "PASS",
+    "foreign_events_untouched": "PASS",
+    "empty_routes": "PASS",
+    "network_or_scheduler_calls": 0
+  },
+  "live": {
+    "argocd_sync": "Synced",
+    "argocd_health": "Healthy",
+    "argocd_operation": "Succeeded",
+    "worker_replicas": 1,
+    "worker_restarts": 0,
+    "actual_worker_source_hashes_verified": true,
+    "actual_postgresql_route_query": "PASS",
+    "matched_historical_jobs": 542,
+    "routes_unchanged": 3,
+    "other_running_pods_unchanged": 6,
+    "deployment_spec_change": "worker image only",
+    "active_jobs_after": 0,
+    "pending_events_after": 0,
+    "heartbeat_fresh": true
+  },
+  "scope": {
+    "new_api_jobs": 0,
+    "new_gpu_allocations": 0,
+    "slurm_route_enabled": false,
+    "slurm_end_to_end_verified": false,
+    "new_post_rollout_gpu_regression": false,
+    "note": "SQL concurrency tests use synthetic scheduler doubles; live proof covers code deployment and read-only queries, not new hardware execution."
+  }
+}

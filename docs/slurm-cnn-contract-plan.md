@@ -33,6 +33,7 @@ and costs; observation timeouts require inspecting the same job, never replay.
 This test does not enable an API route. The read-only observer identity remains
 unchanged. Scoped executor credentials, full runtime manifest, API submission,
 artifact/MLflow/accounting publication, cancel and cross-user tests remain open.
-Workers currently claim a shared outbox; a Slurm-only worker must not be added
-beside a Kubernetes-only worker until route ownership is handled, or either
-worker could claim a job for a backend it does not implement.
+At this plan's initial acceptance, workers claimed a shared outbox globally.
+The later [route ownership change](worker-route-ownership.md) now scopes and
+deploys those compute claims; its independent credential and execution gates
+must still pass before adding a Slurm-only worker.
