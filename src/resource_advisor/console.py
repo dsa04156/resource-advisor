@@ -142,6 +142,7 @@ def overview(
                     "backend": candidate.backend,
                     "variant_ref": candidate.variant_ref,
                     "capability_ref": candidate.capability_ref,
+                    "resources": candidate.context.resources.model_dump(mode="json"),
                 }
                 try:
                     _, _, variant, cap = service.bundle(conn, project, spec.ref, candidate.ref)
@@ -168,6 +169,7 @@ def overview(
                     "workload_ref": spec.ref,
                     "task_type": spec.identity.task_type,
                     "precision": spec.identity.precision,
+                    "max_run_seconds": spec.execution.max_run_seconds,
                     "candidates": candidates,
                 }
             )

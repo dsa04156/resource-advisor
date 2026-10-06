@@ -2,7 +2,10 @@
 
 Intent: researchers and platform operators inspect actual capacity, locate a queued
 or failed attempt, and follow recommendation evidence before their next execution.
-Read-only inspection stays separate from submission/approval API operations.
+Inspection stays separate from explicit submission controls. Qualified candidate
+rows offer an observe-run button with accelerator/CPU/memory/time limits. Pending
+requests disable repeat clicks; uncertain responses reuse the same idempotency
+key across refreshes without storing credentials. Approval remains a distinct API operation.
 
 Domain: accelerator inventory, scheduler reservations, device sharing, source
 freshness, runtime qualification, independent confirmation, allocation ledger.

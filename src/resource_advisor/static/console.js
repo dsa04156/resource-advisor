@@ -9,6 +9,56 @@ let receivedAt = 0,
   expiryTimer = null,
   active = "execution";
 const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, qualifications: 0 };
+const submitting = new Set();
+const requestKeys = new Map();
+
+function submitButton(workload, candidate) {
+  const key = `ra-submit:${data.project_ref}:${workload.workload_ref}:${candidate.candidate_ref}`;
+  let saved = requestKeys.get(key);
+  try { saved ||= sessionStorage.getItem(key); } catch (_) { /* Memory fallback. */ }
+  if (saved) requestKeys.set(key, saved);
+  const button = el("button", submitting.has(key) ? "제출 중…" : saved ? "제출 확인 재시도" : "관측 실행", "primary");
+  button.setAttribute("aria-label", `관측 실행 · ${workload.workload_ref} · ${candidate.candidate_ref}`);
+  button.disabled = !candidate.contract_compatible_now || submitting.has(key);
+  button.onclick = async () => {
+    if (submitting.has(key)) return;
+    const session = generation;
+    if (!requestKeys.has(key)) {
+      const bytes = crypto.getRandomValues(new Uint8Array(16));
+      requestKeys.set(key, "console-" + Array.from(bytes, b => b.toString(16).padStart(2, "0")).join(""));
+      try { sessionStorage.setItem(key, requestKeys.get(key)); } catch (_) { /* Memory fallback. */ }
+    }
+    submitting.add(key);
+    button.disabled = true;
+    button.textContent = "제출 중…";
+    try {
+      const response = await fetch(API + "/jobs", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token, "Content-Type": "application/json", "Idempotency-Key": requestKeys.get(key) },
+        body: JSON.stringify({ workload_ref: workload.workload_ref, candidate_ref: candidate.candidate_ref, mode: "observe" }),
+      });
+      if (!response.ok) throw new Error("작업을 제출하지 못했습니다. 계약 상태와 프로젝트 권한을 확인해 주세요.");
+      const job = await response.json();
+      requestKeys.delete(key);
+      try { sessionStorage.removeItem(key); } catch (_) { /* No credential is stored. */ }
+      if (session !== generation) return;
+      pages.jobs = 0;
+      active = "execution";
+      location.hash = "execution";
+      await load();
+      $("notice").textContent = "작업을 접수했습니다: " + job.job_id;
+    } catch (error) {
+      if (session === generation)
+        $("notice").textContent = error.message + " 같은 버튼으로 재시도하면 동일 요청을 확인합니다.";
+    } finally {
+      submitting.delete(key);
+      if (session === generation) render();
+    }
+  };
+  const resources = candidate.resources;
+  return add(el("div"), button, resources ? el("small",
+    `가속기 ${resources.accelerator_count} · CPU ${resources.host_cpu} · ${resources.host_memory_mib} MiB · 최대 ${workload.max_run_seconds}초`) : null);
+}
 const views = {
   execution: [
     "OBSERVATION",
@@ -526,6 +576,7 @@ function compatibilityView() {
         ),
         ...c.reasons.map((reason) => el("div", reason, "reason")),
       ),
+      submitButton(w, c),
     ]);
     root.append(
       panel(
@@ -534,7 +585,7 @@ function compatibilityView() {
           " · " +
           w.precision +
           " · 최종 자원 승인은 Kueue / Slurm이 결정합니다.",
-        table(["실행 후보", "장비 / 백엔드", "검증 단계", "현재 검사"], rows),
+        table(["실행 후보", "장비 / 백엔드", "검증 단계", "현재 검사", "작업 제출"], rows),
       ),
     );
   }
