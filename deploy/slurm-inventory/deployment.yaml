@@ -73,6 +73,9 @@ spec:
           readOnly: true
         - name: tmp
           mountPath: /tmp
+        - name: observer-ssh
+          mountPath: /tmp/.ssh
+          readOnly: true
         readinessProbe:
           exec:
             command:
@@ -94,3 +97,8 @@ spec:
       - name: tmp
         emptyDir:
           sizeLimit: 64Mi
+      - name: observer-ssh
+        secret:
+          secretName: ra-slurm-observer-ssh
+          optional: true
+          defaultMode: 288
