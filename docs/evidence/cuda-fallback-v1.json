@@ -1,0 +1,201 @@
+{
+  "status": "PASS",
+  "protocol": "docs/cuda-fallback-plan.md",
+  "source_parent_commit": "16f003e",
+  "verifier_sha256": "f94059a76c801d9413082f0ae5608b7b855283c50eb2739641d4330405572998",
+  "benchmark_source_sha256": "ae576be1e38924920a2c84b487ab2eace326f908fb781b310d122bccef3205c3",
+  "scope": "actual unchanged CUDA matmul runner, allocated positive and explicitly hidden-GPU negative",
+  "attempts": {
+    "positive": {
+      "cuda_visibility": {
+        "pytorch": "2.8.0+cu128",
+        "cuda": "12.8",
+        "cuda_available": true,
+        "device_count": 1
+      },
+      "requested_image_sha256": "sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984",
+      "observed_image_sha256": "sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984",
+      "resource_requests": {
+        "cpu": "1",
+        "memory": "2Gi",
+        "nvidia.com/gpu": "1"
+      },
+      "gpu_visibility_masked": false,
+      "job_native_state": "COMPLETED",
+      "container_exit_code": 0,
+      "pod_restart_count": 0,
+      "kueue_admitted": true,
+      "cpu_core_reservation_seconds": 2.0,
+      "gpu_reservation_seconds": 2.0,
+      "result_markers": 1,
+      "cpu_fallback_refusal": false,
+      "result": {
+        "result": {
+          "schema_version": "v1",
+          "job_id": "ra-cuda-fallback-v1-positive",
+          "attempt_id": "ra-cuda-fallback-v1-positive",
+          "epoch": 1,
+          "workload_signature": "sha256:aad588a26e7b430421424b44db68aff9161d027f05fcea605f967df6e4b5efef",
+          "context_signature": "sha256:aae55114a149459d91912a3364969f38ee376bf00e68e7cfdb500df3ff021c1a",
+          "outcome": "COMPLETED",
+          "measured": true,
+          "evidence_kind": "hardware",
+          "measurements": {
+            "elapsed_seconds": 0.0002677908632904291,
+            "peak_memory_mib": 9.125,
+            "quality_value": 1.0,
+            "sample_count": 20,
+            "work_units": 20,
+            "latency_p50_ms": 0.013137003406882286,
+            "latency_p95_ms": 0.013962970115244389,
+            "latency_p99_ms": 0.013962970115244389,
+            "throughput": 74685.14703695943,
+            "gpu_utilization": null,
+            "power_watts": null,
+            "temperature_celsius": null
+          },
+          "error_code": null
+        },
+        "digest": "sha256:e436df5a7c1ca8f03583564a066ed452a73e40a51fd463751b3cb10295a6ff8c"
+      },
+      "allocation_start": "2026-10-06T13:47:45Z",
+      "container_started": "2026-10-06T13:47:45Z",
+      "container_finished": "2026-10-06T13:47:47Z",
+      "denial_log_lines": [
+        "CUDA_VISIBILITY {\"pytorch\": \"2.8.0+cu128\", \"cuda\": \"12.8\", \"cuda_available\": true, \"device_count\": 1}"
+      ],
+      "kueue_conditions": [
+        {
+          "type": "QuotaReserved",
+          "status": "True",
+          "reason": "QuotaReserved",
+          "lastTransitionTime": "2026-10-06T13:47:45Z"
+        },
+        {
+          "type": "Admitted",
+          "status": "True",
+          "reason": "Admitted",
+          "lastTransitionTime": "2026-10-06T13:47:45Z"
+        },
+        {
+          "type": "Finished",
+          "status": "True",
+          "reason": "Succeeded",
+          "lastTransitionTime": "2026-10-06T13:47:49Z"
+        },
+        {
+          "type": "PodsReady",
+          "status": "True",
+          "reason": "Recovered",
+          "lastTransitionTime": "2026-10-06T13:47:49Z"
+        }
+      ]
+    },
+    "negative": {
+      "cuda_visibility": {
+        "pytorch": "2.8.0+cu128",
+        "cuda": "12.8",
+        "cuda_available": false,
+        "device_count": 0
+      },
+      "requested_image_sha256": "sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984",
+      "observed_image_sha256": "sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984",
+      "resource_requests": {
+        "cpu": "1",
+        "memory": "2Gi"
+      },
+      "gpu_visibility_masked": true,
+      "job_native_state": "FAILED",
+      "container_exit_code": 1,
+      "pod_restart_count": 0,
+      "kueue_admitted": true,
+      "cpu_core_reservation_seconds": 1.0,
+      "gpu_reservation_seconds": 0,
+      "result_markers": 0,
+      "cpu_fallback_refusal": true,
+      "allocation_start": "2026-10-06T13:47:51Z",
+      "container_started": "2026-10-06T13:47:51Z",
+      "container_finished": "2026-10-06T13:47:52Z",
+      "denial_log_lines": [
+        "CUDA_VISIBILITY {\"pytorch\": \"2.8.0+cu128\", \"cuda\": \"12.8\", \"cuda_available\": false, \"device_count\": 0}",
+        "RuntimeError: CUDA unavailable; refusing CPU fallback"
+      ],
+      "kueue_conditions": [
+        {
+          "type": "QuotaReserved",
+          "status": "True",
+          "reason": "QuotaReserved",
+          "lastTransitionTime": "2026-10-06T13:47:51Z"
+        },
+        {
+          "type": "Admitted",
+          "status": "True",
+          "reason": "Admitted",
+          "lastTransitionTime": "2026-10-06T13:47:51Z"
+        },
+        {
+          "type": "Finished",
+          "status": "True",
+          "reason": "Failed",
+          "lastTransitionTime": "2026-10-06T13:47:55Z"
+        },
+        {
+          "type": "PodsReady",
+          "status": "False",
+          "reason": "WaitForRecovery",
+          "lastTransitionTime": "2026-10-06T13:47:54Z"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "same_image_source_runtime_mounts": true,
+    "qualified_source_data_unchanged": true,
+    "api_job_usage_outbox_counts_and_immutable_result_records_unchanged": true,
+    "preexisting_native_object_uids_specs_preserved": true,
+    "two_terminal_test_jobs": true,
+    "queue_pending_workloads": 0,
+    "queue_admitted_workloads": 0
+  },
+  "metadata_before": {
+    "counts": {
+      "ra_jobs": 589,
+      "ra_outbox": 2582,
+      "ra_usage": 588
+    },
+    "immutable_records_sha256": "sha256:c27ed6563b179e769fffab8d0db789a201cc9062a60c7b6a444b93f9576f3c0d",
+    "immutable_record_count": 2637
+  },
+  "metadata_after": {
+    "counts": {
+      "ra_jobs": 589,
+      "ra_outbox": 2582,
+      "ra_usage": 588
+    },
+    "immutable_records_sha256": "sha256:c27ed6563b179e769fffab8d0db789a201cc9062a60c7b6a444b93f9576f3c0d",
+    "immutable_record_count": 2637
+  },
+  "cost": {
+    "gpu_reservation_seconds": 2.0,
+    "cpu_core_reservation_seconds": 3.0,
+    "measured_cpu_busy_seconds": null,
+    "utilization_power_temperature": null,
+    "allocation_clock_resolution_seconds": 1
+  },
+  "unchanged_native_counts": {
+    "jobs": 622,
+    "pods": 620,
+    "workloads.kueue.x-k8s.io": 622,
+    "deployments": 6,
+    "persistentvolumeclaims": 5
+  },
+  "new_api_compute_or_profile_records": 0,
+  "limits": [
+    "GPU visibility explicitly masked in negative; not hostile-user device isolation",
+    "driver version not validated by this matmul runner",
+    "runtime PVC identity/spec and Torch/CUDA versions verified; not complete dependency byte attestation",
+    "numerical agreement not trained-model accuracy",
+    "20 samples do not qualify reliable tail latency",
+    "Slurm cohort, Pi accelerator and broader E0/platform gates remain open"
+  ]
+}

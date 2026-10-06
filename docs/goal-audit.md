@@ -22,6 +22,9 @@ to its actual report and separates partial failure boundaries from passed fixtur
 The [live terminal replay trial](result-replay.md) now verifies nine actual API
 requests: unchanged original result replay, stale/late/modified result rejection,
 project/operator authorization and unchanged DB/artifact/MLflow without new compute.
+The [live CUDA fallback trial](cuda-fallback.md) now adds a same-image positive
+control and explicitly hidden-GPU refusal with two actual Kueue Jobs, unchanged
+application result/profile records and 2 GPU-seconds/3 CPU core-seconds cost.
 
 | Gate | Required authoritative evidence | Current state |
 |---|---|---|

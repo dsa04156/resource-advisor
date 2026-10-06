@@ -25,6 +25,9 @@ idempotency, terminal/epoch/attempt rejection and project/operator authorization
 through nine actual API requests. Both original Slurm attempts' DB rows, result
 artifact and MLflow runs remain unchanged, with no new compute or reservation.
 This does not close the disconnected cohort or external lease-fencing risks.
+M6's [CUDA fallback gate](cuda-fallback.md) also now has actual positive/negative
+Kueue executions, with one correct CUDA result and zero result on explicit GPU
+visibility loss. Both terminal Jobs and all incurred costs remain visible.
 
 1. Contract validation, stable logical/environment signatures, project authentication.
 2. Independent persistence and attempt/outbox state machine with response-loss recovery.
