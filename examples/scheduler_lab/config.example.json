@@ -8,13 +8,47 @@
   "kubeconfig": "/etc/hairp/private/lab.kubeconfig",
   "image": "registry.example.org/qualified-python-cuda@sha256:REPLACE_WITH_QUALIFIED_DIGEST",
   "nodes": [
-    {"id": "gpu-lab-a", "label": "GPU A", "gpu": 1},
-    {"id": "gpu-lab-b", "label": "GPU B", "gpu": 1}
+    {
+      "id": "gpu-lab-a",
+      "label": "GPU A",
+      "gpu": 1
+    },
+    {
+      "id": "gpu-lab-b",
+      "label": "GPU B",
+      "gpu": 1
+    }
   ],
   "slurm_node": "gpu-lab-c",
   "slurm_partition": "gpu-lab",
   "slurm_account": "research-lab",
   "slurm_qos": "normal",
-  "slurm_transport": ["/usr/local/libexec/hairp-lab-slurm-transport"],
-  "lock_file": "/var/lib/hairp/scheduler-lab.lock"
+  "slurm_transport": [
+    "/usr/local/libexec/hairp-lab-slurm-transport"
+  ],
+  "lock_file": "/var/lib/hairp/scheduler-lab.lock",
+  "multi_gpu": {
+    "max_gpus": 3,
+    "queue": "multi-gpu-poc",
+    "node_selector": {
+      "hairp.io/multi-gpu-poc": "true"
+    },
+    "nodes": [
+      {
+        "id": "gpu-lab-a",
+        "label": "GPU A \u00b7 x86",
+        "gpu": 1
+      },
+      {
+        "id": "gpu-lab-b",
+        "label": "GPU B \u00b7 x86",
+        "gpu": 1
+      },
+      {
+        "id": "gpu-lab-c",
+        "label": "GPU C \u00b7 ARM64",
+        "gpu": 1
+      }
+    ]
+  }
 }

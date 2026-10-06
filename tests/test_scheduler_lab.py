@@ -30,3 +30,27 @@ def test_native_experiment_scope_idempotency_and_cancellation():
     lab.report(first["ref"], LabReport(state="CANCELED"))
     assert lab.report(first["ref"], report)["state"] == "CANCELED"
     assert lab.start("team-b", request, "two")["state"] == "REQUESTED"
+
+
+def test_multi_gpu_request_capacity_and_idempotency():
+    from pydantic import ValidationError
+
+    for value in (
+        {"scenario": "multi_gpu"},
+        {"scenario": "multi_gpu", "gpu_count": 0},
+        {"scenario": "gang", "gpu_count": 3},
+    ):
+        with pytest.raises(ValidationError):
+            LabRequest(**value)
+    store = Store("sqlite://")
+    store.initialize()
+    lab = SchedulerLab(store)
+    lab.heartbeat({"scenarios": ["multi_gpu"], "multi_gpu": {"max_gpus": 3}})
+    with pytest.raises(Rejected):
+        lab.start("team-a", LabRequest(scenario="multi_gpu", gpu_count=4), "oversized")
+    request = LabRequest(scenario="multi_gpu", gpu_count=3)
+    first = lab.start("team-a", request, "multi")
+    assert first["body"]["gpu_count"] == 3
+    assert lab.start("team-a", request, "multi")["ref"] == first["ref"]
+    with pytest.raises(Conflict):
+        lab.start("team-a", LabRequest(scenario="multi_gpu", gpu_count=2), "multi")

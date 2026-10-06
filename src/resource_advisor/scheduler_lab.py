@@ -4,7 +4,7 @@ import hashlib
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import JSON, Column, Integer, String, Table, select, update
 
 from .contracts import now
@@ -33,7 +33,16 @@ TERMINAL = {"SUCCEEDED", "FAILED", "CANCELED"}
 
 
 class LabRequest(BaseModel):
-    scenario: Literal["backfill", "gang", "topology"]
+    scenario: Literal["backfill", "gang", "topology", "multi_gpu"]
+    gpu_count: int | None = Field(default=None, ge=1, le=8, strict=True)
+
+    @model_validator(mode="after")
+    def valid_count(self):
+        if self.scenario == "multi_gpu" and self.gpu_count is None:
+            raise ValueError("multi_gpu requires gpu_count")
+        if self.scenario != "multi_gpu" and self.gpu_count is not None:
+            raise ValueError("gpu_count is only configurable for multi_gpu")
+        return self
 
 
 class LabReport(BaseModel):
@@ -77,13 +86,20 @@ class SchedulerLab:
             a = conn.execute(q).mappings().first()
             old = conn.execute(select(runs).where(runs.c.ref == ref)).mappings().first()
             if old:
-                if old["scenario"] != request.scenario:
+                if (
+                    old["scenario"] != request.scenario
+                    or old["body"].get("gpu_count") != request.gpu_count
+                ):
                     raise Conflict("idempotency key already used for another scenario")
                 return dict(old)
             if not a or (now() - datetime.fromisoformat(a["seen_at"])).total_seconds() > 40:
                 raise Rejected("실험 실행기 연결을 확인해 주세요")
             if request.scenario not in a["body"].get("scenarios", []):
                 raise Rejected("이 환경에 준비되지 않은 실험입니다")
+            if request.scenario == "multi_gpu" and request.gpu_count > a["body"].get(
+                "multi_gpu", {}
+            ).get("max_gpus", 0):
+                raise Rejected("요청 GPU 수가 이 PoC에 등록된 물리 GPU 수를 초과합니다")
             if conn.execute(select(runs.c.ref).where(~runs.c.state.in_(TERMINAL))).first():
                 raise Conflict("다른 스케줄링 실험이 실행 중입니다. 종료 후 시작해 주세요")
             conn.execute(
@@ -93,7 +109,11 @@ class SchedulerLab:
                     scenario=request.scenario,
                     state="REQUESTED",
                     version=0,
-                    body={"events": [], "snapshot": {}},
+                    body={
+                        "events": [],
+                        "snapshot": {},
+                        **({"gpu_count": request.gpu_count} if request.gpu_count else {}),
+                    },
                     created_at=now().isoformat(),
                 )
             )

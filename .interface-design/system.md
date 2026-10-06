@@ -143,3 +143,10 @@ same evidence inspector. Recorded events have a seek slider; replay and latest
 observations are labelled separately. The 3-column board stacks vertically below
 760px. Slots show this experiment allocation only. Dark header is reserved for
 native experiment state; amber wait, blue active and teal complete accompany text.
+
+Multi-GPU PoC: count-only request control, four observation counters (request,
+native admission, CUDA readiness, completed verification), and one clickable card
+per worker. The three worker cards show actual CUDA model and architecture and
+select worker evidence. Waiting workers keep readable empty states. On mobile,
+counters use two columns and workers stack; configured physical capacity is never
+presented as current fleet availability or a performance speedup.

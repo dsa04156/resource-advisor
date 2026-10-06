@@ -18,7 +18,7 @@ def emit(phase, **values):
 rank = int(os.environ.get("JOB_COMPLETION_INDEX", "0"))
 world = int(os.environ.get("WORLD_SIZE", "1"))
 report = measure()
-emit("GPU_READY", correctness=True)
+emit("GPU_READY", correctness=True, model=report["accelerator_model"], architecture=report["arch"])
 if world > 1:
     deadline = time.monotonic() + 80
     if rank == 0:

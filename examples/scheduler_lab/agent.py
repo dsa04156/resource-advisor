@@ -48,7 +48,9 @@ class Agent:
         return self.api(
             "/scheduler-lab-agent/heartbeat",
             {
-                "scenarios": ["backfill", "gang", "topology"],
+                "scenarios": ["backfill", "gang", "topology"]
+                + (["multi_gpu"] if self.c.get("multi_gpu") else []),
+                "multi_gpu": self.c.get("multi_gpu", {}),
                 "kubernetes": "Kueue native admission + hostname topology",
                 "slurm": "Native sched/backfill + bounded reservation window",
                 "nodes": self.c["nodes"],
@@ -110,8 +112,12 @@ class Agent:
         time.sleep(3)
 
     def job(self, suffix, count, duration, required=False):
+        pool = self.c.get("multi_gpu", {}) if self.snapshot.get("multi_gpu") else {}
         name = self.ref + "-" + suffix
-        labels = {"hairp.io/lab-run": self.ref, "kueue.x-k8s.io/queue-name": self.c["queue"]}
+        labels = {
+            "hairp.io/lab-run": self.ref,
+            "kueue.x-k8s.io/queue-name": pool.get("queue", self.c["queue"]),
+        }
         service = {
             "apiVersion": "v1",
             "kind": "Service",
@@ -150,7 +156,9 @@ class Agent:
                         "subdomain": name,
                         "runtimeClassName": self.c["runtime_class"],
                         "terminationGracePeriodSeconds": 5,
-                        "nodeSelector": {"hairp.io/scheduling-lab": "gpu"},
+                        "nodeSelector": pool.get(
+                            "node_selector", {"hairp.io/scheduling-lab": "gpu"}
+                        ),
                         "containers": [
                             {
                                 "name": "gpu",
@@ -228,11 +236,14 @@ class Agent:
                     continue
                 item = {
                     "name": p["metadata"]["name"],
+                    "rank": p["metadata"]
+                    .get("annotations", {})
+                    .get("batch.kubernetes.io/job-completion-index"),
                     "node": p["spec"].get("nodeName"),
                     "state": p.get("status", {}).get("phase", "Pending"),
                 }
                 if item["state"] in {"Running", "Succeeded", "Failed"}:
-                    lines = self.kube("logs", item["name"], "--tail=5").splitlines()
+                    lines = self.kube("logs", item["name"], "--tail=8").splitlines()
                     item["events"] = [
                         json.loads(line) for line in lines if line.startswith('{"phase"')
                     ]
@@ -306,6 +317,68 @@ class Agent:
             raise RuntimeError("missing two-worker barrier evidence")
         self.snapshot["verdict"] = (
             "GPU 2개 전체 quota 승인 후 두 worker가 barrier를 통과하고 CUDA 계산 완료"
+        )
+
+    def multi_gpu(self):
+        count = self.snapshot["requested_gpus"]
+        pool = self.c["multi_gpu"]
+        if not 1 <= count <= pool["max_gpus"]:
+            raise RuntimeError("requested GPU count exceeds configured PoC capacity")
+        self.snapshot.update(
+            backend="Kueue",
+            policy="Multi-GPU PoC",
+            phase="REQUEST",
+            nodes=pool["nodes"],
+            pool_gpus=pool["max_gpus"],
+            explanation=f"하나의 작업이 GPU {count}개를 요청합니다. Worker마다 물리 GPU 1개를 배정하고 전체 준비 후 CUDA 검증을 실행합니다.",
+        )
+        if count > 1:
+            self.job("blocker", pool["max_gpus"] - count + 1, 25)
+            self.wait_kube(
+                lambda r: r.get("blocker", {}).get("state") == "RUNNING",
+                "선행 작업의 물리 GPU 할당 관측",
+            )
+        self.job("workers", count, 20)
+        if count > 1:
+            self.snapshot["phase"] = "WAIT_ALL"
+            queued = self.wait_kube(
+                lambda r: (
+                    r.get("workers", {}).get("state") == "PENDING" and bool(r["workers"]["reason"])
+                ),
+                "다중 GPU 요청 전체 입장 대기",
+            )
+            self.snapshot["queue_evidence"] = queued["workers"]
+        self.snapshot["phase"] = "PARALLEL_COMPUTE"
+        result = self.wait_kube(
+            lambda r: r.get("workers", {}).get("state") == "SUCCEEDED",
+            "GPU별 worker 승인·준비·실행 관측",
+        )
+        pods = result["workers"]["pods"]
+        finished = [
+            next((e for e in p.get("events", []) if e["phase"] == "COMPUTE_FINISHED"), {})
+            for p in pods
+        ]
+        ranks = {e.get("rank") for e in finished}
+        if (
+            len(pods) != count
+            or ranks != set(range(count))
+            or not all(e.get("correctness") for e in finished)
+        ):
+            raise RuntimeError("missing distinct successful CUDA workers")
+        if count > 1 and not all(
+            any(e["phase"] == "BARRIER_RELEASED" for e in p["events"]) for p in pods
+        ):
+            raise RuntimeError("missing all-worker startup barrier evidence")
+        self.snapshot["result"] = {
+            "requested_gpus": count,
+            "workers_passed": len(finished),
+            "nodes_used": len({p["node"] for p in pods}),
+            "models": [e["report"]["accelerator_model"] for e in finished],
+            "architectures": sorted({e["report"]["arch"] for e in finished}),
+            "semantics": "Independent CUDA probes after a shared barrier; not DDP or a speedup benchmark",
+        }
+        self.snapshot["verdict"] = (
+            f"물리 GPU {count}개에서 {count}개 worker 모두 CUDA 계산 완료 · 결과 {count}/{count} 검증"
         )
 
     def topology(self):
@@ -517,6 +590,8 @@ class Agent:
                     if row["state"] == "CANCEL_REQUESTED"
                     else RuntimeError("runner restarted; bounded resources cleaned up")
                 )
+            if row["scenario"] == "multi_gpu":
+                self.snapshot.update(multi_gpu=True, requested_gpus=row["body"]["gpu_count"])
             self.report("네이티브 스케줄러 실험 시작")
             getattr(self, row["scenario"])()
             state, title = "SUCCEEDED", self.snapshot["verdict"]

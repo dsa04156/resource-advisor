@@ -137,3 +137,35 @@ Focused validation: 10 API/console tests passed, JavaScript syntax and changed P
 lint passed. Desktop layout, 390px mobile width without horizontal overflow, job-node
 selection and historical snapshot seeking were checked against the live console.
 Raw observations and screenshots are private, excluded from the public repository.
+
+
+## Multi-GPU PoC: one job, configurable physical GPU count
+
+The **Multi-GPU PoC** selector accepts **1, 2 or 3 GPUs** in the current lab.
+The request contains a count, not device names. Kueue assigns an Indexed Job with
+one real GPU per worker; the multiarchitecture image runs on x86 and ARM64 nodes.
+A bounded preceding job occupies `pool capacity - requested count + 1` GPUs for
+multi-GPU requests, so the group must wait for whole admission. A one-GPU request
+runs directly. The browser displays requested count, native PodSet admission,
+observed GPU initialization and successful worker results. Worker cards identify
+rank, node, actual CUDA device, CPU architecture and completed checks. They select
+the corresponding worker evidence; recorded snapshots remain seekable.
+
+This is **independent CUDA probes coordinated as one multi-worker job**. It does not
+claim partitioned model training, gradient synchronization, NCCL AllReduce, or linear
+speedup. Jetson time-slicing slots are not counted as additional physical GPUs.
+Slurm is not combined with Kubernetes into a single distributed compute job.
+
+Setup is additive: keep the original two-GPU lab pool and apply
+`examples/scheduler_lab/multi-gpu-resources.json`, label the three qualified physical
+GPU nodes `hairp.io/multi-gpu-poc=true`, and add the external `multi_gpu` config section.
+The image digest must resolve to the required amd64 and arm64 manifests, and the
+NVIDIA runtime handler must work on all selected nodes. Existing queues are unchanged;
+these pools can share hardware, so quotas do not imply exclusive ownership. The API
+rejects requests above the configured PoC capacity and detects changed GPU counts
+on idempotent retries. Do not raise the configured limit without qualifying the
+additional physical resources and adjusting the dedicated lab quota.
+
+The current 3-worker preflight completed on RTX 5060 Ti, RTX 5080 and GB10. Each
+worker emitted GPU_READY, BARRIER_RELEASED, COMPUTE_STARTED and COMPUTE_FINISHED.
+The GPU payload and architecture are observed from CUDA, not inferred from UI labels.
