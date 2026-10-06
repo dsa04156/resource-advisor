@@ -9,7 +9,9 @@ experiment has run on a physical RTX 5080 through Kueue, with measured results
 in PostgreSQL and MLflow. See the [hardware report](docs/gpu-experiment.md) for
 failures, raw measurements and limits. Separate [Slurm CUDA qualification](docs/slurm-verification.md)
 and [quota/priority enforcement](docs/slurm-policy.md) now have live evidence;
-its model/API path remains open. A separately qualified
+a bounded [browser → API → Orin → S3/MLflow result path](docs/slurm-api-results.md)
+now also passes, with the initial failed attempt retained. Full Slurm multi-user
+and recovery qualification remains open. A separately qualified
 [Hailo-8 ResNet-50 API path](docs/hailo-resnet50.md) now completes three
 observations, measured lookup, approval and a fourth verification, with matching
 PostgreSQL/S3/MLflow evidence. Earlier NPU model failures remain visible.
@@ -30,7 +32,8 @@ GPU utilization and Pi NPU execution remain unqualified; registration is not mod
 execution acceptance. An [isolated Orin runtime](docs/slurm-jetson-runtime-results.md)
 now passes its fixed GPU CNN gate under enforced memory limits. A subsequent
 [real Slurm CNN job](docs/slurm-cnn-contract-results.md) also emits a validated
-platform result envelope; full API submission and publication remain open.
+platform result envelope. The subsequent [browser/API trial](docs/slurm-api-results.md)
+now verifies real submission, result collection and publication.
 
 Open `/console` on the API origin for the [four-view research console](docs/console.md):
 resources/jobs, compatibility, queue/allocation history, and recommendation evidence.

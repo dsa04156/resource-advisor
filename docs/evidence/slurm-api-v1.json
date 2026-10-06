@@ -1,0 +1,260 @@
+{
+  "schema_version": "v1",
+  "scope": "one browser-submitted native Orin CNN success plus one retained failed attempt; not full Slurm qualification",
+  "source_commit": "dbe7e467778fcee526c86de654d9bf6392f3ceb2",
+  "job_id": "j-b78ca40b1b224e91b371557f8f4a04ed",
+  "attempt_id": "a-4555b2c054a84e8ba57d8cf9b66c8c99",
+  "external_id": "38",
+  "result_digest": "sha256:89b7ee04c3179645ac1c0d8fdda113bae5651be2bd7806ab4257069547d3cd3b",
+  "result": {
+    "schema_version": "v1",
+    "job_id": "j-b78ca40b1b224e91b371557f8f4a04ed",
+    "attempt_id": "a-4555b2c054a84e8ba57d8cf9b66c8c99",
+    "epoch": 1,
+    "workload_signature": "sha256:e9cf688cdf5357d023ad229974fcb2427559304dc2b00bdea5172c9cfeaa7140",
+    "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+    "outcome": "COMPLETED",
+    "measured": true,
+    "evidence_kind": "hardware",
+    "measurements": {
+      "elapsed_seconds": 0.011012711038347334,
+      "peak_memory_mib": 33.05615234375,
+      "quality_value": 1.0,
+      "sample_count": 10,
+      "work_units": 10,
+      "latency_p50_ms": 1.0756255069281906,
+      "latency_p95_ms": 1.1631639790721238,
+      "latency_p99_ms": 1.1631639790721238,
+      "throughput": 908.0416225558834,
+      "gpu_utilization": null,
+      "power_watts": null,
+      "temperature_celsius": null
+    },
+    "error_code": null
+  },
+  "ledger": [
+    {
+      "attempt_id": "a-4555b2c054a84e8ba57d8cf9b66c8c99",
+      "project": "ra-lab",
+      "backend": "slurm",
+      "device_class": "gpu",
+      "allocation_mode": "physical_device",
+      "allocated_device_seconds": 72.0,
+      "measured_compute_seconds": 0.011012711038347334,
+      "queue_seconds": 0.0,
+      "body": {
+        "schema_version": "v2",
+        "accelerator_model": "Orin",
+        "backend_cluster_id": "lab-slurm",
+        "job_id": "j-b78ca40b1b224e91b371557f8f4a04ed",
+        "outcome": "SUCCEEDED",
+        "error": null,
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "slurm:sacct AllocTRES",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "termination_receipt_ref": null,
+        "never_submitted": false,
+        "allocation_interval_seconds": 72.0,
+        "started_at": "2026-10-06T04:44:58+0000",
+        "backend_finished_at": "2026-10-06T04:46:10+0000",
+        "terminal_observed_at": "2026-10-06T04:46:15.866551+00:00",
+        "cancel_requested_at": null,
+        "cancel_dispatch_started_at": null,
+        "cancel_acknowledged_at": null,
+        "cancel_confirmed_at": null,
+        "cancel_dispatch_wait_seconds": null,
+        "cancel_confirmation_seconds": null,
+        "submitted_at": "2026-10-06T04:44:58+0000",
+        "submission_time_source": "scheduler",
+        "collection_seconds": 0.810707,
+        "preparation_seconds": null,
+        "container_runtime_seconds": null,
+        "allocated_cpu_seconds": 72.0,
+        "allocation_memory_mib": 1024.0,
+        "allocation_scope": "slurm:sacct AllocTRES",
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    }
+  ],
+  "mlflow_run_id": "421642e713e648edb4259fd596bb8f67",
+  "mlflow_status": "FINISHED",
+  "one_mlflow_run": true,
+  "one_ledger_row": true,
+  "matching_s3_api_mlflow_bytes": true,
+  "bundle_sha256": "abce0a5ff962d2ae4f5c6d6e4425a104b69787c39a64cd6c2c8ee18d31e97778",
+  "failed_attempt": {
+    "job": {
+      "job_id": "j-7b8a4fe971ea44d29d036f305a614a18",
+      "project_ref": "ra-lab",
+      "state": "FAILED",
+      "attempt_id": "a-cb07825d10154df28cfdb5c7d1995bdf",
+      "epoch": 1,
+      "created_at": "2026-10-06T04:41:04.706060+00:00",
+      "external_id": "37",
+      "workload_signature": "sha256:e9cf688cdf5357d023ad229974fcb2427559304dc2b00bdea5172c9cfeaa7140",
+      "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+      "error": "FAILED",
+      "result_digest": null,
+      "last_observation_error": null,
+      "last_observation_error_at": null,
+      "cancel_requested_at": null,
+      "cancel_dispatch_started_at": null,
+      "cancel_acknowledged_at": null,
+      "owner_lease_expires_at": null,
+      "owner_last_heartbeat_at": null
+    },
+    "ledger": [
+      {
+        "attempt_id": "a-cb07825d10154df28cfdb5c7d1995bdf",
+        "project": "ra-lab",
+        "backend": "slurm",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 74.0,
+        "measured_compute_seconds": null,
+        "queue_seconds": 1.0,
+        "body": {
+          "schema_version": "v2",
+          "accelerator_model": "Orin",
+          "backend_cluster_id": "lab-slurm",
+          "job_id": "j-7b8a4fe971ea44d29d036f305a614a18",
+          "outcome": "FAILED",
+          "error": "FAILED",
+          "result_valid": false,
+          "requested_resources": {
+            "host_cpu": 1.0,
+            "host_memory_mib": 1024,
+            "accelerator_count": 1
+          },
+          "observed_allocation": {
+            "source": "slurm:sacct AllocTRES",
+            "accelerator_count": 1.0,
+            "cpu": 1.0,
+            "memory_mib": 1024.0
+          },
+          "termination_receipt_ref": null,
+          "never_submitted": false,
+          "allocation_interval_seconds": 74.0,
+          "started_at": "2026-10-06T04:41:09+0000",
+          "backend_finished_at": "2026-10-06T04:42:23+0000",
+          "terminal_observed_at": "2026-10-06T04:42:25.964171+00:00",
+          "cancel_requested_at": null,
+          "cancel_dispatch_started_at": null,
+          "cancel_acknowledged_at": null,
+          "cancel_confirmed_at": null,
+          "cancel_dispatch_wait_seconds": null,
+          "cancel_confirmation_seconds": null,
+          "submitted_at": "2026-10-06T04:41:08+0000",
+          "submission_time_source": "scheduler",
+          "collection_seconds": null,
+          "preparation_seconds": null,
+          "container_runtime_seconds": null,
+          "allocated_cpu_seconds": 74.0,
+          "allocation_memory_mib": 1024.0,
+          "allocation_scope": "slurm:sacct AllocTRES",
+          "uncertainty": [
+            "QUEUE_WHOLE_SECOND_RESOLUTION"
+          ],
+          "semantics": "allocated reservations, not utilization; unknowns are null"
+        }
+      }
+    ],
+    "mlflow_run_id": "32622a0401334f02924f36d15b9be4a8",
+    "mlflow_status": "FAILED"
+  },
+  "qualification": {
+    "schema_version": "v1",
+    "result": "PASS",
+    "scope": "deterministic generated CNN numerical qualification, not model accuracy",
+    "torch": "2.5.0a0+872d972e41.nv24.08",
+    "cuda": "12.6",
+    "device": "Orin",
+    "capability": [
+      8,
+      7
+    ],
+    "cuda_arch_list": [
+      "sm_70",
+      "sm_72",
+      "sm_75",
+      "sm_80",
+      "sm_86",
+      "sm_87",
+      "compute_87"
+    ],
+    "input_shape": [
+      4,
+      3,
+      32,
+      32
+    ],
+    "precision": "fp32",
+    "seed": 20261006,
+    "input_sha256": "878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+    "weights_sha256": "b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+    "warmup_forwards": 3,
+    "measured_forwards": 10,
+    "compared_elements": 400,
+    "reference_rtol": 0.0001,
+    "reference_atol": 0.0001,
+    "max_absolute_error": 1.4901161193847656e-08,
+    "samples_seconds": [
+      0.0010515129542909563,
+      0.0012656940380111337,
+      0.0011361550423316658,
+      0.0010804740013554692,
+      0.0010657539824023843,
+      0.0011631639790721238,
+      0.001076376996934414,
+      0.0010558009962551296,
+      0.0010748740169219673,
+      0.00104290503077209
+    ],
+    "median_forward_ms": 1.0756255069281906,
+    "peak_tensor_allocation_mib": 33.05615234375,
+    "peak_process_rss_kib": 797052,
+    "cpu_fallback": false,
+    "enforced_boundary": {
+      "memory_max_bytes": 1073741824,
+      "swap_max_bytes": 0,
+      "memory_peak_bytes": 1070358528,
+      "cpu_affinity_count": 1
+    }
+  },
+  "native_manifest": {
+    "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+    "guard_digest": "sha256:20aff8754dccb7266565916cfeb3b085ac20ef23cfb1574b71f2fd959f0b4627",
+    "manifest_digest": "sha256:a50d7d73a4987d4d6f37441cc47bd6a25299c0464abda378763471d8f9a38033",
+    "file_count": 26649,
+    "unique_files": 25319,
+    "manifest_bytes": 5370331
+  },
+  "failure_correction": "Dedicated executor lacked read/write access to the qualified DRM render device. A named-user ACL and exact-device udev rule preserve existing device owner/group and scheduler controls. Controller/worker render numeric group IDs differ; broad controller group privileges were not granted.",
+  "total_gpu_reservation_seconds": 146.0,
+  "unknown": [
+    "GPU utilization",
+    "power",
+    "temperature",
+    "actual model CPU time"
+  ],
+  "limitations": [
+    "Generated numerical fixture, not trained model accuracy",
+    "Experimental native Jetson/runtime pairing, not vendor certification",
+    "Capability registration expires; future runs require current qualification",
+    "Hashing the full native runtime has large startup cost and charged file-cache pressure",
+    "No cross-user/cancel/failure-recovery or Pi NPU completion claim"
+  ],
+  "evidence_recorded_at": "2026-10-06T04:48:01.728756+00:00"
+}

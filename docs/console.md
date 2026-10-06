@@ -28,8 +28,17 @@ with 25 rows and an explicit total. Workload rows include their candidate lists.
 Job counters cover the whole authenticated project, not only the visible page.
 Latest inventory selection is performed in SQL rather than loading all snapshots.
 No command strings, backend credentials or object-store locations are added to
-these read models. The UI is read-only: it does not submit, approve, migrate,
-restart or cancel research workloads.
+these read models. Compatible candidate rows now offer an explicit **관측 실행**
+button, with requested accelerator count, CPU, memory and run-time limit. It calls
+the existing project-authenticated `POST /jobs` endpoint in `observe` mode;
+scheduler admission still determines when the workload runs. Incompatible or
+expired candidates cannot be submitted through this control. Approval, migration,
+restart and cancellation remain separate API operations.
+
+Submission disables duplicate clicks. An uncertain response retains its
+idempotency key in tab session storage; retrying the same candidate uses that key
+to recover the original request. Credentials remain in memory only. A successful
+response opens execution status, where subsequent polling observes the job.
 
 Expand a recommendation to call
 `GET /api/v1/compute/recommendations/{ref}/evidence`. It shows candidate means,
