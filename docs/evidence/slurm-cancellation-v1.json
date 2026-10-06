@@ -1,0 +1,180 @@
+{
+  "schema_version": "v1",
+  "source_commit": "008800edf68b1f3a77fe28704143713e69e57cc3",
+  "recorded_at": "2026-10-06T04:54:33.776915+00:00",
+  "scope": "one running GPU allocation cancelled through browser; same-account Linux owner filter and cross-project API denial; not two-project Slurm policy acceptance",
+  "job": {
+    "job_id": "j-87691e513847419ab1b85a20353b3f17",
+    "project_ref": "ra-lab",
+    "state": "CANCELED",
+    "attempt_id": "a-356252969ce7426f80a4289c733421d9",
+    "epoch": 1,
+    "created_at": "2026-10-06T04:52:41.300684+00:00",
+    "external_id": "40",
+    "workload_signature": "sha256:e9cf688cdf5357d023ad229974fcb2427559304dc2b00bdea5172c9cfeaa7140",
+    "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+    "error": null,
+    "result_digest": null,
+    "last_observation_error": null,
+    "last_observation_error_at": null,
+    "cancel_requested_at": "2026-10-06T04:53:08.420655+00:00",
+    "cancel_dispatch_started_at": "2026-10-06T04:53:11.591661+00:00",
+    "cancel_acknowledged_at": "2026-10-06T04:53:11.968685+00:00",
+    "owner_lease_expires_at": null,
+    "owner_last_heartbeat_at": null
+  },
+  "ledger": [
+    {
+      "attempt_id": "a-356252969ce7426f80a4289c733421d9",
+      "project": "ra-lab",
+      "backend": "slurm",
+      "device_class": "gpu",
+      "allocation_mode": "physical_device",
+      "allocated_device_seconds": 27.0,
+      "measured_compute_seconds": null,
+      "queue_seconds": 1.0,
+      "body": {
+        "schema_version": "v2",
+        "accelerator_model": "Orin",
+        "backend_cluster_id": "lab-slurm",
+        "job_id": "j-87691e513847419ab1b85a20353b3f17",
+        "outcome": "CANCELED",
+        "error": null,
+        "result_valid": false,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "slurm:sacct AllocTRES",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "termination_receipt_ref": null,
+        "never_submitted": false,
+        "allocation_interval_seconds": 27.0,
+        "started_at": "2026-10-06T04:52:44+0000",
+        "backend_finished_at": "2026-10-06T04:53:11+0000",
+        "terminal_observed_at": "2026-10-06T04:53:12.702777+00:00",
+        "cancel_requested_at": "2026-10-06T04:53:08.420655+00:00",
+        "cancel_dispatch_started_at": "2026-10-06T04:53:11.591661+00:00",
+        "cancel_acknowledged_at": "2026-10-06T04:53:11.968685+00:00",
+        "cancel_confirmed_at": "2026-10-06T04:53:12.702777+00:00",
+        "cancel_dispatch_wait_seconds": 3.171006,
+        "cancel_confirmation_seconds": 4.282122,
+        "submitted_at": "2026-10-06T04:52:43+0000",
+        "submission_time_source": "scheduler",
+        "collection_seconds": null,
+        "preparation_seconds": null,
+        "container_runtime_seconds": null,
+        "allocated_cpu_seconds": 27.0,
+        "allocation_memory_mib": 1024.0,
+        "allocation_scope": "slurm:sacct AllocTRES",
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    }
+  ],
+  "verification": {
+    "mlflow_run_id": "9451217e6a3441d8b9e1af7b8c2fc009",
+    "mlflow_status": "KILLED",
+    "one_mlflow_run": true,
+    "one_api_job": true,
+    "one_ledger_row": true,
+    "no_performance_result_profile_or_artifact": true,
+    "allocated_gpu_seconds": 27.0,
+    "cancel_confirmation_seconds": 4.282122
+  },
+  "cancel_responses": [
+    {
+      "status": 200,
+      "body": {
+        "job_id": "j-87691e513847419ab1b85a20353b3f17",
+        "project_ref": "ra-lab",
+        "state": "CANCEL_REQUESTED",
+        "attempt_id": "a-356252969ce7426f80a4289c733421d9",
+        "epoch": 1,
+        "created_at": "2026-10-06T04:52:41.300684+00:00",
+        "external_id": "40",
+        "workload_signature": "sha256:e9cf688cdf5357d023ad229974fcb2427559304dc2b00bdea5172c9cfeaa7140",
+        "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+        "error": null,
+        "result_digest": null,
+        "last_observation_error": null,
+        "last_observation_error_at": null,
+        "cancel_requested_at": "2026-10-06T04:53:08.420655+00:00",
+        "cancel_dispatch_started_at": null,
+        "cancel_acknowledged_at": null,
+        "owner_lease_expires_at": null,
+        "owner_last_heartbeat_at": null
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "job_id": "j-87691e513847419ab1b85a20353b3f17",
+        "project_ref": "ra-lab",
+        "state": "CANCELED",
+        "attempt_id": "a-356252969ce7426f80a4289c733421d9",
+        "epoch": 1,
+        "created_at": "2026-10-06T04:52:41.300684+00:00",
+        "external_id": "40",
+        "workload_signature": "sha256:e9cf688cdf5357d023ad229974fcb2427559304dc2b00bdea5172c9cfeaa7140",
+        "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+        "error": null,
+        "result_digest": null,
+        "last_observation_error": null,
+        "last_observation_error_at": null,
+        "cancel_requested_at": "2026-10-06T04:53:08.420655+00:00",
+        "cancel_dispatch_started_at": "2026-10-06T04:53:11.591661+00:00",
+        "cancel_acknowledged_at": "2026-10-06T04:53:11.968685+00:00",
+        "owner_lease_expires_at": null,
+        "owner_last_heartbeat_at": null
+      }
+    }
+  ],
+  "project_access_checks": [
+    {
+      "method": "GET",
+      "route": "/jobs/j-87691e513847419ab1b85a20353b3f17",
+      "status": 404
+    },
+    {
+      "method": "POST",
+      "route": "/jobs/j-87691e513847419ab1b85a20353b3f17/cancel",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "route": "/jobs/j-87691e513847419ab1b85a20353b3f17/artifacts",
+      "status": 404
+    }
+  ],
+  "foreign_held_job": {
+    "external_id": "39",
+    "gpu_requested": 1,
+    "started": false,
+    "allocated_gpu_seconds": 0,
+    "restricted_cancel_returncode": 0,
+    "unchanged_after_foreign_cancel": true,
+    "cleaned_up_by_owner": true
+  },
+  "scheduler_accounting_sanitized": [
+    "39|foreign-owner|ra-lab|ra-owner-held-v1|CANCELLED|0:0|0|None|2026-10-06T04:53:46|",
+    "40|scoped-executor|ra-lab|a-356252969ce7426f80a4289c733421d9|CANCELLED|0:0|27|2026-10-06T04:52:44|2026-10-06T04:53:11|billing=1,cpu=1,gres/gpu=1,mem=1G,node=1",
+    "40.batch||ra-lab|batch|FAILED|15:0|28|2026-10-06T04:52:44|2026-10-06T04:53:12|cpu=1,gres/gpu=1,mem=1G,node=1",
+    "40.0||ra-lab|python3|CANCELLED|0:15|27|2026-10-06T04:52:45|2026-10-06T04:53:12|cpu=1,gres/gpu=1,mem=1G,node=1"
+  ],
+  "queue_empty_after": true,
+  "no_executor_model_or_guard_processes_after": true,
+  "limitations": [
+    "Cancelled during native runtime verification before measured CNN output; no completed model or performance claim",
+    "Foreign-owner probe was held and never allocated; no GPU execution claim",
+    "Two Slurm project accounts, priority contention and crash/response-loss recovery remain separate gates",
+    "Scheduler parent interval is charged allocation; measured compute/utilization/power remain unknown"
+  ]
+}

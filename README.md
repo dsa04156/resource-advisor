@@ -37,6 +37,9 @@ now verifies real submission, result collection and publication.
 
 Open `/console` on the API origin for the [four-view research console](docs/console.md):
 resources/jobs, compatibility, queue/allocation history, and recommendation evidence.
+Compatible candidates offer observed execution; active jobs offer cancellation.
+[Actual Slurm cancellation](docs/slurm-cancellation.md) now verifies terminal
+confirmation, retained costs and project/owner filtering.
 
 The [approved GPU demo](docs/approved-gpu-demo.md) now connects fresh qualification,
 three observations, recommendation, approval and independent measured comparison.

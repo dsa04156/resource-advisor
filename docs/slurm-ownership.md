@@ -51,13 +51,16 @@ No fake scheduler output is published as a physical accelerator result.
 Controller connectivity and both worker registrations have recovered; the two
 allocation-free nodes now report `IDLE`. Fresh MUNGE authentication passed in both
 directions. See [the recovery evidence and remaining gates](slurm-recovery.md).
-The Pi accelerator is still absent, and full model/API execution is still pending.
+The Pi accelerator is still absent. The later [browser/API execution](slurm-api-results.md)
+and [console cancellation](slurm-cancellation.md) now have live evidence.
 The first new Orin PyTorch CNN Job completed with correct output, but runtime
 support and host-memory findings prevent automatic execution registration
 ([results](slurm-torch-results.md)).
 The separate [Jetson runtime follow-up](slurm-jetson-runtime-results.md) now passes
-the fixed CNN with native GPU code and enforced memory; scoped executor identities
-and full platform model delivery are still pending.
+the fixed CNN with native GPU code and enforced memory. Dedicated forced-SSH
+execution credentials and full result publication are now deployed; one real
+console cancellation and project/owner isolation check pass. Two-project Slurm
+policy and crash/response-loss recovery remain open.
 
 ## Previous lab observation — 2026-10-03 KST
 
