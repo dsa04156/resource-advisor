@@ -406,6 +406,40 @@ function resourcePanel(snapshot) {
   );
   return box;
 }
+const cancelling = new Set();
+function cancelButton(job) {
+  if (["SUCCEEDED", "FAILED", "CANCELED", "RESULT_INVALID", "REJECTED"].includes(job.state)) return null;
+  if (job.state === "CANCEL_REQUESTED") return el("small", "백엔드 종료 확인 중");
+  const button = el("button", cancelling.has(job.job_id) ? "취소 요청 중…" : "작업 취소");
+  button.setAttribute("aria-label", `작업 취소 · ${job.job_id}`);
+  button.disabled = cancelling.has(job.job_id);
+  button.onclick = async () => {
+    if (cancelling.has(job.job_id)) return;
+    const session = generation;
+    cancelling.add(job.job_id);
+    button.disabled = true;
+    button.textContent = "취소 요청 중…";
+    try {
+      const response = await fetch(API + "/jobs/" + encodeURIComponent(job.job_id) + "/cancel", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token },
+      });
+      if (!response.ok) throw new Error("취소 요청을 확인하지 못했습니다. 같은 작업에서 다시 요청할 수 있습니다.");
+      const current = await response.json();
+      if (session !== generation) return;
+      await load();
+      $("notice").textContent = current.state === "CANCEL_REQUESTED"
+        ? "취소를 요청했습니다. 백엔드 종료가 확인되면 상태가 바뀝니다."
+        : "현재 작업 상태: " + (states[current.state] || current.state);
+    } catch (error) {
+      if (session === generation) $("notice").textContent = error.message;
+    } finally {
+      cancelling.delete(job.job_id);
+      if (session === generation) render();
+    }
+  };
+  return button;
+}
 function jobRows() {
   return data.jobs.items.map((j) => [
     add(
@@ -421,6 +455,7 @@ function jobRows() {
       j.last_observation_error
         ? el("small", "최근 관측 오류: " + j.last_observation_error)
         : null,
+      cancelButton(j),
     ),
     add(
       el("div"),

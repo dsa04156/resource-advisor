@@ -32,8 +32,12 @@ these read models. Compatible candidate rows now offer an explicit **관측 실�
 button, with requested accelerator count, CPU, memory and run-time limit. It calls
 the existing project-authenticated `POST /jobs` endpoint in `observe` mode;
 scheduler admission still determines when the workload runs. Incompatible or
-expired candidates cannot be submitted through this control. Approval, migration,
-restart and cancellation remain separate API operations.
+expired candidates cannot be submitted through this control. Active execution rows
+offer **작업 취소**, using the same project-authenticated cancellation API. Repeated
+requests are idempotent. A cancellation request remains **백엔드 종료 확인 중** until
+the scheduler confirms termination; completion racing cancellation can still be
+reported as completed. Terminal rows have no cancellation control. Approval,
+migration and restart remain separate API operations.
 
 Submission disables duplicate clicks. An uncertain response retains its
 idempotency key in tab session storage; retrying the same candidate uses that key
