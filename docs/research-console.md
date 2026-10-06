@@ -79,3 +79,14 @@ stages and dependencies, and notebook cards pair readiness with start/stop actio
 
 API references: [MLflow REST](https://mlflow.org/docs/latest/api_reference/rest-api.html),
 [KFP service-account authentication](https://www.kubeflow.org/docs/components/pipelines/user-guides/core-functions/connect-api/).
+
+## Lab evidence (2026-10-06)
+
+All three integrations returned connected with real project-scoped records.
+Browser comparison selected two MLflow runs; artifact listing returned stored
+files. A browser-submitted automatic Kubeflow run completed, linked to exactly
+one successful platform GPU job. KFP driver/executor/task states were observed,
+not simulated. Desktop and 390px mobile layouts were inspected; no browser
+console errors or page-level horizontal overflow were found. Twenty focused
+checks passed. Existing notebook start/stop and KFP termination write semantics
+were tested with adapters; the live user notebook was not interrupted for testing.

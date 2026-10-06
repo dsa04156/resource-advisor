@@ -117,6 +117,16 @@ def create_app(
         workload_ref: str = Field(max_length=96)
         profile_ref: str = Field(max_length=96)
 
+    @app.get(PREFIX + "/jobs/{job_id}/view")
+    def job_operations_view(job_id: str, p=Depends(principal)):
+        from .console import job_view
+
+        with service.store.transaction() as conn:
+            row = service.store.job(conn, job_id)
+            if not row or row["project"] != p.project:
+                raise NotFound("job not found")
+            return job_view(service, conn, row)
+
     @app.post(PREFIX + "/jobs/{job_id}/retry")
     def retry_job(job_id: str, idempotency_key: str = Header(default=""), p=Depends(principal)):
         with service.store.transaction() as conn:

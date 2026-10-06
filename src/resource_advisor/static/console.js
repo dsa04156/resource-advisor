@@ -1967,7 +1967,7 @@ function experimentsView() {
   const rows=runs.map(r=>{
     const check=el("input");check.type="checkbox";check.checked=experimentSelection.has(r.run_id);check.disabled=!check.checked && experimentSelection.size>=4;check.setAttribute("aria-label","비교 선택 · "+r.name);check.onchange=()=>{check.checked?experimentSelection.set(r.run_id,r):experimentSelection.delete(r.run_id);render();};
     const metricEntries=Object.entries(r.metrics).filter(([k])=>/latency_p95|quality|throughput/.test(k)).slice(0,3);
-    return [check,add(el("div",null,"job-name"),el("strong",r.name),code(r.run_id)),badge(r.status,r.status==="FINISHED"?"good":r.status==="FAILED"?"warn":""),el("span",r.params.accelerator_model||r.params.backend||"—"),add(el("div"),...metricEntries.map(([k,v])=>el("small",`${k}: ${fmt(v)}`))),el("span",r.start_time?stamp(new Date(r.start_time).toISOString()):"—"),researchButton("상세 · 아티팩트",()=>openExperiment(r.run_id))];
+    return [check,add(el("div",null,"job-name"),el("strong",r.name),code(r.run_id)),badge(r.status,r.status==="FINISHED"?"good":r.status==="FAILED"?"warn":""),el("span",r.params.accelerator_model||r.params.backend||"—"),add(el("div"),...metricEntries.map(([k,v])=>el("small",`${k}: ${fmt(v)}`))),el("span",r.start_time?stamp(new Date(r.start_time).toISOString()):"—"),researchButton("상세 보기",()=>openExperiment(r.run_id))];
   });
   root.append(panel("실행 기록",`${runs.length}개 표시 · 최신 실행 순`,rows.length?table(["비교","실행","상태","실행 환경","주요 지표","시작","관리"],rows):empty("해당 실험에 실행 기록이 없습니다.")));
   if(researchRuns?.next_page_token)root.append(researchButton("다음 실행 보기",async()=>{researchRuns=await researchRequest("/runs?page_token="+encodeURIComponent(researchRuns.next_page_token)+(selectedExperiment?"&experiment_id="+encodeURIComponent(selectedExperiment):""));render();}));
@@ -2010,8 +2010,8 @@ async function openPipeline(ref) {
   const graph=el("div",null,"pipeline-graph");for(const task of run.graph){const observed=run.tasks.find(t=>t.display_name===task.name);graph.append(add(el("div",null,"pipeline-task"),el("small",task.dependencies.length?"선행: "+task.dependencies.join(" → "):"시작 단계"),el("strong",task.name),badge(observed?.state||"상태 미관측")));}body.append(graph);
   body.append(table(["단계","상태","시작","종료"],run.tasks.map(t=>[el("span",t.display_name),badge(t.state),el("span",stamp(t.start_time)),el("span",stamp(t.end_time))])));
   if(run.job_id)body.append(researchButton("연결된 컴퓨트 작업 보기",async()=>{
-    const response=await fetch(API+"/jobs/"+encodeURIComponent(run.job_id),{headers:authHeaders()});if(!response.ok)throw new Error("작업 기록을 조회하지 못했습니다.");const job=await response.json();
-    const known=data.jobs.items.find(j=>j.job_id===run.job_id);if(known)showJob(known);else{$("job-dialog-body").replaceChildren(details("연결된 작업",job));}
+    const response=await fetch(API+"/jobs/"+encodeURIComponent(run.job_id)+"/view",{headers:authHeaders()});if(!response.ok)throw new Error("작업 기록을 조회하지 못했습니다.");const job=await response.json();
+    showJob(job);
   }));
   if(!["SUCCEEDED","FAILED","CANCELED","CANCELLED","SKIPPED"].includes(run.state)){
     const stop=researchButton("파이프라인 중지",async()=>{if(stop.dataset.confirm!=="yes"){stop.dataset.confirm="yes";stop.textContent="중지 확인 · 연결 작업도 정리됩니다";return;}await researchRequest("/pipelines/"+encodeURIComponent(ref)+"/terminate",{});$("notice").textContent="중지를 요청했습니다. 실제 종료 상태는 갱신 후 확인하세요.";$("job-dialog").close();researchUpdated=0;await refreshResearch();});body.append(stop);
