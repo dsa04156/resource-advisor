@@ -3,10 +3,9 @@ from pathlib import Path
 
 import pytest
 
-
-check = runpy.run_path(
-    str(Path(__file__).parents[1] / "examples/verify_mlflow_server_outage.py")
-)["assert_gpu_requests"]
+check = runpy.run_path(str(Path(__file__).parents[1] / "examples/verify_mlflow_server_outage.py"))[
+    "assert_gpu_requests"
+]
 
 
 @pytest.mark.parametrize("memory", ["2048Mi", "2Gi", "2147483648"])
