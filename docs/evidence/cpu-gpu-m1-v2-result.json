@@ -1,0 +1,474 @@
+{
+  "schema_version": "cpu_gpu_m1_v2",
+  "status": "PASSED_BOUNDED_TWO_COMPUTE_STAGE_FIXTURE",
+  "source_commit": "b8d24f57bf42f18c40506a9d561f6569a5724639",
+  "source_ci": {
+    "run_id": 37498428045,
+    "conclusion": "success",
+    "url": "https://github.com/dsa04156/resource-advisor/actions/runs/37498428045"
+  },
+  "worker": {
+    "image_digest": "sha256:eabeb52f254b8180042d2839b4a7308146bb4b1620d969e43b2e9dabf110c1b2",
+    "source_tree_sha256": "6484067c7ef9cdeae95b8affaae1c7c7b6effa911655ca9375688268822885ce",
+    "release": {
+      "source_commit": "b8d24f57bf42f18c40506a9d561f6569a5724639",
+      "worker_source_hash_match": true,
+      "unchanged_existing_entities": 4477,
+      "unchanged_terminal_jobs": 591,
+      "unchanged_job_identities": 592,
+      "unchanged_ledgers": 591,
+      "unchanged_other_static_specs_uids": true,
+      "unchanged_secrets_pvc_quota": true,
+      "gitops_synced_healthy": true,
+      "gpu_jobs_submitted": 0
+    }
+  },
+  "pipeline": {
+    "kfp_run_id": "0bcd7480-8a4d-4759-b155-37b26b46ad17",
+    "kfp_state": "SUCCEEDED",
+    "uncached_two_step_dependency": true,
+    "gpu_api_created_after_cpu_result": true,
+    "distinct_attempts": true,
+    "exactly_two_compute_jobs_two_new_ledgers": true
+  },
+  "failure_preservation": {
+    "v1": "cpu-gpu-m1-v1-failure.json",
+    "v2_old_launcher_run_id": "436b87e2-c0b7-4ad6-a26c-5bf9a442730f",
+    "v2_old_launcher_state": "FAILED",
+    "reason": "argparse rejected --owner-lease-seconds; no API compute job created",
+    "successful_retry": "same compute run keys; only orchestration image updated; no repeated compute within v2"
+  },
+  "stages": {
+    "cpu": {
+      "job_id": "j-d6192ec60fc9466dacf2ca12c2c417ac",
+      "attempt_id": "a-fef0cff016174214bf35127afad0b9da",
+      "mlflow_run_id": "659755d82000463e8e917dc82e5b1b29",
+      "backend_uid_digest": "sha256:216c8d5cec0eeac69cf0c3b2acf2f33349cc61267ad0bf9f9fdca8932a3808c5",
+      "state": "SUCCEEDED",
+      "allocation": {
+        "source": "kubernetes:scheduled workload container requests",
+        "accelerator_count": 0.0,
+        "cpu": 1.0,
+        "memory_mib": 512.0
+      },
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-d6192ec60fc9466dacf2ca12c2c417ac",
+        "attempt_id": "a-fef0cff016174214bf35127afad0b9da",
+        "epoch": 1,
+        "workload_signature": "sha256:a2df6b7b198af2e8e7f7aabdcc495a87a8e8c73043c06c56b4d043574de4cb82",
+        "context_signature": "sha256:3fa9baa7b8ac24d7e173a1c50c25e559595f15821a2f2fbc8d4657335bf82d0b",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.02806854818481952,
+          "peak_memory_mib": 34.0625,
+          "quality_value": 1.0,
+          "sample_count": 5,
+          "work_units": 5,
+          "latency_p50_ms": 5.621409974992275,
+          "latency_p95_ms": 5.661797011271119,
+          "latency_p99_ms": 5.661797011271119,
+          "throughput": 178.1353266680241,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:0bebecaa0d7c98a4ee1051fdf9a75642ab74c9d8dc966c69892c34cea6f14c04",
+      "artifact_sha256": "dd05641e0c00e206e0002c8a66d6d29962dcda9e115243bad97c06700cbecb22",
+      "api_s3_mlflow_bytes_match": true,
+      "image_digest": "sha256:eabeb52f254b8180042d2839b4a7308146bb4b1620d969e43b2e9dabf110c1b2",
+      "usage": {
+        "device_class": "cpu",
+        "allocation_mode": "cpu_only",
+        "allocated_device_seconds": 0.0,
+        "measured_compute_seconds": 0.02806854818481952,
+        "queue_seconds": 0.0
+      },
+      "allocated_cpu_seconds": 1.0,
+      "mlflow_state": "FINISHED",
+      "native_admitted": true
+    },
+    "gpu": {
+      "job_id": "j-f3a1568407c646c093bbefdf5a20ff2f",
+      "attempt_id": "a-674081d0c99148b6b08c3a782df0f820",
+      "mlflow_run_id": "f05648109f964826907905d0f4a890dc",
+      "backend_uid_digest": "sha256:7630420aa068b544d21f5c83b25132691ed583bc3e28db33ad8ea0211a0da929",
+      "state": "SUCCEEDED",
+      "allocation": {
+        "source": "kubernetes:scheduled workload container requests",
+        "accelerator_count": 1.0,
+        "cpu": 1.0,
+        "memory_mib": 2048.0
+      },
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-f3a1568407c646c093bbefdf5a20ff2f",
+        "attempt_id": "a-674081d0c99148b6b08c3a782df0f820",
+        "epoch": 1,
+        "workload_signature": "sha256:7f914e76e408971cad9b79c86668c8d1c13bd040a5b555c5f7d4eec2f221fbf9",
+        "context_signature": "sha256:e90b00c26bf2038a7512f3fb5ae44c66a43dbb9af1619cdd097c1afc06c87b08",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.0002709953114390373,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.013182521797716618,
+          "latency_p95_ms": 0.014047953300178051,
+          "latency_p99_ms": 0.014047953300178051,
+          "throughput": 73802.01485330556,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:dfe0a336a6cbec495fb814631749dc3a471c20645c004550be4d3bbbacea43c1",
+      "artifact_sha256": "6b2f23b03fbed2d21f6cfec13461eed6e239fdbac67c2d156388aaeea50af46b",
+      "api_s3_mlflow_bytes_match": true,
+      "image_digest": "sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984",
+      "usage": {
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 2.0,
+        "measured_compute_seconds": 0.0002709953114390373,
+        "queue_seconds": 0.0
+      },
+      "allocated_cpu_seconds": 2.0,
+      "mlflow_state": "FINISHED",
+      "native_admitted": true
+    }
+  },
+  "compute_cost_records": [
+    {
+      "trial": "v1",
+      "kind": "qualification",
+      "stage": "cpu",
+      "scheduled_at": "2026-10-06T16:55:52Z",
+      "finished_at": "2026-10-06T16:56:01Z",
+      "cpu_core_reservation_proxy_seconds": 9.0,
+      "gpu_reservation_proxy_seconds": 0
+    },
+    {
+      "trial": "v2",
+      "kind": "qualification",
+      "stage": "cpu",
+      "scheduled_at": "2026-10-06T17:00:53Z",
+      "container_started_at": "2026-10-06T17:00:54Z",
+      "finished_at": "2026-10-06T17:00:54Z",
+      "cpu_core_reservation_proxy_seconds": 1.0,
+      "gpu_reservation_proxy_seconds": 0,
+      "allocation_scope": "Scheduled Pod requests through workload-container termination, not utilization or exact Kueue quota release."
+    },
+    {
+      "trial": "v2",
+      "kind": "api_compute",
+      "stage": "cpu",
+      "scheduled_at": "2026-10-06T17:05:30Z",
+      "finished_at": "2026-10-06T17:05:31Z",
+      "cpu_core_reservation_proxy_seconds": 1.0,
+      "gpu_reservation_proxy_seconds": 0.0,
+      "allocation_scope": "kubernetes:scheduled workload container requests"
+    },
+    {
+      "trial": "v1",
+      "kind": "qualification",
+      "stage": "gpu",
+      "scheduled_at": "2026-10-06T16:56:45Z",
+      "finished_at": "2026-10-06T16:56:47Z",
+      "cpu_core_reservation_proxy_seconds": 2.0,
+      "gpu_reservation_proxy_seconds": 2.0
+    },
+    {
+      "trial": "v2",
+      "kind": "qualification",
+      "stage": "gpu",
+      "scheduled_at": "2026-10-06T17:01:35Z",
+      "container_started_at": "2026-10-06T17:01:35Z",
+      "finished_at": "2026-10-06T17:01:37Z",
+      "cpu_core_reservation_proxy_seconds": 2.0,
+      "gpu_reservation_proxy_seconds": 2.0,
+      "allocation_scope": "Scheduled Pod requests through workload-container termination, not utilization or exact Kueue quota release."
+    },
+    {
+      "trial": "v2",
+      "kind": "api_compute",
+      "stage": "gpu",
+      "scheduled_at": "2026-10-06T17:06:13Z",
+      "finished_at": "2026-10-06T17:06:15Z",
+      "cpu_core_reservation_proxy_seconds": 2.0,
+      "gpu_reservation_proxy_seconds": 2.0,
+      "allocation_scope": "kubernetes:scheduled workload container requests"
+    }
+  ],
+  "cost_summary": {
+    "compute_jobs_all_trials": 6,
+    "compute_gpu_reservation_proxy_seconds": 6,
+    "compute_cpu_core_reservation_proxy_seconds": 17,
+    "kfp_main_cpu_core_reservation_proxy_seconds": 10.1,
+    "kfp_main_plus_compute_cpu_core_reservation_proxy_seconds": 27.1,
+    "whole_platform_cpu_cost": null,
+    "exact_kueue_quota_release_cost": null,
+    "semantics": "Requested resources from PodScheduled through named container termination; not utilization. Different CPU/GPU fixtures cannot imply speedup. Controller, init/wait containers and background platform costs are excluded from known subtotal."
+  },
+  "kfp_control_pods": [
+    {
+      "workflow": "failed_old_launcher",
+      "role": "driver",
+      "pod_uid_sha256": "7d4c6e30b81db795b7fa8afa17051b76ce64dbe94bb502a4858cb77fcdd3117d",
+      "phase": "Succeeded",
+      "main_exit_code": 0,
+      "main_requests": {
+        "cpu": "100m",
+        "memory": "64Mi"
+      },
+      "scheduled_at": "2026-10-06T17:02:38Z",
+      "main_started_at": "2026-10-06T17:02:49Z",
+      "main_finished_at": "2026-10-06T17:02:50Z",
+      "main_cpu_core_reservation_proxy_seconds": 1.2,
+      "accelerator_requested": false
+    },
+    {
+      "workflow": "failed_old_launcher",
+      "role": "launcher",
+      "pod_uid_sha256": "d4e9c15cb2c0254cbd508a5b2123fca6c3ec7d56af5d9d394fefe2ec76006222",
+      "phase": "Failed",
+      "main_exit_code": 1,
+      "main_requests": {
+        "cpu": "100m",
+        "memory": "128Mi"
+      },
+      "scheduled_at": "2026-10-06T17:03:01Z",
+      "main_started_at": "2026-10-06T17:03:16Z",
+      "main_finished_at": "2026-10-06T17:03:17Z",
+      "main_cpu_core_reservation_proxy_seconds": 1.6,
+      "accelerator_requested": false
+    },
+    {
+      "workflow": "failed_old_launcher",
+      "role": "driver",
+      "pod_uid_sha256": "ec591dde853662fc08801d0b55828eab3de289f290f60e3e9ccbba22bce40815",
+      "phase": "Succeeded",
+      "main_exit_code": 0,
+      "main_requests": {
+        "cpu": "100m",
+        "memory": "64Mi"
+      },
+      "scheduled_at": "2026-10-06T17:02:18Z",
+      "main_started_at": "2026-10-06T17:02:26Z",
+      "main_finished_at": "2026-10-06T17:02:27Z",
+      "main_cpu_core_reservation_proxy_seconds": 0.9,
+      "accelerator_requested": false
+    },
+    {
+      "workflow": "successful_retry",
+      "role": "driver",
+      "pod_uid_sha256": "281949c30357b3d4fdef270f211fdec8a8efeaf4228cfd17e638f148108a9c73",
+      "phase": "Succeeded",
+      "main_exit_code": 0,
+      "main_requests": {
+        "cpu": "100m",
+        "memory": "64Mi"
+      },
+      "scheduled_at": "2026-10-06T17:05:50Z",
+      "main_started_at": "2026-10-06T17:05:53Z",
+      "main_finished_at": "2026-10-06T17:05:55Z",
+      "main_cpu_core_reservation_proxy_seconds": 0.5,
+      "accelerator_requested": false
+    },
+    {
+      "workflow": "successful_retry",
+      "role": "driver",
+      "pod_uid_sha256": "fa3a8b86258391a535e42b4f1110175cae0bfeaaf56f2e74228279590a1a8bf2",
+      "phase": "Succeeded",
+      "main_exit_code": 0,
+      "main_requests": {
+        "cpu": "100m",
+        "memory": "64Mi"
+      },
+      "scheduled_at": "2026-10-06T17:04:55Z",
+      "main_started_at": "2026-10-06T17:05:01Z",
+      "main_finished_at": "2026-10-06T17:05:02Z",
+      "main_cpu_core_reservation_proxy_seconds": 0.7,
+      "accelerator_requested": false
+    },
+    {
+      "workflow": "successful_retry",
+      "role": "launcher",
+      "pod_uid_sha256": "08505fdb97982e3f66a027dccbe686f9ca8acc8a376c7924d73cbe490ce15b0b",
+      "phase": "Succeeded",
+      "main_exit_code": 0,
+      "main_requests": {
+        "cpu": "100m",
+        "memory": "128Mi"
+      },
+      "scheduled_at": "2026-10-06T17:06:00Z",
+      "main_started_at": "2026-10-06T17:06:08Z",
+      "main_finished_at": "2026-10-06T17:06:24Z",
+      "main_cpu_core_reservation_proxy_seconds": 2.4,
+      "accelerator_requested": false
+    },
+    {
+      "workflow": "successful_retry",
+      "role": "launcher",
+      "pod_uid_sha256": "fe5466e54054c4218c741dee2c896689c3af4de7d2362a9ee82a99da4d55c122",
+      "phase": "Succeeded",
+      "main_exit_code": 0,
+      "main_requests": {
+        "cpu": "100m",
+        "memory": "128Mi"
+      },
+      "scheduled_at": "2026-10-06T17:05:15Z",
+      "main_started_at": "2026-10-06T17:05:28Z",
+      "main_finished_at": "2026-10-06T17:05:39Z",
+      "main_cpu_core_reservation_proxy_seconds": 2.4,
+      "accelerator_requested": false
+    },
+    {
+      "workflow": "successful_retry",
+      "role": "driver",
+      "pod_uid_sha256": "e581d243abf5785d0d46c183c8152cf440f082818e9fe888a32cd155cacc502f",
+      "phase": "Succeeded",
+      "main_exit_code": 0,
+      "main_requests": {
+        "cpu": "100m",
+        "memory": "64Mi"
+      },
+      "scheduled_at": "2026-10-06T17:04:45Z",
+      "main_started_at": "2026-10-06T17:04:48Z",
+      "main_finished_at": "2026-10-06T17:04:49Z",
+      "main_cpu_core_reservation_proxy_seconds": 0.4,
+      "accelerator_requested": false
+    }
+  ],
+  "preservation": {
+    "unchanged_existing_entities": 4477,
+    "unchanged_job_identities": 592,
+    "unchanged_terminal_jobs": 591,
+    "unchanged_ledgers": 591,
+    "preserved_static_specs_uids_secrets_pvc_quota": true
+  },
+  "cleanup": {
+    "owned_qualification_jobs_deleted": true,
+    "api_native_jobs_retained_for_evidence": true,
+    "queue_released": true
+  },
+  "limits": [
+    "Execution dependency only; no dataset/model artifact transfer between stages",
+    "No new CPU-stage cancellation test; existing GPU cancellation/owner-loss evidence is separate",
+    "No trained-model accuracy, CPU/GPU speedup, optimal scheduling or whole-HAIRP completion claim"
+  ],
+  "qualification": {
+    "cpu": {
+      "capability": {
+        "observed_at": "2026-10-06T17:00:54Z",
+        "arch": "amd64",
+        "accelerator_vendor": "host",
+        "accelerator_model": "Intel(R) Core(TM) Ultra 9 285",
+        "device_class": "cpu",
+        "allocation_mode": "cpu_only",
+        "resource_key": null,
+        "runtime_versions": {
+          "python": "3.11.15"
+        },
+        "reservation_verified": true,
+        "isolation_verified": false
+      },
+      "result": {
+        "schema_version": "v1",
+        "job_id": "cpu-gpu-m1-v2-cpu-qualification",
+        "attempt_id": "cpu-gpu-m1-v2-cpu-qualification",
+        "epoch": 1,
+        "workload_signature": "sha256:a2df6b7b198af2e8e7f7aabdcc495a87a8e8c73043c06c56b4d043574de4cb82",
+        "context_signature": "sha256:3fa9baa7b8ac24d7e173a1c50c25e559595f15821a2f2fbc8d4657335bf82d0b",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.028728805016726255,
+          "peak_memory_mib": 34.3203125,
+          "quality_value": 1.0,
+          "sample_count": 5,
+          "work_units": 5,
+          "latency_p50_ms": 5.73739199899137,
+          "latency_p95_ms": 5.771443014964461,
+          "latency_p99_ms": 5.771443014964461,
+          "throughput": 174.0413496868018,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "quality_policy": {
+        "metric": "numerical_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 256.0,
+        "max_profile_age_seconds": 86400
+      },
+      "image_digest": "sha256:eabeb52f254b8180042d2839b4a7308146bb4b1620d969e43b2e9dabf110c1b2",
+      "result_digest": "sha256:ed47d43fef43bb971669e5012f82a970f031085056b1b9c316495351a8631ed3",
+      "source_sha256": "cba2f5b58a902111ce01b8f14abdc3c9b36688adabb95fdc125c89f85403bac3"
+    },
+    "gpu": {
+      "capability": {
+        "observed_at": "2026-10-06T17:01:37Z",
+        "arch": "amd64",
+        "accelerator_vendor": "nvidia",
+        "accelerator_model": "NVIDIA GeForce RTX 5080",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "resource_key": "nvidia.com/gpu",
+        "runtime_versions": {
+          "pytorch": "2.8.0+cu128",
+          "cuda": "12.8"
+        },
+        "reservation_verified": true,
+        "isolation_verified": false
+      },
+      "result": {
+        "schema_version": "v1",
+        "job_id": "cpu-gpu-m1-v2-gpu-qualification",
+        "attempt_id": "cpu-gpu-m1-v2-gpu-qualification",
+        "epoch": 1,
+        "workload_signature": "sha256:7f914e76e408971cad9b79c86668c8d1c13bd040a5b555c5f7d4eec2f221fbf9",
+        "context_signature": "sha256:e90b00c26bf2038a7512f3fb5ae44c66a43dbb9af1619cdd097c1afc06c87b08",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.00028114463202655315,
+          "peak_memory_mib": 9.125,
+          "quality_value": 1.0,
+          "sample_count": 20,
+          "work_units": 20,
+          "latency_p50_ms": 0.013842480257153511,
+          "latency_p95_ms": 0.014330027624964714,
+          "latency_p99_ms": 0.014330027624964714,
+          "throughput": 71137.76228212341,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "quality_policy": {
+        "metric": "numerical_agreement",
+        "minimum": 0.99,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 86400
+      },
+      "image_digest": "sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984",
+      "result_digest": "sha256:5c0b10ae1e9884ca9a8d7df0c016a1f8f60c185f21663fed839d69882383ae6f"
+    }
+  }
+}

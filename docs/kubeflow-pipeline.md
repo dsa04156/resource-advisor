@@ -1,5 +1,18 @@
 # Kubeflow launches; the compute backend owns the GPU
 
+For the separate two-compute-stage example, compile
+`examples/cpu_gpu_pipeline.py --output <pipeline-package.yaml>` with the same
+SDK environment. It runs a validated CPU API Job before creating a distinct
+GPU API Job, disables caching on both tasks, and uses separate stable run keys.
+Both launcher tasks request CPU only; the worker submits the actual workloads.
+Use a digest-pinned launcher supporting `--owner-lease-seconds` and registered,
+qualified CPU/GPU workload/candidate references. The API token and CA remain in
+the existing Secret, not notebook source or pipeline parameters.
+The [actual two-stage result](cpu-gpu-pipeline-results.md) includes the first
+old-launcher failure, successful retry, result/MLflow/artifact/ledger identities
+and all compute costs. This is an execution dependency; it does not transfer a
+dataset or model artifact between tasks.
+
 `examples/pipeline.py` contains a CPU-only, uncached launcher. It submits a
 registered workload/candidate through the authenticated Compute API, polls the
 job and fails the pipeline if the backend result is unsuccessful. A stable

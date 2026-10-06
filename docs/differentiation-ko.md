@@ -69,6 +69,7 @@ Slurm의 시간 분할 gang scheduling과 여러 Pod의 동시 입장은 의미�
 - 실패한 모델 검증과 불확실한 추천도 남기며, 추가 측정 비용까지 보고.
 - 큐·할당·실행 흐름과 그 시점의 노드 상태를 재생하는 운영 화면.
 - 연구 코드 수정 없이 기존 CUDA 프로세스·노드·GPU를 관측하고 프로젝트별로 기록 조회.
+- 캐시 없는 CPU 계산 완료 후 별도 GPU 계산을 실행하고, 단계별 결과·MLflow·사용량을 확인.
 
 성능 우수성은 별도 실험 주장이다. [정책 비교](policy-comparison-v2.md)에서는
 BO의 선택 우위가 확인되지 않았다. [운영 비교](operational-comparison.md)에서도
@@ -120,8 +121,12 @@ Slurm Pi의 NPU는 실제 PCIe 탐지와 모델 실행 근거가
 2026-10-07 읽기 전용 재확인에서도 같은 Slurm 작업은 `CANCEL_REQUESTED`이며
 네이티브 종료·원장 비용을 조회할 수 없었다. Pi는 접속 가능하고 CPU는 보이지만,
 PCIe 링크가 내려가 DEEPX/Hailo 가속기 endpoint가 탐지되지 않았다. 기존 작업을
-다시 제출하거나 상태를 성공으로 바꾸지 않았다. 한편 KFP의 CPU-only launcher는
-워크플로 제어용이며, 원본의 별도 CPU 계산 Job 결과 검증을 대신하는 근거가 아니다.
+다시 제출하거나 상태를 성공으로 바꾸지 않았다. KFP의 CPU-only launcher는
+워크플로 제어용이다. 별도로 [실제 CPU→GPU 계산 시험](cpu-gpu-pipeline-results.md)을
+수행해 캐시 없는 순차 실행, 두 검증 결과·MLflow·원장을 확인했다. 처음 준비한
+계약 오류와 오래된 launcher 실패도 보존했다. 전체 계산 비용은 6 GPU초/
+17 CPU core초이며 KFP main container 비용 10.1 CPU core초는 별도로 기록했다.
+서로 다른 CPU/GPU fixture의 시간 차이를 성능 우위로 표시하지 않았다.
 
 현재 스키마의 [독립 DB 복구](restore-rehearsal.md)는 7개 테이블의 25,771개
 레코드, 결과 파일 567개, MLflow·사용량 연결 582건, 기록된 스케줄링 실험

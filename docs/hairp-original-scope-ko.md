@@ -46,7 +46,7 @@ MLflow는 실험 파라미터·측정값·결과 파일을 기록한다
 | 3–4 공통 작업 모델·라우터 | ComputeJob/Attempt/RuntimeVariant/SchedulingProfile과 네이티브 adapter 구현 | 최초 ResearchJob 요구의 SLA/dependency/다중 노드 HPC 의미를 현재 계약과 대조하고 실제 지원 여부 검증 |
 | 5 Kueue | 두 프로젝트 큐·쿼터·우선순위·실제 GPU 대기/입장 검증 | 예시 4/8 GPU 쿼터는 현재 장비 용량과 분리해 재현 가능한 lab 설정으로 제공; 대규모 공정성은 미검증 |
 | 6 Slurm | 실제 Orin GPU 제출·조회·취소·결과·QOS·응답 유실 복구 검증 | [두 프로젝트 시험](slurm-project-isolation.md)의 제한·접근 차단·양방향 선행은 관측; 연결 장애 후 마지막 작업 종료·비용 및 전체 수용시험은 미완료 |
-| 7 Kubeflow | 실제 launcher 파이프라인과 콘솔 제출/상태 연결 | 최초 Benchmark/Training/Edge Deployment/Runtime Evaluation 네 종류 전체를 실제 용도로 실행·연결 |
+| 7 Kubeflow | 캐시 없는 실제 CPU→GPU 계산·결과 검증과 콘솔 제출/상태 연결 ([측정 보고](cpu-gpu-pipeline-results.md)) | 최초 Benchmark/Training/Edge Deployment/Runtime Evaluation 네 종류 전체를 실제 용도로 실행·연결; 현재 두 계산의 실행 의존성은 데이터/모델 전달 근거가 아님 |
 | 8 MLflow | 실제 실행 metadata·측정·artifact 및 실패/취소 tracking | 모든 요구 metric/환경 metadata의 장치별 수집, 모델 버전 lifecycle 및 전체 pipeline artifact 범위 |
 | 9–10 하드웨어/작업 프로파일·장치 탐지 | 정적 capability와 동적 inventory를 분리하고 검증된 GPU/Hailo/Orin 계약 제공 | 최초 공통 HardwareProfile/WorkloadProfile 대응, AMD 및 vendor NPU plugin의 지원표와 실제 장비별 검증 |
 | 11–12 HAMi·간섭 모델 | 공유 슬롯과 물리 장치를 구분; M7 확장은 현재 미완료 | 실제 HAMi 논리 할당과 물리 사용량의 동시 관측, 동시 실행 slowdown, A/B/C 비교 |
