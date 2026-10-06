@@ -24,9 +24,10 @@ flowchart TD
 - Bindings map each backend/cluster to administrator-provisioned LocalQueue /
   WorkloadPriorityClass or Account / QOS / Partition. These names must match the
   worker route. Changing a profile never edits `slurm.conf` or provisions queues.
-- The compiler filters workload candidates, then orders by backend preference and
-  candidate reference. This initial deterministic policy does **not** predict
-  performance, inspect current free capacity, migrate running jobs or replace
+- The compiler filters workload candidates, then prefers fresh observed request headroom, busy candidates, and unknown
+  capacity, in that order. Backend preference and candidate reference break ties.
+  This initial deterministic policy does **not** predict
+  performance, migrate running jobs or replace
   the Placement Engine. A preview is not an admission or resource reservation.
 - Priority is a backend-local mapping; it does not promise equal priority across
   schedulers, immediate execution, or Kubernetes Pod priority/preemption.
@@ -102,13 +103,43 @@ Kubernetes jobs using the normal profile completed on RTX 5060 Ti, NVIDIA GB10
 this confirms the submission/result path, not comparative AI-model performance.
 A separate existing Hailo ResNet50 workload also completed.
 
-Current catalog workloads are device-specific (one candidate each). The backend
-preference therefore does not manufacture an alternative executable. Selection
-between two compatible backend candidates is covered by a contract fixture;
-a real equivalent-workload comparison across both backends remains future work.
+At the initial rollout catalog workloads were device-specific (one candidate each).
+The subsequent workload-first update combines the identical CUDA workload into
+four qualified device candidates. An equivalent-workload comparison across
+Kubernetes and Slurm remains future work.
 Vendor NPUs without a validated compiled-model workload remain unavailable for
 submission. Dedicated lab queues and RuntimeClass settings are privately
 provisioned; they have not been converted into a portable GitOps lab overlay.
 
 The browser-submitted Slurm Orin CNN job also completed through the same profile
 preview and digest-checked submission API, using the existing Account/QOS route.
+
+## Workload-first automatic submission
+
+The default UI selects a **workload**, not a GPU. Send `POST /jobs` with
+`workload_ref`, `scheduling_profile_ref`, `mode:"observe"` and an Idempotency-Key,
+omitting both `candidate_ref` and `scheduling_plan_digest`. The server compiles
+and saves its actual choice in the same job-creation transaction. Retries return
+the original job. An optional preview shows current candidates, but automatic
+submission reevaluates at acceptance time. Explicit candidate/digest submission
+remains available as an advanced fixed-target option.
+
+Fresh project-scoped inventory contributes CPU, memory and typed accelerator
+request headroom. Observed down/draining nodes are excluded; stale/missing values
+remain unknown. Busy candidates remain eligible so the native scheduler can
+queue jobs. This is a routing heuristic, not an atomic reservation or physical
+GPU-utilization model. Kueue/Slurm still enforce admission, quotas and allocation.
+Concurrent submissions can choose the same target; native queueing arbitrates.
+
+The UI shows workload → candidate checks → resource selection → backend queue →
+execution → result. Candidate rows expose observed state, time, exclusion reasons
+and selection. Job progress uses recorded submission/start/result state; it does
+not invent admission times or call a queue submission a running task. Details
+retain the selection-time evidence while queue status refreshes from the backend.
+Templates can omit `candidate_ref` and preserve automatic selection.
+
+`examples/combine_workload.py` groups existing qualified device bundles only when
+project, logical workload identity and quality contract are identical. It does
+not make CUDA code executable on NPUs or convert vendor model formats. The lab
+GPU smoke workload has four compatible candidates; other workloads can correctly
+have just one. Arbitrary new code/model execution still requires runtime registration.

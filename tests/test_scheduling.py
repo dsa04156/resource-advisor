@@ -233,3 +233,100 @@ def test_auto_selection_and_slurm_qos_are_compiled_above_backends(service, bundl
     backend.qos = "changed"
     with pytest.raises(BackendError, match="SCHEDULING_BINDING_DRIFT"):
         backend.script(row)
+
+
+@pytest.mark.parametrize("headroom,expected", [(1, "spare"), (0, "base")])
+def test_automatic_job_selects_fresh_capacity_and_queues_when_busy(
+    service, bundle, headroom, expected
+):
+    from test_worker import SchedulerDouble
+
+    from resource_advisor.contracts import JobTemplate, now
+    from resource_advisor.inventory import save_inventory, signal
+    from resource_advisor.worker import Worker
+
+    spec, candidate, variant, cap = bundle
+    spare_cap = cap.model_copy(update={"ref": "spare-cap", "node_ref": "spare-node"})
+    spare = candidate.model_copy(update={"ref": "spare", "capability_ref": spare_cap.ref})
+    service.operational_mode = True
+    spec = spec.model_copy(update={"ref": "auto-work", "candidates": (candidate, spare)})
+    variant = variant.model_copy(update={"ref": "auto-variant", "workload_ref": spec.ref})
+    spec = spec.model_copy(
+        update={
+            "candidates": tuple(
+                c.model_copy(update={"variant_ref": variant.ref}) for c in spec.candidates
+            )
+        }
+    )
+    for kind, model in [
+        ("capability", spare_cap),
+        ("variant", variant),
+        ("workload", spec),
+        ("scheduling_profile", profile()),
+    ]:
+        service.register(kind, model, "team-a")
+    observed = now().isoformat()
+
+    def node(ref, free):
+        return {
+            "node_ref": ref,
+            "ready": signal(True, observed_at=observed, source="fixture"),
+            "resources": {
+                key: {"request_headroom": signal(value, observed_at=observed, source="fixture")}
+                for key, value in {"cpu": 2, "memory": 2**30, "nvidia.com/gpu": free}.items()
+            },
+        }
+
+    save_inventory(
+        service.store,
+        "team-a",
+        {
+            "ref": "inventory-fixture",
+            "cluster_ref": "lab",
+            "collected_at": observed,
+            "stale_after_seconds": 120,
+            "status": "ok",
+            "nodes": [node(cap.node_ref, 0), node(spare_cap.node_ref, headroom)],
+        },
+    )
+    service.register_template(
+        "team-a",
+        JobTemplate(
+            ref="auto-template",
+            name="Auto",
+            workload_ref=spec.ref,
+            max_run_seconds=30,
+            max_queue_seconds=90,
+        ),
+    )
+    request = JobRequest(
+        workload_ref=spec.ref, scheduling_profile_ref="interactive-v1", template_ref="auto-template"
+    )
+    job = service.submit("team-a", request, "automatic")
+    # Reusing the same request never selects or submits a second job.
+    assert service.submit("team-a", request, "automatic")["job_id"] == job["job_id"]
+    with service.store.transaction() as conn:
+        saved = service.store.job(conn, job["job_id"])["body"]
+    assert saved["candidate"]["ref"] == expected
+    assert len(saved["scheduling_plan"]["evaluation"]) == 2
+    backend = SchedulerDouble()
+    assert Worker(service, {("team-a", "lab"): backend}).submit_one()
+    assert service.get_job("team-a", job["job_id"])["state"] == "QUEUED"
+
+
+def test_stale_capacity_does_not_claim_available(bundle):
+    from resource_advisor.scheduling import availability
+
+    _, candidate, _, cap = bundle
+    observations = {
+        ("kubernetes", cap.node_ref): {
+            "snapshot_ref": "old",
+            "collected_at": "old",
+            "node": {
+                "resources": {
+                    "nvidia.com/gpu": {"request_headroom": {"status": "stale", "value": 10}}
+                }
+            },
+        }
+    }
+    assert availability(candidate, cap, observations)["status"] == "unknown"

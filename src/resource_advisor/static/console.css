@@ -931,3 +931,16 @@ button { border-radius: 10px; min-height: 40px; }
  .incident-row { align-items:flex-start; flex-direction:column; gap:12px; }
  .queue-cards { grid-template-columns:1fr; }
 }
+
+/* Workload-first decision trace: observations, not fabricated progress. */
+.scheduling-flow { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; list-style:none; padding:0; margin:24px 0; }
+.scheduling-flow li { min-width:0; padding:16px 12px; border:1px solid var(--line,#e5e5e8); border-radius:12px; background:#f5f5f7; display:flex; flex-direction:column; gap:8px; }
+.scheduling-flow .flow-number { width:26px; height:26px; border-radius:50%; display:grid; place-items:center; background:#e5e5e8; font-size:12px; font-weight:600; }
+.scheduling-flow li.done { background:#eef6ff; border-color:#c8dff5; }
+.scheduling-flow li.done .flow-number { background:#0071e3; color:white; }
+.scheduling-flow li[aria-current="step"] { border-color:#0071e3; }
+.scheduling-flow li.failed { background:#fff2f0; border-color:#e8b9b1; }
+.scheduling-flow small { overflow-wrap:anywhere; }
+.job-form .scheduling-flow { grid-column:1/-1; }
+@media(max-width:900px) { .scheduling-flow { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media(max-width:520px) { .scheduling-flow { grid-template-columns:repeat(2,minmax(0,1fr)); } }

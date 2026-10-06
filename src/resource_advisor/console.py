@@ -266,7 +266,8 @@ def overview(
                         "candidates": [
                             c
                             for c in source["candidates"]
-                            if c["candidate_ref"] == template["candidate_ref"]
+                            if template.get("candidate_ref") is None
+                            or c["candidate_ref"] == template["candidate_ref"]
                         ],
                     }
                 )

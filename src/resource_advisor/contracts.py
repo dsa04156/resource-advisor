@@ -303,7 +303,7 @@ class JobTemplate(Contract):
     ref: Ref
     name: str = Field(min_length=1, max_length=100)
     workload_ref: Ref
-    candidate_ref: Ref
+    candidate_ref: Ref | None = None
     priority: Literal["normal", "high"] = "normal"
     max_run_seconds: int = Field(ge=1, le=86400)
     max_queue_seconds: int = Field(ge=1, le=86400)
@@ -314,7 +314,7 @@ class JobRequest(Contract):
     scheduling_plan_digest: Digest | None = None
     template_ref: Ref | None = None
     workload_ref: Ref
-    candidate_ref: Ref
+    candidate_ref: Ref | None = None
     mode: Literal["fixed", "observe", "pilot", "confirmation"] = "observe"
     approval_ref: Ref | None = None
     study_ref: Ref | None = None

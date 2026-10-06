@@ -74,9 +74,11 @@ class Service:
 
     def register_template(self, project, template):
         with self.store.transaction() as conn:
-            spec, candidate, variant, cap = self.bundle(
-                conn, project, template.workload_ref, template.candidate_ref
+            spec = WorkloadSpec.model_validate(
+                required(self.store, conn, "workload", template.workload_ref, project)
             )
+            if template.candidate_ref is not None:
+                self.bundle(conn, project, template.workload_ref, template.candidate_ref)
             self.template_spec(spec, template)
             # Reference existing execution bindings; never synthesize verification or a new command.
             return self.store.put(
@@ -147,6 +149,41 @@ class Service:
                     if existing["request_digest"] != request_digest:
                         raise Conflict("idempotency key reused with different request")
                     return self.public_job(existing)
+                automatic_plan = None
+                if request.candidate_ref is None:
+                    if (
+                        not request.scheduling_profile_ref
+                        or request.mode != "observe"
+                        or request.approval_ref
+                        or request.study_ref
+                        or request.probe_plan_ref
+                        or request.scheduling_plan_digest
+                    ):
+                        raise Rejected(
+                            "Automatic scheduling requires an observe request and profile"
+                        )
+                    from .scheduling import SchedulingPlanRequest, compile_plan
+
+                    automatic_plan = compile_plan(
+                        self,
+                        conn,
+                        project,
+                        SchedulingPlanRequest(
+                            profile_ref=request.scheduling_profile_ref,
+                            workload_ref=request.workload_ref,
+                            template_ref=request.template_ref,
+                        ),
+                    )
+                    if not automatic_plan["accepted"]:
+                        raise Rejected(
+                            "SCHEDULING_POLICY_REJECTED: " + str(automatic_plan["excluded"])
+                        )
+                    request = request.model_copy(
+                        update={
+                            "candidate_ref": automatic_plan["plan"]["candidate_ref"],
+                            "scheduling_plan_digest": automatic_plan["digest"],
+                        }
+                    )
                 spec, candidate, variant, cap = self.bundle(
                     conn, project, request.workload_ref, request.candidate_ref
                 )
@@ -161,7 +198,10 @@ class Service:
                         or request.study_ref
                         or request.probe_plan_ref
                         or template.workload_ref != request.workload_ref
-                        or template.candidate_ref != request.candidate_ref
+                        or (
+                            template.candidate_ref is not None
+                            and template.candidate_ref != request.candidate_ref
+                        )
                     ):
                         raise Rejected("템플릿과 작업 요청이 일치하지 않습니다.")
                     spec = self.template_spec(spec, template)
@@ -180,7 +220,7 @@ class Service:
                         )
                     from .scheduling import SchedulingPlanRequest, apply_plan, compile_plan
 
-                    compiled = compile_plan(
+                    compiled = automatic_plan or compile_plan(
                         self,
                         conn,
                         project,

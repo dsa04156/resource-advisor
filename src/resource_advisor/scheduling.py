@@ -7,9 +7,12 @@ cluster configuration nor claim a quota shared across independent schedulers.
 from typing import Literal
 
 from pydantic import Field, model_validator
+from sqlalchemy import func, select
 
 from .contracts import Contract, Ref, Resources, WorkloadSpec, signature
+from .inventory import fresh_view
 from .policy import execution_compatibility
+from .store import entities
 
 
 class SchedulingPolicy(Contract):
@@ -108,6 +111,80 @@ class SchedulingPlanRequest(Contract):
     backend: Literal["auto", "kubernetes", "slurm"] = "auto"
 
 
+def node_observations(conn, project):
+    """Latest authorized inventory per cluster; missing telemetry stays unknown."""
+    ranked = (
+        select(
+            entities.c.ref,
+            func.row_number()
+            .over(
+                partition_by=entities.c.body["cluster_ref"].as_string(),
+                order_by=(entities.c.created_at.desc(), entities.c.ref.desc()),
+            )
+            .label("rank"),
+        )
+        .where(entities.c.kind == "inventory", entities.c.project == project)
+        .subquery()
+    )
+    rows = conn.execute(
+        select(entities.c.body)
+        .join(ranked, entities.c.ref == ranked.c.ref)
+        .where(entities.c.kind == "inventory", entities.c.project == project, ranked.c.rank == 1)
+    ).scalars()
+    result = {}
+    for raw in rows:
+        snapshot = fresh_view(raw)
+        for node in snapshot["nodes"]:
+            key = (snapshot.get("backend", "kubernetes"), node["node_ref"])
+            observation = {
+                "snapshot_ref": snapshot["ref"],
+                "collected_at": snapshot["collected_at"],
+                "node": node,
+            }
+            if key not in result or observation["collected_at"] > result[key]["collected_at"]:
+                result[key] = observation
+    return result
+
+
+def availability(candidate, cap, observations):
+    observed = observations.get((str(candidate.backend), cap.node_ref))
+    if observed is None:
+        return {"status": "unknown", "reason": "NO_FRESH_INVENTORY", "headroom": {}}
+    node = observed["node"]
+
+    def value(signal):
+        return signal.get("value") if signal and signal.get("status") == "ok" else None
+
+    result = {
+        "snapshot_ref": observed["snapshot_ref"],
+        "collected_at": observed["collected_at"],
+        "headroom": {},
+    }
+    states = value(node.get("scheduler_state")) or []
+    if value(node.get("ready")) is False or any(
+        x in str(states).upper() for x in ["DOWN", "DRAIN", "FAIL"]
+    ):
+        return {**result, "status": "unavailable", "reason": "OBSERVED_NODE_UNAVAILABLE"}
+    resources = candidate.context.resources
+    required = {"cpu": resources.host_cpu, "memory": resources.host_memory_mib * 2**20}
+    if resources.accelerator_count:
+        required[cap.resource_key] = resources.accelerator_count
+    for key in required:
+        result["headroom"][key] = value(
+            node.get("resources", {}).get(key, {}).get("request_headroom")
+        )
+    if any(v is not None and v < required[k] for k, v in result["headroom"].items()):
+        return {**result, "status": "busy", "reason": "WAIT_FOR_BACKEND_RESOURCES"}
+    if any(v is None for v in result["headroom"].values()):
+        return {**result, "status": "unknown", "reason": "NO_FRESH_INVENTORY"}
+    return {**result, "status": "available", "reason": "OBSERVED_REQUEST_HEADROOM"}
+
+
+def plan_digest(plan):
+    # Inventory evidence may refresh without changing the actual execution plan.
+    return signature({k: v for k, v in plan.items() if k != "evaluation"})
+
+
 def compile_plan(service, conn, project, request):
     from .contracts import JobTemplate
     from .service import NotFound, Rejected, required
@@ -124,12 +201,17 @@ def compile_plan(service, conn, project, request):
         template = JobTemplate.model_validate(
             required(service.store, conn, "job_template", request.template_ref, project)
         )
-        if template.workload_ref != spec.ref or request.candidate_ref not in {
-            None,
-            template.candidate_ref,
-        }:
+        if template.workload_ref != spec.ref or (
+            template.candidate_ref is not None
+            and request.candidate_ref
+            not in {
+                None,
+                template.candidate_ref,
+            }
+        ):
             raise ValueError("template does not match the requested workload/candidate")
-        request = request.model_copy(update={"candidate_ref": template.candidate_ref})
+        if template.candidate_ref is not None:
+            request = request.model_copy(update={"candidate_ref": template.candidate_ref})
         spec = service.template_spec(spec, template)
     policy = profile.policy
     common = []
@@ -144,6 +226,8 @@ def compile_plan(service, conn, project, request):
         common.append("CANDIDATE_NOT_FOUND")
     excluded = {}
     eligible = []
+    evaluation = []
+    observations = node_observations(conn, project)
     for candidate in candidates:
         errors = list(common)
         try:
@@ -182,10 +266,25 @@ def compile_plan(service, conn, project, request):
             errors.append("SCHEDULER_BINDING_MISSING")
         elif policy.priority not in binding.priority_map:
             errors.append("PRIORITY_UNSUPPORTED")
+        live = availability(candidate, cap, observations)
+        if live["status"] == "unavailable":
+            errors.append(live["reason"])
+        evaluation.append(
+            {
+                "candidate_ref": candidate.ref,
+                "node_ref": cap.node_ref,
+                "backend": str(candidate.backend),
+                "model": cap.accelerator_model,
+                "availability": live,
+                "resources": candidate.context.resources.model_dump(mode="json"),
+                "eligible": not errors,
+                "reasons": list(dict.fromkeys(errors)),
+            }
+        )
         if errors:
             excluded[candidate.ref] = list(dict.fromkeys(errors))
         else:
-            eligible.append((candidate, cap, binding))
+            eligible.append((candidate, cap, binding, live))
     if not eligible:
         return {
             "accepted": False,
@@ -193,9 +292,13 @@ def compile_plan(service, conn, project, request):
             "excluded": excluded,
             "plan": None,
             "digest": None,
+            "evaluation": evaluation,
         }
-    eligible.sort(key=lambda x: (policy.backend_order.index(x[0].backend), x[0].ref))
-    candidate, cap, binding = eligible[0]
+    ranks = {"available": 0, "busy": 1, "unknown": 2}
+    eligible.sort(
+        key=lambda x: (ranks[x[3]["status"]], policy.backend_order.index(x[0].backend), x[0].ref)
+    )
+    candidate, cap, binding, live = eligible[0]
     execution = spec.execution.model_dump(mode="json")
     execution.update(
         priority=policy.priority,
@@ -219,9 +322,12 @@ def compile_plan(service, conn, project, request):
         "adapter": binding.adapter(policy.priority),
         "quota_scope": "backend",
         "preemption": "inherit",
+        "evaluation": [
+            {**item, "selected": item["candidate_ref"] == candidate.ref} for item in evaluation
+        ],
         "reason": [
             "Verified workload candidate satisfies profile constraints",
-            "Selection follows configured backend order, then candidate reference; not a performance prediction",
+            "Fresh request headroom first, then busy, then unknown; backend preference and candidate reference break ties",
             "Backend queue/account enforces its own quota; no cross-backend quota is reserved",
         ],
     }
@@ -230,7 +336,7 @@ def compile_plan(service, conn, project, request):
         "reasons": [],
         "excluded": excluded,
         "plan": plan,
-        "digest": signature(plan),
+        "digest": plan_digest(plan),
     }
 
 

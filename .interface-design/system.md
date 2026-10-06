@@ -100,3 +100,11 @@ inspection list. Existing resource and job views stay separate. Usage has its ow
 route with current-project terminal accounting grouped by backend/model/device/mode,
 CSV export and the existing ledger. Missing observations are amber, never an inferred
 hardware outage; pending codes and suggested checks remain separate from diagnosis.
+
+Workload-first scheduling: default submission leads with a workload and policy;
+device pinning lives in an advanced disclosure. Preview exposes candidate checks
+and the chosen route without reserving resources. A six-step responsive ordered
+flow (six/three/two columns) uses blue completed observations and neutral future
+steps, with explicit failure text. Job details and the latest submitted job reuse
+this flow and an expandable candidate decision table. Unknown capacity is text,
+never fabricated green headroom. Actual backend timestamps determine progress.
