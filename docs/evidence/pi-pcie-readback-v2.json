@@ -1,0 +1,37 @@
+{
+  "observed_date": "2026-10-06",
+  "read_only": true,
+  "ssh_reachable": true,
+  "architecture": "aarch64",
+  "cpu_cores": 4,
+  "pci_devices": [
+    {
+      "vendor": "0x14e4",
+      "device": "0x2712",
+      "class": "0x060400"
+    },
+    {
+      "vendor": "0x1de4",
+      "device": "0x0001",
+      "class": "0x020000"
+    }
+  ],
+  "reported_pci_device_names": [
+    "Broadcom BCM2712 PCIe Bridge",
+    "Raspberry Pi RP1 PCIe 2.0 South Bridge"
+  ],
+  "pcie_boot_settings": [
+    "dtparam=pciex1",
+    "dtparam=pciex1_gen=2"
+  ],
+  "external_link_down_observed": true,
+  "deepx_hailo_pci_endpoint_detected": false,
+  "slurmd_active": true,
+  "npu_workload_submitted": false,
+  "driver_or_boot_or_scheduler_changed": false,
+  "limits": [
+    "physical board identity, cabling and power remain unverified",
+    "CPU hardware/daemon presence does not prove Slurm job execution",
+    "controller connectivity and actual NPU execution remain open"
+  ]
+}

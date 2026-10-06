@@ -1,5 +1,15 @@
 # Slurm connectivity recovery — 2026-10-06
 
+This is the earlier recovery capture, not a continuous availability guarantee.
+The later [two-project trial](slurm-project-isolation.md) encountered a new
+controller outage. Both worker SSH paths remain reachable; native controller
+termination/accounting for the last original attempt is still unconfirmed.
+The [current read-only Pi check](evidence/pi-pcie-readback-v2.json) again finds
+BCM2712/RP1 PCIe devices, active Slurmd and retained Gen2 settings, but external
+link-down and no detected DEEPX/Hailo endpoint. No reboot or driver/boot change
+was made. Physical board/cabling/power need verification before NPU execution;
+daemon presence is not a successful Slurm CPU Job.
+
 The controller is reachable again. Both dedicated ARM workers now register as
 `IDLE`, with no allocated CPUs/memory and an empty queue. The Orin worker advertises
 one `gpu:orin_nano` GRES. The Pi still has no detected accelerator and advertises
