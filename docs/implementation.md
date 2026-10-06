@@ -31,6 +31,11 @@ visibility loss. Both terminal Jobs and all incurred costs remain visible.
 M6's [Hailo artifact guard](hailo-artifact.md) now rejects an actual different
 compiled model before device configuration, with a fresh qualified positive,
 unchanged application history and 8 NPU-seconds including the failed arm.
+M6's [actual MLflow server outage](mlflow-server-outage-v2.md) now preserves
+a successful GPU result and one ledger while the server is stopped, observes
+the original PENDING outbox/transport error, and recovers one FINISHED run with
+matching SQL/API/S3/MLflow bytes. The predecessor failure, reporting errors and
+all5GPU reservation seconds across failure/qualification/outage remain visible.
 
 1. Contract validation, stable logical/environment signatures, project authentication.
 2. Independent persistence and attempt/outbox state machine with response-loss recovery.

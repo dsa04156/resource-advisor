@@ -42,3 +42,7 @@ unexpected compute outcomes, restores service on failure and refuses an existing
 output directory. This trial consumes its one compute slot; a later successful
 server-outage test requires a separately frozen complete environment and must
 include this failure's cost. No broad E7/platform completion is inferred.
+
+The separate [qualified second trial](mlflow-server-outage-v2.md) now passes
+actual server-stop/successful-GPU/same-outbox recovery. This original report
+remains INCOMPLETE; its1GPU-second failure was not replaced or relabeled.

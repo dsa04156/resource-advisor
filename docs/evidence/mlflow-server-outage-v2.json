@@ -1,0 +1,90 @@
+{
+  "status": "PASS",
+  "scope": "one qualified Kubernetes CUDA fixture during actual MLflow server stop and same-outbox recovery",
+  "protocol_commit": "0728704",
+  "quantity_correction_commit": "ee569ab",
+  "actual_mlflow_server_version": "3.16.1",
+  "one_new_compute_job": true,
+  "original_verifier_exit": 1,
+  "supplemental_same_job_readback_exit": 0,
+  "report_errors_retained": [
+    "post-execution canonical memory string comparison",
+    "supplemental readback incorrect local repository root"
+  ],
+  "no_replacement_compute": true,
+  "server_stopped_zero_pods_endpoints": true,
+  "during_outage": {
+    "compute_state": "SUCCEEDED",
+    "ledger_count": 1,
+    "mlflow_outbox_status": "PENDING",
+    "mlflow_delivery_tries": 1,
+    "actual_transport_error": "RemoteProtocolError",
+    "tracking_absent": true
+  },
+  "after_restoration": {
+    "outbox_status": "DONE",
+    "delivery_tries": 3,
+    "one_finished_run": true,
+    "server_uid_spec_service_pvc_preserved": true,
+    "server_ready_replicas": 1
+  },
+  "timing": {
+    "outage_observed_seconds": 12.004009274067357,
+    "outage_started_at": "2026-10-07T00:11:23.852178+09:00",
+    "restore_requested_at": "2026-10-07T00:11:36.533528+09:00",
+    "server_answered_at": "2026-10-07T00:11:43.347048+09:00"
+  },
+  "one_native_job_pod": true,
+  "same_key_same_attempt": true,
+  "unique_ledger": true,
+  "matching_sql_api_s3_mlflow_bytes": true,
+  "artifact_sha256": "6a03f63c4d539dcec255bed512666bc2e239ceafb62d912746773d249e10346f",
+  "measurements": {
+    "elapsed_seconds": 0.000269687850959599,
+    "peak_memory_mib": 9.125,
+    "quality_value": 1.0,
+    "sample_count": 20,
+    "work_units": 20,
+    "latency_p50_ms": 0.01317902933806181,
+    "latency_p95_ms": 0.013943994417786598,
+    "latency_p99_ms": 0.013943994417786598,
+    "throughput": 74159.81079175914,
+    "gpu_utilization": null,
+    "power_watts": null,
+    "temperature_celsius": null
+  },
+  "allocation": {
+    "gpu_reservation_seconds": 2.0,
+    "cpu_reservation_seconds": 2.0,
+    "queue_seconds": 0.0,
+    "preparation_seconds": 1.0,
+    "container_runtime_seconds": 1.0,
+    "collection_seconds": 0.078254,
+    "reservation_is_not_utilization": true
+  },
+  "preexisting_entities_ledgers_terminal_jobs_preserved": true,
+  "preexisting_mlflow_run_bodies_preserved": true,
+  "native_objects_preserved": true,
+  "no_pending_tracking": true,
+  "retained_predecessors": [
+    {
+      "trial": "mlflow-server-outage-v1",
+      "state": "FAILED",
+      "gpu_reservation_seconds": 1,
+      "not_replaced": true
+    },
+    {
+      "trial": "kubernetes-runtime-bundle-v1",
+      "state": "SUCCEEDED",
+      "gpu_reservation_seconds": 2,
+      "not_an_outage_test": true
+    }
+  ],
+  "total_gpu_reservation_seconds_with_predecessors": 5.0,
+  "limitations": [
+    "one qualified CUDA fixture",
+    "not MLflow tenant-isolation or distributed exactly-once proof",
+    "original Slurm cancellation remains unresolved",
+    "full original HAIRP remains incomplete"
+  ]
+}
