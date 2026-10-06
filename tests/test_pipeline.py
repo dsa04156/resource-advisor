@@ -44,3 +44,28 @@ def test_server_requires_both_tls_files(monkeypatch):
     with pytest.raises(SystemExit) as error:
         main()
     assert error.value.code == 2
+
+
+def test_cpu_gpu_workflow_has_uncached_execution_dependency(tmp_path, monkeypatch):
+    pytest.importorskip("kfp.kubernetes")
+    import yaml
+    from kfp import compiler
+
+    folder = Path(__file__).parents[1] / "examples"
+    monkeypatch.syspath_prepend(str(folder))
+    import cpu_gpu_pipeline
+
+    output = tmp_path / "cpu-gpu.yaml"
+    compiler.Compiler().compile(cpu_gpu_pipeline.cpu_then_gpu, str(output))
+    pipeline = list(yaml.safe_load_all(output.read_text()))[0]
+    tasks = pipeline["root"]["dag"]["tasks"]
+    first = next(k for k, v in tasks.items() if not v.get("dependentTasks"))
+    second = next(k for k, v in tasks.items() if v.get("dependentTasks"))
+    assert tasks[second]["dependentTasks"] == [first]
+    assert all(not v.get("cachingOptions", {}).get("enableCache", False) for v in tasks.values())
+    assert len(tasks) == 2
+    assert {
+        tasks[k]["inputs"]["parameters"]["run_key"]["componentInputParameter"] for k in tasks
+    } == {"cpu_run_key", "gpu_run_key"}
+    for executor in pipeline["deploymentSpec"]["executors"].values():
+        assert "accelerator" not in executor["container"]["resources"]

@@ -238,6 +238,42 @@ def test_pending_pod_is_not_running_even_when_job_active(service):
     assert backend.status(job).state == "QUEUED"
 
 
+@pytest.mark.parametrize(
+    "cpu_only,extra_request,expected",
+    [
+        (True, None, 0.0),
+        (False, None, None),
+        (True, ("nvidia.com/gpu", "1"), None),
+    ],
+)
+def test_zero_accelerator_allocation_requires_observed_cpu_only_requests(
+    service, cpu_only, extra_request, expected
+):
+    from test_kubernetes_retention import Scheduler
+
+    job = row(service)
+    job["body"]["external_id"] = job["body"]["attempt_id"]
+    if cpu_only:
+        job["body"]["capability"].update(device_class="cpu", resource_key=None)
+        context = job["body"]["candidate"]["context"]
+        context["allocation_mode"] = "cpu_only"
+        context["resources"]["accelerator_count"] = 0
+    scheduler = Scheduler(job)
+    requests = scheduler.pod["spec"]["containers"][0]["resources"]["requests"]
+    requests.pop("nvidia.com/gpu")
+    if extra_request:
+        requests[extra_request[0]] = extra_request[1]
+    backend = KubernetesBackend(
+        namespace="research-a",
+        local_queue="batch",
+        node_selector={"pool": "lab"},
+        execute=scheduler.execute,
+    )
+    observation = backend.status(job)
+    assert observation.allocation["accelerator_count"] == expected
+    assert observation.allocation["cpu"] == 0.5
+
+
 @pytest.mark.parametrize("retention", [False, True])
 @pytest.mark.parametrize("exit_code", [0, 1])
 def test_terminated_container_waits_for_job_condition_without_requeue(

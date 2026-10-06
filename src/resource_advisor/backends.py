@@ -435,11 +435,22 @@ class KubernetesBackend:
                 if isinstance(cpu, str) and cpu.endswith("m") and number(cpu[:-1]) is not None
                 else number(cpu)
             )
+            capability = job["body"]["capability"]
+            context = job["body"]["candidate"]["context"]
+            accelerator_count = number(requests.get(capability["resource_key"]))
+            if (
+                capability["device_class"] == "cpu"
+                and context["allocation_mode"] == "cpu_only"
+                and context["resources"]["accelerator_count"] == 0
+                and capability["resource_key"] is None
+                and set(requests) <= {"cpu", "memory", "ephemeral-storage"}
+            ):
+                # Zero is evidenced by this CPU-only Pod's observed requests.
+                # Missing GPU/NPU requests in other contexts remain unknown.
+                accelerator_count = 0.0
             allocation = {
                 "source": "kubernetes:scheduled workload container requests",
-                "accelerator_count": number(
-                    requests.get(job["body"]["capability"]["resource_key"])
-                ),
+                "accelerator_count": accelerator_count,
                 "cpu": cpu,
                 "memory_mib": memory_mib(requests.get("memory")),
             }
