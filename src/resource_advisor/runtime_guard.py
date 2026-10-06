@@ -23,8 +23,8 @@ def digest(data):
 
 def verify(manifest_path, expected_manifest, expected_environment, command):
     with Path(manifest_path).open("rb") as handle:
-        raw = handle.read(1024 * 1024 + 1)
-    if len(raw) > 1024 * 1024 or digest(raw) != expected_manifest:
+        raw = handle.read(8 * 1024 * 1024 + 1)
+    if len(raw) > 8 * 1024 * 1024 or digest(raw) != expected_manifest:
         raise RuntimeMismatch("runtime manifest digest mismatch")
     manifest = json.loads(raw)
     if manifest.get("schema_version") != "v1" or manifest.get("kind") != "native":
