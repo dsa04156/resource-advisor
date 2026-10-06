@@ -196,3 +196,10 @@ default; node detail uses the existing native dialog. Card lists scroll locally
 and never flex-shrink their contents. At desktop heights below 800px tighten
 row gaps and meter margins to keep the board within 1366×768. Freeze freshness
 only for server-recorded observation views; live inventory continues aging.
+
+Passive observations: a collapsed native details section on Jobs keeps the main
+execution board compact. Preserve its expanded state on refresh. Reuse the
+existing table/pager/dialog; individual samples keep process metrics apart from
+physical-device-inclusive GPU measurements. Unknown quality/step/throughput and
+missing sensors use explicit text. Mark synthetic fixtures as test data in both
+the list and dialog. Do not present collection completion as native job success.

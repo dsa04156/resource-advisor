@@ -117,6 +117,7 @@ def overview(
     history_page=0,
     recommendations_page=0,
     qualifications_page=0,
+    observations_page=0,
     templates_page=0,
     jobs_status="all",
     jobs_backend="all",
@@ -293,6 +294,9 @@ def overview(
         from .qualifications import list_page as qualification_page
 
         qualifications = qualification_page(store, conn, project, qualifications_page)
+        from .passive import list_page as observation_page
+
+        observations = observation_page(store, conn, project, observations_page)
     return {
         "generated_at": now().isoformat(),
         "project_ref": project,
@@ -308,6 +312,7 @@ def overview(
         "history": history,
         "recommendations": recommendations,
         "qualifications": qualifications,
+        "observations": observations,
         "semantics": "Recorded state; inventory is not model qualification or admission. Null is unknown.",
     }
 

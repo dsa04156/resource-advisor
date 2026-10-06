@@ -10,7 +10,7 @@ let token = "",
 let receivedAt = 0,
   expiryTimer = null,
   active = "operations";
-const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, qualifications: 0, templates: 0 };
+const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, qualifications: 0, observations: 0, templates: 0 };
 const submitting = new Set();
 const requestKeys = new Map();
 const jobFilters = { status: "all", backend: "all", search: "" };
@@ -870,6 +870,7 @@ function execution() {
   return root;
 }
 function showJob(job) {
+  passiveRequestSerial++;
   $("job-dialog-title").textContent="작업 상세";
   const m = job.result?.measurements;
   const content = add(el("div", null, "job-detail-content"),
@@ -935,7 +936,54 @@ function jobsView() {
       stamp(j.created_at),add(el("div",null,"job-actions"),open,cancelButton(j))];
   });
   root.append(add(el("section",null,"panel jobs-panel"), toolbar, rows.length ? (jobsDisplay==="graph"?mlJobsGraph():table(["작업","상태","실행 대상","요청 자원","생성 시각","관리"],rows)) : empty("조건에 맞는 작업이 없습니다."),pager("jobs",data.jobs)));
+  root.append(passiveObservationsView());
   return root;
+}
+let passiveExpanded = false;
+function passiveObservationsView() {
+  const page = data.observations || {items:[],total:0,page:0,size:12,has_next:false};
+  const content = page.items.length ? table(["기존 작업 · 관측", "노드", "관측 구간", "프로세스 메모리", "모델 지표", "기록"], page.items.map(r => {
+    const open = el("button", "관측 상세", "details-action");
+    open.setAttribute("aria-label", `관측 상세 · ${r.ref}`);
+    open.onclick = () => showPassiveObservation(r.ref);
+    return [add(el("div"),code(r.target.external_job_ref),el("small",r.target.backend),badge(r.evidence_kind==="synthetic"?"테스트 데이터":"운영자 수집"),code(r.ref)),
+      el("span",r.target.node_ref),add(el("div"),stamp(r.started_at),el("small",`${duration(r.assessment.window_seconds)} · ${r.assessment.sample_count}회`)),
+      el("span",r.assessment.process_sampled_peak_rss_mib == null ? "미수집" : fmt(r.assessment.process_sampled_peak_rss_mib)+" MiB · 표본 최대"),
+      el("span","정확도 · step · 처리량 미수집"),open];
+  })) : empty("등록된 관측 기록이 없습니다. 읽기 전용 수집 결과가 등록되면 표시됩니다.");
+  const section = el("details",null,"passive-observations");
+  section.open = passiveExpanded;
+  section.ontoggle = () => { passiveExpanded = section.open; };
+  section.append(el("summary",`코드 변경 없는 관측 · ${page.total}건`),
+    panel("관측 기록", "기존 프로그램의 수집 구간입니다. 수집 종료는 작업 종료가 아니며, 이 기록은 성능 추천이나 자원 사용 원장을 만들지 않습니다.",
+      add(el("div"),content,pager("observations",page))));
+  return section;
+}
+let passiveRequestSerial = 0;
+async function showPassiveObservation(ref) {
+  const session = generation;
+  const requestSerial = ++passiveRequestSerial;
+  $("job-dialog-title").textContent = "관측 상세";
+  $("job-dialog-body").replaceChildren(el("p","관측 기록을 불러오는 중…"));
+  $("job-dialog").showModal();
+  try {
+    const response = await fetch(API+"/observations/"+encodeURIComponent(ref),{headers:authHeaders()});
+    if (!response.ok) throw new Error("관측 기록을 불러오지 못했습니다.");
+    const r = await response.json();
+    if (session !== generation || requestSerial !== passiveRequestSerial || !$("job-dialog").open) return;
+    const shown = value => value == null ? "미수집" : fmt(value);
+    const body = add(el("div",null,"job-detail-content"),
+      code(r.target.external_job_ref),badge(r.evidence_kind==="synthetic"?"테스트 데이터":"운영자 수집"),el("p",`${r.target.backend} · ${r.target.node_ref}`),
+      el("p",`관측 ${stamp(r.started_at)} ~ ${stamp(r.finished_at)} · ${r.stop_reason}`),
+      el("p","모델 정확도·학습 step·처리량은 알 수 없습니다. GPU 지표는 물리 장치 전체의 값이며 이 프로세스만의 사용률이 아닙니다."),
+      table(["관측 경과 (초)","프로세스 CPU 누적 (초)","프로세스 RSS (MiB)","GPU 전체 사용률 (%)","GPU 전체 메모리 (MiB)"],r.samples.map(s=>[
+        shown(s.started_seconds),shown(s.process.cpu_seconds),shown(s.process.rss_bytes == null ? null : s.process.rss_bytes/1048576),
+        shown(s.device?.utilization_percent),shown(s.device?.memory_used_bytes == null ? null : s.device.memory_used_bytes/1048576)])),
+      details("관측 범위 · 원본 지표 · 출처",r));
+    $("job-dialog-body").replaceChildren(body);
+  } catch(error) {
+    if(session===generation && requestSerial===passiveRequestSerial && $("job-dialog").open) $("job-dialog-body").replaceChildren(el("p",error.message,"error-message"));
+  }
 }
 function schedulingKey(workload) {
   return JSON.stringify([generation, schedulingProfile, selectionKey(workload), submissionDraft.candidate]);

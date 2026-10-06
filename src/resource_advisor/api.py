@@ -23,6 +23,8 @@ from .contracts import (
     StudyRequest,
     WorkloadSpec,
 )
+from .passive import PassiveImport, PassiveObservations
+from .passive import list_page as observation_page
 from .qualifications import QualificationImport, Qualifications
 from .qualifications import list_page as qualification_page
 from .scheduling import SchedulingPlanRequest, SchedulingProfile, compile_plan
@@ -57,6 +59,9 @@ def create_app(
 
     study_service = Studies(service)
     model_qualifications = Qualifications(service.store)
+    passive_observations = PassiveObservations(
+        service.store, accept_synthetic=service.accept_synthetic
+    )
 
     def principal(authorization: str = Header(default="")):
         if not authorization and anonymous_project is not None:
@@ -270,6 +275,7 @@ def create_app(
         recommendations_page: int = Query(default=0, ge=0, le=100000),
         templates_page: int = Query(default=0, ge=0, le=100000),
         qualifications_page: int = Query(default=0, ge=0, le=100000),
+        observations_page: int = Query(default=0, ge=0, le=100000),
         jobs_status: Literal[
             "all", "running", "pending", "succeeded", "failed", "canceled"
         ] = "all",
@@ -287,6 +293,7 @@ def create_app(
             history_page=history_page,
             recommendations_page=recommendations_page,
             qualifications_page=qualifications_page,
+            observations_page=observations_page,
             templates_page=templates_page,
             jobs_status=jobs_status,
             jobs_backend=jobs_backend,
@@ -457,6 +464,21 @@ def create_app(
     @app.post(PREFIX + "/qualifications")
     def import_qualification(value: QualificationImport, p=Depends(operator)):
         return model_qualifications.create(p.project, value)
+
+    @app.post(PREFIX + "/observations")
+    def import_passive_observation(value: PassiveImport, p=Depends(operator)):
+        return passive_observations.create(p.project, value)
+
+    @app.get(PREFIX + "/observations")
+    def list_passive_observations(
+        page: int = Query(default=0, ge=0, le=100000), p=Depends(principal)
+    ):
+        with service.store.transaction() as conn:
+            return observation_page(service.store, conn, p.project, page)
+
+    @app.get(PREFIX + "/observations/{ref}")
+    def passive_observation(ref: str, p=Depends(principal)):
+        return passive_observations.get(p.project, ref)
 
     @app.get(PREFIX + "/qualifications")
     def list_qualifications(page: int = Query(default=0, ge=0, le=100000), p=Depends(principal)):
