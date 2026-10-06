@@ -34,7 +34,8 @@ a {
   color: var(--accent);
 }
 button,
-input {
+input,
+select {
   font: inherit;
 }
 button {
@@ -482,6 +483,48 @@ pre {
 .details-action {
   margin-top: 8px;
 }
+.submit-entry {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.submit-entry span { color: var(--secondary); font-size: 12px; }
+.action-link {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--panel);
+  padding: 12px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.action-link:hover { opacity: 0.9; }
+.job-form { padding: 16px; max-width: 840px; }
+.job-form label { display: block; margin-bottom: 8px; font-weight: 600; }
+.job-form select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  background: var(--inset);
+  margin-bottom: 8px;
+}
+.job-form input[type="file"] { max-width: 100%; }
+.job-form p { overflow-wrap: anywhere; }
+.submission-summary {
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.submission-summary button { margin-top: 16px; min-height: 44px; }
 @media (max-width: 1000px) {
   .layout {
     grid-template-columns: 180px minmax(0, 1fr);

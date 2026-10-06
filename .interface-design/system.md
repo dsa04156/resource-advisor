@@ -21,9 +21,15 @@ row pairs measured utilization with scheduler reservations and a source-age labe
 Rejected defaults: a summed heterogeneous GPU number, green zero for missing
 telemetry, and giant equal-sized statistic cards without evidence provenance.
 
-Hierarchy: four compact navigation sections; execution starts with the node table,
+Hierarchy: a dedicated job submission section precedes the four inspection sections.
+Execution starts with a prominent new-job link, then the node table,
 then attempt history. Compatibility and evidence use dense comparison tables with
 expandable provenance. Counts are secondary and name their scope.
+Submission uses labeled native selectors for registered workload and execution
+candidate, followed by a resource/time/priority summary and explicit submit action.
+Selection persists across refreshes; focusing the form pauses automatic refresh.
+Incompatible candidates remain inspectable with reasons and a disabled submit.
+A secondary details panel imports WorkloadSpec JSON without starting compute.
 Palette: slate text #192d3a on #f4f7f8, white panels, teal #006d69,
 amber #805500, red #a12e39. No remote fonts or assets.
 Depth: subtle borders only. Sidebar shares the canvas, panels are white, inputs

@@ -34,7 +34,10 @@ with 25 rows and an explicit total. Workload rows include their candidate lists.
 Job counters cover the whole authenticated project, not only the visible page.
 Latest inventory selection is performed in SQL rather than loading all snapshots.
 No command strings, backend credentials or object-store locations are added to
-these read models. Compatible candidate rows now offer an explicit **관측 실행**
+these read models. The **작업 제출** page selects a registered workload and candidate,
+shows resource/time/priority limits, and submits a new execution. It also supports
+WorkloadSpec JSON registration through the existing project-scoped API. Arbitrary
+Python/model uploads are not supported. Compatible candidate rows offer **작업 제출**
 button, with requested accelerator count, CPU, memory and run-time limit. It calls
 the existing project-authenticated `POST /jobs` endpoint in `observe` mode;
 scheduler admission still determines when the workload runs. Incompatible or

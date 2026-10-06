@@ -13,9 +13,10 @@ let receivedAt = 0,
 const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, qualifications: 0 };
 const submitting = new Set();
 const requestKeys = new Map();
+const submissionDraft = { workload: "", candidate: "" };
 
 function submitButton(workload, candidate, approval = null) {
-  const label = approval ? "승인한 구성 실행" : "관측 실행";
+  const label = approval ? "승인한 구성 실행" : "작업 제출";
   const key = `ra-submit:${data.project_ref}:${workload.workload_ref}:${candidate.candidate_ref}${approval ? ":" + approval.ref : ""}`;
   let saved = requestKeys.get(key);
   try { saved ||= sessionStorage.getItem(key); } catch (_) { /* Memory fallback. */ }
@@ -138,6 +139,11 @@ function approvalControls(recommendation) {
   return add(el("div"), button, el("small", "승인 시 현재 근거를 다시 검사합니다. 승인은 자원 예약이 아닙니다."));
 }
 const views = {
+  submit: [
+    "SUBMIT JOB",
+    "작업 제출",
+    "작업 템플릿과 실행 장비를 선택하면 Kubernetes 또는 Slurm에 새 작업을 제출합니다.",
+  ],
   execution: [
     "OBSERVATION",
     "실행 현황",
@@ -177,7 +183,7 @@ const states = {
   RESULT_INVALID: "결과 검증 실패",
   RUNNING: "실행 중",
   QUEUED: "대기",
-  VALIDATED: "제출 준비",
+  VALIDATED: "접수됨",
   SUBMITTING: "제출 중",
   SUBMISSION_UNKNOWN: "제출 확인 필요",
   COLLECTING: "결과 수집",
@@ -606,6 +612,10 @@ function diagnosticView(d) {
 function execution() {
   const root = el("div"),
     stats = el("div", null, "stats");
+  const start = el("a", "＋ 새 작업 제출", "action-link");
+  start.href = "#submit";
+  root.append(add(el("div", null, "submit-entry"), start,
+    el("span", "작업 선택 → 실행 장비 선택 → 제출 → 결과 확인")));
   for (const [label, count] of [
     [
       "프로젝트 전체 기록",
@@ -640,6 +650,107 @@ function execution() {
   attempts.append(pager("jobs", data.jobs));
   root.append(attempts);
   return root;
+}
+function submissionView() {
+  const root = el("div");
+  const items = data.compatibility.items;
+  const form = el("div", null, "job-form");
+  const workloadSelect = el("select");
+  workloadSelect.id = "submit-workload";
+  workloadSelect.append(new Option("실행할 작업을 선택하세요", ""));
+  const types = { inference: "추론", training: "학습", benchmark: "벤치마크", preprocessing: "전처리" };
+  for (const w of items) workloadSelect.append(new Option(
+    `${w.workload_ref} · ${types[w.task_type] || w.task_type}`, w.workload_ref));
+  workloadSelect.value = submissionDraft.workload;
+  workloadSelect.onchange = () => {
+    submissionDraft.workload = workloadSelect.value;
+    submissionDraft.candidate = "";
+    render();
+    $("submit-candidate")?.focus();
+  };
+  const label = el("label", "1. 작업 템플릿"); label.htmlFor = workloadSelect.id;
+  form.append(label, workloadSelect,
+    el("small", "템플릿에 등록된 모델·입력·실행 환경을 사용합니다. 제출할 때마다 새 실행 기록이 만들어집니다."));
+  const workload = items.find(w => w.workload_ref === submissionDraft.workload);
+  if (workload) {
+    form.append(el("p", `${types[workload.task_type] || workload.task_type} · ${workload.precision} · 배치 ${workload.batch_size ?? "—"} · 입력 ${(workload.input_shape || []).join(" × ")}`));
+    const candidates = el("select"); candidates.id = "submit-candidate";
+    candidates.append(new Option("실행 장비를 선택하세요", ""));
+    for (const c of workload.candidates) candidates.append(new Option(
+      `${c.backend === "slurm" ? "Slurm" : "Kubernetes"} · ${c.model || c.candidate_ref} · ${c.candidate_ref}${c.contract_compatible_now ? "" : " · 현재 실행 불가"}`, c.candidate_ref));
+    candidates.value = submissionDraft.candidate;
+    candidates.onchange = () => {
+      submissionDraft.candidate = candidates.value;
+      render(); $("submit-candidate")?.focus();
+    };
+    const targetLabel = el("label", "2. 실행 장비 · 백엔드"); targetLabel.htmlFor = candidates.id;
+    form.append(targetLabel, candidates);
+    const candidate = workload.candidates.find(c => c.candidate_ref === submissionDraft.candidate);
+    if (candidate) {
+      const r = candidate.resources;
+      const summary = add(el("div", null, "submission-summary"),
+        el("h3", "3. 요청 자원 확인 후 제출"),
+        el("p", `${candidate.model || candidate.candidate_ref} · ${candidate.node_ref || "노드 미확인"}`),
+        el("p", `가속기 ${r.accelerator_count}개 (${modes[candidate.allocation_mode] || "단위 미확인"}) · CPU ${r.host_cpu}코어 · 메모리 ${r.host_memory_mib} MiB`),
+        el("p", `실행 제한 ${workload.max_run_seconds}초 · 대기 제한 ${workload.max_queue_seconds ?? "—"}초 · 우선순위 ${workload.priority === "high" ? "높음" : "보통"}`),
+        badge(candidate.contract_compatible_now ? "실행 조건 확인됨" : "현재 실행 불가", candidate.contract_compatible_now ? "good" : "warn"),
+        ...candidate.reasons.map(reason => el("p", reason, "reason")),
+        el("small", candidate.backend === "slurm"
+          ? "Slurm이 자원과 우선순위에 따라 실행합니다. 여유 자원이 없으면 큐에서 기다립니다."
+          : "Kueue 승인 후 Kubernetes에서 실행합니다. 여유 자원이나 할당량이 없으면 큐에서 기다립니다."),
+        submitButton(workload, candidate));
+      form.append(summary);
+    } else form.append(empty("장비를 선택하면 요청 자원과 제출 버튼이 표시됩니다."));
+    form.append(add(el("details"), el("summary", "어떤 장비를 선택할지 모르겠다면"), recommendButton(workload)));
+  }
+  root.append(panel("새 작업 만들기", "제출 후 실행 현황에서 대기·실행·결과를 확인하고 작업을 취소할 수 있습니다.",
+    items.length ? form : empty("등록된 작업 템플릿이 없습니다. 아래에서 작업 명세를 등록하세요.")));
+  root.append(pager("compatibility", data.compatibility));
+  root.append(workloadImport());
+  return root;
+}
+let importedWorkload = null, importingWorkload = false;
+function workloadImport() {
+  const body = el("div", null, "job-form");
+  const upload = el("input"); upload.type = "file"; upload.accept = ".json,application/json";
+  upload.id = "workload-file"; upload.disabled = importingWorkload;
+  const label = el("label", "새 작업 명세 파일 (WorkloadSpec JSON)"); label.htmlFor = upload.id;
+  const status = el("p", importedWorkload ? `선택됨: ${importedWorkload.ref}` : "선택한 파일 없음");
+  const register = el("button", importingWorkload ? "등록 중…" : "작업 템플릿 등록");
+  register.disabled = !importedWorkload || importingWorkload;
+  upload.onchange = async () => {
+    importedWorkload = null; register.disabled = true;
+    const file = upload.files[0];
+    if (!file) { status.textContent = "선택한 파일 없음"; return; }
+    try {
+      if (file.size > 1024 * 1024) throw new Error("1 MiB 이하의 JSON 파일을 선택하세요.");
+      const value = JSON.parse(await file.text());
+      if (!value || typeof value !== "object" || !value.ref || value.project_ref !== data.project_ref)
+        throw new Error("작업 ref와 현재 프로젝트의 project_ref가 필요합니다.");
+      importedWorkload = value; status.textContent = `선택됨: ${value.ref}`; register.disabled = false;
+    } catch (error) { status.textContent = error.message; }
+  };
+  register.onclick = async () => {
+    if (!importedWorkload || importingWorkload) return;
+    const session = generation, value = importedWorkload;
+    importingWorkload = true; register.disabled = true;
+    try {
+      const response = await fetch(API + "/workloads", {
+        method: "POST", headers: { ...authHeaders(), "Content-Type": "application/json" }, body: JSON.stringify(value),
+      });
+      if (!response.ok) throw new Error("등록하지 못했습니다. 작업 명세 형식, 프로젝트와 기존 ref 중복을 확인해 주세요.");
+      if (session !== generation) return;
+      importedWorkload = null; submissionDraft.workload = value.ref; submissionDraft.candidate = "";
+      pages.compatibility = 0; await load();
+      $("notice").textContent = "작업 템플릿을 등록했습니다. 실행 장비를 선택하고 작업을 제출하세요.";
+    } catch (error) { if (session === generation) $("notice").textContent = error.message; }
+    finally { importingWorkload = false; if (session === generation) render(); }
+  };
+  const specLink = el("a", "작업 명세 예제와 등록 방법");
+  specLink.href = "https://github.com/dsa04156/resource-advisor/blob/main/docs/quickstart-ko.md#새-작업-템플릿-등록";
+  body.append(label, upload, status, register,
+    el("p", "기존에 등록된 실행 환경과 장비 후보를 참조하는 작업 명세를 등록합니다. 임의의 Python 파일이나 모델 파일을 업로드해 실행하는 기능은 아직 지원하지 않습니다."), specLink);
+  return add(el("details", null, "panel"), el("summary", "새 작업 템플릿 등록", "panel-head"), body);
 }
 function compatibilityView() {
   const root = el("div");
@@ -1237,6 +1348,7 @@ function render() {
   $("content").replaceChildren(
     {
       execution,
+      submit: submissionView,
       compatibility: compatibilityView,
       history: historyView,
       recommendations: recommendationsView,
@@ -1270,6 +1382,9 @@ function reset(message = "") {
   controller = null;
   pending = false;
   token = "";
+  importedWorkload = null;
+  submissionDraft.workload = "";
+  submissionDraft.candidate = "";
   anonymousConnected = false;
   data = null;
   clearTimeout(expiryTimer);
@@ -1344,6 +1459,9 @@ $("content").addEventListener(
   },
   true,
 );
+$("content").addEventListener("focusin", (e) => {
+  if (e.target.closest(".job-form")) $("auto").checked = false;
+});
 $("logout").onclick = () => {
   reset("연결을 해제했습니다.");
   $("token").focus();

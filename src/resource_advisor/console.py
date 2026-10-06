@@ -170,6 +170,10 @@ def overview(
                     "workload_ref": spec.ref,
                     "task_type": spec.identity.task_type,
                     "precision": spec.identity.precision,
+                    "batch_size": spec.identity.batch_size,
+                    "input_shape": spec.identity.input_shape,
+                    "priority": spec.execution.priority,
+                    "max_queue_seconds": spec.execution.max_queue_seconds,
                     "max_run_seconds": spec.execution.max_run_seconds,
                     "candidates": candidates,
                 }
