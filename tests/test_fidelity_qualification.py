@@ -207,15 +207,51 @@ def mf_request(space):
     )
 
 
-def test_real_kernel_drives_mixed_jobs_and_independent_confirmation(qualified_space, monkeypatch):
+@pytest.mark.parametrize("observer_delay", [0, 0.01])
+def test_real_kernel_drives_mixed_jobs_and_independent_confirmation(
+    qualified_space, monkeypatch, observer_delay
+):
+    import importlib
+
     from resource_advisor.mfkg import ask_mfkg
 
+    # These invented scheduler/sensor measurements need invented, reproducible
+    # evaluation costs too. Runner/DB/CI load is not this fixture's workload cost.
+    # Keep the real numerical kernel, feedback, stop rule and all assertions.
+    clock = [now()]
+    original_result = ThermalSchedulerDouble.result
+
+    def timed_result(backend, job):
+        envelope = original_result(backend, job)
+        time.sleep(observer_delay)  # unrelated host/observer work cannot alter fixture costs
+        clock[0] += timedelta(seconds=envelope["result"]["measurements"]["elapsed_seconds"] + 0.001)
+        return envelope
+
+    for module in (
+        "service",
+        "study",
+        "fidelity_qualification",
+        "fidelity_space",
+        "worker",
+        "store",
+    ):
+        monkeypatch.setattr(
+            importlib.import_module("resource_advisor." + module), "now", lambda: clock[0]
+        )
+    monkeypatch.setattr(ThermalSchedulerDouble, "result", timed_result)
     service, space, _, assessment, calibration, worker, _ = calibrate(qualified_space)
     assert assessment["status"] == "QUALIFIED" and not assessment["early_pruning_authorized"]
     seen = []
 
     def checked_ask(problem):
         seen.append({o.attempt_id for o in problem.observations})
+        for option in problem.options:
+            costs = {
+                o.evaluation_wall_seconds
+                for o in problem.observations
+                if o.option_ref == option.ref
+            }
+            assert len(costs) == 1  # identical simulated evaluations have identical declared cost
         return ask_mfkg(problem)
 
     monkeypatch.setattr("resource_advisor.mfkg.ask_mfkg", checked_ask)

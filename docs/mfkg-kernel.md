@@ -134,6 +134,23 @@ evidence** and not an equal-budget strategy comparison.
   and independent target confirmation, verified in an 18-Job GPU trial.
 - Held-out calibration and real equal-budget comparison with fixed-level qLogNEI.
 
-Until those gates have direct evidence, `Studies.create(strategy="mfkg")` keeps
-its existing explicit rejection. Numerical correctness does not authorize
-running an unqualified fidelity policy on the shared cluster.
+Unqualified groups remain explicitly rejected by `Studies.create(strategy="mfkg")`.
+The later [qualified-group coordinator](qualified-mfkg.md) connects the numerical
+kernel to reserved ProbePlans only after its separate qualification gate.
+Numerical correctness does not authorize an unqualified policy on the cluster.
+
+## Reproducible numerical integration fixture
+
+The mixed-job integration test uses explicit scheduler/sensor doubles, not real
+accelerator measurements. Previously it combined their identical invented
+latencies with host-dependent database/observer wall costs. Since MF-KG is
+cost-sensitive and may correctly stop at no positive gain, those unrelated
+cost fluctuations made the test's expected second probe intermittent.
+
+That fixture now uses one controlled lifecycle clock and declares each invented
+evaluation's cost as its invented elapsed time plus a fixed1ms overhead. Both
+zero and10ms extra observer-delay cases verify identical per-option cost inputs,
+the actual BoTorch kernel, feedback from the first probe, at least two probes,
+six independent confirmations, held-out exclusion and unchanged charging checks.
+Production clocks, cost inputs, acquisition logic and stop rules are unchanged.
+This test correction is not new hardware qualification or evidence of MF-KG benefit.
