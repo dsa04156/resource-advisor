@@ -55,6 +55,8 @@ def job_view(service, conn, row):
         "node_ref": body["capability"]["node_ref"],
         "mode": body["request"]["mode"],
         "scheduler_reason": body.get("scheduler_reason"),
+        "scheduling_plan": body.get("scheduling_plan"),
+        "scheduling_plan_digest": body.get("scheduling_plan_digest"),
         "priority": body["spec"]["execution"].get("priority", "normal"),
         "execution_limits": body.get("execution_limits", body["spec"]["execution"]),
         "queued_at": body.get("scheduler_submitted_at") or body.get("queued_at"),
@@ -209,6 +211,7 @@ def overview(
                         cluster_ref=cap.backend_cluster_id,
                         model=cap.accelerator_model,
                         device_class=cap.device_class,
+                        resource_key=cap.resource_key,
                         allocation_mode=cap.allocation_mode,
                         verification=variant.verification,
                         runtime_versions=variant.runtime_versions,
@@ -237,6 +240,7 @@ def overview(
                     "workload_ref": spec.ref,
                     "task_type": spec.identity.task_type,
                     "precision": spec.identity.precision,
+                    "measurement_boundary": spec.identity.measurement_boundary,
                     "batch_size": spec.identity.batch_size,
                     "input_shape": spec.identity.input_shape,
                     "priority": spec.execution.priority,
@@ -293,6 +297,7 @@ def overview(
         from .operations import operations_snapshot
 
         operations = operations_snapshot(service, conn, project, inventory, counts)
+        scheduling_profiles = [r["body"] for r in store.list(conn, "scheduling_profile", project)]
         from .qualifications import list_page as qualification_page
 
         qualifications = qualification_page(store, conn, project, qualifications_page)
@@ -307,6 +312,7 @@ def overview(
         "submission_catalog": catalog if service.console_workloads else None,
         "templates": templates,
         "operations": operations,
+        "scheduling_profiles": scheduling_profiles,
         "history": history,
         "recommendations": recommendations,
         "qualifications": qualifications,

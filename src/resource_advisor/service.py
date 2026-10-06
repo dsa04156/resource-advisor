@@ -123,6 +123,9 @@ class Service:
 
     def submit(self, project: str, request: JobRequest, key: str):
         request_body = request.model_dump(mode="json")
+        for field in ("scheduling_profile_ref", "scheduling_plan_digest"):
+            if getattr(request, field) is None:
+                request_body.pop(field)
         # Optional ownership must not invalidate pre-upgrade idempotency keys.
         if request.template_ref is None:
             request_body.pop("template_ref")
@@ -162,6 +165,38 @@ class Service:
                     ):
                         raise Rejected("템플릿과 작업 요청이 일치하지 않습니다.")
                     spec = self.template_spec(spec, template)
+                scheduling = None
+                if request.scheduling_profile_ref or request.scheduling_plan_digest:
+                    if (
+                        not request.scheduling_profile_ref
+                        or not request.scheduling_plan_digest
+                        or request.mode != "observe"
+                        or request.approval_ref
+                        or request.study_ref
+                        or request.probe_plan_ref
+                    ):
+                        raise Rejected(
+                            "A scheduling profile requires an observe request and plan digest"
+                        )
+                    from .scheduling import SchedulingPlanRequest, apply_plan, compile_plan
+
+                    compiled = compile_plan(
+                        self,
+                        conn,
+                        project,
+                        SchedulingPlanRequest(
+                            profile_ref=request.scheduling_profile_ref,
+                            workload_ref=request.workload_ref,
+                            candidate_ref=request.candidate_ref,
+                            template_ref=request.template_ref,
+                        ),
+                    )
+                    if not compiled["accepted"]:
+                        raise Rejected("SCHEDULING_POLICY_REJECTED: " + str(compiled["excluded"]))
+                    if compiled["digest"] != request.scheduling_plan_digest:
+                        raise Rejected("SCHEDULING_PLAN_CHANGED: preview the policy again")
+                    scheduling = compiled["plan"]
+                    spec = apply_plan(spec, scheduling)
                 operational = (
                     self.operational_mode and request.mode == "observe" and not request.approval_ref
                 )
@@ -258,6 +293,9 @@ class Service:
                 }
                 if template:
                     body["job_template"] = template.model_dump(mode="json")
+                if scheduling:
+                    body["scheduling_plan"] = scheduling
+                    body["scheduling_plan_digest"] = request.scheduling_plan_digest
                 if spec.identity.sampling_policy_digest is not None:
                     from .sampling import SamplingPolicies
 

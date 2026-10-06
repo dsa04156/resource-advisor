@@ -24,10 +24,12 @@ from .contracts import (
 )
 from .qualifications import QualificationImport, Qualifications
 from .qualifications import list_page as qualification_page
+from .scheduling import SchedulingPlanRequest, SchedulingProfile, compile_plan
 from .service import NotFound, Rejected, Service
 from .store import Conflict, jobs, outbox, usage
 
 PREFIX = "/api/v1/compute"
+
 
 
 @dataclass(frozen=True)
@@ -167,6 +169,29 @@ def create_app(
         with service.store.transaction() as conn:
             conn.execute(select(1))
         return {"status": "ok", "execution_enabled": "worker configuration required"}
+
+    @app.post(PREFIX + "/scheduling-profiles")
+    def register_scheduling_profile(value: SchedulingProfile, p=Depends(operator)):
+        return service.register("scheduling_profile", value, p.project)
+
+    @app.get(PREFIX + "/scheduling-profiles")
+    def scheduling_profiles(p=Depends(principal)):
+        with service.store.transaction() as conn:
+            return {
+                "items": [
+                    row["body"] for row in service.store.list(conn, "scheduling_profile", p.project)
+                ]
+            }
+
+    @app.post(PREFIX + "/scheduling-plans")
+    def scheduling_plan(value: SchedulingPlanRequest, p=Depends(principal)):
+        with service.store.transaction() as conn:
+            try:
+                return compile_plan(service, conn, p.project, value)
+            except (NotFound, Rejected):
+                raise
+            except ValueError as exc:
+                raise Rejected(str(exc)) from exc
 
     @app.post(PREFIX + "/profiling-runs")
     def create_study(value: StudyRequest, idempotency_key: str = Header(), p=Depends(principal)):

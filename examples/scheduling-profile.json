@@ -1,0 +1,41 @@
+{
+  "ref": "interactive-v1",
+  "project_ref": "team-a",
+  "name": "Interactive accelerator jobs",
+  "version": 1,
+  "policy": {
+    "backend_order": [
+      "kubernetes",
+      "slurm"
+    ],
+    "priority": "normal",
+    "max_resources": {
+      "host_cpu": 2,
+      "host_memory_mib": 4096,
+      "accelerator_count": 1
+    },
+    "max_run_seconds": 300,
+    "max_queue_seconds": 600
+  },
+  "bindings": [
+    {
+      "backend": "kubernetes",
+      "cluster_ref": "kubernetes-lab",
+      "namespace": "research-a",
+      "local_queue": "interactive",
+      "priority_map": {
+        "normal": "research-normal",
+        "high": "research-urgent"
+      }
+    },
+    {
+      "backend": "slurm",
+      "cluster_ref": "slurm-lab",
+      "partition": "gpu",
+      "account": "team-a",
+      "priority_map": {
+        "normal": "normal"
+      }
+    }
+  ]
+}

@@ -166,6 +166,7 @@ class KubernetesBackend:
         training_sources=None,
         priority_classes=None,
         retain_termination_evidence=False,
+        runtime_class_name=None,
         execute=run,
     ):
         if not namespace or not local_queue or not node_selector:
@@ -183,6 +184,11 @@ class KubernetesBackend:
         if not isinstance(retain_termination_evidence, bool):
             raise ValueError("termination retention must be an explicit boolean")
         self.retain_termination_evidence = retain_termination_evidence
+        if runtime_class_name is not None and not re.fullmatch(
+            r"[a-z0-9]([-a-z0-9.]*[a-z0-9])?", runtime_class_name
+        ):
+            raise ValueError("invalid Kubernetes runtime class")
+        self.runtime_class_name = runtime_class_name
         self.prefix = ["kubectl"]
         if kubeconfig:
             self.prefix += ["--kubeconfig", kubeconfig]
@@ -196,6 +202,20 @@ class KubernetesBackend:
     def manifest(self, job):
         b = job["body"]
         priority_class = policy_priority(job, self.priority_classes)
+        from .scheduling import verify_adapter_plan
+
+        try:
+            verify_adapter_plan(
+                job,
+                {
+                    "namespace": self.namespace,
+                    "local_queue": self.local_queue,
+                    "runtime_class_name": self.runtime_class_name,
+                    "priority_class": priority_class,
+                },
+            )
+        except ValueError as exc:
+            raise BackendError(str(exc)) from exc
         r = b["candidate"]["context"]["resources"]
         resources = {"cpu": str(r["host_cpu"]), "memory": f"{r['host_memory_mib']}Mi"}
         key = b["capability"]["resource_key"]
@@ -262,6 +282,8 @@ class KubernetesBackend:
                 },
             },
         }
+        if self.runtime_class_name:
+            manifest["spec"]["template"]["spec"]["runtimeClassName"] = self.runtime_class_name
         bundle = self.runtime_bundles.get(b["variant"]["ref"])
         if self.retain_termination_evidence:
             from .kubernetes_retention import FINALIZER
@@ -604,6 +626,14 @@ class SlurmBackend:
         if b["spec"]["identity"]["task_type"] == "training":
             raise BackendError("Slurm checkpoint isolation is not qualified")
         qos = policy_priority(job, self.qos_by_priority, self.qos)
+        from .scheduling import verify_adapter_plan
+
+        try:
+            verify_adapter_plan(
+                job, {"partition": self.partition, "account": self.account, "qos": qos}
+            )
+        except ValueError as exc:
+            raise BackendError(str(exc)) from exc
         check, command = self.runtime_command(job)
         r = b["candidate"]["context"]["resources"]
         if r["host_cpu"] != int(r["host_cpu"]):

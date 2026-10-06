@@ -224,3 +224,5 @@ two method blocks, full source costs and equal target budgets. All four methods
 selected the same configuration: this fixture demonstrates no selection advantage
 for transfer. Numerical failure tests remain explicitly synthetic; broader
 effectiveness and live harmful-transfer injection remain unverified.
+
+공통 정책 API와 웹 제출 흐름: [SchedulingProfile 가이드](docs/scheduling-profiles.md).

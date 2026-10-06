@@ -310,6 +310,8 @@ class JobTemplate(Contract):
 
 
 class JobRequest(Contract):
+    scheduling_profile_ref: Ref | None = None
+    scheduling_plan_digest: Digest | None = None
     template_ref: Ref | None = None
     workload_ref: Ref
     candidate_ref: Ref
