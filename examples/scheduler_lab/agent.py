@@ -348,12 +348,20 @@ class Agent:
             ",".join(self.slurm_ids),
             "--format=JobID,JobName,State,Reason,Start,End,Elapsed,Timelimit,NodeList",
         )
+        active = {}
+        live = self.slurm("squeue", "-h", "-j", ",".join(self.slurm_ids), "-o", "%i|%T|%r|%N")
+        for line in live.splitlines():
+            values = line.split("|")
+            if len(values) == 4:
+                active[values[0]] = values[1:]
         jobs = []
         for line in raw.splitlines():
             fields = line.split("|")
             if len(fields) < 9 or fields[0] not in self.slurm_ids:
                 continue
             i, name, state, reason, start, end, elapsed, limit, node = fields[:9]
+            if i in active:
+                state, reason, node = active[i]
             jobs.append(
                 {
                     "id": i,
@@ -398,7 +406,7 @@ class Agent:
             probe.read_text().split("if __name__")[0]
             + "\nimport time\nfor _ in range(30):\n print(measure(), flush=True)\n time.sleep(.3)\n"
         )
-        for label, limit, nice in [("long", "00:04:00", "0"), ("short", "00:01:00", "100")]:
+        for label, limit, nice in [("long", "00:02:00", "0"), ("short", "00:01:00", "100")]:
             script = "#!/bin/bash\nset -e\npython3 - <<\x27PY\x27\n" + code + "\nPY\n"
             ident = (
                 self.slurm(

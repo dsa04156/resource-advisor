@@ -2363,10 +2363,11 @@ function schedulerLabView(){
   const queue=add(el("section",null,"lab-queue"),el("div","01 / WORKLOAD QUEUE","eyebrow"));
   for(const j of jobs){const b=el("button",null,"lab-job "+labTone(j.state)+(selected?.id===j.id?" selected":""));add(b,el("span",j.label,"lab-job-name"),badge(j.state,labTone(j.state)==="done"?"good":"warn"),el("small",`${j.gpu} GPU${j.time_limit?" · "+j.time_limit:""}`),el("span",j.reason&&j.reason!=="None"?j.reason:labTone(j.state)==="done"?"네이티브 실행 완료":"실행 상태 관측","lab-job-reason"));b.onclick=()=>{labSelected=j.id;render();};queue.append(b);}
   if(!jobs.length)queue.append(el("p","네이티브 작업 제출 준비 중","muted"));layout.append(queue);
-  const middle=add(el("div",null,"lab-admission"),el("span","02 / ADMISSION","eyebrow"),el("div",snap.backend==="Slurm"?"SLURM":"KUEUE","lab-scheduler-core"),el("strong",snap.policy||spec.name),el("p",run.scenario==="topology"?"hostname domain":run.scenario==="gang"?"All workers · quota reservation":"Time window · walltime"),el("span","→","lab-arrow"));layout.append(middle);
+  const middle=add(el("div",null,"lab-admission"),el("span","02 / ADMISSION","eyebrow"),el("div",run.scenario==="backfill"?"SLURM":"KUEUE","lab-scheduler-core"),el("strong",snap.policy||spec.name),el("p",run.scenario==="topology"?"hostname domain":run.scenario==="gang"?"All workers · quota reservation":"Time window · walltime"),el("span","→","lab-arrow"));layout.append(middle);
   const pool=add(el("section",null,"lab-pool"),el("div","03 / GPU PLACEMENT","eyebrow"));
   const known=run.scenario==="backfill"?[{id:jobs.flatMap(j=>j.pods||[]).find(p=>p.node&&p.node!=="None assigned")?.node,label:"Slurm · Orin Nano",gpu:1}]:(labData?.agent?.nodes||[]);
   for(const n of known){const assigned=jobs.filter(j=>(j.pods||[]).some(p=>p.node===n.id)),node=add(el("div",null,"lab-node"),el("strong",n.label),el("small",n.id||"배치 전"));const slots=el("div",null,"lab-slots");for(let i=0;i<n.gpu;i++){const occupied=assigned.find(j=>["RUNNING","Running","ADMITTED"].includes(j.state));slots.append(add(el("div",null,"lab-slot"+(occupied?" allocated":"")),el("span","GPU "+i),el("strong",occupied?occupied.label:"현재 실험 미할당")));}node.append(slots);for(const j of assigned){const b=el("button",j.label+" · "+j.state,"lab-assigned "+labTone(j.state));b.onclick=()=>{labSelected=j.id;render();};node.append(b);}pool.append(node);}pool.append(el("small","슬롯은 이 실험의 할당 기록입니다. GPU 사용률과 클러스터 전체 여유를 뜻하지 않습니다."));layout.append(pool);stage.append(layout);root.append(stage);
+  if(run.scenario==="backfill" && snap.reservation)root.append(backfillWindow(run,snap));
   const bottom=el("div",null,"lab-bottom"),timeline=add(el("section",null,"lab-timeline"),el("h3","실행 타임라인"));
   const range=el("input");range.type="range";range.min="0";range.max=String(Math.max(events.length-1,0));range.value=String(Math.max(index,0));range.setAttribute("aria-label","네이티브 관측 시점 탐색");range.disabled=!events.length;range.oninput=()=>{labCursor=Number(range.value);render();};timeline.append(range);
   events.slice(-12).reverse().forEach((e,offset)=>{const idx=events.length-1-offset,b=el("button",null,"lab-event"+(index===idx?" selected":""));add(b,el("time",stamp(e.observed_at)),el("span",e.title));b.onclick=()=>{labCursor=idx;render();};timeline.append(b);});bottom.append(timeline);
@@ -2376,3 +2377,20 @@ function schedulerLabView(){
 }
 
 setInterval(()=>{if(active==="scheduler-lab" && data && !labPending && !labBusy)refreshLab();},3000);
+
+function backfillWindow(run,snap){
+  const panel=add(el("section",null,"lab-time-window"),el("span","BACKFILL WINDOW","eyebrow"),el("h3","짧은 작업이 먼저 들어간 시간"));
+  const match=snap.reservation.match(/StartTime=([^\s]+).*?EndTime=([^\s]+)/s);
+  if(!match){panel.append(el("p","Slurm 예약 시간 파싱 대기"));return panel;}
+  // Slurm times carry the controller's local timezone. Keep all bars in that
+  // same clock domain; never mix them with API UTC observation timestamps.
+  const reservedStart=Date.parse(match[1]),reservedEnd=Date.parse(match[2]);
+  if(!Number.isFinite(reservedStart)||!Number.isFinite(reservedEnd))return panel;
+  const jobs=snap.jobs||[],starts=jobs.map(j=>Date.parse(j.start)).filter(Number.isFinite),ends=jobs.map(j=>Date.parse(j.end)).filter(Number.isFinite);
+  const min=Math.min(reservedStart-120000,...starts),max=Math.max(reservedEnd+30000,...ends),span=max-min;
+  panel.append(el("p","사선 = 미래 예약 · 막대 = 실제 시작–종료 기록. 아직 시작하지 않은 작업은 막대를 만들지 않습니다.","muted"));
+  const row=(label,start,end,kind,text)=>{const r=add(el("div",null,"lab-time-row"),el("strong",label)),track=el("div",null,"lab-time-track"),bar=el("div",null,"lab-time-bar "+kind);bar.style.left=((start-min)/span*100)+"%";bar.style.width=(Math.max(end-start,1000)/span*100)+"%";bar.title=text;bar.setAttribute("aria-label",text);track.append(bar);r.append(track,el("small",text));return r;};
+  panel.append(row("예약 창",reservedStart,reservedEnd,"reserved",match[1].slice(11)+" → "+match[2].slice(11)));
+  for(const j of jobs){const start=Date.parse(j.start),end=Date.parse(j.end);if(Number.isFinite(start)&&Number.isFinite(end))panel.append(row(j.label,start,end,"executed",j.start.slice(11)+" → "+j.end.slice(11)));else panel.append(add(el("div",null,"lab-time-row"),el("strong",j.label),el("span",Number.isFinite(start)?"실행 중 · "+j.start.slice(11)+" 시작":"시작 대기 · "+(j.reason&&j.reason!=="None"?j.reason:"네이티브 사유 확인 중"),"muted")));}
+  return panel;
+}

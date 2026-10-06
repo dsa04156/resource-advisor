@@ -23,7 +23,7 @@ optimal policy. Topology comparison deliberately cancels its own unschedulable
 same-node job after saving native evidence, then submits the relaxed comparison.
 
 Slurm uses a one-minute reservation starting about two minutes in the future.
-The earlier job requests four minutes; the later job requests one minute and a
+The earlier job requests two minutes; the later job requests one minute and a
 lower priority via nice. Both compute for around ten seconds. Requested walltime,
 not measured kernel runtime, drives the backfill example. This artificial reservation
 creates a repeatable lab window; it is not evidence of real multi-user utilization
