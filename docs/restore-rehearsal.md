@@ -139,3 +139,13 @@ same metadata node, so the evidence is not node-loss recovery. Original object
 storage and MLflow were read back, **not restored**. Object-store backup, PITR,
 off-site retention, HA, schema upgrades and disaster recovery remain separate
 work. All hardware and recovery operations here were assistant-executed.
+# Current scheduler-history schema
+
+The rehearsal below predates the native scheduler experiment tables. It remains
+evidence for that five-table snapshot, not a restore of newer experiment history.
+The current schema also includes `ra_scheduler_labs` and `ra_scheduler_lab_agent`.
+Fresh backup CLI processes now register both before fingerprint/manifest checks;
+previously their inclusion depended on another module having initialized Store.
+Seven-table membership, JSON round-trip content and equal-count corruption in
+both history tables have focused regression coverage. A new actual seven-table
+dump/restore rehearsal remains required before claiming current-schema recovery.

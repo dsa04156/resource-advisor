@@ -127,7 +127,17 @@ def test_heartbeat_api_requires_same_project(service):
 
 def test_default_request_keeps_old_idempotency_digest(service):
     request = JobRequest(workload_ref="workload-1", candidate_ref="base")
-    legacy = request.model_dump(mode="json", exclude={"owner_lease_seconds"})
+    # Freeze the actual pre-lease request contract. Later optional profile/template
+    # fields must not silently become part of this historical fixture.
+    legacy = {
+        "workload_ref": "workload-1",
+        "candidate_ref": "base",
+        "mode": "observe",
+        "approval_ref": None,
+        "study_ref": None,
+        "parent_run_ref": None,
+        "probe_plan_ref": None,
+    }
     job = service.submit("team-a", request, "legacy-key")
     with service.store.transaction() as conn:
         row = conn.execute(select(jobs).where(jobs.c.id == job["job_id"])).mappings().one()

@@ -1,6 +1,8 @@
 """Restore verification must detect corruption even with unchanged row counts."""
 
 import json
+import subprocess
+import sys
 
 import pytest
 from sqlalchemy import insert, update
@@ -12,7 +14,26 @@ from resource_advisor.backup import (
     fingerprint,
     verify_snapshot,
 )
+from resource_advisor.scheduler_lab import agent, runs
 from resource_advisor.store import Store, entities, outbox
+
+
+def test_fresh_backup_process_registers_scheduler_history_without_store_initialization():
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import json; from resource_advisor.backup import metadata; "
+            "print(json.dumps(sorted(metadata.tables)))",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=15,
+    )
+    tables = json.loads(result.stdout)
+    assert len(tables) == 7
+    assert {"ra_scheduler_labs", "ra_scheduler_lab_agent"} <= set(tables)
 
 
 def test_copy_comparison_detects_changed_json_with_equal_counts(database_store):
@@ -35,7 +56,15 @@ def test_copy_comparison_detects_changed_json_with_equal_counts(database_store):
             c.execute(insert(entities).values(**row))
         report = compare(database_store, restored)
         assert report["matches"]
-        assert len(report["source"]) == 5
+        assert set(report["source"]) == {
+            "ra_entities",
+            "ra_jobs",
+            "ra_outbox",
+            "ra_studies",
+            "ra_usage",
+            "ra_scheduler_labs",
+            "ra_scheduler_lab_agent",
+        }
         assert "private-" not in json.dumps(report)
         with restored.transaction() as c:
             c.execute(update(entities).values(body={"nested": {"metric": 2}}))
@@ -45,6 +74,37 @@ def test_copy_comparison_detects_changed_json_with_equal_counts(database_store):
         assert report["source"]["ra_entities"]["rows"] == 1
         assert report["restored"]["ra_entities"]["rows"] == 1
         assert fingerprint(database_store) == report["source"]
+    finally:
+        restored.engine.dispose()
+
+
+@pytest.mark.parametrize("table", [agent, runs], ids=["agent", "experiment-history"])
+def test_copy_detects_equal_count_corruption_in_scheduler_history(database_store, table):
+    restored = Store("sqlite://")
+    restored.initialize()
+    row = (
+        {"id": "runner", "seen_at": "test-time"}
+        if table is agent
+        else {
+            "ref": "lab-one",
+            "project": "team-one",
+            "scenario": "quota",
+            "state": "SUCCEEDED",
+            "version": 1,
+            "created_at": "test-time",
+        }
+    )
+    row["body"] = {"snapshot": {"nodes": [{"free_memory": 10}]}}
+    try:
+        for store in (database_store, restored):
+            with store.transaction() as conn:
+                conn.execute(insert(table).values(**row))
+        assert compare(database_store, restored)["matches"]
+        with restored.transaction() as conn:
+            conn.execute(update(table).values(body={"snapshot": {"nodes": [{"free_memory": 5}]}}))
+        report = compare(database_store, restored)
+        assert report["mismatched_tables"] == [table.name]
+        assert report["source"][table.name]["rows"] == report["restored"][table.name]["rows"] == 1
     finally:
         restored.engine.dispose()
 

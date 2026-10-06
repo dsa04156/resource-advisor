@@ -7,6 +7,7 @@ from contextlib import contextmanager
 
 from sqlalchemy import select
 
+from . import scheduler_lab  # noqa: F401 — register experiment tables in fresh backup CLI processes
 from .store import metadata
 
 
@@ -107,5 +108,5 @@ def compare(source, restored):
         "source": before,
         "restored": after,
         "mismatched_tables": [name for name in before if before[name] != after[name]],
-        "scope": "All five platform tables, exact canonical contents; writers must be quiesced",
+        "scope": "All registered platform tables, exact canonical contents; writers must be quiesced",
     }
