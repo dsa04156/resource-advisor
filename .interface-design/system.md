@@ -135,3 +135,11 @@ Canvas supports zoom, fit, pointer pan, keyboard-accessible node buttons; narrow
 screens start around the selected node instead of shrinking labels to illegibility.
 Green denotes observed completion, amber wait, blue active/selected, gray configured
 or unobserved. Existing text always accompanies color. No decorative animation.
+
+Native scheduler lab: three explicit policy selectors lead to one real launch
+button. A navy observation header anchors a left-to-right queue → native scheduler
+→ physical GPU allocation board. Job cards and assigned worker chips select the
+same evidence inspector. Recorded events have a seek slider; replay and latest
+observations are labelled separately. The 3-column board stacks vertically below
+760px. Slots show this experiment allocation only. Dark header is reserved for
+native experiment state; amber wait, blue active and teal complete accompany text.

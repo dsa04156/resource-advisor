@@ -1793,6 +1793,7 @@ function render() {
 function reset(message = "") {
   generation++;
   graphJobId=null;graphSelection="compute";
+  labData=null; labRef=""; labUpdated=0; labCursor=null; labKey=null;
   scenarioData=null; scenarioRecent=[]; scenarioRef=""; scenarioUpdated=0; scenarioPending=false; scenarioError=""; scenarioCursor=null; scenarioSubmission=null; stopScenarioReplay();
   researchData=null; researchRuns=null; researchPending=false; experimentSelection.clear(); researchUpdated=0;
   controller?.abort();
@@ -2354,10 +2355,10 @@ function schedulerLabView(){
   const events=run.body.events||[],index=labCursor===null?events.length-1:Math.min(labCursor,events.length-1),event=events[index];
   const snap=labCursor===null?run.body.snapshot:(event?.snapshot||{}),jobs=snap.jobs||[],selected=jobs.find(j=>j.id===labSelected)||jobs[0],spec=labKinds[run.scenario];
   const controls=el("div",null,"lab-controls lab-toolbar"),select=el("select");select.setAttribute("aria-label","실험 기록 선택");items.forEach(r=>{const o=el("option",labKinds[r.scenario].name+" · "+stamp(r.created_at));o.value=r.ref;o.selected=r.ref===labRef;select.append(o);});select.onchange=()=>{labRef=select.value;labCursor=null;labSelected="";render();};
-  const live=el("button",labCursor===null?"● LIVE":"실시간으로 돌아가기");live.onclick=()=>{labCursor=null;render();};
+  const live=el("button",labCursor===null?(["SUCCEEDED","FAILED","CANCELED"].includes(run.state)?"최종 기록":"● LIVE"):"최신 기록으로");live.onclick=()=>{labCursor=null;render();};
   add(controls,select,badge(run.state,labTone(run.state)==="done"?"good":"warn"),live);
   if(!["SUCCEEDED","FAILED","CANCELED"].includes(run.state)){const cancel=el("button","실험 중지");cancel.disabled=run.state==="CANCEL_REQUESTED";cancel.onclick=async()=>{cancel.disabled=true;try{const r=await fetch(API+"/scheduler-labs/"+run.ref+"/cancel",{method:"POST",headers:authHeaders()});if(!r.ok)throw new Error("취소 접수 실패");await refreshLab();}catch(e){labError=e.message;render();}};controls.append(cancel);}root.append(controls);
-  const stage=el("div",null,"lab-stage"),top=add(el("div",null,"lab-stage-title"),el("span",spec.name.toUpperCase(),"eyebrow"),el("strong",snap.phase==="FINISHED"?(snap.verdict||snap.error||run.state):snap.explanation||"실험 접수 완료"),el("small",(labCursor===null?"마지막 관측 ":"기록 재생 ")+stamp(labCursor===null?run.body.observed_at:event?.observed_at)));stage.append(top);
+  const stage=el("div",null,"lab-stage"),top=add(el("div",null,"lab-stage-title"),el("span",spec.name.toUpperCase(),"eyebrow"),el("strong",snap.phase==="FINISHED"?(snap.verdict||(snap.error?"실험 실행 오류 · 아래 네이티브 기록 확인":run.state)):snap.explanation||"실험 접수 완료"),el("small",(labCursor===null?"마지막 관측 ":"기록 재생 ")+stamp(labCursor===null?run.body.observed_at:event?.observed_at)));stage.append(top);
   const layout=el("div",null,"lab-allocation");
   const queue=add(el("section",null,"lab-queue"),el("div","01 / WORKLOAD QUEUE","eyebrow"));
   for(const j of jobs){const b=el("button",null,"lab-job "+labTone(j.state)+(selected?.id===j.id?" selected":""));add(b,el("span",j.label,"lab-job-name"),badge(j.state,labTone(j.state)==="done"?"good":"warn"),el("small",`${j.gpu} GPU${j.time_limit?" · "+j.time_limit:""}`),el("span",j.reason&&j.reason!=="None"?j.reason:labTone(j.state)==="done"?"네이티브 실행 완료":"실행 상태 관측","lab-job-reason"));b.onclick=()=>{labSelected=j.id;render();};queue.append(b);}
@@ -2373,3 +2374,5 @@ function schedulerLabView(){
   if(selected){add(inspector,el("p","ID · "+selected.id),el("p","상태 · "+selected.state),el("p",selected.reason||"대기 사유 없음"));for(const p of selected.pods||[]){inspector.append(el("p",(p.node||"노드 미정")+" · "+p.state));for(const e of p.events||[])inspector.append(el("small",e.phase+(e.correctness?" · CUDA 검증 통과":"")));}}
   if(snap.queue_evidence){const d=el("details");add(d,el("summary","기록된 대기 사유"),el("pre",JSON.stringify(snap.queue_evidence,null,2)));inspector.append(d);}if(selected?.admission){const d=el("details");add(d,el("summary","실제 Kueue admission / topologyAssignment"),el("pre",JSON.stringify(selected.admission,null,2)));inspector.append(d);}if(snap.reservation){const d=el("details");add(d,el("summary","실제 Slurm 예약 창"),el("pre",snap.reservation));inspector.append(d);}if(snap.error)inspector.append(el("p",snap.error,"error"));if(snap.verdict)inspector.append(el("p",snap.verdict,"lab-verdict"));bottom.append(inspector);root.append(bottom);return root;
 }
+
+setInterval(()=>{if(active==="scheduler-lab" && data && !labPending && !labBusy)refreshLab();},3000);

@@ -1,0 +1,20 @@
+{
+  "credentials_file": "/etc/hairp/private/api.json",
+  "ca_file": "/etc/hairp/private/ca.crt",
+  "namespace": "hairp-scheduling-lab",
+  "queue": "gpu-lab",
+  "runtime_class": "hairp-lab-nvidia",
+  "kubectl": "/usr/bin/kubectl",
+  "kubeconfig": "/etc/hairp/private/lab.kubeconfig",
+  "image": "registry.example.org/qualified-python-cuda@sha256:REPLACE_WITH_QUALIFIED_DIGEST",
+  "nodes": [
+    {"id": "gpu-lab-a", "label": "GPU A", "gpu": 1},
+    {"id": "gpu-lab-b", "label": "GPU B", "gpu": 1}
+  ],
+  "slurm_node": "gpu-lab-c",
+  "slurm_partition": "gpu-lab",
+  "slurm_account": "research-lab",
+  "slurm_qos": "normal",
+  "slurm_transport": ["/usr/local/libexec/hairp-lab-slurm-transport"],
+  "lock_file": "/var/lib/hairp/scheduler-lab.lock"
+}

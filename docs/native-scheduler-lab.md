@@ -1,0 +1,102 @@
+# Native GPU scheduling lab
+
+Open **Console → 스케줄링 실험실** (`/console#scheduler-lab`). Select a scenario,
+then **실제 GPU로 실험 시작**. The server persists a request; an external bounded
+runner submits real native jobs and publishes observed snapshots every few seconds.
+Closing the browser does not stop the experiment. **실험 중지** cancels this run.
+The history selector and timeline replay stored observations, not synthetic progress.
+
+## What the three experiments actually demonstrate
+
+| Scenario | Native mechanism | Evidence required for success |
+|---|---|---|
+| Gang admission | Kueue admits a two-pod Indexed Job as one workload after a one-GPU blocker frees quota | Native pending reason, whole PodSet admission, both CUDA workers passing their application barrier and completing |
+| Topology-aware | Kueue ResourceFlavor + Topology with `kubernetes.io/hostname` | Same-node two-GPU request remains pending on two one-GPU nodes; comparison job without that locality constraint receives a two-domain topologyAssignment and completes |
+| Backfill | Existing Slurm `sched/backfill`, requested walltimes and a bounded future reservation | A later short GPU job runs while the earlier long GPU job is pending; both complete with short.Start < long.Start; reservation and sdiag snapshots retained |
+
+The GPU payload is a real CUDA numerical correctness probe (4,096 squares), not a
+model training benchmark. Each worker initializes a real visible GPU. There is no
+CPU fallback. The two-worker barrier coordinates compute startup; Kubernetes pod
+creation itself is **not atomic**. This does not implement NCCL collective training,
+preemptive gang time slicing, rack optimization, NVLink awareness, or proof of an
+optimal policy. Topology comparison deliberately cancels its own unschedulable
+same-node job after saving native evidence, then submits the relaxed comparison.
+
+Slurm uses a one-minute reservation starting about two minutes in the future.
+The earlier job requests four minutes; the later job requests one minute and a
+lower priority via nice. Both compute for around ten seconds. Requested walltime,
+not measured kernel runtime, drives the backfill example. This artificial reservation
+creates a repeatable lab window; it is not evidence of real multi-user utilization
+gains. Reservation expiry bounds disruption even if the runner dies.
+
+## Separation from ordinary research jobs
+
+`/api/v1/compute/scheduler-labs` accepts only an allowlisted scenario name. A user
+cannot send shell commands, select arbitrary hosts, edit queue quotas, or request
+root operations. Admission for one active lab experiment is serialized across
+projects. Idempotency keys preserve retries; listings/cancellation are project
+scoped. Operator-only heartbeat/report endpoints feed PostgreSQL records. A local
+file lock enforces one runner; this is not a distributed HA worker implementation.
+
+Lab records are separate from ordinary WorkloadSpec jobs: their multi-worker native
+semantics are not silently flattened into the existing single-worker model. Existing
+MLflow/Kubeflow workflows remain available, but these three lab runs do **not** create
+MLflow runs or KFP pipelines automatically. Their evidence lives in PostgreSQL.
+
+The UI shows real job state, pending reasons, GPU placement and native admission
+JSON. Slot occupancy is the current experiment allocation, **not GPU utilization**
+or total cluster capacity. Completion does not imply the GPU is unused by other
+projects. Times are observed transitions; start/end from Slurm remain native values.
+
+## Installation in an isolated lab
+
+Verified target: Kubernetes 1.31.14, Kueue 0.19.5, Slurm 24.11.5. No runtime or
+scheduler upgrade was needed. Recheck your versions and device-plugin resources.
+TAS must already be available; do not enable new controller features on a production
+cluster just to run the example. NVIDIA runtime handler must exist on both nodes.
+
+1. Use two expendable GPU nodes, each advertising `nvidia.com/gpu: 1`, with a
+   Python image pinned by digest and qualified for both GPU drivers/architectures.
+   Label those nodes `hairp.io/scheduling-lab=gpu`. No other labels are changed.
+2. Review/apply `examples/scheduler_lab/resources.json`. It creates a dedicated
+   namespace, queue, flavor, hostname topology and NVIDIA RuntimeClass. Existing
+   queues, quotas, Slurm accounts and priorities are not reconfigured. Dedicated
+   quota does not create exclusive hardware ownership: other queues can compete.
+3. Create ConfigMap `hairp-lab-probe` in that namespace from
+   `examples/scheduler_lab/gpu_task.py` and `src/resource_advisor/cuda_probe.py`.
+4. Run the normal schema-init command, or create just the additive `runs` and
+   `agent` tables exported by `resource_advisor.scheduler_lab`. Upgrading the API
+   image alone does not migrate an existing database.
+5. Copy `config.example.json` outside the repository. Supply an external API
+   credential file with `api_url` and `operator_token`, CA, kubeconfig and qualified
+   image. Credentials never enter the browser or GPU job.
+6. Implement the site-specific Slurm transport. It reads JSON `{argv, stdin}` on
+   standard input and returns `{returncode, stdout, stderr}`. It needs sbatch,
+   squeue/sacct, scancel, sdiag, and narrowly scoped permission to create/delete
+   reservations prefixed by this lab run. Submit compute as the lab account/user;
+   do not grant API users arbitrary root shell access. SSH authentication is external.
+7. Run `python examples/scheduler_lab/agent.py /path/to/private/config.json` under
+   a supervisor with the right PATH (`rtk`, kubectl, Python) and a single writable
+   lock file. Explicit kubeconfig avoids selecting a different cluster under systemd.
+
+## Failure handling and limits
+
+Absent/stale runner heartbeat disables new submissions. The runner has an eight-minute
+experiment deadline, per-command timeouts and bounded GPU job lifetimes. Failure,
+cancellation and restart attempt cleanup of only the run-labelled Kubernetes jobs
+and services, recorded Slurm IDs and exact reservation name. A restarted active run
+is failed and cleaned, not silently resubmitted. Cleanup errors remain failed evidence
+requiring operator attention. Native completed logs/conditions are captured before
+cleanup; raw infrastructure identities remain in private state, never in this repo.
+
+An unadmitted Kueue Job deadline does not run while suspended; if the runner and
+cluster are both unavailable, an operator must remove suspended lab jobs after
+recovery. This runner is for a controlled lab, not arbitrary public multi-tenant
+execution. Kueue controller-wide waitForPodsReady, production quota borrowing and
+scheduler preemption settings are unchanged.
+
+## References
+
+- [Kueue 0.19 topology-aware scheduling](https://kueue.sigs.k8s.io/v0.19/docs/tasks/run/topology_aware_scheduling/)
+- [Kubernetes Indexed Job communication](https://kubernetes.io/docs/tasks/job/job-with-pod-to-pod-communication/)
+- [Slurm scheduling configuration](https://slurm.schedmd.com/sched_config.html)

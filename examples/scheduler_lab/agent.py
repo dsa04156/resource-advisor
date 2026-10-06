@@ -65,7 +65,13 @@ class Agent:
 
     def kube(self, *args, value=None):
         return self.command(
-            ["kubectl", "-n", self.c["namespace"], *args],
+            [
+                self.c.get("kubectl", "kubectl"),
+                *(["--kubeconfig", self.c["kubeconfig"]] if self.c.get("kubeconfig") else []),
+                "-n",
+                self.c["namespace"],
+                *args,
+            ],
             json.dumps(value) if value is not None else None,
         )
 
@@ -447,22 +453,34 @@ class Agent:
                 return
 
     def cleanup(self):
-        # Delete only resources carrying this run label / exact native IDs.
-        self.kube(
-            "delete",
-            "job,service",
-            "-l",
-            "hairp.io/lab-run=" + self.ref,
-            "--ignore-not-found=true",
-            "--wait=false",
-        )
+        # Attempt both backends even if one is unavailable. Never delete by a broad name.
+        errors = []
+        try:
+            self.kube(
+                "delete",
+                "job,service",
+                "-l",
+                "hairp.io/lab-run=" + self.ref,
+                "--ignore-not-found=true",
+                "--wait=false",
+            )
+        except (RuntimeError, subprocess.TimeoutExpired) as exc:
+            errors.append(str(exc)[:300])
         ids = self.slurm_ids or self.snapshot.get("native_ids", [])
         if ids:
-            self.slurm("scancel", *ids)
+            try:
+                self.slurm("scancel", *ids)
+            except (RuntimeError, subprocess.TimeoutExpired) as exc:
+                errors.append(str(exc)[:300])
         if self.reservation or self.snapshot.get("reservation"):
-            reservations = self.slurm("scontrol", "show", "reservation")
-            if "ReservationName=" + self.ref + " " in reservations:
-                self.slurm("scontrol", "delete", "ReservationName=" + self.ref)
+            try:
+                reservations = self.slurm("scontrol", "show", "reservation")
+                if "ReservationName=" + self.ref + " " in reservations:
+                    self.slurm("scontrol", "delete", "ReservationName=" + self.ref)
+            except (RuntimeError, subprocess.TimeoutExpired) as exc:
+                errors.append(str(exc)[:300])
+        if errors:
+            raise RuntimeError("; ".join(errors))
 
     def execute(self, row):
         self.ref, self.snapshot = row["ref"], row["body"].get("snapshot", {})
