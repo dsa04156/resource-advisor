@@ -4,6 +4,8 @@
 
 처음이면 [한국어 사용 가이드](docs/quickstart-ko.md)부터 보세요.
 [직접 만든 차별점과 원래 설계의 완료 기준](docs/differentiation-ko.md)도 확인할 수 있습니다.
+[구성요소와 차별점을 쉽게 설명한 안내](docs/platform-explained-ko.md)는 도구별 역할,
+직접 만든 기능과 최초 HAIRP의 미완료 범위를 함께 설명합니다.
 설정된 API 주소의 `/console`에서 다음 순서로 사용합니다.
 
 1. **실행 현황** — CPU·메모리·가속기 자원과 작업 상태 확인

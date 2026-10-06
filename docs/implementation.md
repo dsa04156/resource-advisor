@@ -28,6 +28,9 @@ This does not close the disconnected cohort or external lease-fencing risks.
 M6's [CUDA fallback gate](cuda-fallback.md) also now has actual positive/negative
 Kueue executions, with one correct CUDA result and zero result on explicit GPU
 visibility loss. Both terminal Jobs and all incurred costs remain visible.
+M6's [Hailo artifact guard](hailo-artifact.md) now rejects an actual different
+compiled model before device configuration, with a fresh qualified positive,
+unchanged application history and 8 NPU-seconds including the failed arm.
 
 1. Contract validation, stable logical/environment signatures, project authentication.
 2. Independent persistence and attempt/outbox state machine with response-loss recovery.

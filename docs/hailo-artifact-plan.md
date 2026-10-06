@@ -37,4 +37,5 @@ unchanged and the queue has no remaining test allocations. Stop on unexpected
 availability, digest, outcome, eviction or timeout; inspect the same IDs.
 
 This proves the specified compiled-artifact binding guard with a real different
-HEF. It does not qualify ResNet18, arbitrary conversion, compiler correctness,+all NPUs, hostile tenants, Pi hardware or full E0/HAIRP completion.
+HEF. It does not qualify ResNet18, arbitrary conversion, compiler correctness,
+all NPUs, hostile tenants, Pi hardware or full E0/HAIRP completion.

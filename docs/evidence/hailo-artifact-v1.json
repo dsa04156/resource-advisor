@@ -1,0 +1,179 @@
+{
+  "status": "PASS",
+  "protocol": "docs/hailo-artifact-plan.md",
+  "protocol_commit": "05415d9",
+  "verifier_sha256": "415a127c2c6b2cb88010fdcda87531b2e4f37c47d3c22ee258ecd33ec51d10cf",
+  "scope": "qualified Hailo-8 ResNet50 positive and actual different ResNet18 compiled artifact rejection",
+  "metadata_before": {
+    "counts": {
+      "ra_jobs": 589,
+      "ra_outbox": 2582,
+      "ra_usage": 588
+    },
+    "immutable_records_sha256": "sha256:c27ed6563b179e769fffab8d0db789a201cc9062a60c7b6a444b93f9576f3c0d",
+    "immutable_record_count": 2637
+  },
+  "metadata_after": {
+    "counts": {
+      "ra_jobs": 589,
+      "ra_outbox": 2582,
+      "ra_usage": 588
+    },
+    "immutable_records_sha256": "sha256:c27ed6563b179e769fffab8d0db789a201cc9062a60c7b6a444b93f9576f3c0d",
+    "immutable_record_count": 2637
+  },
+  "attempts": {
+    "positive": {
+      "native_outcome": "COMPLETED",
+      "exit_code": 0,
+      "restarts": 0,
+      "initialization_exit_code": 0,
+      "artifact": {
+        "hef_sha256": "a1d82e9121c66e772257490cb3af904d1e90fb4387ad5f683fbc5efe1a05f9f7",
+        "binding_sha256": "2a31a929d041c8788027990463858d278cd57b91cd6ad78f2d276e882ed67d59",
+        "sources": {
+          "hailo_qualification.py": "00641ea7b1de447b8656278ebf1c2fa40b947830d5da8823672bc5adb96e3939",
+          "hailo_benchmark.py": "eafdf42377a23ec04c3fe02f0cfd62d2564fca3c91f01fddd2fbd545000c22aa"
+        }
+      },
+      "images": {
+        "main_requested": "sha256:53ff138554921d149051fdef586c1d32d09737b546b9bc413b77037a7217059c",
+        "main_observed": "sha256:53ff138554921d149051fdef586c1d32d09737b546b9bc413b77037a7217059c",
+        "init_requested": "sha256:4c524b12874382a3cdafe8c7c381a117df2ac91e48215b7b42bae0a531d3fcfd",
+        "init_observed": "sha256:4c524b12874382a3cdafe8c7c381a117df2ac91e48215b7b42bae0a531d3fcfd"
+      },
+      "kueue_admitted": true,
+      "requests": {
+        "cpu": "1",
+        "hailo.ai/h8": "1",
+        "memory": "1Gi"
+      },
+      "init_requests": {
+        "cpu": "1",
+        "memory": "256Mi"
+      },
+      "npu_reservation_seconds": 5.0,
+      "cpu_core_reservation_seconds": 5.0,
+      "result_markers": 1,
+      "qualification_markers": 1,
+      "result": {
+        "result": {
+          "schema_version": "v1",
+          "job_id": "ra-hailo-artifact-v1-positive",
+          "attempt_id": "ra-hailo-artifact-v1-positive",
+          "epoch": 1,
+          "workload_signature": "sha256:8a74c00b467fa7e601b48c7ba6369329844b92361a86baaf7ad680827fdf3b8d",
+          "context_signature": "sha256:61155185436f70f4ac5b0438a161f3e95bc2c396e0ceee9e835f0d23a2bed620",
+          "outcome": "COMPLETED",
+          "measured": true,
+          "evidence_kind": "hardware",
+          "measurements": {
+            "elapsed_seconds": 0.3429148782743141,
+            "peak_memory_mib": 154.75,
+            "quality_value": 0.8,
+            "sample_count": 100,
+            "work_units": 100,
+            "latency_p50_ms": 3.396318934392184,
+            "latency_p95_ms": 3.606548998504877,
+            "latency_p99_ms": 3.7659560330212116,
+            "throughput": 291.6175597373911,
+            "gpu_utilization": null,
+            "power_watts": null,
+            "temperature_celsius": null
+          },
+          "error_code": null
+        },
+        "digest": "sha256:738b9bafc56ddd9900587e0234780d3b1797af57395d0b2652f68e0473bc3332"
+      },
+      "quality": {
+        "accuracy": 0.8,
+        "reference_accuracy": 0.79,
+        "reference_agreement": 0.97,
+        "checks": {
+          "minimum_accuracy_0_75": true,
+          "minimum_reference_agreement_0_90": true,
+          "maximum_accuracy_loss_0_05": true
+        },
+        "qualified": true
+      },
+      "elapsed_seconds": 0.3429148782743141,
+      "measured_images": 100,
+      "runtime_versions": {
+        "hailort": "4.23.0",
+        "driver": "4.23.0",
+        "firmware": "4.23.0 (release,app,extended context switch buffer)",
+        "python": "3.13.16",
+        "numpy": "2.2.6"
+      },
+      "report_digest": "sha256:08c3ec84c8d263891499eeeaafa69c98fba6f0cd444b74057ff53f2cb55f101a"
+    },
+    "negative": {
+      "native_outcome": "FAILED",
+      "exit_code": 1,
+      "restarts": 0,
+      "initialization_exit_code": 0,
+      "artifact": {
+        "hef_sha256": "d5a76ed6f116fc9b9ef502df914a298917091724ed88cfccab36bfb716f61b22",
+        "binding_sha256": "2a31a929d041c8788027990463858d278cd57b91cd6ad78f2d276e882ed67d59",
+        "sources": {
+          "hailo_qualification.py": "00641ea7b1de447b8656278ebf1c2fa40b947830d5da8823672bc5adb96e3939",
+          "hailo_benchmark.py": "eafdf42377a23ec04c3fe02f0cfd62d2564fca3c91f01fddd2fbd545000c22aa"
+        }
+      },
+      "images": {
+        "main_requested": "sha256:53ff138554921d149051fdef586c1d32d09737b546b9bc413b77037a7217059c",
+        "main_observed": "sha256:53ff138554921d149051fdef586c1d32d09737b546b9bc413b77037a7217059c",
+        "init_requested": "sha256:4c524b12874382a3cdafe8c7c381a117df2ac91e48215b7b42bae0a531d3fcfd",
+        "init_observed": "sha256:4c524b12874382a3cdafe8c7c381a117df2ac91e48215b7b42bae0a531d3fcfd"
+      },
+      "kueue_admitted": true,
+      "requests": {
+        "cpu": "1",
+        "hailo.ai/h8": "1",
+        "memory": "1Gi"
+      },
+      "init_requests": {
+        "cpu": "1",
+        "memory": "256Mi"
+      },
+      "npu_reservation_seconds": 3.0,
+      "cpu_core_reservation_seconds": 3.0,
+      "result_markers": 0,
+      "qualification_markers": 0,
+      "rejection": "compiled model digest mismatch"
+    }
+  },
+  "cost": {
+    "npu_reservation_seconds": 8.0,
+    "cpu_core_reservation_seconds": 8.0,
+    "includes_initialization_and_rejected_attempt": true,
+    "measured_cpu_busy_seconds": null,
+    "npu_utilization_power_temperature": null,
+    "allocation_clock_resolution_seconds": 1
+  },
+  "checks": {
+    "no_new_api_jobs_profiles_results_usage": true,
+    "preexisting_native_uids_specs_preserved": true,
+    "queue_pending_workloads": 0,
+    "queue_admitted_workloads": 0,
+    "same_main_and_init_images_binding_sources": true,
+    "different_hef_verified_by_actual_bytes": true,
+    "no_result_or_performance_for_negative": true
+  },
+  "preserved_native_counts": {
+    "jobs": 624,
+    "pods": 622,
+    "workloads.kueue.x-k8s.io": 624,
+    "deployments": 6,
+    "persistentvolumeclaims": 5,
+    "clusterqueues.kueue.x-k8s.io": 9
+  },
+  "limits": [
+    "Only this qualified ResNet50 binding and different ResNet18 artifact; no arbitrary NPU conversion qualification",
+    "Device-scan ordering follows unchanged executed source; no kernel trace",
+    "Reservation time is not device compute utilization or CPU busy time",
+    "Two direct qualification Jobs; no API ledger, MLflow or profile insertion",
+    "Pi physical device and disconnected Slurm trial still unresolved",
+    "Full original HAIRP and independent v0.3 completion not asserted"
+  ]
+}

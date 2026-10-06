@@ -25,6 +25,9 @@ project/operator authorization and unchanged DB/artifact/MLflow without new comp
 The [live CUDA fallback trial](cuda-fallback.md) now adds a same-image positive
 control and explicitly hidden-GPU refusal with two actual Kueue Jobs, unchanged
 application result/profile records and 2 GPU-seconds/3 CPU core-seconds cost.
+The [Hailo compiled-artifact trial](hailo-artifact.md) additionally verifies a
+qualified ResNet50 control and real different ResNet18 HEF rejection through
+two Kueue Jobs, with no negative result/history and 8 NPU-seconds total.
 
 | Gate | Required authoritative evidence | Current state |
 |---|---|---|
