@@ -11,7 +11,7 @@ No private design document or site configuration belongs in this repository.
 |---|---|---|
 | M0 | Read-only inventory, versions, allowlists, separate backend pools | Read-only Kubernetes/Prometheus inventory and project API verified. Two Slurm hosts have advancing CPU/memory observations through independent mTLS ingestion and console; controller-backed inventory and full hardware discovery remain pending |
 | M1 | KFP launcher → API → suspended Kubernetes Job → result + MLflow | Actual uncached KFP → API → Kueue → RTX 5080 → S3/MLflow verified, including replay |
-| M2 | Slurm submission/status/cancel/results on qualified GPU/NPU | GPU F0/accounting historical proof; native guard and result transport implemented; controller unreachable, full model/API path pending |
+| M2 | Slurm submission/status/cancel/results on qualified GPU/NPU | GPU F0/accounting historical proof; native guard and result transport implemented. October 6 controller/worker recovery verified; full model/API path pending |
 | M3 | Actual Kueue and Slurm quota/account enforcement, unit-separated ledger | Bounded live quota/priority trials and terminal ledger verified. Two-project Kubernetes admission/API/artifact isolation and durable cancellation timing have live evidence; direct MLflow/S3 tenant authorization, Slurm cross-user gates and full utilization/energy costs remain open |
 | M4 | Immutable variants, two signatures, consent/budgets, quality-gated profiles | Consent/budget/pilot loop, real GPU confirmation and isolated deterministic JSON-checkpoint training verified; general training and large checkpoint formats remain open |
 | M5 | Lookup/random/qLogNEI ask/execute/observe/final-confirmation | Real GPU random/qLogNEI loops verified. Lookup freezes its historical cohort. A fresh preregistered three-block comparison completed with 15 real BO acquisitions and no demonstrated BO selection advantage after the first trial stopped for missing worker optimizer dependencies; prior costs and failures remain visible |
@@ -40,8 +40,10 @@ gate-to-evidence map; this milestone summary does not replace it.
 The existing control plane and edge nodes use different Kubernetes versions;
 they will not be upgraded. Queue API is v1beta2. Slurm is 24.11.5 and currently
 has historical one-GPU Jetson F0, SlurmDBD and QOS enforcement evidence.
-The controller is currently unreachable, so its current scheduler health and
-complete model/API path are not asserted. The DEEPX worker has a PCIe link failure.
+The controller and both worker registrations recovered on October 6 after fresh
+bidirectional authentication checks and bounded node-state recovery
+([evidence](slurm-recovery.md)). The complete model/API path remains unverified.
+The DEEPX worker still has no detected PCIe accelerator.
 Other Hailo hardware executed two classification models whose preregistered
 qualifications failed fixed gates; those failures remain unqualified. A third,
 separately preregistered [ResNet-50 contract](hailo-resnet50.md) passed and completed

@@ -52,6 +52,9 @@ Controller connectivity and both worker registrations have recovered; the two
 allocation-free nodes now report `IDLE`. Fresh MUNGE authentication passed in both
 directions. See [the recovery evidence and remaining gates](slurm-recovery.md).
 The Pi accelerator is still absent, and full model/API execution is still pending.
+The first new Orin PyTorch CNN Job completed with correct output, but runtime
+support and host-memory findings prevent automatic execution registration
+([results](slurm-torch-results.md)).
 
 ## Previous lab observation — 2026-10-03 KST
 

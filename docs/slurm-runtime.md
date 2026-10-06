@@ -86,6 +86,12 @@ limit the requested operation. Live multi-user verification remains open.
 
 ## Evidence and open gate
 
+The controller and both workers [recovered on October 6](slurm-recovery.md).
+A subsequent [real Orin PyTorch CNN attempt](slurm-torch-results.md) passed
+numerical checks but remains blocked for automatic execution because of an
+explicit runtime support warning and host-memory overrun. It is not a qualified
+API/model-result path. The earlier disconnected observations below are historical.
+
 A real ARM worker ran the installed guard successfully, then rejected a changed
 source before its command executed. See [the sanitized guard evidence](evidence/native-runtime-guard.json).
 Unit tests cover manifest/environment/architecture/command/probe mismatches,
