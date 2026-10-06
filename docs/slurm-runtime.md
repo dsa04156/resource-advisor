@@ -92,6 +92,9 @@ numerical checks but remains blocked for automatic execution because of an
 explicit runtime support warning and host-memory overrun. A separate
 [Jetson runtime follow-up](slurm-jetson-runtime-results.md) now passes the fixed
 CNN with native `sm_87` and enforced memory limits, retaining the failed candidate.
+A subsequent [native CNN contract trial](slurm-cnn-contract-results.md) also
+passes the platform's result model, canonical digest and identity checks, using
+a standalone Python 3.10 producer. Its acceptance identities are not API jobs.
 The complete API/model-result path and scoped execution credentials remain open.
 The earlier disconnected observations below are historical.
 

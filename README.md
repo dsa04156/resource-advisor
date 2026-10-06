@@ -28,8 +28,9 @@ through actual mTLS Prometheus observations. A
 supplies live Slurm node state, CPU/memory/GPU reservations and scoped queue counts.
 GPU utilization and Pi NPU execution remain unqualified; registration is not model
 execution acceptance. An [isolated Orin runtime](docs/slurm-jetson-runtime-results.md)
-now passes its fixed GPU CNN gate under enforced memory limits; full Slurm
-API/model delivery remains open.
+now passes its fixed GPU CNN gate under enforced memory limits. A subsequent
+[real Slurm CNN job](docs/slurm-cnn-contract-results.md) also emits a validated
+platform result envelope; full API submission and publication remain open.
 
 Open `/console` on the API origin for the [four-view research console](docs/console.md):
 resources/jobs, compatibility, queue/allocation history, and recommendation evidence.
