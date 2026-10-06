@@ -20,7 +20,7 @@ worker, inventory collector or externally published API.
 ## Capture and restore
 
 1. Start a read-only repeatable-read source transaction, export its snapshot and
-   calculate canonical fingerprints of all five platform tables in that same
+   calculate canonical fingerprints of all seven current platform tables in that same
    transaction. Keep it open while the same-version `pg_dump --snapshot` finishes.
    Capture failures retain partial private files and cannot produce a PASS.
 2. Save the custom-format archive and its size/SHA-256, source fingerprints,
@@ -33,6 +33,12 @@ worker, inventory collector or externally published API.
 4. Verify archive integrity and restored table contents against the saved
    snapshot fingerprints. Same-count corruption, missing tables/rows and wrong
    archive bytes must fail automated regression tests.
+
+The current-schema v2 rehearsal includes `ra_entities`, `ra_jobs`, `ra_outbox`,
+`ra_studies`, `ra_usage`, `ra_scheduler_labs` and `ra_scheduler_lab_agent`.
+Both experiment tables must contain actual saved history, not newly synthesized
+records. Their canonical contents and project-scoped API replay must survive
+restoration. The earlier five-table v1 result remains separate historical evidence.
 
 ## Restored application checks
 
