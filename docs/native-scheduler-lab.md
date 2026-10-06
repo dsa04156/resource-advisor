@@ -169,3 +169,18 @@ additional physical resources and adjusting the dedicated lab quota.
 The current 3-worker preflight completed on RTX 5060 Ti, RTX 5080 and GB10. Each
 worker emitted GPU_READY, BARRIER_RELEASED, COMPUTE_STARTED and COMPUTE_FINISHED.
 The GPU payload and architecture are observed from CUDA, not inferred from UI labels.
+
+Browser-launched 3-GPU PoC also completed on 2026-10-06: a one-GPU preceding job
+caused the requested three-worker group to wait with native `1 more needed` quota
+evidence. Kueue then admitted count 3, all three CUDA workers passed the startup
+barrier and completed, and the API recorded `workers_passed=3`, `nodes_used=3`,
+architectures `amd64` and `arm64`. Owned Job/Service resources were cleaned. The
+browser verified per-worker evidence, 0/3 → 3/3 counters, pending-state replay and
+390px layout without horizontal overflow. Two focused contract tests passed,
+including rejecting GPU count above capacity and changed-count idempotency retries.
+The count-1 and count-2 options were not separately replayed as new full experiments.
+
+발표 시연 순서: **스케줄링 실험실 → Multi-GPU PoC → GPU 3개 → 실행**.
+대기 중에는 네이티브 quota 사유를, 입장 후에는 worker별 실제 GPU 모델과
+아키텍처를 보여주세요. 마지막에는 3/3 결과를 확인하고 타임라인으로 대기
+시점에 돌아가면 됩니다. 다시 실행하지 않아도 완료한 기록으로 설명할 수 있습니다.
