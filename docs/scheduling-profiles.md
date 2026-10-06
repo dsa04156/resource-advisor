@@ -93,3 +93,22 @@ private binding configuration are kept outside the public repository.
 
 Native semantics: [Kueue concepts](https://kueue.sigs.k8s.io/docs/concepts/) and
 [Slurm QOS](https://slurm.schedmd.com/qos.html).
+
+## Recorded lab rollout (2026-10-06)
+
+The common policy path was deployed to the API and both workers. Four separate
+Kubernetes jobs using the normal profile completed on RTX 5060 Ti, NVIDIA GB10
+(Spark), Jetson Orin Nano and Jetson AGX Orin. All used real CUDA execution;
+this confirms the submission/result path, not comparative AI-model performance.
+A separate existing Hailo ResNet50 workload also completed.
+
+Current catalog workloads are device-specific (one candidate each). The backend
+preference therefore does not manufacture an alternative executable. Selection
+between two compatible backend candidates is covered by a contract fixture;
+a real equivalent-workload comparison across both backends remains future work.
+Vendor NPUs without a validated compiled-model workload remain unavailable for
+submission. Dedicated lab queues and RuntimeClass settings are privately
+provisioned; they have not been converted into a portable GitOps lab overlay.
+
+The browser-submitted Slurm Orin CNN job also completed through the same profile
+preview and digest-checked submission API, using the existing Account/QOS route.
