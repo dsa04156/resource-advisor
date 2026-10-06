@@ -25,6 +25,9 @@ now accepts a separately operator-enabled zero-GRES adapter script while retaini
 the original GPU scope and all runtime/resource/owner restrictions. The CPU
 rejection and opt-in negatives have software regression evidence only; both-node
 native CPU execution remains pending controller recovery and CPU qualification.
+The [standalone ARM CPU producer](slurm-cpu-plan.md) now has result-contract tests
+and actual read-only identity/version descriptions on both workers. No native
+CPU calculation or scheduler allocation has been inferred from those descriptions.
 
 M6's [live terminal replay](result-replay.md) additionally verifies exact-result
 idempotency, terminal/epoch/attempt rejection and project/operator authorization

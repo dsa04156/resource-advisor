@@ -1,0 +1,29 @@
+{
+  "scope": "read-only --describe only, no computation, installation or submission",
+  "source_sha256": "8bf8a2e11728603e2f6dd856b467f355e31a007c461ca683be6dd00865a83dbb",
+  "nodes": [
+    {
+      "label": "slurm_orin",
+      "description": {
+        "accelerator_model": "NVIDIA Jetson Orin Nano Engineering Reference Developer Kit Super / 0x41:0xd42",
+        "arch": "arm64",
+        "runtime_versions": {
+          "python": "3.12.3"
+        }
+      }
+    },
+    {
+      "label": "slurm_pi",
+      "description": {
+        "accelerator_model": "Raspberry Pi 5 Model B Rev 1.1 / 0x41:0xd0b",
+        "arch": "arm64",
+        "runtime_versions": {
+          "python": "3.13.5"
+        }
+      }
+    }
+  ],
+  "compute_jobs_submitted": 0,
+  "live_gateway_modified": false,
+  "actual_cpu_compute_acceptance": "NOT_RUN_CONTROLLER_UNREACHABLE"
+}

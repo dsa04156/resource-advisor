@@ -86,6 +86,10 @@ limit the requested operation. Live multi-user verification remains open.
 
 ## Explicit CPU-only gateway scope
 
+The [two-node CPU producer and execution protocol](slurm-cpu-plan.md) provides
+the separate ARM fixture and read-only current host descriptions; native CPU
+compute acceptance remains pending controller recovery.
+
 The adapter already omits GRES for a zero-accelerator request. The forced SSH
 gateway formerly accepted only the fixed one-accelerator fixture, so it rejected
 that CPU script before `sbatch`. An operator-owned gateway configuration can now
