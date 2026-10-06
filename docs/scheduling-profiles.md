@@ -143,3 +143,11 @@ project, logical workload identity and quality contract are identical. It does
 not make CUDA code executable on NPUs or convert vendor model formats. The lab
 GPU smoke workload has four compatible candidates; other workloads can correctly
 have just one. Arbitrary new code/model execution still requires runtime registration.
+
+The workload-first lab check submitted the four-candidate CUDA smoke workload
+from the browser without a candidate or GPU selection. The server evaluated all
+four, selected the RTX 5060 Ti route, submitted to Kueue and collected a successful
+GPU result. The six-stage display reached completion from the recorded job state.
+Focused tests passed (33); browser console had no errors, and the 390px layout had
+no page-level horizontal overflow. This verifies automatic routing of this
+registered workload, not arbitrary model portability or optimal placement.
