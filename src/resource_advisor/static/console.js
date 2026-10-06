@@ -14,6 +14,7 @@ const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, quali
 const submitting = new Set();
 const requestKeys = new Map();
 const jobFilters = { status: "all", backend: "all", search: "" };
+let jobsDisplay="graph", graphJobId=null, graphSelection="compute";
 let resourceBackend = "all", resourceSearch = "", searchTimer = null, filterRevision = 0;
 const submissionDraft = { workload: "", candidate: "" };
 let schedulingProfile = "", schedulingPreview = null, schedulingPreviewKey = "";
@@ -897,8 +898,8 @@ function jobsView() {
   const waiting = ["RECEIVED","VALIDATED","SUBMITTING","SUBMISSION_UNKNOWN","QUEUED"].reduce((sum,k) => sum+(counts[k]||0),0);
   root.classList.add("jobs-page");
   const tracked=data.jobs.items.find(j=>j.job_id===trackedJobId) || data.jobs.items.find(j=>j.scheduling_plan && !["SUCCEEDED","FAILED","CANCELED","RESULT_INVALID"].includes(j.state));
-  if(tracked)root.append(schedulingProgress(tracked));
-  root.append(add(el("div",null,"section-heading"),el("p","EXECUTIONS","eyebrow"),el("h2","작업 이력"),el("p",`전체 ${total}개 · 실행 ${counts.RUNNING||0}개 · 대기 ${waiting}개 · 완료 ${counts.SUCCEEDED||0}개`)));
+  if(tracked && jobsDisplay==="table")root.append(schedulingProgress(tracked));
+  root.append(add(el("div",null,"section-heading"),el("p","ML EXECUTION MAP","eyebrow"),el("h2","ML 작업 흐름"),el("p",`전체 ${total}개 · 실행 ${counts.RUNNING||0}개 · 대기 ${waiting}개 · 완료 ${counts.SUCCEEDED||0}개`)));
   const toolbar = el("div",null,"jobs-toolbar"), search = el("input");
   search.id = "job-search"; search.type = "search"; search.maxLength = 128; search.placeholder = "작업 이름 · ID · 노드 검색"; search.setAttribute("aria-label","작업 검색"); search.value = jobFilters.search;
   const refreshFilters = () => { pages.jobs = 0; filterRevision++; load(); };
@@ -913,6 +914,12 @@ function jobsView() {
     b.onclick = () => { jobFilters.status=key; refreshFilters(); }; filters.append(b);
   }
   toolbar.append(filters);
+  const display=el("div",null,"status-filters");
+  for(const [key,label] of [["graph","그래프 보기"],["table","표 보기"]]) {
+    const b=el("button",label,jobsDisplay===key?"selected":"");b.setAttribute("aria-pressed",String(jobsDisplay===key));
+    b.onclick=()=>{jobsDisplay=key;render();};display.append(b);
+  }
+  toolbar.append(display);
   const rows = data.jobs.items.map(j => {
     const open = el("button", "상세 보기", "details-action"); open.setAttribute("aria-label", `상세 보기 · ${j.job_id}`); open.onclick = () => showJob(j);
     return [add(el("div",null,"job-name"),el("strong",j.template?.name || j.workload_ref),code(j.job_id)),add(el("div"),stateBadge(j.state),j.scheduler_reason?el("small",j.attention?.title||j.scheduler_reason):null),
@@ -920,7 +927,7 @@ function jobsView() {
       el("span",`CPU ${j.requested_resources?.host_cpu ?? "—"} · GPU/NPU ${j.requested_resources?.accelerator_count ?? "—"}`),
       stamp(j.created_at),add(el("div",null,"job-actions"),open,cancelButton(j))];
   });
-  root.append(add(el("section",null,"panel jobs-panel"), toolbar, rows.length ? table(["작업","상태","실행 대상","요청 자원","생성 시각","관리"],rows) : empty("조건에 맞는 작업이 없습니다."),pager("jobs",data.jobs)));
+  root.append(add(el("section",null,"panel jobs-panel"), toolbar, rows.length ? (jobsDisplay==="graph"?mlJobsGraph():table(["작업","상태","실행 대상","요청 자원","생성 시각","관리"],rows)) : empty("조건에 맞는 작업이 없습니다."),pager("jobs",data.jobs)));
   return root;
 }
 function schedulingKey(workload) {
@@ -1727,7 +1734,7 @@ function recommendationsView() {
 function render() {
   if (!data) return;
   if (active === "scenario" && !scenarioPending && Date.now()-scenarioUpdated > 3000) refreshScenario();
-  if (["operations","experiments","pipelines","notebooks"].includes(active) && !researchPending && Date.now()-researchUpdated>30000) refreshResearch();
+  if (["operations","experiments","pipelines","notebooks","jobs"].includes(active) && !researchPending && Date.now()-researchUpdated>30000) refreshResearch();
   const focused = document.activeElement;
   const keepFocus = ["job-search", "resource-search"].includes(focused?.id)
     ? { id: focused.id, start: focused.selectionStart, end: focused.selectionEnd } : null;
@@ -1782,6 +1789,7 @@ function render() {
 }
 function reset(message = "") {
   generation++;
+  graphJobId=null;graphSelection="compute";
   scenarioData=null; scenarioRecent=[]; scenarioRef=""; scenarioUpdated=0; scenarioPending=false; scenarioError=""; scenarioCursor=null; scenarioSubmission=null; stopScenarioReplay();
   researchData=null; researchRuns=null; researchPending=false; experimentSelection.clear(); researchUpdated=0;
   controller?.abort();
@@ -2011,7 +2019,7 @@ function pipelinesView() {
 async function openPipeline(ref) {
   const session=generation;const run=await researchRequest("/pipelines/"+encodeURIComponent(ref));if(session!==generation)return;
   const body=el("div",null,"job-detail-content");body.append(el("h3",run.display_name),badge(run.state));
-  const graph=el("div",null,"pipeline-graph");for(const task of run.graph){const observed=run.tasks.find(t=>t.display_name===task.name);graph.append(add(el("div",null,"pipeline-task"),el("small",task.dependencies.length?"선행: "+task.dependencies.join(" → "):"시작 단계"),el("strong",task.name),badge(observed?.state||"상태 미관측")));}body.append(graph);
+  body.append(pipelineDag(run));
   body.append(table(["단계","상태","시작","종료"],run.tasks.map(t=>[el("span",t.display_name),badge(t.state),el("span",stamp(t.start_time)),el("span",stamp(t.end_time))])));
   if(run.job_id)body.append(researchButton("연결된 컴퓨트 작업 보기",async()=>{
     const response=await fetch(API+"/jobs/"+encodeURIComponent(run.job_id)+"/view",{headers:authHeaders()});if(!response.ok)throw new Error("작업 기록을 조회하지 못했습니다.");const job=await response.json();
@@ -2197,3 +2205,114 @@ function scenarioView() {
   return root;
 }
 setInterval(()=>{if(active==="scenario" && data && !scenarioPending && !scenarioStarting)refreshScenario();},3000);
+
+// Graph nodes are real buttons. Edges distinguish execution lineage from KFP DAGs.
+let graphSerial=0;
+function svgElement(name,attrs={}) {
+  const node=document.createElementNS("http://www.w3.org/2000/svg",name);
+  for(const [k,v] of Object.entries(attrs))node.setAttribute(k,String(v));
+  return node;
+}
+function workflowCanvas(nodes,edges,onSelect,{width=1230,height=370,label="작업 실행 연결 그래프"}={}) {
+  const wrap=el("div",null,"ml-graph-wrap"), bar=el("div",null,"ml-graph-controls");
+  const viewport=svgElement("svg",{viewBox:`0 0 ${width} ${height}`,class:"ml-graph-canvas",role:"group","aria-label":label});
+  const arrow="flow-arrow-"+(++graphSerial), defs=svgElement("defs");
+  const marker=svgElement("marker",{id:arrow,viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:6,markerHeight:6,orient:"auto-start-reverse"});
+  marker.append(svgElement("path",{d:"M 0 0 L 10 5 L 0 10 z",class:"ml-arrow"}));defs.append(marker);viewport.append(defs);
+  for(const [from,to] of edges){
+    const a=nodes.find(n=>n.id===from),b=nodes.find(n=>n.id===to);if(!a || !b)continue;
+    const vertical=a.x===b.x, x1=vertical?a.x+100:a.x+200, y1=vertical?a.y+96:a.y+48, x2=vertical?b.x+100:b.x, y2=vertical?b.y:b.y+48;
+    const d=vertical?`M ${x1} ${y1} L ${x2} ${y2}`:`M ${x1} ${y1} C ${x1+28} ${y1}, ${x2-28} ${y2}, ${x2} ${y2}`;
+    viewport.append(svgElement("path",{d,class:"ml-edge "+(b.tone||""),"marker-end":`url(#${arrow})`}));
+  }
+  for(const n of nodes){
+    const foreign=svgElement("foreignObject",{x:n.x,y:n.y,width:202,height:100});
+    const b=document.createElementNS("http://www.w3.org/1999/xhtml","button");b.setAttribute("type","button");
+    b.className="ml-graph-node "+(n.tone||"")+(n.selected?" selected":"");b.setAttribute("aria-label",n.label+" 상세");b.setAttribute("aria-pressed",String(Boolean(n.selected)));
+    b.append(el("small",n.kicker),el("strong",n.label),el("span",n.caption));b.title=n.label+" · "+n.caption;b.onclick=()=>onSelect(n.id);foreign.append(b);viewport.append(foreign);
+  }
+  const focus=nodes.find(n=>n.selected)||nodes[0];
+  let camera=window.innerWidth<650 && width>520 ? {x:Math.max(0,focus.x-100),y:Math.max(0,focus.y-100),w:420,h:312} : {x:0,y:0,w:width,h:height}, drag=null;
+  const paint=()=>viewport.setAttribute("viewBox",`${camera.x} ${camera.y} ${camera.w} ${camera.h}`);
+  paint();
+  const scale=factor=>{const next=Math.max(320,Math.min(width*1.5,camera.w*factor)),ratio=next/camera.w;camera={x:camera.x+(camera.w-next)/2,y:camera.y+(camera.h-camera.h*ratio)/2,w:next,h:camera.h*ratio};paint();};
+  for(const [text,label,fn] of [["−","그래프 축소",()=>scale(1.2)],["＋","그래프 확대",()=>scale(1/1.2)],["전체 보기","그래프 전체 보기",()=>{camera={x:0,y:0,w:width,h:height};paint();}]]){
+    const b=el("button",text);b.setAttribute("aria-label",label);b.onclick=fn;bar.append(b);
+  }
+  viewport.onpointerdown=e=>{if(e.target.closest("button") || e.button!==0)return;const matrix=viewport.getScreenCTM();drag={x:e.clientX,y:e.clientY,camera:{...camera},scale:matrix.a};viewport.setPointerCapture(e.pointerId);};
+  viewport.onpointermove=e=>{if(!drag)return;camera.x=drag.camera.x-(e.clientX-drag.x)/drag.scale;camera.y=drag.camera.y-(e.clientY-drag.y)/drag.scale;paint();};
+  viewport.onpointerup=viewport.onpointercancel=()=>{drag=null;};
+  bar.append(el("small","노드 클릭 · 빈 배경을 드래그해 이동"));wrap.append(bar,viewport);return wrap;
+}
+function mlJobsGraph() {
+  const items=data.jobs.items, root=el("div",null,"ml-workbench");
+  let job=items.find(j=>j.job_id===graphJobId) || items.find(j=>j.job_id===trackedJobId) || items.find(j=>!scenarioTerminal(j.state)) || items[0];
+  graphJobId=job.job_id;
+  const picker=el("div",null,"ml-job-picker");picker.setAttribute("aria-label","그래프로 볼 작업 선택");
+  for(const j of items){const b=el("button",null,j.job_id===job.job_id?"selected":"");b.setAttribute("aria-label",`작업 그래프 · ${j.job_id}`);b.setAttribute("aria-pressed",String(j.job_id===job.job_id));
+    b.append(el("small",j.backend+" · "+stamp(j.created_at)),el("strong",j.template?.name||j.workload_ref),stateBadge(j.state),el("small",j.job_id.slice(0,12)));
+    b.onclick=()=>{graphJobId=j.job_id;graphSelection="compute";render();};picker.append(b);
+  }
+  root.append(picker,el("p",`현재 검색 결과 ${data.jobs.total}개 중 이 페이지 ${items.length}개 · 작업 카드를 선택하면 아래 그래프가 바뀝니다.`,"ml-graph-hint"));
+  const info=job.workload_summary || {}, terminal=scenarioTerminal(job.state), successful=job.state==="SUCCEEDED";
+  const running=job.state==="RUNNING" || job.state==="COLLECTING";
+  const started=Boolean(job.started_at || running || job.result);
+  const submitted=Boolean(job.external_id || job.queued_at);
+  const tone=successful?"complete":["FAILED","RESULT_INVALID","CANCELED"].includes(job.state)?"problem":running?"active":"waiting";
+  const pipeline=researchData?.kubeflow?.items?.find(r=>r.job_id===job.job_id);
+  const q=job.scheduling_plan?.adapter;
+  const short=v=>v?String(v).replace(/^sha256:/,"").slice(0,16):"등록 정보 없음";
+  const nodes=[
+    {id:"model",x:20,y:108,kicker:"MODEL",label:"모델 · 실행 대상",caption:info.model_digest?short(info.model_digest):"모델 정보 미기록",tone:"configured"},
+    {id:"input",x:20,y:242,kicker:"DATA / INPUT",label:"데이터 · 입력",caption:info.input_shape?.length?`입력 ${info.input_shape.join(" × ")}`:"입력 정보 미기록",tone:"configured"},
+    {id:"workload",x:270,y:175,kicker:(info.task_type||"ML WORKLOAD").toUpperCase(),label:({training:"학습 작업",inference:"추론 작업",benchmark:"벤치마크 작업",preprocessing:"전처리 작업"})[info.task_type]||"ML 작업",caption:`배치 ${info.batch_size ?? "—"} · ${info.precision || "정밀도 미기록"}`,tone:"complete"},
+    {id:"policy",x:520,y:30,kicker:"SCHEDULING POLICY",label:"자원 요청 · 정책",caption:job.scheduling_plan?.profile_ref||"기본 실행 설정",tone:"configured"},
+    {id:"queue",x:520,y:175,kicker:job.backend==="slurm"?"SLURM QUEUE":"KUEUE / KUBERNETES",label:q?.local_queue || q?.partition || "백엔드 큐",caption:submitted?(job.state==="QUEUED"?"대기 중 · 눌러서 이유 확인":"백엔드 제출 확인"):"제출 준비",tone:started?"complete":submitted?"waiting":""},
+    {id:"compute",x:770,y:175,kicker:job.allocation_mode==="cpu_only"?"CPU EXECUTION":"GPU / NPU EXECUTION",label:job.node_ref || "실행 대상 확인 중",caption:states[job.state]||job.state,tone},
+    {id:"result",x:1020,y:175,kicker:"RESULT / EXPERIMENT",label:successful?"실험 결과":terminal?"종료 기록":"결과 수집",caption:job.tracking?.run_id?"MLflow 기록 연결됨":job.result?"결과 수집됨":terminal?"종료 상세 확인":"실행 후 기록",tone:terminal?tone:""},
+  ];
+  const edges=[["model","workload"],["input","workload"],["workload","queue"],["policy","queue"],["queue","compute"],["compute","result"]];
+  if(pipeline){nodes.push({id:"pipeline",x:270,y:30,kicker:"KUBEFLOW",label:"연결된 파이프라인",caption:pipeline.state,tone:"configured"});edges.push(["pipeline","workload"]);}
+  for(const n of nodes)n.selected=n.id===graphSelection;
+  const heading=add(el("div",null,"ml-graph-heading"),add(el("div"),el("p","EXECUTION LINEAGE","eyebrow"),el("h3",job.template?.name||job.workload_ref),el("small",job.job_id)),stateBadge(job.state));
+  root.append(heading,workflowCanvas(nodes,edges,id=>{graphSelection=id;render();}),
+    add(el("div",null,"ml-graph-legend"),el("span","● 파랑: 실행 중 / 선택"),el("span","● 초록: 확인된 완료"),el("span","● 주황: 대기"),el("span","○ 회색: 설정 / 미관측")),
+    el("p","선은 이 작업의 입력·실행·결과 연결을 뜻합니다. 각 노드가 별도의 학습·전처리 작업이라는 의미는 아닙니다.","ml-graph-hint"));
+  const selected=nodes.find(n=>n.id===graphSelection)||nodes.find(n=>n.id==="compute");
+  const inspector=el("div",null,"ml-node-inspector");
+  const title=add(el("div"),el("p",selected.kicker,"eyebrow"),el("h3",selected.label));
+  const content=el("div",null,"ml-node-content");
+  if(selected.id==="model")content.append(el("p","모델 식별자: "+(info.model_digest||"미기록")),el("p","정밀도: "+(info.precision||"미기록")),el("small","등록된 작업의 모델 식별자를 표시합니다. 모델 파일이나 학습 단계를 새로 만들지 않습니다."));
+  if(selected.id==="input")content.append(el("p","데이터 버전: "+(info.dataset_version||"미기록")),el("p","입력 크기: "+(info.input_shape?.join(" × ")||"미기록")),el("p","배치 크기: "+(info.batch_size??"미기록")));
+  if(selected.id==="workload")content.append(el("p",job.workload_ref),el("p","측정 범위: "+(info.measurement_boundary||"미기록")),el("small","Notebook·웹·파이프라인이 제출한 실행 단위입니다. 이 그래프는 등록된 실행 정보를 보여줍니다."));
+  if(selected.id==="policy")content.append(el("p",`요청 가속기 ${job.requested_resources?.accelerator_count ?? "—"} · CPU ${job.requested_resources?.host_cpu ?? "—"} · 메모리 ${job.requested_resources?.host_memory_mib ?? "—"} MiB`),el("p",`우선순위: ${job.priority==="high"?"높음":"보통"} · 실행 제한 ${job.execution_limits?.max_run_seconds ?? "—"}초`),job.scheduling_plan?details("후보 비교 · 선택 근거",job.scheduling_plan):el("small","공통 정책 적용 기록이 없는 실행입니다."));
+  if(selected.id==="queue"){
+    content.append(el("p",scenarioReason(job.state,job.scheduler_reason)),el("p","백엔드 제출: "+stamp(job.queued_at)));
+    const waited=(job.lifecycle_events||[]).filter(e=>e.state==="QUEUED" && e.reason && e.reason!=="None");
+    for(const e of waited)content.append(el("small",stamp(e.observed_at)+" · "+scenarioReason(e.state,e.reason)));
+    content.append(actionLink("전체 큐 · 쿼터 보기 →","#history"));
+  }
+  if(selected.id==="compute")content.append(el("p",`${job.backend} · ${modes[job.allocation_mode]||"할당 방식 미기록"}`),el("p",scenarioReason(job.state,job.scheduler_reason)),el("small","최근 실행 관측: "+stamp(job.backend_observed_at)),job.error?el("p",job.error,"error-message"):null);
+  if(selected.id==="pipeline")content.append(el("p",pipeline.display_name),researchButton("실제 파이프라인 DAG 열기",()=>openPipeline(pipeline.run_id)));
+  if(selected.id==="result"){
+    const m=job.result?.measurements;
+    content.append(m?dashboardStats([["p95 지연",m.latency_p95_ms==null?"—":fmt(m.latency_p95_ms)+" ms","모델 측정 구간"],["처리량",m.throughput==null?"—":fmt(m.throughput),"측정값"],["실행 측정",m.elapsed_seconds==null?"—":duration(m.elapsed_seconds),"큐 대기 시간 제외"]]):el("p",terminal?"수집된 모델 측정 결과가 없습니다. 종료 기록을 확인하세요.":"실행 결과를 기다립니다."));
+    if(job.tracking?.run_id)content.append(researchButton("MLflow 지표 · 아티팩트",()=>openExperiment(job.tracking.run_id)));
+  }
+  const actions=add(el("div",null,"ml-node-actions"),researchButton("작업 전체 상세",()=>showJob(job)),cancelButton(job));
+  if(pipeline && selected.id!=="pipeline")actions.append(researchButton("Kubeflow DAG",()=>openPipeline(pipeline.run_id)));
+  inspector.append(title,content,actions);root.append(inspector);return root;
+}
+function pipelineDag(run) {
+  if(!run.graph?.length)return empty("등록된 파이프라인 의존관계가 없습니다. 아래 실제 실행 기록을 확인하세요.");
+  const tasks=run.graph, names=new Set(tasks.map(t=>t.name)), levels=new Map();
+  for(let i=0;i<tasks.length;i++)for(const t of tasks)if(!levels.has(t.name) && t.dependencies.every(d=>!names.has(d)||levels.has(d)))levels.set(t.name,Math.max(-1,...t.dependencies.filter(d=>names.has(d)).map(d=>levels.get(d)))+1);
+  if(levels.size!==tasks.length)return empty("의존관계에 순환 또는 미해결 연결이 있습니다. 원본 단계 기록을 확인하세요.");
+  const rows=new Map(),positions=tasks.map(t=>{const level=levels.get(t.name),row=rows.get(level)||0;rows.set(level,row+1);const state=run.tasks.find(r=>r.display_name===t.name)?.state||"미관측";
+    return {id:t.name,x:20+level*260,y:24+row*125,kicker:"KUBEFLOW TASK",label:t.name,caption:state,tone:state==="SUCCEEDED"?"complete":state==="RUNNING"?"active":state==="FAILED"?"problem":""};});
+  const selected=el("div",null,"ml-task-inspector");selected.append(el("small","단계 노드를 누르면 실제 실행 상태와 선행 작업을 확인할 수 있습니다."));
+  const canvas=workflowCanvas(positions,tasks.flatMap(t=>t.dependencies.filter(d=>names.has(d)).map(d=>[d,t.name])),id=>{const task=tasks.find(t=>t.name===id),observations=run.tasks.filter(t=>t.display_name===id);
+    selected.replaceChildren(el("h3",id),el("p","선행 단계: "+(task.dependencies.join(", ")||"없음")),observations.length?table(["상태","시작","종료"],observations.map(t=>[badge(t.state),stamp(t.start_time),stamp(t.end_time)])):el("p","이 단계의 실행 상태는 아직 관측되지 않았습니다."));
+  },{width:Math.max(520,Math.max(...levels.values())*260+245),height:Math.max(230,Math.max(...rows.values())*125+40),label:"Kubeflow 실제 단계 의존관계 그래프"});
+  return add(el("div"),canvas,selected);
+}

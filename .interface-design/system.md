@@ -125,3 +125,13 @@ not fabricated user identities. Replay is marked separately from live data;
 observation times and native reasons are retained. Board uses four desktop columns,
 two narrow columns; inspector and form collapse to one column. No automatic motion
 of cards: explicit recorded-event playback is user controlled and can pause.
+
+ML job graph: jobs default to an execution-lineage canvas with a horizontally
+scrollable job picker; the table remains a toggle. SVG connectors join native
+HTML buttons for model/input, workload, policy/queue, compute and result. These
+are lineage links, not invented pipeline tasks. Only KFP's recorded dependentTasks
+become DAG edges. A selected-node inspector exposes metadata and native actions.
+Canvas supports zoom, fit, pointer pan, keyboard-accessible node buttons; narrow
+screens start around the selected node instead of shrinking labels to illegibility.
+Green denotes observed completion, amber wait, blue active/selected, gray configured
+or unobserved. Existing text always accompanies color. No decorative animation.

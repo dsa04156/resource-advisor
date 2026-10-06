@@ -48,6 +48,18 @@ def job_view(service, conn, row):
     view = {
         **service.public_job(row),
         "workload_ref": body["request"]["workload_ref"],
+        "workload_summary": {
+            key: body["spec"]["identity"].get(key)
+            for key in (
+                "task_type",
+                "model_digest",
+                "dataset_version",
+                "input_shape",
+                "batch_size",
+                "precision",
+                "measurement_boundary",
+            )
+        },
         "template": body.get("job_template"),
         "candidate_ref": body["candidate"]["ref"],
         "backend": body["candidate"]["backend"],
