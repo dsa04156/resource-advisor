@@ -66,6 +66,51 @@ def test_qualified_runtime_mount_is_read_only_and_digest_bound(service):
         backend.manifest(job)
 
 
+def test_versioned_variant_explicitly_reuses_approved_runtime_bundle(service):
+    job = row(service)
+    job["body"]["variant"].update(
+        ref="variant-v2", kubernetes_runtime_bundle_ref="approved-runtime"
+    )
+    backend = KubernetesBackend(
+        namespace="research-a",
+        local_queue="batch",
+        node_selector={"pool": "lab"},
+        runtime_bundles={
+            "approved-runtime": {
+                "environment_digest": job["body"]["variant"]["environment_digest"],
+                "pvc": "qualified-packages",
+                "source_config_map": "immutable-source",
+            }
+        },
+    )
+    pod = backend.manifest(job)["spec"]["template"]["spec"]
+    assert pod["volumes"][0]["persistentVolumeClaim"] == {
+        "claimName": "qualified-packages",
+        "readOnly": True,
+    }
+    assert all(m["readOnly"] for m in pod["containers"][0]["volumeMounts"])
+    assert {e["name"]: e["value"] for e in pod["containers"][0]["env"]}["PYTHONPATH"] == (
+        "/opt/resource-advisor:/opt/qualified-runtime/site"
+    )
+
+
+@pytest.mark.parametrize("configured", [False, True])
+def test_required_runtime_bundle_fails_preflight_without_native_submission(service, configured):
+    job = row(service)
+    job["body"]["variant"]["kubernetes_runtime_bundle_ref"] = "approved-runtime"
+    calls = []
+    backend = KubernetesBackend(
+        namespace="research-a",
+        local_queue="batch",
+        node_selector={"pool": "lab"},
+        runtime_bundles={"approved-runtime": {"environment_digest": "wrong"}} if configured else {},
+        execute=lambda *args, **kwargs: calls.append(args),
+    )
+    with pytest.raises(BackendError, match="qualified"):
+        backend.validate(job)
+    assert calls == []
+
+
 def test_slurm_is_not_wrapped_in_kueue_and_quotes_payload(service):
     job = row(service)
     job["body"]["capability"]["resource_key"] = "gpu:test"

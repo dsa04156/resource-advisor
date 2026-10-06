@@ -28,6 +28,11 @@ application result/profile records and 2 GPU-seconds/3 CPU core-seconds cost.
 The [Hailo compiled-artifact trial](hailo-artifact.md) additionally verifies a
 qualified ResNet50 control and real different ResNet18 HEF rejection through
 two Kueue Jobs, with no negative result/history and 8 NPU-seconds total.
+The [actual MLflow server interruption](mlflow-server-outage.md) is retained
+as INCOMPLETE: the new variant lacked its mounted runtime, consumed1GPU-second
+and recovered exactly one FAILED tracking run with no fabricated result.
+The [explicit bundle reference](kubernetes-runtime-bundles.md) fixes the new-ID
+attachment contract in code; its live deployment/qualification remains pending.
 
 | Gate | Required authoritative evidence | Current state |
 |---|---|---|

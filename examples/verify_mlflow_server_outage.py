@@ -142,7 +142,7 @@ def run(config, directory):
 
     def target():
         with store.transaction() as conn:
-            row = store.job(conn, state["job_id"])
+            row = dict(store.job(conn, state["job_id"]))
             attempt = row["body"]["attempt_id"]
             ledger = [
                 dict(r)
@@ -157,10 +157,12 @@ def run(config, directory):
                 if row["state"] in TERMINAL
                 else None
             )
-            found = {
-                k: store.get(conn, k, attempt if k != "artifact" else "artifact-" + attempt)
-                for k in ("result", "profile", "tracking", "artifact", "artifact_tracking")
-            }
+            found = {}
+            for kind in ("result", "profile", "tracking", "artifact", "artifact_tracking"):
+                record = store.get(
+                    conn, kind, attempt if kind != "artifact" else "artifact-" + attempt
+                )
+                found[kind] = dict(record) if record is not None else None
         return {"job": row, "ledger": ledger, "outbox": event, **found}
 
     def restore():

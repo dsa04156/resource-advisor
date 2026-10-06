@@ -23,6 +23,13 @@ specification. Capability snapshots have a TTL; stale inventory blocks new
 execution. This first version does not resolve stable capability aliases to new
 snapshots automatically.
 
+Mounted Kubernetes runtimes may declare an operator-owned
+[`kubernetes_runtime_bundle_ref`](kubernetes-runtime-bundles.md). New variant
+versions then explicitly select the approved read-only attachments; a missing
+required bundle fails preflight. The reference is part of context scope while
+its absence preserves legacy signatures. This does not replace model/runtime
+qualification or permit arbitrary researcher volume mounts.
+
 ## Why no automatic retry of uncertain submission?
 
 A scheduler can accept a job while the response is lost. The database commits

@@ -284,7 +284,10 @@ class KubernetesBackend:
         }
         if self.runtime_class_name:
             manifest["spec"]["template"]["spec"]["runtimeClassName"] = self.runtime_class_name
-        bundle = self.runtime_bundles.get(b["variant"]["ref"])
+        bundle_ref = b["variant"].get("kubernetes_runtime_bundle_ref")
+        bundle = self.runtime_bundles.get(bundle_ref or b["variant"]["ref"])
+        if bundle_ref and not bundle:
+            raise BackendError("required qualified Kubernetes runtime bundle is unavailable")
         if self.retain_termination_evidence:
             from .kubernetes_retention import FINALIZER
 

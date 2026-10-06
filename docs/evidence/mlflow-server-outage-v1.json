@@ -1,0 +1,47 @@
+{
+  "status": "INCOMPLETE",
+  "protocol_commit": "f346fae",
+  "continuation_commit": "a7adab8",
+  "scope": "actual dedicated lab MLflow server interruption; retained resultless failed allocation and independent recovery readback",
+  "administrative_stop_restore_episodes": 2,
+  "accepted_compute_jobs": 1,
+  "replacement_compute_jobs": 0,
+  "before_compute_tool_failure": "EndpointSlice endpoints null iteration",
+  "after_acceptance_tool_failure": "SQL RowMapping report serialization",
+  "compute": {
+    "platform_state": "FAILED",
+    "native_failure": "ModuleNotFoundError: resource_advisor package absent",
+    "gpu_reservation_seconds": 1.0,
+    "device_class": "gpu",
+    "allocation_mode": "physical_device",
+    "cpu_core_reservation_seconds": 1.0,
+    "ledger_rows": 1,
+    "same_key_jobs": 1,
+    "result_present": false,
+    "profile_present": false,
+    "artifact_present": false,
+    "gpu_kernel_execution_verified": false,
+    "utilization_power_temperature": null
+  },
+  "tracking": {
+    "run_count": 1,
+    "status": "FAILED",
+    "metrics_present": false,
+    "outbox_status": "DONE",
+    "delivery_attempts": 2,
+    "first_error_type": null,
+    "recorded_end_time": 1791297561019,
+    "terminal_timestamp_preserved": true
+  },
+  "checks": {
+    "server_restored_unchanged_spec_uid_pvc": true,
+    "preexisting_immutable_records_preserved": true,
+    "preexisting_ledgers_preserved": true,
+    "preexisting_terminal_jobs_preserved": true,
+    "preexisting_mlflow_runs_preserved": true
+  },
+  "historical_run_count_preserved": 593,
+  "immutable_entity_count_preserved": 2810,
+  "positive_gpu_completion_gate": false,
+  "limitation": "Positive complete-environment GPU execution during actual outage not achieved; E7 remains open. Original failed attempt and cost retained; no retry to hide failure."
+}

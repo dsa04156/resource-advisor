@@ -3,7 +3,7 @@ from datetime import timedelta
 import pytest
 from pydantic import ValidationError
 
-from resource_advisor.contracts import ExecutionResult, WorkloadSpec, signature
+from resource_advisor.contracts import ExecutionResult, RuntimeVariant, WorkloadSpec, signature
 from resource_advisor.policy import compatibility, context_signature
 
 
@@ -15,6 +15,27 @@ def test_two_signatures_separate_environment(bundle):
     assert context_signature(moved, variant) != context_signature(candidate, variant)
     assert signature(spec.identity) == signature(
         spec.model_copy(update={"candidates": (moved,)}).identity
+    )
+
+
+def test_explicit_runtime_bundle_is_signed_and_legacy_digest_is_preserved(bundle):
+    _, candidate, variant, _ = bundle
+    legacy = variant.model_dump(mode="json")
+    assert "kubernetes_runtime_bundle_ref" not in legacy
+    explicit_none = RuntimeVariant.model_validate({**legacy, "kubernetes_runtime_bundle_ref": None})
+    assert signature(explicit_none) == signature(variant)
+    attached = RuntimeVariant.model_validate(
+        {**legacy, "kubernetes_runtime_bundle_ref": "approved-runtime"}
+    )
+    assert context_signature(candidate, attached) != context_signature(candidate, variant)
+    with pytest.raises(ValidationError, match="pinned container"):
+        RuntimeVariant.model_validate({**attached.model_dump(mode="json"), "image": None})
+    _, _, _, cap = bundle
+    assert "KUBERNETES_RUNTIME_BINDING_ON_SLURM" in compatibility(
+        bundle[0],
+        candidate.model_copy(update={"backend": "slurm"}),
+        attached,
+        cap.model_copy(update={"backend": "slurm"}),
     )
 
 

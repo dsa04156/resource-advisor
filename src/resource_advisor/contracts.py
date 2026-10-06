@@ -129,6 +129,7 @@ class RuntimeVariant(Contract):
     validation_refs: tuple[Ref, ...] = ()
     supported_shapes: tuple[tuple[int, ...], ...]
     runtime_versions: dict[str, str]
+    kubernetes_runtime_bundle_ref: Ref | None = None
     thermal_policy: ThermalPolicy | None = None
     load_context_policy: Literal["linux-cgroup-v2-brackets-v1"] | None = None
 
@@ -139,10 +140,14 @@ class RuntimeVariant(Contract):
             value.pop("thermal_policy", None)
         if self.load_context_policy is None:
             value.pop("load_context_policy", None)
+        if self.kubernetes_runtime_bundle_ref is None:
+            value.pop("kubernetes_runtime_bundle_ref", None)
         return value
 
     @model_validator(mode="after")
     def immutable_environment(self):
+        if self.kubernetes_runtime_bundle_ref is not None and self.image is None:
+            raise ValueError("Kubernetes runtime bundle requires a pinned container image")
         if self.thermal_policy and (
             self.accelerator_vendor != "nvidia"
             or self.device_class != "gpu"

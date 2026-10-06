@@ -18,6 +18,8 @@ def context_signature(candidate: Candidate, variant: RuntimeVariant) -> str:
         value["thermal_policy"] = variant.thermal_policy.model_dump(mode="json")
     if variant.load_context_policy is not None:
         value["load_context_policy"] = variant.load_context_policy
+    if variant.kubernetes_runtime_bundle_ref is not None:
+        value["kubernetes_runtime_bundle_ref"] = variant.kubernetes_runtime_bundle_ref
     return signature(value)
 
 
@@ -40,6 +42,8 @@ def compatibility(
         "WRONG_REFERENCE": candidate.variant_ref != variant.ref
         or candidate.capability_ref != cap.ref,
         "BACKEND_MISMATCH": candidate.backend != cap.backend,
+        "KUBERNETES_RUNTIME_BINDING_ON_SLURM": candidate.backend == "slurm"
+        and variant.kubernetes_runtime_bundle_ref is not None,
         "ARCH_MISMATCH": not (variant.arch == ctx.arch == cap.arch),
         "VENDOR_MISMATCH": variant.accelerator_vendor != cap.accelerator_vendor,
         "DEVICE_CLASS_MISMATCH": variant.device_class != cap.device_class,
