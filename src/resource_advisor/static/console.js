@@ -1782,7 +1782,7 @@ function render() {
 }
 function reset(message = "") {
   generation++;
-  scenarioData=null; scenarioRecent=[]; scenarioRef=""; scenarioUpdated=0; scenarioPending=false; scenarioError=""; scenarioCursor=null; stopScenarioReplay();
+  scenarioData=null; scenarioRecent=[]; scenarioRef=""; scenarioUpdated=0; scenarioPending=false; scenarioError=""; scenarioCursor=null; scenarioSubmission=null; stopScenarioReplay();
   researchData=null; researchRuns=null; researchPending=false; experimentSelection.clear(); researchUpdated=0;
   controller?.abort();
   controller = null;
@@ -2050,7 +2050,7 @@ function retryJobButton(job) {
 // Real queue walkthrough. Replay advances recorded observations only.
 let scenarioData=null, scenarioRecent=[], scenarioRef="", scenarioUpdated=0;
 let scenarioPending=false, scenarioStarting=false, scenarioError="", scenarioCursor=null;
-let scenarioSelected=1, scenarioReplay=null, scenarioWorkload="", scenarioProfile="";
+let scenarioSelected=1, scenarioReplay=null, scenarioWorkload="", scenarioProfile="", scenarioSubmission=null;
 const scenarioTerminal = s => ["SUCCEEDED","FAILED","CANCELED","RESULT_INVALID"].includes(s);
 function stopScenarioReplay() { clearInterval(scenarioReplay); scenarioReplay=null; }
 function scenarioEvents() {
@@ -2081,13 +2081,13 @@ async function startScenario(workload,profile) {
   if(scenarioStarting)return;
   scenarioStarting=true;scenarioError="";stopScenarioReplay();scenarioCursor=null;
   const session=generation, storageKey="ra-queue-scenario:"+data.project_ref;
-  let saved;
-  try{saved=JSON.parse(sessionStorage.getItem(storageKey));}catch(_){/* Memory-free recovery uses server list. */}
+  let saved=scenarioSubmission;
+  try{saved ||= JSON.parse(sessionStorage.getItem(storageKey));}catch(_){/* Memory-free recovery uses server list. */}
   const request={workload_ref:workload,profile_ref:profile};
   if(saved && JSON.stringify(saved.request)!==JSON.stringify(request)) {
     scenarioError="미확인 제출이 있습니다. 이전 작업·정책으로 같은 요청을 다시 확인해 주세요.";scenarioStarting=false;render();return;
   }
-  saved ||= {request,key:"scenario-"+crypto.randomUUID()};
+  saved ||= {request,key:"scenario-"+crypto.randomUUID()};scenarioSubmission=saved;
   try{sessionStorage.setItem(storageKey,JSON.stringify(saved));}catch(_){}
   render();
   try {
@@ -2095,6 +2095,7 @@ async function startScenario(workload,profile) {
     const result=await response.json();
     if(!response.ok)throw new Error(typeof result.detail==="string"?result.detail:"시나리오를 접수하지 못했습니다.");
     try{sessionStorage.removeItem(storageKey);}catch(_){}
+    scenarioSubmission=null;
     if(session!==generation)return;
     scenarioRef=result.ref;scenarioData=result;scenarioSelected=1;scenarioUpdated=Date.now();
     $("auto").checked=true;await refreshScenario();
@@ -2108,7 +2109,8 @@ function scenarioLane(state) {
   return 3;
 }
 function scenarioReason(state,reason) {
-  if(reason)return ({AdmissionPending:"큐 승인 대기 · 아직 실행 자원을 배정받지 못했습니다.",Resources:"요청 자원 확보 대기",Priority:"먼저 처리할 작업이 있습니다.",ContainerCreating:"자원 배정 후 컨테이너 준비 중",Unschedulable:"배치 조건을 만족하는 노드 대기"})[reason] || reason;
+  if(["None","(null)","N/A"].includes(reason))reason=null;
+  if(reason)return ({AssocGrpCpuLimit:"계정의 CPU 할당 한도에 도달해 대기합니다.",AssocGrpGRES:"계정의 GPU/GRES 할당 한도에 도달해 대기합니다.",AssocGrpMemLimit:"계정의 메모리 할당 한도에 도달해 대기합니다.",QOSGrpCpuLimit:"QOS의 CPU 할당 한도에 도달해 대기합니다.",QOSGrpGRES:"QOS의 GPU/GRES 할당 한도에 도달해 대기합니다.",AdmissionPending:"큐 승인 대기 · 아직 실행 자원을 배정받지 못했습니다.",Resources:"요청 자원 확보 대기",Priority:"먼저 처리할 작업이 있습니다.",ContainerCreating:"자원 배정 후 컨테이너 준비 중",Unschedulable:"배치 조건을 만족하는 노드 대기"})[reason] || reason;
   return ({VALIDATED:"자원 요청을 접수했습니다.",SUBMITTING:"스케줄러에 요청을 전달하고 있습니다.",QUEUED:"스케줄러가 실행 시작을 보고할 때까지 대기합니다.",RUNNING:"백엔드에서 실행 중임을 확인했습니다.",COLLECTING:"실행 결과를 수집하고 있습니다.",SUCCEEDED:"실행과 결과 수집이 완료됐습니다.",FAILED:"실행 실패 · 상세 오류를 확인하세요.",CANCELED:"취소 완료",RESULT_INVALID:"결과 검증 실패",SUBMISSION_UNKNOWN:"제출 여부 재확인 중 · 재제출하지 않습니다.",CANCEL_REQUESTED:"취소 확인 중 · 자원 반환은 아직 미확인"})[state] || "아직 제출되지 않았습니다.";
 }
 function scenarioView() {
@@ -2134,9 +2136,10 @@ function scenarioView() {
   launch.disabled=scenarioStarting || activeRun || !work || !scenarioProfile;
   launch.onclick=()=>startScenario(scenarioWorkload,scenarioProfile);
   controls.append(add(el("label"),el("span","연구 작업"),workload),add(el("label"),el("span","실행 정책"),profile),launch);
-  root.append(panel("연구자의 자원 요청서","등록된 실행 환경을 재사용합니다. GPU 모델·노드를 직접 고르지 않습니다.",add(el("div"),controls,
+  const requestPanel=panel("연구자의 자원 요청서","등록된 실행 환경을 재사용합니다. GPU 모델·노드를 직접 고르지 않습니다.",add(el("div",null,"scenario-request-body"),controls,
     resources ? add(el("div",null,"scenario-request-summary"),badge("요청당 GPU "+resources.accelerator_count),badge("CPU "+resources.host_cpu+" core"),badge("메모리 "+resources.host_memory_mib+" MiB"),badge("최대 실행 "+work.max_run_seconds+"초"),badge("요청 2건")) : empty("현재 실행 가능한 GPU 작업이 없습니다."),
-    el("small","실제 컴퓨트 작업 2개가 생성됩니다. 할당량·우선순위는 기존 정책을 따릅니다. 여유가 충분하거나 작업이 짧으면 대기를 관측하지 못할 수도 있습니다."))));
+    el("small","실제 컴퓨트 작업 2개가 생성됩니다. 할당량·우선순위는 기존 정책을 따릅니다. 여유가 충분하거나 작업이 짧으면 대기를 관측하지 못할 수도 있습니다.")));
+  if(scenarioData)root.append(add(el("details",null,"scenario-new-request"),el("summary","새 시나리오 실행 · 자원 요청서 열기"),requestPanel));else root.append(requestPanel);
   if(scenarioError)root.append(add(el("div",null,"scenario-error"),el("strong","최신 상태 확인 필요"),el("p",scenarioError),el("small","아래 기록은 마지막으로 성공한 조회 시점입니다.")));
   const toolbar=el("div",null,"scenario-toolbar");
   const recent=el("select");recent.setAttribute("aria-label","시나리오 실행 이력");
@@ -2173,8 +2176,9 @@ function scenarioView() {
   if(selected){
     const detail=el("div",null,"scenario-inspector");
     const plan=selected.scheduling_plan, queue=plan?.adapter?.local_queue || plan?.adapter?.partition || "—";
-    const observedWait=(selected.lifecycle_events || []).some(e=>e.state==="QUEUED" && ["AdmissionPending","Resources","Priority"].includes(e.reason));
+    const observedWait=(selected.lifecycle_events || []).some(e=>e.state==="QUEUED" && ( ["AdmissionPending","Resources","Priority"].includes(e.reason) || /^(Assoc|QOS).*Limit$|^(Assoc|QOS).*GRES$/.test(e.reason || "")));
     const facts=add(el("div"),el("p","선택한 요청 · "+(scenarioSelected===0?"A":"B"),"eyebrow"),el("h2",scenarioReason(snapshot?.state,snapshot?.reason)),
+      snapshot?.reason && snapshot.reason!=="None" ? code(snapshot.reason) : null,
       el("p",`배정 경로: ${selected.backend} → ${queue}`),el("p",`선택 노드: ${selected.node_ref || "확인 중"}`),
       el("p",`요청량: GPU ${selected.requested_resources?.accelerator_count ?? "—"} · CPU ${selected.requested_resources?.host_cpu ?? "—"} · 메모리 ${selected.requested_resources?.host_memory_mib ?? "—"} MiB`),
       el("small",observedWait?"이 실행에서 스케줄러 대기 사유가 기록됐습니다.":"이 실행에는 자원·승인 대기 사유가 아직 기록되지 않았습니다. 컨테이너 준비와 자원 부족은 구분합니다."));

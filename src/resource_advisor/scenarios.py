@@ -34,7 +34,9 @@ class QueueScenarios:
                 # researcher to choose hardware or changing global queue policy.
                 if len(spec["candidates"]) != 1:
                     raise Rejected("Queue scenario requires a single-route registered workload")
-                compile_plan(self.service, conn, project, SchedulingPlanRequest(**body))
+                plan = compile_plan(self.service, conn, project, SchedulingPlanRequest(**body))
+                if not plan["accepted"]:
+                    raise Rejected(",".join(plan["reasons"]))
             self.store.put(conn, "queue_scenario", ref, project, body)
         # Separate durable submissions intentionally allow partial progress.
         # Retrying the same scenario resumes missing jobs without duplicating A.

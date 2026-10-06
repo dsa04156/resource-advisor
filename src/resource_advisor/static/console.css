@@ -991,3 +991,9 @@ button { border-radius: 10px; min-height: 40px; }
 .scenario-page button:focus-visible, .scenario-page input:focus-visible { outline: 3px solid #0071e3; outline-offset: 3px; }
 @media (max-width: 1200px) { .scenario-request { grid-template-columns: 1fr 1fr; } .scenario-request > button { grid-column: 1 / -1; } .scenario-board { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 650px) { .scenario-request, .scenario-inspector { grid-template-columns: 1fr; } .scenario-hero { padding: 20px; } .scenario-lane { padding: 10px; min-height: 170px; } .scenario-job { padding: 12px; } .scenario-inspector { padding: 16px; } .scenario-lane-title { display: block; } .scenario-lane-title h3 { margin-top: 6px; } }
+.scenario-request-body { padding: 0 24px 22px; }
+.scenario-page select { min-height: 42px; padding: 8px 12px; border: 1px solid #d4d8df; border-radius: 8px; background: #fff; font: inherit; font-size: 13px; }
+.scenario-new-request { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; }
+.scenario-new-request > summary { padding: 16px 20px; cursor: pointer; font-size: 14px; font-weight: 600; }
+.scenario-new-request .panel { box-shadow: none; border: 0; margin: 0; }
+@media (max-width: 650px) { .scenario-request-body { padding: 0 16px 16px; } }
