@@ -5,7 +5,7 @@ then **실제 GPU로 실험 시작**. The server persists a request; an external
 runner submits real native jobs and publishes observed snapshots every few seconds.
 Closing the browser does not stop the experiment. **실험 중지** cancels this run.
 The history selector and timeline replay stored observations, not synthetic progress.
-For GPU and NPU workloads together, choose the ten-request mixed scenario.
+The default ten-request scenario covers all registered GPU/NPU execution families.
 
 ## Current catalog: ten requests in every scenario
 
@@ -31,10 +31,12 @@ The explicit current-state toggle is a different time basis. Allocation is not
 physical utilization; a missing sensor remains unmeasured. CPU-only, unavailable
 NPU and model-unqualified nodes stay visible with their participation constraints.
 
-The CUDA probe is qualified for three exclusive-GPU nodes. Jetson shared GPU
-resources participate through their registered application variants in the mixed
-batch. The automatic router uses accepted active project requests as a candidate
-tiebreaker, serialized with a PostgreSQL transaction lock; Kueue/Slurm retain native
+The native CUDA comparison probe is qualified for three exclusive-GPU nodes.
+The default registered CUDA workload has four compatible candidates, including
+a Jetson runtime; other Jetson, CNN and NPU variants use their own registered
+contracts. The automatic router uses active accepted project requests and bounded
+five-minute assignment history as candidate tiebreakers, serialized with a
+PostgreSQL transaction lock; Kueue/Slurm retain native
 admission. This is not a cross-project GPU reservation or an optimal interference
 model. See [common GPU pool](common-gpu-pool.md) for configuration and limits.
 
@@ -70,6 +72,33 @@ verified by selecting a completed Slurm job and highlighting its inventory row.
 Initial 28 focused checks passed; the receipt-fix runner checks passed 10 tests.
 Sanitized counts and boundaries are in
 [the common-pool evidence report](evidence/common-gpu-pool-ten-request.json).
+
+### Full-fleet default and completed-pod cleanup — 2026-10-07
+
+The new default `fleet_batch` completed ten actual jobs on six GPU nodes and
+one NPU node: eight GPU requests, two NPU requests, eight Kubernetes executions
+and two Slurm executions. All ten results, ten distinct MLflow run receipts and
+ten PostgreSQL usage records were verified. Five automatic CUDA requests used
+four compatible nodes. The board retained ten rows and twelve node observations
+on one desktop screen; execution coverage is cumulative, not simultaneous use.
+
+A preceding default run lost its HTTPS transport and failed after nine successful
+jobs; its remaining Slurm job was canceled. The failed history is retained.
+Bounded receipt/report retries and report-based agent liveness were added, then
+the successful run above was executed. This does not prove arbitrary process-crash
+recovery or unlimited network-outage tolerance.
+
+The lab operator removed 573 historical platform terminal pods after matching
+terminal database attempts and terminal parent Jobs. Another 69 terminal diagnostic
+pods had their logs and Pod status archived locally before deletion. Eight of those
+had an orphaned platform evidence finalizer; only that exact finalizer was released
+after archival and parent completion checks. Runtime services and nonterminal jobs
+were preserved. A private five-minute timer now removes terminal platform pods only
+after database completion and parent Job completion. Job records, collected results,
+MLflow references and accounting remain intact. It does not clean arbitrary projects.
+
+[Sanitized full-fleet evidence](evidence/full-fleet-ten-request.json) includes the
+retained failure, actual execution counts and remaining accelerator constraints.
 
 ## Archived scenario definitions and evidence
 

@@ -39,6 +39,10 @@ admission, scheduler request headroom and measured utilization.
 
 Automatic selection counts accepted nonterminal requests within the same project
 and uses that demand as a tiebreaker after compatibility and native availability.
+For equal active demand, five-minute assignment counts also include completed
+requests. This prevents fast jobs from always returning to the first candidate
+while a concurrent burst is still being accepted. Counts are exposed in each
+selection evaluation and are not physical allocations.
 A PostgreSQL advisory transaction lock serializes automatic selection and acceptance,
 so simultaneous arrivals see earlier accepted requests. The native scheduler still
 owns admission and resource allocation. This is neither a global distributed GPU

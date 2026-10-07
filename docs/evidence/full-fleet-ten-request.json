@@ -1,0 +1,66 @@
+{
+  "scenario": "fleet_batch",
+  "state": "SUCCEEDED",
+  "requests": 10,
+  "cleanup": "completed",
+  "node_observations": 24,
+  "backends": [
+    "kubernetes",
+    "slurm"
+  ],
+  "device_classes": [
+    "gpu",
+    "npu"
+  ],
+  "results": 10,
+  "gpu_requests": 8,
+  "npu_requests": 2,
+  "distinct_observed_nodes": 7,
+  "source_commit": "c52dc77cf069c737bb6e920eca027f505d21b226",
+  "gpu_execution_nodes": 6,
+  "npu_execution_nodes": 1,
+  "mlflow_run_receipts": 10,
+  "accounting_records": 10,
+  "automatic_cuda_requests": 5,
+  "automatic_cuda_execution_nodes": 4,
+  "focused_tests": 36,
+  "ci": "success",
+  "prior_transport_failure": {
+    "state": "FAILED",
+    "successful_jobs": 9,
+    "canceled_jobs": 1,
+    "remaining_nonterminal": 0
+  },
+  "initial_cleanup": {
+    "platform_terminal_pods": 573,
+    "legacy_terminal_pods": 69,
+    "legacy_logs_archived": 69,
+    "archived_evidence_finalizers_released": 8
+  },
+  "limitations": [
+    "Execution-node coverage is cumulative, not simultaneous allocation",
+    "CUDA-only comparison still has its own three-device native quota",
+    "One discovered NPU route has zero allocatable devices",
+    "Mobilint device is visible but has no registered model/runtime route",
+    "Five-minute selection history is project-local, not optimal placement or a GPU reservation",
+    "Cleanup timer is a private lab operation, not a public production controller"
+  ],
+  "post_run_cleanup": {
+    "remaining_terminal_pods": 0,
+    "preserved_nonterminal_service_pods": 8,
+    "timer_interval_seconds": 300,
+    "timer_verified_success": true
+  },
+  "served_ui": {
+    "viewport": [
+      1366,
+      768
+    ],
+    "job_rows": 10,
+    "node_rows": 12,
+    "table_bottom_px": 689.140625,
+    "horizontal_overflow": false,
+    "coverage_gpu_nodes": 6,
+    "coverage_npu_nodes": 1
+  }
+}
