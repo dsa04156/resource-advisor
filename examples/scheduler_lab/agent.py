@@ -530,7 +530,7 @@ class Agent:
         # The native adapters remain independent; only acceptance is concurrent.
         failures = []
         with ThreadPoolExecutor(max_workers=min(len(tasks), 10)) as pool:
-            futures = [pool.submit(submit, item) for item in enumerate(tasks)]
+            futures = {pool.submit(submit, item): item for item in enumerate(tasks)}
             for future in as_completed(futures):
                 try:
                     i, task, result = future.result()
@@ -549,22 +549,39 @@ class Agent:
                         self.snapshot["acceptance_observation_error"] = type(exc).__name__
                     self.report("등록된 " + task["device_class"].upper() + " 작업 접수")
                 except Exception as exc:  # noqa: BLE001 — retain successful receipts for cleanup
-                    failures.append(str(exc)[:300])
-        if failures:
-            raise RuntimeError("Partial batch submission: " + "; ".join(failures))
+                    index, task = futures[future]
+                    reason = str(exc)[:300]
+                    if isinstance(exc, urllib.error.HTTPError):
+                        try:
+                            reason += (
+                                " · " + str(json.loads(exc.read(4096)).get("detail", ""))[:700]
+                            )
+                        except (ValueError, OSError):
+                            pass
+                    self.snapshot["jobs"][index].update(
+                        state="FAILED", reason=reason, submission_rejected=True
+                    )
+                    failures.append(reason)
+                    self.report("요청 거절 · 다른 접수 작업은 계속 실행")
+        self.snapshot["submission_failures"] = failures
         self.snapshot["phase"] = "EXECUTION"
         while True:
-            jobs = []
+            jobs = list(self.snapshot["jobs"])
             for task in sorted(self.snapshot["platform_jobs"], key=lambda t: t["request_index"]):
-                jobs.append(self.observe_registered_job(task))
+                jobs[task["request_index"]] = self.observe_registered_job(task)
             self.snapshot["jobs"] = jobs
+            accepted_jobs = [j for j in jobs if not j.get("submission_rejected")]
             self.tick("GPU·NPU 네이티브 작업 상태와 결과 관측")
-            if any(j["state"] in {"FAILED", "CANCELED", "RESULT_INVALID"} for j in jobs):
+            if any(j["state"] in {"FAILED", "CANCELED", "RESULT_INVALID"} for j in accepted_jobs):
                 raise RuntimeError(
                     "이기종 작업 중 실패가 있습니다. 작업 상세의 실제 오류를 확인하세요"
                 )
-            if all(j["state"] == "SUCCEEDED" for j in jobs):
-                if mixed and {j["backend"] for j in jobs} != {"kubernetes", "slurm"}:
+            if all(j["state"] == "SUCCEEDED" for j in accepted_jobs):
+                if (
+                    not failures
+                    and mixed
+                    and {j["backend"] for j in accepted_jobs} != {"kubernetes", "slurm"}
+                ):
                     raise RuntimeError(
                         "mixed execution completed without evidence of both backends"
                     )
@@ -579,6 +596,11 @@ class Agent:
                     )
                     for device in {j["device_class"] for j in jobs}
                 }
+                if failures:
+                    raise RuntimeError(
+                        f"접수 작업 {len(accepted_jobs)}개 완료; 요청 {len(failures)}개 거절: "
+                        + "; ".join(failures)
+                    )
                 self.snapshot["verdict"] = (
                     f"{title} {len(jobs)}개 등록 작업 모두 실제 실행 성공 · 작업별 결과와 MLflow 기록 확인 가능"
                 )

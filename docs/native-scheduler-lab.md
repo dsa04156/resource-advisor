@@ -591,3 +591,10 @@ acceptance, rather than holding every accepted row at its receipt state until al
 ten responses arrive. Unaccepted rows remain visible. Idempotent observation/report
 RPCs retry up to six times with two-second gaps; job submission retains its identical
 idempotency-key retry contract. This is bounded recovery, not an availability SLA.
+
+Independent registered requests keep their results when another submission is
+rejected. Rejected rows remain visible with the server reason and no native Job
+identity; they have no Job-detail link. Accepted requests continue until completion,
+then the run reports its partial failure. Rejection is not native queue admission
+or an executed NPU workload. This does not yet make native execution failure of
+an accepted request independent of the runner's broader cleanup policy.

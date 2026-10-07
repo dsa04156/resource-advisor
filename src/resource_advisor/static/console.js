@@ -2649,7 +2649,7 @@ function labFlowBoard(run,snap){
   if(selected){
     const nodes=labJobNodes(selected),reason=selected.reason&&selected.reason!=="None"?selected.reason:"",text=[(selected.backend||(run.scenario==="backfill"?"slurm":"kubernetes")).toUpperCase(),(selected.device_class||"gpu").toUpperCase(),selected.priority!=null?"우선순위 "+selected.priority:"",nodes.length?"실행 노드 · "+nodes.join(" / "):"실행 노드 미관측",reason].filter(Boolean).join(" · ");
     const detail=el("span",text);detail.title=text;add(inspect,el("strong",selected.label),detail);
-    if(["fleet_batch","mixed_batch"].includes(run.scenario)){const b=el("button","작업 상세 · 결과");b.onclick=async()=>{try{showJob(await scenarioFetch("/jobs/"+selected.id+"/view"));}catch(e){$("notice").textContent=e.message;}};inspect.append(b);}
+    if(["fleet_batch","mixed_batch"].includes(run.scenario)&&!selected.submission_rejected){const b=el("button","작업 상세 · 결과");b.onclick=async()=>{try{showJob(await scenarioFetch("/jobs/"+selected.id+"/view"));}catch(e){$("notice").textContent=e.message;}};inspect.append(b);}
   }else add(inspect,el("strong","작업 선택"),el("span","각 행은 한 요청입니다. 상태는 실제 관측 시에만 이동합니다. 짧은 단계는 조회 간격 사이에 지나갈 수 있습니다."));
   root.append(inspect);return root;
 }

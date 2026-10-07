@@ -260,3 +260,37 @@ def test_lost_final_report_preserves_terminal_receipt_without_reexecuting():
     a.report = lambda *args: receipts.append(args)
     a.report(*a.pending_report)
     assert receipts == [("completed", "SUCCEEDED")] and executions == ["one"]
+
+
+def test_rejected_request_does_not_abort_accepted_independent_job():
+    from urllib.error import HTTPError
+
+    a = runner()
+    a.report = lambda *args: None
+    observations = []
+    a.tick = lambda *args: observations.append([j["state"] for j in a.snapshot["jobs"]])
+
+    def api(path, body=None, key=None):
+        if path == "/jobs":
+            if body["workload_ref"] == "unavailable":
+                raise HTTPError("https://example.test/jobs", 422, "Unavailable", None, None)
+            return {"job_id": "actual-job", "state": "VALIDATED"}
+        return {
+            "state": "SUCCEEDED",
+            "backend": "kubernetes",
+            "node_ref": "available-node",
+            "result": {"valid": True},
+        }
+
+    a.api = api
+    tasks = [
+        {"name": ref, "device_class": "gpu", "workload_ref": ref, "profile_ref": "p"}
+        for ref in ["available", "unavailable"]
+    ]
+    with pytest.raises(RuntimeError, match="접수 작업 1개 완료"):
+        a.registered_workloads(tasks, "independent")
+    assert a.snapshot["jobs"][0]["state"] == "SUCCEEDED"
+    assert a.snapshot["jobs"][1]["submission_rejected"]
+    assert a.snapshot["jobs"][1]["state"] == "FAILED"
+    assert len(a.snapshot["platform_jobs"]) == 1
+    assert observations
