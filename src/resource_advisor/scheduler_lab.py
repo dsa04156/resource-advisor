@@ -44,6 +44,7 @@ class LabRequest(BaseModel):
         "burst",
         "pool_batch",
         "mixed_batch",
+        "fleet_batch",
         "priority_batch",
         "gang_batch",
         "priority",
@@ -123,6 +124,7 @@ class SchedulerLab:
                 "npu",
                 "mixed",
                 "mixed_batch",
+                "fleet_batch",
             } and project != a["body"].get("project_ref"):
                 raise Rejected("등록 작업 PoC는 실행기 인증 프로젝트에서만 실행할 수 있습니다")
             if conn.execute(select(runs.c.ref).where(~runs.c.state.in_(TERMINAL))).first():

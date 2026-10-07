@@ -2391,11 +2391,12 @@ function pipelineDag(run) {
 }
 
 // Native scheduling lab: snapshots are collected from Kueue/Slurm, never simulated.
-let labData=null,labPending=false,labUpdated=0,labRef="",labKind="mixed_batch",labSelected="",labCursor=null,labError="",labBusy=false,labKey=null;
+let labData=null,labPending=false,labUpdated=0,labRef="",labKind="fleet_batch",labSelected="",labCursor=null,labError="",labBusy=false,labKey=null;
 let labGpuCount=3,labWorker="",labResourceMode="recorded";
 const labKinds={
-  mixed_batch:{name:"10개 · GPU + NPU + Slurm",tag:"COMMON POOL",desc:"등록된 CUDA·CNN·NPU·Slurm 작업 10개를 동시에 요청합니다. 공통 GPU 풀에서 정책이 자원을 선택하고 각 네이티브 큐가 입장시킵니다."},
-  pool_batch:{name:"10개 · GPU 풀 분산",tag:"GPU POOL",desc:"검증된 CUDA probe 작업 10개를 공통 GPU 큐에 요청합니다. RTX·GB10 노드에 실제로 분산되는 할당과 대기를 확인합니다."},
+  fleet_batch:{name:"10개 · 전체 연결 자원",tag:"HETEROGENEOUS POOL",desc:"RTX·GB10·Jetson·Slurm GPU와 연결된 NPU 작업을 함께 요청합니다. CUDA 전용 3노드 제한 없이 작업별 호환 경로에서 자동 선택합니다. 미연결 모델이나 할당 불가 장비는 표에 제외 사유를 남깁니다."},
+  mixed_batch:{archived:true,name:"기존 · GPU + NPU + Slurm 10개",tag:"COMMON POOL",desc:"등록된 CUDA·CNN·NPU·Slurm 작업 10개를 동시에 요청합니다. 공통 GPU 풀에서 정책이 자원을 선택하고 각 네이티브 큐가 입장시킵니다."},
+  pool_batch:{name:"비교 · CUDA 전용 10개",tag:"GPU POOL",desc:"검증된 CUDA probe 작업 10개를 공통 GPU 큐에 요청합니다. RTX·GB10 노드에 실제로 분산되는 할당과 대기를 확인합니다."},
   burst:{name:"10개 · Quota 제한 비교",tag:"QUOTA CONTROL",desc:"같은 10개 요청을 2 GPU로 제한한 비교 큐에 넣습니다. 이 큐의 제한을 전체 GPU 부족으로 해석하지 않습니다."},
   priority_batch:{name:"10개 · 우선순위",tag:"NATIVE PRIORITY",desc:"앞의 5개는 low, 뒤의 5개는 high로 동시에 접수합니다. Kueue의 실제 입장 우선순위와 대기 기록을 확인합니다."},
   gang_batch:{name:"10개 · 다중 GPU 그룹",tag:"GANG ADMISSION",desc:"3개 요청은 2 GPU worker 그룹, 7개는 1 GPU 작업입니다. 전체 GPU 확보를 기다리는 그룹과 작은 요청의 입장을 확인합니다."}
@@ -2419,7 +2420,7 @@ function schedulerLabView(){
   root.append(el("div",labCursor!==null?`기록 ${labReplay?"자동 재생 중":"재생 정지"} · 과거 관측을 보는 중입니다.`:labError||Date.now()-labReceivedAt>15000?"라이브 연결 지연 · 이전 관측값입니다. 자동으로 다시 연결합니다.":"● 라이브 · 3초마다 조회 · 응답 "+stamp(new Date(labReceivedAt).toISOString()),"lab-mode"+(labCursor!==null?" replay":labError?" delayed":"")));
   const choices=el("div",null,"lab-setup lab-controls"),scenario=el("select"),scenarioLabel=el("label","시나리오");
   scenario.id="lab-scenario";scenarioLabel.htmlFor=scenario.id;scenario.disabled=labBusy;
-  for(const [id,k] of Object.entries(labKinds)){const previous=items.find(r=>r.scenario===id),o=el("option",k.name+" · "+(previous?({SUCCEEDED:"완료 기록",FAILED:"실패 기록",CANCELED:"취소 기록"}[previous.state]||"진행 중"):(labData?.agent?.scenarios||[]).includes(id)?"준비됨":"설정 필요"));o.value=id;o.selected=id===labKind;scenario.append(o);}
+  for(const [id,k] of Object.entries(labKinds)){if(k.archived&&id!==labKind)continue;const previous=items.find(r=>r.scenario===id),o=el("option",k.name+" · "+(previous?({SUCCEEDED:"완료 기록",FAILED:"실패 기록",CANCELED:"취소 기록"}[previous.state]||"진행 중"):(labData?.agent?.scenarios||[]).includes(id)?"준비됨":"설정 필요"));o.value=id;o.selected=id===labKind;scenario.append(o);}
   scenario.onchange=()=>{stopLabReplay();labKind=scenario.value;labKey=null;labRef=items.find(r=>r.scenario===labKind)?.ref||"empty:"+labKind;labCursor=null;labSelected="";labWorker="";autoReplayLab(true);render();};
   add(choices,scenarioLabel,scenario,header.lastElementChild);root.append(choices);
   if(labKind==="multi_gpu"){
@@ -2430,7 +2431,7 @@ function schedulerLabView(){
     add(box,label,count,el("span",`물리 GPU ${capacity}개 풀`,"muted"));choices.append(box);
   }
   const guide=labScenarioGuide(labKind);guide.append(el("p",kind.desc));
-  if(labKind==="mixed_batch"){const catalog=el("details",null,"lab-catalog-details");catalog.append(el("summary","실행할 GPU·NPU 작업과 다른 장치 확인"),heterogeneousCatalog());guide.append(catalog);}
+  if(["fleet_batch","mixed_batch"].includes(labKind)){const catalog=el("details",null,"lab-catalog-details");catalog.append(el("summary","실행할 GPU·NPU 작업과 다른 장치 확인"),heterogeneousCatalog());guide.append(catalog);}
   const running=items.some(r=>!["SUCCEEDED","FAILED","CANCELED"].includes(r.state));
   const launch=el("button",labBusy?"접수 중…":(labKind==="mixed"?"두 backend에 작업 실행 →":labKind==="npu"?"NPU 작업 실행 →":"시나리오 실행 →"),"primary");launch.disabled=labBusy||running||!labData?.agent?.online||Date.now()-labReceivedAt>15000||Date.now()-Date.parse(labData?.agent?.seen_at)>40000||!(labData?.agent?.scenarios||[]).includes(labKind);launch.onclick=startLab;
   choices.append(launch);
@@ -2443,7 +2444,7 @@ function schedulerLabView(){
   const shortcut=el("button",labReplay?"Ⅱ 재생 정지":"▶ 기록 재생");shortcut.disabled=events.length<2;shortcut.onclick=()=>{if(labReplay)stopLabReplay();else startLabReplay();render();};
   add(controls,select,badge(run.state,labTone(run.state)==="done"?"good":"warn"),shortcut,live);
   if(!["SUCCEEDED","FAILED","CANCELED"].includes(run.state)){const cancel=el("button","실험 중지");cancel.disabled=run.state==="CANCEL_REQUESTED";cancel.onclick=async()=>{cancel.disabled=true;try{const r=await fetch(API+"/scheduler-labs/"+run.ref+"/cancel",{method:"POST",headers:authHeaders()});if(!r.ok)throw new Error("취소 접수 실패");await refreshLab();}catch(e){labError=e.message;render();}};choices.append(cancel);}choices.insertBefore(select,launch);
-  const stage=el("div",null,"lab-stage"),top=add(el("div",null,"lab-stage-title"),el("span",spec.name.toUpperCase(),"eyebrow"),el("strong",snap.phase==="FINISHED"?((snap.error||snap.cleanup_error)?"실험 실행 오류 · 아래 네이티브 기록 확인":(snap.verdict||run.state)):snap.explanation||"실험 접수 완료"),el("small",(labCursor===null?"마지막 관측 ":"기록 재생 ")+stamp(labCursor===null?run.body.observed_at:event?.observed_at)));top.append(root.querySelector(".lab-mode"));stage.append(top);
+  const stage=el("div",null,"lab-stage"),top=add(el("div",null,"lab-stage-title"),el("span",spec.name.toUpperCase(),"eyebrow"),el("strong",snap.phase==="FINISHED"?((snap.error||snap.cleanup_error)?"실험 실행 오류 · 아래 네이티브 기록 확인":(snap.verdict||run.state)):snap.explanation||"실험 접수 완료"),el("small",(labCursor===null?"마지막 관측 ":"기록 재생 ")+stamp(labCursor===null?run.body.observed_at:event?.observed_at)));top.append(root.querySelector(".lab-mode"),labPoolCoverage(snap));stage.append(top);
   stage.append(labResourceRack(snap),labFlowBoard(run,snap));root.append(stage);
   if(run.scenario==="multi_gpu"){const workers=el("details",null,"lab-catalog-details");workers.append(el("summary","Worker별 CUDA 실행 근거"),multiGpuPoc(run,snap));root.append(workers);}
   if(run.scenario==="backfill" && snap.reservation){const window=el("details",null,"lab-catalog-details");window.append(el("summary","Slurm 예약 · 실행 시간 비교"),backfillWindow(run,snap));root.append(window);}
@@ -2525,7 +2526,7 @@ function autoReplayLab(force=false){
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&labReplay){stopLabReplay();if(active==="scheduler-lab"&&data)render();}});
 
 function heterogeneousCatalog(){
-  const box=el("div",null,"hetero-catalog"),tasks=(["mixed","mixed_batch"].includes(labKind)?(labData?.agent?.mixed||[]):labData?.agent?.heterogeneous||[]).filter(t=>labKind!=="npu"||t.device_class==="npu");
+  const box=el("div",null,"hetero-catalog"),tasks=(["mixed","mixed_batch","fleet_batch"].includes(labKind)?(labData?.agent?.mixed||[]):labData?.agent?.heterogeneous||[]).filter(t=>labKind!=="npu"||t.device_class==="npu");
   box.append(el("strong","이번 PoC 실행 작업"));
   for(const t of tasks)box.append(el("span",t.device_class.toUpperCase()+" · "+t.name));
   const qualified=new Set((data.submission_catalog||[]).flatMap(w=>w.candidates.filter(c=>c.device_class==="npu").map(c=>c.node_ref+":"+c.resource_key)));
@@ -2551,8 +2552,9 @@ function labJobLane(j){
 }
 function labScenarioGuide(kind){
   const guides={
+    fleet_batch:{needs:"등록된 GPU·NPU 실행 경로",steps:["이기종 작업 10개 요청","호환 자원 자동 선택","각 backend 큐·quota로 실행","실제 GPU·NPU 사용 노드 확인"],pass:"10개 결과와 실제 GPU/NPU 실행 노드, 두 backend 관측",scope:"GPU 공유 슬롯은 물리 장비 수와 다릅니다. 모델 미연결 NPU는 실행 후보에서 제외되고 표에 남습니다."},
     mixed_batch:{needs:"공통 GPU 풀 + 검증된 NPU·Slurm 템플릿",steps:["서로 다른 작업 10개 요청","정책이 호환 자원 선택","네이티브 큐 입장·실행","작업별 결과·MLflow 확인"],pass:"10개 실제 작업 모두 성공, GPU/NPU와 Kubernetes/Slurm 모두 관측",scope:"Slurm과 Kubernetes의 입장 quota는 각 backend에서 집행합니다. NPU는 CUDA 작업에 대체 할당되지 않습니다."},
-    pool_batch:{needs:"공통 GPU 큐 + 검증된 CUDA 노드",steps:["1 GPU 요청 10개 동시 접수","실행 + quota 대기 관측","자원 반환 → 다음 입장","10개 CUDA 결과"],pass:"10개 네이티브 Job과 CUDA 결과; 입장·대기 근거",scope:"CUDA probe 이미지가 검증된 노드만 사용합니다. 공유 Jetson은 등록된 전용 런타임 작업으로 실행합니다."},
+    pool_batch:{needs:"공통 GPU 큐 + 검증된 CUDA 노드",steps:["1 GPU 요청 10개 동시 접수","실행 + quota 대기 관측","자원 반환 → 다음 입장","10개 CUDA 결과"],pass:"10개 네이티브 Job과 CUDA 결과; 입장·대기 근거",scope:"이 항목은 CUDA 전용 정책 비교이며 전체 자원 시나리오가 아닙니다. CUDA probe 이미지가 검증된 노드만 사용합니다. 공유 Jetson은 등록된 전용 런타임 작업으로 실행합니다."},
     burst:{needs:"2 GPU 제한 비교 큐",steps:["10개 요청","quota 대기 관측","완료 후 다음 요청","10개 결과"],pass:"네이티브 quota 대기 사유와 10개 성공",scope:"의도적인 quota 비교입니다. 기본 공통 GPU 풀의 용량이 2라는 뜻이 아닙니다."},
     priority_batch:{needs:"공통 큐 + low/high PriorityClass",steps:["low 5개·high 5개 접수","quota 입장 대기","실제 우선순위 관측","10개 결과"],pass:"10개 성공과 네이티브 low/high 값",scope:"동시 도착과 컨트롤러 관측 시차가 있습니다. 관측하지 않은 엄격한 순서나 선점을 주장하지 않습니다."},
     gang_batch:{needs:"공통 GPU 큐 + worker barrier",steps:["2 GPU 그룹 3개·1 GPU 7개","그룹 전체 입장 대기","worker 준비 동기화","모든 worker CUDA 검증"],pass:"10개 Job, 모든 worker 결과, 2-worker 그룹 barrier",scope:"전체 PodSet 입장과 애플리케이션 barrier입니다. DDP 학습이나 원자적 Pod 생성이 아닙니다."}
@@ -2581,6 +2583,20 @@ function labResourceSource(snap){
   const observation=snap.resource_observation;
   return {inventory:observation?.inventory||[],at:observation?.observed_at,historical:true,missing:!observation?.inventory?.length};
 }
+function labExecutedNodes(job){
+  const executing=job.started_at||["RUNNING","Running","SUCCEEDED","Succeeded","COMPLETED","COLLECTING","COMPLETING","FINALIZING"].includes(job.state)||(job.pods||[]).some(p=>["Running","Succeeded"].includes(p.state)||(p.events||[]).some(e=>["COMPUTE_STARTED","COMPUTE_FINISHED"].includes(e.phase)));
+  return executing?labJobNodes(job):[];
+}
+function labPoolCoverage(snap){
+  const source=labResourceSource(snap),pool=labData?.agent?.gpu_pool||{},gpu=new Set([...(pool.kubernetes_members||[]),...(pool.slurm_members||[])].map(labNodeAlias)),catalog=data.submission_catalog||[],npu=new Set(),gpuUsed=new Set(),npuUsed=new Set();
+  for(const inv of source.inventory)for(const n of inv.nodes||[])for(const [key,r] of Object.entries(n.resources||{}))if(r.device_class==="npu"&&catalog.some(w=>w.candidates.some(c=>labNodeAlias(c.node_ref)===n.node_ref&&c.resource_key===key&&canSubmit(c))))npu.add(n.node_ref);
+  for(const job of labFlowJobs(snap))for(const node of labExecutedNodes(job))(job.device_class==="npu"?npuUsed:gpuUsed).add(node);
+  const row=el("div",null,"lab-pool-coverage");
+  add(row,el("span",`등록 GPU 노드 ${gpu.size||"미확인"}`),el("span",`NPU 실행 경로 ${npu.size}`),el("span",`이번 실행 GPU ${gpuUsed.size} · NPU ${npuUsed.size} 노드`));
+  if(!["fleet_batch","mixed_batch"].includes(labKind))row.append(el("strong","CUDA 정책 비교 · 전체 자원 사용은 ‘전체 연결 자원’ 선택"));
+  row.title="장비 수와 공유 슬롯을 구분합니다. 이번 실행은 실제 실행 또는 완료 상태가 관측된 노드의 누적 수입니다. 동시에 실행된 장비 수가 아닙니다.";
+  return row;
+}
 function labResourceRack(snap){
   const source=labResourceSource(snap),box=el("section",null,"lab-fleet lab-node-table"),head=el("div",null,"lab-fleet-head"),pool=labData?.agent?.gpu_pool||{};
   const mode=el("button",source.historical?"현재 상태":"실험 시점");mode.id="lab-resource-mode";mode.disabled=!Object.keys(snap).length;mode.onclick=()=>{labResourceMode=source.historical?"live":"recorded";render();};
@@ -2594,7 +2610,7 @@ function labResourceRack(snap){
     const utils=Object.entries(n.telemetry||{}).filter(([k])=>k.endsWith(":utilization")),util=el("div");for(const [,v] of utils)util.append(measure("",v,view,100,"%"));if(!utils.length)util.append(el("span",devices.length?"미측정":"—","lab-unknown"));
     const slurm=backend==="slurm",cpu=measure("",slurm?n.telemetry["node:cpu_non_idle_cores"]:n.telemetry.cpu_usage_cores,view,value(slurm?n.telemetry["node:cpu_count"]:n.resources.cpu?.capacity,view),"cores"),mem=measure("",n.telemetry["node:memory_available_bytes"],view,value(slurm?n.telemetry["node:memory_total_bytes"]:n.resources.memory?.capacity,view),"GiB",2**30);
     const registered=catalog.some(w=>w.candidates.some(c=>labNodeAlias(c.node_ref)===n.node_ref&&c.backend===backend))||labFlowJobs(snap).some(j=>j.backend===backend&&labJobNodes(j).includes(n.node_ref)),cuda=(labData?.agent?.multi_gpu?.nodes||[]).some(x=>x.id===n.node_ref),isGPU=devices.some(([,r])=>r.device_class==="gpu"),inPool=[...(pool.kubernetes_members||[]),...(pool.slurm_members||[])].includes(n.node_ref);
-    const scope=labKind==="mixed_batch"?(registered?"등록 작업":devices.length?"모델 미등록":"CPU 노드"):cuda?(labKind==="burst"&&!(labData?.agent?.nodes||[]).some(x=>x.id===n.node_ref)?"비교 큐 제외":"CUDA 대상"):isGPU&&inPool?"전용 작업 필요":devices.length?"요청 종류 다름":"CPU 노드";
+    const used=labFlowJobs(snap).filter(j=>labExecutedNodes(j).includes(n.node_ref)),scope=used.length?`실행 ${used.length}건`:["fleet_batch","mixed_batch"].includes(labKind)?(registered?"자동 배치 후보":devices.some(([,r])=>value(r.allocatable,view)===0)?"할당 가능 0":devices.length?"모델 미등록":"CPU 노드"):cuda?(labKind==="burst"&&!(labData?.agent?.nodes||[]).some(x=>x.id===n.node_ref)?"비교 큐 제외":"CUDA 대상"):isGPU&&inPool?"전용 작업 필요":devices.length?"요청 종류 다름":"CPU 노드";
     const eligibility=el("span",scope,"lab-node-scope");eligibility.title="공통 GPU 풀: "+(inPool?"등록됨":"GPU 풀 외")+" · 이번 작업 경로: "+scope;rows.push([pick,allocation,util,cpu,mem,eligibility]);
   }
   const t=table(["노드 / 상태","가속기 예약","사용률","CPU 사용","메모리 여유","이번 요청"],rows);box.append(t);
@@ -2633,7 +2649,7 @@ function labFlowBoard(run,snap){
   if(selected){
     const nodes=labJobNodes(selected),reason=selected.reason&&selected.reason!=="None"?selected.reason:"",text=[(selected.backend||(run.scenario==="backfill"?"slurm":"kubernetes")).toUpperCase(),(selected.device_class||"gpu").toUpperCase(),selected.priority!=null?"우선순위 "+selected.priority:"",nodes.length?"실행 노드 · "+nodes.join(" / "):"실행 노드 미관측",reason].filter(Boolean).join(" · ");
     const detail=el("span",text);detail.title=text;add(inspect,el("strong",selected.label),detail);
-    if(run.scenario==="mixed_batch"){const b=el("button","작업 상세 · 결과");b.onclick=async()=>{try{showJob(await scenarioFetch("/jobs/"+selected.id+"/view"));}catch(e){$("notice").textContent=e.message;}};inspect.append(b);}
+    if(["fleet_batch","mixed_batch"].includes(run.scenario)){const b=el("button","작업 상세 · 결과");b.onclick=async()=>{try{showJob(await scenarioFetch("/jobs/"+selected.id+"/view"));}catch(e){$("notice").textContent=e.message;}};inspect.append(b);}
   }else add(inspect,el("strong","작업 선택"),el("span","각 행은 한 요청입니다. 상태는 실제 관측 시에만 이동합니다. 짧은 단계는 조회 간격 사이에 지나갈 수 있습니다."));
   root.append(inspect);return root;
 }

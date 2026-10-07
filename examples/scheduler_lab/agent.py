@@ -57,7 +57,7 @@ class Agent:
             {
                 "scenarios": ["burst"]
                 + (["pool_batch", "gang_batch"] if self.c.get("multi_gpu") else [])
-                + (["mixed_batch"] if self.c.get("mixed") else [])
+                + (["fleet_batch", "mixed_batch"] if self.c.get("mixed") else [])
                 + (
                     ["priority_batch"]
                     if self.c.get("priorities") and self.c.get("multi_gpu")
@@ -548,6 +548,17 @@ class Agent:
                     raise RuntimeError(
                         "mixed execution completed without evidence of both backends"
                     )
+                aliases = self.c.get("gpu_pool", {}).get("node_aliases", {})
+                self.snapshot["execution_coverage"] = {
+                    device: sorted(
+                        {
+                            aliases.get(j["node"], j["node"])
+                            for j in jobs
+                            if j.get("node") and j["device_class"] == device
+                        }
+                    )
+                    for device in {j["device_class"] for j in jobs}
+                }
                 self.snapshot["verdict"] = (
                     f"{title} {len(jobs)}개 등록 작업 모두 실제 실행 성공 · 작업별 결과와 MLflow 기록 확인 가능"
                 )
@@ -610,6 +621,10 @@ class Agent:
     def priority_batch(self):
         self.snapshot.update(multi_gpu=True, priority_batch=True)
         return self.burst()
+
+    def fleet_batch(self):
+        self.snapshot["scope"] = "registered_heterogeneous_pool"
+        return self.mixed_batch()
 
     def mixed_batch(self):
         templates = self.c["mixed"]

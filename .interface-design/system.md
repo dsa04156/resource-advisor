@@ -230,3 +230,12 @@ to the existing detail dialog. Preserve explicit missing measurements and shared
 logical-unit labels. A job selection highlights its actual node; replay uses the
 same frozen timestamp for board and node table. Common pool status shows native
 admitted/pending counts separately from table utilization.
+
+Default operations scenario is fleet_batch (ten registered heterogeneous requests).
+Move CUDA-only policy probes into explicitly named comparisons; preserve old run
+identities in history. A compact header line separates registered physical GPU
+nodes, connected NPU routes and observed cumulative execution nodes. It never
+sums shared slots as devices or calls cumulative coverage simultaneous execution.
+The node table reports observed execution counts and distinguishes allocation-zero
+from missing model routes. Header line spans existing title grid; reuse existing
+blue/amber colors and keep the desktop ten-row/twelve-node viewport budget.

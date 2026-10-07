@@ -9,17 +9,22 @@ For GPU and NPU workloads together, choose the ten-request mixed scenario.
 
 ## Current catalog: ten requests in every scenario
 
-The selector now contains five ten-request scenarios. Older runs remain in the
+The default is **전체 연결 자원** (`fleet_batch`), using all registered GPU/NPU
+execution families. The selector contains five ten-request scenarios; the previous
+`mixed_batch` is available through history. Older runs remain in the
 server's audit history; they are no longer offered as new UI scenarios.
 
 | Scenario | Requests and native admission | Evidence |
 |---|---|---|
-| GPU + NPU mixed batch (`mixed_batch`) | Five automatically routed CUDA requests, one registered CNN, two registered Hailo inferences, two Slurm Orin CNN requests | Ten ordinary Job API records, actual backend/node/result observations |
-| Common GPU pool (`pool_batch`) | Ten one-GPU CUDA probes, submitted concurrently to `hairp-gpu-pool` | Concurrent running/pending jobs, native quota reason, ten CUDA correctness results |
+| All connected resources (`fleet_batch`) | Five automatically routed CUDA requests, one registered CNN, two registered Hailo inferences, two Slurm Orin CNN requests | Ten ordinary Job API records, actual backend/node/result observations |
+| CUDA-only policy comparison (`pool_batch`) | Ten one-GPU CUDA probes, submitted concurrently to `hairp-gpu-pool` | Concurrent running/pending jobs, native quota reason, ten CUDA correctness results |
 | Quota comparison (`burst`) | Ten one-GPU CUDA probes in the isolated two-GPU comparison queue | Same request count with the original restricted quota; not total platform capacity |
 | Priority batch (`priority_batch`) | Five low-priority and five high-priority one-GPU probes in the common pool | Actual native priority values and observed admission order; no invented FIFO/preemption guarantee |
 | Multi-GPU groups (`gang_batch`) | Three two-worker GPU groups and seven one-GPU requests in the common pool | Thirteen worker results, whole-workload admission and application startup barriers |
 
+The header distinguishes six registered physical GPU nodes, qualified NPU execution
+routes and the cumulative nodes actually used by this run. CUDA-only comparisons
+are explicitly marked; their three-node quota is not total platform capacity.
 The six-stage board shows all ten requests beside a table of every inventory node.
 Seeking the timeline also selects the node observation saved with that event.
 The explicit current-state toggle is a different time basis. Allocation is not

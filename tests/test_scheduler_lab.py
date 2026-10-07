@@ -56,7 +56,7 @@ def test_multi_gpu_request_capacity_and_idempotency():
         lab.start("team-a", LabRequest(scenario="multi_gpu", gpu_count=2), "multi")
 
 
-@pytest.mark.parametrize("scenario", ["heterogeneous", "npu", "mixed"])
+@pytest.mark.parametrize("scenario", ["heterogeneous", "npu", "mixed", "mixed_batch", "fleet_batch"])
 def test_registered_workload_poc_uses_runner_project_only(scenario):
     store = Store("sqlite://")
     store.initialize()
