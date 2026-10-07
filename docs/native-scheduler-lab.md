@@ -647,3 +647,19 @@ and the existing eight-minute deadline retain run-scoped cleanup.
 This increment exercises the existing compatible CUDA worker group and Kueue.
 It does not add automatic retry to every registered Job, Slurm or NPU execution,
 change production node settings, or claim checkpoint recovery of model training.
+
+Observed run: **ten requests succeeded**, seven requesting one GPU and three
+requesting two GPUs. Thirteen worker outputs passed the CUDA check; each measured
+at least its 30/60-second compute target. Ten different first Job creation times
+spanned 58 seconds. Six pending Workloads changed from priority 10 to 100. The
+injected failure retained exit code 42; its second native attempt succeeded on a
+different GPU node. Total observed run time was 218.1 seconds, with 52 node-state
+captures. Eleven native attempts were retained in replay evidence and all owned
+Jobs/Pods/Services were removed after completion.
+
+The deployed desktop shows ten request rows beside twelve node rows; both fit
+1366×768. Actual recorded replay verified label and card motion. Reduced motion
+produced opacity feedback without transforms. See the sanitized
+[variable-arrival GPU evidence](evidence/adaptive-gpu-arrivals.json). Native Job
+creation times are authoritative for receipts; planned arrival gaps do not promise
+exact acceptance times during native API and observation overhead.

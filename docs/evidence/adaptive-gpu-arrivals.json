@@ -1,0 +1,186 @@
+{
+  "date": "2026-10-07",
+  "scenario": "adaptive_batch",
+  "state": "SUCCEEDED",
+  "logical_requests": 10,
+  "native_attempts": 11,
+  "native_failure_injection": {
+    "exit_code": 42,
+    "attempts": 1,
+    "hardware_fault_claimed": false
+  },
+  "successful_single_gpu_requests": 7,
+  "successful_two_gpu_requests": 3,
+  "correct_cuda_worker_results": 13,
+  "multi_gpu_semantics": "One Indexed Job with two independent workers, one physical GPU each, all-worker startup barrier; not DDP training.",
+  "arrival": {
+    "seed": 1701776293,
+    "planned_offset_seconds": [
+      0,
+      9,
+      15,
+      21,
+      27,
+      31,
+      35,
+      41,
+      48,
+      53
+    ],
+    "actual_first_native_creation_offset_seconds": [
+      0,
+      11,
+      19,
+      32,
+      33,
+      40,
+      43,
+      53,
+      55,
+      58
+    ],
+    "distinct_first_native_creation_times": 10,
+    "timestamp_precision_seconds": 1,
+    "note": "Generated arrival schedule; actual acceptance includes observation and API overhead. Native creation timestamps are the authoritative receipt evidence."
+  },
+  "priority": {
+    "native_promotions": 6,
+    "from": 10,
+    "to": 100,
+    "minimum_wait_seconds": 20,
+    "pending_workloads_only": true,
+    "display_order": "Observed pending priority descending, receipt time tie-break; not guaranteed admission order."
+  },
+  "retry": {
+    "logical_rows": 1,
+    "maximum_extra_attempts": 1,
+    "failed_native_attempt_retained": true,
+    "original_failed_node_excluded": true,
+    "new_node_different": true,
+    "new_native_attempt_succeeded": true,
+    "resume_checkpoint_claimed": false
+  },
+  "worker_measurements": [
+    {
+      "request": "request-01",
+      "rank": 0,
+      "sustained_seconds": 60,
+      "compute_seconds": 60.00004144292325
+    },
+    {
+      "request": "request-01",
+      "rank": 1,
+      "sustained_seconds": 60,
+      "compute_seconds": 60.000030527007766
+    },
+    {
+      "request": "request-02",
+      "rank": 0,
+      "sustained_seconds": 60,
+      "compute_seconds": 60.00004401803017
+    },
+    {
+      "request": "request-03",
+      "rank": 0,
+      "sustained_seconds": 30,
+      "compute_seconds": 30.000040600076318
+    },
+    {
+      "request": "request-03",
+      "rank": 1,
+      "sustained_seconds": 30,
+      "compute_seconds": 30.00003712414764
+    },
+    {
+      "request": "request-04",
+      "rank": 0,
+      "sustained_seconds": 30,
+      "compute_seconds": 30.000037809000105
+    },
+    {
+      "request": "request-05",
+      "rank": 0,
+      "sustained_seconds": 30,
+      "compute_seconds": 30.000035848000834
+    },
+    {
+      "request": "request-06",
+      "rank": 0,
+      "sustained_seconds": 30,
+      "compute_seconds": 30.00003965513315
+    },
+    {
+      "request": "request-06",
+      "rank": 1,
+      "sustained_seconds": 30,
+      "compute_seconds": 30.0000470330001
+    },
+    {
+      "request": "request-07",
+      "rank": 0,
+      "sustained_seconds": 30,
+      "compute_seconds": 30.000036894999084
+    },
+    {
+      "request": "request-08",
+      "rank": 0,
+      "sustained_seconds": 30,
+      "compute_seconds": 30.00002437911462
+    },
+    {
+      "request": "request-09",
+      "rank": 0,
+      "sustained_seconds": 30,
+      "compute_seconds": 30.00004032600009
+    },
+    {
+      "request": "request-10",
+      "rank": 0,
+      "sustained_seconds": 30,
+      "compute_seconds": 30.000461343093775
+    }
+  ],
+  "observed_run_elapsed_seconds": 218.1,
+  "replay": {
+    "events": 52,
+    "node_snapshots": 52,
+    "logical_row_count_stayed_ten": true
+  },
+  "cleanup": {
+    "remaining_owned_jobs_pods_services": 0,
+    "retained_replay_and_failure_evidence": true,
+    "terminal_lab_pods_after_followup": 0
+  },
+  "ui": {
+    "desktop_viewport": [
+      1366,
+      768
+    ],
+    "request_rows": 10,
+    "node_rows": 12,
+    "board_bottom_px": 618,
+    "node_table_bottom_px": 701.640625,
+    "horizontal_overflow": false,
+    "recorded_replay_row_motion_verified": true,
+    "recorded_replay_card_motion_verified": true,
+    "reduced_motion_has_transform": false,
+    "mobile_viewport": [
+      390,
+      844
+    ],
+    "mobile_horizontal_overflow": false,
+    "mobile_request_rows": 10,
+    "mobile_stage_columns": 6
+  },
+  "focused_tests_passed": 28,
+  "feature_ci": {
+    "run": 37601275870,
+    "conclusion": "success"
+  },
+  "scope": "Native Kueue/CUDA policy scenario on the existing three-node compatible worker group. Heterogeneous registered GPU/NPU/Slurm fleet remains a separate scenario. This does not add general Job API retries, MLflow records, Slurm/NPU failover or model training checkpoint recovery.",
+  "deployed_api_source_commit": "dfbab1306571b4fec3ffbc6f93fbacc908e6c119",
+  "ui_ci": {
+    "run": 37601783452,
+    "conclusion": "success"
+  }
+}

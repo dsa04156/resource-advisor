@@ -805,7 +805,7 @@ class Agent:
             for task in tasks:
                 if task["attempt"] == 0 and elapsed >= task["arrival_seconds"]:
                     task["attempt"] = 1
-                    task["submitted_elapsed"] = elapsed
+                    task["submitted_elapsed"] = time.monotonic() - started
                     task["native_label"] = task["request_id"] + "-a1"
                     self.job(
                         task["native_label"],
