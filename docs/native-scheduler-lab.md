@@ -33,6 +33,39 @@ tiebreaker, serialized with a PostgreSQL transaction lock; Kueue/Slurm retain na
 admission. This is not a cross-project GPU reservation or an optimal interference
 model. See [common GPU pool](common-gpu-pool.md) for configuration and limits.
 
+### Common-pool execution record — 2026-10-07
+
+The common-pool ten-request run succeeded on three native CUDA nodes: three running
+and seven pending requests were observed together, then all ten correctness probes
+finished. Fifteen synchronized node observations were saved and owned native
+Job/Pod/Service objects were removed.
+
+The mixed run completed all ten ordinary jobs: eight GPU and two NPU requests,
+eight Kubernetes and two Slurm executions, ten collected results, ten distinct
+MLflow run receipts and ten accounting records. Five automatic CUDA requests
+selected four compatible GPU nodes. All workloads together executed on seven
+nodes (six GPU nodes and one NPU node). Slurm's account CPU quota visibly queued
+its second job; no scheduler limits were silently overridden.
+
+The first mixed attempt failed because serialized acceptance exceeded the runner's
+15-second receipt timeout for three requests, although the server accepted all ten.
+All ten were reconciled and no nonterminal job remained. That failed history entry
+is retained. The corrected runner waits up to 60 seconds and retries transient
+receipt failures using the same idempotency keys; its second run succeeded.
+
+The grouped run also succeeded: three two-worker groups plus seven one-GPU requests
+produced thirteen CUDA correctness results, including six barrier observations.
+Two running Job records can occupy three GPUs when one Job requests two devices.
+All owned native objects were cleaned. Priority and quota-comparison definitions
+were not rerun in this increment; their older evidence remains explicitly archived.
+
+The served UI showed ten rows, six stages and all twelve nodes at 1366×768;
+390px width had no horizontal overflow. Explicit Slurm display-alias mapping was
+verified by selecting a completed Slurm job and highlighting its inventory row.
+Initial 28 focused checks passed; the receipt-fix runner checks passed 10 tests.
+Sanitized counts and boundaries are in
+[the common-pool evidence report](evidence/common-gpu-pool-ten-request.json).
+
 ## Archived scenario definitions and evidence
 
 The following describes earlier independent experiments, not the current selector.

@@ -1,0 +1,99 @@
+{
+  "api_source_commit": "8ffa1edeb4d890123ff3d9bc571f2cb4cbef426a",
+  "runner_receipt_fix_commit": "eb74f50b2370b3fdadca01163fab2496e57abd00",
+  "common_pool": {
+    "exclusive_gpu_quota": 3,
+    "shared_gpu_logical_slots": 4,
+    "shared_gpu_physical_nodes": 2,
+    "kubernetes_gpu_nodes": 5,
+    "slurm_gpu_nodes": 1,
+    "slurm_admission_separate": true,
+    "npu_separate_type": true
+  },
+  "pool_batch": {
+    "scenario": "pool_batch",
+    "state": "SUCCEEDED",
+    "requests": 10,
+    "cleanup": "completed",
+    "node_observations": 15,
+    "pending_at_queue_observation": 7,
+    "running_at_queue_observation": 3,
+    "worker_results": 10,
+    "exclusive_gpu_quota": 3
+  },
+  "mixed_batch": {
+    "scenario": "mixed_batch",
+    "state": "SUCCEEDED",
+    "requests": 10,
+    "cleanup": "completed",
+    "node_observations": 27,
+    "backends": [
+      "kubernetes",
+      "slurm"
+    ],
+    "device_classes": [
+      "gpu",
+      "npu"
+    ],
+    "results": 10,
+    "gpu_requests": 8,
+    "npu_requests": 2,
+    "distinct_observed_nodes": 7,
+    "mlflow_receipts": 10,
+    "distinct_mlflow_run_ids": 10,
+    "cuda_automatic_distinct_nodes": 4,
+    "accounting_records": 10
+  },
+  "gang_batch": {
+    "scenario": "gang_batch",
+    "state": "SUCCEEDED",
+    "requests": 10,
+    "cleanup": "completed",
+    "node_observations": 19,
+    "pending_at_queue_observation": 8,
+    "running_at_queue_observation": 2,
+    "worker_results": 13,
+    "exclusive_gpu_quota": 3,
+    "two_gpu_groups": 3,
+    "correctness_worker_results": 13,
+    "barrier_worker_results": 6,
+    "remaining_owned_native_objects": 0
+  },
+  "first_mixed_failure": {
+    "cause": "15-second receipt timeout during serialized acceptance",
+    "accepted_jobs": 10,
+    "received_before_failure": 7,
+    "all_ten_reconciled": true,
+    "remaining_nonterminal_after_reconciliation": 0
+  },
+  "browser": {
+    "desktop": [
+      1366,
+      768
+    ],
+    "node_rows": 12,
+    "job_rows": 10,
+    "stages": 6,
+    "mobile_width": 390,
+    "horizontal_overflow": false,
+    "slurm_node_alias_link_verified": true
+  },
+  "verification": {
+    "focused_tests_initial": 28,
+    "runner_tests_after_receipt_fix": 10,
+    "initial_api_ci_success": true,
+    "latest_ui_ci_at_capture": "completed_success",
+    "latest_ui_ci_run": 37564083590
+  },
+  "not_rerun_in_this_increment": [
+    "priority_batch",
+    "burst"
+  ],
+  "limits": [
+    "Project-scoped native pool; no global Slurm/Kubernetes quota",
+    "CUDA correctness probes are not ML training benchmarks",
+    "Declared Slurm alias maps display only; native evidence retained",
+    "Single runner; process death or exhausted receipt retries can still require reconciliation",
+    "Registered legacy contracts may retain operational freshness warnings"
+  ]
+}
