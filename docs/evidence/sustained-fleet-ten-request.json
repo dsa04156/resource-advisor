@@ -1,0 +1,105 @@
+{
+  "observed_date": "2026-10-07",
+  "deployed_source_commit": "36e8fa4fe57d58f70a000d0b99c99f58dc9a4b30",
+  "scenario": "fleet_batch",
+  "requested": 10,
+  "accepted": 8,
+  "succeeded": 8,
+  "submission_rejected": 2,
+  "overall_state": "FAILED",
+  "rejection": {
+    "device_class": "npu",
+    "count": 2,
+    "reason": "OBSERVED_NODE_UNAVAILABLE",
+    "native_jobs_created": 0,
+    "healthy_accepted_jobs_canceled": 0
+  },
+  "accepted_backend_counts": {
+    "kubernetes": 6,
+    "slurm": 2
+  },
+  "timed_cuda_requests": 5,
+  "timed_cuda_compute_seconds": [
+    90.00003834115341,
+    90.00164840405341,
+    90.0015334469499,
+    90.00003701227251,
+    90.0000456442358
+  ],
+  "cuda_work": {
+    "measurement_windows": 10,
+    "window_target_seconds": 9,
+    "output_elements_checked": 4096,
+    "sleep_padding": false,
+    "interpretation": "Synchronized repeated CUDA kernels for a scheduling demonstration. Window timings are not individual kernel latency, model inference throughput or training results."
+  },
+  "independent_hardware_qualification": {
+    "qualified_device_targets": 4,
+    "compute_seconds": [
+      90.00003915082198,
+      90.00004148157313,
+      90.00023033411708,
+      90.00035142188426
+    ],
+    "short_results_accepted_as_timed": false
+  },
+  "execution_coverage": {
+    "gpu_nodes_cumulative": 5,
+    "npu_nodes": 0,
+    "recorded_node_snapshots": 28,
+    "observed_frame": {
+      "running": 5,
+      "queued": 2,
+      "succeeded": 1,
+      "rejected": 2
+    },
+    "later_queued_request_started": true
+  },
+  "result_records": 8,
+  "unique_mlflow_run_receipts": 8,
+  "postgresql_usage_records": 8,
+  "quota_alignment": {
+    "scope": "owned lab namespace only",
+    "namespace_gpu_ceiling_before": 1,
+    "namespace_gpu_ceiling_after": 3,
+    "clusterqueue_gpu_quota": 3,
+    "other_projects_changed": false
+  },
+  "api_history": {
+    "maximum_list_metadata_rows": 40,
+    "full_replays_in_list": 1,
+    "older_replay_loaded_on_selection": true,
+    "existing_stored_history_preserved": true,
+    "restart_count_during_final_run": 0,
+    "memory_limit_mib": 512,
+    "observed_final_run_peak_mib": 236.79
+  },
+  "cleanup": {
+    "remaining_terminal_lab_pods": 0,
+    "job_results_tracking_and_usage_retained": true
+  },
+  "retained_failed_attempts": [
+    {
+      "cause": "API full-history polling OOM",
+      "succeeded": 3,
+      "canceled": 7
+    },
+    {
+      "cause": "offline NPU rejection under former batch abort behavior",
+      "accepted": 8,
+      "succeeded": 1,
+      "canceled": 7
+    }
+  ],
+  "verification": {
+    "focused_tests_passed": 27,
+    "deployed_source_ci": "37576082204",
+    "deployed_source_ci_conclusion": "success"
+  },
+  "limitations": [
+    "Two NPU requests were rejected before admission; ten successful executions are not claimed.",
+    "CNN and NPU work sizes remain their registered values and can complete faster.",
+    "Accepted native execution failures still use the broader runner cleanup policy.",
+    "No optimal placement, availability SLA or whole-platform completion is claimed."
+  ]
+}

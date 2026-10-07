@@ -598,3 +598,23 @@ identity; they have no Job-detail link. Accepted requests continue until complet
 then the run reports its partial failure. Rejection is not native queue admission
 or an executed NPU workload. This does not yet make native execution failure of
 an accepted request independent of the runner's broader cleanup policy.
+
+### Observed timed fleet run
+
+The default fleet workload now selects the separately qualified
+`cuda-sustained-auto-v1`. Five requests each completed about **90 seconds of
+actual CUDA work**. The recorded board included **five running and two queued**
+requests; later queued work started after capacity was released. Across the run,
+five GPU execution nodes and 28 node-state snapshots were observed.
+
+Ten requests were made, but the NPU node was unavailable: two requests were
+rejected before native job creation. The remaining eight completed successfully
+(six Kubernetes, two Slurm), with eight result records, distinct MLflow run
+receipts and PostgreSQL usage records. Overall status correctly remains FAILED
+for the two rejected requests. The accepted jobs were not canceled because of
+those rejections. Completed lab Pods were removed while results and usage stayed.
+
+The final API Pod had zero restarts and a recorded peak of 236.79 MiB under the
+existing 512 MiB limit. Earlier interrupted attempts are retained; they are not
+counted as successful demonstrations. See the sanitized
+[timed execution evidence](evidence/sustained-fleet-ten-request.json).
