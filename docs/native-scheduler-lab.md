@@ -427,3 +427,20 @@ meters follow the same recorded observation during replay; current inventory
 is an explicit separate choice. GPU, NPU and Slurm scenarios share the six-stage
 board. The ten-request scenario specifically uses the qualified CUDA lab pool;
 it does not assert ten distinct models, NPU qualification or FIFO fairness.
+
+### Verified ten-request run
+
+The new real run succeeded: ten distinct native Kueue workloads, **two running
+and eight pending** in the recorded queue observation, then ten successful CUDA
+numerical results. All ten Job creation timestamps fell in the same second
+(native timestamp precision is one second). There were 21 recorded node-state
+captures. After cleanup, zero owned Jobs, Services or Pods remained.
+
+The deployed desktop board showed all ten rows and six stages at 1366×768; its
+bottom was 717px and the collapsed page bottom 767.4px, without horizontal
+overflow. Live selection linked the observed execution node; the 390px mobile
+board also retained six columns and ten rows without horizontal overflow. Mobile
+uses normal page scrolling for controls and node details. See the sanitized
+[count and layout evidence](evidence/ten-request-native-run.json). This proves
+this bounded queue demonstration, not performance superiority or physical GPU
+exclusivity.

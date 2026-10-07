@@ -1,0 +1,28 @@
+{
+  "scenario": "burst",
+  "state": "SUCCEEDED",
+  "native_jobs": 10,
+  "pending_at_queue_observation": 8,
+  "running_at_queue_observation": 2,
+  "creation_spread_seconds": 0.0,
+  "correctness_passed": 10,
+  "recorded_node_captures": 21,
+  "cleanup": "completed",
+  "implementation_commit": "cb6f45f90cc8af33c2273b4e81e6f4b243efd106",
+  "submitted_at": "2026-10-07T02:14:34.050226+00:00",
+  "submission_timestamp_precision": "one second; zero spread does not imply atomic creation",
+  "unique_native_workloads": 10,
+  "owned_native_objects_remaining": 0,
+  "desktop_viewport": [
+    1366,
+    768
+  ],
+  "desktop_visible_request_rows": 10,
+  "desktop_visible_stages": 6,
+  "desktop_board_bottom_px": 717,
+  "desktop_page_bottom_px": 767.390625,
+  "horizontal_overflow": false,
+  "mobile_viewport_width": 390,
+  "mobile_horizontal_overflow": false,
+  "targeted_tests_passed": 16
+}
