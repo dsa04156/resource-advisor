@@ -1,0 +1,285 @@
+{
+  "schema_version": "right-sizing-trial-plan-v1",
+  "experiment_id": "right-sizing-20261007-v1",
+  "source_commit": "bb2f8342a54e9ae0f3fc53fd2a83baf854449a4f",
+  "source_digest": "sha256:d02947e57991eb1212432bdf8abc5015afb3709e29c99104e0ba3a8dcad4d4a7",
+  "questions": [
+    "RQ1",
+    "RQ2",
+    "RQ3",
+    "RQ4",
+    "RQ5"
+  ],
+  "independent_units": {
+    "search_comparison": "one study per strategy/workload; functional not powered",
+    "main": "one separately submitted native Job; three randomized temporal blocks",
+    "inner_samples": "subsamples, not independent Jobs"
+  },
+  "workloads": {
+    "W1": {
+      "class": "accelerator-compute-sensitive benchmark candidate",
+      "module": "resource_advisor.gpu_benchmark",
+      "shape": [
+        2048,
+        2048
+      ],
+      "precision": "fp32",
+      "seed": 20261007,
+      "work_units": 100,
+      "model_digest": "sha256:b466077b3aa44f1d39c7c981985b342a0aebcee11b241a5277c62bc089018b93",
+      "quality_minimum": 0.99,
+      "measurement_boundary": "sum-100-synchronized-fp32-matmul-after-three-warmups",
+      "mutable_variables": [
+        "host_cpu",
+        "host_memory_mib"
+      ],
+      "cpu_candidates": [
+        0.5,
+        1,
+        2
+      ],
+      "accelerator_count": 1,
+      "image_digest": "sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984",
+      "host_memory_candidates_mib": [
+        1024,
+        2048
+      ],
+      "baseline": {
+        "host_cpu": 1,
+        "host_memory_mib": 2048
+      },
+      "candidate_count": 6
+    },
+    "W2": {
+      "class": "host/input-sensitive generated CNN",
+      "module": "resource_advisor.transfer_gpu_benchmark",
+      "shape": [
+        1,
+        3,
+        256,
+        256
+      ],
+      "precision": "fp32",
+      "seed": 20261007,
+      "work_units": 12,
+      "model_digest": "sha256:8214aaa63bcd908f735169fc2b2ef4846a926a58b8527c5c7424004e063ec855",
+      "quality_minimum": 1.0,
+      "measurement_boundary": "cnn-preprocess-transfer-32-forwards-synchronize-per-block-v1",
+      "mutable_variables": [
+        "host_cpu",
+        "host_memory_mib"
+      ],
+      "cpu_candidates": [
+        0.5,
+        1,
+        2
+      ],
+      "accelerator_count": 1,
+      "image_digest": "sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984",
+      "host_memory_candidates_mib": [
+        1024,
+        2048
+      ],
+      "baseline": {
+        "host_cpu": 1,
+        "host_memory_mib": 2048
+      },
+      "candidate_count": 6
+    },
+    "W3": {
+      "class": "qualified Hailo heterogeneous inference coverage",
+      "existing_workload_signature": "sha256:8a74c00b467fa7e601b48c7ba6369329844b92361a86baaf7ad680827fdf3b8d",
+      "model_digest": "sha256:2625772f5e1324c1e2781856926a445b4fe6494b9e0bb0161a7d86df7f095d38",
+      "artifact_digest": "sha256:a1d82e9121c66e772257490cb3af904d1e90fb4387ad5f683fbc5efe1a05f9f7",
+      "input_manifest_digest": "sha256:7740c3420918e1264024dd41dbe6c0db18a2f1d283789afc89ef3d0db522d30f",
+      "shape": [
+        1,
+        224,
+        224,
+        3
+      ],
+      "precision": "hailo-compiled-float32-io",
+      "work_units": 100,
+      "mutable_variables": [],
+      "candidate_count": 1,
+      "compare_to_gpu": "NOT_COMPARABLE: no qualified identical model/precision/quality/memory/timing contract",
+      "path": "observe three original executions; measured lookup; approve one independent fixed execution",
+      "qualification_jobs": 1
+    }
+  },
+  "gpu_search": {
+    "strategies": [
+      "random",
+      "qlognei"
+    ],
+    "max_probes": 5,
+    "minimum_repeats": 3,
+    "total_wall_seconds": 900,
+    "final_validation_reserved_seconds": 360,
+    "device_seconds": 900,
+    "per_candidate_run_seconds": 60,
+    "queue_seconds": 120,
+    "baseline_cpu": 1,
+    "confirmation": "three fresh Jobs per baseline/finalist; if same finalist/baseline, three total",
+    "shared_source_history": false,
+    "approval": "explicit operator/project client approval using immutable server digest",
+    "main_reuses": 3,
+    "later_reference": "grid_characterization, two probes and three independent confirmations per CPU, after all main/search decisions",
+    "max_candidates": 6,
+    "baseline_memory_mib": 2048
+  },
+  "maximum_jobs": {
+    "gpu_qualification": 4,
+    "gpu_search": 44,
+    "gpu_main": 18,
+    "gpu_reference": 60,
+    "hailo": 5,
+    "total": 131
+  },
+  "whole_protocol_wall_seconds": 7200,
+  "schedules": {
+    "main": {
+      "W1": [
+        {
+          "unit_id": 1,
+          "block": 0,
+          "arm": "random"
+        },
+        {
+          "unit_id": 2,
+          "block": 0,
+          "arm": "static"
+        },
+        {
+          "unit_id": 3,
+          "block": 0,
+          "arm": "qlognei"
+        },
+        {
+          "unit_id": 4,
+          "block": 1,
+          "arm": "random"
+        },
+        {
+          "unit_id": 5,
+          "block": 1,
+          "arm": "static"
+        },
+        {
+          "unit_id": 6,
+          "block": 1,
+          "arm": "qlognei"
+        },
+        {
+          "unit_id": 7,
+          "block": 2,
+          "arm": "random"
+        },
+        {
+          "unit_id": 8,
+          "block": 2,
+          "arm": "static"
+        },
+        {
+          "unit_id": 9,
+          "block": 2,
+          "arm": "qlognei"
+        }
+      ],
+      "W2": [
+        {
+          "unit_id": 1,
+          "block": 0,
+          "arm": "qlognei"
+        },
+        {
+          "unit_id": 2,
+          "block": 0,
+          "arm": "static"
+        },
+        {
+          "unit_id": 3,
+          "block": 0,
+          "arm": "random"
+        },
+        {
+          "unit_id": 4,
+          "block": 1,
+          "arm": "qlognei"
+        },
+        {
+          "unit_id": 5,
+          "block": 1,
+          "arm": "random"
+        },
+        {
+          "unit_id": 6,
+          "block": 1,
+          "arm": "static"
+        },
+        {
+          "unit_id": 7,
+          "block": 2,
+          "arm": "qlognei"
+        },
+        {
+          "unit_id": 8,
+          "block": 2,
+          "arm": "random"
+        },
+        {
+          "unit_id": 9,
+          "block": 2,
+          "arm": "static"
+        }
+      ]
+    },
+    "study": {
+      "W1": [
+        {
+          "unit_id": 1,
+          "block": 0,
+          "arm": "random"
+        },
+        {
+          "unit_id": 2,
+          "block": 0,
+          "arm": "qlognei"
+        }
+      ],
+      "W2": [
+        {
+          "unit_id": 1,
+          "block": 0,
+          "arm": "random"
+        },
+        {
+          "unit_id": 2,
+          "block": 0,
+          "arm": "qlognei"
+        }
+      ]
+    },
+    "generator": "experimental-design/randomization.py:block_randomization",
+    "generator_sha256": "f0cf8bf7ba27a3381366b9cf03e30506d34a70670537d046e851c340187060f8",
+    "numpy": "2.3.3",
+    "pandas": "2.3.3"
+  },
+  "rules": [
+    "Stop a workload on failed fresh qualification; no threshold relaxation or replacement F0 to obtain a pass.",
+    "Keep all failed/canceled/invalid attempt reservation and unknown costs.",
+    "Keep original input/model/output unchanged; generated fixtures and original Hailo binding only.",
+    "Model fitting is included in persisted planning cost and study wall; it is not separately zeroed.",
+    "No measured break-even extrapolation beyond three actually executed main uses.",
+    "Slurm new hardware feedback blocked until authenticated controller/worker connectivity is re-established without changing configuration.",
+    "Existing conditional MF-KG groups remain unqualified; no opportunistic threshold change.",
+    "Reference grid is later characterization, not an equal-budget grid strategy.",
+    "A study abstention stops that strategy main executions; record actual cost and outcome instead of replacing it.",
+    "No superiority p-values or production/economic claims from one study per strategy/workload.",
+    "Six CPU/memory candidates share one qualified RuntimeVariant per workload; CPU/memory are numerical coordinates, not new runtime categories.",
+    "Five probes cannot evaluate all six candidate configurations before selection; report exact candidate coverage and any abstention.",
+    "Host OOM remains a failed/censored measurement; peak_memory_mib remains the runner GPU tensor boundary, not host RSS.",
+    "Qualification checks the fixed baseline and CPU2 at2GiB; other resource configurations do not acquire performance evidence from F0.",
+    "Plan design finalized before commit and before any qualification/profiling; no observations informed this larger candidate space."
+  ]
+}
