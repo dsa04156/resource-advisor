@@ -320,6 +320,12 @@ def create_app(
 
         return shadow_report(service.store, p.project)
 
+    @app.get(PREFIX + "/workloads/{ref}/right-sizing")
+    def right_sizing_lifecycle(ref: str, p=Depends(principal)):
+        from .right_sizing import lifecycle
+
+        return lifecycle(service, p.project, ref)
+
     @app.get("/healthz")
     def health():
         with service.store.transaction() as conn:

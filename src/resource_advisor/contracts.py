@@ -68,18 +68,35 @@ class WorkloadIdentity(Contract):
     quality_contract_digest: Digest
     measurement_boundary: str = Field(min_length=1)
     sampling_policy_digest: Digest | None = None
+    model_name: str | None = Field(default=None, min_length=1, max_length=256)
+    optimizer: str | None = Field(default=None, min_length=1, max_length=128)
+    optimizer_parameters: dict[str, int | float | str | bool] = Field(default_factory=dict)
+    input_shape_range: tuple[tuple[int, int], ...] | None = None
 
     @model_serializer(mode="wrap")
     def preserve_legacy_signature(self, handler):
         value = handler(self)
         if self.sampling_policy_digest is None:
             value.pop("sampling_policy_digest", None)
+        for key in ("model_name", "optimizer", "optimizer_parameters", "input_shape_range"):
+            if not getattr(self, key):
+                value.pop(key, None)
         return value
 
     @model_validator(mode="after")
     def positive_shape(self):
         if any(n <= 0 for n in self.input_shape):
             raise ValueError("input shape dimensions must be positive")
+        if self.input_shape_range is not None and (
+            len(self.input_shape_range) != len(self.input_shape)
+            or any(
+                not 0 < low <= n <= high
+                for n, (low, high) in zip(self.input_shape, self.input_shape_range, strict=True)
+            )
+        ):
+            raise ValueError("input shape must lie in the declared positive range")
+        if self.optimizer_parameters and not self.optimizer:
+            raise ValueError("optimizer parameters require an explicit optimizer")
         return self
 
 
@@ -99,6 +116,16 @@ class ExecutionContext(Contract):
     allocation_mode: Literal["physical_device", "virtual_slot", "cpu_only"]
     resources: Resources
     parameters: dict[str, int | float | str] = Field(default_factory=dict)
+    host_cpu_model: str | None = Field(default=None, min_length=1, max_length=256)
+    runtime_flags: dict[str, int | float | str | bool] = Field(default_factory=dict)
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_signature(self, handler):
+        value = handler(self)
+        for key in ("host_cpu_model", "runtime_flags"):
+            if not getattr(self, key):
+                value.pop(key, None)
+        return value
 
 
 class ThermalPolicy(Contract):

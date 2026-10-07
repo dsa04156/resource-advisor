@@ -690,7 +690,9 @@ class Service:
             [{"ref": item["ref"], "digest": signature(item["body"])} for item in profiles]
         )
 
-    def recommend(self, project, workload_ref, *, profile_refs=None, cohort_digest=None):
+    def recommend(
+        self, project, workload_ref, *, profile_refs=None, cohort_digest=None, persist=True
+    ):
         with self.store.transaction() as conn:
             spec = WorkloadSpec.model_validate(
                 required(self.store, conn, "workload", workload_ref, project)
@@ -798,7 +800,8 @@ class Service:
                     "cohort_digest": self.lookup_cohort_digest(profiles),
                     "scope": "explicit immutable cohort; current validity checks still apply",
                 }
-            self.store.put(conn, "recommendation", rec["ref"], project, rec)
+            if persist:
+                self.store.put(conn, "recommendation", rec["ref"], project, rec)
             return dict(rec, digest=signature(rec))
 
     def approve(self, project, ref, request: ApprovalRequest):

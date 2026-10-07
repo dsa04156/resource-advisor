@@ -1,0 +1,1497 @@
+{
+  "schema_version": "right-sizing-baseline-audit-v1",
+  "evidence_kind": "offline_audit_of_preserved_hardware_records",
+  "inputs": [
+    {
+      "role": "contract",
+      "path": "docs/evidence/contract-boundaries-v1.json",
+      "sha256": "d41bfb47358df8da8da63d21c832c2d9d03313c824695a1b545aa5724bee3b1c"
+    },
+    {
+      "role": "policy",
+      "path": "docs/evidence/policy-comparison-v2.json",
+      "sha256": "2b1ec19d2f80241d04f702eeeb9f4438a84870f5e1baa804962de6231b3b27dd"
+    },
+    {
+      "role": "policy_plan",
+      "path": "docs/evidence/policy-comparison-plan-v2.json",
+      "sha256": "4d261df39fd330d75972ccbe770a01c9bf144e91090f0cb08add0dade6d5c440"
+    },
+    {
+      "role": "predecessor",
+      "path": "docs/evidence/policy-stop.json",
+      "sha256": "064beb97142bcbeb9960f346627e0a594b5362ada289550189b28a0956ca4f47"
+    },
+    {
+      "role": "operational",
+      "path": "docs/evidence/operational-comparison-v1.json",
+      "sha256": "4e55c716daf18489c2dd0438a69052169bbc2b83821fc2eeafddd12560ef7bca"
+    },
+    {
+      "role": "operational_plan",
+      "path": "docs/evidence/operational-plan-v1.json",
+      "sha256": "66636f9a1d24b9be0d5c6b5f0eae0efc3edd436c67ef8e1a391509693385804a"
+    },
+    {
+      "role": "transfer",
+      "path": "docs/evidence/transfer-gpu.json",
+      "sha256": "fb0d3f4f7a42ff2b161e2fa25faf2f2c4336f9444ef17fc740aa819c74fb1b71"
+    },
+    {
+      "role": "drift",
+      "path": "docs/evidence/load-drift-v1.json",
+      "sha256": "76f530365bd9500ef110c12784777c01f53ea9883427ea9f4924b3b92d719788"
+    },
+    {
+      "role": "hailo",
+      "path": "docs/evidence/hailo-resnet50-platform.json",
+      "sha256": "793b171473e9c6a83fb31b0eb9ec530a1b72311047c05555fa89a8fb34d7a7e7"
+    },
+    {
+      "role": "hailo_inputs",
+      "path": "docs/evidence/hailo-resnet50-inputs.json",
+      "sha256": "7740c3420918e1264024dd41dbe6c0db18a2f1d283789afc89ef3d0db522d30f"
+    }
+  ],
+  "results": {
+    "cold_start_contract": {
+      "scope_cases": 5,
+      "budget_cases": 4,
+      "control_profiles": 12,
+      "api_jobs_created": 0,
+      "qualification_gpu_seconds": 2.0,
+      "capture_digest": "sha256:5744f3c0b6a00c1b190993ed7fa031c6732cac69f426a7d12e2fbd48f25ae5be"
+    },
+    "active_profiling": {
+      "scope": "descriptive three-block single-GPU comparison; no powered superiority claim",
+      "whole_protocol_wall_seconds": 3565.339559,
+      "studies": [
+        {
+          "order": 1,
+          "block": 0,
+          "strategy": "random",
+          "seed": 2026100301,
+          "label": "target-0-random",
+          "state": "COMPLETED",
+          "selected_candidate": "cpu2",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "stop_reason": null,
+          "posthoc_selection_regret_fraction": 0.0,
+          "independent_confirmation_mean_seconds": 0.26104306128884974,
+          "study_wall_seconds": 344.722924,
+          "planning_seconds": 0.00023910996969789267,
+          "allocated_gpu_seconds": 38.0,
+          "first_use_gpu_seconds_including_history": 38.0,
+          "first_use_wall_seconds_including_history": 344.722924,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_jobs": 0,
+          "model_based_choices": 0,
+          "choice_reasons": [
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION"
+          ],
+          "queue_seconds_known": 1.0,
+          "unknown_queue_intervals": 0
+        },
+        {
+          "order": 2,
+          "block": 0,
+          "strategy": "lookup",
+          "seed": 2026100301,
+          "label": "target-0-lookup",
+          "state": "COMPLETED",
+          "selected_candidate": "cpu2",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "stop_reason": null,
+          "posthoc_selection_regret_fraction": 0.0,
+          "independent_confirmation_mean_seconds": 0.26112143670131144,
+          "study_wall_seconds": 150.640709,
+          "planning_seconds": 0.0,
+          "allocated_gpu_seconds": 14.0,
+          "first_use_gpu_seconds_including_history": 60.0,
+          "first_use_wall_seconds_including_history": 529.826152,
+          "pilot_jobs": 0,
+          "confirmation_jobs": 6,
+          "failed_jobs": 0,
+          "model_based_choices": 0,
+          "choice_reasons": [
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION"
+          ],
+          "queue_seconds_known": 0.0,
+          "unknown_queue_intervals": 0
+        },
+        {
+          "order": 3,
+          "block": 0,
+          "strategy": "qlognei",
+          "seed": 2026100301,
+          "label": "target-0-qlognei",
+          "state": "COMPLETED",
+          "selected_candidate": "cpu2",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "stop_reason": null,
+          "posthoc_selection_regret_fraction": 0.0,
+          "independent_confirmation_mean_seconds": 0.2613397377038685,
+          "study_wall_seconds": 350.891631,
+          "planning_seconds": 1.1438313459511846,
+          "allocated_gpu_seconds": 36.0,
+          "first_use_gpu_seconds_including_history": 36.0,
+          "first_use_wall_seconds_including_history": 350.891631,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_jobs": 0,
+          "model_based_choices": 5,
+          "choice_reasons": [
+            "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+            "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+            "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+            "CONSTRAINED_QLOGNEI",
+            "CONSTRAINED_QLOGNEI",
+            "CONSTRAINED_QLOGNEI",
+            "CONSTRAINED_QLOGNEI",
+            "CONSTRAINED_QLOGNEI",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION"
+          ],
+          "queue_seconds_known": 4.0,
+          "unknown_queue_intervals": 0
+        },
+        {
+          "order": 4,
+          "block": 1,
+          "strategy": "qlognei",
+          "seed": 2026100302,
+          "label": "target-1-qlognei",
+          "state": "COMPLETED",
+          "selected_candidate": "cpu2",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "stop_reason": null,
+          "posthoc_selection_regret_fraction": 0.0,
+          "independent_confirmation_mean_seconds": 0.261590613964169,
+          "study_wall_seconds": 350.957482,
+          "planning_seconds": 0.19134084292454645,
+          "allocated_gpu_seconds": 37.0,
+          "first_use_gpu_seconds_including_history": 37.0,
+          "first_use_wall_seconds_including_history": 350.957482,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_jobs": 0,
+          "model_based_choices": 5,
+          "choice_reasons": [
+            "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+            "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+            "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+            "CONSTRAINED_QLOGNEI",
+            "CONSTRAINED_QLOGNEI",
+            "CONSTRAINED_QLOGNEI",
+            "CONSTRAINED_QLOGNEI",
+            "CONSTRAINED_QLOGNEI",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION"
+          ],
+          "queue_seconds_known": 3.0,
+          "unknown_queue_intervals": 0
+        },
+        {
+          "order": 5,
+          "block": 1,
+          "strategy": "lookup",
+          "seed": 2026100302,
+          "label": "target-1-lookup",
+          "state": "COMPLETED",
+          "selected_candidate": "cpu2",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "stop_reason": null,
+          "posthoc_selection_regret_fraction": 0.0,
+          "independent_confirmation_mean_seconds": 0.26109728805022314,
+          "study_wall_seconds": 151.368757,
+          "planning_seconds": 0.0,
+          "allocated_gpu_seconds": 15.0,
+          "first_use_gpu_seconds_including_history": 61.0,
+          "first_use_wall_seconds_including_history": 530.5542,
+          "pilot_jobs": 0,
+          "confirmation_jobs": 6,
+          "failed_jobs": 0,
+          "model_based_choices": 0,
+          "choice_reasons": [
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION"
+          ],
+          "queue_seconds_known": 0.0,
+          "unknown_queue_intervals": 0
+        },
+        {
+          "order": 6,
+          "block": 1,
+          "strategy": "random",
+          "seed": 2026100302,
+          "label": "target-1-random",
+          "state": "COMPLETED",
+          "selected_candidate": "cpu2",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "stop_reason": null,
+          "posthoc_selection_regret_fraction": 0.0,
+          "independent_confirmation_mean_seconds": 0.2608714986514921,
+          "study_wall_seconds": 350.995023,
+          "planning_seconds": 0.00030392996268346906,
+          "allocated_gpu_seconds": 37.0,
+          "first_use_gpu_seconds_including_history": 37.0,
+          "first_use_wall_seconds_including_history": 350.995023,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_jobs": 0,
+          "model_based_choices": 0,
+          "choice_reasons": [
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION"
+          ],
+          "queue_seconds_known": 1.0,
+          "unknown_queue_intervals": 0
+        },
+        {
+          "order": 7,
+          "block": 2,
+          "strategy": "qlognei",
+          "seed": 2026100303,
+          "label": "target-2-qlognei",
+          "state": "COMPLETED",
+          "selected_candidate": "cpu1",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "stop_reason": null,
+          "posthoc_selection_regret_fraction": 0.009691289713812168,
+          "independent_confirmation_mean_seconds": 0.26411533256759867,
+          "study_wall_seconds": 276.566287,
+          "planning_seconds": 0.1879686620668508,
+          "allocated_gpu_seconds": 29.0,
+          "first_use_gpu_seconds_including_history": 29.0,
+          "first_use_wall_seconds_including_history": 276.566287,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 3,
+          "failed_jobs": 0,
+          "model_based_choices": 5,
+          "choice_reasons": [
+            "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+            "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+            "INITIAL_DESIGN_INSUFFICIENT_OBSERVATIONS",
+            "CONSTRAINED_QLOGNEI",
+            "CONSTRAINED_QLOGNEI",
+            "CONSTRAINED_QLOGNEI",
+            "CONSTRAINED_QLOGNEI",
+            "CONSTRAINED_QLOGNEI",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION"
+          ],
+          "queue_seconds_known": 1.0,
+          "unknown_queue_intervals": 0
+        },
+        {
+          "order": 8,
+          "block": 2,
+          "strategy": "random",
+          "seed": 2026100303,
+          "label": "target-2-random",
+          "state": "COMPLETED",
+          "selected_candidate": "cpu2",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "stop_reason": null,
+          "posthoc_selection_regret_fraction": 0.0,
+          "independent_confirmation_mean_seconds": 0.2606575229632047,
+          "study_wall_seconds": 346.396544,
+          "planning_seconds": 0.0002662399201653898,
+          "allocated_gpu_seconds": 39.0,
+          "first_use_gpu_seconds_including_history": 39.0,
+          "first_use_wall_seconds_including_history": 346.396544,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_jobs": 0,
+          "model_based_choices": 0,
+          "choice_reasons": [
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "SEEDED_RANDOM",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION"
+          ],
+          "queue_seconds_known": 2.0,
+          "unknown_queue_intervals": 0
+        },
+        {
+          "order": 9,
+          "block": 2,
+          "strategy": "lookup",
+          "seed": 2026100303,
+          "label": "target-2-lookup",
+          "state": "COMPLETED",
+          "selected_candidate": "cpu2",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "stop_reason": null,
+          "posthoc_selection_regret_fraction": 0.0,
+          "independent_confirmation_mean_seconds": 0.26095941303841147,
+          "study_wall_seconds": 150.587581,
+          "planning_seconds": 0.0,
+          "allocated_gpu_seconds": 17.0,
+          "first_use_gpu_seconds_including_history": 63.0,
+          "first_use_wall_seconds_including_history": 529.7730240000001,
+          "pilot_jobs": 0,
+          "confirmation_jobs": 6,
+          "failed_jobs": 0,
+          "model_based_choices": 0,
+          "choice_reasons": [
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION",
+            "INDEPENDENT_FINAL_CONFIRMATION"
+          ],
+          "queue_seconds_known": 0.0,
+          "unknown_queue_intervals": 0
+        }
+      ],
+      "block_paired_differences": [
+        {
+          "block": 0,
+          "left": "lookup",
+          "right": "random",
+          "first_use_gpu_seconds_difference": 22.0,
+          "regret_fraction_difference": 0.0
+        },
+        {
+          "block": 1,
+          "left": "lookup",
+          "right": "random",
+          "first_use_gpu_seconds_difference": 24.0,
+          "regret_fraction_difference": 0.0
+        },
+        {
+          "block": 2,
+          "left": "lookup",
+          "right": "random",
+          "first_use_gpu_seconds_difference": 24.0,
+          "regret_fraction_difference": 0.0
+        },
+        {
+          "block": 0,
+          "left": "lookup",
+          "right": "qlognei",
+          "first_use_gpu_seconds_difference": 24.0,
+          "regret_fraction_difference": 0.0
+        },
+        {
+          "block": 1,
+          "left": "lookup",
+          "right": "qlognei",
+          "first_use_gpu_seconds_difference": 24.0,
+          "regret_fraction_difference": 0.0
+        },
+        {
+          "block": 2,
+          "left": "lookup",
+          "right": "qlognei",
+          "first_use_gpu_seconds_difference": 34.0,
+          "regret_fraction_difference": -0.009691289713812168
+        },
+        {
+          "block": 0,
+          "left": "random",
+          "right": "qlognei",
+          "first_use_gpu_seconds_difference": 2.0,
+          "regret_fraction_difference": 0.0
+        },
+        {
+          "block": 1,
+          "left": "random",
+          "right": "qlognei",
+          "first_use_gpu_seconds_difference": 0.0,
+          "regret_fraction_difference": 0.0
+        },
+        {
+          "block": 2,
+          "left": "random",
+          "right": "qlognei",
+          "first_use_gpu_seconds_difference": 10.0,
+          "regret_fraction_difference": -0.009691289713812168
+        }
+      ],
+      "oracle_confirmation_mean_seconds": {
+        "cpu0-5": 0.4113834482850507,
+        "cpu1": 0.263867338343213,
+        "cpu2": 0.26133466835987446
+      },
+      "history_cost": {
+        "jobs": 15,
+        "profile_jobs": 9,
+        "wall_seconds": 379.185443,
+        "gpu_seconds": 46.0
+      },
+      "three_block_gpu_cost_including_history_once": {
+        "lookup": 92.0,
+        "random": 114.0,
+        "qlognei": 102.0
+      },
+      "oracle_gpu_seconds": 44.0,
+      "qualification_gpu_seconds": 9.0,
+      "total_gpu_reservation_seconds": 361.0,
+      "retained_predecessor_gpu_reservation_seconds": 140.0,
+      "cumulative_policy_trials_gpu_reservation_seconds": 501.0,
+      "cumulative_cost_scope": "This completed policy trial and its declared stopped predecessor only; not all Resource Advisor experiments or infrastructure operation",
+      "bo_updates": [
+        {
+          "study_ref": "study-a9dddca60fd7403abd77c5ada2d99621",
+          "plan_ref": "plan-02c1723458c14c9e87924c77971fd632",
+          "training_attempts": [
+            "a-756dd46acd42480fa37049418e9e1f74",
+            "a-d57cd062c8894ff3bb6d47771e7932f9",
+            "a-f91ecabf2ca0418c9056e7eeaa43ea59"
+          ]
+        },
+        {
+          "study_ref": "study-a9dddca60fd7403abd77c5ada2d99621",
+          "plan_ref": "plan-466126b9f8f942baaa2502db5092aa60",
+          "training_attempts": [
+            "a-077efa5392a34bf9acc3a94298aa93f2",
+            "a-756dd46acd42480fa37049418e9e1f74",
+            "a-d57cd062c8894ff3bb6d47771e7932f9",
+            "a-f91ecabf2ca0418c9056e7eeaa43ea59"
+          ]
+        },
+        {
+          "study_ref": "study-a9dddca60fd7403abd77c5ada2d99621",
+          "plan_ref": "plan-64e2cb697274481f9999234d64de74b6",
+          "training_attempts": [
+            "a-077efa5392a34bf9acc3a94298aa93f2",
+            "a-0aba98faec8a4707bdb96ef5cb076f07",
+            "a-756dd46acd42480fa37049418e9e1f74",
+            "a-d57cd062c8894ff3bb6d47771e7932f9",
+            "a-f91ecabf2ca0418c9056e7eeaa43ea59"
+          ]
+        },
+        {
+          "study_ref": "study-a9dddca60fd7403abd77c5ada2d99621",
+          "plan_ref": "plan-b01e65c8972642c8821a6ac8ddf772fa",
+          "training_attempts": [
+            "a-077efa5392a34bf9acc3a94298aa93f2",
+            "a-0aba98faec8a4707bdb96ef5cb076f07",
+            "a-756dd46acd42480fa37049418e9e1f74",
+            "a-af8e13205e9244b4bfdcb7ecebf12fe9",
+            "a-d57cd062c8894ff3bb6d47771e7932f9",
+            "a-f91ecabf2ca0418c9056e7eeaa43ea59"
+          ]
+        },
+        {
+          "study_ref": "study-a9dddca60fd7403abd77c5ada2d99621",
+          "plan_ref": "plan-706083a112cb409a884d0f4e792bd4e0",
+          "training_attempts": [
+            "a-077efa5392a34bf9acc3a94298aa93f2",
+            "a-0aba98faec8a4707bdb96ef5cb076f07",
+            "a-578c39cc5be54b4eb91d9b2bc2a11742",
+            "a-756dd46acd42480fa37049418e9e1f74",
+            "a-af8e13205e9244b4bfdcb7ecebf12fe9",
+            "a-d57cd062c8894ff3bb6d47771e7932f9",
+            "a-f91ecabf2ca0418c9056e7eeaa43ea59"
+          ]
+        },
+        {
+          "study_ref": "study-3959ab40108a4e7ba75eac3f9d334b04",
+          "plan_ref": "plan-f44548bc2fd84f7f9c702ffd32372452",
+          "training_attempts": [
+            "a-756d4e4df6e5403595c8bb3d390a700f",
+            "a-c25f8a6f22a640b0b6d28f69d51a32b2",
+            "a-ff1f33cf77ce4749ba2913dede7fbb2b"
+          ]
+        },
+        {
+          "study_ref": "study-3959ab40108a4e7ba75eac3f9d334b04",
+          "plan_ref": "plan-5bc5fbbf6cec40e187fa0d59f4dbe884",
+          "training_attempts": [
+            "a-756d4e4df6e5403595c8bb3d390a700f",
+            "a-c25f8a6f22a640b0b6d28f69d51a32b2",
+            "a-c6e538d436db452994c8376161a4532d",
+            "a-ff1f33cf77ce4749ba2913dede7fbb2b"
+          ]
+        },
+        {
+          "study_ref": "study-3959ab40108a4e7ba75eac3f9d334b04",
+          "plan_ref": "plan-f1c1849e17bf412dbcf71caca18a3700",
+          "training_attempts": [
+            "a-225dee7b4240457ba7ff54c39936e9e6",
+            "a-756d4e4df6e5403595c8bb3d390a700f",
+            "a-c25f8a6f22a640b0b6d28f69d51a32b2",
+            "a-c6e538d436db452994c8376161a4532d",
+            "a-ff1f33cf77ce4749ba2913dede7fbb2b"
+          ]
+        },
+        {
+          "study_ref": "study-3959ab40108a4e7ba75eac3f9d334b04",
+          "plan_ref": "plan-1a984b4e89e04ef28364ddae2869258e",
+          "training_attempts": [
+            "a-225dee7b4240457ba7ff54c39936e9e6",
+            "a-754d13daddda45f39c75d82fdc3ab6b2",
+            "a-756d4e4df6e5403595c8bb3d390a700f",
+            "a-c25f8a6f22a640b0b6d28f69d51a32b2",
+            "a-c6e538d436db452994c8376161a4532d",
+            "a-ff1f33cf77ce4749ba2913dede7fbb2b"
+          ]
+        },
+        {
+          "study_ref": "study-3959ab40108a4e7ba75eac3f9d334b04",
+          "plan_ref": "plan-ac7c2e1dd02c461b8c3ca1285c6e8357",
+          "training_attempts": [
+            "a-225dee7b4240457ba7ff54c39936e9e6",
+            "a-754d13daddda45f39c75d82fdc3ab6b2",
+            "a-756d4e4df6e5403595c8bb3d390a700f",
+            "a-c25f8a6f22a640b0b6d28f69d51a32b2",
+            "a-c6e538d436db452994c8376161a4532d",
+            "a-eeddeb8dba0244daa323a7d29eae1a59",
+            "a-ff1f33cf77ce4749ba2913dede7fbb2b"
+          ]
+        },
+        {
+          "study_ref": "study-a4bee8765b0e47cba09095a91dfed079",
+          "plan_ref": "plan-ced2b80134654928a153adcb6b9bd3a1",
+          "training_attempts": [
+            "a-44b749541ba24a1e836215716657774f",
+            "a-73214e14cfdb4ee2a25ae467f3dcc924",
+            "a-d1345ca45d4540f591241d5f51195fd4"
+          ]
+        },
+        {
+          "study_ref": "study-a4bee8765b0e47cba09095a91dfed079",
+          "plan_ref": "plan-9c6a8e91d2524042891cb57c6e783e32",
+          "training_attempts": [
+            "a-056cd23fd81f4a178affc1b986b5597d",
+            "a-44b749541ba24a1e836215716657774f",
+            "a-73214e14cfdb4ee2a25ae467f3dcc924",
+            "a-d1345ca45d4540f591241d5f51195fd4"
+          ]
+        },
+        {
+          "study_ref": "study-a4bee8765b0e47cba09095a91dfed079",
+          "plan_ref": "plan-0fcd6ea0e0854b1db249ca4a66747616",
+          "training_attempts": [
+            "a-056cd23fd81f4a178affc1b986b5597d",
+            "a-44b749541ba24a1e836215716657774f",
+            "a-73214e14cfdb4ee2a25ae467f3dcc924",
+            "a-80462415a4e94096822235c3af04bea9",
+            "a-d1345ca45d4540f591241d5f51195fd4"
+          ]
+        },
+        {
+          "study_ref": "study-a4bee8765b0e47cba09095a91dfed079",
+          "plan_ref": "plan-eec6c5eac81340ff9e37843b0f1822f3",
+          "training_attempts": [
+            "a-056cd23fd81f4a178affc1b986b5597d",
+            "a-44b749541ba24a1e836215716657774f",
+            "a-73214e14cfdb4ee2a25ae467f3dcc924",
+            "a-80462415a4e94096822235c3af04bea9",
+            "a-97121ded8f8f4a6c920ef578db3db8c0",
+            "a-d1345ca45d4540f591241d5f51195fd4"
+          ]
+        },
+        {
+          "study_ref": "study-a4bee8765b0e47cba09095a91dfed079",
+          "plan_ref": "plan-1c33eb4ff291471f86b685e8eeef1d0b",
+          "training_attempts": [
+            "a-056cd23fd81f4a178affc1b986b5597d",
+            "a-44b749541ba24a1e836215716657774f",
+            "a-73214e14cfdb4ee2a25ae467f3dcc924",
+            "a-80462415a4e94096822235c3af04bea9",
+            "a-97121ded8f8f4a6c920ef578db3db8c0",
+            "a-d09716e4ba494c8b8f20393e76c54e33",
+            "a-d1345ca45d4540f591241d5f51195fd4"
+          ]
+        }
+      ],
+      "frozen_history_and_temporal_leakage_audit_passed": true,
+      "limitations": [
+        "One numerical CNN fixture and one GPU; no trained-model accuracy or multi-backend effectiveness claim.",
+        "S0 has prior observations; their full acquisition cost is included. S1/S2 start cold.",
+        "Three temporal blocks are not independent devices or workload families.",
+        "Oracle estimates use later independent runs, not known ground truth; nonstationarity and finite-sample uncertainty remain.",
+        "GPU reservation time is not active compute time or measured energy; unknown queue durations stay unknown.",
+        "No production break-even or statistical superiority inference."
+      ]
+    },
+    "operational_cost": {
+      "scope": "one generated CNN/GPU; descriptive blocked operational comparison",
+      "source_capture_digest": "sha256:c28d534a7b20d3e60e4530eca1c3648a05b797128beb399d219639b35da137d5",
+      "selected_candidate": "cpu2",
+      "actual_qlognei_choices": 5,
+      "random_fallbacks": 0,
+      "profiling_jobs": 14,
+      "main_jobs": 18,
+      "qualification_jobs": 3,
+      "whole_protocol_wall_seconds": 888.373739,
+      "whole_protocol_gpu_seconds": 102.0,
+      "shared_qualification_gpu_seconds": 8.0,
+      "B2_setup_wall_seconds": 354.439165,
+      "profiling_gpu_seconds": 49.0,
+      "profiling_cpu_core_seconds": 48.5,
+      "arms": {
+        "B0": {
+          "count": 6,
+          "raw_mean_seconds": 7.0108793333333335,
+          "compute_mean_seconds": 0.2637617296810883,
+          "gpu_seconds": 16.0,
+          "cpu_core_seconds": 16.0
+        },
+        "B1": {
+          "count": 6,
+          "raw_mean_seconds": 10.0615455,
+          "compute_mean_seconds": 0.26373782848046784,
+          "gpu_seconds": 15.0,
+          "cpu_core_seconds": 15.0
+        },
+        "B2": {
+          "count": 6,
+          "raw_mean_seconds": 9.8260055,
+          "compute_mean_seconds": 0.2611063733735743,
+          "gpu_seconds": 14.0,
+          "cpu_core_seconds": 28.0
+        }
+      },
+      "main_timings": [
+        {
+          "index": 0,
+          "block": 0,
+          "arm": "B1",
+          "candidate_ref": "cpu1",
+          "raw_result_wall_seconds": 11.067605,
+          "validated_wall_seconds": 199.896318,
+          "delivery_wall_seconds": 199.922837,
+          "platform_recorded_validation_seconds": 13.786614,
+          "platform_recorded_delivery_seconds": 14.166979,
+          "compute_seconds": 0.26382858509896323,
+          "gpu_seconds": 3.0,
+          "cpu_core_seconds": 3.0
+        },
+        {
+          "index": 1,
+          "block": 0,
+          "arm": "B2",
+          "candidate_ref": "cpu2",
+          "raw_result_wall_seconds": 7.097119,
+          "validated_wall_seconds": 7.136851,
+          "delivery_wall_seconds": 7.148559,
+          "platform_recorded_validation_seconds": 6.344957,
+          "platform_recorded_delivery_seconds": 6.689533,
+          "compute_seconds": 0.2613139209570363,
+          "gpu_seconds": 2.0,
+          "cpu_core_seconds": 4.0
+        },
+        {
+          "index": 2,
+          "block": 0,
+          "arm": "B0",
+          "candidate_ref": "cpu1",
+          "raw_result_wall_seconds": 6.890441,
+          "validated_wall_seconds": null,
+          "delivery_wall_seconds": null,
+          "platform_recorded_validation_seconds": null,
+          "platform_recorded_delivery_seconds": null,
+          "compute_seconds": 0.2637553720269352,
+          "gpu_seconds": 3.0,
+          "cpu_core_seconds": 3.0
+        },
+        {
+          "index": 3,
+          "block": 1,
+          "arm": "B0",
+          "candidate_ref": "cpu1",
+          "raw_result_wall_seconds": 7.028092,
+          "validated_wall_seconds": null,
+          "delivery_wall_seconds": null,
+          "platform_recorded_validation_seconds": null,
+          "platform_recorded_delivery_seconds": null,
+          "compute_seconds": 0.263327278138604,
+          "gpu_seconds": 3.0,
+          "cpu_core_seconds": 3.0
+        },
+        {
+          "index": 4,
+          "block": 1,
+          "arm": "B2",
+          "candidate_ref": "cpu2",
+          "raw_result_wall_seconds": 6.920161,
+          "validated_wall_seconds": 12.990069,
+          "delivery_wall_seconds": 12.999881,
+          "platform_recorded_validation_seconds": 10.96017,
+          "platform_recorded_delivery_seconds": 11.326864,
+          "compute_seconds": 0.26026940008159727,
+          "gpu_seconds": 2.0,
+          "cpu_core_seconds": 4.0
+        },
+        {
+          "index": 5,
+          "block": 1,
+          "arm": "B1",
+          "candidate_ref": "cpu1",
+          "raw_result_wall_seconds": 11.054338,
+          "validated_wall_seconds": 15.094597,
+          "delivery_wall_seconds": 15.102526,
+          "platform_recorded_validation_seconds": 13.929395,
+          "platform_recorded_delivery_seconds": 14.226088,
+          "compute_seconds": 0.2638631689478643,
+          "gpu_seconds": 2.0,
+          "cpu_core_seconds": 2.0
+        },
+        {
+          "index": 6,
+          "block": 2,
+          "arm": "B1",
+          "candidate_ref": "cpu1",
+          "raw_result_wall_seconds": 11.097719,
+          "validated_wall_seconds": 11.118034,
+          "delivery_wall_seconds": 11.123618,
+          "platform_recorded_validation_seconds": 9.402256,
+          "platform_recorded_delivery_seconds": 9.792255,
+          "compute_seconds": 0.26315058703767136,
+          "gpu_seconds": 2.0,
+          "cpu_core_seconds": 2.0
+        },
+        {
+          "index": 7,
+          "block": 2,
+          "arm": "B2",
+          "candidate_ref": "cpu2",
+          "raw_result_wall_seconds": 11.377552,
+          "validated_wall_seconds": 15.418779,
+          "delivery_wall_seconds": 15.424775,
+          "platform_recorded_validation_seconds": 14.086659,
+          "platform_recorded_delivery_seconds": 14.545117,
+          "compute_seconds": 0.261695291090291,
+          "gpu_seconds": 2.0,
+          "cpu_core_seconds": 4.0
+        },
+        {
+          "index": 8,
+          "block": 2,
+          "arm": "B0",
+          "candidate_ref": "cpu1",
+          "raw_result_wall_seconds": 7.039499,
+          "validated_wall_seconds": null,
+          "delivery_wall_seconds": null,
+          "platform_recorded_validation_seconds": null,
+          "platform_recorded_delivery_seconds": null,
+          "compute_seconds": 0.26318542880471796,
+          "gpu_seconds": 3.0,
+          "cpu_core_seconds": 3.0
+        },
+        {
+          "index": 9,
+          "block": 3,
+          "arm": "B0",
+          "candidate_ref": "cpu1",
+          "raw_result_wall_seconds": 6.989758,
+          "validated_wall_seconds": null,
+          "delivery_wall_seconds": null,
+          "platform_recorded_validation_seconds": null,
+          "platform_recorded_delivery_seconds": null,
+          "compute_seconds": 0.2640287931426428,
+          "gpu_seconds": 2.0,
+          "cpu_core_seconds": 2.0
+        },
+        {
+          "index": 10,
+          "block": 3,
+          "arm": "B2",
+          "candidate_ref": "cpu2",
+          "raw_result_wall_seconds": 13.212854,
+          "validated_wall_seconds": 17.274481,
+          "delivery_wall_seconds": 17.284939,
+          "platform_recorded_validation_seconds": 15.465295,
+          "platform_recorded_delivery_seconds": 15.759417,
+          "compute_seconds": 0.2612340190098621,
+          "gpu_seconds": 2.0,
+          "cpu_core_seconds": 4.0
+        },
+        {
+          "index": 11,
+          "block": 3,
+          "arm": "B1",
+          "candidate_ref": "cpu1",
+          "raw_result_wall_seconds": 11.081128,
+          "validated_wall_seconds": 11.099108,
+          "delivery_wall_seconds": 11.111011,
+          "platform_recorded_validation_seconds": 8.842792,
+          "platform_recorded_delivery_seconds": 9.159303,
+          "compute_seconds": 0.26350351294968277,
+          "gpu_seconds": 2.0,
+          "cpu_core_seconds": 2.0
+        },
+        {
+          "index": 12,
+          "block": 4,
+          "arm": "B2",
+          "candidate_ref": "cpu2",
+          "raw_result_wall_seconds": 9.274729,
+          "validated_wall_seconds": 15.3309,
+          "delivery_wall_seconds": 15.341029,
+          "platform_recorded_validation_seconds": 13.401239,
+          "platform_recorded_delivery_seconds": 13.698301,
+          "compute_seconds": 0.26132695004343987,
+          "gpu_seconds": 3.0,
+          "cpu_core_seconds": 6.0
+        },
+        {
+          "index": 13,
+          "block": 4,
+          "arm": "B0",
+          "candidate_ref": "cpu1",
+          "raw_result_wall_seconds": 6.950103,
+          "validated_wall_seconds": null,
+          "delivery_wall_seconds": null,
+          "platform_recorded_validation_seconds": null,
+          "platform_recorded_delivery_seconds": null,
+          "compute_seconds": 0.2642764849588275,
+          "gpu_seconds": 2.0,
+          "cpu_core_seconds": 2.0
+        },
+        {
+          "index": 14,
+          "block": 4,
+          "arm": "B1",
+          "candidate_ref": "cpu1",
+          "raw_result_wall_seconds": 9.113054,
+          "validated_wall_seconds": 9.136872,
+          "delivery_wall_seconds": 9.14941,
+          "platform_recorded_validation_seconds": 6.803422,
+          "platform_recorded_delivery_seconds": 7.092921,
+          "compute_seconds": 0.2637159207952209,
+          "gpu_seconds": 3.0,
+          "cpu_core_seconds": 3.0
+        },
+        {
+          "index": 15,
+          "block": 5,
+          "arm": "B2",
+          "candidate_ref": "cpu2",
+          "raw_result_wall_seconds": 11.073618,
+          "validated_wall_seconds": 15.116227,
+          "delivery_wall_seconds": 15.122906,
+          "platform_recorded_validation_seconds": 13.394112,
+          "platform_recorded_delivery_seconds": 13.709048,
+          "compute_seconds": 0.26079865905921906,
+          "gpu_seconds": 3.0,
+          "cpu_core_seconds": 6.0
+        },
+        {
+          "index": 16,
+          "block": 5,
+          "arm": "B0",
+          "candidate_ref": "cpu1",
+          "raw_result_wall_seconds": 7.167383,
+          "validated_wall_seconds": null,
+          "delivery_wall_seconds": null,
+          "platform_recorded_validation_seconds": null,
+          "platform_recorded_delivery_seconds": null,
+          "compute_seconds": 0.26399702101480216,
+          "gpu_seconds": 3.0,
+          "cpu_core_seconds": 3.0
+        },
+        {
+          "index": 17,
+          "block": 5,
+          "arm": "B1",
+          "candidate_ref": "cpu1",
+          "raw_result_wall_seconds": 6.955429,
+          "validated_wall_seconds": 6.968841,
+          "delivery_wall_seconds": 9.001521,
+          "platform_recorded_validation_seconds": 6.767292,
+          "platform_recorded_delivery_seconds": 7.109873,
+          "compute_seconds": 0.26436519605340436,
+          "gpu_seconds": 3.0,
+          "cpu_core_seconds": 3.0
+        }
+      ],
+      "paired_differences": [
+        {
+          "block": 0,
+          "B1_minus_B0_raw_seconds": 4.177164,
+          "B2_minus_B1_raw_seconds": -3.970486,
+          "B2_minus_B1_compute_seconds": -0.0025146641419269145
+        },
+        {
+          "block": 1,
+          "B1_minus_B0_raw_seconds": 4.0262459999999995,
+          "B2_minus_B1_raw_seconds": -4.134176999999999,
+          "B2_minus_B1_compute_seconds": -0.0035937688662670553
+        },
+        {
+          "block": 2,
+          "B1_minus_B0_raw_seconds": 4.0582199999999995,
+          "B2_minus_B1_raw_seconds": 0.279833,
+          "B2_minus_B1_compute_seconds": -0.001455295947380364
+        },
+        {
+          "block": 3,
+          "B1_minus_B0_raw_seconds": 4.0913699999999995,
+          "B2_minus_B1_raw_seconds": 2.1317260000000005,
+          "B2_minus_B1_compute_seconds": -0.002269493939820677
+        },
+        {
+          "block": 4,
+          "B1_minus_B0_raw_seconds": 2.1629509999999996,
+          "B2_minus_B1_raw_seconds": 0.16167500000000068,
+          "B2_minus_B1_compute_seconds": -0.0023889707517810166
+        },
+        {
+          "block": 5,
+          "B1_minus_B0_raw_seconds": -0.21195400000000042,
+          "B2_minus_B1_raw_seconds": 4.118189,
+          "B2_minus_B1_compute_seconds": -0.0035665369941852987
+        }
+      ],
+      "actual_serial_cumulative": [
+        {
+          "arm": "B0",
+          "uses": 1,
+          "raw_wall_seconds_including_profile": 6.890441,
+          "observed_completion_seconds_including_profile": 6.890441,
+          "platform_recorded_delivery_seconds_including_profile": null,
+          "gpu_seconds_including_profile": 3.0,
+          "cpu_core_seconds_including_profile": 3.0
+        },
+        {
+          "arm": "B0",
+          "uses": 2,
+          "raw_wall_seconds_including_profile": 13.918533,
+          "observed_completion_seconds_including_profile": 13.918533,
+          "platform_recorded_delivery_seconds_including_profile": null,
+          "gpu_seconds_including_profile": 6.0,
+          "cpu_core_seconds_including_profile": 6.0
+        },
+        {
+          "arm": "B0",
+          "uses": 3,
+          "raw_wall_seconds_including_profile": 20.958032,
+          "observed_completion_seconds_including_profile": 20.958032,
+          "platform_recorded_delivery_seconds_including_profile": null,
+          "gpu_seconds_including_profile": 9.0,
+          "cpu_core_seconds_including_profile": 9.0
+        },
+        {
+          "arm": "B0",
+          "uses": 4,
+          "raw_wall_seconds_including_profile": 27.94779,
+          "observed_completion_seconds_including_profile": 27.94779,
+          "platform_recorded_delivery_seconds_including_profile": null,
+          "gpu_seconds_including_profile": 11.0,
+          "cpu_core_seconds_including_profile": 11.0
+        },
+        {
+          "arm": "B0",
+          "uses": 5,
+          "raw_wall_seconds_including_profile": 34.897893,
+          "observed_completion_seconds_including_profile": 34.897893,
+          "platform_recorded_delivery_seconds_including_profile": null,
+          "gpu_seconds_including_profile": 13.0,
+          "cpu_core_seconds_including_profile": 13.0
+        },
+        {
+          "arm": "B0",
+          "uses": 6,
+          "raw_wall_seconds_including_profile": 42.065276,
+          "observed_completion_seconds_including_profile": 42.065276,
+          "platform_recorded_delivery_seconds_including_profile": null,
+          "gpu_seconds_including_profile": 16.0,
+          "cpu_core_seconds_including_profile": 16.0
+        },
+        {
+          "arm": "B1",
+          "uses": 1,
+          "raw_wall_seconds_including_profile": 11.067605,
+          "observed_completion_seconds_including_profile": 199.922837,
+          "platform_recorded_delivery_seconds_including_profile": 14.166979,
+          "gpu_seconds_including_profile": 3.0,
+          "cpu_core_seconds_including_profile": 3.0
+        },
+        {
+          "arm": "B1",
+          "uses": 2,
+          "raw_wall_seconds_including_profile": 22.121943,
+          "observed_completion_seconds_including_profile": 215.025363,
+          "platform_recorded_delivery_seconds_including_profile": 28.393067000000002,
+          "gpu_seconds_including_profile": 5.0,
+          "cpu_core_seconds_including_profile": 5.0
+        },
+        {
+          "arm": "B1",
+          "uses": 3,
+          "raw_wall_seconds_including_profile": 33.219662,
+          "observed_completion_seconds_including_profile": 226.148981,
+          "platform_recorded_delivery_seconds_including_profile": 38.185322,
+          "gpu_seconds_including_profile": 7.0,
+          "cpu_core_seconds_including_profile": 7.0
+        },
+        {
+          "arm": "B1",
+          "uses": 4,
+          "raw_wall_seconds_including_profile": 44.30079,
+          "observed_completion_seconds_including_profile": 237.25999199999998,
+          "platform_recorded_delivery_seconds_including_profile": 47.344625,
+          "gpu_seconds_including_profile": 9.0,
+          "cpu_core_seconds_including_profile": 9.0
+        },
+        {
+          "arm": "B1",
+          "uses": 5,
+          "raw_wall_seconds_including_profile": 53.413844,
+          "observed_completion_seconds_including_profile": 246.409402,
+          "platform_recorded_delivery_seconds_including_profile": 54.437546,
+          "gpu_seconds_including_profile": 12.0,
+          "cpu_core_seconds_including_profile": 12.0
+        },
+        {
+          "arm": "B1",
+          "uses": 6,
+          "raw_wall_seconds_including_profile": 60.369273,
+          "observed_completion_seconds_including_profile": 255.410923,
+          "platform_recorded_delivery_seconds_including_profile": 61.547419,
+          "gpu_seconds_including_profile": 15.0,
+          "cpu_core_seconds_including_profile": 15.0
+        },
+        {
+          "arm": "B2",
+          "uses": 1,
+          "raw_wall_seconds_including_profile": 361.536284,
+          "observed_completion_seconds_including_profile": 361.587724,
+          "platform_recorded_delivery_seconds_including_profile": 361.128698,
+          "gpu_seconds_including_profile": 51.0,
+          "cpu_core_seconds_including_profile": 52.5
+        },
+        {
+          "arm": "B2",
+          "uses": 2,
+          "raw_wall_seconds_including_profile": 368.45644500000003,
+          "observed_completion_seconds_including_profile": 374.587605,
+          "platform_recorded_delivery_seconds_including_profile": 372.455562,
+          "gpu_seconds_including_profile": 53.0,
+          "cpu_core_seconds_including_profile": 56.5
+        },
+        {
+          "arm": "B2",
+          "uses": 3,
+          "raw_wall_seconds_including_profile": 379.833997,
+          "observed_completion_seconds_including_profile": 390.01238,
+          "platform_recorded_delivery_seconds_including_profile": 387.000679,
+          "gpu_seconds_including_profile": 55.0,
+          "cpu_core_seconds_including_profile": 60.5
+        },
+        {
+          "arm": "B2",
+          "uses": 4,
+          "raw_wall_seconds_including_profile": 393.046851,
+          "observed_completion_seconds_including_profile": 407.297319,
+          "platform_recorded_delivery_seconds_including_profile": 402.760096,
+          "gpu_seconds_including_profile": 57.0,
+          "cpu_core_seconds_including_profile": 64.5
+        },
+        {
+          "arm": "B2",
+          "uses": 5,
+          "raw_wall_seconds_including_profile": 402.32158,
+          "observed_completion_seconds_including_profile": 422.638348,
+          "platform_recorded_delivery_seconds_including_profile": 416.458397,
+          "gpu_seconds_including_profile": 60.0,
+          "cpu_core_seconds_including_profile": 70.5
+        },
+        {
+          "arm": "B2",
+          "uses": 6,
+          "raw_wall_seconds_including_profile": 413.395198,
+          "observed_completion_seconds_including_profile": 437.761254,
+          "platform_recorded_delivery_seconds_including_profile": 430.167445,
+          "gpu_seconds_including_profile": 63.0,
+          "cpu_core_seconds_including_profile": 76.5
+        }
+      ],
+      "limits": [
+        "one workload and one device, with one B2 tuning episode reused across blocks",
+        "baseline cpu1 is reasonable; cpu2 can use more CPU for little or no measured improvement",
+        "B0 direct client and B1/B2 worker have different control-plane paths; decompose them rather than label every difference validator overhead",
+        "scheduler timestamps have whole-second resolution; zero recorded queue seconds is not exactly zero waiting",
+        "no integrated energy or job-attributed GPU utilization inferred from bracketing telemetry"
+      ]
+    },
+    "transfer": {
+      "scope": "descriptive bounded GPU comparison; no powered superiority conclusion",
+      "target_studies": [
+        {
+          "label": "target-0-qlognei",
+          "strategy": "qlognei",
+          "seed": 20261003,
+          "state": "COMPLETED",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "selected_candidate": "cpu2",
+          "independent_confirmation_mean_seconds": 0.26105095938934636,
+          "posthoc_selection_regret_fraction": 0.0,
+          "allocated_gpu_seconds": 38.0,
+          "queue_seconds": 1.0,
+          "unknown_queue_intervals": 0,
+          "study_wall_seconds": 342.407244,
+          "planning_seconds": 3.6055961399688385,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_or_incomplete_jobs": 0,
+          "stop_reason": null
+        },
+        {
+          "label": "target-0-rgpe",
+          "strategy": "rgpe",
+          "seed": 20261003,
+          "state": "COMPLETED",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "selected_candidate": "cpu2",
+          "independent_confirmation_mean_seconds": 0.26114611795249704,
+          "posthoc_selection_regret_fraction": 0.0,
+          "allocated_gpu_seconds": 37.0,
+          "queue_seconds": 3.0,
+          "unknown_queue_intervals": 0,
+          "study_wall_seconds": 345.615364,
+          "planning_seconds": 2.936268061050214,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_or_incomplete_jobs": 0,
+          "stop_reason": null
+        },
+        {
+          "label": "target-0-history_warm_start",
+          "strategy": "history_warm_start",
+          "seed": 20261003,
+          "state": "COMPLETED",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "selected_candidate": "cpu2",
+          "independent_confirmation_mean_seconds": 0.2606532045950492,
+          "posthoc_selection_regret_fraction": 0.0,
+          "allocated_gpu_seconds": 39.0,
+          "queue_seconds": 0.0,
+          "unknown_queue_intervals": 0,
+          "study_wall_seconds": 339.907397,
+          "planning_seconds": 2.5830889520584606,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_or_incomplete_jobs": 0,
+          "stop_reason": null
+        },
+        {
+          "label": "target-0-random",
+          "strategy": "random",
+          "seed": 20261003,
+          "state": "COMPLETED",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "selected_candidate": "cpu2",
+          "independent_confirmation_mean_seconds": 0.26067108133186895,
+          "posthoc_selection_regret_fraction": 0.0,
+          "allocated_gpu_seconds": 36.0,
+          "queue_seconds": 0.0,
+          "unknown_queue_intervals": 0,
+          "study_wall_seconds": 338.034963,
+          "planning_seconds": 0.00040205399272963405,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_or_incomplete_jobs": 0,
+          "stop_reason": null
+        },
+        {
+          "label": "target-1-rgpe",
+          "strategy": "rgpe",
+          "seed": 20261004,
+          "state": "COMPLETED",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "selected_candidate": "cpu2",
+          "independent_confirmation_mean_seconds": 0.26075461202223477,
+          "posthoc_selection_regret_fraction": 0.0,
+          "allocated_gpu_seconds": 37.0,
+          "queue_seconds": 0.0,
+          "unknown_queue_intervals": 0,
+          "study_wall_seconds": 341.567798,
+          "planning_seconds": 2.29652550292667,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_or_incomplete_jobs": 0,
+          "stop_reason": null
+        },
+        {
+          "label": "target-1-qlognei",
+          "strategy": "qlognei",
+          "seed": 20261004,
+          "state": "COMPLETED",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "selected_candidate": "cpu2",
+          "independent_confirmation_mean_seconds": 0.2610876399946089,
+          "posthoc_selection_regret_fraction": 0.0,
+          "allocated_gpu_seconds": 43.0,
+          "queue_seconds": 0.0,
+          "unknown_queue_intervals": 0,
+          "study_wall_seconds": 353.028385,
+          "planning_seconds": 0.19067985995206982,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_or_incomplete_jobs": 0,
+          "stop_reason": null
+        },
+        {
+          "label": "target-1-random",
+          "strategy": "random",
+          "seed": 20261004,
+          "state": "COMPLETED",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "selected_candidate": "cpu2",
+          "independent_confirmation_mean_seconds": 0.2608833872751954,
+          "posthoc_selection_regret_fraction": 0.0,
+          "allocated_gpu_seconds": 41.0,
+          "queue_seconds": 0.0,
+          "unknown_queue_intervals": 0,
+          "study_wall_seconds": 336.473963,
+          "planning_seconds": 0.00025224004639312625,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_or_incomplete_jobs": 0,
+          "stop_reason": null
+        },
+        {
+          "label": "target-1-history_warm_start",
+          "strategy": "history_warm_start",
+          "seed": 20261004,
+          "state": "COMPLETED",
+          "recommendation_status": "CONFIRMED_RECOMMENDATION",
+          "selected_candidate": "cpu2",
+          "independent_confirmation_mean_seconds": 0.2608699374056111,
+          "posthoc_selection_regret_fraction": 0.0,
+          "allocated_gpu_seconds": 39.0,
+          "queue_seconds": 1.0,
+          "unknown_queue_intervals": 0,
+          "study_wall_seconds": 359.887848,
+          "planning_seconds": 2.445471504004672,
+          "pilot_jobs": 8,
+          "confirmation_jobs": 6,
+          "failed_or_incomplete_jobs": 0,
+          "stop_reason": null
+        }
+      ],
+      "oracle_confirmation_mean_seconds": {
+        "cpu0-5": 0.3977740130503662,
+        "cpu1": 0.2636238133806425,
+        "cpu2": 0.26123514796684805
+      },
+      "source_characterization_cost": {
+        "all_jobs": 30,
+        "gpu_reservation_seconds": 82.0,
+        "study_wall_seconds": 729.91209,
+        "selected_profile_job_wall_seconds": 150.03092999999998,
+        "selected_profile_jobs": 18
+      },
+      "oracle_gpu_reservation_seconds": 45.0,
+      "rgpe_updates": [
+        {
+          "plan_ref": "plan-b3c7129362384bf58fe01c0e8ab254b8",
+          "study_ref": "study-9c70cd0a26114020ae45d22b74d7e9c0",
+          "source_count": 18,
+          "target_count": 6,
+          "weights": {
+            "target": 0.140625,
+            "sha256:6a000686347cede44a92c54913cbb492f87d967138a07be0f6d6c7ea3401326c": 0.859375,
+            "sha256:dca651b71224f7185c26beedc141cdfdfabbc4bdb001397910e15539c26738bd": 0.0
+          },
+          "rank_diagnostics": {
+            "informative_ordered_pairs": 4,
+            "tie_fraction": 0.05,
+            "maximum_source_rank_loss": 0.25,
+            "target_loo_mean_loss": 0.3515625,
+            "source_mean_losses": [
+              0.0,
+              0.0
+            ],
+            "eligible_sources": [
+              true,
+              true
+            ],
+            "tie_rule": "target wins equal posterior ranking losses"
+          },
+          "fallback_reason": null
+        },
+        {
+          "plan_ref": "plan-0ecd1adda1b140a5979eb0625e6ed452",
+          "study_ref": "study-9c70cd0a26114020ae45d22b74d7e9c0",
+          "source_count": 18,
+          "target_count": 7,
+          "weights": {
+            "target": 0.140625,
+            "sha256:6a000686347cede44a92c54913cbb492f87d967138a07be0f6d6c7ea3401326c": 0.859375,
+            "sha256:dca651b71224f7185c26beedc141cdfdfabbc4bdb001397910e15539c26738bd": 0.0
+          },
+          "rank_diagnostics": {
+            "informative_ordered_pairs": 4,
+            "tie_fraction": 0.05,
+            "maximum_source_rank_loss": 0.25,
+            "target_loo_mean_loss": 0.3515625,
+            "source_mean_losses": [
+              0.0,
+              0.0
+            ],
+            "eligible_sources": [
+              true,
+              true
+            ],
+            "tie_rule": "target wins equal posterior ranking losses"
+          },
+          "fallback_reason": null
+        },
+        {
+          "plan_ref": "plan-f49f34afc60f4dc0a4881ef75bb9736c",
+          "study_ref": "study-5428e2cd18a64bd888af5a40d484385f",
+          "source_count": 18,
+          "target_count": 6,
+          "weights": {
+            "target": 0.15625,
+            "sha256:6a000686347cede44a92c54913cbb492f87d967138a07be0f6d6c7ea3401326c": 0.84375,
+            "sha256:dca651b71224f7185c26beedc141cdfdfabbc4bdb001397910e15539c26738bd": 0.0
+          },
+          "rank_diagnostics": {
+            "informative_ordered_pairs": 4,
+            "tie_fraction": 0.05,
+            "maximum_source_rank_loss": 0.25,
+            "target_loo_mean_loss": 0.3515625,
+            "source_mean_losses": [
+              0.0,
+              0.0
+            ],
+            "eligible_sources": [
+              true,
+              true
+            ],
+            "tie_rule": "target wins equal posterior ranking losses"
+          },
+          "fallback_reason": null
+        },
+        {
+          "plan_ref": "plan-63b9fe7827204f3db5e6bb904e0f71e7",
+          "study_ref": "study-5428e2cd18a64bd888af5a40d484385f",
+          "source_count": 18,
+          "target_count": 7,
+          "weights": {
+            "target": 0.15625,
+            "sha256:6a000686347cede44a92c54913cbb492f87d967138a07be0f6d6c7ea3401326c": 0.84375,
+            "sha256:dca651b71224f7185c26beedc141cdfdfabbc4bdb001397910e15539c26738bd": 0.0
+          },
+          "rank_diagnostics": {
+            "informative_ordered_pairs": 4,
+            "tie_fraction": 0.05,
+            "maximum_source_rank_loss": 0.25,
+            "target_loo_mean_loss": 0.3515625,
+            "source_mean_losses": [
+              0.0,
+              0.0
+            ],
+            "eligible_sources": [
+              true,
+              true
+            ],
+            "tie_rule": "target wins equal posterior ranking losses"
+          },
+          "fallback_reason": null
+        }
+      ],
+      "source_target_confirmation_and_oracle_leakage_audit_passed": true,
+      "same_target_workload_and_approved_budgets": true,
+      "limitations": [
+        "Two study blocks provide functional replication, not a powered method comparison.",
+        "Post-hoc regret describes configuration selection against later measurements; time drift remains possible.",
+        "Block time includes 32 forwards; it is not individual request latency.",
+        "Source costs are separate from incremental target costs; qualify any amortization assumption.",
+        "GPU reservation is not utilization or energy; preparation and external setup remain separate."
+      ]
+    },
+    "drift": {
+      "independent_gpu_jobs": 10,
+      "baseline_mean_seconds": 0.43020749402542907,
+      "competitor_mean_seconds": 0.7890549590811133,
+      "recovery_mean_seconds": 0.4031983686145395,
+      "followup_relative_residuals": [
+        0.7487621058532526,
+        0.491633395372629,
+        1.261983955472796,
+        -0.059803835234507004,
+        -0.03328503855163059,
+        -0.09525600015945497
+      ],
+      "first_drift_slot_zero_based": 5,
+      "drift_remained_latched": true,
+      "gpu_reservation_seconds": 197.0,
+      "protocol_wall_seconds": 577.06875,
+      "scope": "fixed-order functional acceptance; no randomized causal or calibrated probability claim"
+    },
+    "hailo": {
+      "verified_api_jobs": 4,
+      "qualification_jobs": 1,
+      "independent_accuracy_images": 100,
+      "api_npu_reservation_seconds": 12.0,
+      "qualification_npu_reservation_seconds": 8.0,
+      "observation_mean_call_seconds": 0.3395763797064622,
+      "verification_call_seconds": 0.3435466450464446,
+      "later_verification_inside_mean_interval": false,
+      "scope": "Offline consistency checks; live storage read-backs remain operator-attested evidence."
+    }
+  },
+  "new_hardware_jobs": 0,
+  "overall_goal_complete": false,
+  "limitations": [
+    "This rechecks captured evidence, not current private scheduler/storage readbacks.",
+    "Per-domain duplicate/leakage/digest/quality/cost/budget checks are reused; no timings are copied from Markdown.",
+    "Existing successful hardware records are not new experiments or cross-accelerator comparability proof.",
+    "Missing live heterogeneous profiling and Slurm feedback qualification remain open."
+  ]
+}

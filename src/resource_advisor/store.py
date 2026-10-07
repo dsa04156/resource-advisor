@@ -193,6 +193,9 @@ class Store:
             raise Conflict("concurrent job transition; retry")
         if state in TERMINAL:
             self.record_usage(conn, row, state, body)
+            from .right_sizing import record_feedback
+
+            record_feedback(self, conn, row, state, body)
             self.enqueue_tracking(conn, row, body)
             if body.get("termination", {}).get("retention_finalizer"):
                 self.enqueue(
