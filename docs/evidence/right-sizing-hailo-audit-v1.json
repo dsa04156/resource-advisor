@@ -1,0 +1,15 @@
+{
+  "verified_api_jobs": 4,
+  "qualification_jobs": 1,
+  "independent_accuracy_images": 100,
+  "api_npu_reservation_seconds": 9.0,
+  "qualification_npu_reservation_seconds": 5.0,
+  "observation_mean_call_seconds": 0.33959198700085835,
+  "verification_call_seconds": 0.3406952160084984,
+  "later_verification_inside_mean_interval": false,
+  "scope": "Offline consistency checks; live storage read-backs remain operator-attested evidence.",
+  "feedback_status": "COMPARABLE",
+  "relative_residual": 0.003248689750848715,
+  "total_npu_reservation_seconds": 14.0,
+  "comparison_scope": "Same Hailo configuration feedback, not GPU/NPU performance comparison"
+}

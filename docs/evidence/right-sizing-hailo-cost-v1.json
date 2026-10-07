@@ -1,0 +1,70 @@
+{
+  "schema_version": "right-sizing-hailo-cost-v1",
+  "experiment_id": "right-sizing-20261007-v1",
+  "raw_path": "docs/evidence/right-sizing-hailo-v1.json",
+  "raw_sha256": "ae69a99b02f31f043a946018ab394aec5bb5d792c79d2c31b2e59fef714d63b3",
+  "qualification": {
+    "job_uid": "47b0589c-3bbc-4f8f-917b-11d952a32e57",
+    "job_created_at": "2026-10-07T10:34:17Z",
+    "container_finished_at": "2026-10-07T10:34:22Z",
+    "native_wall_seconds": 5.0,
+    "npu_reservation_seconds": 5.0,
+    "cpu_core_seconds": 5.0
+  },
+  "runs": [
+    {
+      "index": 0,
+      "attempt_id": "a-df095f8f77d9447ba118efcdc2ee52e4",
+      "mode": "observe",
+      "request_started_at": "2026-10-07T10:34:28.270217+00:00",
+      "terminal_observed_at": "2026-10-07T10:34:40.356142+00:00",
+      "request_to_terminal_seconds": 12.085925,
+      "npu_reservation_seconds": 2.0,
+      "cpu_core_seconds": 2.0,
+      "memory_mib_seconds": 2048.0
+    },
+    {
+      "index": 1,
+      "attempt_id": "a-52e7057f14104580870595c3e2baa9b7",
+      "mode": "observe",
+      "request_started_at": "2026-10-07T10:34:41.481737+00:00",
+      "terminal_observed_at": "2026-10-07T10:34:51.577811+00:00",
+      "request_to_terminal_seconds": 10.096074,
+      "npu_reservation_seconds": 2.0,
+      "cpu_core_seconds": 2.0,
+      "memory_mib_seconds": 2048.0
+    },
+    {
+      "index": 2,
+      "attempt_id": "a-ecadba5090e547e7bb25e268b084f0ea",
+      "mode": "observe",
+      "request_started_at": "2026-10-07T10:34:52.797448+00:00",
+      "terminal_observed_at": "2026-10-07T10:35:13.302689+00:00",
+      "request_to_terminal_seconds": 20.505241,
+      "npu_reservation_seconds": 3.0,
+      "cpu_core_seconds": 3.0,
+      "memory_mib_seconds": 3072.0
+    },
+    {
+      "index": 3,
+      "attempt_id": "a-0ddf520f190e470694e64cf67082e06e",
+      "mode": "fixed",
+      "request_started_at": "2026-10-07T10:35:14.743848+00:00",
+      "terminal_observed_at": "2026-10-07T10:35:29.139842+00:00",
+      "request_to_terminal_seconds": 14.395994,
+      "npu_reservation_seconds": 2.0,
+      "cpu_core_seconds": 2.0,
+      "memory_mib_seconds": 2048.0
+    }
+  ],
+  "observed_protocol_wall_seconds": 73.276937,
+  "total_npu_reservation_seconds": 14.0,
+  "total_cpu_core_seconds": 14.0,
+  "overhead_scope": "protocol wall includes qualification, registration, observe, approval, main and driver/control waits; summed per-Job wall excludes gaps; no subtracting setup or confirmation",
+  "unmeasured_cost": [
+    "previous fixture construction",
+    "previous image construction",
+    "energy",
+    "API lookup fitting not applicable; exact lookup-call overhead not separately timed"
+  ]
+}
