@@ -124,6 +124,7 @@ def test_node_history_is_project_scoped_frozen_and_samples_resource_changes(monk
     clock += timedelta(seconds=16)
     save_inventory(store, "team-a", inventory("inventory-2", 2))
     lab.report(ref, LabReport(state="RUNNING", snapshot={"jobs": []}))
+    assert lab.listing("team-a")["agent"]["seen_at"] == clock.isoformat()
     body = lab.listing("team-a")["items"][0]["body"]
     assert len(body["events"]) == 2
     assert body["events"][1]["title"] == "노드 자원 관측 갱신"
@@ -132,6 +133,7 @@ def test_node_history_is_project_scoped_frozen_and_samples_resource_changes(monk
     # The next read cannot age a historical sample or backfill it from current data.
     clock += timedelta(minutes=5)
     lab.report(ref, LabReport(state="RUNNING", snapshot={}, event={"title": "later"}))
+    assert lab.listing("team-a")["agent"]["seen_at"] == clock.isoformat()
     body = lab.listing("team-a")["items"][0]["body"]
     stale = body["snapshot"]["resource_observation"]["inventory"][0]
     assert stale["status"] == "stale"

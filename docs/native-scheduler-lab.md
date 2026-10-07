@@ -512,3 +512,18 @@ uses normal page scrolling for controls and node details. See the sanitized
 [count and layout evidence](evidence/ten-request-native-run.json). This proves
 this bounded queue demonstration, not performance superiority or physical GPU
 exclusivity.
+
+### Agent transport continuity
+
+A transient TLS EOF during the first default fleet run caused the old agent process
+to exit; restart cleanup stopped its remaining registered jobs. The failed run is
+retained. Observation/heartbeat/report RPCs now retry transient transport failures
+three times, preserving certificate verification and failing client errors promptly.
+A lost final report stays in memory for acknowledgement retry; the process does not
+restart for that transport error. A real process crash still uses bounded cleanup,
+not undocumented native-job resumption. Job acceptance retains its own same-key
+three-attempt limit; network retries do not create extra execution attempts.
+
+Authenticated agent reports also refresh the liveness timestamp, preserving the
+advertised capability body. Long concurrent acceptance no longer appears offline
+while fresh reports are arriving. This does not refresh hardware qualification.

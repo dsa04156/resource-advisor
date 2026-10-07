@@ -193,3 +193,61 @@ def test_registered_batch_recovers_lost_receipt_with_same_key_and_keeps_ten_rows
     assert len(a.snapshot["platform_jobs"]) == 10
     assert [j["label"] for j in a.snapshot["jobs"]] == [t["name"] for t in tasks]
     assert all(j["state"] == "SUCCEEDED" for j in a.snapshot["jobs"])
+
+
+@pytest.mark.parametrize("failure", ["tls", "timeout", "client"])
+def test_agent_observation_rpc_retries_transient_disconnect_only(tmp_path, monkeypatch, failure):
+    import io
+    import ssl
+    import urllib.error
+    import urllib.request
+
+    a = runner()
+    a.context = ssl.create_default_context()
+    cred = tmp_path / "auth.json"
+    cred.write_text(json.dumps({"api_url": "https://lab.invalid", "operator_token": "test-only"}))
+    a.c["credentials_file"] = str(cred)
+    calls = []
+    monkeypatch.setattr("time.sleep", lambda _: None)
+
+    def open_response(request, **kwargs):
+        calls.append(request.full_url)
+        if len(calls) == 1:
+            if failure == "client":
+                raise urllib.error.HTTPError(request.full_url, 403, "denied", {}, None)
+            if failure == "tls":
+                raise urllib.error.URLError(ssl.SSLEOFError("temporary handshake EOF"))
+            raise TimeoutError("read timeout")
+        return io.BytesIO(b'{"items":[]}')
+
+    monkeypatch.setattr(urllib.request, "urlopen", open_response)
+    if failure == "client":
+        with pytest.raises(urllib.error.HTTPError):
+            a.api("/scheduler-labs")
+        assert len(calls) == 1
+    else:
+        assert a.api("/scheduler-labs") == {"items": []}
+        assert len(calls) == 2 and calls[0] == calls[1]
+
+
+def test_lost_final_report_preserves_terminal_receipt_without_reexecuting():
+    import urllib.error
+
+    a = runner()
+    executions = []
+    a.fleet_batch = lambda: (executions.append("one"), a.snapshot.update(verdict="completed"))
+    a.cleanup = lambda: None
+
+    def report(title=None, state="RUNNING"):
+        if state == "SUCCEEDED":
+            raise urllib.error.URLError("lost final acknowledgement")
+
+    a.report = report
+    with pytest.raises(urllib.error.URLError):
+        a.execute({"ref": a.ref, "scenario": "fleet_batch", "state": "REQUESTED", "body": {}})
+    assert a.pending_report == ("completed", "SUCCEEDED")
+    assert a.snapshot["cleanup"] == "completed"
+    receipts = []
+    a.report = lambda *args: receipts.append(args)
+    a.report(*a.pending_report)
+    assert receipts == [("completed", "SUCCEEDED")] and executions == ["one"]

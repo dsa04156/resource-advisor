@@ -181,6 +181,13 @@ class SchedulerLab:
             if r["state"] in TERMINAL:
                 return dict(r)
             observed_at = now()
+            # Receiving an authenticated agent report is also a live signal.
+            # Preserve advertised capabilities; only refresh transport liveness.
+            conn.execute(
+                update(agent)
+                .where(agent.c.id == "native-lab")
+                .values(seen_at=observed_at.isoformat())
+            )
             inventory = latest_inventory_views(conn, r["project"], at=observed_at)
             # Freeze source timestamps and freshness at observation time. Keep
             # aggregate node facts, never other projects' jobs or queue payloads.

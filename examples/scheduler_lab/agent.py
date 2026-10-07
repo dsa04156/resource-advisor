@@ -32,6 +32,7 @@ class Agent:
         self.context = ssl.create_default_context(cafile=config.get("ca_file"))
         self.slurm_ids = []
         self.reservation = None
+        self.pending_report = None
 
     def api(self, path, body=None, key=None):
         credential = json.loads(Path(self.c["credentials_file"]).read_text())
@@ -44,12 +45,21 @@ class Agent:
                 **({"Idempotency-Key": key} if key else {}),
             },
         )
-        # Concurrent automatic submissions serialize candidate selection server-side.
-        # A lost receipt is retried with the identical key, never a fresh job.
-        with urllib.request.urlopen(
-            req, context=self.context, timeout=60 if path == "/jobs" else 15
-        ) as response:
-            return json.load(response)
+        # Job acceptance retries keep their identical key in registered_workloads.
+        # Reads and idempotent agent reports survive a transient TLS disconnect.
+        attempts = 1 if path == "/jobs" else 3
+        for attempt in range(attempts):
+            try:
+                with urllib.request.urlopen(
+                    req, context=self.context, timeout=60 if path == "/jobs" else 15
+                ) as response:
+                    return json.load(response)
+            except (TimeoutError, ConnectionError, urllib.error.URLError) as exc:
+                if (
+                    isinstance(exc, urllib.error.HTTPError) and exc.code < 500
+                ) or attempt == attempts - 1:
+                    raise
+                time.sleep(1)
 
     def heartbeat(self):
         return self.api(
@@ -1063,7 +1073,9 @@ class Agent:
                 state, title = "FAILED", "실험 자원 정리 확인 필요"
                 self.snapshot["cleanup_error"] = str(exc)[:500]
             self.snapshot["phase"] = "FINISHED"
+            self.pending_report = (title, state)
             self.report(title, state)
+            self.pending_report = None
 
 
 def main():
@@ -1075,9 +1087,17 @@ def main():
     fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     runner = Agent(config)
     while True:
-        rows = runner.heartbeat()
-        if rows:
-            runner.execute(rows[0])
+        try:
+            if runner.pending_report:
+                runner.report(*runner.pending_report)
+                runner.pending_report = None
+            rows = runner.heartbeat()
+            if rows:
+                runner.execute(rows[0])
+        except (TimeoutError, ConnectionError, urllib.error.URLError):
+            # Preserve the in-memory final report; do not restart and cancel a
+            # run merely because its final report acknowledgement was lost.
+            print("Agent API temporarily unavailable; retrying without process restart", flush=True)
         time.sleep(4)
 
 
