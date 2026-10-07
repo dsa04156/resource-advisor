@@ -162,7 +162,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--qualify", action="store_true")
     parser.add_argument("--sustain-seconds", type=int, choices=(30, 60, 90), default=0)
-    args = parser.parse_args()
+    args = parser.parse_args(sys.argv[1:])
     qualification = args.qualify
     context = None if qualification else json.loads(os.environ["RA_CONTEXT_JSON"])
     if not qualification and (
