@@ -219,3 +219,14 @@ pair a compact label with a short bar; mode joins the history toolbar and two
 collapsed help disclosures share one footer row. Desktop 1366×768 is the layout
 budget. Mobile keeps six compact headings and readable request labels, with
 selected evidence underneath. No request or native state is invented for motion.
+
+Common-pool operations workspace: current catalog is five ten-request scenarios;
+older independent scenario records remain archived. At desktop widths above
+1100px, keep the ten-row six-stage board beside the complete node table (1.25:1
+columns, table minimum 390px). The table shows accelerator reservation/resource
+name, measured utilization, CPU usage and memory headroom, plus participation
+constraints. Twelve rows fit the 1366×768 workspace with 24px rows; node names link
+to the existing detail dialog. Preserve explicit missing measurements and shared
+logical-unit labels. A job selection highlights its actual node; replay uses the
+same frozen timestamp for board and node table. Common pool status shows native
+admitted/pending counts separately from table utilization.

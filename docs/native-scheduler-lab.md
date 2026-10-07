@@ -5,9 +5,39 @@ then **실제 GPU로 실험 시작**. The server persists a request; an external
 runner submits real native jobs and publishes observed snapshots every few seconds.
 Closing the browser does not stop the experiment. **실험 중지** cancels this run.
 The history selector and timeline replay stored observations, not synthetic progress.
-For GPU and NPU workloads together, choose **GPU + NPU PoC** and its execution button.
+For GPU and NPU workloads together, choose the ten-request mixed scenario.
 
-## Twelve runnable scenario definitions
+## Current catalog: ten requests in every scenario
+
+The selector now contains five ten-request scenarios. Older runs remain in the
+server's audit history; they are no longer offered as new UI scenarios.
+
+| Scenario | Requests and native admission | Evidence |
+|---|---|---|
+| GPU + NPU mixed batch (`mixed_batch`) | Five automatically routed CUDA requests, one registered CNN, two registered Hailo inferences, two Slurm Orin CNN requests | Ten ordinary Job API records, actual backend/node/result observations |
+| Common GPU pool (`pool_batch`) | Ten one-GPU CUDA probes, submitted concurrently to `hairp-gpu-pool` | Concurrent running/pending jobs, native quota reason, ten CUDA correctness results |
+| Quota comparison (`burst`) | Ten one-GPU CUDA probes in the isolated two-GPU comparison queue | Same request count with the original restricted quota; not total platform capacity |
+| Priority batch (`priority_batch`) | Five low-priority and five high-priority one-GPU probes in the common pool | Actual native priority values and observed admission order; no invented FIFO/preemption guarantee |
+| Multi-GPU groups (`gang_batch`) | Three two-worker GPU groups and seven one-GPU requests in the common pool | Thirteen worker results, whole-workload admission and application startup barriers |
+
+The six-stage board shows all ten requests beside a table of every inventory node.
+Seeking the timeline also selects the node observation saved with that event.
+The explicit current-state toggle is a different time basis. Allocation is not
+physical utilization; a missing sensor remains unmeasured. CPU-only, unavailable
+NPU and model-unqualified nodes stay visible with their participation constraints.
+
+The CUDA probe is qualified for three exclusive-GPU nodes. Jetson shared GPU
+resources participate through their registered application variants in the mixed
+batch. The automatic router uses accepted active project requests as a candidate
+tiebreaker, serialized with a PostgreSQL transaction lock; Kueue/Slurm retain native
+admission. This is not a cross-project GPU reservation or an optimal interference
+model. See [common GPU pool](common-gpu-pool.md) for configuration and limits.
+
+## Archived scenario definitions and evidence
+
+The following describes earlier independent experiments, not the current selector.
+
+### Previous twelve scenario definitions
 
 Each selector contains prerequisites, four observation steps, success criteria and
 the boundary of what the experiment demonstrates. The latest recorded outcome is

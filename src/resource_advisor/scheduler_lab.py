@@ -42,6 +42,10 @@ class LabRequest(BaseModel):
         "heterogeneous",
         "quota",
         "burst",
+        "pool_batch",
+        "mixed_batch",
+        "priority_batch",
+        "gang_batch",
         "priority",
         "cancel",
         "recovery",
@@ -114,9 +118,12 @@ class SchedulerLab:
                 "multi_gpu", {}
             ).get("max_gpus", 0):
                 raise Rejected("요청 GPU 수가 이 PoC에 등록된 물리 GPU 수를 초과합니다")
-            if request.scenario in {"heterogeneous", "npu", "mixed"} and project != a["body"].get(
-                "project_ref"
-            ):
+            if request.scenario in {
+                "heterogeneous",
+                "npu",
+                "mixed",
+                "mixed_batch",
+            } and project != a["body"].get("project_ref"):
                 raise Rejected("등록 작업 PoC는 실행기 인증 프로젝트에서만 실행할 수 있습니다")
             if conn.execute(select(runs.c.ref).where(~runs.c.state.in_(TERMINAL))).first():
                 raise Conflict("다른 스케줄링 실험이 실행 중입니다. 종료 후 시작해 주세요")

@@ -5,7 +5,7 @@ import statistics
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from sqlalchemy import insert, select
+from sqlalchemy import func, insert, select
 from sqlalchemy.exc import IntegrityError
 
 from .contracts import (
@@ -138,6 +138,12 @@ class Service:
             raise Rejected("Idempotency-Key must contain 1–128 characters")
         try:
             with self.store.transaction() as conn:
+                if request.candidate_ref is None and conn.dialect.name == "postgresql":
+                    # Serialize automatic selection+acceptance within a project so
+                    # concurrent submissions observe preceding accepted demand.
+                    conn.execute(
+                        select(func.pg_advisory_xact_lock(func.hashtextextended(project, 0)))
+                    )
                 existing = (
                     conn.execute(
                         select(jobs).where(jobs.c.project == project, jobs.c.idempotency_key == key)

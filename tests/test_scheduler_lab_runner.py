@@ -122,7 +122,7 @@ def test_burst_submits_ten_concurrently_and_requires_native_queue_and_results():
     barrier = threading.Barrier(10, timeout=5)
     calls = []
 
-    def submit(label, count, duration):
+    def submit(label, count, duration, **options):
         calls.append((label, count, duration))
         barrier.wait()  # Sequential submission would fail this check.
 
@@ -136,6 +136,7 @@ def test_burst_submits_ten_concurrently_and_requires_native_queue_and_results():
     done = {
         label: {
             "state": "SUCCEEDED",
+            "gpu": 1,
             "pods": [{"events": [{"phase": "COMPUTE_FINISHED", "correctness": True}]}],
         }
         for label in labels
@@ -151,7 +152,7 @@ def test_burst_submits_ten_concurrently_and_requires_native_queue_and_results():
     a.wait_kube = wait
     a.burst()
     assert len(calls) == 10 and {c[0] for c in calls} == set(labels)
-    assert all(c[1:] == (1, 20) for c in calls)
+    assert all(c[1:] == (1, 12) for c in calls)
     assert len(a.snapshot["queue_evidence"]) == 10
     assert not waits[0]({label: {"state": "RUNNING"} for label in labels})
     done[labels[-1]]["pods"] = []

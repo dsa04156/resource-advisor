@@ -9,10 +9,10 @@ from typing import Literal
 from pydantic import Field, model_validator
 from sqlalchemy import func, select
 
-from .contracts import Contract, Ref, Resources, WorkloadSpec, signature
+from .contracts import TERMINAL, Contract, Ref, Resources, WorkloadSpec, signature
 from .inventory import fresh_view
 from .policy import execution_compatibility
-from .store import entities
+from .store import entities, jobs
 
 
 class SchedulingPolicy(Contract):
@@ -228,6 +228,15 @@ def compile_plan(service, conn, project, request):
     eligible = []
     evaluation = []
     observations = node_observations(conn, project)
+    # Native inventory can lag a simultaneous burst. This is project-local
+    # accepted demand, not an invented physical reservation or a global quota.
+    demand = {}
+    for body in conn.execute(
+        select(jobs.c.body).where(jobs.c.project == project, ~jobs.c.state.in_(TERMINAL))
+    ).scalars():
+        capability = body.get("capability", {})
+        key = (body.get("candidate", {}).get("backend"), capability.get("node_ref"))
+        demand[key] = demand.get(key, 0) + 1
     for candidate in candidates:
         errors = list(common)
         try:
@@ -267,6 +276,7 @@ def compile_plan(service, conn, project, request):
         elif policy.priority not in binding.priority_map:
             errors.append("PRIORITY_UNSUPPORTED")
         live = availability(candidate, cap, observations)
+        live["accepted_active_jobs"] = demand.get((str(candidate.backend), cap.node_ref), 0)
         if live["status"] == "unavailable":
             errors.append(live["reason"])
         evaluation.append(
@@ -296,7 +306,12 @@ def compile_plan(service, conn, project, request):
         }
     ranks = {"available": 0, "busy": 1, "unknown": 2}
     eligible.sort(
-        key=lambda x: (ranks[x[3]["status"]], policy.backend_order.index(x[0].backend), x[0].ref)
+        key=lambda x: (
+            ranks[x[3]["status"]],
+            policy.backend_order.index(x[0].backend),
+            x[3]["accepted_active_jobs"],
+            x[0].ref,
+        )
     )
     candidate, cap, binding, live = eligible[0]
     execution = spec.execution.model_dump(mode="json")

@@ -50,24 +50,15 @@ class Agent:
         return self.api(
             "/scheduler-lab-agent/heartbeat",
             {
-                "scenarios": [
-                    "backfill",
-                    "gang",
-                    "topology",
-                    "quota",
-                    "burst",
-                    "cancel",
-                    "recovery",
-                ]
-                + (["multi_gpu"] if self.c.get("multi_gpu") else [])
-                + (["heterogeneous"] if self.c.get("heterogeneous") else [])
+                "scenarios": ["burst"]
+                + (["pool_batch", "gang_batch"] if self.c.get("multi_gpu") else [])
+                + (["mixed_batch"] if self.c.get("mixed") else [])
                 + (
-                    ["npu"]
-                    if any(t.get("device_class") == "npu" for t in self.c.get("heterogeneous", []))
+                    ["priority_batch"]
+                    if self.c.get("priorities") and self.c.get("multi_gpu")
                     else []
-                )
-                + (["mixed"] if self.c.get("mixed") else [])
-                + (["priority"] if self.c.get("priorities") else []),
+                ),
+                "gpu_pool": self.c.get("gpu_pool", {}),
                 "heterogeneous": self.c.get("heterogeneous", []),
                 "mixed": self.c.get("mixed", []),
                 "multi_gpu": self.c.get("multi_gpu", {}),
@@ -118,6 +109,21 @@ class Agent:
         )
 
     def tick(self, title=None):
+        if self.c.get("gpu_pool"):
+            ref = (
+                self.c["gpu_pool"].get("comparison_queue", "hairp-scheduling-lab")
+                if self.snapshot.get("queue_scope", {}).get("purpose") == "quota comparison"
+                else self.c["gpu_pool"]["ref"]
+            )
+            queue = json.loads(self.kube("get", "clusterqueue", ref, "-o", "json"))
+            status = queue.get("status", {})
+            self.snapshot["pool_observation"] = {
+                "ref": ref,
+                "admitted": status.get("admittedWorkloads"),
+                "pending": status.get("pendingWorkloads"),
+                "flavors": queue["spec"]["resourceGroups"],
+                "reservation": status.get("flavorsReservation"),
+            }
         rows = self.heartbeat()
         if any(r["ref"] == self.ref and r["state"] == "CANCEL_REQUESTED" for r in rows):
             raise Canceled()
@@ -450,8 +456,10 @@ class Agent:
             explanation=title
             + " 등록 작업을 각각의 네이티브 큐에 제출합니다. 작업별 실제 backend·장치·결과를 관측합니다.",
         )
-        for i, task in enumerate(tasks):
-            result = self.api(
+
+        def submit(item):
+            i, task = item
+            return task, self.api(
                 "/jobs",
                 {
                     "workload_ref": task["workload_ref"],
@@ -460,8 +468,20 @@ class Agent:
                 },
                 key=f"{self.ref}-registered-{i}",
             )
-            self.snapshot["platform_jobs"].append({**task, "job_id": result["job_id"]})
-            self.report("등록된 " + task["device_class"].upper() + " 작업 접수")
+
+        # The native adapters remain independent; only acceptance is concurrent.
+        failures = []
+        with ThreadPoolExecutor(max_workers=min(len(tasks), 10)) as pool:
+            futures = [pool.submit(submit, item) for item in enumerate(tasks)]
+            for future in futures:
+                try:
+                    task, result = future.result()
+                    self.snapshot["platform_jobs"].append({**task, "job_id": result["job_id"]})
+                    self.report("등록된 " + task["device_class"].upper() + " 작업 접수")
+                except Exception as exc:  # noqa: BLE001 — retain successful receipts for cleanup
+                    failures.append(str(exc)[:300])
+        if failures:
+            raise RuntimeError("Partial batch submission: " + "; ".join(failures))
         self.snapshot["phase"] = "EXECUTION"
         while True:
             jobs = []
@@ -549,22 +569,74 @@ class Agent:
             "3개 요청의 quota 대기를 기록한 뒤 선행 작업 종료, 모든 GPU 요청 완료"
         )
 
+    def pool_batch(self):
+        self.snapshot["multi_gpu"] = True
+        return self.burst()
+
+    def gang_batch(self):
+        self.snapshot.update(multi_gpu=True, gang_batch=True)
+        return self.burst()
+
+    def priority_batch(self):
+        self.snapshot.update(multi_gpu=True, priority_batch=True)
+        return self.burst()
+
+    def mixed_batch(self):
+        templates = self.c["mixed"]
+        cuda = next(t for t in templates if t["workload_ref"] == "cuda-smoke-auto-v1")
+        cnn = next(t for t in templates if t["workload_ref"] == "e5-kernel-cache-v2")
+        npu = next(t for t in templates if t["device_class"] == "npu")
+        slurm = next(t for t in templates if t["workload_ref"] == "slurm-orin-cnn-api-v1")
+        selected = [cuda] * 5 + [cnn, npu, npu, slurm, slurm]
+        tasks = [
+            {**task, "name": f"요청 {index + 1:02d} · " + task["name"]}
+            for index, task in enumerate(selected)
+        ]
+        return self.registered_workloads(tasks, "공통 GPU 풀 + NPU · 10개 요청", mixed=True)
+
     def burst(self):
+        capacity = self.c["multi_gpu"]["max_gpus"] if self.snapshot.get("multi_gpu") else 2
+        self.snapshot["pool_gpus"] = capacity
+        self.snapshot["queue_scope"] = {
+            "local_queue": self.c["multi_gpu"]["queue"]
+            if self.snapshot.get("multi_gpu")
+            else self.c["queue"],
+            "purpose": "common GPU pool" if self.snapshot.get("multi_gpu") else "quota comparison",
+            "qualified_probe_gpu_nodes": capacity,
+        }
         labels = [f"request-{index:02d}" for index in range(1, 11)]
         self.snapshot.update(
             phase="SUBMIT",
-            explanation="1 GPU 요청 10개를 동시에 접수합니다. 2 GPU quota에서 대기·입장·실행을 관측합니다.",
+            explanation=f"독립 요청 10개 · {capacity}개 검증된 CUDA 노드 · 큐 대기와 실제 자원 할당을 관측합니다.",
             request_batch={"count": 10, "labels": labels, "submission": "concurrent"},
             submitted_requests=[
-                {"id": self.ref + "-" + label, "label": label, "state": "SUBMITTED", "gpu": 1}
-                for label in labels
+                {
+                    "id": self.ref + "-" + label,
+                    "label": label,
+                    "state": "SUBMITTED",
+                    "gpu": 2 if self.snapshot.get("gang_batch") and index < 3 else 1,
+                }
+                for index, label in enumerate(labels)
             ],
         )
         self.report("동시 요청 10개 접수 · 네이티브 Job 생성 시작")
         # Independent native requests, not a ten-worker gang or an expanded fixture.
         # Wait for every submission before cleanup, including partial-create failure.
         with ThreadPoolExecutor(max_workers=10) as pool:
-            submitted = [pool.submit(self.job, label, 1, 20) for label in labels]
+            submitted = [
+                pool.submit(
+                    self.job,
+                    label,
+                    2 if self.snapshot.get("gang_batch") and index < 3 else 1,
+                    12,
+                    priority=(
+                        self.c["priorities"]["high" if index >= 5 else "low"]
+                        if self.snapshot.get("priority_batch")
+                        else None
+                    ),
+                )
+                for index, label in enumerate(labels)
+            ]
             for future in submitted:
                 future.result()
         self.snapshot["phase"] = "QUEUE"
@@ -582,10 +654,17 @@ class Agent:
         self.wait_kube(
             lambda rows: all(
                 rows.get(label, {}).get("state") == "SUCCEEDED"
-                and any(
-                    e.get("phase") == "COMPUTE_FINISHED" and e.get("correctness") is True
+                and len(rows[label].get("pods", [])) == rows[label]["gpu"]
+                and all(
+                    any(
+                        e.get("phase") == "COMPUTE_FINISHED" and e.get("correctness") is True
+                        for e in pod.get("events", [])
+                    )
+                    and (
+                        rows[label]["gpu"] == 1
+                        or any(e.get("phase") == "BARRIER_RELEASED" for e in pod.get("events", []))
+                    )
                     for pod in rows[label].get("pods", [])
-                    for e in pod.get("events", [])
                 )
                 for label in labels
             ),
