@@ -8,6 +8,7 @@ A separate transport can hold SSH credentials; neither API nor UI receive them.
 import argparse
 import fcntl
 import json
+import random
 import re
 import ssl
 import subprocess
@@ -69,7 +70,7 @@ class Agent:
                 + (["pool_batch", "gang_batch"] if self.c.get("multi_gpu") else [])
                 + (["fleet_batch", "mixed_batch"] if self.c.get("mixed") else [])
                 + (
-                    ["priority_batch"]
+                    ["priority_batch", "adaptive_batch"]
                     if self.c.get("priorities") and self.c.get("multi_gpu")
                     else []
                 ),
@@ -152,7 +153,18 @@ class Agent:
             self.report()  # Fresh observation without adding an identical replay event.
         time.sleep(3)
 
-    def job(self, suffix, count, duration, required=False, priority=None, fail=False):
+    def job(
+        self,
+        suffix,
+        count,
+        duration,
+        required=False,
+        priority=None,
+        fail=False,
+        exclude_nodes=(),
+        sustained=False,
+        target_node=None,
+    ):
         pool = self.c.get("multi_gpu", {}) if self.snapshot.get("multi_gpu") else {}
         name = self.ref + "-" + suffix
         labels = {
@@ -210,6 +222,10 @@ class Agent:
                                 "env": [
                                     {"name": "WORLD_SIZE", "value": str(count)},
                                     {"name": "DURATION", "value": str(duration)},
+                                    {
+                                        "name": "COMPUTE_MODE",
+                                        "value": "sustained" if sustained else "probe",
+                                    },
                                     {"name": "RENDEZVOUS", "value": name + "-0." + name},
                                 ],
                                 "resources": {
@@ -241,10 +257,33 @@ class Agent:
                 "-c",
                 'import json,sys; print(json.dumps({"phase":"EXPECTED_FAILURE","exit_code":42}),flush=True); sys.exit(42)',
             ]
+        if exclude_nodes:
+            job["spec"]["template"]["spec"]["affinity"] = {
+                "nodeAffinity": {
+                    "requiredDuringSchedulingIgnoredDuringExecution": {
+                        "nodeSelectorTerms": [
+                            {
+                                "matchExpressions": [
+                                    {
+                                        "key": "kubernetes.io/hostname",
+                                        "operator": "NotIn",
+                                        "values": list(exclude_nodes),
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        if target_node:
+            job["spec"]["template"]["spec"]["nodeSelector"] = {
+                **job["spec"]["template"]["spec"]["nodeSelector"],
+                "kubernetes.io/hostname": target_node,
+            }
         self.kube("apply", "-f", "-", value=job)
         return name
 
-    def observe_kube(self):
+    def observe_kube(self, update_snapshot=True):
         jobs = json.loads(
             self.kube("get", "jobs", "-l", "hairp.io/lab-run=" + self.ref, "-o", "json")
         )["items"]
@@ -298,7 +337,7 @@ class Agent:
                     ],
                 }
                 if item["state"] in {"Running", "Succeeded", "Failed"}:
-                    lines = self.kube("logs", item["name"], "--tail=8").splitlines()
+                    lines = self.kube("logs", item["name"], "--tail=32").splitlines()
                     item["events"] = [
                         json.loads(line) for line in lines if line.startswith('{"phase"')
                     ]
@@ -337,10 +376,12 @@ class Agent:
                     "admission": w.get("status", {}).get("admission"),
                     "conditions": conditions,
                     "native_uid": w.get("metadata", {}).get("uid"),
+                    "workload_name": w.get("metadata", {}).get("name"),
                 }
             )
         result.extend(self.snapshot.get("retired_jobs", []))
-        self.snapshot["jobs"] = result
+        if update_snapshot:
+            self.snapshot["jobs"] = result
         return {j["label"]: j for j in result}
 
     def wait_kube(self, predicate, title, expected_failures=()):
@@ -667,6 +708,228 @@ class Agent:
     def fleet_batch(self):
         self.snapshot["scope"] = "registered_heterogeneous_pool"
         return self.mixed_batch()
+
+    def promote_pending(self, record):
+        """Update only this run's unreserved Workload, guarded against races."""
+        name = record.get("workload_name")
+        if not name or record["state"] != "PENDING":
+            return False
+        w = json.loads(self.kube("get", "workload", name, "-o", "json"))
+        if not any(o.get("name") == record["id"] for o in w["metadata"].get("ownerReferences", [])):
+            raise RuntimeError("priority change owner mismatch")
+        if any(
+            c["type"] == "QuotaReserved" and c["status"] == "True"
+            for c in w.get("status", {}).get("conditions", [])
+        ):
+            return False
+        patch = [
+            {"op": "test", "path": "/metadata/uid", "value": w["metadata"]["uid"]},
+            {
+                "op": "test",
+                "path": "/metadata/resourceVersion",
+                "value": w["metadata"]["resourceVersion"],
+            },
+            {"op": "replace", "path": "/spec/priority", "value": 100},
+        ]
+        try:
+            self.kube("patch", "workload", name, "--type=json", "-p", json.dumps(patch))
+        except RuntimeError:
+            # A concurrent admission wins; never modify admitted/running work.
+            current = json.loads(self.kube("get", "workload", name, "-o", "json"))
+            if current["metadata"]["resourceVersion"] != w["metadata"]["resourceVersion"]:
+                return False
+            raise
+        self.snapshot.setdefault("priority_changes", []).append(
+            {
+                "request_id": record["id"],
+                "workload_uid": w["metadata"]["uid"],
+                "before": w["spec"].get("priority"),
+                "after": 100,
+                "reason": "대기 20초 이상 · 시나리오 aging 정책",
+                "observed_at": time.time(),
+            }
+        )
+        return True
+
+    @staticmethod
+    def arrival_plan(seed):
+        rng = random.Random(seed)
+        offset = 0
+        tasks = []
+        for i in range(10):
+            if i:
+                offset += rng.randint(3, 9)
+            tasks.append(
+                {
+                    "request_id": f"request-{i + 1:02d}",
+                    "arrival_seconds": offset,
+                    "gpu": 2 if i in {0, 2, 5} else 1,
+                    "duration": 60 if i < 2 else 30,
+                    "priority_class": "high" if i in {4, 7} else "low",
+                    "attempt": 0,
+                    "attempts": [],
+                    "excluded_nodes": [],
+                }
+            )
+        return tasks
+
+    def adaptive_batch(self):
+        seed = random.SystemRandom().randrange(2**31)
+        tasks = self.arrival_plan(seed)
+        self.snapshot.update(
+            multi_gpu=True,
+            adaptive=True,
+            phase="ARRIVALS",
+            policy="Staggered arrivals + aging + bounded failover",
+            backend="Kueue",
+            pool_gpus=self.c["multi_gpu"]["max_gpus"],
+            request_batch={"count": 10, "submission": "staggered", "seed": seed},
+            explanation="10개 변동 도착 · 1/2 GPU 요청 · 대기 우선순위 승격 · 실험 장애 1회 후 다른 노드 재실행",
+            queue_scope={"purpose": "common GPU pool"},
+            arrival_plan=tasks,
+            jobs=[
+                {
+                    "id": self.ref + ":" + t["request_id"],
+                    "label": t["request_id"],
+                    "state": "NOT_SUBMITTED",
+                    "gpu": t["gpu"],
+                    "arrival_seconds": t["arrival_seconds"],
+                }
+                for t in tasks
+            ],
+        )
+        started = time.monotonic()
+        archived = {}
+        while True:
+            elapsed = time.monotonic() - started
+            for task in tasks:
+                if task["attempt"] == 0 and elapsed >= task["arrival_seconds"]:
+                    task["attempt"] = 1
+                    task["submitted_elapsed"] = elapsed
+                    task["native_label"] = task["request_id"] + "-a1"
+                    self.job(
+                        task["native_label"],
+                        task["gpu"],
+                        task["duration"],
+                        priority=self.c["priorities"][task["priority_class"]],
+                        fail=task["request_id"] == "request-02",
+                        sustained=True,
+                    )
+                    self.report("새 요청 도착 · " + task["request_id"])
+            native = self.observe_kube(update_snapshot=False)
+            rows = []
+            for task in tasks:
+                record = native.get(task.get("native_label"))
+                if record and record["state"] == "FAILED" and task["attempt"] == 1:
+                    failed_nodes = sorted({p["node"] for p in record["pods"] if p.get("node")})
+                    expected = task["request_id"] == "request-02" and any(
+                        42 in p.get("exit_codes", []) for p in record["pods"]
+                    )
+                    if failed_nodes and expected:
+                        nodes = json.loads(self.kube("get", "nodes", "-o", "json"))["items"]
+                        qualified = {n["id"] for n in self.c["multi_gpu"]["nodes"]}
+                        available = sorted(
+                            n["metadata"]["name"]
+                            for n in nodes
+                            if n["metadata"]["name"] in qualified
+                            and n["metadata"]["name"] not in failed_nodes
+                            and not n["spec"].get("unschedulable")
+                            and any(
+                                c["type"] == "Ready" and c["status"] == "True"
+                                for c in n["status"]["conditions"]
+                            )
+                            and int(n["status"].get("allocatable", {}).get("nvidia.com/gpu", 0))
+                            >= task["gpu"]
+                        )
+                        if not available:
+                            raise RuntimeError("다른 검증된 GPU 노드 없음 · 실패 근거 보존")
+                        task["attempts"].append(record)
+                        archived[record["label"]] = record
+                        task["excluded_nodes"] = failed_nodes
+                        task["attempt"] = 2
+                        task["native_label"] = task["request_id"] + "-a2"
+                        self.job(
+                            task["native_label"],
+                            task["gpu"],
+                            task["duration"],
+                            priority=self.c["priorities"][task["priority_class"]],
+                            exclude_nodes=failed_nodes,
+                            sustained=True,
+                            target_node=available[0],
+                        )
+                        record = None
+                        self.report(
+                            "실패 기록 보존 · 다른 GPU 후보로 재접수 · " + task["request_id"]
+                        )
+                if (
+                    record
+                    and record["state"] == "PENDING"
+                    and not task.get("promoted")
+                    and task["priority_class"] == "low"
+                    and elapsed - task["submitted_elapsed"] >= 20
+                ):
+                    task["promoted"] = self.promote_pending(record)
+                    if task["promoted"]:
+                        self.report("대기 우선순위 승격 · " + task["request_id"])
+                row = {
+                    **(record or {}),
+                    "id": self.ref + ":" + task["request_id"],
+                    "native_id": record["id"] if record else None,
+                    "label": task["request_id"],
+                    "device_class": "gpu",
+                    "backend": "kubernetes",
+                    "state": record["state"]
+                    if record
+                    else "REQUEUED"
+                    if task["attempt"] == 2
+                    else "SUBMITTED"
+                    if task["attempt"]
+                    else "NOT_SUBMITTED",
+                    "gpu": task["gpu"],
+                    "attempt": task["attempt"],
+                    "attempts": task["attempts"],
+                    "excluded_nodes": task["excluded_nodes"],
+                    "arrival_seconds": task["arrival_seconds"],
+                    "duration": task["duration"],
+                    "submitted_elapsed": task.get("submitted_elapsed"),
+                    "priority": record.get("priority")
+                    if record
+                    else (100 if task["priority_class"] == "high" else 10),
+                }
+                rows.append(row)
+                if record and record["state"] in {"FAILED", "SUCCEEDED"}:
+                    archived[record["label"]] = record
+            self.snapshot["jobs"] = rows
+            self.snapshot["elapsed_seconds"] = round(elapsed, 1)
+            self.snapshot["native_attempt_evidence"] = list(archived.values())
+            self.tick("도착·대기 순서·GPU 그룹·재할당 관측")
+            if all(r["state"] in {"SUCCEEDED", "FAILED"} for r in rows):
+                if any(r["state"] == "FAILED" for r in rows):
+                    raise RuntimeError(
+                        "작업 실패 · 재시도 제한 또는 복구 불가 · 나머지 독립 작업 결과 보존"
+                    )
+                for row in rows:
+                    finished = [
+                        e
+                        for p in row["pods"]
+                        for e in p.get("events", [])
+                        if e["phase"] == "COMPUTE_FINISHED" and e.get("correctness")
+                    ]
+                    if len(finished) != row["gpu"]:
+                        raise RuntimeError("GPU worker numerical results missing")
+                    if row["gpu"] > 1 and not all(
+                        any(e["phase"] == "BARRIER_RELEASED" for e in p.get("events", []))
+                        for p in row["pods"]
+                    ):
+                        raise RuntimeError("multi-worker startup barrier evidence missing")
+                    if row["attempt"] > 1 and set(row["excluded_nodes"]) & {
+                        p["node"] for p in row["pods"]
+                    }:
+                        raise RuntimeError("retry used an excluded failed node")
+                self.snapshot["verdict"] = (
+                    "10개 실제 요청 완료 · 1/2 GPU worker 결과와 재시도 노드 근거 보존"
+                )
+                return
 
     def mixed_batch(self):
         templates = self.c["mixed"]

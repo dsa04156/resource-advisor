@@ -239,3 +239,15 @@ sums shared slots as devices or calls cumulative coverage simultaneous execution
 The node table reports observed execution counts and distinguishes allocation-zero
 from missing model routes. Header line spans existing title grid; reuse existing
 blue/amber colors and keep the desktop ten-row/twelve-node viewport budget.
+
+The default adaptive_batch adds variable arrival and mixed one/two GPU native
+requests. Keep ten logical request identities through native retry attempts.
+Queue rows sort by observed Kueue priority then receipt time; executing, not-yet
+arrived and terminal requests follow. This is a visual priority ordering, not a
+promise of native admission order. Animate both label and state card with the
+existing FLIP transform/opacity transition, reading current screen coordinates;
+reduced motion uses an opacity fade. Retain the six columns and compact viewport.
+Show before-arrival offset, requested GPU group size, attempt count and failed
+node exclusion. Previous native failures and priority change evidence remain in
+the existing collapsed inspector. Preserve fleet_batch as the heterogeneous
+registered-workload option, with its own GPU/NPU/Slurm routes and limitations.

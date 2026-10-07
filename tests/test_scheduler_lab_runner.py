@@ -294,3 +294,67 @@ def test_rejected_request_does_not_abort_accepted_independent_job():
     assert a.snapshot["jobs"][1]["state"] == "FAILED"
     assert len(a.snapshot["platform_jobs"]) == 1
     assert observations
+
+
+def test_staggered_plan_reproducible_with_single_and_multi_gpu_requests():
+    plan = Agent.arrival_plan(81)
+    assert plan == Agent.arrival_plan(81)
+    assert len(plan) == 10
+    assert plan[0]["arrival_seconds"] == 0
+    assert all(
+        3 <= b["arrival_seconds"] - a["arrival_seconds"] <= 9
+        for a, b in zip(plan, plan[1:], strict=False)
+    )
+    assert sum(t["gpu"] == 2 for t in plan) == 3
+    assert {t["priority_class"] for t in plan} == {"low", "high"}
+
+
+def test_requeue_manifest_excludes_failed_node_and_keeps_group_resources():
+    a = runner()
+    a.snapshot["multi_gpu"] = True
+    applied = []
+    a.kube = lambda *args, value=None: applied.append(value)
+    a.job("request-a2", 2, 30, exclude_nodes=["failed-node"], sustained=True)
+    job = applied[-1]
+    spec = job["spec"]["template"]["spec"]
+    assert job["spec"]["parallelism"] == job["spec"]["completions"] == 2
+    assert spec["containers"][0]["resources"]["limits"]["nvidia.com/gpu"] == 1
+    assert {e["name"]: e["value"] for e in spec["containers"][0]["env"]}[
+        "COMPUTE_MODE"
+    ] == "sustained"
+    expr = spec["affinity"]["nodeAffinity"]["requiredDuringSchedulingIgnoredDuringExecution"][
+        "nodeSelectorTerms"
+    ][0]["matchExpressions"][0]
+    assert expr == {"key": "kubernetes.io/hostname", "operator": "NotIn", "values": ["failed-node"]}
+
+
+def test_priority_promotion_guards_owner_version_and_reserved_workload():
+    a = runner()
+    workload = {
+        "metadata": {
+            "name": "w",
+            "uid": "u",
+            "resourceVersion": "2",
+            "ownerReferences": [{"name": "native"}],
+        },
+        "spec": {"priority": 10},
+        "status": {"conditions": []},
+    }
+    patches = []
+
+    def kube(*args):
+        if args[0] == "get":
+            return json.dumps(workload)
+        patches.append(json.loads(args[-1]))
+        return "{}"
+
+    a.kube = kube
+    record = {"id": "native", "state": "PENDING", "workload_name": "w"}
+    assert a.promote_pending(record)
+    assert patches[0][:2] == [
+        {"op": "test", "path": "/metadata/uid", "value": "u"},
+        {"op": "test", "path": "/metadata/resourceVersion", "value": "2"},
+    ]
+    workload["status"]["conditions"] = [{"type": "QuotaReserved", "status": "True"}]
+    assert not a.promote_pending(record)
+    assert len(patches) == 1

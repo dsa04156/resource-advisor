@@ -45,6 +45,7 @@ class LabRequest(BaseModel):
         "pool_batch",
         "mixed_batch",
         "fleet_batch",
+        "adaptive_batch",
         "priority_batch",
         "gang_batch",
         "priority",

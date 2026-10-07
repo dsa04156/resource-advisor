@@ -49,8 +49,12 @@ if world > 1:
 emit("COMPUTE_STARTED")
 end = time.monotonic() + int(os.environ.get("DURATION", "15"))
 iterations = 0
-while time.monotonic() < end:
-    report = measure()
-    iterations += 1
-    time.sleep(0.1)
+if os.environ.get("COMPUTE_MODE") == "sustained":
+    report = measure(sustained_seconds=int(os.environ["DURATION"]))
+    iterations = report["kernel_launches"]
+else:
+    while time.monotonic() < end:
+        report = measure()
+        iterations += 1
+        time.sleep(0.1)
 emit("COMPUTE_FINISHED", iterations=iterations, correctness=True, report=report)

@@ -618,3 +618,32 @@ The final API Pod had zero restarts and a recorded peak of 236.79 MiB under the
 existing 512 MiB limit. Earlier interrupted attempts are retained; they are not
 counted as successful demonstrations. See the sanitized
 [timed execution evidence](evidence/sustained-fleet-ten-request.json).
+
+### Variable arrivals, GPU groups and bounded recovery
+
+`adaptive_batch` creates ten real Kubernetes Indexed Jobs at generated 3–9 second
+arrival gaps. The seed, planned relative arrivals and observed receipt times are
+recorded; this is a generated reproducible arrival scenario, not ten real people.
+Three requests ask for two GPUs and seven for one. Two-GPU work is two independent
+CUDA workers, one GPU each, with an all-worker startup barrier; it is not DDP.
+Each worker computes continuously for 30 or 60 seconds without sleep padding.
+
+Low/high admission classes map to existing Kueue priorities 10/100. Pending low
+requests waiting at least twenty seconds can be promoted to 100 by a guarded
+Workload priority patch. Owner UID and resourceVersion checks protect concurrent
+admission; already reserved work is not changed. Queue rows follow observed
+priority and receipt time, with label/card animation and reduced-motion fades.
+Rows retain logical request identity across native attempts. This displayed order
+does not guarantee admission ahead of a smaller resource-fitting request.
+
+One isolated request exits with explicit injected code 42. After its native Job
+fails, the scenario retains its Pod/node/exit evidence and creates at most one new
+attempt on another Ready, qualified GPU node. The new Job has both a node exclusion
+affinity and a selected alternate hostname, so the original node cannot be used.
+Native queue admission and CUDA results remain required. Unrecoverable or repeated
+failures remain failures while other independent requests continue. Cancellation
+and the existing eight-minute deadline retain run-scoped cleanup.
+
+This increment exercises the existing compatible CUDA worker group and Kueue.
+It does not add automatic retry to every registered Job, Slurm or NPU execution,
+change production node settings, or claim checkpoint recovery of model training.
