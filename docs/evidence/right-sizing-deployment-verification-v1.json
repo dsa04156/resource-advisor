@@ -1,0 +1,90 @@
+{
+  "schema_version": "right-sizing-deployment-verification-v1",
+  "verified_at": "2026-10-07T12:26:30.605559+00:00",
+  "source_commit": "1b1bb48362fcd0fc78e8e46b34e1a0b13dc85b4c",
+  "ci": {
+    "run_id": 37617693598,
+    "url": "https://github.com/dsa04156/resource-advisor/actions/runs/37617693598",
+    "conclusion": "success",
+    "headSha": "1b1bb48362fcd0fc78e8e46b34e1a0b13dc85b4c",
+    "status": "completed",
+    "pytest_summaries": [
+      "2026-10-07T12:00:15.9467873Z 1137 passed, 4 skipped, 3 warnings in 92.91s (0:01:32)",
+      "2026-10-07T12:02:59.9907745Z 1141 passed, 3 warnings in 161.43s (0:02:41)",
+      "2026-10-07T12:00:11.9286636Z 1137 passed, 4 skipped, 3 warnings in 89.28s (0:01:29)",
+      "2026-10-07T12:02:48.6967482Z 1141 passed, 3 warnings in 154.51s (0:02:34)"
+    ],
+    "scope": "Python3.11/3.13, full SQLite and PostgreSQL suites, Ruff/format, wheel/assets, JS syntax, Ansible syntax; software tests, not hardware performance"
+  },
+  "local_full_suite": {
+    "passed": 1138,
+    "skipped": 4,
+    "seconds": 43.51,
+    "scope": "Before final fitting/acquisition subphase instrumentation and cost-auditor tests; changed modules retested. Unrelated pre-existing priority worktree changes present, excluded from these commits."
+  },
+  "release_checks": {
+    "api": {
+      "source_commit": "1b1bb48362fcd0fc78e8e46b34e1a0b13dc85b4c",
+      "api_source_hash_match": true,
+      "unchanged_existing_entities": 5876,
+      "unchanged_terminal_jobs": 806,
+      "unchanged_job_identities": 806,
+      "unchanged_ledgers": 806,
+      "unchanged_other_static_specs_uids": true,
+      "unchanged_secrets_pvc_quota": true,
+      "gitops_synced_healthy": true,
+      "gpu_jobs_submitted": 0
+    },
+    "kubernetes_worker": {
+      "source_commit": "1b1bb48362fcd0fc78e8e46b34e1a0b13dc85b4c",
+      "worker_source_hash_match": true,
+      "unchanged_existing_entities": 5876,
+      "unchanged_terminal_jobs": 806,
+      "unchanged_job_identities": 806,
+      "unchanged_ledgers": 806,
+      "unchanged_other_static_specs_uids": true,
+      "unchanged_secrets_pvc_quota": true,
+      "gitops_synced_healthy": true,
+      "gpu_jobs_submitted": 0
+    },
+    "slurm_worker": {
+      "source_commit": "1b1bb48362fcd0fc78e8e46b34e1a0b13dc85b4c",
+      "worker_source_hash_match": true,
+      "unchanged_existing_entities": 5876,
+      "unchanged_terminal_jobs": 806,
+      "unchanged_job_identities": 806,
+      "unchanged_ledgers": 806,
+      "unchanged_other_static_specs_uids": true,
+      "unchanged_secrets_pvc_quota": true,
+      "gitops_synced_healthy": true,
+      "gpu_jobs_submitted": 0
+    }
+  },
+  "deployed_source": {
+    "api": {
+      "image_digest": "sha256:55a5666a4f5068e061399230eb14bba2790d94ee6aa725e390399cc209f0fa10",
+      "source_tree_sha256": "073ace2957757d335dbe1547b07c167e05fee657f7a57cdd5dd3d3901db67400"
+    },
+    "kubernetes_worker": {
+      "image_digest": "sha256:eef4d7afb901facfb448b1757953138673facc4d7d6424054d0df4ddae6d3f90",
+      "source_tree_sha256": "073ace2957757d335dbe1547b07c167e05fee657f7a57cdd5dd3d3901db67400"
+    },
+    "slurm_worker": {
+      "image_digest": "sha256:f9f256d2fc40debeca6683d66aafbaa20b39ba2fdb493147f2061d71a5351368",
+      "source_tree_sha256": "073ace2957757d335dbe1547b07c167e05fee657f7a57cdd5dd3d3901db67400"
+    }
+  },
+  "baseline_records_preserved": {
+    "entities": 4782,
+    "terminal_jobs": 660,
+    "job_identities": 660,
+    "usage": 660
+  },
+  "native_experiment_jobs_retained": 151,
+  "terminal_native_failures": 3,
+  "old_api_fields_and_hashes_preserved_by_tests": true,
+  "schema_table_migration": false,
+  "release_submitted_hardware_jobs": 0,
+  "new_slurm_native_execution": "BLOCKED",
+  "overall_goal_complete": false
+}

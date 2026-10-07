@@ -33,8 +33,13 @@ Duplicate result ingestion returns the original receipt and ledger; no rewrite.
 No SQL table migration is needed: this adds a bounded record kind to the existing
 immutable entity table. Older records are not backfilled or assigned fictional
 historical receipts. Existing read-time residual/drift checks continue to work
-for old Jobs. Rolling back the application leaves new receipts intact; old
-code ignores the additional entity kind. New receipts are created only by a
+for old Jobs. Rolling back only the lifecycle/feedback layer leaves new receipts intact;
+older code can ignore that additional entity kind. Rolling back before the
+optional descriptor schema was introduced is **not** transparent for new workload
+contracts. Drain active Jobs/studies, retain a DB snapshot and the verified OCI
+reports/private overlays, and do not send new-schema workloads to old workers.
+Roll forward to the verified release to resume them. This is a recovery path,
+not a claim of a tested destructive downgrade. New receipts are created only by a
 worker/API process running the new terminal transaction code, so deployment of
 an API alone does not prove worker-generated hardware feedback.
 

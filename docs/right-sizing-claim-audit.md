@@ -54,3 +54,10 @@
 0 regret으로 채우지 않는다. Startup budget guard와 fitting/acquisition subphase
 계측은 고정된 실험 이후 source 변경으로, software 검증과 신규 hardware 검증을
 구분한다.
+
+
+배포와 검증 범위는 [release evidence](evidence/right-sizing-deployment-verification-v1.json)에
+source/CI/보존 hash별로 분리했다. [Slurm read-only check](evidence/right-sizing-slurm-readiness-v2.json)는
+새 native execution이 0개임을 명시한다. Source가 배포됐다는 이유로 그 gate를
+PASS로 바꾸지 않는다. C4는 finite-N 비용 판별이며 online ROI policy나 외삽한
+손익분기 예측이 아니다.

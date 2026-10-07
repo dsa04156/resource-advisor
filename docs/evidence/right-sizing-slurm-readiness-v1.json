@@ -1,0 +1,28 @@
+{
+  "schema_version": "right-sizing-slurm-readiness-v1",
+  "observed_at": "2026-10-07T12:03:43.373951+00:00",
+  "read_only": true,
+  "checks": [
+    {
+      "role": "controller",
+      "status": "BLOCKED",
+      "reason": "CONTROLLER_NETWORK_UNREACHABLE",
+      "error_type": "RuntimeError"
+    },
+    {
+      "role": "slurm_orin",
+      "status": "BLOCKED",
+      "reason": "REMOTE_ACCESS_FAILED",
+      "error_type": "RuntimeError"
+    }
+  ],
+  "new_slurm_jobs": 0,
+  "changed_cluster_or_driver_settings": false,
+  "resumption": [
+    "Restore authorized controller SSH/network reachability",
+    "Confirm sinfo/squeue/sacct work with scoped observer/executor identities",
+    "Requalify stale runtime/capability under a new experiment ID",
+    "Run independent approved Slurm execution and audit matching result/usage/feedback/native ID"
+  ],
+  "overall_goal_complete": false
+}

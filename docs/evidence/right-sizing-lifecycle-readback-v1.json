@@ -1,0 +1,1479 @@
+{
+  "schema_version": "right-sizing-lifecycle-readback-v1",
+  "source_commit": "b476ba9dcf91bd47baf8fc45c0fd8f882e5750d3",
+  "evidence_kind": "read-only-live-api",
+  "no_new_jobs": true,
+  "no_entity_job_usage_mutation": true,
+  "runs": [
+    {
+      "workload_ref": "right-sizing-v1-w1",
+      "observed_at": "2026-10-07T12:02:38.588904+00:00",
+      "lifecycle": {
+        "schema_version": "right-sizing-lifecycle-v1",
+        "workload_ref": "right-sizing-v1-w1",
+        "workload_signature": "sha256:fd1285e56477a66ca6c40e71bff78bf3f18fd75bec31027ee1f3160a2de044bb",
+        "workload_digest": "sha256:bd9b7a439744187cb3cd8e275206948324a6f13d18ee0ee909be895d433af2b3",
+        "state": "NEEDS_RECONFIRMATION",
+        "recommendability": {
+          "status": "PRESERVE_BASELINE_UNCERTAINTY",
+          "ranking": [
+            {
+              "candidate_ref": "cpu2-mem1024",
+              "mean_seconds": 0.046651341719552875,
+              "interval_seconds": [
+                0.04641203740109531,
+                0.046890646038010436
+              ],
+              "independent_runs": 4,
+              "evidence_refs": [
+                "a-6a10b8a1af6e49b88baccea3223657ef",
+                "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+                "a-bab527001a124f5484138c451452ec31",
+                "a-457d04d0f32443428273631aa0b56655"
+              ]
+            },
+            {
+              "candidate_ref": "cpu2-mem2048",
+              "mean_seconds": 0.046717152534984055,
+              "interval_seconds": [
+                0.046441060671233506,
+                0.046993244398734604
+              ],
+              "independent_runs": 5,
+              "evidence_refs": [
+                "a-4e68a34f026c4c8d97186c44c21942c8",
+                "a-0fd85076601342eeb616af127a0faf8e",
+                "a-fb9127fee5d04dcbb635893c7eda835a",
+                "a-cab29de55860407199180a79544ef54f",
+                "a-2cf7e7a4120b4ea69fac96b3f5816d7a"
+              ]
+            },
+            {
+              "candidate_ref": "cpu1-mem2048",
+              "mean_seconds": 0.04680028810010602,
+              "interval_seconds": [
+                0.046326364972134305,
+                0.04727421122807774
+              ],
+              "independent_runs": 6,
+              "evidence_refs": [
+                "a-2ad3b82c07ea4513b404cc8a0d369780",
+                "a-b88600f12123441aa8b4ff46529cf4bf",
+                "a-bc0aefc98d5c43bc8857dd5b47749c26",
+                "a-7d78ddb39dc0466f96e1f0c120b81af8",
+                "a-0672aeb86a3f4c06bd14d9a497874155",
+                "a-54deecc2a5124ec0acb61cb960fb997a"
+              ]
+            },
+            {
+              "candidate_ref": "cpu1-mem1024",
+              "mean_seconds": 0.04714744761586189,
+              "interval_seconds": [
+                0.04626981943528357,
+                0.04802507579644021
+              ],
+              "independent_runs": 5,
+              "evidence_refs": [
+                "a-b4a658d8d57d40d98afed6290aec0ae8",
+                "a-c811b34353a1433b8f87490e47bdbe2a",
+                "a-5073f02581d3469b93b4de105c88a94b",
+                "a-f77f0925a1624548940325d533d40eab",
+                "a-ff532a49c22a450484635334e9a0770c"
+              ]
+            },
+            {
+              "candidate_ref": "cpu0-5-mem2048",
+              "mean_seconds": 0.09478744483203627,
+              "interval_seconds": [
+                0.0904116809906213,
+                0.09916320867345124
+              ],
+              "independent_runs": 4,
+              "evidence_refs": [
+                "a-6cf3e53b03344ab0b163d42ee8742e3f",
+                "a-88f6010e389142528f4e6c1d7ff80d05",
+                "a-0708be129a94418c998e86c0a22daddb",
+                "a-352d30e521b04ec880bfe4e242b33dce"
+              ]
+            },
+            {
+              "candidate_ref": "cpu0-5-mem1024",
+              "mean_seconds": 0.09587783059881379,
+              "interval_seconds": [
+                0.09562699905037009,
+                0.09612866214725749
+              ],
+              "independent_runs": 3,
+              "evidence_refs": [
+                "a-dfb45341f29b4705a7670043b61d411a",
+                "a-9acaa6def25b44ac9b83977687790fcb",
+                "a-ba6be0832af841a088ab17ea52b931c8"
+              ]
+            }
+          ],
+          "excluded": {},
+          "approval_authorized": false
+        },
+        "distribution": {
+          "status": "OBSERVED_QUALIFIED_SCOPE",
+          "in_distribution": true,
+          "predictive_interval_calibration": "NOT_QUALIFIED",
+          "semantics": "Exact workload/context evidence scope, not statistical OOD probability"
+        },
+        "reasons": [
+          "RECOMMENDATION_EXPIRED_OR_TIME_INVALID"
+        ],
+        "assessed_at": "2026-10-07T12:02:38.585619+00:00",
+        "candidates": [
+          {
+            "candidate_ref": "cpu0-5-mem1024",
+            "context_signature": "sha256:2dab040bdfac24b848a4782e213cee8e15f305e7552b49636dd9b7a0e6574f02",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu0-5-mem2048",
+            "context_signature": "sha256:753c054b9badf79b1e2ede803a746d5cc363cf00eac7940392cbf611f3c27ae7",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu1-mem1024",
+            "context_signature": "sha256:372d37cfea6511319956788e6ce464ac872706816ebf1038d28ab0a2086c3a7c",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu1-mem2048",
+            "context_signature": "sha256:84350a32b6e0013368e0007c2a23e34e9128f5f23f9e417ee4ff8bb0b328fff0",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu2-mem1024",
+            "context_signature": "sha256:13e45002a7dd0e59480326af41a82fc5244d1f9454237da6a1838835ba3a265c",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu2-mem2048",
+            "context_signature": "sha256:7af677d98482793723a3fe112f4e142eabba81237003b4646e4471653d00de77",
+            "compatible": true,
+            "reasons": []
+          }
+        ],
+        "profile_refs": [
+          "a-0672aeb86a3f4c06bd14d9a497874155",
+          "a-0708be129a94418c998e86c0a22daddb",
+          "a-0fd85076601342eeb616af127a0faf8e",
+          "a-160cef2b3fdc4d11bccc018c6617d110",
+          "a-1be5afd852f843c48624be71c99677d5",
+          "a-27a3a9b977ea49efb77bf770a4188579",
+          "a-2ad3b82c07ea4513b404cc8a0d369780",
+          "a-2cf7e7a4120b4ea69fac96b3f5816d7a",
+          "a-2d2db34997c24809bbf8f822c110868e",
+          "a-352d30e521b04ec880bfe4e242b33dce",
+          "a-457d04d0f32443428273631aa0b56655",
+          "a-4e68a34f026c4c8d97186c44c21942c8",
+          "a-5073f02581d3469b93b4de105c88a94b",
+          "a-54deecc2a5124ec0acb61cb960fb997a",
+          "a-6a10b8a1af6e49b88baccea3223657ef",
+          "a-6cf3e53b03344ab0b163d42ee8742e3f",
+          "a-7acdbbb16c664d77934b92358d7aacaf",
+          "a-7d78ddb39dc0466f96e1f0c120b81af8",
+          "a-88f6010e389142528f4e6c1d7ff80d05",
+          "a-9acaa6def25b44ac9b83977687790fcb",
+          "a-a13d45ee38da4968900f30a24b52686b",
+          "a-a1d91b7b23e446ec9a6f7ff82b09d7d4",
+          "a-a69bc63449314488ad1e871adcc53a13",
+          "a-acb54433664a45a5a3cc6b907b12477e",
+          "a-ae91915bb9a1455fa13feb59aedc125b",
+          "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+          "a-b4a658d8d57d40d98afed6290aec0ae8",
+          "a-b88600f12123441aa8b4ff46529cf4bf",
+          "a-ba6be0832af841a088ab17ea52b931c8",
+          "a-bab527001a124f5484138c451452ec31",
+          "a-bc0aefc98d5c43bc8857dd5b47749c26",
+          "a-c0e1e8c7e17d4308b624acd4fc449d3e",
+          "a-c811b34353a1433b8f87490e47bdbe2a",
+          "a-cab29de55860407199180a79544ef54f",
+          "a-d391275db5ba41e39b328094edf8ce5c",
+          "a-d3e80dc0b74a4ffaa7b63727ddfb697d",
+          "a-dfb45341f29b4705a7670043b61d411a",
+          "a-e1d9cb0bf6e546959f7102691407f684",
+          "a-f77f0925a1624548940325d533d40eab",
+          "a-fb9127fee5d04dcbb635893c7eda835a",
+          "a-ff532a49c22a450484635334e9a0770c"
+        ],
+        "study_refs": [
+          "study-165e8b3600f54a728539dbf9c2b8e758",
+          "study-764f57c1aaa242609c21b3d5a8a47cf3"
+        ],
+        "recommendation_ref": "rec-de3c6ef3de70464d8bff32d546bae5b7",
+        "current_validity": {
+          "policy_version": "recommendation-reuse-v1",
+          "assessed_at": "2026-10-07T12:02:38.465512+00:00",
+          "recommendation_ref": "rec-de3c6ef3de70464d8bff32d546bae5b7",
+          "reusable": false,
+          "reasons": [
+            "RECOMMENDATION_EXPIRED_OR_TIME_INVALID"
+          ],
+          "residuals": [
+            {
+              "attempt_id": "a-b88600f12123441aa8b4ff46529cf4bf",
+              "recorded_at": "2026-10-07T11:06:34.567646+00:00",
+              "actual_seconds": 0.04652395227458328,
+              "relative_error": -0.0028552875202957875
+            },
+            {
+              "attempt_id": "a-bc0aefc98d5c43bc8857dd5b47749c26",
+              "recorded_at": "2026-10-07T11:07:02.460447+00:00",
+              "actual_seconds": 0.04664657358080149,
+              "relative_error": -0.00022715338390088348
+            },
+            {
+              "attempt_id": "a-7d78ddb39dc0466f96e1f0c120b81af8",
+              "recorded_at": "2026-10-07T11:25:47.306332+00:00",
+              "actual_seconds": 0.04757209843955934,
+              "relative_error": 0.019609558117565918
+            },
+            {
+              "attempt_id": "a-0672aeb86a3f4c06bd14d9a497874155",
+              "recorded_at": "2026-10-07T11:26:13.684187+00:00",
+              "actual_seconds": 0.04672282107640058,
+              "relative_error": 0.0014070540159289318
+            },
+            {
+              "attempt_id": "a-54deecc2a5124ec0acb61cb960fb997a",
+              "recorded_at": "2026-10-07T11:28:29.413909+00:00",
+              "actual_seconds": 0.04659045720472932,
+              "relative_error": -0.0014298918647941959
+            }
+          ],
+          "drift_policy": {
+            "relative_error_limit": 0.25,
+            "consecutive_independent_runs": 3,
+            "semantics": "heuristic recheck trigger, not calibrated probability or root cause"
+          },
+          "drift_evidence_refs": [],
+          "constraint_failure_refs": []
+        },
+        "feedback": [],
+        "additional_profiling_required": true,
+        "milestones": [
+          {
+            "state": "UNKNOWN",
+            "evidence_refs": [
+              "right-sizing-v1-w1"
+            ],
+            "observed": true
+          },
+          {
+            "state": "COMPATIBILITY_CHECKED",
+            "evidence_refs": [
+              "cpu0-5-mem1024",
+              "cpu0-5-mem2048",
+              "cpu1-mem1024",
+              "cpu1-mem2048",
+              "cpu2-mem1024",
+              "cpu2-mem2048"
+            ],
+            "observed": true
+          },
+          {
+            "state": "NEEDS_PROFILE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILING",
+            "evidence_refs": [
+              "study-165e8b3600f54a728539dbf9c2b8e758",
+              "study-764f57c1aaa242609c21b3d5a8a47cf3"
+            ],
+            "observed": true
+          },
+          {
+            "state": "PROFILED",
+            "evidence_refs": [
+              "a-0672aeb86a3f4c06bd14d9a497874155",
+              "a-0708be129a94418c998e86c0a22daddb",
+              "a-0fd85076601342eeb616af127a0faf8e",
+              "a-160cef2b3fdc4d11bccc018c6617d110",
+              "a-1be5afd852f843c48624be71c99677d5",
+              "a-27a3a9b977ea49efb77bf770a4188579",
+              "a-2ad3b82c07ea4513b404cc8a0d369780",
+              "a-2cf7e7a4120b4ea69fac96b3f5816d7a",
+              "a-2d2db34997c24809bbf8f822c110868e",
+              "a-352d30e521b04ec880bfe4e242b33dce",
+              "a-457d04d0f32443428273631aa0b56655",
+              "a-4e68a34f026c4c8d97186c44c21942c8",
+              "a-5073f02581d3469b93b4de105c88a94b",
+              "a-54deecc2a5124ec0acb61cb960fb997a",
+              "a-6a10b8a1af6e49b88baccea3223657ef",
+              "a-6cf3e53b03344ab0b163d42ee8742e3f",
+              "a-7acdbbb16c664d77934b92358d7aacaf",
+              "a-7d78ddb39dc0466f96e1f0c120b81af8",
+              "a-88f6010e389142528f4e6c1d7ff80d05",
+              "a-9acaa6def25b44ac9b83977687790fcb",
+              "a-a13d45ee38da4968900f30a24b52686b",
+              "a-a1d91b7b23e446ec9a6f7ff82b09d7d4",
+              "a-a69bc63449314488ad1e871adcc53a13",
+              "a-acb54433664a45a5a3cc6b907b12477e",
+              "a-ae91915bb9a1455fa13feb59aedc125b",
+              "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+              "a-b4a658d8d57d40d98afed6290aec0ae8",
+              "a-b88600f12123441aa8b4ff46529cf4bf",
+              "a-ba6be0832af841a088ab17ea52b931c8",
+              "a-bab527001a124f5484138c451452ec31",
+              "a-bc0aefc98d5c43bc8857dd5b47749c26",
+              "a-c0e1e8c7e17d4308b624acd4fc449d3e",
+              "a-c811b34353a1433b8f87490e47bdbe2a",
+              "a-cab29de55860407199180a79544ef54f",
+              "a-d391275db5ba41e39b328094edf8ce5c",
+              "a-d3e80dc0b74a4ffaa7b63727ddfb697d",
+              "a-dfb45341f29b4705a7670043b61d411a",
+              "a-e1d9cb0bf6e546959f7102691407f684",
+              "a-f77f0925a1624548940325d533d40eab",
+              "a-fb9127fee5d04dcbb635893c7eda835a",
+              "a-ff532a49c22a450484635334e9a0770c"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDABLE",
+            "evidence_refs": [
+              "rec-de3c6ef3de70464d8bff32d546bae5b7"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDED",
+            "evidence_refs": [
+              "rec-de3c6ef3de70464d8bff32d546bae5b7"
+            ],
+            "observed": true
+          },
+          {
+            "state": "APPROVED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "EXECUTED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "VERIFIED",
+            "evidence_refs": [],
+            "observed": false
+          }
+        ],
+        "semantics": "Evidence projection, not a new Job state machine. VERIFIED means independent actual/reference comparison; no speedup or calibrated coverage guarantee."
+      }
+    },
+    {
+      "workload_ref": "right-sizing-v1-w2",
+      "observed_at": "2026-10-07T12:02:38.932894+00:00",
+      "lifecycle": {
+        "schema_version": "right-sizing-lifecycle-v1",
+        "workload_ref": "right-sizing-v1-w2",
+        "workload_signature": "sha256:4ef5789a814dfcfd891e2ff607912313bdcc711d93a162fccb674d0e4242e2ec",
+        "workload_digest": "sha256:62091018e5d73d04d0e9ec2ca9c897c4661aa91308c00a3b0cf96d5569229a3d",
+        "state": "NEEDS_RECONFIRMATION",
+        "recommendability": {
+          "status": "MEASURED_RECOMMENDATION",
+          "ranking": [
+            {
+              "candidate_ref": "cpu2-mem2048",
+              "mean_seconds": 0.2607306621891136,
+              "interval_seconds": [
+                0.260403127948712,
+                0.2610581964295152
+              ],
+              "independent_runs": 6,
+              "evidence_refs": [
+                "a-c490b32feca048dd86ca80659c69e066",
+                "a-3cece8d6d63a47539521756aec3cfcad",
+                "a-5efa7d349636483fbe2bf3db99f1c829",
+                "a-4234e2d6f2ea49f7bf55c771edbf80b0",
+                "a-427321c9d900458e930c83a5cc7b945d",
+                "a-85049b46af55468f91d630853a7aa891"
+              ]
+            },
+            {
+              "candidate_ref": "cpu1-mem2048",
+              "mean_seconds": 0.26349383233658347,
+              "interval_seconds": [
+                0.2627929537676081,
+                0.26419471090555885
+              ],
+              "independent_runs": 6,
+              "evidence_refs": [
+                "a-e733a3345cf84f27876e072ac2e7a51e",
+                "a-754039f6ccd148d18731540e47d68500",
+                "a-62d3f9c4d35e433cb6eb24610ca1e324",
+                "a-5ceabe1ff1274dc8935e2ef55c7f1947",
+                "a-438571f0020a42469c212cf7c3b8fdb8",
+                "a-9a6a4ce6293e49ab928883958572e7da"
+              ]
+            }
+          ],
+          "excluded": {
+            "cpu0-5-mem1024": [
+              "NEEDS_PROFILE"
+            ],
+            "cpu0-5-mem2048": [
+              "NEEDS_PROFILE"
+            ],
+            "cpu1-mem1024": [
+              "NEEDS_PROFILE"
+            ],
+            "cpu2-mem1024": [
+              "NEEDS_PROFILE"
+            ]
+          },
+          "approval_authorized": false
+        },
+        "distribution": {
+          "status": "OBSERVED_QUALIFIED_SCOPE",
+          "in_distribution": true,
+          "predictive_interval_calibration": "NOT_QUALIFIED",
+          "semantics": "Exact workload/context evidence scope, not statistical OOD probability"
+        },
+        "reasons": [
+          "RECOMMENDATION_EXPIRED_OR_TIME_INVALID"
+        ],
+        "assessed_at": "2026-10-07T12:02:38.928212+00:00",
+        "candidates": [
+          {
+            "candidate_ref": "cpu0-5-mem1024",
+            "context_signature": "sha256:884ef870f5a34c2d3db663c2c8006ed00b86a945eb03744b7d986b884d1433c8",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu0-5-mem2048",
+            "context_signature": "sha256:6bbe889644f9994be25a9b069c43dae782eb57948b0a8b46914175d4c20b5cdf",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu1-mem1024",
+            "context_signature": "sha256:20c1066356dfa9008e47d5e9ecfa434b1d289dbd07578bc2957c8a6b5676b3a0",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu1-mem2048",
+            "context_signature": "sha256:b77ce0d03a6257bcfd633593049b6962a24eee1bac3f4ced125a9514233db5fc",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu2-mem1024",
+            "context_signature": "sha256:fad52be76daf9376819acd405bec63b801e7e2bf8d718e70a80037a35335f903",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu2-mem2048",
+            "context_signature": "sha256:bb57621f2be21a478841e2ce2aa4965376c180a378c6825a2dfbc0b1cbac6090",
+            "compatible": true,
+            "reasons": []
+          }
+        ],
+        "profile_refs": [
+          "a-175e6b040cb54fc7bbe904855d849078",
+          "a-18c3f1c062ad468b945699acf87d26c4",
+          "a-1f2e6affe3514c7a9d57b331536b87dd",
+          "a-37db3256ffc54123be6f90b94dd16692",
+          "a-3a02504f727348f1876dd9be9ae81275",
+          "a-3cece8d6d63a47539521756aec3cfcad",
+          "a-4234e2d6f2ea49f7bf55c771edbf80b0",
+          "a-427321c9d900458e930c83a5cc7b945d",
+          "a-438571f0020a42469c212cf7c3b8fdb8",
+          "a-4594a3cc61334e67909ff2dcffd12d8a",
+          "a-5ceabe1ff1274dc8935e2ef55c7f1947",
+          "a-5efa7d349636483fbe2bf3db99f1c829",
+          "a-62d3f9c4d35e433cb6eb24610ca1e324",
+          "a-6fa0fe3eedcc4ffda8dde4e21c9f06b1",
+          "a-754039f6ccd148d18731540e47d68500",
+          "a-8077360716284f5fa965122f8eb5559c",
+          "a-834ef38e4a5c4ef49ac4179e86f1cb5b",
+          "a-85049b46af55468f91d630853a7aa891",
+          "a-8710fc5b2f644879b7faf9e6d883252b",
+          "a-950dfaf7d8f64404aeba92a59cb3d2e9",
+          "a-9a6a4ce6293e49ab928883958572e7da",
+          "a-a3b2fa45b1344990b44b2d6c5bc6ed4f",
+          "a-b88e9298ef1842ea88fec09d4256856e",
+          "a-c490b32feca048dd86ca80659c69e066",
+          "a-cbcaa7249cd148a79dbbc583ece95367",
+          "a-ce3657a6dcc342caa39ce9c897ac5e2d",
+          "a-cfc7a2849c114855beef7ec5e1573a31",
+          "a-e3ecf8633b564149a5c8368c99eb5180",
+          "a-e733a3345cf84f27876e072ac2e7a51e",
+          "a-fae4b29b850d4031846594794a95026f"
+        ],
+        "study_refs": [
+          "study-48d9218ae3354135925d1fe4f797684e",
+          "study-fce0ed5b4b15479d9d7f2e2e48264fd2"
+        ],
+        "recommendation_ref": "rec-344f2b4da91e48f5a1d9e0a9db741a14",
+        "current_validity": {
+          "policy_version": "recommendation-reuse-v1",
+          "assessed_at": "2026-10-07T12:02:38.790190+00:00",
+          "recommendation_ref": "rec-344f2b4da91e48f5a1d9e0a9db741a14",
+          "reusable": false,
+          "reasons": [
+            "RECOMMENDATION_EXPIRED_OR_TIME_INVALID"
+          ],
+          "residuals": [
+            {
+              "attempt_id": "a-4234e2d6f2ea49f7bf55c771edbf80b0",
+              "recorded_at": "2026-10-07T11:14:06.177451+00:00",
+              "actual_seconds": 0.2606542988214642,
+              "relative_error": -0.0005205823174892304
+            },
+            {
+              "attempt_id": "a-427321c9d900458e930c83a5cc7b945d",
+              "recorded_at": "2026-10-07T11:15:25.351059+00:00",
+              "actual_seconds": 0.26090283691883087,
+              "relative_error": 0.0004324375020615965
+            },
+            {
+              "attempt_id": "a-85049b46af55468f91d630853a7aa891",
+              "recorded_at": "2026-10-07T11:37:22.821808+00:00",
+              "actual_seconds": 0.26027614308986813,
+              "relative_error": -0.0019706212085332277
+            }
+          ],
+          "drift_policy": {
+            "relative_error_limit": 0.25,
+            "consecutive_independent_runs": 3,
+            "semantics": "heuristic recheck trigger, not calibrated probability or root cause"
+          },
+          "drift_evidence_refs": [],
+          "constraint_failure_refs": []
+        },
+        "feedback": [],
+        "additional_profiling_required": true,
+        "milestones": [
+          {
+            "state": "UNKNOWN",
+            "evidence_refs": [
+              "right-sizing-v1-w2"
+            ],
+            "observed": true
+          },
+          {
+            "state": "COMPATIBILITY_CHECKED",
+            "evidence_refs": [
+              "cpu0-5-mem1024",
+              "cpu0-5-mem2048",
+              "cpu1-mem1024",
+              "cpu1-mem2048",
+              "cpu2-mem1024",
+              "cpu2-mem2048"
+            ],
+            "observed": true
+          },
+          {
+            "state": "NEEDS_PROFILE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILING",
+            "evidence_refs": [
+              "study-48d9218ae3354135925d1fe4f797684e",
+              "study-fce0ed5b4b15479d9d7f2e2e48264fd2"
+            ],
+            "observed": true
+          },
+          {
+            "state": "PROFILED",
+            "evidence_refs": [
+              "a-175e6b040cb54fc7bbe904855d849078",
+              "a-18c3f1c062ad468b945699acf87d26c4",
+              "a-1f2e6affe3514c7a9d57b331536b87dd",
+              "a-37db3256ffc54123be6f90b94dd16692",
+              "a-3a02504f727348f1876dd9be9ae81275",
+              "a-3cece8d6d63a47539521756aec3cfcad",
+              "a-4234e2d6f2ea49f7bf55c771edbf80b0",
+              "a-427321c9d900458e930c83a5cc7b945d",
+              "a-438571f0020a42469c212cf7c3b8fdb8",
+              "a-4594a3cc61334e67909ff2dcffd12d8a",
+              "a-5ceabe1ff1274dc8935e2ef55c7f1947",
+              "a-5efa7d349636483fbe2bf3db99f1c829",
+              "a-62d3f9c4d35e433cb6eb24610ca1e324",
+              "a-6fa0fe3eedcc4ffda8dde4e21c9f06b1",
+              "a-754039f6ccd148d18731540e47d68500",
+              "a-8077360716284f5fa965122f8eb5559c",
+              "a-834ef38e4a5c4ef49ac4179e86f1cb5b",
+              "a-85049b46af55468f91d630853a7aa891",
+              "a-8710fc5b2f644879b7faf9e6d883252b",
+              "a-950dfaf7d8f64404aeba92a59cb3d2e9",
+              "a-9a6a4ce6293e49ab928883958572e7da",
+              "a-a3b2fa45b1344990b44b2d6c5bc6ed4f",
+              "a-b88e9298ef1842ea88fec09d4256856e",
+              "a-c490b32feca048dd86ca80659c69e066",
+              "a-cbcaa7249cd148a79dbbc583ece95367",
+              "a-ce3657a6dcc342caa39ce9c897ac5e2d",
+              "a-cfc7a2849c114855beef7ec5e1573a31",
+              "a-e3ecf8633b564149a5c8368c99eb5180",
+              "a-e733a3345cf84f27876e072ac2e7a51e",
+              "a-fae4b29b850d4031846594794a95026f"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDABLE",
+            "evidence_refs": [
+              "rec-344f2b4da91e48f5a1d9e0a9db741a14"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDED",
+            "evidence_refs": [
+              "rec-344f2b4da91e48f5a1d9e0a9db741a14"
+            ],
+            "observed": true
+          },
+          {
+            "state": "APPROVED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "EXECUTED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "VERIFIED",
+            "evidence_refs": [],
+            "observed": false
+          }
+        ],
+        "semantics": "Evidence projection, not a new Job state machine. VERIFIED means independent actual/reference comparison; no speedup or calibrated coverage guarantee."
+      }
+    },
+    {
+      "workload_ref": "right-sizing-v1-hailo",
+      "observed_at": "2026-10-07T12:02:39.211835+00:00",
+      "lifecycle": {
+        "schema_version": "right-sizing-lifecycle-v1",
+        "workload_ref": "right-sizing-v1-hailo",
+        "workload_signature": "sha256:8a74c00b467fa7e601b48c7ba6369329844b92361a86baaf7ad680827fdf3b8d",
+        "workload_digest": "sha256:f22f831393c74925b9a2fd691d61bd60313f65da59847e90e2716cda5db416c9",
+        "state": "NEEDS_RECONFIRMATION",
+        "recommendability": {
+          "status": "MEASURED_RECOMMENDATION",
+          "ranking": [
+            {
+              "candidate_ref": "hailo-physical",
+              "mean_seconds": 0.33986779425276836,
+              "interval_seconds": [
+                0.3390155562490316,
+                0.3407200322565051
+              ],
+              "independent_runs": 4,
+              "evidence_refs": [
+                "a-df095f8f77d9447ba118efcdc2ee52e4",
+                "a-52e7057f14104580870595c3e2baa9b7",
+                "a-ecadba5090e547e7bb25e268b084f0ea",
+                "a-0ddf520f190e470694e64cf67082e06e"
+              ]
+            }
+          ],
+          "excluded": {},
+          "approval_authorized": false
+        },
+        "distribution": {
+          "status": "OBSERVED_QUALIFIED_SCOPE",
+          "in_distribution": true,
+          "predictive_interval_calibration": "NOT_QUALIFIED",
+          "semantics": "Exact workload/context evidence scope, not statistical OOD probability"
+        },
+        "reasons": [
+          "RECOMMENDATION_EXPIRED_OR_TIME_INVALID"
+        ],
+        "assessed_at": "2026-10-07T12:02:39.205325+00:00",
+        "candidates": [
+          {
+            "candidate_ref": "hailo-physical",
+            "context_signature": "sha256:61155185436f70f4ac5b0438a161f3e95bc2c396e0ceee9e835f0d23a2bed620",
+            "compatible": true,
+            "reasons": []
+          }
+        ],
+        "profile_refs": [
+          "a-06cbc0e265904accb68f5bce2e6818d3",
+          "a-0ddf520f190e470694e64cf67082e06e",
+          "a-1110514913c54b88988dc00de98d9e56",
+          "a-122ef8842d6f4b3a82eb00b08f93816c",
+          "a-1957dd598ef4459799dce677428ca01e",
+          "a-1cd3946123e141c9b94ef135a8ead62c",
+          "a-3e7ca8da44154f58bcdfe6898643c602",
+          "a-44cb5d2180ba442dac544c5b6574440c",
+          "a-52e7057f14104580870595c3e2baa9b7",
+          "a-634edc15afd54b7680b832b94e824954",
+          "a-6c8a2bd915004c37bb97325e5a20db10",
+          "a-720171986f6244a59a930b69a88126b2",
+          "a-84ae4b483a1c4428adb678335489c5c9",
+          "a-89600cf775824245b727f17c9bbb7402",
+          "a-8bd7b02900dd47f5a8d32516cb314cd3",
+          "a-c4c8c662e8674c838747356e4aeeb3f9",
+          "a-c94450c575254457beecbeaf63c7702c",
+          "a-df095f8f77d9447ba118efcdc2ee52e4",
+          "a-ecadba5090e547e7bb25e268b084f0ea",
+          "a-f8d7bcdb735c41e0a78eff5224eec96b",
+          "a-fcc02e0f26fc4b7398ff795b359935db",
+          "a-fcdf60c114a04dfe917b05d6b639535a"
+        ],
+        "study_refs": [],
+        "recommendation_ref": "rec-5e2cd05cd9b14c0683fbb8f4e193a96e",
+        "current_validity": {
+          "policy_version": "recommendation-reuse-v1",
+          "assessed_at": "2026-10-07T12:02:39.099827+00:00",
+          "recommendation_ref": "rec-5e2cd05cd9b14c0683fbb8f4e193a96e",
+          "reusable": false,
+          "reasons": [
+            "RECOMMENDATION_EXPIRED_OR_TIME_INVALID"
+          ],
+          "residuals": [
+            {
+              "attempt_id": "a-0ddf520f190e470694e64cf67082e06e",
+              "recorded_at": "2026-10-07T10:35:29.014184+00:00",
+              "actual_seconds": 0.3406952160084984,
+              "relative_error": 0.003248689750848715
+            }
+          ],
+          "drift_policy": {
+            "relative_error_limit": 0.25,
+            "consecutive_independent_runs": 3,
+            "semantics": "heuristic recheck trigger, not calibrated probability or root cause"
+          },
+          "drift_evidence_refs": [],
+          "constraint_failure_refs": []
+        },
+        "feedback": [
+          {
+            "schema_version": "recommendation-feedback-v1",
+            "job_id": "j-b479327d28e54ce7886352dc9c8bc609",
+            "attempt_id": "a-0ddf520f190e470694e64cf67082e06e",
+            "epoch": 1,
+            "approval_ref": "apr-ae8a927d6cc34caea7fae5b1ea4b398d",
+            "recommendation_ref": "rec-5e2cd05cd9b14c0683fbb8f4e193a96e",
+            "recommendation_digest": "sha256:d70c30759683c611e389e5d8ac5cad609eeb5000d47dc2b159cddd8f42f2cef6",
+            "source_profile_refs": [
+              "a-df095f8f77d9447ba118efcdc2ee52e4",
+              "a-52e7057f14104580870595c3e2baa9b7",
+              "a-ecadba5090e547e7bb25e268b084f0ea"
+            ],
+            "workload_signature": "sha256:8a74c00b467fa7e601b48c7ba6369329844b92361a86baaf7ad680827fdf3b8d",
+            "context_signature": "sha256:61155185436f70f4ac5b0438a161f3e95bc2c396e0ceee9e835f0d23a2bed620",
+            "backend": "kubernetes",
+            "native_job_id": "a-0ddf520f190e470694e64cf67082e06e",
+            "result_digest": "sha256:25cc5adec0673b99618f2a3ef4e5086b4b0493790d518859df48a6050e65f75b",
+            "usage_attempt_id": "a-0ddf520f190e470694e64cf67082e06e",
+            "evidence_kind": "hardware",
+            "terminal_state": "SUCCEEDED",
+            "recorded_at": "2026-10-07T10:35:29.014184+00:00",
+            "status": "COMPARABLE",
+            "reasons": [],
+            "constraint_passed": true,
+            "reference_mean_seconds": 0.33959198700085835,
+            "actual_measurements": {
+              "elapsed_seconds": 0.3406952160084984,
+              "peak_memory_mib": 138.28125,
+              "quality_value": 0.8,
+              "sample_count": 100,
+              "work_units": 100,
+              "latency_p50_ms": 3.3831910000117205,
+              "latency_p95_ms": 3.5924209996665013,
+              "latency_p99_ms": 3.681698999571381,
+              "throughput": 293.51747632847764,
+              "gpu_utilization": null,
+              "power_watts": null,
+              "temperature_celsius": null
+            },
+            "actual_seconds": 0.3406952160084984,
+            "residual_seconds": 0.0011032290076400386,
+            "relative_residual": 0.003248689750848715,
+            "reference_interval_seconds": [
+              0.339303255800058,
+              0.3398807182016587
+            ],
+            "semantics": "Comparison with measured reference mean, not a calibrated forecast or speedup proof"
+          }
+        ],
+        "additional_profiling_required": true,
+        "milestones": [
+          {
+            "state": "UNKNOWN",
+            "evidence_refs": [
+              "right-sizing-v1-hailo"
+            ],
+            "observed": true
+          },
+          {
+            "state": "COMPATIBILITY_CHECKED",
+            "evidence_refs": [
+              "hailo-physical"
+            ],
+            "observed": true
+          },
+          {
+            "state": "NEEDS_PROFILE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILING",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILED",
+            "evidence_refs": [
+              "a-06cbc0e265904accb68f5bce2e6818d3",
+              "a-0ddf520f190e470694e64cf67082e06e",
+              "a-1110514913c54b88988dc00de98d9e56",
+              "a-122ef8842d6f4b3a82eb00b08f93816c",
+              "a-1957dd598ef4459799dce677428ca01e",
+              "a-1cd3946123e141c9b94ef135a8ead62c",
+              "a-3e7ca8da44154f58bcdfe6898643c602",
+              "a-44cb5d2180ba442dac544c5b6574440c",
+              "a-52e7057f14104580870595c3e2baa9b7",
+              "a-634edc15afd54b7680b832b94e824954",
+              "a-6c8a2bd915004c37bb97325e5a20db10",
+              "a-720171986f6244a59a930b69a88126b2",
+              "a-84ae4b483a1c4428adb678335489c5c9",
+              "a-89600cf775824245b727f17c9bbb7402",
+              "a-8bd7b02900dd47f5a8d32516cb314cd3",
+              "a-c4c8c662e8674c838747356e4aeeb3f9",
+              "a-c94450c575254457beecbeaf63c7702c",
+              "a-df095f8f77d9447ba118efcdc2ee52e4",
+              "a-ecadba5090e547e7bb25e268b084f0ea",
+              "a-f8d7bcdb735c41e0a78eff5224eec96b",
+              "a-fcc02e0f26fc4b7398ff795b359935db",
+              "a-fcdf60c114a04dfe917b05d6b639535a"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDABLE",
+            "evidence_refs": [
+              "rec-5e2cd05cd9b14c0683fbb8f4e193a96e"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDED",
+            "evidence_refs": [
+              "rec-5e2cd05cd9b14c0683fbb8f4e193a96e"
+            ],
+            "observed": true
+          },
+          {
+            "state": "APPROVED",
+            "evidence_refs": [
+              "apr-ae8a927d6cc34caea7fae5b1ea4b398d"
+            ],
+            "observed": true
+          },
+          {
+            "state": "EXECUTED",
+            "evidence_refs": [
+              "j-b479327d28e54ce7886352dc9c8bc609"
+            ],
+            "observed": true
+          },
+          {
+            "state": "VERIFIED",
+            "evidence_refs": [
+              "a-0ddf520f190e470694e64cf67082e06e"
+            ],
+            "observed": true
+          }
+        ],
+        "semantics": "Evidence projection, not a new Job state machine. VERIFIED means independent actual/reference comparison; no speedup or calibrated coverage guarantee."
+      }
+    },
+    {
+      "workload_ref": "right-sizing-v1-w1-reference",
+      "observed_at": "2026-10-07T12:02:39.458445+00:00",
+      "lifecycle": {
+        "schema_version": "right-sizing-lifecycle-v1",
+        "workload_ref": "right-sizing-v1-w1-reference",
+        "workload_signature": "sha256:fd1285e56477a66ca6c40e71bff78bf3f18fd75bec31027ee1f3160a2de044bb",
+        "workload_digest": "sha256:5effb3812bd5689726416b6cc9b748350a70ef44b32af9fb5ab000cb3fdb611f",
+        "state": "RECOMMENDABLE",
+        "recommendability": {
+          "status": "PRESERVE_BASELINE_UNCERTAINTY",
+          "ranking": [
+            {
+              "candidate_ref": "cpu2-mem1024",
+              "mean_seconds": 0.046651341719552875,
+              "interval_seconds": [
+                0.04641203740109531,
+                0.046890646038010436
+              ],
+              "independent_runs": 4,
+              "evidence_refs": [
+                "a-6a10b8a1af6e49b88baccea3223657ef",
+                "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+                "a-bab527001a124f5484138c451452ec31",
+                "a-457d04d0f32443428273631aa0b56655"
+              ]
+            },
+            {
+              "candidate_ref": "cpu2-mem2048",
+              "mean_seconds": 0.046717152534984055,
+              "interval_seconds": [
+                0.046441060671233506,
+                0.046993244398734604
+              ],
+              "independent_runs": 5,
+              "evidence_refs": [
+                "a-4e68a34f026c4c8d97186c44c21942c8",
+                "a-0fd85076601342eeb616af127a0faf8e",
+                "a-fb9127fee5d04dcbb635893c7eda835a",
+                "a-cab29de55860407199180a79544ef54f",
+                "a-2cf7e7a4120b4ea69fac96b3f5816d7a"
+              ]
+            },
+            {
+              "candidate_ref": "cpu1-mem2048",
+              "mean_seconds": 0.04680028810010602,
+              "interval_seconds": [
+                0.046326364972134305,
+                0.04727421122807774
+              ],
+              "independent_runs": 6,
+              "evidence_refs": [
+                "a-2ad3b82c07ea4513b404cc8a0d369780",
+                "a-b88600f12123441aa8b4ff46529cf4bf",
+                "a-bc0aefc98d5c43bc8857dd5b47749c26",
+                "a-7d78ddb39dc0466f96e1f0c120b81af8",
+                "a-0672aeb86a3f4c06bd14d9a497874155",
+                "a-54deecc2a5124ec0acb61cb960fb997a"
+              ]
+            },
+            {
+              "candidate_ref": "cpu1-mem1024",
+              "mean_seconds": 0.04714744761586189,
+              "interval_seconds": [
+                0.04626981943528357,
+                0.04802507579644021
+              ],
+              "independent_runs": 5,
+              "evidence_refs": [
+                "a-b4a658d8d57d40d98afed6290aec0ae8",
+                "a-c811b34353a1433b8f87490e47bdbe2a",
+                "a-5073f02581d3469b93b4de105c88a94b",
+                "a-f77f0925a1624548940325d533d40eab",
+                "a-ff532a49c22a450484635334e9a0770c"
+              ]
+            },
+            {
+              "candidate_ref": "cpu0-5-mem2048",
+              "mean_seconds": 0.09478744483203627,
+              "interval_seconds": [
+                0.0904116809906213,
+                0.09916320867345124
+              ],
+              "independent_runs": 4,
+              "evidence_refs": [
+                "a-6cf3e53b03344ab0b163d42ee8742e3f",
+                "a-88f6010e389142528f4e6c1d7ff80d05",
+                "a-0708be129a94418c998e86c0a22daddb",
+                "a-352d30e521b04ec880bfe4e242b33dce"
+              ]
+            },
+            {
+              "candidate_ref": "cpu0-5-mem1024",
+              "mean_seconds": 0.09587783059881379,
+              "interval_seconds": [
+                0.09562699905037009,
+                0.09612866214725749
+              ],
+              "independent_runs": 3,
+              "evidence_refs": [
+                "a-dfb45341f29b4705a7670043b61d411a",
+                "a-9acaa6def25b44ac9b83977687790fcb",
+                "a-ba6be0832af841a088ab17ea52b931c8"
+              ]
+            }
+          ],
+          "excluded": {},
+          "approval_authorized": false
+        },
+        "distribution": {
+          "status": "OBSERVED_QUALIFIED_SCOPE",
+          "in_distribution": true,
+          "predictive_interval_calibration": "NOT_QUALIFIED",
+          "semantics": "Exact workload/context evidence scope, not statistical OOD probability"
+        },
+        "reasons": [],
+        "assessed_at": "2026-10-07T12:02:39.456446+00:00",
+        "candidates": [
+          {
+            "candidate_ref": "cpu0-5-mem1024",
+            "context_signature": "sha256:2dab040bdfac24b848a4782e213cee8e15f305e7552b49636dd9b7a0e6574f02",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu0-5-mem2048",
+            "context_signature": "sha256:753c054b9badf79b1e2ede803a746d5cc363cf00eac7940392cbf611f3c27ae7",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu1-mem1024",
+            "context_signature": "sha256:372d37cfea6511319956788e6ce464ac872706816ebf1038d28ab0a2086c3a7c",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu1-mem2048",
+            "context_signature": "sha256:84350a32b6e0013368e0007c2a23e34e9128f5f23f9e417ee4ff8bb0b328fff0",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu2-mem1024",
+            "context_signature": "sha256:13e45002a7dd0e59480326af41a82fc5244d1f9454237da6a1838835ba3a265c",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu2-mem2048",
+            "context_signature": "sha256:7af677d98482793723a3fe112f4e142eabba81237003b4646e4471653d00de77",
+            "compatible": true,
+            "reasons": []
+          }
+        ],
+        "profile_refs": [
+          "a-0672aeb86a3f4c06bd14d9a497874155",
+          "a-0708be129a94418c998e86c0a22daddb",
+          "a-0fd85076601342eeb616af127a0faf8e",
+          "a-160cef2b3fdc4d11bccc018c6617d110",
+          "a-1be5afd852f843c48624be71c99677d5",
+          "a-27a3a9b977ea49efb77bf770a4188579",
+          "a-2ad3b82c07ea4513b404cc8a0d369780",
+          "a-2cf7e7a4120b4ea69fac96b3f5816d7a",
+          "a-2d2db34997c24809bbf8f822c110868e",
+          "a-352d30e521b04ec880bfe4e242b33dce",
+          "a-457d04d0f32443428273631aa0b56655",
+          "a-4e68a34f026c4c8d97186c44c21942c8",
+          "a-5073f02581d3469b93b4de105c88a94b",
+          "a-54deecc2a5124ec0acb61cb960fb997a",
+          "a-6a10b8a1af6e49b88baccea3223657ef",
+          "a-6cf3e53b03344ab0b163d42ee8742e3f",
+          "a-7acdbbb16c664d77934b92358d7aacaf",
+          "a-7d78ddb39dc0466f96e1f0c120b81af8",
+          "a-88f6010e389142528f4e6c1d7ff80d05",
+          "a-9acaa6def25b44ac9b83977687790fcb",
+          "a-a13d45ee38da4968900f30a24b52686b",
+          "a-a1d91b7b23e446ec9a6f7ff82b09d7d4",
+          "a-a69bc63449314488ad1e871adcc53a13",
+          "a-acb54433664a45a5a3cc6b907b12477e",
+          "a-ae91915bb9a1455fa13feb59aedc125b",
+          "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+          "a-b4a658d8d57d40d98afed6290aec0ae8",
+          "a-b88600f12123441aa8b4ff46529cf4bf",
+          "a-ba6be0832af841a088ab17ea52b931c8",
+          "a-bab527001a124f5484138c451452ec31",
+          "a-bc0aefc98d5c43bc8857dd5b47749c26",
+          "a-c0e1e8c7e17d4308b624acd4fc449d3e",
+          "a-c811b34353a1433b8f87490e47bdbe2a",
+          "a-cab29de55860407199180a79544ef54f",
+          "a-d391275db5ba41e39b328094edf8ce5c",
+          "a-d3e80dc0b74a4ffaa7b63727ddfb697d",
+          "a-dfb45341f29b4705a7670043b61d411a",
+          "a-e1d9cb0bf6e546959f7102691407f684",
+          "a-f77f0925a1624548940325d533d40eab",
+          "a-fb9127fee5d04dcbb635893c7eda835a",
+          "a-ff532a49c22a450484635334e9a0770c"
+        ],
+        "study_refs": [
+          "study-221b9ccbd52b4879be09a627ef67511c"
+        ],
+        "recommendation_ref": null,
+        "current_validity": null,
+        "feedback": [],
+        "additional_profiling_required": false,
+        "milestones": [
+          {
+            "state": "UNKNOWN",
+            "evidence_refs": [
+              "right-sizing-v1-w1-reference"
+            ],
+            "observed": true
+          },
+          {
+            "state": "COMPATIBILITY_CHECKED",
+            "evidence_refs": [
+              "cpu0-5-mem1024",
+              "cpu0-5-mem2048",
+              "cpu1-mem1024",
+              "cpu1-mem2048",
+              "cpu2-mem1024",
+              "cpu2-mem2048"
+            ],
+            "observed": true
+          },
+          {
+            "state": "NEEDS_PROFILE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILING",
+            "evidence_refs": [
+              "study-221b9ccbd52b4879be09a627ef67511c"
+            ],
+            "observed": true
+          },
+          {
+            "state": "PROFILED",
+            "evidence_refs": [
+              "a-0672aeb86a3f4c06bd14d9a497874155",
+              "a-0708be129a94418c998e86c0a22daddb",
+              "a-0fd85076601342eeb616af127a0faf8e",
+              "a-160cef2b3fdc4d11bccc018c6617d110",
+              "a-1be5afd852f843c48624be71c99677d5",
+              "a-27a3a9b977ea49efb77bf770a4188579",
+              "a-2ad3b82c07ea4513b404cc8a0d369780",
+              "a-2cf7e7a4120b4ea69fac96b3f5816d7a",
+              "a-2d2db34997c24809bbf8f822c110868e",
+              "a-352d30e521b04ec880bfe4e242b33dce",
+              "a-457d04d0f32443428273631aa0b56655",
+              "a-4e68a34f026c4c8d97186c44c21942c8",
+              "a-5073f02581d3469b93b4de105c88a94b",
+              "a-54deecc2a5124ec0acb61cb960fb997a",
+              "a-6a10b8a1af6e49b88baccea3223657ef",
+              "a-6cf3e53b03344ab0b163d42ee8742e3f",
+              "a-7acdbbb16c664d77934b92358d7aacaf",
+              "a-7d78ddb39dc0466f96e1f0c120b81af8",
+              "a-88f6010e389142528f4e6c1d7ff80d05",
+              "a-9acaa6def25b44ac9b83977687790fcb",
+              "a-a13d45ee38da4968900f30a24b52686b",
+              "a-a1d91b7b23e446ec9a6f7ff82b09d7d4",
+              "a-a69bc63449314488ad1e871adcc53a13",
+              "a-acb54433664a45a5a3cc6b907b12477e",
+              "a-ae91915bb9a1455fa13feb59aedc125b",
+              "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+              "a-b4a658d8d57d40d98afed6290aec0ae8",
+              "a-b88600f12123441aa8b4ff46529cf4bf",
+              "a-ba6be0832af841a088ab17ea52b931c8",
+              "a-bab527001a124f5484138c451452ec31",
+              "a-bc0aefc98d5c43bc8857dd5b47749c26",
+              "a-c0e1e8c7e17d4308b624acd4fc449d3e",
+              "a-c811b34353a1433b8f87490e47bdbe2a",
+              "a-cab29de55860407199180a79544ef54f",
+              "a-d391275db5ba41e39b328094edf8ce5c",
+              "a-d3e80dc0b74a4ffaa7b63727ddfb697d",
+              "a-dfb45341f29b4705a7670043b61d411a",
+              "a-e1d9cb0bf6e546959f7102691407f684",
+              "a-f77f0925a1624548940325d533d40eab",
+              "a-fb9127fee5d04dcbb635893c7eda835a",
+              "a-ff532a49c22a450484635334e9a0770c"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDABLE",
+            "evidence_refs": [
+              "a-6a10b8a1af6e49b88baccea3223657ef",
+              "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+              "a-bab527001a124f5484138c451452ec31",
+              "a-457d04d0f32443428273631aa0b56655"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "APPROVED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "EXECUTED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "VERIFIED",
+            "evidence_refs": [],
+            "observed": false
+          }
+        ],
+        "semantics": "Evidence projection, not a new Job state machine. VERIFIED means independent actual/reference comparison; no speedup or calibrated coverage guarantee."
+      }
+    },
+    {
+      "workload_ref": "right-sizing-v1-w2-reference",
+      "observed_at": "2026-10-07T12:02:39.680617+00:00",
+      "lifecycle": {
+        "schema_version": "right-sizing-lifecycle-v1",
+        "workload_ref": "right-sizing-v1-w2-reference",
+        "workload_signature": "sha256:4ef5789a814dfcfd891e2ff607912313bdcc711d93a162fccb674d0e4242e2ec",
+        "workload_digest": "sha256:cc340006e3e1c8254238faf6d56f9f72479dfe219820761154311a566effce0c",
+        "state": "RECOMMENDABLE",
+        "recommendability": {
+          "status": "MEASURED_RECOMMENDATION",
+          "ranking": [
+            {
+              "candidate_ref": "cpu2-mem2048",
+              "mean_seconds": 0.2607306621891136,
+              "interval_seconds": [
+                0.260403127948712,
+                0.2610581964295152
+              ],
+              "independent_runs": 6,
+              "evidence_refs": [
+                "a-c490b32feca048dd86ca80659c69e066",
+                "a-3cece8d6d63a47539521756aec3cfcad",
+                "a-5efa7d349636483fbe2bf3db99f1c829",
+                "a-4234e2d6f2ea49f7bf55c771edbf80b0",
+                "a-427321c9d900458e930c83a5cc7b945d",
+                "a-85049b46af55468f91d630853a7aa891"
+              ]
+            },
+            {
+              "candidate_ref": "cpu1-mem2048",
+              "mean_seconds": 0.26349383233658347,
+              "interval_seconds": [
+                0.2627929537676081,
+                0.26419471090555885
+              ],
+              "independent_runs": 6,
+              "evidence_refs": [
+                "a-e733a3345cf84f27876e072ac2e7a51e",
+                "a-754039f6ccd148d18731540e47d68500",
+                "a-62d3f9c4d35e433cb6eb24610ca1e324",
+                "a-5ceabe1ff1274dc8935e2ef55c7f1947",
+                "a-438571f0020a42469c212cf7c3b8fdb8",
+                "a-9a6a4ce6293e49ab928883958572e7da"
+              ]
+            }
+          ],
+          "excluded": {
+            "cpu0-5-mem1024": [
+              "NEEDS_PROFILE"
+            ],
+            "cpu0-5-mem2048": [
+              "NEEDS_PROFILE"
+            ],
+            "cpu1-mem1024": [
+              "NEEDS_PROFILE"
+            ],
+            "cpu2-mem1024": [
+              "NEEDS_PROFILE"
+            ]
+          },
+          "approval_authorized": false
+        },
+        "distribution": {
+          "status": "OBSERVED_QUALIFIED_SCOPE",
+          "in_distribution": true,
+          "predictive_interval_calibration": "NOT_QUALIFIED",
+          "semantics": "Exact workload/context evidence scope, not statistical OOD probability"
+        },
+        "reasons": [],
+        "assessed_at": "2026-10-07T12:02:39.677981+00:00",
+        "candidates": [
+          {
+            "candidate_ref": "cpu0-5-mem1024",
+            "context_signature": "sha256:884ef870f5a34c2d3db663c2c8006ed00b86a945eb03744b7d986b884d1433c8",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu0-5-mem2048",
+            "context_signature": "sha256:6bbe889644f9994be25a9b069c43dae782eb57948b0a8b46914175d4c20b5cdf",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu1-mem1024",
+            "context_signature": "sha256:20c1066356dfa9008e47d5e9ecfa434b1d289dbd07578bc2957c8a6b5676b3a0",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu1-mem2048",
+            "context_signature": "sha256:b77ce0d03a6257bcfd633593049b6962a24eee1bac3f4ced125a9514233db5fc",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu2-mem1024",
+            "context_signature": "sha256:fad52be76daf9376819acd405bec63b801e7e2bf8d718e70a80037a35335f903",
+            "compatible": true,
+            "reasons": []
+          },
+          {
+            "candidate_ref": "cpu2-mem2048",
+            "context_signature": "sha256:bb57621f2be21a478841e2ce2aa4965376c180a378c6825a2dfbc0b1cbac6090",
+            "compatible": true,
+            "reasons": []
+          }
+        ],
+        "profile_refs": [
+          "a-175e6b040cb54fc7bbe904855d849078",
+          "a-18c3f1c062ad468b945699acf87d26c4",
+          "a-1f2e6affe3514c7a9d57b331536b87dd",
+          "a-37db3256ffc54123be6f90b94dd16692",
+          "a-3a02504f727348f1876dd9be9ae81275",
+          "a-3cece8d6d63a47539521756aec3cfcad",
+          "a-4234e2d6f2ea49f7bf55c771edbf80b0",
+          "a-427321c9d900458e930c83a5cc7b945d",
+          "a-438571f0020a42469c212cf7c3b8fdb8",
+          "a-4594a3cc61334e67909ff2dcffd12d8a",
+          "a-5ceabe1ff1274dc8935e2ef55c7f1947",
+          "a-5efa7d349636483fbe2bf3db99f1c829",
+          "a-62d3f9c4d35e433cb6eb24610ca1e324",
+          "a-6fa0fe3eedcc4ffda8dde4e21c9f06b1",
+          "a-754039f6ccd148d18731540e47d68500",
+          "a-8077360716284f5fa965122f8eb5559c",
+          "a-834ef38e4a5c4ef49ac4179e86f1cb5b",
+          "a-85049b46af55468f91d630853a7aa891",
+          "a-8710fc5b2f644879b7faf9e6d883252b",
+          "a-950dfaf7d8f64404aeba92a59cb3d2e9",
+          "a-9a6a4ce6293e49ab928883958572e7da",
+          "a-a3b2fa45b1344990b44b2d6c5bc6ed4f",
+          "a-b88e9298ef1842ea88fec09d4256856e",
+          "a-c490b32feca048dd86ca80659c69e066",
+          "a-cbcaa7249cd148a79dbbc583ece95367",
+          "a-ce3657a6dcc342caa39ce9c897ac5e2d",
+          "a-cfc7a2849c114855beef7ec5e1573a31",
+          "a-e3ecf8633b564149a5c8368c99eb5180",
+          "a-e733a3345cf84f27876e072ac2e7a51e",
+          "a-fae4b29b850d4031846594794a95026f"
+        ],
+        "study_refs": [
+          "study-84dd07c77fcd4fcdb9c448b9a6a04c52"
+        ],
+        "recommendation_ref": null,
+        "current_validity": null,
+        "feedback": [],
+        "additional_profiling_required": false,
+        "milestones": [
+          {
+            "state": "UNKNOWN",
+            "evidence_refs": [
+              "right-sizing-v1-w2-reference"
+            ],
+            "observed": true
+          },
+          {
+            "state": "COMPATIBILITY_CHECKED",
+            "evidence_refs": [
+              "cpu0-5-mem1024",
+              "cpu0-5-mem2048",
+              "cpu1-mem1024",
+              "cpu1-mem2048",
+              "cpu2-mem1024",
+              "cpu2-mem2048"
+            ],
+            "observed": true
+          },
+          {
+            "state": "NEEDS_PROFILE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILING",
+            "evidence_refs": [
+              "study-84dd07c77fcd4fcdb9c448b9a6a04c52"
+            ],
+            "observed": true
+          },
+          {
+            "state": "PROFILED",
+            "evidence_refs": [
+              "a-175e6b040cb54fc7bbe904855d849078",
+              "a-18c3f1c062ad468b945699acf87d26c4",
+              "a-1f2e6affe3514c7a9d57b331536b87dd",
+              "a-37db3256ffc54123be6f90b94dd16692",
+              "a-3a02504f727348f1876dd9be9ae81275",
+              "a-3cece8d6d63a47539521756aec3cfcad",
+              "a-4234e2d6f2ea49f7bf55c771edbf80b0",
+              "a-427321c9d900458e930c83a5cc7b945d",
+              "a-438571f0020a42469c212cf7c3b8fdb8",
+              "a-4594a3cc61334e67909ff2dcffd12d8a",
+              "a-5ceabe1ff1274dc8935e2ef55c7f1947",
+              "a-5efa7d349636483fbe2bf3db99f1c829",
+              "a-62d3f9c4d35e433cb6eb24610ca1e324",
+              "a-6fa0fe3eedcc4ffda8dde4e21c9f06b1",
+              "a-754039f6ccd148d18731540e47d68500",
+              "a-8077360716284f5fa965122f8eb5559c",
+              "a-834ef38e4a5c4ef49ac4179e86f1cb5b",
+              "a-85049b46af55468f91d630853a7aa891",
+              "a-8710fc5b2f644879b7faf9e6d883252b",
+              "a-950dfaf7d8f64404aeba92a59cb3d2e9",
+              "a-9a6a4ce6293e49ab928883958572e7da",
+              "a-a3b2fa45b1344990b44b2d6c5bc6ed4f",
+              "a-b88e9298ef1842ea88fec09d4256856e",
+              "a-c490b32feca048dd86ca80659c69e066",
+              "a-cbcaa7249cd148a79dbbc583ece95367",
+              "a-ce3657a6dcc342caa39ce9c897ac5e2d",
+              "a-cfc7a2849c114855beef7ec5e1573a31",
+              "a-e3ecf8633b564149a5c8368c99eb5180",
+              "a-e733a3345cf84f27876e072ac2e7a51e",
+              "a-fae4b29b850d4031846594794a95026f"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDABLE",
+            "evidence_refs": [
+              "a-c490b32feca048dd86ca80659c69e066",
+              "a-3cece8d6d63a47539521756aec3cfcad",
+              "a-5efa7d349636483fbe2bf3db99f1c829",
+              "a-4234e2d6f2ea49f7bf55c771edbf80b0",
+              "a-427321c9d900458e930c83a5cc7b945d",
+              "a-85049b46af55468f91d630853a7aa891"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "APPROVED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "EXECUTED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "VERIFIED",
+            "evidence_refs": [],
+            "observed": false
+          }
+        ],
+        "semantics": "Evidence projection, not a new Job state machine. VERIFIED means independent actual/reference comparison; no speedup or calibrated coverage guarantee."
+      }
+    }
+  ],
+  "scope": "After projection fix; stored actual hardware profiles, no replay or fabricated milestone timestamp; expiry can supersede historic verification"
+}

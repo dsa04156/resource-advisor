@@ -217,8 +217,10 @@ collector-on/off 실험이 없어서 전체 instrumentation slowdown으로 해�
 W1 phase trace, 새 job-attributed eBPF/PSI와 장기 thermal qualification은 unknown이다.
 
 새 Hailo의 중간 lifecycle projection은 옛 cold-start 기록 때문에 새로운
-profile을 가렸다. 코드와 regression test를 수정했지만 고정된 실험 중간에는
-실배포를 교체하지 않았다. Completed Pod cleanup에 따른 외부 로그 수집
+profile을 가렸다. 코드와 regression test를 수정했고 고정된 실험 중간에는
+실배포를 교체하지 않았다. 이후 [live read-only API](evidence/right-sizing-lifecycle-readback-v1.json)
+readback은 만료한 원래 추천 3개를 NEEDS_RECONFIRMATION으로, 이력이 있는
+reference workload 2개를 RECOMMENDABLE로 투영했고 DB/job/usage를 변경하지 않았다. Completed Pod cleanup에 따른 외부 로그 수집
 중단은 저장된 native termination receipt와 같은 Job ID로 복구한다. Replay로
 유리한 결과를 선택하지 않는다.
 
@@ -229,7 +231,10 @@ independent confirmation의 결합, explicit approval과 native execution 연결
 새 immutable actual/reference feedback, cost-aware 평가 및 null result 보존이다.
 새 GPU 12개와 Hailo 1개의 approved feedback, source-history 재사용과 expiry 거부가 실제로 검증됐다. 최종 claim
 gate는 [claim audit](right-sizing-claim-audit.md)에서 계속 갱신한다.
-BO 우위와 profiling 순이익은 검증되지 않으면 방법 구현 및 null result로 보고한다.
+BO 우위와 profiling 순이익은 방법 구현 및 null/negative result로 보고한다.
+C4는 실제 N 범위의 비용 평가와 회수 실패 판별이며, 미래 반복 횟수의 손익분기를
+예측하거나 ROI에 따라 자동 추천을 차단하는 온라인 정책은 구현·검증했다고
+주장하지 않는다.
 
 ## 12. Limitations
 
@@ -259,10 +264,23 @@ uv run --with matplotlib==3.11.1 python examples/plot_right_sizing.py docs/evide
 
 > 처음 등록된 GPU·NPU AI 워크로드의 실행 조건을 검증하고, 승인된 profiling과
 > 실측 기반 탐색·독립 확인을 Kubernetes/Kueue 실행에 연결해, 추천 근거·실행
-> 오차·비용·유효성을 다음 자원 판단에 반영하는 profile-guided resource advisor
-> 계층을 구현·검증했다.
+> 오차·유효성을 다음 자원 판단에 반영하는 profile-guided resource advisor 계층을
+> 구현·검증하고, profiling을 포함한 실제 비용과 순효과를 평가했다.
 
 각 구절은 [claim audit](right-sizing-claim-audit.md)의 cold-start, compatibility,
 actual acquisition, confirmation, approved feedback, post-main lookup, expiry
 행에 연결한다. Slurm 공통 계약과 기존 실행 복구는 재사용했지만 이번 새
 Slurm feedback hardware gate가 막혀 있어 목표 문장 전체를 채택하지 않는다.
+
+
+최종 [배포/보존 검증](evidence/right-sizing-deployment-verification-v1.json)은
+API·Kubernetes worker·Slurm worker의 같은 source hash, 세 ArgoCD 앱의 정상 상태,
+기준선 entity 4,782개·terminal Job/usage 660개의 불변을 확인했다. 실험의 native
+Job 151개도 유지된다. [종료 Pod 정리](evidence/right-sizing-terminal-pod-cleanup-v1.json)는
+owner/Pod UID precondition으로 남은 5개만 삭제했고 다른 Pod는 0개 삭제했다.
+CI는 Python3.11/3.13 각각 SQLite 1,137 passed/4 skipped, PostgreSQL 1,141 passed였다.
+이 CI는 software 계약 검증이며 hardware benchmark가 아니다.
+
+[새 Slurm readiness](evidence/right-sizing-slurm-readiness-v2.json)는 controller
+SSH network unreachable, Orin SSH 성공 뒤 native `sinfo` RPC timeout을 구분한다.
+Slurm worker의 새 source 배포가 이 물리적 막힘을 해결했다는 뜻은 아니다.

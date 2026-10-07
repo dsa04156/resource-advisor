@@ -1,0 +1,23 @@
+{
+  "schema_version": "right-sizing-slurm-readiness-v2",
+  "observed_at": "2026-10-07T12:05:45.681076+00:00",
+  "read_only": true,
+  "checks": [
+    {
+      "role": "controller",
+      "ssh_authenticated": false,
+      "status": "BLOCKED",
+      "reason": "CONTROLLER_NETWORK_UNREACHABLE"
+    },
+    {
+      "role": "slurm_orin",
+      "ssh_authenticated": true,
+      "native_command": "sinfo",
+      "status": "BLOCKED",
+      "reason": "NATIVE_RPC_TIMEOUT"
+    }
+  ],
+  "new_slurm_jobs": 0,
+  "changed_cluster_or_driver_settings": false,
+  "overall_goal_complete": false
+}

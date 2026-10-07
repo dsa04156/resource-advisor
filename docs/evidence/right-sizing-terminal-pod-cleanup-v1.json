@@ -1,0 +1,32 @@
+{
+  "schema_version": "right-sizing-terminal-pod-cleanup-v1",
+  "observed_at": "2026-10-07T12:17:18.524982+00:00",
+  "owned_native_jobs": 151,
+  "removed_terminal_pods": [
+    {
+      "pod_uid": "e9c7cb30-ce96-4b0a-a575-4720da189104",
+      "terminal_phase": "Succeeded"
+    },
+    {
+      "pod_uid": "950ccbe5-a51d-4f49-b287-67e6750b1437",
+      "terminal_phase": "Succeeded"
+    },
+    {
+      "pod_uid": "4d0988f8-6a56-496e-a25d-01db1c20aeb3",
+      "terminal_phase": "Succeeded"
+    },
+    {
+      "pod_uid": "7a4888a8-9fdc-419b-9f00-f87f82eb5d2d",
+      "terminal_phase": "Succeeded"
+    },
+    {
+      "pod_uid": "71117207-5a77-4012-a3a5-4ce2e3fa3fa2",
+      "terminal_phase": "Succeeded"
+    }
+  ],
+  "remaining_own_pods": 0,
+  "native_jobs_results_profiles_ledgers_artifacts_preserved": true,
+  "unrelated_pods_deleted": 0,
+  "preconditions": "Exact native Job owner UID + terminal Pod phase + API DeleteOptions Pod UID",
+  "new_jobs": 0
+}
