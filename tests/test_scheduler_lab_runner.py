@@ -157,3 +157,39 @@ def test_burst_submits_ten_concurrently_and_requires_native_queue_and_results():
     assert not waits[0]({label: {"state": "RUNNING"} for label in labels})
     done[labels[-1]]["pods"] = []
     assert not waits[1](done)  # Native success alone is insufficient numerical evidence.
+
+
+def test_registered_batch_recovers_lost_receipt_with_same_key_and_keeps_ten_rows(monkeypatch):
+    import threading
+
+    a = runner()
+    a.report = lambda *args: None
+    a.tick = lambda *args: None
+    monkeypatch.setattr("time.sleep", lambda _: None)
+    lock = threading.Lock()
+    accepted = {}
+    retries = []
+    sizes = []
+
+    def api(path, body=None, key=None):
+        if path == "/jobs":
+            with lock:
+                if key not in accepted:
+                    accepted[key] = {"job_id": key, "state": "RECEIVED"}
+                    raise TimeoutError("server accepted; response was lost")
+                retries.append(key)
+                return accepted[key]
+        return {"state": "SUCCEEDED", "backend": "kubernetes", "result": {"valid": True}}
+
+    a.api = api
+    a.report = lambda *args: sizes.append(len(a.snapshot["jobs"]))
+    tasks = [
+        {"name": f"request-{i}", "device_class": "gpu", "workload_ref": "w", "profile_ref": "p"}
+        for i in range(10)
+    ]
+    a.registered_workloads(tasks, "ten")
+    assert len(accepted) == 10 and set(retries) == set(accepted)
+    assert sizes and all(size == 10 for size in sizes)
+    assert len(a.snapshot["platform_jobs"]) == 10
+    assert [j["label"] for j in a.snapshot["jobs"]] == [t["name"] for t in tasks]
+    assert all(j["state"] == "SUCCEEDED" for j in a.snapshot["jobs"])

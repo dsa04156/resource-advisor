@@ -44,3 +44,10 @@ so simultaneous arrivals see earlier accepted requests. The native scheduler sti
 owns admission and resource allocation. This is neither a global distributed GPU
 lease nor quota enforcement across Slurm and Kubernetes. There is no new runtime
 upgrade, physical GPU pooling, cross-scheduler DDP, or automatic model qualification.
+
+The ten-request registered runner allows 60 seconds for serialized acceptance.
+Transient receipt failures retry the identical request and idempotency key at most
+three times. The board keeps all ten requested rows from submission onward; a
+requested row is not native admission evidence. Successful receipts are retained
+for cleanup even if another submission fails. Process death or exhaustion of all
+receipt retries still requires reconciliation; this is not crash-proof ownership.

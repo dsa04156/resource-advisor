@@ -12,8 +12,9 @@ import re
 import ssl
 import subprocess
 import time
+import urllib.error
 import urllib.request
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 
@@ -43,7 +44,11 @@ class Agent:
                 **({"Idempotency-Key": key} if key else {}),
             },
         )
-        with urllib.request.urlopen(req, context=self.context, timeout=15) as response:
+        # Concurrent automatic submissions serialize candidate selection server-side.
+        # A lost receipt is retried with the identical key, never a fresh job.
+        with urllib.request.urlopen(
+            req, context=self.context, timeout=60 if path == "/jobs" else 15
+        ) as response:
             return json.load(response)
 
     def heartbeat(self):
@@ -452,31 +457,56 @@ class Agent:
             heterogeneous=True,
             phase="SUBMIT",
             platform_jobs=[],
-            jobs=[],
+            jobs=[
+                {
+                    "id": f"{self.ref}-registered-{i}",
+                    "label": task["name"],
+                    "state": "REQUESTED",
+                    "device_class": task["device_class"],
+                    "workload_ref": task["workload_ref"],
+                }
+                for i, task in enumerate(tasks)
+            ],
+            request_batch={"count": len(tasks), "submission": "concurrent"},
             explanation=title
             + " 등록 작업을 각각의 네이티브 큐에 제출합니다. 작업별 실제 backend·장치·결과를 관측합니다.",
         )
 
+        self.report(f"독립 요청 {len(tasks)}개 · 플랫폼 접수 시작")
+
         def submit(item):
             i, task = item
-            return task, self.api(
-                "/jobs",
-                {
-                    "workload_ref": task["workload_ref"],
-                    "scheduling_profile_ref": task["profile_ref"],
-                    "mode": "observe",
-                },
-                key=f"{self.ref}-registered-{i}",
-            )
+            for attempt in range(3):
+                try:
+                    return (
+                        i,
+                        task,
+                        self.api(
+                            "/jobs",
+                            {
+                                "workload_ref": task["workload_ref"],
+                                "scheduling_profile_ref": task["profile_ref"],
+                                "mode": "observe",
+                            },
+                            key=f"{self.ref}-registered-{i}",
+                        ),
+                    )
+                except (TimeoutError, ConnectionError, urllib.error.URLError) as exc:
+                    if (isinstance(exc, urllib.error.HTTPError) and exc.code < 500) or attempt == 2:
+                        raise
+                    time.sleep(0.5)
 
         # The native adapters remain independent; only acceptance is concurrent.
         failures = []
         with ThreadPoolExecutor(max_workers=min(len(tasks), 10)) as pool:
             futures = [pool.submit(submit, item) for item in enumerate(tasks)]
-            for future in futures:
+            for future in as_completed(futures):
                 try:
-                    task, result = future.result()
-                    self.snapshot["platform_jobs"].append({**task, "job_id": result["job_id"]})
+                    i, task, result = future.result()
+                    self.snapshot["platform_jobs"].append(
+                        {**task, "job_id": result["job_id"], "request_index": i}
+                    )
+                    self.snapshot["jobs"][i].update(id=result["job_id"], state=result["state"])
                     self.report("등록된 " + task["device_class"].upper() + " 작업 접수")
                 except Exception as exc:  # noqa: BLE001 — retain successful receipts for cleanup
                     failures.append(str(exc)[:300])
@@ -485,7 +515,7 @@ class Agent:
         self.snapshot["phase"] = "EXECUTION"
         while True:
             jobs = []
-            for task in self.snapshot["platform_jobs"]:
+            for task in sorted(self.snapshot["platform_jobs"], key=lambda t: t["request_index"]):
                 view = self.api("/jobs/" + task["job_id"] + "/view")
                 jobs.append(
                     {
