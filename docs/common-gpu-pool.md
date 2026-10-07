@@ -61,3 +61,11 @@ operator config declares `gpu_pool.node_aliases` explicitly. The node table and
 job selection use this display mapping; stored native evidence stays unchanged.
 An actually executing registered job also proves its current participation even
 if that route is absent from the submission catalog.
+
+The lab namespace ResourceQuota must also agree with native admission. An older
+`project-gpu-ceiling` restricted `requests.nvidia.com/gpu` to one, although the
+common ClusterQueue admitted three exclusive devices. Long jobs exposed this:
+Kueue admitted the second job, then Kubernetes refused its Pod with `FailedCreate`.
+The example now includes a ceiling of three in `resource-advisor-lab`. Apply this
+only to the owned lab namespace after inspecting existing quotas; other projects
+keep their own budgets. Logical shared slots and NPU resources remain distinct.

@@ -146,7 +146,9 @@ def build(report, *, ref, project, node, image, shared=False):
         ),
         baseline_candidate_ref="device",
         quality=quality,
-        execution=ExecutionPolicy(max_run_seconds=max(60, duration + 60), max_queue_seconds=300),
+        execution=ExecutionPolicy(
+            max_run_seconds=max(60, duration + 60), max_queue_seconds=300 if duration else 180
+        ),
     )
     return {
         k: v.model_dump(mode="json")

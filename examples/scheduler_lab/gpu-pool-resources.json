@@ -135,6 +135,19 @@
       "spec": {
         "clusterQueue": "hairp-gpu-pool"
       }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ResourceQuota",
+      "metadata": {
+        "name": "project-gpu-ceiling",
+        "namespace": "resource-advisor-lab"
+      },
+      "spec": {
+        "hard": {
+          "requests.nvidia.com/gpu": "3"
+        }
+      }
     }
   ]
 }
