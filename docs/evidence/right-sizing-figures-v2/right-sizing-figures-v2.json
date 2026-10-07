@@ -1,0 +1,195 @@
+{
+  "schema_version": "right-sizing-figure-provenance-v1",
+  "destination": "portfolio web/docs; no journal specification",
+  "experiment_id": "right-sizing-20261007-v1",
+  "matplotlib_version": "3.11.1",
+  "inputs": [
+    {
+      "path": "docs/evidence/right-sizing-gpu-v1.json",
+      "sha256": "980d668402c4a857422fba04489492ce2d2308c08ea4e39e9c0d4ced1e1ca2bd"
+    },
+    {
+      "path": "docs/evidence/right-sizing-trial-plan-v1.json",
+      "sha256": "9663e1b34d57c4de5be767e1582c9bddceb2dd4e153d0caea8faa403b086c479"
+    },
+    {
+      "path": "docs/evidence/right-sizing-reference-recovery-v2.json",
+      "sha256": "83d3b18e0b114e3c1737faeb7752f9906ebca5c6ffb662bc2ce6e900013c2f02"
+    },
+    {
+      "path": "docs/evidence/right-sizing-reference-recovery-plan-v2.json",
+      "sha256": "9aa7311acfb1543f522d69d27e957c84e2e3d5f7b275f61530555189c26b2786"
+    }
+  ],
+  "reference_comparison": {
+    "schema_version": "right-sizing-reference-comparison-v1",
+    "primary_experiment_id": "right-sizing-20261007-v1",
+    "reference_experiment_id": "right-sizing-reference-recovery-20261007-v2",
+    "comparison": [
+      {
+        "workload": "W1",
+        "strategy": "random",
+        "selected_candidate": "cpu1-mem2048",
+        "reference_complete": true,
+        "reference_means_seconds": {
+          "cpu2-mem2048": 0.046661845912846424,
+          "cpu1-mem1024": 0.04726442551085105,
+          "cpu2-mem1024": 0.04667807285053035,
+          "cpu1-mem2048": 0.04696179224022975,
+          "cpu0-5-mem2048": 0.09395237045828253,
+          "cpu0-5-mem1024": 0.09587783059881379
+        },
+        "reference_best_candidate": "cpu2-mem2048",
+        "relative_distance_to_measured_reference": 0.006428085334291206,
+        "reference_attempt_ids": [
+          "a-fb9127fee5d04dcbb635893c7eda835a",
+          "a-5073f02581d3469b93b4de105c88a94b",
+          "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+          "a-cab29de55860407199180a79544ef54f",
+          "a-7d78ddb39dc0466f96e1f0c120b81af8",
+          "a-0672aeb86a3f4c06bd14d9a497874155",
+          "a-88f6010e389142528f4e6c1d7ff80d05",
+          "a-f77f0925a1624548940325d533d40eab",
+          "a-0708be129a94418c998e86c0a22daddb",
+          "a-dfb45341f29b4705a7670043b61d411a",
+          "a-54deecc2a5124ec0acb61cb960fb997a",
+          "a-bab527001a124f5484138c451452ec31",
+          "a-9acaa6def25b44ac9b83977687790fcb",
+          "a-ff532a49c22a450484635334e9a0770c",
+          "a-457d04d0f32443428273631aa0b56655",
+          "a-352d30e521b04ec880bfe4e242b33dce",
+          "a-2cf7e7a4120b4ea69fac96b3f5816d7a",
+          "a-ba6be0832af841a088ab17ea52b931c8"
+        ],
+        "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+      },
+      {
+        "workload": "W1",
+        "strategy": "qlognei",
+        "selected_candidate": "cpu1-mem2048",
+        "reference_complete": true,
+        "reference_means_seconds": {
+          "cpu2-mem2048": 0.046661845912846424,
+          "cpu1-mem1024": 0.04726442551085105,
+          "cpu2-mem1024": 0.04667807285053035,
+          "cpu1-mem2048": 0.04696179224022975,
+          "cpu0-5-mem2048": 0.09395237045828253,
+          "cpu0-5-mem1024": 0.09587783059881379
+        },
+        "reference_best_candidate": "cpu2-mem2048",
+        "relative_distance_to_measured_reference": 0.006428085334291206,
+        "reference_attempt_ids": [
+          "a-fb9127fee5d04dcbb635893c7eda835a",
+          "a-5073f02581d3469b93b4de105c88a94b",
+          "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+          "a-cab29de55860407199180a79544ef54f",
+          "a-7d78ddb39dc0466f96e1f0c120b81af8",
+          "a-0672aeb86a3f4c06bd14d9a497874155",
+          "a-88f6010e389142528f4e6c1d7ff80d05",
+          "a-f77f0925a1624548940325d533d40eab",
+          "a-0708be129a94418c998e86c0a22daddb",
+          "a-dfb45341f29b4705a7670043b61d411a",
+          "a-54deecc2a5124ec0acb61cb960fb997a",
+          "a-bab527001a124f5484138c451452ec31",
+          "a-9acaa6def25b44ac9b83977687790fcb",
+          "a-ff532a49c22a450484635334e9a0770c",
+          "a-457d04d0f32443428273631aa0b56655",
+          "a-352d30e521b04ec880bfe4e242b33dce",
+          "a-2cf7e7a4120b4ea69fac96b3f5816d7a",
+          "a-ba6be0832af841a088ab17ea52b931c8"
+        ],
+        "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+      },
+      {
+        "workload": "W2",
+        "strategy": "random",
+        "selected_candidate": "cpu2-mem2048",
+        "reference_complete": false,
+        "reference_means_seconds": {},
+        "reference_best_candidate": null,
+        "relative_distance_to_measured_reference": null,
+        "reference_attempt_ids": [
+          "a-85049b46af55468f91d630853a7aa891",
+          "a-ce3657a6dcc342caa39ce9c897ac5e2d",
+          "a-ce5d985b448143f78b6ee915f239e1a5"
+        ],
+        "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+      },
+      {
+        "workload": "W2",
+        "strategy": "qlognei",
+        "selected_candidate": "cpu2-mem2048",
+        "reference_complete": false,
+        "reference_means_seconds": {},
+        "reference_best_candidate": null,
+        "relative_distance_to_measured_reference": null,
+        "reference_attempt_ids": [
+          "a-85049b46af55468f91d630853a7aa891",
+          "a-ce3657a6dcc342caa39ce9c897ac5e2d",
+          "a-ce5d985b448143f78b6ee915f239e1a5"
+        ],
+        "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+      }
+    ],
+    "total_gpu_native_jobs": 146,
+    "primary_reservation_by_unit": {
+      "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 285.0
+    },
+    "supplementary_reservation_by_unit": {
+      "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 136.0
+    },
+    "combined_reservation_by_unit": {
+      "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 421.0
+    },
+    "failures_including_original_reference": 3,
+    "cost_policy": "Primary finite-N deployment curves unchanged. Both failed v1 and supplementary v2 characterization costs retained in total research usage.",
+    "overall_goal_complete": false
+  },
+  "transformations": [
+    "Run strict trial auditor first",
+    "Sum actual qualification/study/main costs as defined in raw capture",
+    "No projection beyond N=3",
+    "Reference plot shows every valid fresh confirmation, with arithmetic means"
+  ],
+  "uncertainty": "Reference plot shows raw spread; no confidence/predictive bars or significance claim",
+  "missing_data": "Abstained arms are omitted from lines and explicitly labeled; failed/censored costs remain in audit",
+  "cost_semantics": "Cumulative latency cost: sum of qualification Job latencies, study elapsed (including confirmation/planning/control), and each main API lifecycle latency. Overlapping F0 queue waits are conservatively counted per Job; this is not end-to-end experiment wall time. Reservation uses native scheduled-to-finished duration. Historical image/fixture construction and energy are unmeasured.",
+  "color_redundancy": "markers and line styles identify every arm",
+  "export": {
+    "size_inches": {
+      "cost": [
+        11,
+        9
+      ],
+      "reference": [
+        11,
+        4.8
+      ]
+    },
+    "png_dpi": 160,
+    "opaque_white": true,
+    "svg_fonts": "text; depends on viewer font availability"
+  },
+  "outputs": [
+    {
+      "path": "right-sizing-cost-v2.png",
+      "sha256": "05a9268bc6a83e98d6f9c753d09a123d84c4fa0b08089ed92b71252ea055e130"
+    },
+    {
+      "path": "right-sizing-cost-v2.svg",
+      "sha256": "955e6bda86289dc6850aabbffa7a50a489e8bf7475ef5a71e74dc483b7b942ac"
+    },
+    {
+      "path": "right-sizing-reference-v2.png",
+      "sha256": "37fd30a06c8804df17265660e08c18f0657d25beeaabf7287196e987e4b3ea00"
+    },
+    {
+      "path": "right-sizing-reference-v2.svg",
+      "sha256": "f3fb4060ee279c0bc1ab5de06ae3ef953970698914c6317059149ff193fb36b6"
+    },
+    {
+      "path": "right-sizing-cost-v2.csv",
+      "sha256": "df70dabd5446760c9ac8168b995d0dbd1ffeadcb70efe3c03ee6a9b74517f527"
+    }
+  ]
+}

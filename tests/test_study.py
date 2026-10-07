@@ -9,7 +9,7 @@ from resource_advisor.contracts import JobRequest, ProfilingPolicy, State, Study
 from resource_advisor.search import ask, device_unit, features
 from resource_advisor.service import Rejected, Service
 from resource_advisor.store import jobs
-from resource_advisor.study import Studies
+from resource_advisor.study import Studies, native_startup_budget
 from resource_advisor.worker import Worker
 
 
@@ -248,6 +248,12 @@ def test_actual_botorch_acquisition_has_separate_predictions(study_fixture):
     assert result["candidate_ref"] in {c.ref for c in spec.candidates}
     assert all(p["measured"] is False for p in result["predictions"])
     assert len(result["surrogate"]["training_run_ids"]) == 4
+    timing = result["surrogate"]
+    assert timing["model_fitting_seconds"] >= 0 and timing["acquisition_seconds"] >= 0
+    assert (
+        timing["model_fitting_seconds"] + timing["acquisition_seconds"]
+        <= result["planning_seconds"]
+    )
 
 
 def test_oom_is_never_learned_as_fast_success(bundle):
@@ -260,3 +266,35 @@ def test_oom_is_never_learned_as_fast_success(bundle):
         0,
     )
     assert result["candidate_ref"] is None
+
+
+@pytest.mark.parametrize(
+    "backend,cap,expected",
+    [
+        ("kubernetes", 10, "INSUFFICIENT_NATIVE_STARTUP_BUDGET"),
+        ("kubernetes", 20, "OBSERVED_STARTUP_FITS_BOUND"),
+        ("slurm", 10, "UNKNOWN_STARTUP"),
+    ],
+)
+def test_native_startup_budget_does_not_extend_approved_limits(backend, cap, expected):
+    sources = [
+        {
+            "body": {
+                "attempt_id": "startup-source",
+                "scheduler_submitted_at": "2026-01-01T00:00:00+00:00",
+                "execution_started_at": "2026-01-01T00:00:10+00:00",
+            }
+        }
+    ]
+    assessment = native_startup_budget(backend, cap, sources)
+    assert assessment["status"] == expected
+    assert assessment["native_active_deadline_seconds"] == cap
+    assert (
+        assessment["source_attempts"][0]["attempt_id"] if backend == "kubernetes" else None
+    ) == ("startup-source" if backend == "kubernetes" else None)
+
+
+def test_native_startup_unknown_is_not_zero_or_success_assurance():
+    assessment = native_startup_budget("kubernetes", 10, [{"body": {"attempt_id": "no-clock"}}])
+    assert assessment["status"] == "UNKNOWN_STARTUP"
+    assert assessment["maximum_observed_startup_seconds"] is None

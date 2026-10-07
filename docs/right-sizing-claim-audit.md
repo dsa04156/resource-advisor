@@ -1,6 +1,6 @@
 # Right-sizing claim acceptance audit
 
-상태: **진행 중 / 전체 완료 아님**. 코드 검사, 이전 실장비 증거, 새 실험을
+상태: **K8s core 검증 / Slurm 신규 gate BLOCKED / 전체 완료 아님**. 코드 검사, 이전 실장비 증거, 새 실험을
 분리한다. 이전 결과는 [baseline audit](right-sizing-gap-audit.md)와
 [재계산 기록](evidence/right-sizing-baseline-audit-v2.json)에 보존했다.
 
@@ -10,8 +10,8 @@
 | 승인된 pilot/observe로 profile 생성 | study.py, passive.py | study/passive tests | GPU 4 studies / Hailo 원본 observe 3회 | PASS |
 | Workload/context signature로 이력 구분 | contracts.py, policy.py | contracts/right_sizing tests | 신규 GPU·Hailo digest/context, strict auditor | PASS; shape range는 자동 qualification 아님 |
 | ≥2 실제 accelerator/runtime qualification | policy.py, qualifications.py | qualification tests | GPU F0 4 / Hailo F0 1 | PASS; 등록 장치 전체를 supported로 처리 안 함 |
-| 동일 logical workload 후보 비교 | policy.py, study.py | search/study tests | GPU CPU×memory 6개 구성 | PASS 자원 비교; GPU/NPU task간 NOT_COMPARABLE |
-| 실제 BoTorch ask→native probe→observe | search.py, study.py | test_search.py | 신규 actual BO choices 4개, fallback 0 | PASS; 성능 우위 아님 |
+| 동일 logical workload 후보 비교 | policy.py, study.py | search/study tests | GPU CPU×memory 6개 구성, W1 v2 full reference / W2 incomplete | PASS 자원 비교; GPU/NPU task간 NOT_COMPARABLE |
+| 실제 BoTorch ask→native probe→observe | search.py, study.py | test_study.py | 신규 actual BO choices 4개, fallback 0 | PASS; 성능 우위 아님 |
 | Random/BO 같은 예산 | study.py | trial mutation tests | 각 5 probes, 같은 wall/device/confirmation budget | PASS |
 | 독립 final confirmation | study.py | study/trial auditor tests | W1 3 jobs/study, W2 6 jobs/study | PASS; training profile 재사용 금지 |
 | Actual/reference residual+source ID | right_sizing.py, store.py | right_sizing/trial tests | GPU feedback12 / Hailo feedback1 | PASS; descriptive interval만 |
@@ -20,8 +20,8 @@
 | Kubernetes/Kueue native 실행 | backends.py | backend/worker tests | primary GPU101 native Jobs, Hailo5 | PASS |
 | Slurm native 실행 보존 | backends.py | Slurm recovery tests | 기존 Orin 실제 실행·cancel·response loss/crash recovery | 기존 PASS; 새 controller 접근 BLOCKED |
 | 새 Slurm approved feedback loop | right_sizing.py, backends.py | 공통 terminal tests | 신규 Slurm run 없음 | BLOCKED: controller route / native RPC timeout |
-| Profiling/confirmation/fitting 비용 | study.py, accounting.py | strict cost/budget rejection tests | 신규 GPU/Hailo raw+cost audit | PASS; historical image/energy unknown |
-| 실패/취소/invalid 비용 | accounting.py | terminal/recovery tests | 신규 실패 grid2 / 기존 invalid Slurm·stopped predecessor | PASS; 실패 runtime을 0으로 학습 안 함 |
+| Profiling/confirmation/fitting 비용 | study.py, accounting.py | strict cost/budget rejection tests | 신규 GPU/Hailo raw+total-cost audit | PASS; historical image/energy unknown |
+| 실패/취소/invalid 비용 | accounting.py | terminal/recovery tests | 신규 실패 grid3 / 기존 invalid Slurm·stopped predecessor | PASS; 실패 runtime을 0으로 학습 안 함 |
 | Positive/null/negative 보존 | domain auditors | baseline/trial mutation tests | 기존 BO/transfer/MF, 신규 same-selection·비용 회수 실패 | PASS |
 | 목표 기여 문장 전체 채택 | 이 표, contribution 문서 | evidence auditors | 새 Slurm loop / 같은 logical GPU↔NPU ranking 미증명 | OPEN; 전체 완료·최적화 성공 금지 |
 | Qualified MF-KG | mfkg.py | numerical tests | 실제 calibration NOT_QUALIFIED | 조건부 비활성 |
@@ -44,3 +44,13 @@
 | Profile-guided right-sizing 설계·구현 | 기존 모듈 재사용 + 신규 lifecycle/receipt/auditor | 시스템 계층 기여; native scheduler 기능 개발 주장 금지 |
 
 필수 gate 전체가 닫히기 전에는 전체 완료와 최적화 성공을 선언하지 않는다.
+
+
+새 총 사용량은 [cost capture](evidence/right-sizing-total-cost-capture-v1.json),
+[cost auditor](../examples/audit_right_sizing_cost.py),
+[cost result](evidence/right-sizing-total-cost-audit-v1.json)로 재계산한다.
+추가 reference의 chrono/context/digest/Job 독립성은
+[comparison](evidence/right-sizing-comparison-v1.json)에 분리하며, W2 incomplete를
+0 regret으로 채우지 않는다. Startup budget guard와 fitting/acquisition subphase
+계측은 고정된 실험 이후 source 변경으로, software 검증과 신규 hardware 검증을
+구분한다.

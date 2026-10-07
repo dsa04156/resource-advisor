@@ -177,10 +177,13 @@ def qlognei(candidates, observations, quality, seed):
                 for i in range(3)
             ]
         )
+        fit_started = time.monotonic()
         fit_gpytorch_mll(
             SumMarginalLogLikelihood(model.likelihood, model),
             optimizer_kwargs={"options": {"maxiter": 60}},
         )
+        model_fitting_seconds = time.monotonic() - fit_started
+        acquisition_started = time.monotonic()
         acquisition = qLogNoisyExpectedImprovement(
             model=model,
             X_baseline=train_x,
@@ -194,6 +197,7 @@ def qlognei(candidates, observations, quality, seed):
         selected, value = optimize_acqf_discrete(
             acquisition, q=1, choices=choices, unique=True, max_batch_size=64
         )
+        acquisition_seconds = time.monotonic() - acquisition_started
         index = torch.argmin(torch.sum((choices - selected[0]) ** 2, dim=-1)).item()
         posterior = model.posterior(choices)
         means, std = posterior.mean.detach(), posterior.variance.clamp_min(0).sqrt().detach()
@@ -221,6 +225,8 @@ def qlognei(candidates, observations, quality, seed):
             "feature_schema": schema,
             "training_run_ids": [o["attempt_id"] for o in observations],
             "botorch_version": botorch.__version__,
+            "model_fitting_seconds": model_fitting_seconds,
+            "acquisition_seconds": acquisition_seconds,
             "torch_version": torch.__version__,
             "outputs": ["negative_log_elapsed", "peak_memory_mib", "quality"],
             "validation_error": None,

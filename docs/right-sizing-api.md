@@ -58,3 +58,18 @@ manifest identifies exactly which preserved files were audited. It does not
 contact private hardware/storage and explicitly reports zero new hardware Jobs
 and an open overall goal. Mutation tests reject corrupt digests, missing costs,
 duplicate attempts, changed budgets and reversed/future native timestamps.
+
+
+## Native startup budget
+
+Kubernetes `activeDeadlineSeconds` starts when a suspended Job resumes, before
+container execution. It remains equal to the approved `max_run_seconds`; queue
+allowance is not silently added to that cap. New confirmation plans inspect
+only same-candidate, same-study completed hardware pilot timestamps. If observed
+server-submission-to-container-start time already exhausts the next native cap,
+the study abstains with `INSUFFICIENT_NATIVE_STARTUP_BUDGET` and source attempt
+IDs, before submitting another Job. This interval conservatively includes
+admission and is not a calibrated startup forecast. Missing timestamps are
+unknown; an unseen startup delay can still fail. The fixed v1/v2 hardware trials
+used the previous committed source, so this guard has software verification,
+not a claim of retrospectively preventing their recorded failures.

@@ -1,0 +1,124 @@
+{
+  "schema_version": "right-sizing-reference-comparison-v1",
+  "primary_experiment_id": "right-sizing-20261007-v1",
+  "reference_experiment_id": "right-sizing-reference-recovery-20261007-v2",
+  "comparison": [
+    {
+      "workload": "W1",
+      "strategy": "random",
+      "selected_candidate": "cpu1-mem2048",
+      "reference_complete": true,
+      "reference_means_seconds": {
+        "cpu2-mem2048": 0.046661845912846424,
+        "cpu1-mem1024": 0.04726442551085105,
+        "cpu2-mem1024": 0.04667807285053035,
+        "cpu1-mem2048": 0.04696179224022975,
+        "cpu0-5-mem2048": 0.09395237045828253,
+        "cpu0-5-mem1024": 0.09587783059881379
+      },
+      "reference_best_candidate": "cpu2-mem2048",
+      "relative_distance_to_measured_reference": 0.006428085334291206,
+      "reference_attempt_ids": [
+        "a-fb9127fee5d04dcbb635893c7eda835a",
+        "a-5073f02581d3469b93b4de105c88a94b",
+        "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+        "a-cab29de55860407199180a79544ef54f",
+        "a-7d78ddb39dc0466f96e1f0c120b81af8",
+        "a-0672aeb86a3f4c06bd14d9a497874155",
+        "a-88f6010e389142528f4e6c1d7ff80d05",
+        "a-f77f0925a1624548940325d533d40eab",
+        "a-0708be129a94418c998e86c0a22daddb",
+        "a-dfb45341f29b4705a7670043b61d411a",
+        "a-54deecc2a5124ec0acb61cb960fb997a",
+        "a-bab527001a124f5484138c451452ec31",
+        "a-9acaa6def25b44ac9b83977687790fcb",
+        "a-ff532a49c22a450484635334e9a0770c",
+        "a-457d04d0f32443428273631aa0b56655",
+        "a-352d30e521b04ec880bfe4e242b33dce",
+        "a-2cf7e7a4120b4ea69fac96b3f5816d7a",
+        "a-ba6be0832af841a088ab17ea52b931c8"
+      ],
+      "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+    },
+    {
+      "workload": "W1",
+      "strategy": "qlognei",
+      "selected_candidate": "cpu1-mem2048",
+      "reference_complete": true,
+      "reference_means_seconds": {
+        "cpu2-mem2048": 0.046661845912846424,
+        "cpu1-mem1024": 0.04726442551085105,
+        "cpu2-mem1024": 0.04667807285053035,
+        "cpu1-mem2048": 0.04696179224022975,
+        "cpu0-5-mem2048": 0.09395237045828253,
+        "cpu0-5-mem1024": 0.09587783059881379
+      },
+      "reference_best_candidate": "cpu2-mem2048",
+      "relative_distance_to_measured_reference": 0.006428085334291206,
+      "reference_attempt_ids": [
+        "a-fb9127fee5d04dcbb635893c7eda835a",
+        "a-5073f02581d3469b93b4de105c88a94b",
+        "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+        "a-cab29de55860407199180a79544ef54f",
+        "a-7d78ddb39dc0466f96e1f0c120b81af8",
+        "a-0672aeb86a3f4c06bd14d9a497874155",
+        "a-88f6010e389142528f4e6c1d7ff80d05",
+        "a-f77f0925a1624548940325d533d40eab",
+        "a-0708be129a94418c998e86c0a22daddb",
+        "a-dfb45341f29b4705a7670043b61d411a",
+        "a-54deecc2a5124ec0acb61cb960fb997a",
+        "a-bab527001a124f5484138c451452ec31",
+        "a-9acaa6def25b44ac9b83977687790fcb",
+        "a-ff532a49c22a450484635334e9a0770c",
+        "a-457d04d0f32443428273631aa0b56655",
+        "a-352d30e521b04ec880bfe4e242b33dce",
+        "a-2cf7e7a4120b4ea69fac96b3f5816d7a",
+        "a-ba6be0832af841a088ab17ea52b931c8"
+      ],
+      "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+    },
+    {
+      "workload": "W2",
+      "strategy": "random",
+      "selected_candidate": "cpu2-mem2048",
+      "reference_complete": false,
+      "reference_means_seconds": {},
+      "reference_best_candidate": null,
+      "relative_distance_to_measured_reference": null,
+      "reference_attempt_ids": [
+        "a-85049b46af55468f91d630853a7aa891",
+        "a-ce3657a6dcc342caa39ce9c897ac5e2d",
+        "a-ce5d985b448143f78b6ee915f239e1a5"
+      ],
+      "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+    },
+    {
+      "workload": "W2",
+      "strategy": "qlognei",
+      "selected_candidate": "cpu2-mem2048",
+      "reference_complete": false,
+      "reference_means_seconds": {},
+      "reference_best_candidate": null,
+      "relative_distance_to_measured_reference": null,
+      "reference_attempt_ids": [
+        "a-85049b46af55468f91d630853a7aa891",
+        "a-ce3657a6dcc342caa39ce9c897ac5e2d",
+        "a-ce5d985b448143f78b6ee915f239e1a5"
+      ],
+      "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+    }
+  ],
+  "total_gpu_native_jobs": 146,
+  "primary_reservation_by_unit": {
+    "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 285.0
+  },
+  "supplementary_reservation_by_unit": {
+    "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 136.0
+  },
+  "combined_reservation_by_unit": {
+    "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 421.0
+  },
+  "failures_including_original_reference": 3,
+  "cost_policy": "Primary finite-N deployment curves unchanged. Both failed v1 and supplementary v2 characterization costs retained in total research usage.",
+  "overall_goal_complete": false
+}

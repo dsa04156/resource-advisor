@@ -50,6 +50,9 @@ checkpoint/scaling qualification 없는 GPU count 탐색은 포함하지 않는�
 - Lookup, seeded random, 실제 BoTorch constrained qLogNEI를 재사용한다.
   측정 observation만 학습하며 실패/OOM을 runtime=0으로 만들지 않는다.
   범주를 ordinal 성능으로 인코딩하지 않고 모델/계획 시간을 비용에 남긴다.
+  이번 BB-source trial은 fitting/acquisition/import를 합친 `planning_seconds`만
+  측정했다. 이후 source는 fitting과 acquisition subphase도 별도 기록한다.
+  과거 측정에서 subphase를 분리한 수치를 추정해 넣지 않는다.
 - Adaptive replication은 min/max repeats, stopping rule, noise와 독립 확인
   예산을 갖는다. 기존 실험은 equal-budget 우위를 보여 주지 않았다.
 - MF-KG는 preregistered paired fidelity calibration이 통과한 그룹에만 허용한다.
@@ -87,7 +90,7 @@ signature가 유지되고 선언한 input range가 미검증 shape를 허용하�
 
 기존 실장비 증거는 RTX5080 CUDA/PyTorch, Slurm Orin GPU, Hailo8 ResNet50과
 KFP→API→Kueue→GPU→Result다. 새 trial은 접근 가능한 RTX5080과 Hailo8을
-사용한다. [고정 계획](right-sizing-trial-plan.md)은 W1 synchronized matmul,
+사용한다. [갱신된 hardware matrix](right-sizing-hardware-matrix.md)와 [고정 계획](right-sizing-trial-plan.md)은 W1 synchronized matmul,
 W2 input/preprocess 포함 generated CNN, W3 qualified Hailo ResNet50을 정의한다.
 
 W1/W2는 CPU 0.5/1/2 × memory 1/2GiB의 여섯 구성이다. W3는 기존 단일
@@ -127,8 +130,16 @@ W2 -1.1500%지만, **Random과 BO가 같은 구성을 선택했으므로 BO의 �
 [추가 reference v2 계획](right-sizing-reference-recovery-plan.md)은 별도 ID로
 실행 전에 고정했다. 최초 search/main 선택·후보·품질 조건을 바꾸지 않고,
 reference confirmation 보호 예산만 늘렸다. 양쪽 workload에 같은 새 reference를
-사용하며 v1의 실패를 덮어쓰지 않는다. 최종 finite-space 비교는 별도 캡처와
-cross-report auditor가 완성된 뒤 채택한다.
+사용하며 v1의 실패를 덮어쓰지 않는다. [별도 reference 캡처](evidence/right-sizing-reference-recovery-v2.json)와
+[cross-report audit](evidence/right-sizing-comparison-v1.json)는 W1 전체 여섯 구성의
+3회 독립 확인을 검증했다. W1에서 두 전략의 선택은 뒤에 측정된 최소 평균보다
+0.6428% 길었다. 이는 같은 환경에서 나중에 얻은 finite reference의 서술적
+거리이며 실제 oracle, 우위나 near-optimal 확률 보장이 아니다. W2 v2는 첫 3개
+confirmation 중 native deadline 실패가 있어 abstain했다. W2의 regret은 null이다.
+이후 source에 같은 후보의 실제 pilot 시작 시간을 보는 보수적 preflight를 추가했다.
+측정된 startup이 cap을 이미 다 쓰면 `INSUFFICIENT_NATIVE_STARTUP_BUDGET`으로
+추가 제출을 보류하며, native limit/승인 시간 예산을 임의로 늘리지 않는다.
+이 guard는 software 검증이며 이번 고정 BB-source hardware 결과를 바꾸지 않는다.
 
 GPU 승인 실행 12개에 immutable comparable feedback이 생성됐다. 실행 이후
 다음 read-only lookup은 W1의 실제 main profile 6개, W2의 9개를 근거로 사용했다.
@@ -164,11 +175,26 @@ latency + study elapsed(모델/확인/control 포함) + main API lifecycle laten
 | W2 BO | 375.268462 | 43 | 63 |
 
 **Random과 BO 모두 실제 N=1..3에서 profiling 비용을 회수하지 못했다.**
-측정하지 않은 N까지 손익분기를 외삽하지 않는다. Primary GPU 연구 전체는
+측정하지 않은 N까지 손익분기를 외삽하지 않는다.
+[누적 비용 그림](evidence/right-sizing-figures-v2/right-sizing-cost-v2.png),
+[reference 그림](evidence/right-sizing-figures-v2/right-sizing-reference-v2.png),
+[CSV](evidence/right-sizing-figures-v2/right-sizing-cost-v2.csv)와
+[figure provenance](evidence/right-sizing-figures-v2/right-sizing-figures-v2.json)는
+원시 JSON에서 auditor를 거쳐 생성한다. 곡선은 N=1..3만, reference는 모든 유효
+fresh confirmation 점을 보여 준다. W2 incomplete label은 결과가 없는 후보를
+0초로 표시하지 않는다는 뜻이다. Primary GPU 연구 전체는
 101 native Jobs, 285 GPU 예약초로, 실패한 v1 reference의 비용도 포함한다.
-뒤에 추가한 reference v2는 별도 연구 사용량으로 더하며 배포의 first-use 곡선에서
-숨기지 않는다. Hailo protocol은 73.276937초, 5 native Jobs, 14 NPU 예약초와
+Reference v2는 추가 45 Jobs, 136 GPU 예약초다. 합계 GPU 146 Jobs / 421 GPU
+예약초이며 native deadline 실패 3개를 포함한다. Hailo까지 이번 새 연구 실행은
+151 native Jobs다. Reference 비용은 별도 연구 사용량과 총계에 모두 보고하며,
+first-use 배포 곡선을 유리하게 바꾸지 않는다. Hailo protocol은 73.276937초, 5 native Jobs, 14 NPU 예약초와
 14 CPU core초다. GPU와 NPU 예약초를 경제적으로 동등한 숫자로 합치지 않는다.
+[총 연구 비용 auditor](../examples/audit_right_sizing_cost.py)와
+[재계산 기록](evidence/right-sizing-total-cost-audit-v1.json)은 CPU 500.5 core초,
+GPU 연구 Job의 host-memory 721,920 MiB초, 원래 controller 시작부터 마지막
+reference terminal 관측까지 4,195.255873초를 보고한다. Hailo는 그 시간 안에
+병행 실행돼 73.276937초를 전체 wall에 다시 더하지 않는다. 실험 종료 뒤의
+artifact readback·배포·소프트웨어 테스트는 이 envelope 밖이다.
 기존 fixture/image construction과 에너지는 이번에 측정하지 않았으므로 0으로
 쓰지 않는다. [Hailo 비용](evidence/right-sizing-hailo-cost-v1.json)에 이를 명시했다.
 기존 [operational comparison](operational-comparison.md)의 compute 약 1% 단축,
@@ -218,3 +244,25 @@ driver, KubeEdge 설정을 바꿔 이 문제를 숨기지 않는다.
 right-sizing, large-cluster 일반화, shared-GPU interference predictor와 job-attributed
 eBPF diagnosis 성능은 주장하지 않는다. 고정 생성 workload의 측정 결과를 임의
 사용자 AI 코드의 최적 성능 예측으로 일반화하지 않는다.
+
+
+재현 명령(새 output 경로 사용):
+
+```sh
+uv run python examples/audit_right_sizing_trial.py docs/evidence/right-sizing-gpu-v1.json docs/evidence/right-sizing-trial-plan-v1.json
+uv run python examples/audit_right_sizing_trial.py docs/evidence/right-sizing-gpu-v1.json docs/evidence/right-sizing-trial-plan-v1.json --reference docs/evidence/right-sizing-reference-recovery-v2.json --reference-plan docs/evidence/right-sizing-reference-recovery-plan-v2.json
+uv run python examples/audit_right_sizing_cost.py docs/evidence/right-sizing-total-cost-capture-v1.json
+uv run --with matplotlib==3.11.1 python examples/plot_right_sizing.py docs/evidence/right-sizing-gpu-v1.json docs/evidence/right-sizing-trial-plan-v1.json /tmp/new-right-sizing-figures --reference docs/evidence/right-sizing-reference-recovery-v2.json --reference-plan docs/evidence/right-sizing-reference-recovery-plan-v2.json --version v2
+```
+
+근거 있게 채택할 문장은 다음 범위다.
+
+> 처음 등록된 GPU·NPU AI 워크로드의 실행 조건을 검증하고, 승인된 profiling과
+> 실측 기반 탐색·독립 확인을 Kubernetes/Kueue 실행에 연결해, 추천 근거·실행
+> 오차·비용·유효성을 다음 자원 판단에 반영하는 profile-guided resource advisor
+> 계층을 구현·검증했다.
+
+각 구절은 [claim audit](right-sizing-claim-audit.md)의 cold-start, compatibility,
+actual acquisition, confirmation, approved feedback, post-main lookup, expiry
+행에 연결한다. Slurm 공통 계약과 기존 실행 복구는 재사용했지만 이번 새
+Slurm feedback hardware gate가 막혀 있어 목표 문장 전체를 채택하지 않는다.

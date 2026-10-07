@@ -9,7 +9,9 @@ from pathlib import Path
 from audit_right_sizing_trial import audit, compare_reference
 
 
-def generate(report_path, plan_path, output, reference_path=None, reference_plan_path=None):
+def generate(
+    report_path, plan_path, output, reference_path=None, reference_plan_path=None, version="v1"
+):
     import matplotlib
 
     matplotlib.use("Agg")
@@ -26,16 +28,16 @@ def generate(report_path, plan_path, output, reference_path=None, reference_plan
             report, plan, reference_report, json.loads(reference_plan_path.read_bytes())
         )
     output.mkdir(parents=True, exist_ok=True)
-    stems = ["right-sizing-cost-v1", "right-sizing-reference-v1"]
+    stems = ["right-sizing-cost-" + version, "right-sizing-reference-" + version]
     paths = [output / (stem + ext) for stem in stems for ext in (".png", ".svg")]
-    paths += [output / "right-sizing-cost-v1.csv", output / "right-sizing-figures-v1.json"]
+    paths += [output / (stems[0] + ".csv"), output / ("right-sizing-figures-" + version + ".json")]
     if any(p.exists() for p in paths):
         raise FileExistsError("Use a new output directory; preserve existing artifacts")
     colors = {"static": "#4C5664", "random": "#0068B8", "qlognei": "#AF4A00"}
     markers = {"static": "s", "random": "o", "qlognei": "^"}
     styles = {"static": "-", "random": "--", "qlognei": ":"}
     curves = checked["cumulative_measured_cost"]
-    with (output / "right-sizing-cost-v1.csv").open("x", newline="") as f:
+    with (output / (stems[0] + ".csv")).open("x", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=list(curves[0]))
         writer.writeheader()
         writer.writerows(curves)
@@ -148,6 +150,8 @@ def generate(report_path, plan_path, output, reference_path=None, reference_plan
                 ylim=(0, None),
                 title=workload + ": later finite reference",
             )
+            if grouped:
+                ax.set_ylim(0, max(v for values in grouped.values() for v in values) * 1.12)
             ax.tick_params(axis="x", labelsize=9)
             ax.grid(axis="y", alpha=0.2)
             ax.legend(loc="best")
@@ -192,7 +196,9 @@ def generate(report_path, plan_path, output, reference_path=None, reference_plan
             if p.exists()
         ],
     }
-    (output / "right-sizing-figures-v1.json").open("x").write(json.dumps(manifest, indent=2) + "\n")
+    (output / ("right-sizing-figures-" + version + ".json")).open("x").write(
+        json.dumps(manifest, indent=2) + "\n"
+    )
     return manifest
 
 
@@ -203,12 +209,20 @@ if __name__ == "__main__":
     parser.add_argument("output", type=Path)
     parser.add_argument("--reference", type=Path)
     parser.add_argument("--reference-plan", type=Path)
+    parser.add_argument("--version", choices=["v1", "v2"], default="v1")
     args = parser.parse_args()
     if bool(args.reference) != bool(args.reference_plan):
         parser.error("--reference and --reference-plan must be supplied together")
     print(
         json.dumps(
-            generate(args.report, args.plan, args.output, args.reference, args.reference_plan),
+            generate(
+                args.report,
+                args.plan,
+                args.output,
+                args.reference,
+                args.reference_plan,
+                args.version,
+            ),
             indent=2,
         )
     )

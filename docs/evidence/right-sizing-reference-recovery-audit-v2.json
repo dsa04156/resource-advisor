@@ -1,0 +1,23 @@
+{
+  "schema_version": "right-sizing-trial-audit-v1",
+  "experiment_id": "right-sizing-reference-recovery-20261007-v2",
+  "attempt_count": 45,
+  "qualification_count": 0,
+  "total_device_seconds": 136.0,
+  "reservation_by_unit": {
+    "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 136.0
+  },
+  "search_comparison": [],
+  "main_execution": [],
+  "net_benefit": [],
+  "feedback_count": 0,
+  "comparable_feedback_count": 0,
+  "failures": 1,
+  "cumulative_measured_cost": [],
+  "overall_goal_complete": false,
+  "limitations": [
+    "No extrapolation beyond actual main runs; setup includes confirmation and model/control overhead once.",
+    "Qualification is charged equally to each arm; historical image construction and energy are unmeasured.",
+    "Wall and device reservation are separate objectives; mixed GPU/NPU totals are accounting counts, not equivalent economic costs."
+  ]
+}

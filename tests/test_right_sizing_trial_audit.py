@@ -9,7 +9,12 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples"))
-from audit_right_sizing_trial import audit, audit_hailo_feedback, audit_phase_readback  # noqa: E402
+from audit_right_sizing_trial import (
+    audit,
+    audit_hailo_feedback,
+    audit_phase_readback,
+    compare_reference,
+)  # noqa: E402
 
 
 @pytest.fixture
@@ -144,3 +149,33 @@ def test_phase_supplement_rejects_unattributed_or_invalid_data(gpu_evidence, fau
     else:
         checked = audit_phase_readback(supplement, report, hashlib.sha256(raw).hexdigest())
         assert checked["runs"] == len(supplement["runs"])
+
+
+@pytest.mark.parametrize("fault", [None, "parent", "chronology", "runtime", "context", "reuse"])
+def test_later_reference_cannot_change_primary_selection_or_leak(gpu_evidence, fault):
+    report, plan = gpu_evidence
+    root = Path(__file__).resolve().parents[1] / "docs/evidence"
+    later = json.loads((root / "right-sizing-reference-recovery-v2.json").read_text())
+    later_plan = json.loads((root / "right-sizing-reference-recovery-plan-v2.json").read_text())
+    if fault == "parent":
+        later["parent_experiment_id"] = "other"
+    elif fault == "chronology":
+        later_plan["declared_at"] = "2000-01-01T00:00:00+00:00"
+    elif fault == "runtime":
+        later["attempts"][0]["variant"]["command"] = ["python", "other.py"]
+    elif fault == "context":
+        later["studies"][0]["study"]["spec"]["candidates"][0]["context"]["power_mode"] = "changed"
+    elif fault == "reuse":
+        later["attempts"][0]["native"]["job_uid"] = report["attempts"][0]["native"]["job_uid"]
+    if fault:
+        with pytest.raises(ValueError):
+            compare_reference(report, plan, later, later_plan)
+    else:
+        result = compare_reference(report, plan, later, later_plan)
+        assert all(c["reference_complete"] for c in result["comparison"] if c["workload"] == "W1")
+        assert all(
+            c["relative_distance_to_measured_reference"] is None
+            for c in result["comparison"]
+            if c["workload"] == "W2"
+        )
+        assert result["failures_including_original_reference"] > 0

@@ -27,6 +27,45 @@ from .store import Conflict, jobs, studies
 STUDY_TERMINAL = {"COMPLETED", "ABSTAINED", "CANCELED", "FAILED"}
 
 
+def native_startup_budget(backend, run_limit, sources):
+    """Conservative warning from own measured pilots, not a startup guarantee.
+
+    Kubernetes activeDeadlineSeconds begins before container execution. Keep
+    that native bound unchanged; never silently add the queue allowance to it.
+    The server submission-to-container-start interval also includes admission,
+    so this guard may abstain conservatively. Missing evidence remains unknown.
+    """
+    samples = []
+    if backend == "kubernetes":
+        for source in sources:
+            body = source["body"]
+            submitted, execution = (
+                body.get("scheduler_submitted_at"),
+                body.get("execution_started_at"),
+            )
+            if not submitted or not execution:
+                continue
+            elapsed = (
+                datetime.fromisoformat(execution) - datetime.fromisoformat(submitted)
+            ).total_seconds()
+            if elapsed >= 0:
+                samples.append(
+                    {"attempt_id": body["attempt_id"], "startup_upper_observation_seconds": elapsed}
+                )
+    observed = max((s["startup_upper_observation_seconds"] for s in samples), default=None)
+    return {
+        "status": "INSUFFICIENT_NATIVE_STARTUP_BUDGET"
+        if observed is not None and observed >= run_limit
+        else "OBSERVED_STARTUP_FITS_BOUND"
+        if observed is not None
+        else "UNKNOWN_STARTUP",
+        "native_active_deadline_seconds": run_limit,
+        "maximum_observed_startup_seconds": observed,
+        "source_attempts": samples,
+        "scope": "Own same-candidate hardware pilot submission-to-container-start intervals; includes admission; not calibrated future startup or success assurance",
+    }
+
+
 class Studies:
     def __init__(self, service):
         self.service, self.store = service, service.store
@@ -899,6 +938,22 @@ class Studies:
         queue_limit = min(policy.max_queue_seconds, execution_wall - run_limit)
         if run_limit < 1 or queue_limit < 1:
             return self._abstain(ref, token, body, "RESERVED_CONFIRMATION_BUDGET_PROTECTED")
+        if confirming and not mixed and candidate.backend == "kubernetes":
+            # Reject a known insufficient cap before spending another Job. Do
+            # not change approved execution bounds or reinterpret failed runs.
+            with self.store.transaction() as conn:
+                source_rows = [
+                    self.store.job(conn, o["job_id"])
+                    for o in probes
+                    if o["candidate_ref"] == candidate.ref
+                    and o["outcome"] == "COMPLETED"
+                    and o["evidence_kind"] == "hardware"
+                ]
+            body["native_startup_assessment"] = native_startup_budget(
+                candidate.backend, run_limit, source_rows
+            )
+            if body["native_startup_assessment"]["status"] == "INSUFFICIENT_NATIVE_STARTUP_BUDGET":
+                return self._abstain(ref, token, body, "INSUFFICIENT_NATIVE_STARTUP_BUDGET")
         plan_ref = "plan-" + uuid4().hex
         execution_spec = spec
         binding = None
