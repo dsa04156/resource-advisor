@@ -1,6 +1,7 @@
 """Mutate captured evidence to test auditor rejection, without running benchmarks."""
 
 import copy
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -8,7 +9,7 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples"))
-from audit_right_sizing_trial import audit_hailo_feedback  # noqa: E402
+from audit_right_sizing_trial import audit, audit_hailo_feedback, audit_phase_readback  # noqa: E402
 
 
 @pytest.fixture
@@ -51,3 +52,95 @@ def test_hailo_auditor_rejects_corrupted_capture(evidence, fault):
         )
     with pytest.raises(ValueError):
         audit_hailo_feedback(report, manifest)
+
+
+@pytest.fixture
+def gpu_evidence():
+    root = Path(__file__).resolve().parents[1] / "docs/evidence"
+    return (
+        json.loads((root / "right-sizing-gpu-v1.json").read_text()),
+        json.loads((root / "right-sizing-trial-plan-v1.json").read_text()),
+    )
+
+
+def test_gpu_capture_includes_failed_reference_cost_and_finite_n(gpu_evidence):
+    report, plan = gpu_evidence
+    checked = audit(report, plan)
+    failed = [a for a in report["attempts"] if a["state"] != "SUCCEEDED"]
+    assert failed and checked["failures"] == len(failed)
+    assert all(a["device_seconds"] > 0 for a in failed)
+    assert checked["total_device_seconds"] == sum(
+        a["device_seconds"] for a in report["attempts"]
+    ) + sum(q["device_seconds"] for q in report["qualifications"])
+    assert all(
+        p["N"] <= plan["gpu_search"]["main_reuses"] for p in checked["cumulative_measured_cost"]
+    )
+    assert all(not p["reference_complete"] for p in checked["search_comparison"])
+
+
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "duplicate",
+        "cost",
+        "digest",
+        "quality",
+        "future_model",
+        "confirmation",
+        "planning",
+        "budget",
+        "stale",
+    ],
+)
+def test_gpu_auditor_rejects_corrupted_capture(gpu_evidence, fault):
+    original, plan = gpu_evidence
+    report = copy.deepcopy(original)
+    entry = next(s for s in report["studies"] if s["strategy"] == "qlognei")
+    if fault == "duplicate":
+        report["attempts"].append(copy.deepcopy(report["attempts"][0]))
+    elif fault == "cost":
+        report["attempts"][0]["device_seconds"] = None
+    elif fault == "digest":
+        row = next(a for a in report["attempts"] if a["result"])
+        row["result"]["context_signature"] = "sha256:" + "0" * 64
+    elif fault == "quality":
+        report["attempts"][0]["spec"]["quality"]["minimum"] = -1
+    elif fault == "future_model":
+        probe = next(p for p in entry["plans"] if p["body"]["choice"].get("surrogate"))
+        probe["body"]["created_at"] = "2000-01-01T00:00:00+00:00"
+    elif fault == "confirmation":
+        probe = next(o for o in entry["study"]["observations"] if o["mode"] == "pilot")
+        entry["study"]["recommendation"]["ranking"][0]["evidence_refs"].append(probe["attempt_id"])
+    elif fault == "planning":
+        entry["plans"][0]["body"]["choice"]["planning_seconds"] = None
+    elif fault == "budget":
+        unit = next(iter(entry["study"]["charged_device_seconds"]))
+        entry["study"]["charged_device_seconds"][unit] = (
+            entry["study"]["spec"]["profiling"]["device_seconds"][unit] + 1
+        )
+    else:
+        report["stale_reuse"][0]["submission_http_status"] = 202
+    with pytest.raises(ValueError):
+        audit(report, plan)
+
+
+@pytest.mark.parametrize("fault", [None, "identity", "digest", "overlap", "thermal"])
+def test_phase_supplement_rejects_unattributed_or_invalid_data(gpu_evidence, fault):
+    report, _ = gpu_evidence
+    root = Path(__file__).resolve().parents[1] / "docs/evidence"
+    raw = (root / "right-sizing-gpu-v1.json").read_bytes()
+    supplement = json.loads((root / "right-sizing-phase-v1.json").read_text())
+    if fault == "identity":
+        supplement["runs"][1]["attempt_id"] = supplement["runs"][0]["attempt_id"]
+    elif fault == "digest":
+        supplement["primary_sha256"] = "0" * 64
+    elif fault == "overlap":
+        supplement["runs"][0]["phase"]["samples"][0]["phases_seconds"]["cpu_processing"] = 100
+    elif fault == "thermal":
+        supplement["runs"][0]["thermal_assessment"]["status"] = "unknown"
+    if fault:
+        with pytest.raises(ValueError):
+            audit_phase_readback(supplement, report, hashlib.sha256(raw).hexdigest())
+    else:
+        checked = audit_phase_readback(supplement, report, hashlib.sha256(raw).hexdigest())
+        assert checked["runs"] == len(supplement["runs"])

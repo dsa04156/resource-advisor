@@ -1,0 +1,385 @@
+{
+  "schema_version": "right-sizing-stale-reuse-v1",
+  "experiment_id": "right-sizing-20261007-v1",
+  "evidence_kind": "live_api_and_database_guard_readback",
+  "checks": [
+    {
+      "study": "W1-random",
+      "recommendation_ref": "rec-acff0d918e54436c8b26be87195870d8",
+      "approval_ref": "apr-507347f8c7cb404fa40822ee74b1dcdc",
+      "expires_at": "2026-10-07T10:50:17.964203+00:00",
+      "checked_at": "2026-10-07T11:15:25.040847+00:00",
+      "validity": {
+        "policy_version": "recommendation-reuse-v1",
+        "assessed_at": "2026-10-07T11:15:24.860339+00:00",
+        "recommendation_ref": "rec-acff0d918e54436c8b26be87195870d8",
+        "reusable": false,
+        "reasons": [
+          "RECOMMENDATION_EXPIRED_OR_TIME_INVALID"
+        ],
+        "residuals": [
+          {
+            "attempt_id": "a-e1d9cb0bf6e546959f7102691407f684",
+            "recorded_at": "2026-10-07T10:37:54.483786+00:00",
+            "actual_seconds": 0.04647520824801177,
+            "relative_error": -0.00994087458320467
+          },
+          {
+            "attempt_id": "a-a69bc63449314488ad1e871adcc53a13",
+            "recorded_at": "2026-10-07T10:38:20.835744+00:00",
+            "actual_seconds": 0.04695357009768486,
+            "relative_error": 0.000249644886718599
+          },
+          {
+            "attempt_id": "a-160cef2b3fdc4d11bccc018c6617d110",
+            "recorded_at": "2026-10-07T10:38:47.146179+00:00",
+            "actual_seconds": 0.04694807913620025,
+            "relative_error": 0.00013267119837834547
+          },
+          {
+            "attempt_id": "a-c0e1e8c7e17d4308b624acd4fc449d3e",
+            "recorded_at": "2026-10-07T10:39:15.518643+00:00",
+            "actual_seconds": 0.04681117681320757,
+            "relative_error": -0.0027837524020572985
+          },
+          {
+            "attempt_id": "a-27a3a9b977ea49efb77bf770a4188579",
+            "recorded_at": "2026-10-07T10:39:37.169377+00:00",
+            "actual_seconds": 0.04683626291807741,
+            "relative_error": -0.0022493443168904543
+          },
+          {
+            "attempt_id": "a-acb54433664a45a5a3cc6b907b12477e",
+            "recorded_at": "2026-10-07T10:40:00.452684+00:00",
+            "actual_seconds": 0.0467095710337162,
+            "relative_error": -0.004948255434377032
+          },
+          {
+            "attempt_id": "a-2d2db34997c24809bbf8f822c110868e",
+            "recorded_at": "2026-10-07T10:40:27.119026+00:00",
+            "actual_seconds": 0.04655411490239203,
+            "relative_error": -0.008259929921087322
+          },
+          {
+            "attempt_id": "a-7acdbbb16c664d77934b92358d7aacaf",
+            "recorded_at": "2026-10-07T10:40:48.534129+00:00",
+            "actual_seconds": 0.04702817811630666,
+            "relative_error": 0.001839015918077918
+          },
+          {
+            "attempt_id": "a-a13d45ee38da4968900f30a24b52686b",
+            "recorded_at": "2026-10-07T10:41:10.137203+00:00",
+            "actual_seconds": 0.046379680396057665,
+            "relative_error": -0.011975899817603053
+          },
+          {
+            "attempt_id": "a-a1d91b7b23e446ec9a6f7ff82b09d7d4",
+            "recorded_at": "2026-10-07T10:41:31.558416+00:00",
+            "actual_seconds": 0.04687993403058499,
+            "relative_error": -0.001319020708128905
+          },
+          {
+            "attempt_id": "a-d3e80dc0b74a4ffaa7b63727ddfb697d",
+            "recorded_at": "2026-10-07T10:41:57.851160+00:00",
+            "actual_seconds": 0.04635529802180827,
+            "relative_error": -0.012495316363218583
+          },
+          {
+            "attempt_id": "a-2ad3b82c07ea4513b404cc8a0d369780",
+            "recorded_at": "2026-10-07T10:42:19.170803+00:00",
+            "actual_seconds": 0.04674582602456212,
+            "relative_error": -0.0041759171085893314
+          },
+          {
+            "attempt_id": "a-b88600f12123441aa8b4ff46529cf4bf",
+            "recorded_at": "2026-10-07T11:06:34.567646+00:00",
+            "actual_seconds": 0.04652395227458328,
+            "relative_error": -0.008902482930193646
+          },
+          {
+            "attempt_id": "a-bc0aefc98d5c43bc8857dd5b47749c26",
+            "recorded_at": "2026-10-07T11:07:02.460447+00:00",
+            "actual_seconds": 0.04664657358080149,
+            "relative_error": -0.00629028714305467
+          }
+        ],
+        "drift_policy": {
+          "relative_error_limit": 0.25,
+          "consecutive_independent_runs": 3,
+          "semantics": "heuristic recheck trigger, not calibrated probability or root cause"
+        },
+        "drift_evidence_refs": [],
+        "constraint_failure_refs": []
+      },
+      "submission_http_status": 422,
+      "rejection": {
+        "detail": "approval expired or configuration mismatch"
+      },
+      "new_jobs": 0,
+      "same_idempotency_key_has_no_row": true
+    },
+    {
+      "study": "W1-qlognei",
+      "recommendation_ref": "rec-fed4a1eb51a241558417243f2848b8f2",
+      "approval_ref": "apr-762e962879bb409cbb227752eae4447b",
+      "expires_at": "2026-10-07T10:53:57.858298+00:00",
+      "checked_at": "2026-10-07T11:15:25.202995+00:00",
+      "validity": {
+        "policy_version": "recommendation-reuse-v1",
+        "assessed_at": "2026-10-07T11:15:25.045642+00:00",
+        "recommendation_ref": "rec-fed4a1eb51a241558417243f2848b8f2",
+        "reusable": false,
+        "reasons": [
+          "RECOMMENDATION_EXPIRED_OR_TIME_INVALID"
+        ],
+        "residuals": [
+          {
+            "attempt_id": "a-c0e1e8c7e17d4308b624acd4fc449d3e",
+            "recorded_at": "2026-10-07T10:39:15.518643+00:00",
+            "actual_seconds": 0.04681117681320757,
+            "relative_error": 0.00040372009134856564
+          },
+          {
+            "attempt_id": "a-27a3a9b977ea49efb77bf770a4188579",
+            "recorded_at": "2026-10-07T10:39:37.169377+00:00",
+            "actual_seconds": 0.04683626291807741,
+            "relative_error": 0.0009398363426988493
+          },
+          {
+            "attempt_id": "a-acb54433664a45a5a3cc6b907b12477e",
+            "recorded_at": "2026-10-07T10:40:00.452684+00:00",
+            "actual_seconds": 0.0467095710337162,
+            "relative_error": -0.001767701494388274
+          },
+          {
+            "attempt_id": "a-2d2db34997c24809bbf8f822c110868e",
+            "recorded_at": "2026-10-07T10:40:27.119026+00:00",
+            "actual_seconds": 0.04655411490239203,
+            "relative_error": -0.005089961319392971
+          },
+          {
+            "attempt_id": "a-7acdbbb16c664d77934b92358d7aacaf",
+            "recorded_at": "2026-10-07T10:40:48.534129+00:00",
+            "actual_seconds": 0.04702817811630666,
+            "relative_error": 0.005041264491295269
+          },
+          {
+            "attempt_id": "a-a13d45ee38da4968900f30a24b52686b",
+            "recorded_at": "2026-10-07T10:41:10.137203+00:00",
+            "actual_seconds": 0.046379680396057665,
+            "relative_error": -0.008817808832082724
+          },
+          {
+            "attempt_id": "a-a1d91b7b23e446ec9a6f7ff82b09d7d4",
+            "recorded_at": "2026-10-07T10:41:31.558416+00:00",
+            "actual_seconds": 0.04687993403058499,
+            "relative_error": 0.0018731336103032386
+          },
+          {
+            "attempt_id": "a-d3e80dc0b74a4ffaa7b63727ddfb697d",
+            "recorded_at": "2026-10-07T10:41:57.851160+00:00",
+            "actual_seconds": 0.04635529802180827,
+            "relative_error": -0.009338885625368464
+          },
+          {
+            "attempt_id": "a-2ad3b82c07ea4513b404cc8a0d369780",
+            "recorded_at": "2026-10-07T10:42:19.170803+00:00",
+            "actual_seconds": 0.04674582602456212,
+            "relative_error": -0.0009928944892394205
+          },
+          {
+            "attempt_id": "a-b88600f12123441aa8b4ff46529cf4bf",
+            "recorded_at": "2026-10-07T11:06:34.567646+00:00",
+            "actual_seconds": 0.04652395227458328,
+            "relative_error": -0.00573456816591622
+          },
+          {
+            "attempt_id": "a-bc0aefc98d5c43bc8857dd5b47749c26",
+            "recorded_at": "2026-10-07T11:07:02.460447+00:00",
+            "actual_seconds": 0.04664657358080149,
+            "relative_error": -0.003114022833491602
+          }
+        ],
+        "drift_policy": {
+          "relative_error_limit": 0.25,
+          "consecutive_independent_runs": 3,
+          "semantics": "heuristic recheck trigger, not calibrated probability or root cause"
+        },
+        "drift_evidence_refs": [],
+        "constraint_failure_refs": []
+      },
+      "submission_http_status": 422,
+      "rejection": {
+        "detail": "approval expired or configuration mismatch"
+      },
+      "new_jobs": 0,
+      "same_idempotency_key_has_no_row": true
+    },
+    {
+      "study": "W2-random",
+      "recommendation_ref": "rec-3ac56f4cbc1145749d334440061af3ad",
+      "approval_ref": "apr-449db74eb45e45c3a91a2997ad78967b",
+      "expires_at": "2026-10-07T11:04:45.754698+00:00",
+      "checked_at": "2026-10-07T11:15:25.356236+00:00",
+      "validity": {
+        "policy_version": "recommendation-reuse-v1",
+        "assessed_at": "2026-10-07T11:15:25.206999+00:00",
+        "recommendation_ref": "rec-3ac56f4cbc1145749d334440061af3ad",
+        "reusable": false,
+        "reasons": [
+          "RECOMMENDATION_EXPIRED_OR_TIME_INVALID"
+        ],
+        "residuals": [
+          {
+            "attempt_id": "a-cfc7a2849c114855beef7ec5e1573a31",
+            "recorded_at": "2026-10-07T10:52:45.428170+00:00",
+            "actual_seconds": 0.26047853217460215,
+            "relative_error": -0.0015159041857988908
+          },
+          {
+            "attempt_id": "a-1f2e6affe3514c7a9d57b331536b87dd",
+            "recorded_at": "2026-10-07T10:53:11.897120+00:00",
+            "actual_seconds": 0.2611617019865662,
+            "relative_error": 0.0011028689863764802
+          },
+          {
+            "attempt_id": "a-3a02504f727348f1876dd9be9ae81275",
+            "recorded_at": "2026-10-07T10:54:31.260988+00:00",
+            "actual_seconds": 0.2606135979294777,
+            "relative_error": -0.0009981609115010776
+          },
+          {
+            "attempt_id": "a-8710fc5b2f644879b7faf9e6d883252b",
+            "recorded_at": "2026-10-07T10:54:57.815738+00:00",
+            "actual_seconds": 0.26073218090459704,
+            "relative_error": -0.0005436005540600382
+          },
+          {
+            "attempt_id": "a-8077360716284f5fa965122f8eb5559c",
+            "recorded_at": "2026-10-07T10:55:40.439914+00:00",
+            "actual_seconds": 0.2606784988893196,
+            "relative_error": -0.0007493781205961353
+          },
+          {
+            "attempt_id": "a-6fa0fe3eedcc4ffda8dde4e21c9f06b1",
+            "recorded_at": "2026-10-07T10:56:01.869638+00:00",
+            "actual_seconds": 0.2607789949979633,
+            "relative_error": -0.0003641495747568975
+          },
+          {
+            "attempt_id": "a-c490b32feca048dd86ca80659c69e066",
+            "recorded_at": "2026-10-07T10:56:23.173444+00:00",
+            "actual_seconds": 0.26105780072975904,
+            "relative_error": 0.0007045875940830687
+          },
+          {
+            "attempt_id": "a-3cece8d6d63a47539521756aec3cfcad",
+            "recorded_at": "2026-10-07T10:57:05.898198+00:00",
+            "actual_seconds": 0.26068314374424517,
+            "relative_error": -0.0007315731455303208
+          },
+          {
+            "attempt_id": "a-5efa7d349636483fbe2bf3db99f1c829",
+            "recorded_at": "2026-10-07T10:57:27.282058+00:00",
+            "actual_seconds": 0.2608097498305142,
+            "relative_error": -0.000246258050587444
+          },
+          {
+            "attempt_id": "a-4234e2d6f2ea49f7bf55c771edbf80b0",
+            "recorded_at": "2026-10-07T11:14:06.177451+00:00",
+            "actual_seconds": 0.2606542988214642,
+            "relative_error": -0.0008421434731552555
+          }
+        ],
+        "drift_policy": {
+          "relative_error_limit": 0.25,
+          "consecutive_independent_runs": 3,
+          "semantics": "heuristic recheck trigger, not calibrated probability or root cause"
+        },
+        "drift_evidence_refs": [],
+        "constraint_failure_refs": []
+      },
+      "submission_http_status": 422,
+      "rejection": {
+        "detail": "approval expired or configuration mismatch"
+      },
+      "new_jobs": 0,
+      "same_idempotency_key_has_no_row": true
+    },
+    {
+      "study": "W2-qlognei",
+      "recommendation_ref": "rec-1c5c9ff20cd24c26b659a44e99fdc4af",
+      "approval_ref": "apr-0dffdaf66dfa4c8e8de9efb9cf48f452",
+      "expires_at": "2026-10-07T11:09:41.981016+00:00",
+      "checked_at": "2026-10-07T11:15:25.485889+00:00",
+      "validity": {
+        "policy_version": "recommendation-reuse-v1",
+        "assessed_at": "2026-10-07T11:15:25.359566+00:00",
+        "recommendation_ref": "rec-1c5c9ff20cd24c26b659a44e99fdc4af",
+        "reusable": false,
+        "reasons": [
+          "RECOMMENDATION_EXPIRED_OR_TIME_INVALID"
+        ],
+        "residuals": [
+          {
+            "attempt_id": "a-8710fc5b2f644879b7faf9e6d883252b",
+            "recorded_at": "2026-10-07T10:54:57.815738+00:00",
+            "actual_seconds": 0.26073218090459704,
+            "relative_error": -7.323630067984566e-05
+          },
+          {
+            "attempt_id": "a-8077360716284f5fa965122f8eb5559c",
+            "recorded_at": "2026-10-07T10:55:40.439914+00:00",
+            "actual_seconds": 0.2606784988893196,
+            "relative_error": -0.00027911071027132754
+          },
+          {
+            "attempt_id": "a-6fa0fe3eedcc4ffda8dde4e21c9f06b1",
+            "recorded_at": "2026-10-07T10:56:01.869638+00:00",
+            "actual_seconds": 0.2607789949979633,
+            "relative_error": 0.00010629913185801847
+          },
+          {
+            "attempt_id": "a-c490b32feca048dd86ca80659c69e066",
+            "recorded_at": "2026-10-07T10:56:23.173444+00:00",
+            "actual_seconds": 0.26105780072975904,
+            "relative_error": 0.0011755392698727877
+          },
+          {
+            "attempt_id": "a-3cece8d6d63a47539521756aec3cfcad",
+            "recorded_at": "2026-10-07T10:57:05.898198+00:00",
+            "actual_seconds": 0.26068314374424517,
+            "relative_error": -0.0002612973558266747
+          },
+          {
+            "attempt_id": "a-5efa7d349636483fbe2bf3db99f1c829",
+            "recorded_at": "2026-10-07T10:57:27.282058+00:00",
+            "actual_seconds": 0.2608097498305142,
+            "relative_error": 0.00022424613814632827
+          },
+          {
+            "attempt_id": "a-4234e2d6f2ea49f7bf55c771edbf80b0",
+            "recorded_at": "2026-10-07T11:14:06.177451+00:00",
+            "actual_seconds": 0.2606542988214642,
+            "relative_error": -0.00037191972006834237
+          }
+        ],
+        "drift_policy": {
+          "relative_error_limit": 0.25,
+          "consecutive_independent_runs": 3,
+          "semantics": "heuristic recheck trigger, not calibrated probability or root cause"
+        },
+        "drift_evidence_refs": [],
+        "constraint_failure_refs": []
+      },
+      "submission_http_status": 422,
+      "rejection": {
+        "detail": "approval expired or configuration mismatch"
+      },
+      "new_jobs": 0,
+      "same_idempotency_key_has_no_row": true
+    }
+  ],
+  "new_native_jobs": 0,
+  "clock_changed": false
+}

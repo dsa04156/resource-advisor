@@ -1,0 +1,92 @@
+{
+  "schema_version": "right-sizing-phase-audit-v1",
+  "experiment_id": "right-sizing-20261007-v1",
+  "runs": 9,
+  "by_arm": {
+    "qlognei": {
+      "attempt_ids": [
+        "a-8710fc5b2f644879b7faf9e6d883252b",
+        "a-6fa0fe3eedcc4ffda8dde4e21c9f06b1",
+        "a-3cece8d6d63a47539521756aec3cfcad"
+      ],
+      "phases_seconds": {
+        "cpu_processing": 0.024549758876673877,
+        "host_to_device": 0.00258670502807945,
+        "accelerator_compute": 0.7550578557420522
+      },
+      "objective_seconds": 0.7821943196468055,
+      "sensor_query_seconds": 0.007984705502167344,
+      "maximum_observed_temperature_c": 36.0,
+      "diagnoses": [
+        "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "POSSIBLE_ACCELERATOR_PATH_BOUND"
+      ],
+      "phase_shares": {
+        "cpu_processing": 0.031385754485866314,
+        "host_to_device": 0.003306985186554997,
+        "accelerator_compute": 0.9653072603275787
+      },
+      "sensor_query_over_objective": 0.010208084233816455
+    },
+    "static": {
+      "attempt_ids": [
+        "a-754039f6ccd148d18731540e47d68500",
+        "a-62d3f9c4d35e433cb6eb24610ca1e324",
+        "a-5ceabe1ff1274dc8935e2ef55c7f1947"
+      ],
+      "phases_seconds": {
+        "cpu_processing": 0.036184090888127685,
+        "host_to_device": 0.0026285791536793113,
+        "accelerator_compute": 0.7524816232034937
+      },
+      "objective_seconds": 0.7912942932453007,
+      "sensor_query_seconds": 0.007887821295298636,
+      "maximum_observed_temperature_c": 50.0,
+      "diagnoses": [
+        "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "POSSIBLE_ACCELERATOR_PATH_BOUND"
+      ],
+      "phase_shares": {
+        "cpu_processing": 0.045727728857650994,
+        "host_to_device": 0.0033218730074481323,
+        "accelerator_compute": 0.9509503981349009
+      },
+      "sensor_query_over_objective": 0.009968252472728775
+    },
+    "random": {
+      "attempt_ids": [
+        "a-8077360716284f5fa965122f8eb5559c",
+        "a-c490b32feca048dd86ca80659c69e066",
+        "a-5efa7d349636483fbe2bf3db99f1c829"
+      ],
+      "phases_seconds": {
+        "cpu_processing": 0.024379331967793405,
+        "host_to_device": 0.0024852416245266795,
+        "accelerator_compute": 0.7556814758572727
+      },
+      "objective_seconds": 0.7825460494495928,
+      "sensor_query_seconds": 0.007972055929712951,
+      "maximum_observed_temperature_c": 42.0,
+      "diagnoses": [
+        "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "POSSIBLE_ACCELERATOR_PATH_BOUND",
+        "POSSIBLE_ACCELERATOR_PATH_BOUND"
+      ],
+      "phase_shares": {
+        "cpu_processing": 0.031153862427573068,
+        "host_to_device": 0.00317584073969153,
+        "accelerator_compute": 0.9656702968327354
+      },
+      "sensor_query_over_objective": 0.010187331384932722
+    }
+  },
+  "scope": [
+    "No new jobs or modifications of primary results",
+    "accelerator_compute includes launch/device/synchronization wall time, not pure kernel busy time",
+    "No W1 phase trace and no job-attributed eBPF/PSI data in this trial; unknown",
+    "NVML sampled brackets are not continuous thermal or energy measurements"
+  ],
+  "conclusion": "CPU preparation is a small measured fraction; dominant accelerator path includes launch/device/synchronization, not a causal hardware bottleneck verdict."
+}

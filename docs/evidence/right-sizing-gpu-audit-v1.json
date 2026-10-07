@@ -1,0 +1,243 @@
+{
+  "schema_version": "right-sizing-trial-audit-v1",
+  "experiment_id": "right-sizing-20261007-v1",
+  "attempt_count": 97,
+  "qualification_count": 4,
+  "total_device_seconds": 285.0,
+  "reservation_by_unit": {
+    "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 285.0
+  },
+  "search_comparison": [
+    {
+      "workload": "W1",
+      "strategy": "random",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu1-mem2048",
+      "probes": 5,
+      "unique_probed_candidates": 4,
+      "candidate_count": 6,
+      "confirmation_jobs": 3,
+      "planning_seconds": 0.00013735098764300346,
+      "actual_bo_choices": 0,
+      "fallback_choices": 0,
+      "study_elapsed_seconds": 214.318672,
+      "profile_confirmation_device_seconds": 22.0,
+      "later_reference_means_seconds": {},
+      "relative_distance_to_measured_reference": null,
+      "reference_complete": false,
+      "abstained": false
+    },
+    {
+      "workload": "W1",
+      "strategy": "qlognei",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu1-mem2048",
+      "probes": 5,
+      "unique_probed_candidates": 5,
+      "candidate_count": 6,
+      "confirmation_jobs": 3,
+      "planning_seconds": 2.218689809087664,
+      "actual_bo_choices": 2,
+      "fallback_choices": 0,
+      "study_elapsed_seconds": 220.487919,
+      "profile_confirmation_device_seconds": 22.0,
+      "later_reference_means_seconds": {},
+      "relative_distance_to_measured_reference": null,
+      "reference_complete": false,
+      "abstained": false
+    },
+    {
+      "workload": "W2",
+      "strategy": "random",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu2-mem2048",
+      "probes": 5,
+      "unique_probed_candidates": 4,
+      "candidate_count": 6,
+      "confirmation_jobs": 6,
+      "planning_seconds": 0.00020478677470237017,
+      "actual_bo_choices": 0,
+      "fallback_choices": 0,
+      "study_elapsed_seconds": 297.215433,
+      "profile_confirmation_device_seconds": 31.0,
+      "later_reference_means_seconds": {},
+      "relative_distance_to_measured_reference": null,
+      "reference_complete": false,
+      "abstained": false
+    },
+    {
+      "workload": "W2",
+      "strategy": "qlognei",
+      "state": "COMPLETED",
+      "selected_candidate": "cpu2-mem2048",
+      "probes": 5,
+      "unique_probed_candidates": 5,
+      "candidate_count": 6,
+      "confirmation_jobs": 6,
+      "planning_seconds": 0.148724579019472,
+      "actual_bo_choices": 2,
+      "fallback_choices": 0,
+      "study_elapsed_seconds": 296.525148,
+      "profile_confirmation_device_seconds": 31.0,
+      "later_reference_means_seconds": {},
+      "relative_distance_to_measured_reference": null,
+      "reference_complete": false,
+      "abstained": false
+    }
+  ],
+  "feedback_count": 12,
+  "comparable_feedback_count": 12,
+  "failures": 2,
+  "cumulative_measured_cost": [
+    {
+      "workload": "W1",
+      "arm": "static",
+      "N": 1,
+      "wall_seconds": 27.742979,
+      "device_seconds": 9.0,
+      "cpu_core_seconds": 11.0
+    },
+    {
+      "workload": "W1",
+      "arm": "static",
+      "N": 2,
+      "wall_seconds": 40.689082,
+      "device_seconds": 11.0,
+      "cpu_core_seconds": 13.0
+    },
+    {
+      "workload": "W1",
+      "arm": "static",
+      "N": 3,
+      "wall_seconds": 56.463414,
+      "device_seconds": 13.0,
+      "cpu_core_seconds": 15.0
+    },
+    {
+      "workload": "W1",
+      "arm": "random",
+      "N": 1,
+      "wall_seconds": 245.726869,
+      "device_seconds": 29.0,
+      "cpu_core_seconds": 32.0
+    },
+    {
+      "workload": "W1",
+      "arm": "random",
+      "N": 2,
+      "wall_seconds": 261.859521,
+      "device_seconds": 32.0,
+      "cpu_core_seconds": 35.0
+    },
+    {
+      "workload": "W1",
+      "arm": "random",
+      "N": 3,
+      "wall_seconds": 274.443631,
+      "device_seconds": 34.0,
+      "cpu_core_seconds": 37.0
+    },
+    {
+      "workload": "W1",
+      "arm": "qlognei",
+      "N": 1,
+      "wall_seconds": 250.606984,
+      "device_seconds": 30.0,
+      "cpu_core_seconds": 34.5
+    },
+    {
+      "workload": "W1",
+      "arm": "qlognei",
+      "N": 2,
+      "wall_seconds": 262.454865,
+      "device_seconds": 33.0,
+      "cpu_core_seconds": 37.5
+    },
+    {
+      "workload": "W1",
+      "arm": "qlognei",
+      "N": 3,
+      "wall_seconds": 274.687254,
+      "device_seconds": 36.0,
+      "cpu_core_seconds": 40.5
+    },
+    {
+      "workload": "W2",
+      "arm": "static",
+      "N": 1,
+      "wall_seconds": 54.87836,
+      "device_seconds": 9.0,
+      "cpu_core_seconds": 12.0
+    },
+    {
+      "workload": "W2",
+      "arm": "static",
+      "N": 2,
+      "wall_seconds": 65.620496,
+      "device_seconds": 11.0,
+      "cpu_core_seconds": 14.0
+    },
+    {
+      "workload": "W2",
+      "arm": "static",
+      "N": 3,
+      "wall_seconds": 77.892482,
+      "device_seconds": 13.0,
+      "cpu_core_seconds": 16.0
+    },
+    {
+      "workload": "W2",
+      "arm": "random",
+      "N": 1,
+      "wall_seconds": 352.93662700000004,
+      "device_seconds": 39.0,
+      "cpu_core_seconds": 52.5
+    },
+    {
+      "workload": "W2",
+      "arm": "random",
+      "N": 2,
+      "wall_seconds": 365.069563,
+      "device_seconds": 42.0,
+      "cpu_core_seconds": 58.5
+    },
+    {
+      "workload": "W2",
+      "arm": "random",
+      "N": 3,
+      "wall_seconds": 376.872685,
+      "device_seconds": 45.0,
+      "cpu_core_seconds": 64.5
+    },
+    {
+      "workload": "W2",
+      "arm": "qlognei",
+      "N": 1,
+      "wall_seconds": 352.789785,
+      "device_seconds": 39.0,
+      "cpu_core_seconds": 55.0
+    },
+    {
+      "workload": "W2",
+      "arm": "qlognei",
+      "N": 2,
+      "wall_seconds": 364.222795,
+      "device_seconds": 41.0,
+      "cpu_core_seconds": 59.0
+    },
+    {
+      "workload": "W2",
+      "arm": "qlognei",
+      "N": 3,
+      "wall_seconds": 375.268462,
+      "device_seconds": 43.0,
+      "cpu_core_seconds": 63.0
+    }
+  ],
+  "overall_goal_complete": false,
+  "limitations": [
+    "No extrapolation beyond actual main runs; setup includes confirmation and model/control overhead once.",
+    "Qualification is charged equally to each arm; historical image construction and energy are unmeasured.",
+    "Wall and device reservation are separate objectives; mixed GPU/NPU totals are accounting counts, not equivalent economic costs."
+  ]
+}

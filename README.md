@@ -249,3 +249,13 @@ effectiveness and live harmful-transfer injection remain unverified.
 공통 정책 API와 웹 제출 흐름: [SchedulingProfile 가이드](docs/scheduling-profiles.md).
 
 연구 운영 화면과 MLflow/Kubeflow 연결: [Research Console](docs/research-console.md).
+
+
+### Profile-guided right-sizing audit
+
+[기여와 실제 비용](docs/right-sizing-contribution.md),
+[주장별 acceptance gate](docs/right-sizing-claim-audit.md),
+[기존 저장소 기준선 감사](docs/right-sizing-gap-audit.md)를 함께 확인한다.
+신규 Kubernetes GPU/Hailo feedback은 실장비에서 검증했지만, 새 Slurm feedback
+loop는 controller 연결 문제로 BLOCKED다. Random/BO 우위나 profiling 순이익,
+전체 목표 완료를 주장하지 않는다.
