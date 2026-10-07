@@ -4,12 +4,13 @@ Profiles reference administrator-provisioned queues/QOS. They neither rewrite
 cluster configuration nor claim a quota shared across independent schedulers.
 """
 
+from datetime import timedelta
 from typing import Literal
 
 from pydantic import Field, model_validator
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 
-from .contracts import TERMINAL, Contract, Ref, Resources, WorkloadSpec, signature
+from .contracts import TERMINAL, Contract, Ref, Resources, WorkloadSpec, now, signature
 from .inventory import fresh_view
 from .policy import execution_compatibility
 from .store import entities, jobs
@@ -231,12 +232,22 @@ def compile_plan(service, conn, project, request):
     # Native inventory can lag a simultaneous burst. This is project-local
     # accepted demand, not an invented physical reservation or a global quota.
     demand = {}
-    for body in conn.execute(
-        select(jobs.c.body).where(jobs.c.project == project, ~jobs.c.state.in_(TERMINAL))
-    ).scalars():
+    recent = {}
+    cutoff = (now() - timedelta(minutes=5)).isoformat()
+    for body, state in conn.execute(
+        select(jobs.c.body, jobs.c.state).where(
+            jobs.c.project == project,
+            or_(~jobs.c.state.in_(TERMINAL), jobs.c.body["created_at"].as_string() >= cutoff),
+        )
+    ):
         capability = body.get("capability", {})
         key = (body.get("candidate", {}).get("backend"), capability.get("node_ref"))
-        demand[key] = demand.get(key, 0) + 1
+        if state not in TERMINAL:
+            demand[key] = demand.get(key, 0) + 1
+        # Short jobs can finish before all burst requests are accepted. Retain
+        # their recent assignment as a tie breaker, never as reserved capacity.
+        if body.get("created_at", "") >= cutoff:
+            recent[key] = recent.get(key, 0) + 1
     for candidate in candidates:
         errors = list(common)
         try:
@@ -276,7 +287,10 @@ def compile_plan(service, conn, project, request):
         elif policy.priority not in binding.priority_map:
             errors.append("PRIORITY_UNSUPPORTED")
         live = availability(candidate, cap, observations)
-        live["accepted_active_jobs"] = demand.get((str(candidate.backend), cap.node_ref), 0)
+        key = (str(candidate.backend), cap.node_ref)
+        live["accepted_active_jobs"] = demand.get(key, 0)
+        live["accepted_recent_jobs"] = recent.get(key, 0)
+        live["recent_assignment_window_seconds"] = 300
         if live["status"] == "unavailable":
             errors.append(live["reason"])
         evaluation.append(
@@ -310,6 +324,7 @@ def compile_plan(service, conn, project, request):
             ranks[x[3]["status"]],
             policy.backend_order.index(x[0].backend),
             x[3]["accepted_active_jobs"],
+            x[3]["accepted_recent_jobs"],
             x[0].ref,
         )
     )
@@ -342,7 +357,7 @@ def compile_plan(service, conn, project, request):
         ],
         "reason": [
             "Verified workload candidate satisfies profile constraints",
-            "Fresh request headroom first, then busy, then unknown; backend preference and candidate reference break ties",
+            "Fresh headroom first, then backend preference, active accepted demand, five-minute assignment history and candidate reference",
             "Backend queue/account enforces its own quota; no cross-backend quota is reserved",
         ],
     }

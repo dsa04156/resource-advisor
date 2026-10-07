@@ -129,7 +129,12 @@ request headroom. Observed down/draining nodes are excluded; stale/missing value
 remain unknown. Busy candidates remain eligible so the native scheduler can
 queue jobs. This is a routing heuristic, not an atomic reservation or physical
 GPU-utilization model. Kueue/Slurm still enforce admission, quotas and allocation.
-Concurrent submissions can choose the same target; native queueing arbitrates.
+Within equal headroom and backend preference, project-local active accepted jobs
+break ties, followed by the number of assignments in the last five minutes.
+Including recently completed jobs prevents fast burst requests repeatedly returning
+to the first candidate before untouched compatible nodes are considered. These
+counts are selection evidence, not GPU reservations or utilization; no cross-project
+fairness or optimal placement is claimed. Native queueing still arbitrates.
 
 The UI shows workload → candidate checks → resource selection → backend queue →
 execution → result. Candidate rows expose observed state, time, exclusion reasons

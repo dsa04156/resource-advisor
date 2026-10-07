@@ -332,7 +332,8 @@ def test_stale_capacity_does_not_claim_available(bundle):
     assert availability(candidate, cap, observations)["status"] == "unknown"
 
 
-def test_common_pool_selection_accounts_for_accepted_burst_demand(service, bundle):
+@pytest.mark.parametrize("first_completed", [False, True])
+def test_common_pool_selection_accounts_for_accepted_burst_demand(service, bundle, first_completed):
     spec, candidate, variant, cap = bundle
     second_cap = cap.model_copy(update={"ref": "second-cap", "node_ref": "second-node"})
     second = candidate.model_copy(update={"ref": "second", "capability_ref": second_cap.ref})
@@ -355,6 +356,10 @@ def test_common_pool_selection_accounts_for_accepted_burst_demand(service, bundl
         service.register(kind, model, "team-a")
     request = JobRequest(workload_ref=spec.ref, scheduling_profile_ref="interactive-v1")
     first = service.submit("team-a", request, "pool-1")
+    if first_completed:
+        with service.store.transaction() as conn:
+            row = service.store.job(conn, first["job_id"])
+            service.store.change_job(conn, row, "SUCCEEDED", row["body"])
     second = service.submit("team-a", request, "pool-2")
     with service.store.transaction() as conn:
         a = service.store.job(conn, first["job_id"])["body"]
@@ -362,5 +367,7 @@ def test_common_pool_selection_accounts_for_accepted_burst_demand(service, bundl
     assert a["capability"]["node_ref"] != b["capability"]["node_ref"]
     assert service.submit("team-a", request, "pool-1")["job_id"] == first["job_id"]
     assert any(
-        e["availability"]["accepted_active_jobs"] == 1 for e in b["scheduling_plan"]["evaluation"]
+        e["availability"]["accepted_active_jobs"] == int(not first_completed)
+        and e["availability"]["accepted_recent_jobs"] == 1
+        for e in b["scheduling_plan"]["evaluation"]
     )
