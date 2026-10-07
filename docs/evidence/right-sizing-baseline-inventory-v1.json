@@ -1,0 +1,4674 @@
+{
+  "schema_version": "baseline-inventory-v1",
+  "evidence_kind": "repository_audit",
+  "baseline_commit": "5d8b3954efc816c1f1271c6d0c03b73068236868",
+  "worktree_changes_excluded": [
+    "examples/scheduler_lab/agent.py",
+    "examples/scheduler_lab/config.example.json",
+    "examples/scheduler_lab/priority-resources.json",
+    "tests/test_scheduler_lab_runner.py"
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/verify.yml",
+      "sha256": "c6b1cc0064530a6420d625e24697fbfe1e3c1150b9f1d7f33a4bb9079dd24ae6",
+      "bytes": 3042
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "aed5a0a3965130bedf9f817b2e6e07d444824afc96bc7f160627190b63fc08fd",
+      "bytes": 142
+    },
+    {
+      "path": ".interface-design/system.md",
+      "sha256": "b55dd1756800b265fcf48188dbfcaca0e99f0461993c4ccdc6e3e816acd88415",
+      "bytes": 18185
+    },
+    {
+      "path": "README.md",
+      "sha256": "313bf79b7aeb8517813b40fd2e7a4140dcc65fec9ed5c905214072912a1c61c5",
+      "bytes": 15605
+    },
+    {
+      "path": "automation/ansible/README.md",
+      "sha256": "3da919f65adbccb012498156855610c7e87261b88192874e01e913809f4d451f",
+      "bytes": 5634
+    },
+    {
+      "path": "automation/ansible/SLURM_PROJECT.md",
+      "sha256": "7fef244b174dcb82f17a09c0b751f14e29d02f0c566716fcf984304ca5e5995e",
+      "bytes": 2933
+    },
+    {
+      "path": "automation/ansible/ansible.cfg",
+      "sha256": "bf26f86fba89d3c4a489b595655538dda7edb0b8fe772eb231f80cf906983a18",
+      "bytes": 156
+    },
+    {
+      "path": "automation/ansible/inventory.example.yml",
+      "sha256": "d729de44cee2b515d1d6a59fac1c2c34628420464c175621d9f6802337986fc7",
+      "bytes": 457
+    },
+    {
+      "path": "automation/ansible/requirements.in",
+      "sha256": "62c55a31164bf9d6cda3ec97dd6e0fd60888bd30859f7da2d40df444868092a8",
+      "bytes": 93
+    },
+    {
+      "path": "automation/ansible/requirements.txt",
+      "sha256": "25252df9deadf67768c42498bd4e3275e3a3bea1dd0aa669d75d217ac9a8696b",
+      "bytes": 33981
+    },
+    {
+      "path": "automation/ansible/roles/node_exporter/defaults/main.yml",
+      "sha256": "014a72288adf40704fc3be88948ebd80f39c21c204b188cc6f0ebb206e661395",
+      "bytes": 412
+    },
+    {
+      "path": "automation/ansible/roles/node_exporter/handlers/main.yml",
+      "sha256": "3cb311b907c226526610311a0b04752f39173d057ae5c5a3b0a640332f1efc47",
+      "bytes": 184
+    },
+    {
+      "path": "automation/ansible/roles/node_exporter/tasks/main.yml",
+      "sha256": "1bf0f4e12d6bd84c3272acac62da909045d5157eb667755fd1e3ce61cfb8de30",
+      "bytes": 8569
+    },
+    {
+      "path": "automation/ansible/roles/node_exporter/templates/resource-advisor-node-exporter.service.j2",
+      "sha256": "d9df3b35e8d25a00511fcb1ba0bfa3e12cf48029b65b7420efeb4d6508b14cf5",
+      "bytes": 1269
+    },
+    {
+      "path": "automation/ansible/roles/node_exporter/templates/web.yml.j2",
+      "sha256": "072406ac9d7780d5f9d351c83a03b5d63398fafd38fac2585e4ad80f08eeccef",
+      "bytes": 352
+    },
+    {
+      "path": "automation/ansible/roles/slurm_discovery/tasks/main.yml",
+      "sha256": "e662520fd0a84f6edfce69d1f5976d167fa882d7c7b43aa4d4c68afaa762166f",
+      "bytes": 1019
+    },
+    {
+      "path": "automation/ansible/roles/slurm_limits/tasks/main.yml",
+      "sha256": "4bda34730e1ab1621593aaee48236513bb273b7a1cab1b3f4bccfa987f15cc17",
+      "bytes": 9663
+    },
+    {
+      "path": "automation/ansible/roles/slurm_observer/tasks/main.yml",
+      "sha256": "8a29ed3ee3f1ac6632cb9067e1dab9d82bbb77d10a010b87f0d7dd4d81f13e43",
+      "bytes": 4266
+    },
+    {
+      "path": "automation/ansible/roles/slurm_project/tasks/main.yml",
+      "sha256": "68f2968bfd9159b3ce1426c7ce3e62e5efd4a9debfd2777ac137864d92a528d0",
+      "bytes": 9037
+    },
+    {
+      "path": "automation/ansible/site.yml",
+      "sha256": "d280d2a9d510629c765a2b4fbe56881c50b6bb33cc3e24d2ff1ada08e11227e5",
+      "bytes": 2272
+    },
+    {
+      "path": "automation/ansible/slurm-limits.yml",
+      "sha256": "a27ff068ea85b9d4e43e36d3304fa1b290056bd54d684bc541ca3dbf79e04104",
+      "bytes": 215
+    },
+    {
+      "path": "automation/ansible/slurm-observer.yml",
+      "sha256": "18bd72ae78c6ef3c69452dcc0ae77aa3e6613143e9f23adfff060e57a25da44c",
+      "bytes": 209
+    },
+    {
+      "path": "automation/ansible/slurm-project.yml",
+      "sha256": "e4bf33e85bd7ed9662e189ab79b5cd77b1e2d00a3e75303e62a3e2ca845cfdae",
+      "bytes": 209
+    },
+    {
+      "path": "deploy/README.md",
+      "sha256": "b8cd00e047bc540f78761bb428218b68c365f0dd724aad415efbd3ea0bfb3a71",
+      "bytes": 2550
+    },
+    {
+      "path": "deploy/argocd/README.md",
+      "sha256": "bf550b9d7bafe01562bd21598c753ee8df1b2146a62528c8430eef9f23a5c584",
+      "bytes": 6284
+    },
+    {
+      "path": "deploy/argocd/render.py",
+      "sha256": "61bb210743c65487d04d54f7c10eace5cf6d932f7e23123b7f9df4067311b8ac",
+      "bytes": 7341,
+      "classes": [
+        "Site"
+      ],
+      "functions": [
+        "render"
+      ]
+    },
+    {
+      "path": "deploy/argocd/site.example.json",
+      "sha256": "a109ca3a503408d53d02675285927f93a1e8e723cc9e8a44f3c1e938c613553b",
+      "bytes": 743
+    },
+    {
+      "path": "deploy/inventory-rbac.yaml",
+      "sha256": "c81a3cc5fac75e7818f19b49243549f6ab3d1e39a2fe1e8ed831b69972ad3324",
+      "bytes": 1765
+    },
+    {
+      "path": "deploy/kueue-priorities.yaml",
+      "sha256": "f7876270212970544e193f95a69f5773a2abfbc866497d19e5abd9dce0214226",
+      "bytes": 516
+    },
+    {
+      "path": "deploy/kustomization.yaml",
+      "sha256": "3bd67a87811f91a7e76b87ac086b2778b5c632058feb53f27696c58cb64d20e4",
+      "bytes": 144
+    },
+    {
+      "path": "deploy/postgres/kustomization.yaml",
+      "sha256": "905bd41da94bb4e3582ba975402e8ac84c5cffdecf8e0bac85ca50ce4b6c0e5f",
+      "bytes": 125
+    },
+    {
+      "path": "deploy/postgres/postgres.yaml",
+      "sha256": "4f420107b1f0cb7558c511e2965d7d7b09fa86b9d292575cf89caf063005b68c",
+      "bytes": 3395
+    },
+    {
+      "path": "deploy/projects/lab-project-b.yaml",
+      "sha256": "a2a67e9da5aca35aadff317eecd5be2676f3d484b183edd68f094de54f344afc",
+      "bytes": 1502
+    },
+    {
+      "path": "deploy/resource-advisor-forward.service",
+      "sha256": "bc0e4efc7195c41ee18d2283b0f1d595ef3910108452ae0277828af545104349",
+      "bytes": 447
+    },
+    {
+      "path": "deploy/routes.example.json",
+      "sha256": "05ea95f66720c145f46e429eb342c67ab5c39e217e2d361b732ccabc35842a9a",
+      "bytes": 1749
+    },
+    {
+      "path": "deploy/services/kustomization.yaml",
+      "sha256": "65e3fa3a0c1009ba2bfb81a7d85f9c8bb703074f8a6c1ba8128dc909d265d5c2",
+      "bytes": 125
+    },
+    {
+      "path": "deploy/services/services.yaml",
+      "sha256": "273ca3b13f01e27bdccfca95ee855532b30018f1c63b14bbec826ff4261527c5",
+      "bytes": 5299
+    },
+    {
+      "path": "deploy/slurm-inventory/README.md",
+      "sha256": "e51c41933b0991000eb5441126813cc3f81925e5103d5a24ee8e53625beab106",
+      "bytes": 2724
+    },
+    {
+      "path": "deploy/slurm-inventory/deployment.yaml",
+      "sha256": "f1f0209606886577e1f6766a88307865b4a8c147df8149c7020111972d043da4",
+      "bytes": 2664
+    },
+    {
+      "path": "deploy/slurm-inventory/kustomization.yaml",
+      "sha256": "09b08f2f9d4c9a9f3717a314f0b796b52cd5d85a4af0490f5a32bbb7a4c9eac5",
+      "bytes": 127
+    },
+    {
+      "path": "deploy/slurm-worker/kustomization.yaml",
+      "sha256": "70fcb39dc3e77d239cbac37641618267a92a7c0ae63666cb0de78f706433839d",
+      "bytes": 123
+    },
+    {
+      "path": "deploy/slurm-worker/worker.yaml",
+      "sha256": "d0198e58a4265b900ca31b9c3aeb2f480dcdba236e9bec2288fb1f98ab1f86de",
+      "bytes": 2342
+    },
+    {
+      "path": "deploy/telemetry/README.md",
+      "sha256": "352c1211df4f4b2334c89aff0665f799fd2930df7033f2d41d87e672e65d22c1",
+      "bytes": 4558
+    },
+    {
+      "path": "deploy/telemetry/kustomization.yaml",
+      "sha256": "0120a383d91a31fa1dc31277dd35d3b69adf028f6fb11e0762408f631a2654ec",
+      "bytes": 123
+    },
+    {
+      "path": "deploy/telemetry/render.py",
+      "sha256": "42ea791e66e90bc5a071c16735a3d87937d9ccb54a70828cddce3d208d903665",
+      "bytes": 4427,
+      "classes": [
+        "Target",
+        "Site"
+      ],
+      "functions": [
+        "render"
+      ]
+    },
+    {
+      "path": "deploy/telemetry/scrape.yaml",
+      "sha256": "1e57814eae9d925c0512adfe0463180bf7847c65a638a54819e1ca4ffabdcfc3",
+      "bytes": 861
+    },
+    {
+      "path": "deploy/worker/kustomization.yaml",
+      "sha256": "70fcb39dc3e77d239cbac37641618267a92a7c0ae63666cb0de78f706433839d",
+      "bytes": 123
+    },
+    {
+      "path": "deploy/worker/termination-retention-rbac.yaml",
+      "sha256": "6da05757c0bd91f516e81ddd57488939a4e8b1bfa8016b7de3962faf999bef0b",
+      "bytes": 659
+    },
+    {
+      "path": "deploy/worker/worker.yaml",
+      "sha256": "6b105c775d852a1240a5319bde393e3b06da6a104f014916b9f3445ff6c5a79b",
+      "bytes": 3382
+    },
+    {
+      "path": "docs/accounting.md",
+      "sha256": "45820c74d59c83b96a234b43e895d2265bc489f27ae60290210e02d829e281c8",
+      "bytes": 7429
+    },
+    {
+      "path": "docs/adaptive-replication.md",
+      "sha256": "b886849119897f4014db398760239dc9a67ac529e00aec928314899433af9dd5",
+      "bytes": 8361
+    },
+    {
+      "path": "docs/ansible-lab-plan.md",
+      "sha256": "d475c9dca9714572b0a4774e601fdabc24fe957da33e1ae4d0592795b0318180",
+      "bytes": 2571
+    },
+    {
+      "path": "docs/ansible-lab.md",
+      "sha256": "0034c206e6f1635cbaad22294e34765062b321f7c442478fca36a6d5fcb7ed35",
+      "bytes": 5277
+    },
+    {
+      "path": "docs/approved-gpu-demo.md",
+      "sha256": "a02983996c8b6f2480513eb9b2ce1d716adf5108999630b4cdfca242503c79d0",
+      "bytes": 5813
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "a3f26f38e0e58a5aa77ab37f023861ab705ca7cca13958a883b8f861fa6504ff",
+      "bytes": 8207
+    },
+    {
+      "path": "docs/artifacts.md",
+      "sha256": "6a3dd51acb412a2bd480ae811cf582f11150d6cb093151739e12819bf0b0d3df",
+      "bytes": 5258
+    },
+    {
+      "path": "docs/bottleneck-diagnostics.md",
+      "sha256": "190d5510258aa01a1f747e374c95ab04f4f5cb922016d045637c6a87675ca62e",
+      "bytes": 7861
+    },
+    {
+      "path": "docs/cancellation-verification.md",
+      "sha256": "e65b7575777d41620a341dcd58a00926e79fb35df8d5289f9e91f88ceeed2e93",
+      "bytes": 4514
+    },
+    {
+      "path": "docs/central-telemetry-plan.md",
+      "sha256": "932ba9291276d9df8be4d5c3066069771c0e7badc2767ff879c302fcab5a7c90",
+      "bytes": 1811
+    },
+    {
+      "path": "docs/central-telemetry.md",
+      "sha256": "3c1d363acff4a23f1be38d8db2a2f5fbc8211a0af63d82518cd319a95e63ae33",
+      "bytes": 5181
+    },
+    {
+      "path": "docs/common-gpu-pool.md",
+      "sha256": "88a6620cdba4eb614f25e09a84db85adb7ddcdc312c20b773fd49e009934dd93",
+      "bytes": 4953
+    },
+    {
+      "path": "docs/concurrent-worker-plan.md",
+      "sha256": "5235fcf2439eb64acd6a9ff9b23144d750e5641ac684254a286937595f97fb2b",
+      "bytes": 2634
+    },
+    {
+      "path": "docs/concurrent-workers.md",
+      "sha256": "74cba90e684e38e298b8edf8a67248b787c8b641935deb0d03324e63e29ddcd9",
+      "bytes": 7010
+    },
+    {
+      "path": "docs/configuration-checks.md",
+      "sha256": "d4459b75ee57fb9a55202411d754dae5c3d6f9fc66c83e7e2f453725657cc4ed",
+      "bytes": 6803
+    },
+    {
+      "path": "docs/console.md",
+      "sha256": "f6114ac00b70d477de67d4b63e5df7c1780bbdc6a4f88375bd49aed798484610",
+      "bytes": 15164
+    },
+    {
+      "path": "docs/contract-boundaries.md",
+      "sha256": "f466ffde0d743b288e66b0692ddefe326420e16f6f0fcb3f58abc0e5ad7deb1f",
+      "bytes": 6346
+    },
+    {
+      "path": "docs/cpu-gpu-pipeline-plan-v2.md",
+      "sha256": "13050fc9e727a65cdb7ae81232c5d4257f3cb8bfa80a1b2c9866846f880a62ee",
+      "bytes": 2167
+    },
+    {
+      "path": "docs/cpu-gpu-pipeline-plan.md",
+      "sha256": "ecf71367bd3d474d39925dead510fccd249f125be30587f0d0fdfac179401974",
+      "bytes": 3740
+    },
+    {
+      "path": "docs/cpu-gpu-pipeline-results.md",
+      "sha256": "0573b4700f76c6420b226a262a2199e07657640d91757360e9792cebb1341f30",
+      "bytes": 6268
+    },
+    {
+      "path": "docs/cuda-fallback-plan.md",
+      "sha256": "de5e0889af76514288cb4553c54ab1f67badd703f3989bc1db6572a5bf9b8086",
+      "bytes": 2839
+    },
+    {
+      "path": "docs/cuda-fallback.md",
+      "sha256": "7e14946d4008152301c3dfa2a594cdf41f8ff4468e9d6eeaa5f090d2248bcfdc",
+      "bytes": 4059
+    },
+    {
+      "path": "docs/differentiation-ko.md",
+      "sha256": "a941d70e5e2afc1ad406a99de971dbfb58e3f1f89c13136fb9047766f78c54ab",
+      "bytes": 12327
+    },
+    {
+      "path": "docs/e5-kernel-plan-v2.md",
+      "sha256": "0464332fdf158ef9557a69b92c779b26c9ce5ab6b3d2174743d05915cf76ad26",
+      "bytes": 1973
+    },
+    {
+      "path": "docs/e5-kernel-plan.md",
+      "sha256": "dc18a1d203784003504c85261e1c8c51c7cd94345fa3dcb012b26ae1d62db4de",
+      "bytes": 6680
+    },
+    {
+      "path": "docs/e5-kernel-qualification.md",
+      "sha256": "c2b32c130171d6f24dcd68dcd30d5e166858f5151f051156e8be3d5dbfe91ee8",
+      "bytes": 4084
+    },
+    {
+      "path": "docs/e5-kernel-results.md",
+      "sha256": "069ae5e0e49c23d0b632dbcdd6cae75866846a0352391627a92895c6503ad612",
+      "bytes": 5711
+    },
+    {
+      "path": "docs/evidence/adaptive-gpu-arrivals.json",
+      "sha256": "5e0bdb8b79bf76831d01ec45074f1a7ce81ea2235dfcd830b3e5976752c78887",
+      "bytes": 4780
+    },
+    {
+      "path": "docs/evidence/adaptive-replication-strict.csv",
+      "sha256": "78472bd44e5acd4e298af6ca00d0a39fe6c8f5c0eee76e015606b8f91cd9b46c",
+      "bytes": 2142
+    },
+    {
+      "path": "docs/evidence/adaptive-replication-strict.json",
+      "sha256": "5fea50e7b426530dc07a9909decbddb8614593382586786e0d010b22b0ae3307",
+      "bytes": 60997
+    },
+    {
+      "path": "docs/evidence/adaptive-replication.csv",
+      "sha256": "9f0d8e1e0968409e8916c63809067dcae5226198df24788785dd24da09c838f8",
+      "bytes": 1529
+    },
+    {
+      "path": "docs/evidence/adaptive-replication.json",
+      "sha256": "963b0ef1ff2cc566b9661ce0f7116d6468394d60f126e3955d5a2567619cdcf0",
+      "bytes": 42023
+    },
+    {
+      "path": "docs/evidence/ansible-lab.json",
+      "sha256": "57bae9b5944f38e65f20bee0a5fa1d8351780e5e2b16d8db9410115867de5271",
+      "bytes": 5153
+    },
+    {
+      "path": "docs/evidence/approved-gpu-execution.csv",
+      "sha256": "f24c7f0d1f414a1a1667fcb43cb4369c491f53ce40af20b289a09a3d37775dcb",
+      "bytes": 484
+    },
+    {
+      "path": "docs/evidence/approved-gpu-execution.json",
+      "sha256": "3fd5dd8657822e63eeefe1399e781236707fb3803715e6642166423362bfdf3e",
+      "bytes": 20837
+    },
+    {
+      "path": "docs/evidence/artifacts.json",
+      "sha256": "be546151798afe90a7a70afcf2e2a0c2a090fff01deb85d28c2402476d823bcd",
+      "bytes": 577
+    },
+    {
+      "path": "docs/evidence/cancellation.json",
+      "sha256": "3e2981a30999132d9992c2700771bf20454a917c6ab556c4df61d0359efc932b",
+      "bytes": 5288
+    },
+    {
+      "path": "docs/evidence/central-telemetry.json",
+      "sha256": "5a290fb1136a7ac991f9f168395717afe392b71f8e76ab6e404b279c55f64be5",
+      "bytes": 3902
+    },
+    {
+      "path": "docs/evidence/cnn-diagnostics.csv",
+      "sha256": "6b464f748ad4da152a22658397f00d69a5235fb5be46be643de4ca4228f08c17",
+      "bytes": 1612
+    },
+    {
+      "path": "docs/evidence/cnn-diagnostics.json",
+      "sha256": "ae0f9d6b2c2990a3346f6956eafbc641a59ce014665382e05142c29f589c6964",
+      "bytes": 91078
+    },
+    {
+      "path": "docs/evidence/common-gpu-pool-ten-request.json",
+      "sha256": "1687e2e57a3867d1ac52f553afda684fad4d98c42695a9b6a35330f3455c5f3b",
+      "bytes": 2778
+    },
+    {
+      "path": "docs/evidence/concurrent-workers.json",
+      "sha256": "9d61adbcbd5c8787e52fc0834deae1e3c27af5bae7d2b0d8ebfc9a134d5290fe",
+      "bytes": 8980
+    },
+    {
+      "path": "docs/evidence/configuration-checks.json",
+      "sha256": "7a5f46252d060e29f8708e7f7c9138bff2990c2eb0ef96131d342004b87ec9a2",
+      "bytes": 2606
+    },
+    {
+      "path": "docs/evidence/console-verification.json",
+      "sha256": "496030b5d53e02a6b71ea766a4206e3aafdfbcc50391e868473c93b233b842a2",
+      "bytes": 1383
+    },
+    {
+      "path": "docs/evidence/contract-boundaries-v1.json",
+      "sha256": "d41bfb47358df8da8da63d21c832c2d9d03313c824695a1b545aa5724bee3b1c",
+      "bytes": 199684
+    },
+    {
+      "path": "docs/evidence/cpu-gpu-m1-v1-failure.json",
+      "sha256": "641ca465fad0dc73d53032ff58d9d9532b7f50434d5d7b114a317eaab334aaaa",
+      "bytes": 2294
+    },
+    {
+      "path": "docs/evidence/cpu-gpu-m1-v2-result.json",
+      "sha256": "0bb9852aa083e3c2095cc0be71aacab7f856bdd761b60e303781da034a50501d",
+      "bytes": 17857
+    },
+    {
+      "path": "docs/evidence/cuda-f0.json",
+      "sha256": "1893c1a96ae08d3159479b1cebf9c79695cc096aafbd780781d393b6f4d11b98",
+      "bytes": 714
+    },
+    {
+      "path": "docs/evidence/cuda-fallback-v1.json",
+      "sha256": "7d7516c9ac7790afb013fef6f6b3514c40c42e8767fa1deeaadcb1c77340f82b",
+      "bytes": 7091
+    },
+    {
+      "path": "docs/evidence/e5-kernel-plan-v1.json",
+      "sha256": "54ca08117a6a015719c832272a8725dac5c3757edf4be805306292a5f0f87d7c",
+      "bytes": 1164
+    },
+    {
+      "path": "docs/evidence/e5-kernel-plan-v2.json",
+      "sha256": "fa4b7fe1339aa3c3e438e0e8017980e4b7efc0587b64738c343abe5ff769e8f3",
+      "bytes": 1618
+    },
+    {
+      "path": "docs/evidence/e5-kernel-qualification-v1.json",
+      "sha256": "bbcf8961f36584c543f221438163e5247dfce7cb190633fd371ef9242b3994ec",
+      "bytes": 22669
+    },
+    {
+      "path": "docs/evidence/e5-kernel-trace-probe-v1.json",
+      "sha256": "c5d8281109f08cd45848e710c4cde309852565b99d60b89e96c926bde59854a0",
+      "bytes": 276332
+    },
+    {
+      "path": "docs/evidence/e5-kernel-v2-provenance.json",
+      "sha256": "d819aaffb9e8faeea0e9312616728ffbfce6050bcbdf3c7af73df2fe34e08b9f",
+      "bytes": 1356
+    },
+    {
+      "path": "docs/evidence/e5-kernel-v2-report.json",
+      "sha256": "5107d6ea5a65e9f526cefec210c936b63e54271c2cf410b00d6837f7b4cf60bb",
+      "bytes": 3455
+    },
+    {
+      "path": "docs/evidence/e5-kernel-v2.json",
+      "sha256": "a564cdf24e765df075f92c36ca11446c8b485a0250f5becad95d9e033312007b",
+      "bytes": 4305510
+    },
+    {
+      "path": "docs/evidence/failure-ledger.json",
+      "sha256": "749d61592885a477c5e22fa899cc1931eb67bdbaf863f6601defe4a231564d82",
+      "bytes": 2438
+    },
+    {
+      "path": "docs/evidence/failure-tracking.json",
+      "sha256": "d131cd97dffbabb8fa4625ef470fe62a7169dacf0c246d0229739c8c48dc8223",
+      "bytes": 4776
+    },
+    {
+      "path": "docs/evidence/fidelity-calibration.csv",
+      "sha256": "e1a55b05daf774dc5388ebf2a6131b8d54307c8e4fc0babc844633d1c35c8f23",
+      "bytes": 2738
+    },
+    {
+      "path": "docs/evidence/fidelity-calibration.json",
+      "sha256": "500a77fc12d5aac45ea1b241f141d441d89f725750f552f2af98d2eaaa07efb2",
+      "bytes": 39336
+    },
+    {
+      "path": "docs/evidence/figures/uncertainty-drift-ablation-v1.png",
+      "sha256": "5bb242fbf2d19b969066b2e1f9302dafe2e2fb68b2d7b6b2b238311dd4ea3068",
+      "bytes": 100215
+    },
+    {
+      "path": "docs/evidence/figures/uncertainty-drift-ablation-v1.svg",
+      "sha256": "96ac8b180a924d872e779dd69b5e2607d1d0754b8e2ee89579ac5b119bbd527f",
+      "bytes": 26800
+    },
+    {
+      "path": "docs/evidence/full-fleet-ten-request.json",
+      "sha256": "a8a14c6e703115229a7616cc072d2001eed7a6a6d8cc588c332476a238fc2012",
+      "bytes": 1822
+    },
+    {
+      "path": "docs/evidence/gitops-adoption.json",
+      "sha256": "906e432185d5ae365c598b5d29f8183b9f76297b27f5a2e4c369564792aec6f6",
+      "bytes": 5222
+    },
+    {
+      "path": "docs/evidence/gpu-study.csv",
+      "sha256": "b6d98a5717f76a906efb737f4def8400cbb47d7de221026166b9d023e14860ca",
+      "bytes": 4302
+    },
+    {
+      "path": "docs/evidence/gpu-study.json",
+      "sha256": "fda0ae15d368a14530adf5cd9190b4b6166050b0e4f9a99c817e7dabd8fedbae",
+      "bytes": 52534
+    },
+    {
+      "path": "docs/evidence/hailo-artifact-v1.json",
+      "sha256": "13839082b0ba9de6c521e82a6d9609ecca75c8889624346c401fd5209ec2598c",
+      "bytes": 6885
+    },
+    {
+      "path": "docs/evidence/hailo-efficientformer-inputs.json",
+      "sha256": "5696247d5a65905dc2cc5421392957e2276749932394bc53451a484152208415",
+      "bytes": 31970
+    },
+    {
+      "path": "docs/evidence/hailo-efficientformer.json",
+      "sha256": "a61cacc889e5b99032a3407a77c2ebdfbd9640f8c949811a50818087a74ca4f8",
+      "bytes": 36352
+    },
+    {
+      "path": "docs/evidence/hailo-input-manifest.json",
+      "sha256": "b96a400c1dd303d76119f69af6c444d13faeccd8026998345f8d3056950c4239",
+      "bytes": 31767
+    },
+    {
+      "path": "docs/evidence/hailo-qualification.json",
+      "sha256": "5b6de190e8d770261316fe2c21555e61b2e7b07c2619eb51d1b08b0b9dd540b2",
+      "bytes": 39472
+    },
+    {
+      "path": "docs/evidence/hailo-reservation.json",
+      "sha256": "6f2c1c2a3153623d0c330df836ea9e254bed7ad50b52c355935ffa6af6db0bcc",
+      "bytes": 3801
+    },
+    {
+      "path": "docs/evidence/hailo-resnet50-inputs.json",
+      "sha256": "7740c3420918e1264024dd41dbe6c0db18a2f1d283789afc89ef3d0db522d30f",
+      "bytes": 32090
+    },
+    {
+      "path": "docs/evidence/hailo-resnet50-platform.json",
+      "sha256": "793b171473e9c6a83fb31b0eb9ec530a1b72311047c05555fa89a8fb34d7a7e7",
+      "bytes": 180581
+    },
+    {
+      "path": "docs/evidence/hailo-resnet50-provenance.json",
+      "sha256": "393f55981b215916e1696ae505497ee9cc4837a47116f42c349663ccc565f649",
+      "bytes": 558
+    },
+    {
+      "path": "docs/evidence/hailo-resnet50-qualification.json",
+      "sha256": "591f5ea11e96581c32975ddd75892e157192a53ff7e11d7941e9f035fe4cb58d",
+      "bytes": 32770
+    },
+    {
+      "path": "docs/evidence/hailo-resnet50-sample-plan.json",
+      "sha256": "88069cc81031f10e3f7c83813ecd04020a04754cb54dba30056e996adf148a85",
+      "bytes": 5928
+    },
+    {
+      "path": "docs/evidence/inventory-live.json",
+      "sha256": "4eccb935b41b7f30266d72a79c7d0bc057e0224bb658cbd9354ace9e35a9ff99",
+      "bytes": 61632
+    },
+    {
+      "path": "docs/evidence/kubeflow-cancellation.json",
+      "sha256": "de7b1ae4b1009b3b6f07b9c7e4b5001c97356988e3f0cf2e35875a9c980489a2",
+      "bytes": 4874
+    },
+    {
+      "path": "docs/evidence/kubeflow-pipeline.json",
+      "sha256": "3da6c78b66a024ee1176fcedfbe45256966d70b38a5038715194d6827f39d363",
+      "bytes": 4007
+    },
+    {
+      "path": "docs/evidence/kubernetes-completion.json",
+      "sha256": "a83b7bd28a6dc6d81bc5e264a7578467c960ba4cb7c4214419c017514b04e455",
+      "bytes": 1802
+    },
+    {
+      "path": "docs/evidence/kubernetes-runtime-bundle-v1.json",
+      "sha256": "2dd9147e36e343b5688ac89af97ed7318dafb803a4cf3ad226fad0628c3d070f",
+      "bytes": 1454
+    },
+    {
+      "path": "docs/evidence/kueue-policy.json",
+      "sha256": "744ec31fde386dafb4b7a0d8f3a711086db89907746f5908dc001757d2e2c8b1",
+      "bytes": 7758
+    },
+    {
+      "path": "docs/evidence/load-context-deployment.json",
+      "sha256": "2ced22b6c0fbce0721b82612234a3f7990490c3d88d8c89dd86527d04ff15dae",
+      "bytes": 1514
+    },
+    {
+      "path": "docs/evidence/load-drift-v1.json",
+      "sha256": "76f530365bd9500ef110c12784777c01f53ea9883427ea9f4924b3b92d719788",
+      "bytes": 173898
+    },
+    {
+      "path": "docs/evidence/mfkg-numerical.json",
+      "sha256": "39427b5ce4272cba472ff542cce9f0ab25ecbd5087dc1573b420ba5ce1d70d2d",
+      "bytes": 74427
+    },
+    {
+      "path": "docs/evidence/mixed-fidelity-calibration.csv",
+      "sha256": "03e8e1ef9750e8b0552cd21978e74ae77a0b9ee47f2f05a72456ee98f96e40d8",
+      "bytes": 3386
+    },
+    {
+      "path": "docs/evidence/mixed-fidelity-calibration.json",
+      "sha256": "51258773824f2d769bd1f433b8a703338b1cdaf7f2c86f466f08c7a341509d04",
+      "bytes": 101468
+    },
+    {
+      "path": "docs/evidence/mlflow-server-outage-v1.json",
+      "sha256": "3b6d5bd92bb25f053ae88d787328d7673e687a283d462908e7fd3f82731d2d30",
+      "bytes": 1822
+    },
+    {
+      "path": "docs/evidence/mlflow-server-outage-v2.json",
+      "sha256": "6d19d5b055f7d6dc2c26a05e197b772b3eb9bc7ecdf0ba185dad92ec16150d03",
+      "bytes": 2993
+    },
+    {
+      "path": "docs/evidence/native-runtime-guard.json",
+      "sha256": "16cdcec81b020297a5af1387958ffd357861906a740d12d7fc9f513b60f56ca2",
+      "bytes": 391
+    },
+    {
+      "path": "docs/evidence/numerical-holdout-provenance-v1.json",
+      "sha256": "0a3ceaa13ea7da848ac3767067de37efcdf0f6218850ef15bd187401a5896e6e",
+      "bytes": 1351
+    },
+    {
+      "path": "docs/evidence/numerical-workload-holdout-v1.json",
+      "sha256": "5c5871a40a96190d808cbc01ebcc91f912affff7b339cb4e936f011aebbc2fc1",
+      "bytes": 95268
+    },
+    {
+      "path": "docs/evidence/numerical-workload-holdout-v1.svg",
+      "sha256": "15d7efef356a9d58dc43d0bf20f080167d257dc8a56c0e13ef4f4f4b62d8e863",
+      "bytes": 85273
+    },
+    {
+      "path": "docs/evidence/operational-comparison-v1-figure/comparison.png",
+      "sha256": "ffa0310afba30ae24b47a99f7a10108a4ffba07aca954f69be90304775a37803",
+      "bytes": 113579
+    },
+    {
+      "path": "docs/evidence/operational-comparison-v1-figure/comparison.svg",
+      "sha256": "82eba1221b66c3bf5e609b2ae04ada9a30bd5c511085d188493136c28f56a25b",
+      "bytes": 63047
+    },
+    {
+      "path": "docs/evidence/operational-comparison-v1-figure/description.txt",
+      "sha256": "6c6226df6c0a6ca8c9834526c200b048ffde43678b8703d4cba728958d83eae1",
+      "bytes": 366
+    },
+    {
+      "path": "docs/evidence/operational-comparison-v1-figure/manifest.json",
+      "sha256": "2c35975d6289e396f3f422eb87cfcfe10611c64164178bc1f7ce928db7a89963",
+      "bytes": 505
+    },
+    {
+      "path": "docs/evidence/operational-comparison-v1-figure/raw-main.csv",
+      "sha256": "e19936e519603c88aad2924d8510e1a9d5896a1c94f9984f8e185dace2ff769e",
+      "bytes": 1588
+    },
+    {
+      "path": "docs/evidence/operational-comparison-v1-figure/serial-cost.csv",
+      "sha256": "b60a6704df98adff69e96ad99ffdf940eb1d2a1d6dcf83135b761921f0db1384",
+      "bytes": 992
+    },
+    {
+      "path": "docs/evidence/operational-comparison-v1-summary.json",
+      "sha256": "7cd24e9d77a1894a7087efc33b5de2ad17074bc584b19253ad909627474ff537",
+      "bytes": 16810
+    },
+    {
+      "path": "docs/evidence/operational-comparison-v1.csv",
+      "sha256": "e19936e519603c88aad2924d8510e1a9d5896a1c94f9984f8e185dace2ff769e",
+      "bytes": 1588
+    },
+    {
+      "path": "docs/evidence/operational-comparison-v1.json",
+      "sha256": "4e55c716daf18489c2dd0438a69052169bbc2b83821fc2eeafddd12560ef7bca",
+      "bytes": 716784
+    },
+    {
+      "path": "docs/evidence/operational-plan-v1.json",
+      "sha256": "66636f9a1d24b9be0d5c6b5f0eae0efc3edd436c67ef8e1a391509693385804a",
+      "bytes": 6206
+    },
+    {
+      "path": "docs/evidence/optimizer-repair.json",
+      "sha256": "b264c08bb729393adb5465b21466dfe94262dccec59ff20edd95cef8aa883528",
+      "bytes": 1280
+    },
+    {
+      "path": "docs/evidence/passive-gpu-observation-plan-v1.json",
+      "sha256": "713fec703379e1a171dc5a5de2f90334011e2bccd42e9a44e00f65f73e01ae25",
+      "bytes": 1323
+    },
+    {
+      "path": "docs/evidence/passive-gpu-observation-result-v1.json",
+      "sha256": "1cf1a3cd4010457ebf3f6c2793ed52152d90e3f1982670cc9d6d21055236569e",
+      "bytes": 15520
+    },
+    {
+      "path": "docs/evidence/passive-observation-deployment-v1.json",
+      "sha256": "f4dce9ef2e23f9db3294970a7a70b257f68f9929575950134e5a9e5a2b5f5fa7",
+      "bytes": 2245
+    },
+    {
+      "path": "docs/evidence/persistent-postgres.json",
+      "sha256": "69e6068ff3e4e033b8de082b3054501b465ce31b43d1c218833341f74edfa2ed",
+      "bytes": 2712
+    },
+    {
+      "path": "docs/evidence/pi-pcie-readback-v2.json",
+      "sha256": "ef6ffddea02f80786d55103dc30402128ffbf60cfbcd344518584b4588877b53",
+      "bytes": 951
+    },
+    {
+      "path": "docs/evidence/pipeline-stage-links.json",
+      "sha256": "6fa5e0bca2757b2012832c451beb5987a427105917c18db07941a5a8b980cc45",
+      "bytes": 4542
+    },
+    {
+      "path": "docs/evidence/policy-comparison-plan-v2.json",
+      "sha256": "4d261df39fd330d75972ccbe770a01c9bf144e91090f0cb08add0dade6d5c440",
+      "bytes": 7288
+    },
+    {
+      "path": "docs/evidence/policy-comparison-plan.json",
+      "sha256": "b65d26446f152db7e8363222beef9904b3481dd97f257da53f28f75eb8e0d079",
+      "bytes": 5549
+    },
+    {
+      "path": "docs/evidence/policy-comparison-v2-figure/comparison.png",
+      "sha256": "81fe1219e934f2be1a260d0173de9aaafa8fad8f054dc641f75a789b86974444",
+      "bytes": 270019
+    },
+    {
+      "path": "docs/evidence/policy-comparison-v2-figure/comparison.svg",
+      "sha256": "5a51275d751cd3a6721b836bbe8990b4a7744c8d83fba1d66be4f521de6f1b23",
+      "bytes": 115149
+    },
+    {
+      "path": "docs/evidence/policy-comparison-v2-figure/description.txt",
+      "sha256": "d43f2ee4569fad6d8fcf4b051d5cbb946b26fcae7d87f777ae5b00ac601391f7",
+      "bytes": 636
+    },
+    {
+      "path": "docs/evidence/policy-comparison-v2-figure/manifest.json",
+      "sha256": "2f0e9f091164468d059f0c76cfc58668ff3a93987453439cb91ffb3ad130a019",
+      "bytes": 1632
+    },
+    {
+      "path": "docs/evidence/policy-comparison-v2-figure/oracle-confirmations.csv",
+      "sha256": "df2c43acf1f50df9276cf097d732c175b2bb276411419c66226140eb602de076",
+      "bytes": 575
+    },
+    {
+      "path": "docs/evidence/policy-comparison-v2-figure/selected-confirmations.csv",
+      "sha256": "eeef75950c75f12093acb6fba5c3f303743dafd64b50bf940d99f0cf5db2eb4f",
+      "bytes": 2121
+    },
+    {
+      "path": "docs/evidence/policy-comparison-v2-figure/study-summary.csv",
+      "sha256": "553fc48fdfe794c0fd3babd5bceccc4974ec2b2713b7956d7bf122e3ef9bcf58",
+      "bytes": 4834
+    },
+    {
+      "path": "docs/evidence/policy-comparison-v2-summary.json",
+      "sha256": "74b137fc89e14e130262f3e79b2225f5e203ebdfa1cec5bc8d51a18e82be4e67",
+      "bytes": 21074
+    },
+    {
+      "path": "docs/evidence/policy-comparison-v2.csv",
+      "sha256": "9ee6c3b532fe304875ea836dd60006e0b7d33d249c2e482428a2584569b131f4",
+      "bytes": 29250
+    },
+    {
+      "path": "docs/evidence/policy-comparison-v2.json",
+      "sha256": "2b1ec19d2f80241d04f702eeeb9f4438a84870f5e1baa804962de6231b3b27dd",
+      "bytes": 2929956
+    },
+    {
+      "path": "docs/evidence/policy-launch.json",
+      "sha256": "d00179c712ba65b4e33a4a526cb28204825d63a0e629bcfde628c46dc4607706",
+      "bytes": 2362
+    },
+    {
+      "path": "docs/evidence/policy-stop.json",
+      "sha256": "064beb97142bcbeb9960f346627e0a594b5362ada289550189b28a0956ca4f47",
+      "bytes": 1340
+    },
+    {
+      "path": "docs/evidence/policy-v2-completion.json",
+      "sha256": "72ea5c5e3271d658c936a6880bd283ce00fd7af6bd300b6f33921d5f44146951",
+      "bytes": 2036
+    },
+    {
+      "path": "docs/evidence/policy-v2-launch.json",
+      "sha256": "70cd7ed5077adbd0a095c32767d3338f2645d40600b31cf64214c1aaf66e240c",
+      "bytes": 1872
+    },
+    {
+      "path": "docs/evidence/project-isolation.json",
+      "sha256": "34de01edc955edea683dea54e30098b155572def5d198dd0b2294c17ce756a5e",
+      "bytes": 7320
+    },
+    {
+      "path": "docs/evidence/qualification-registry.json",
+      "sha256": "fa6f339ab5e50de16c31d51cf196983643aab37ce8b33ea44008a035962230e1",
+      "bytes": 4118
+    },
+    {
+      "path": "docs/evidence/qualified-mfkg-gates.json",
+      "sha256": "8f25ac65b115a7aad3d8bc61a715dceb346d98a66cd7fea2a257731706e6c0d8",
+      "bytes": 4367
+    },
+    {
+      "path": "docs/evidence/queue-inventory-preview.json",
+      "sha256": "b7703f59954135a72f4e8faeb4869bfb1070e56a807fdf155d1dbcc8d5562b03",
+      "bytes": 5748
+    },
+    {
+      "path": "docs/evidence/restore-rehearsal-v2.json",
+      "sha256": "6e3591fd8f2c9d243e71ff1c481477bae78963e14c73180d8167a364d2285280",
+      "bytes": 3836
+    },
+    {
+      "path": "docs/evidence/restore-rehearsal.json",
+      "sha256": "f558b6ed95b56b3da0103ad2cbebeb216b86e46c2da3f50192e227cf8819547f",
+      "bytes": 2494
+    },
+    {
+      "path": "docs/evidence/result-replay-v1.json",
+      "sha256": "21476d24b5250b444728e88b952ce83a644bfb9de8f9de4d99f7c5350a3d3e77",
+      "bytes": 3286
+    },
+    {
+      "path": "docs/evidence/rgpe-live-gates.json",
+      "sha256": "25d2359d25ad386fcd516c070cf3d65686f0ff09bc240b6494056e94275aafcf",
+      "bytes": 1343
+    },
+    {
+      "path": "docs/evidence/sampled-gpu-calibration.csv",
+      "sha256": "98e96de171869f09d587e925d070011552762f69c8d45d48597b5cc77036951e",
+      "bytes": 3398
+    },
+    {
+      "path": "docs/evidence/sampled-gpu-calibration.json",
+      "sha256": "890c58b48a9b96dc3e5b1cd1d063f9dbb13117d7f83f4c994ca45177732248c3",
+      "bytes": 165063
+    },
+    {
+      "path": "docs/evidence/sampled-mfkg-analysis.json",
+      "sha256": "615186b7e7e07ef51f4f3abfd09e86e31e2f5a511375a84db5cdb767bde2fb61",
+      "bytes": 19845
+    },
+    {
+      "path": "docs/evidence/service-deployment.json",
+      "sha256": "72923c905ff9ec351c399745eebbf11cabd601f247b374260fb14f6841483614",
+      "bytes": 1339
+    },
+    {
+      "path": "docs/evidence/slurm-api-v1.json",
+      "sha256": "4be83d3f828750091aae9b6b14bef164058d47a94815289182acd60acc91f49c",
+      "bytes": 9542
+    },
+    {
+      "path": "docs/evidence/slurm-cancellation-v1.json",
+      "sha256": "1e03200dcb4eff92b399c59c6554f9b398cf222089cc166149c59e6b11b8dd4b",
+      "bytes": 7240
+    },
+    {
+      "path": "docs/evidence/slurm-cnn-contract-v1.json",
+      "sha256": "f75b54d69435b7ca847b77f9c2d735d750e74800892aeb8163a376f61e8bcfe4",
+      "bytes": 5377
+    },
+    {
+      "path": "docs/evidence/slurm-controller-continuous-v1.json",
+      "sha256": "95d80999e2b9ff7de89b1b366de0a232f83c200525eeae9a13cc7917a62675b0",
+      "bytes": 27446
+    },
+    {
+      "path": "docs/evidence/slurm-controller-live-20261006.png",
+      "sha256": "0844b41295f7f074881ac1e791b04616a43e69cd68003302459ce2ed73730725",
+      "bytes": 76998
+    },
+    {
+      "path": "docs/evidence/slurm-controller-v1.json",
+      "sha256": "2c12ad75856c64eff01f37f2e96263a4764cef61874139ad6e2fc0767a8b7267",
+      "bytes": 37399
+    },
+    {
+      "path": "docs/evidence/slurm-cpu-description.json",
+      "sha256": "d9ccb2059dc9b6cc53cd7c9a39061bdfdbcfcb1f35d3e8d9fe740092442827cd",
+      "bytes": 844
+    },
+    {
+      "path": "docs/evidence/slurm-f0.json",
+      "sha256": "9ad5c69fbe8fd67c01e91fdbd118158253051303ec75d7cb59a4168c62c78512",
+      "bytes": 1285
+    },
+    {
+      "path": "docs/evidence/slurm-inventory.json",
+      "sha256": "00d30f47ce9afdaeec13f9346b43a48fe6bc53083bfe9fd00f91cf07d3bf7879",
+      "bytes": 11528
+    },
+    {
+      "path": "docs/evidence/slurm-jetson-python-manifest.json",
+      "sha256": "477ee409b2493a60ea194353656b43d836b71f21d13a1a1fbba9fbd838659ea7",
+      "bytes": 4101
+    },
+    {
+      "path": "docs/evidence/slurm-jetson-userspace-manifest.json",
+      "sha256": "e2c0019194777b87dc5a3adcfa0f45b264ab651ec0082dc4e41c9a8c66506527",
+      "bytes": 4120
+    },
+    {
+      "path": "docs/evidence/slurm-limits-v1.json",
+      "sha256": "1bb9e5e1caa871999b2d234c92ac8508b0f88b581a47c7ab5325b4f1c3c80f59",
+      "bytes": 4727
+    },
+    {
+      "path": "docs/evidence/slurm-limits-v2.json",
+      "sha256": "a234582841074960232e873d5f04508e8e9ed4001b114fa86eb3ac2a876b8b4e",
+      "bytes": 6439
+    },
+    {
+      "path": "docs/evidence/slurm-orin-device-group.json",
+      "sha256": "4a6c3c9fd4723e81d63f016bf947648360455be025324eb2c30518f1dffc2e05",
+      "bytes": 3094
+    },
+    {
+      "path": "docs/evidence/slurm-orin-device-trace.json",
+      "sha256": "c536b92aa55be32e818862200fd9da60423e615a62a3bc8a798286b4903048c2",
+      "bytes": 1933
+    },
+    {
+      "path": "docs/evidence/slurm-orin-torch-environment.json",
+      "sha256": "15fae36756a5885ebed35e1f3e741d2189acb65be6059249ccb97b60c94ba4e9",
+      "bytes": 8977
+    },
+    {
+      "path": "docs/evidence/slurm-orin-torch-f0.json",
+      "sha256": "ecb5dfec754f6e05415edd3dea19045b7b9369b837263d38d82b68bab5ddf85b",
+      "bytes": 3260
+    },
+    {
+      "path": "docs/evidence/slurm-orin-torch-v2.json",
+      "sha256": "9a6b9b8f6ea16fdfc8ab6f7d9f7ebb777377471705e391dae377a85ba99650a9",
+      "bytes": 6725
+    },
+    {
+      "path": "docs/evidence/slurm-policy.json",
+      "sha256": "156cb64e45b24cdc8df218549e2cf37a419659b363fac76c5e203f6284f0f4e5",
+      "bytes": 5546
+    },
+    {
+      "path": "docs/evidence/slurm-priority-gateway.json",
+      "sha256": "f01804633c329bb977d4be6bad73bd875ff1ee6c22daf928d982edfe6a2a8975",
+      "bytes": 1998
+    },
+    {
+      "path": "docs/evidence/slurm-project-isolation-v1.json",
+      "sha256": "43ec2722430e004b45e6957dac2a5792ba0a77411e7a22e2d19d47475db5bf57",
+      "bytes": 9564
+    },
+    {
+      "path": "docs/evidence/slurm-queue-live-20261006.png",
+      "sha256": "6a75f593d4038cf4aca5cbdf0a5c5f5abf1a36bcf2b9de5c372e9dca5d861bb5",
+      "bytes": 18668
+    },
+    {
+      "path": "docs/evidence/slurm-recovery-20261006.json",
+      "sha256": "3bab9823555c387539e14b9311ff37b4f15f9048934136926ec815c7eb9a8ffb",
+      "bytes": 1930
+    },
+    {
+      "path": "docs/evidence/slurm-response-recovery.json",
+      "sha256": "73019a0ecea89d1235cdc512fea27be3fd39feef0e840273ebd04e6d3c2ad939",
+      "bytes": 7243
+    },
+    {
+      "path": "docs/evidence/sustained-fleet-ten-request.json",
+      "sha256": "a3e62395743df96d6f6c2d3adff57b25540180e5bd76d40a0800cb81822161f9",
+      "bytes": 3073
+    },
+    {
+      "path": "docs/evidence/ten-request-native-run.json",
+      "sha256": "25f2e29de158825cbd17de413dcf01981b99fc097a20dd591263705927576aca",
+      "bytes": 880
+    },
+    {
+      "path": "docs/evidence/termination-retention.json",
+      "sha256": "8c191226c6136be4ce4f3394be5334112139e07ae2310583e09a6e10ff246df4",
+      "bytes": 3933
+    },
+    {
+      "path": "docs/evidence/thermal-gpu-calibration.csv",
+      "sha256": "f3e3a84435d4592aadca509c1f139b1150b22417bd996d5ea4a7925b328dda75",
+      "bytes": 4510
+    },
+    {
+      "path": "docs/evidence/thermal-gpu-calibration.json",
+      "sha256": "5ad52176e6b7153ae4af77d615258e3da29c4a8f00ee766e56df2a2b12804237",
+      "bytes": 313375
+    },
+    {
+      "path": "docs/evidence/training-isolation.csv",
+      "sha256": "2a2873d68ba9b37a2349c7b579097e152e117ba1f9ad0b8d69c7582ec138fed2",
+      "bytes": 1034
+    },
+    {
+      "path": "docs/evidence/training-isolation.json",
+      "sha256": "7adddd116f4b03f7dcfad20cf25da51678a200e462ed0e6a62019b2e7a24bc30",
+      "bytes": 23013
+    },
+    {
+      "path": "docs/evidence/transfer-console-deployment.json",
+      "sha256": "f8abe8d653831cb1096315c6845df253b646b4302a47a47f6282aa0d0089e795",
+      "bytes": 3551
+    },
+    {
+      "path": "docs/evidence/transfer-console-preview.json",
+      "sha256": "affb4c881e86713655e82d8d69c2c7716c1e859d7213c221042217cc2abb97eb",
+      "bytes": 1391
+    },
+    {
+      "path": "docs/evidence/transfer-gpu-plan-v2.json",
+      "sha256": "f328912b933e82819260cfcb0a4aa31abd54b80133ba012fd4c7c4bfc9d10b53",
+      "bytes": 2504
+    },
+    {
+      "path": "docs/evidence/transfer-gpu-plan.json",
+      "sha256": "7c6ae5c6d9fd7034ca8cc581da930f5bcdfe84a56571dc8d4cc9e191deb7dc52",
+      "bytes": 2355
+    },
+    {
+      "path": "docs/evidence/transfer-gpu-quota-stop.json",
+      "sha256": "8524a886562527513d0c9e5bfbee7c35345e89a2abc6debc50f5b6bd6dd19dd0",
+      "bytes": 5849
+    },
+    {
+      "path": "docs/evidence/transfer-gpu-summary.json",
+      "sha256": "984872120e6cc45fe3f2a1783bcce96d84a92069082f6159226bc9a3502778e0",
+      "bytes": 11460
+    },
+    {
+      "path": "docs/evidence/transfer-gpu.csv",
+      "sha256": "101e8847bc0277065bca64c46ecab2fc6acb5c3f84796f5ddf2679eadb62da16",
+      "bytes": 35977
+    },
+    {
+      "path": "docs/evidence/transfer-gpu.json",
+      "sha256": "fb0d3f4f7a42ff2b161e2fa25faf2f2c4336f9444ef17fc740aa819c74fb1b71",
+      "bytes": 3747271
+    },
+    {
+      "path": "docs/evidence/uncertainty-ablation-v1.json",
+      "sha256": "3fb4073088b3a9c23776e358485a7c9fe7ef1f5f8dff975ce095f6213a20bcea",
+      "bytes": 19819
+    },
+    {
+      "path": "docs/evidence/uncertainty-drift-ablation-plan-v1.json",
+      "sha256": "a878c4d95673e88b8a93d02c2058cfbdb0beadcda674084e6137a14da8880e57",
+      "bytes": 689
+    },
+    {
+      "path": "docs/evidence/uncertainty-drift-ablation-v1.json",
+      "sha256": "3d922bd8df631e871f6d677f1dda0600f9af942f4d4009c0b16680b204be63d8",
+      "bytes": 9280
+    },
+    {
+      "path": "docs/evidence/uncertainty-shadow.json",
+      "sha256": "eb0d59d5a9183122a178daf7de2e618aa15e876d8fc49e96db3625b0a820b933",
+      "bytes": 8037
+    },
+    {
+      "path": "docs/evidence/worker-recovery.json",
+      "sha256": "fe6ab610c5b73eff8836444350dd150c0f68d8bbf453925e84ec32c3c7213fc8",
+      "bytes": 2713
+    },
+    {
+      "path": "docs/evidence/worker-route-ownership.json",
+      "sha256": "4e17678147d0f54ca2e5cbd85239c86d34f58051e36a5dde0129a9b5e8a05f8d",
+      "bytes": 1914
+    },
+    {
+      "path": "docs/evidence/workload-holdout-v1.json",
+      "sha256": "3e2027e8b3e1623c7b441ae251027bf089db271aeb8bb21a97c22bb5b030edf3",
+      "bytes": 60327
+    },
+    {
+      "path": "docs/failure-tracking.md",
+      "sha256": "73f51296325a9ce1e95d996802476ed83cd4a59dc121b1b9a52fdb953fc44d4a",
+      "bytes": 5572
+    },
+    {
+      "path": "docs/fidelity-calibration.md",
+      "sha256": "fde75f28a90ef5c09c3cf769eacc16529c04d1a73fce5cbce734b6cbb6cdb4bd",
+      "bytes": 7048
+    },
+    {
+      "path": "docs/fidelity-spaces.md",
+      "sha256": "a60d2110ef4381c8dcb83b6dd8d3ce793845a9c1061fe6b219962929475a2d50",
+      "bytes": 10619
+    },
+    {
+      "path": "docs/gitops-adoption-plan.md",
+      "sha256": "876b0c313b3c7cb8da021c4ed0a856ec55fe4defcaaa518f528efeb6e76c976f",
+      "bytes": 2684
+    },
+    {
+      "path": "docs/gitops-adoption.md",
+      "sha256": "f835dfbf5356caf99590b1d37d7e98b1f59c39cdc5aa907939c041c1317b0b7f",
+      "bytes": 4844
+    },
+    {
+      "path": "docs/goal-audit.md",
+      "sha256": "36b4c292a54c65234731de96aa534769ae1016aff5c2cd698b7fcea19ae29760",
+      "bytes": 33497
+    },
+    {
+      "path": "docs/gpu-experiment.md",
+      "sha256": "36e2d45fc79f63ff96802907e0222d08d676822ec6386963e7c1c0e9d222e9bf",
+      "bytes": 6339
+    },
+    {
+      "path": "docs/hailo-artifact-plan.md",
+      "sha256": "ac68960c8ef2ad564dd14870a773217943e723f26a2cb4ed55a6b74fe47ffcda",
+      "bytes": 2600
+    },
+    {
+      "path": "docs/hailo-artifact.md",
+      "sha256": "dff6d99251871d2336be73cf931a7b95f991d77aea698385326d67c8bf57b5cf",
+      "bytes": 3061
+    },
+    {
+      "path": "docs/hailo-efficientformer-plan.md",
+      "sha256": "e17ee67347e48bc112c1392eaa1e41306d6005f27b50d7461bf4006940ea4042",
+      "bytes": 4285
+    },
+    {
+      "path": "docs/hailo-efficientformer.md",
+      "sha256": "c4f251d67c12865d0e2925566a5942eebbfd7c7cfe82afd43290b5ce17d95457",
+      "bytes": 5009
+    },
+    {
+      "path": "docs/hailo-qualification-plan.md",
+      "sha256": "6f2ee300c06840d6861fa9e04a198b623a3808b6423f8e57641fc6cddbbff73c",
+      "bytes": 3609
+    },
+    {
+      "path": "docs/hailo-qualification.md",
+      "sha256": "e0cdc60b012e323712c11f5968fdb20089f68420b77698a17c2967d492cba7c9",
+      "bytes": 8465
+    },
+    {
+      "path": "docs/hailo-reservation.md",
+      "sha256": "66221a0504c413b2554552a039cfdeee9d0f19f3da024cd4ea4aa574663a8a44",
+      "bytes": 4316
+    },
+    {
+      "path": "docs/hailo-resnet50-plan.md",
+      "sha256": "184948b95746980048950ff6d5b452554e42485c213e8180bc08abdfbd4446e1",
+      "bytes": 5121
+    },
+    {
+      "path": "docs/hailo-resnet50.md",
+      "sha256": "79b695c9baed5b2283d70450d7ce7cc33824ec12b65b640f9e87c597b7d27372",
+      "bytes": 10108
+    },
+    {
+      "path": "docs/hairp-original-scope-ko.md",
+      "sha256": "1e3b8288d3aa2cfbc3bac20d8ce1116ec97af53449a4cc23c2d2fd0ed166946c",
+      "bytes": 9670
+    },
+    {
+      "path": "docs/implementation.md",
+      "sha256": "2615049bc5dacac2c5bf6341a3e87d139d2ac9f6b466e9db7c55c5283771e6fb",
+      "bytes": 10760
+    },
+    {
+      "path": "docs/inventory.md",
+      "sha256": "c5f6c437ae94798e0f4e2724ff8b1f72b74fd3ccf1b4afdaeaaec4be2fda09af",
+      "bytes": 6616
+    },
+    {
+      "path": "docs/kubeflow-cancellation.md",
+      "sha256": "6114aec27e5ec42cb3373faa2ffe3ba75e94580d307c155d03eea11b5f2f64f9",
+      "bytes": 4799
+    },
+    {
+      "path": "docs/kubeflow-pipeline.md",
+      "sha256": "ccb7900ba798ef0af3e0733afe9cf6ff68cf31b2d6a54f38bc17d7d734dc2b38",
+      "bytes": 8141
+    },
+    {
+      "path": "docs/kubeflow-recovery.md",
+      "sha256": "7ac963994fcbf20724da2b24f32445e1c191e7064a01514a0249ae01b034fe82",
+      "bytes": 3006
+    },
+    {
+      "path": "docs/kubernetes-completion.md",
+      "sha256": "c5fd188aad66dc9b8848f0f256de7572bfced110f1cba1f5b58ff2393baabb88",
+      "bytes": 3346
+    },
+    {
+      "path": "docs/kubernetes-runtime-bundles.md",
+      "sha256": "0824b9e821a3a525535e4b2f05bef2cd5f5278d08f2e40adf4dbea80d12f2092",
+      "bytes": 5814
+    },
+    {
+      "path": "docs/kueue-policy.md",
+      "sha256": "94c59f22351195dd1cbc9d487ea4c432f0df665faa8dd1722d0a9a75fbd02bca",
+      "bytes": 4821
+    },
+    {
+      "path": "docs/load-context.md",
+      "sha256": "af621a66844c6ef0eda89a99a2c71d16a9d49e0badbdf99221f76784be7c9586",
+      "bytes": 5693
+    },
+    {
+      "path": "docs/load-drift-plan.md",
+      "sha256": "2d1ec6f9434cb228c21f030d67bf7b8927ab87bb6393e79abc5da5445a353be8",
+      "bytes": 6023
+    },
+    {
+      "path": "docs/load-drift.md",
+      "sha256": "963a588a40380f3b896a289060562f8ab09a30af8678a9b2d284295511fb4361",
+      "bytes": 6364
+    },
+    {
+      "path": "docs/lookup-history.md",
+      "sha256": "fb65cc0bf684303155c055d65a2a7c7c38d99750805bb084e6081398617a923d",
+      "bytes": 2491
+    },
+    {
+      "path": "docs/mfkg-kernel.md",
+      "sha256": "091320eedc2f10d7dcc1d29beb3824bde7ad07ba1dbe58b6aebc13e183c22a26",
+      "bytes": 8958
+    },
+    {
+      "path": "docs/mlflow-server-outage-plan.md",
+      "sha256": "19f3b90647c051534f545c55545d685a25013f408b6a24f9e617fd3bbc34cf18",
+      "bytes": 4068
+    },
+    {
+      "path": "docs/mlflow-server-outage-v2-plan.md",
+      "sha256": "2637e4e74445225dae599ba42eb564649d2cb05cf3db9ae7bc67d08c0aa0532f",
+      "bytes": 3978
+    },
+    {
+      "path": "docs/mlflow-server-outage-v2.md",
+      "sha256": "8e232786a885bff0df33138c767964a877b446a694cd92b67ae4bc22488a8556",
+      "bytes": 4139
+    },
+    {
+      "path": "docs/mlflow-server-outage.md",
+      "sha256": "277a5d50b47180f46df2ce4d749af5772222d161014cd78ea6fe71c6c561bf96",
+      "bytes": 3057
+    },
+    {
+      "path": "docs/native-scheduler-lab.md",
+      "sha256": "eac7e97d5b59280891b8f8404e361f8ffaa0c03c8fa047038cd9d9f6fbadcdb3",
+      "bytes": 44954
+    },
+    {
+      "path": "docs/numerical-holdout-plan.md",
+      "sha256": "62f1699c44541ddada087a55830930659aebeb4957c32c0027a6afc7cf271969",
+      "bytes": 4169
+    },
+    {
+      "path": "docs/numerical-workload-holdout.md",
+      "sha256": "fb4f4f73cccd61bed658654c9c19faab1ca6a13e82be93bc8a53077254764f23",
+      "bytes": 7596
+    },
+    {
+      "path": "docs/operational-comparison-plan.md",
+      "sha256": "9ebd5bfca3824ee8740e3194675b562bda2e75eeaa93ef4a80244a5b462f0cb0",
+      "bytes": 4623
+    },
+    {
+      "path": "docs/operational-comparison.md",
+      "sha256": "20e07a45915c1e2eb89074b657e2618da36125c116965811b21752346576fdb3",
+      "bytes": 11261
+    },
+    {
+      "path": "docs/operations-ko.md",
+      "sha256": "e3dc54855559ca0fbc1b3d8e1202717eea854872461a49c55219362bcb175657",
+      "bytes": 3511
+    },
+    {
+      "path": "docs/optimization.md",
+      "sha256": "71668fab83e8ce65c2093ea6d136dc8a5f06be0b0a5796c586a03aaedf0d652a",
+      "bytes": 5817
+    },
+    {
+      "path": "docs/passive-gpu-observation-plan.md",
+      "sha256": "f210bea9ee24a6977097b5b4176d3de435d9d83d8eb4c76f3fa7ac2b83d16e55",
+      "bytes": 4074
+    },
+    {
+      "path": "docs/passive-gpu-observation-results.md",
+      "sha256": "f94b81ac1b7b8c7b892bf0da56f4780182d8ba4de79748fe859b429b6aa5603b",
+      "bytes": 5185
+    },
+    {
+      "path": "docs/passive-observation.md",
+      "sha256": "98e9a89289eae0a80363716eeaccda598c48c29b53e3e62dab5e5c0d86eed87e",
+      "bytes": 6722
+    },
+    {
+      "path": "docs/persistent-postgres.md",
+      "sha256": "20b52fc4358b0f6eec8c6d4480d1b4875837bee0245aa02a381e9591180dd1ac",
+      "bytes": 8467
+    },
+    {
+      "path": "docs/pipeline-stage-links.md",
+      "sha256": "09698d3e3276308a95db64043d6bde85cd4695b5eece16a05912ba79f731b02b",
+      "bytes": 3376
+    },
+    {
+      "path": "docs/platform-explained-ko.md",
+      "sha256": "6aa857ef5db4ff20ee38cc532470aa61f39e05bd1e86b989cb1f3fe15b08e8f2",
+      "bytes": 6031
+    },
+    {
+      "path": "docs/policy-comparison-plan.md",
+      "sha256": "26ac094d2bba0dd05e84d90a8f3f035a2c8ab47828854f5d5f695c2e7b2661a5",
+      "bytes": 5058
+    },
+    {
+      "path": "docs/policy-comparison-v2.md",
+      "sha256": "bed499919763c1b59036449e1f6cd9552065b2dec980d4e578603b1e1d7e88c6",
+      "bytes": 11593
+    },
+    {
+      "path": "docs/policy-comparison.md",
+      "sha256": "6adaf5e05c25030df1d9cc8b179c680de864442c97be93ca8bb8103c25d2c1a8",
+      "bytes": 6120
+    },
+    {
+      "path": "docs/project-isolation-plan.md",
+      "sha256": "1f9d6378bed71f7b328562456c85598996c9275b80a12e3ca8fd8616831d0ce4",
+      "bytes": 7486
+    },
+    {
+      "path": "docs/project-isolation.md",
+      "sha256": "5f23fbb78a9eceb8d0fa4d2faf8aab957a89ce9c16d800c4652f0ab3ccff119c",
+      "bytes": 5256
+    },
+    {
+      "path": "docs/qualification-registry.md",
+      "sha256": "811a35daf32087d06cbe785f6348213bb164d168a9143a6b17dc1e534ea05a98",
+      "bytes": 5963
+    },
+    {
+      "path": "docs/qualified-mfkg.md",
+      "sha256": "b44778c9321afca75820ebaf76406a0a6a6c2be0f940b41946306a3f293bc1f8",
+      "bytes": 8972
+    },
+    {
+      "path": "docs/queue-scenario.md",
+      "sha256": "6dc806ec068d19c9ae867f6a0a0094cb787081d0364085d480e48d9a6c4ed4d4",
+      "bytes": 3883
+    },
+    {
+      "path": "docs/quickstart-ko.md",
+      "sha256": "b47207da972c86d5e0cea53d55ec33622f4772eb41d42c706aaec40e99f4feab",
+      "bytes": 8244
+    },
+    {
+      "path": "docs/research-console.md",
+      "sha256": "f2af1a8d17aff8e1f6a5da1dc80da6d7fc785ede73041d3a457c0756c0db0623",
+      "bytes": 7298
+    },
+    {
+      "path": "docs/restore-rehearsal-plan.md",
+      "sha256": "de69cf08e83204ca547da68e6def3ec86b61dd1024ff5791ab0fe06bf465d031",
+      "bytes": 4116
+    },
+    {
+      "path": "docs/restore-rehearsal.md",
+      "sha256": "9e848a907821174f1fab5443526c1e0e818fa3cd6c61eee01c648952711a22e8",
+      "bytes": 10891
+    },
+    {
+      "path": "docs/result-replay-plan.md",
+      "sha256": "bca389d00e7b7dca1cae0c06458c5e44c4d27491943c2b6562a62a88471d1726",
+      "bytes": 2389
+    },
+    {
+      "path": "docs/result-replay.md",
+      "sha256": "dcb91cd1e65e2e95281b2cf5fa0a656ace58cc4892d0e4b7b20f5155fb0b3b7f",
+      "bytes": 3689
+    },
+    {
+      "path": "docs/review.md",
+      "sha256": "df6d23605955b509ea00a431f5c214c6218b4cdf6f40909879778816eead0dcc",
+      "bytes": 10130
+    },
+    {
+      "path": "docs/sampling.md",
+      "sha256": "fbfbe351398964f90a409f8e94ffaec0c50ebf6249b778015ee393e891722f72",
+      "bytes": 13739
+    },
+    {
+      "path": "docs/scenario-acceptance.md",
+      "sha256": "62a126573c35e3a0cfafa7d108c38b686b534f0691f692ad4a7bab300c705b08",
+      "bytes": 8210
+    },
+    {
+      "path": "docs/scheduling-profiles.md",
+      "sha256": "7ba21dd7bc8e9b500ad59b35c7894c9b00f5a735fc51fab02d82250a695afbe5",
+      "bytes": 9398
+    },
+    {
+      "path": "docs/service-deployment.md",
+      "sha256": "51743cd3bc4a34c9990b2218c943a331c69ade4d8930089c4604cb12f1653c01",
+      "bytes": 9524
+    },
+    {
+      "path": "docs/slurm-api-results.md",
+      "sha256": "ef64e9d577bd4966319abbf83b5a2b0a89994dcd2f25d5a909d683779c5272ff",
+      "bytes": 4938
+    },
+    {
+      "path": "docs/slurm-cancellation.md",
+      "sha256": "b72eeaf9cec3d27e763c8e031553a9acb93ae96e63b3fe3ab1a52789b76e069a",
+      "bytes": 3150
+    },
+    {
+      "path": "docs/slurm-cnn-contract-plan.md",
+      "sha256": "68211377e2a484607f0c090b82b54943517cc92dd15358c230901fd1ea9c7726",
+      "bytes": 2606
+    },
+    {
+      "path": "docs/slurm-cnn-contract-results.md",
+      "sha256": "dd3e7642e7858f1acfa6943a4b44893f65883ffa3549aabb91118b851c511143",
+      "bytes": 3190
+    },
+    {
+      "path": "docs/slurm-controller-plan.md",
+      "sha256": "3282e72b9706c8aee5b3c6ddad03428e892b11ce68bb16ed8ee3090c9c69a3d5",
+      "bytes": 3024
+    },
+    {
+      "path": "docs/slurm-controller-results.md",
+      "sha256": "8ed06d5242076a381b814712425b74633ca8906f5d32e5c1cc2aad7b72df9bfa",
+      "bytes": 6929
+    },
+    {
+      "path": "docs/slurm-cpu-plan.md",
+      "sha256": "332b6b01fdeffb1c04316d3f076abff1ff8340294a97ab37d66edd6d957dcc90",
+      "bytes": 4619
+    },
+    {
+      "path": "docs/slurm-device-trace-plan.md",
+      "sha256": "47136ce7f1a0f010c0a193ec7d0695aa910764b0ebc5617f08d79cd748d34272",
+      "bytes": 1273
+    },
+    {
+      "path": "docs/slurm-inventory-plan.md",
+      "sha256": "20e0915299be4827de0bcf7a2f80f7046de33dd1f1033c58405819cea0498338",
+      "bytes": 2302
+    },
+    {
+      "path": "docs/slurm-inventory.md",
+      "sha256": "76f035e444b45f07d2445a95b54ca8bbb5a3c41e5469d08c6ab93c13ff9b7d60",
+      "bytes": 6648
+    },
+    {
+      "path": "docs/slurm-jetson-runtime-plan.md",
+      "sha256": "36d2c3ab1d3702f74d591831c0c0c1c6feec0beae1cc469cb89a1d6f39243f60",
+      "bytes": 4729
+    },
+    {
+      "path": "docs/slurm-jetson-runtime-results.md",
+      "sha256": "c9a98ed3032cf3d537185b59cf2b6d139cd13ca2b0e8c6621c8787c2cf7bd424",
+      "bytes": 5305
+    },
+    {
+      "path": "docs/slurm-limits-plan.md",
+      "sha256": "cdf1bb73092039016f82fc09ec668c0f52bd6648d389badc370c9e8f3b56896a",
+      "bytes": 5240
+    },
+    {
+      "path": "docs/slurm-limits-results.md",
+      "sha256": "2742938b5d24535c85e73bb4ea2c53814bd2df75deb6125843d72298c59da549",
+      "bytes": 2374
+    },
+    {
+      "path": "docs/slurm-limits-v2-plan.md",
+      "sha256": "ee8f5479b0fb5effe4e523b2661ef691ea1437355539f3fc2dfd8563d8b340ef",
+      "bytes": 3751
+    },
+    {
+      "path": "docs/slurm-limits-v2-results.md",
+      "sha256": "95e6d78cbb8bbb8ba4d803363b086a7353fd544daeb00d9010cb0f7cfd101093",
+      "bytes": 4208
+    },
+    {
+      "path": "docs/slurm-observer-transport.md",
+      "sha256": "1691c50a3ee254114d13843683da9bbbf8b2b3f67bc92957b3fd2c1cfeff64cc",
+      "bytes": 5544
+    },
+    {
+      "path": "docs/slurm-ownership.md",
+      "sha256": "224e7b0f70b07e6db312e47f6b80f0f9da2e429b3f795ceef619b2bc6432a115",
+      "bytes": 5448
+    },
+    {
+      "path": "docs/slurm-policy.md",
+      "sha256": "0c0a74726b59fe0cfacf7adfe52eb97f47953b7385c5e59b64d88394c590548a",
+      "bytes": 6579
+    },
+    {
+      "path": "docs/slurm-priority-gateway.md",
+      "sha256": "315c1b5277f193bebf0c878a354f705b77ac23d581f17817d4769414d7625644",
+      "bytes": 2626
+    },
+    {
+      "path": "docs/slurm-project-isolation-plan.md",
+      "sha256": "af36ca5522c9a88259100f08c506600d3cd5775ab5a15c14f2a98b1ab69c1c78",
+      "bytes": 4639
+    },
+    {
+      "path": "docs/slurm-project-isolation.md",
+      "sha256": "1f358a882a46894db058cc2b4dd78874bc3a62141833db40ef3861252a89b182",
+      "bytes": 6346
+    },
+    {
+      "path": "docs/slurm-recovery-plan.md",
+      "sha256": "2a5fe961a71b6ed872b216ad736f4b634a0dc2007ff6f262bf5156f8806b7a1a",
+      "bytes": 4697
+    },
+    {
+      "path": "docs/slurm-recovery.md",
+      "sha256": "2ee719748dd3ba7231880297ac983c6e78394c4545aaba82d2982636a700fdd1",
+      "bytes": 3351
+    },
+    {
+      "path": "docs/slurm-response-recovery.md",
+      "sha256": "3e840d4df4982f03d33fab0a50136a64b412a8705452ab7fe1c5f85f7d829f11",
+      "bytes": 4967
+    },
+    {
+      "path": "docs/slurm-runtime.md",
+      "sha256": "181d036b844d79f007877da757d437f14d95762847db880f6bd71253b4a683d4",
+      "bytes": 8279
+    },
+    {
+      "path": "docs/slurm-torch-plan.md",
+      "sha256": "9cd5a08dcc7c4f983a68c4b3864b9580fd432ae0bb230a96d4256c4818ec4ca0",
+      "bytes": 2286
+    },
+    {
+      "path": "docs/slurm-torch-results.md",
+      "sha256": "6649b92e2af98ce46509dca14c07418da8422ab3e2c1f3002ccc1c7352bb2536",
+      "bytes": 3417
+    },
+    {
+      "path": "docs/slurm-verification.md",
+      "sha256": "ab705ef8cf95b3636adfbba40ed281207960c7608ddbb628cc796d394dbc3f3c",
+      "bytes": 4188
+    },
+    {
+      "path": "docs/termination-retention.md",
+      "sha256": "109b45b1891e610a33432684885b6b04ca2349de208769a58c9eea81277c4474",
+      "bytes": 6782
+    },
+    {
+      "path": "docs/thermal-evidence.md",
+      "sha256": "03b08182013732fa47d8b9060497476e9c0797fc5473068959063b1442cb38f6",
+      "bytes": 10567
+    },
+    {
+      "path": "docs/training-isolation.md",
+      "sha256": "53b1b88c5202dbbdc05f39ae3e5dee23e3632d1e7af1bde6895c3b667c765198",
+      "bytes": 8885
+    },
+    {
+      "path": "docs/transfer-gpu.md",
+      "sha256": "1b6a47d8d37e7b0c0799879a7ea8fa9390a3e7682d71d55206f5b13218f4cce8",
+      "bytes": 9281
+    },
+    {
+      "path": "docs/transfer.md",
+      "sha256": "1c0b1289d79d81a33067f05da5f0542e6d90fbf497cbcb93918ce46d417d0981",
+      "bytes": 10941
+    },
+    {
+      "path": "docs/uncertainty-ablation.md",
+      "sha256": "f179e96f2d35465fc40dbd7d855cf340a18cfa1b06b228fff25be0a1bce36831",
+      "bytes": 4405
+    },
+    {
+      "path": "docs/uncertainty-drift-ablation-plan.md",
+      "sha256": "72b944441e43dc4749514a29c12270a0bcf51102755053affcf922046a7cf8e9",
+      "bytes": 3070
+    },
+    {
+      "path": "docs/uncertainty-drift-ablation.md",
+      "sha256": "f21e3271f653a170c26f1b8b9b731a7a0ca74dc644fc5abe19646532b9cf40bc",
+      "bytes": 5740
+    },
+    {
+      "path": "docs/uncertainty.md",
+      "sha256": "adef8870988430b67f422e265602e40279fa09bdc0b75d05b486f0145047a12e",
+      "bytes": 8270
+    },
+    {
+      "path": "docs/verification.md",
+      "sha256": "f0f86b8d4a264b4d819a7099ce11e699104c4d8c0700977458240954d78a402a",
+      "bytes": 10999
+    },
+    {
+      "path": "docs/walkthrough.ko.md",
+      "sha256": "80a9daeeaa7a6a806d6c8110175f64f80437cc6474aaf5fb344efdbda4f24a4e",
+      "bytes": 4876
+    },
+    {
+      "path": "docs/worker-recovery.md",
+      "sha256": "7af36ec1fa304aefbe57aafce6a00f8cbc7138eb5a23ffbd2a3e338060ec6d7a",
+      "bytes": 8154
+    },
+    {
+      "path": "docs/worker-route-ownership.md",
+      "sha256": "73c51f306a3541dbabe1e56d035b721455cf7ba5446a9db890a245d9a7063481",
+      "bytes": 4266
+    },
+    {
+      "path": "docs/workload-holdout.md",
+      "sha256": "fc79fbc6e5eabafe645f3dd1c2022cf2e7d1946ac5353eccb6ee9b56fb56ac3e",
+      "bytes": 7043
+    },
+    {
+      "path": "examples/audit_contract_boundaries.py",
+      "sha256": "6bac2818a996b8570b7e590ba7299de3a401c51486141476fc1f3e4fc291f106",
+      "bytes": 9551,
+      "classes": [],
+      "functions": [
+        "require",
+        "audit"
+      ]
+    },
+    {
+      "path": "examples/audit_hailo_platform.py",
+      "sha256": "8c8dcb7d708a9d494ffd31260490d5171e7bbb1e6b4709f544b3d48b0995def2",
+      "bytes": 9003,
+      "classes": [],
+      "functions": [
+        "require",
+        "audit",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/audit_load_drift.py",
+      "sha256": "1c7acf20323c80788ecdba241f0d92eecac9dd85b3e2542063ada7269505f5d4",
+      "bytes": 6496,
+      "classes": [],
+      "functions": [
+        "audit"
+      ]
+    },
+    {
+      "path": "examples/automatic_pipeline.py",
+      "sha256": "028a8fd83b2f49746231e122c4574ef7f59471a68a7a516eb5728a2e473da0da",
+      "bytes": 1905,
+      "classes": [],
+      "functions": [
+        "launch",
+        "automatic"
+      ]
+    },
+    {
+      "path": "examples/backup_metadata.py",
+      "sha256": "7e3980e39cc93c5d3eafde063b9b688cf438c9594ae544fd8cdbfc50f25bf976",
+      "bytes": 4109,
+      "classes": [],
+      "functions": [
+        "capture"
+      ]
+    },
+    {
+      "path": "examples/build_cnn_study.py",
+      "sha256": "10832daec921313c00601ec6fdfeaa336bb585f39c87becbb31750057e2013ab",
+      "bytes": 3768,
+      "classes": [],
+      "functions": [
+        "build",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/build_cuda_target.py",
+      "sha256": "b34d531bb53e9816c5a736077ca93e40af865c1f4f469b94d9dbe2cf3df78704",
+      "bytes": 6005,
+      "classes": [],
+      "functions": [
+        "build"
+      ]
+    },
+    {
+      "path": "examples/build_launcher.py",
+      "sha256": "ad57ed3fe6aed7452ce5556b6c9b5d45f7705226aa9c5c5edd306617254ad624",
+      "bytes": 5325,
+      "classes": [],
+      "functions": [
+        "build",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/combine_workload.py",
+      "sha256": "606d17edd5f6bbe7035ff2e697855a832f8dddf34195fd258f93632d52ea1086",
+      "bytes": 2782,
+      "classes": [],
+      "functions": [
+        "combine"
+      ]
+    },
+    {
+      "path": "examples/console-browser-checks.js",
+      "sha256": "5bcc0911208105b387a6cac6c47190aab764103b1e4dd3dad8b85284a2ff7f0e",
+      "bytes": 4307
+    },
+    {
+      "path": "examples/contract_boundary_cases.py",
+      "sha256": "f1b8985f8f75a43a4cfc8a5ec9108faca1321c322860151cfcf9c564fd9b5ce2",
+      "bytes": 2954,
+      "classes": [],
+      "functions": [
+        "alias",
+        "scope_cases",
+        "budget_cases"
+      ]
+    },
+    {
+      "path": "examples/cpu_gpu_pipeline.py",
+      "sha256": "3898fb58ae5c9df9a74392e6255fa00d2848b0008e7adb19961f3cb00edfcda1",
+      "bytes": 2083,
+      "classes": [],
+      "functions": [
+        "configure",
+        "cpu_then_gpu"
+      ]
+    },
+    {
+      "path": "examples/cuda_driver_probe.py",
+      "sha256": "132102d06e779523fa80ec56bbae5227d684bceb9ba92322860202ddd8ab1235",
+      "bytes": 3516,
+      "classes": [],
+      "functions": [
+        "main"
+      ]
+    },
+    {
+      "path": "examples/evaluate_e5_kernels.py",
+      "sha256": "3f6c7d49fdcbc280011dfcccd1d20b7e67958862cb2e3001686f55f72db6e1f0",
+      "bytes": 9829,
+      "classes": [],
+      "functions": [
+        "evaluate",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/evaluate_numerical_holdout.py",
+      "sha256": "16c56dce935809f576cdddbb881c0f9d8ac87a2f5014d91dabed2638d87ba56d",
+      "bytes": 8795,
+      "classes": [],
+      "functions": [
+        "prepare_capture",
+        "score_targets",
+        "evaluate",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/evaluate_operational_comparison.py",
+      "sha256": "d84bfbe5dda21ba2b2a95bce2adbf3a15f6b151ad0cab9d2d23c7d1fe23ab8fb",
+      "bytes": 19086,
+      "classes": [],
+      "functions": [
+        "require",
+        "stamp",
+        "elapsed",
+        "number",
+        "result_audit",
+        "summarize",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/evaluate_policy_comparison.py",
+      "sha256": "c4c8be32258aff92c86fd4cb3fae762ec708ccf14e2096bfedf456566f8883cb",
+      "bytes": 20010,
+      "classes": [],
+      "functions": [
+        "require",
+        "seconds",
+        "feasible",
+        "comparable",
+        "summarize"
+      ]
+    },
+    {
+      "path": "examples/evaluate_transfer.py",
+      "sha256": "2ef0f0f8f696fa339d5ad25be13e35e09340f7e33dfd529e490e5281571a88ca",
+      "bytes": 13103,
+      "classes": [],
+      "functions": [
+        "summarize",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/evaluate_uncertainty_ablation.py",
+      "sha256": "8290d77c3af0560aa09bb67bd64ce27bd446aead010bdc49c07d3ad619a74ff9",
+      "bytes": 8062,
+      "classes": [],
+      "functions": [
+        "replay",
+        "evaluate"
+      ]
+    },
+    {
+      "path": "examples/evaluate_uncertainty_drift_ablation.py",
+      "sha256": "8eb9078cad28b2d3310d34446729f599b0839575e22a2a233bc04a4c9c8bf98a",
+      "bytes": 9938,
+      "classes": [],
+      "functions": [
+        "require",
+        "describe",
+        "evaluate",
+        "evaluate_capture"
+      ]
+    },
+    {
+      "path": "examples/evaluate_workload_holdout.py",
+      "sha256": "3ad9d01def546d3ad0a4a527a5c2deb33e9789147a25ce86cf5964ce00b4ea09",
+      "bytes": 18052,
+      "classes": [],
+      "functions": [
+        "require",
+        "timestamp",
+        "finite",
+        "validate_rows",
+        "feasible",
+        "rank_fold",
+        "time_forecasts",
+        "evaluate",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/hailo/build_access_job.py",
+      "sha256": "935f5032e5531e805e6f401994bae17d96e3e25ea0d88bf52a960b11ed2c7295",
+      "bytes": 1797,
+      "classes": [],
+      "functions": [
+        "main"
+      ]
+    },
+    {
+      "path": "examples/hailo/build_import.py",
+      "sha256": "b76b1786ac833ed9c47cbdee490915bfbc23dbc75f8159b62c32034aee549a22",
+      "bytes": 6532,
+      "classes": [],
+      "functions": [
+        "digest",
+        "build"
+      ]
+    },
+    {
+      "path": "examples/hailo/device_access.py",
+      "sha256": "ea847685b5d6ba060b278985f20de07dd4812965cc97a8a7ec8ade21401b6cf3",
+      "bytes": 2279,
+      "classes": [],
+      "functions": [
+        "probe"
+      ]
+    },
+    {
+      "path": "examples/hailo/job.json",
+      "sha256": "9ddc9505d7d0c2574a9b97e297f1fb5ad96ed0a448945cb538a025603055ec56",
+      "bytes": 2720
+    },
+    {
+      "path": "examples/hailo/runtime-artifacts.json",
+      "sha256": "02f375d3912a7b7be34a421aabdca4822625e099f894ddb035d0f974fba3c164",
+      "bytes": 1905
+    },
+    {
+      "path": "examples/hailo/runtime-requirements.in",
+      "sha256": "f7e6efa5ef5c0fd14371f8edb1b29b98b9dba753db70c8ffa770b0a71656be7f",
+      "bytes": 160
+    },
+    {
+      "path": "examples/hailo/runtime-requirements.txt",
+      "sha256": "d44e3edcfa9e2107bf665441d62431a883507d4898ad369830d54c41ff1950ee",
+      "bytes": 16704
+    },
+    {
+      "path": "examples/hardware_probe.cu",
+      "sha256": "be7ad70ad4ba2c3de85a3fbbece38d98efca09d8b2f0d3b7922d722890b9436e",
+      "bytes": 2377
+    },
+    {
+      "path": "examples/hold_slurm_submit_response.py",
+      "sha256": "06ddbf0f0065babaea0b18cc78a5de9570a727477f5a168173e428f1f47f62a3",
+      "bytes": 2595,
+      "classes": [],
+      "functions": [
+        "matching_submission",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/hold_submit_response.py",
+      "sha256": "8c9c0cf0dae985f8beee080be2af77cbc2ef5ea0078125a2d2550e7180952b81",
+      "bytes": 1902,
+      "classes": [],
+      "functions": [
+        "main"
+      ]
+    },
+    {
+      "path": "examples/import_observation.py",
+      "sha256": "b55e509a1d6206e8e2daf2669e2f1a53e7ebecb6d51230d8f0687eaff4a28497",
+      "bytes": 1474,
+      "classes": [],
+      "functions": [
+        "main"
+      ]
+    },
+    {
+      "path": "examples/inspect_slurm_jobs.py",
+      "sha256": "26067930b1557ac6487888da92fee8acd464ac8999993cd76e9cd6cce6da5189",
+      "bytes": 2159,
+      "classes": [],
+      "functions": [
+        "inspect"
+      ]
+    },
+    {
+      "path": "examples/inventory-config.json",
+      "sha256": "6b804840f05466c2b813f3fb9f8f0b586a3b173049b98cf1a6d5e42989e07e7b",
+      "bytes": 1045
+    },
+    {
+      "path": "examples/mfkg_numerical_demo.py",
+      "sha256": "6091f1910c746bb03060f9c070c2e0e4505adabbd283823fab1ddcada77c4305",
+      "bytes": 3251,
+      "classes": [],
+      "functions": [
+        "fixture",
+        "observe",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/passive-gpu/job.example.yaml",
+      "sha256": "4dccaa96751f5c9537a599efc9f366a7d4f1bdf3589146e36599972b1a7cc874",
+      "bytes": 1911
+    },
+    {
+      "path": "examples/passive-gpu/program.py",
+      "sha256": "2147eefa45ccb981ee990938af60e57063d49f9028a4580f54b4c90318ad574f",
+      "bytes": 1333,
+      "classes": [],
+      "functions": [
+        "main"
+      ]
+    },
+    {
+      "path": "examples/pipeline.py",
+      "sha256": "b1cac35f97be1edb9b02a63a3ad9aea9b77d07baee254621e8ccd68a780a645c",
+      "bytes": 1907,
+      "classes": [],
+      "functions": [
+        "launch",
+        "observe"
+      ]
+    },
+    {
+      "path": "examples/plan_operational_comparison.py",
+      "sha256": "6cc3d06dbc16a12f380cbc5f86f7132613ef0b322beb4f2247f7e740b050a1c7",
+      "bytes": 6848,
+      "classes": [],
+      "functions": [
+        "make_plan",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/plan_policy_comparison.py",
+      "sha256": "418cdf464266072b5e7140fb5822c336471a7e3dccdcd36513a2603f5a5b18a1",
+      "bytes": 6585,
+      "classes": [],
+      "functions": [
+        "make_plan"
+      ]
+    },
+    {
+      "path": "examples/plan_policy_retry.py",
+      "sha256": "7b686c86e3d6c15165f21162368a54c1a493ae2ed8532d43e81b09a5ea58a77b",
+      "bytes": 4545,
+      "classes": [],
+      "functions": [
+        "digest",
+        "make_plan"
+      ]
+    },
+    {
+      "path": "examples/plot_numerical_holdout.py",
+      "sha256": "fafbbb67d084e9511a78ee8f0793e1c8ba9ade0416453288213572ecf25e92de",
+      "bytes": 4576,
+      "classes": [],
+      "functions": [
+        "render",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/plot_operational_comparison.py",
+      "sha256": "e7269afbe75fa7b6e5a24608e8ad0e778dbd705650eaab79c00c6bc98521d55f",
+      "bytes": 4324,
+      "classes": [],
+      "functions": [
+        "main"
+      ]
+    },
+    {
+      "path": "examples/plot_policy_comparison.py",
+      "sha256": "5562e0220d5918f1ff0124baf20733ba0a8e1e002d855c1ef29b283d122ad659",
+      "bytes": 12109,
+      "classes": [],
+      "functions": [
+        "render"
+      ]
+    },
+    {
+      "path": "examples/plot_uncertainty_drift_ablation.py",
+      "sha256": "dc13fe4f8a4f0b1d9c51f948e06276aea62fab14045f02cab7a4c829758d809d",
+      "bytes": 3547,
+      "classes": [],
+      "functions": [
+        "plot"
+      ]
+    },
+    {
+      "path": "examples/prepare_cuda_userspace.py",
+      "sha256": "fa96dd1198dce9e216ec5c2da4a74f5dec088b38c04e20ed9eaa299b7f54318a",
+      "bytes": 3893,
+      "classes": [],
+      "functions": [
+        "validate_manifest",
+        "prepare"
+      ]
+    },
+    {
+      "path": "examples/prepare_hailo_fixture.py",
+      "sha256": "51e9f04d36800ce8bd12eef669b2fc05dc8938fc9b5dcb33e77a89afa9af0a80",
+      "bytes": 7876,
+      "classes": [],
+      "functions": [
+        "digest",
+        "select_paths",
+        "prepare"
+      ]
+    },
+    {
+      "path": "examples/prepare_hailo_resnet50.py",
+      "sha256": "911575040776d1fd907acc94ec8345d681dd9fcc3f843a269cdd014bfe744a29",
+      "bytes": 6654,
+      "classes": [],
+      "functions": [
+        "selected_inputs",
+        "prepare"
+      ]
+    },
+    {
+      "path": "examples/prepare_ssh_layer.py",
+      "sha256": "87b55f1eb4d207d4ddd930de579345b5074b8d4b54d8c522b780de3003afbbd5",
+      "bytes": 5685,
+      "classes": [],
+      "functions": [
+        "prepare"
+      ]
+    },
+    {
+      "path": "examples/qualification-console-checks.js",
+      "sha256": "8e300a10880a3acc89fe1801e2c50879429188a57b84dedc2b8bcb61692fe888",
+      "bytes": 2787
+    },
+    {
+      "path": "examples/qualify_slurm_torch.py",
+      "sha256": "348e7862ea28f82306ca20e87686c2e9b8ab88d1f8e5f4f5c689796e11144bd1",
+      "bytes": 7634,
+      "classes": [],
+      "functions": [
+        "memory_boundary",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/recovery_workload.py",
+      "sha256": "462ab9b9c62a130a8df6fcd016869209694821deff9b18eccea84200bc4ade33",
+      "bytes": 733,
+      "classes": [],
+      "functions": [
+        "run"
+      ]
+    },
+    {
+      "path": "examples/sampled_fixture.py",
+      "sha256": "98d10e8f00edaab063d6c479cc6ecfbd147c83da3e3ce02fe3e2741ae82804ae",
+      "bytes": 1864,
+      "classes": [],
+      "functions": [
+        "build"
+      ]
+    },
+    {
+      "path": "examples/scheduler_lab/agent.py",
+      "sha256": "45b0e39d25bd9442ef30434d947a04481d88bdea372850f3a11bccb17c614a07",
+      "bytes": 65357,
+      "classes": [
+        "Canceled",
+        "Agent"
+      ],
+      "functions": [
+        "main"
+      ]
+    },
+    {
+      "path": "examples/scheduler_lab/config.example.json",
+      "sha256": "430d13c38b5bd2dfd59dc75e6874d9b7809380e84f07d62c7d7a75e297190bf8",
+      "bytes": 2407
+    },
+    {
+      "path": "examples/scheduler_lab/gpu-pool-resources.json",
+      "sha256": "4e6cc739fe554d9113dd9b0951e3577fd9de6b1240cc9d1320d240db5b37de81",
+      "bytes": 3888
+    },
+    {
+      "path": "examples/scheduler_lab/gpu_task.py",
+      "sha256": "800d14346e3d509f6b012011759b9610f044994b80237637db330bdd1443bf65",
+      "bytes": 1977,
+      "classes": [],
+      "functions": [
+        "emit"
+      ]
+    },
+    {
+      "path": "examples/scheduler_lab/multi-gpu-resources.json",
+      "sha256": "8b33fa0beb4e25df9cde4e6d44e72cdf32ff799773bf5815463ce0d3351cc7df",
+      "bytes": 1702
+    },
+    {
+      "path": "examples/scheduler_lab/priority-resources.json",
+      "sha256": "6a351266c29bef2398999285a407319c16aeef54ad3aea6944bf2d3ad634e372",
+      "bytes": 1084
+    },
+    {
+      "path": "examples/scheduler_lab/resources.json",
+      "sha256": "f4ed7348cdaa9ac2d5e131b4be159412564dcd423e3b3c138c1218338d89b570",
+      "bytes": 2365
+    },
+    {
+      "path": "examples/scheduling-profile.json",
+      "sha256": "50adbb69bb80ba23796bcc25ed6459304eb4815b62bec34c0f8b07d78f84774d",
+      "bytes": 852
+    },
+    {
+      "path": "examples/slurm-console-checks.js",
+      "sha256": "f3b45e056ae774252148458c92dc3fe41ecd07d7360e385a7f4c4e11d1ad319e",
+      "bytes": 4428
+    },
+    {
+      "path": "examples/slurm-cpu-gateway.example.json",
+      "sha256": "4091d47af4daf1902902745a6e59062ccd14c8bf0bc0b744691d85f601ca462a",
+      "bytes": 245
+    },
+    {
+      "path": "examples/slurm-host-bindings.json",
+      "sha256": "27b30227084517d16aaef62c18d892e05e34d918df8629b149302216aa6766f1",
+      "bytes": 8573
+    },
+    {
+      "path": "examples/slurm_cnn_workload.py",
+      "sha256": "a5c020703cdb35ab2c0174ba4b4a34046f12e7e97c07dce7c96b2ee83ed89b81",
+      "bytes": 4443,
+      "classes": [],
+      "functions": [
+        "request_identity",
+        "envelope",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/slurm_cpu_workload.py",
+      "sha256": "8bf8a2e11728603e2f6dd856b467f355e31a007c461ca683be6dd00865a83dbb",
+      "bytes": 5604,
+      "classes": [],
+      "functions": [
+        "describe",
+        "request_identity",
+        "compute",
+        "validate",
+        "run"
+      ]
+    },
+    {
+      "path": "examples/slurm_executor.py",
+      "sha256": "193cec9ac0e9bf24ae39a7a20697e18204732380110261fbded7a3a708864d7c",
+      "bytes": 9884,
+      "classes": [],
+      "functions": [
+        "batch",
+        "plan",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/slurm_limits_probe.py",
+      "sha256": "7f0382cb350d62cff099c4c7558eaec3fa63df195516eb5aa9bc6d2ec7634eab",
+      "bytes": 4525,
+      "classes": [],
+      "functions": [
+        "effective_limit",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/slurm_observer.py",
+      "sha256": "b3c30030eb0a05464b059dbdfcd794303822f518dbb9fa73789a33ea074f03cf",
+      "bytes": 3809,
+      "classes": [],
+      "functions": [
+        "observe",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/trace_worker.py",
+      "sha256": "2e6af4cbbacbddb0d9b5370dbc63ee5b149fa9af5005acf94571128fc7686d52",
+      "bytes": 1918,
+      "classes": [],
+      "functions": [
+        "emit",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/training_fixture.py",
+      "sha256": "7692af16621db4f96993fabe13c5c820eba9258afc48a2d2d1eb2af86396bbe1",
+      "bytes": 1327,
+      "classes": [],
+      "functions": [
+        "write_fixture"
+      ]
+    },
+    {
+      "path": "examples/update_service.py",
+      "sha256": "9d0afa50dddbd223a027bf206b6464177569e1ebc986be36261cccf92151912a",
+      "bytes": 4211,
+      "classes": [],
+      "functions": [
+        "update",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/verify_approved_execution.py",
+      "sha256": "db77502e8a4166ba9ee8cf8255eec80e2355aa3e9fe0e5c7f271e6618200f8b1",
+      "bytes": 7507,
+      "classes": [],
+      "functions": [
+        "verify",
+        "main"
+      ]
+    },
+    {
+      "path": "examples/verify_concurrent_workers.py",
+      "sha256": "abe84af41115ee6be9781ffdb8c64127fb8d1abf3c2bb7160693a5fa4a539e97",
+      "bytes": 9369,
+      "classes": [],
+      "functions": [
+        "run"
+      ]
+    },
+    {
+      "path": "examples/verify_cuda_fallback.py",
+      "sha256": "f94059a76c801d9413082f0ae5608b7b855283c50eb2739641d4330405572998",
+      "bytes": 12689,
+      "classes": [],
+      "functions": [
+        "manifest",
+        "run"
+      ]
+    },
+    {
+      "path": "examples/verify_hailo_artifact.py",
+      "sha256": "415a127c2c6b2cb88010fdcda87531b2e4f37c47d3c22ee258ecd33ec51d10cf",
+      "bytes": 13015,
+      "classes": [],
+      "functions": [
+        "manifest",
+        "run"
+      ]
+    },
+    {
+      "path": "examples/verify_kueue_policy.py",
+      "sha256": "0d42e2812afdf66537f3765e0b76e6569bbfc015b910c64b51509cca0c2f9bd7",
+      "bytes": 7944,
+      "classes": [],
+      "functions": [
+        "main"
+      ]
+    },
+    {
+      "path": "examples/verify_mlflow_server_outage.py",
+      "sha256": "448f245773511b1db3cad8f03a1280d433891fbabd4e7c24b28efd10e9e53497",
+      "bytes": 22108,
+      "classes": [],
+      "functions": [
+        "assert_gpu_requests",
+        "run"
+      ]
+    },
+    {
+      "path": "examples/verify_project_isolation.py",
+      "sha256": "ae078395963b04919dc21d79f68ec18fcbd16d1242a4601b35ac3c7f60668d99",
+      "bytes": 11963,
+      "classes": [],
+      "functions": [
+        "condition",
+        "run"
+      ]
+    },
+    {
+      "path": "examples/verify_restore_links.py",
+      "sha256": "bc1efcf2893a0ef525cfb8ea2f2301ff9457646954f7f99c1d04ce275e12b4bd",
+      "bytes": 10703,
+      "classes": [],
+      "functions": [
+        "verify"
+      ]
+    },
+    {
+      "path": "examples/verify_result_replay.py",
+      "sha256": "62d5e44d053975009ba027fabb1beee543f439bdfd3922001f14ba6849aa5a63",
+      "bytes": 10046,
+      "classes": [],
+      "functions": [
+        "snapshot",
+        "verify"
+      ]
+    },
+    {
+      "path": "examples/verify_slurm_policy.py",
+      "sha256": "2d09914dfa1bbd3722b65e28debb6c9a82b0c8c8bc6575ebe14944da366558d8",
+      "bytes": 6240,
+      "classes": [],
+      "functions": [
+        "main"
+      ]
+    },
+    {
+      "path": "examples/verify_slurm_project_isolation.py",
+      "sha256": "32b3546c8bb45227ae71a8b446d7b56a14231affb1b6ddad961277c98c291a95",
+      "bytes": 15555,
+      "classes": [
+        "NativeObservationUnavailable"
+      ],
+      "functions": [
+        "observe",
+        "saved_cohort",
+        "resume",
+        "verify"
+      ]
+    },
+    {
+      "path": "examples/verify_slurm_project_limits.py",
+      "sha256": "f9f18ec3718f43670d778def681691f2fce548411e0715074415e0146fb46c02",
+      "bytes": 4172,
+      "classes": [],
+      "functions": [
+        "verify"
+      ]
+    },
+    {
+      "path": "examples/verify_slurm_response_recovery.py",
+      "sha256": "aa3c2e7e12d5c7fb31afde03a2ec67597531433b156dca353ca6f6d9a488a1b2",
+      "bytes": 19277,
+      "classes": [],
+      "functions": [
+        "capture_attempt",
+        "verify_files",
+        "run"
+      ]
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "9d58633bbe638ee9e102661fd091c80003ca4ff5dfa43b8675007015ea4d6c5d",
+      "bytes": 1255
+    },
+    {
+      "path": "src/resource_advisor/__init__.py",
+      "sha256": "fd2cd5b440e7cd9a2137c735da66aee69fc7ef42ec1b735be1eecf35e9ec0aa3",
+      "bytes": 84,
+      "classes": [],
+      "functions": []
+    },
+    {
+      "path": "src/resource_advisor/accounting.py",
+      "sha256": "8e3ef10e9fc89a027bd1faa9b215e6482803d849d57c785f9745c3f1b9ddc62a",
+      "bytes": 6345,
+      "classes": [],
+      "functions": [
+        "interval",
+        "number",
+        "ledger_record",
+        "summarize"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/api.py",
+      "sha256": "b3ccb00870db7ba9db29fbf2e1240ab709f37d20a94faac098ddafc2b6dcc88d",
+      "bytes": 28679,
+      "classes": [
+        "Principal"
+      ],
+      "functions": [
+        "create_app"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/artifacts.py",
+      "sha256": "2c6a88462672c90a884dc941336bf5b9995b74b92fedf277d617d4285b5aeb98",
+      "bytes": 7753,
+      "classes": [
+        "ArtifactError",
+        "S3Artifacts",
+        "ArtifactDelivery"
+      ],
+      "functions": []
+    },
+    {
+      "path": "src/resource_advisor/backends.py",
+      "sha256": "d3635eab77615a91d58d2fb92144a44ce83b5c5b07d3ed0b166e2e391c6fe947",
+      "bytes": 37250,
+      "classes": [
+        "BackendError",
+        "SubmissionUnknown",
+        "Observation",
+        "SchedulerBackend",
+        "KubernetesBackend",
+        "SlurmBackend"
+      ],
+      "functions": [
+        "memory_mib",
+        "slurm_allocation",
+        "run",
+        "result_from_log",
+        "identity_environment",
+        "priority_mapping",
+        "policy_priority",
+        "_aware"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/backup.py",
+      "sha256": "7502f38e7f7ef3c0d755b27ba931e905e676d0186862aee40ea1502a46f27c1f",
+      "bytes": 4505,
+      "classes": [],
+      "functions": [
+        "connection_fingerprint",
+        "fingerprint",
+        "exported_snapshot",
+        "file_digest",
+        "verify_snapshot",
+        "compare"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/cli.py",
+      "sha256": "a1f5862d5f43cc836a5081483046b048c13d32e67d895c262cb7f1062dbf500f",
+      "bytes": 11496,
+      "classes": [],
+      "functions": [
+        "main"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/cnn_diagnostic.py",
+      "sha256": "f3cc6883ad4be2365bae162c5905e951351c2a7b1b5dc03567be0fabac28bc9d",
+      "bytes": 6457,
+      "classes": [],
+      "functions": [
+        "run"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/configuration.py",
+      "sha256": "a0033b705a1f8b9404dbb7fceaf57c691b856b60f94502633a25eea48752b0b7",
+      "bytes": 6898,
+      "classes": [
+        "ConfigurationError"
+      ],
+      "functions": [
+        "require",
+        "read_config",
+        "valid_ref",
+        "principals",
+        "artifact_buckets",
+        "api_configuration",
+        "worker_configuration",
+        "check_configuration"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/console.py",
+      "sha256": "b2595f1e0613a9b3eecae9eaef4b2d1d9be037de6a4882972a73553f840ebb7a",
+      "bytes": 20777,
+      "classes": [],
+      "functions": [
+        "page_rows",
+        "entity_query",
+        "owned",
+        "job_view",
+        "selected_context",
+        "overview",
+        "transfer_evidence",
+        "recommendation_evidence"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/contracts.py",
+      "sha256": "e5c4b1af285ac0cf88163f8941b5077c5252d3c968004c834f69b682b71f41eb",
+      "bytes": 15221,
+      "classes": [
+        "Contract",
+        "Backend",
+        "State",
+        "WorkloadIdentity",
+        "Resources",
+        "ExecutionContext",
+        "ThermalPolicy",
+        "RuntimeVariant",
+        "CapabilitySnapshot",
+        "Candidate",
+        "ProfilingPolicy",
+        "QualityPolicy",
+        "ExecutionPolicy",
+        "WorkloadSpec",
+        "Measurements",
+        "ExecutionResult",
+        "JobTemplate",
+        "JobRequest",
+        "RecommendationRequest",
+        "ApprovalRequest",
+        "ReplicationPolicy",
+        "StudyRequest"
+      ],
+      "functions": [
+        "now",
+        "signature"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/cpu_benchmark.py",
+      "sha256": "cba2f5b58a902111ce01b8f14abdc3c9b36688adabb95fdc125c89f85403bac3",
+      "bytes": 4408,
+      "classes": [],
+      "functions": [
+        "cpu_model",
+        "multiply",
+        "numerical_agreement",
+        "run"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/cuda_probe.py",
+      "sha256": "44d440dfe62873ad153a1233dd2c4fea4ae0d3d3d78ae9d7074a627df58d45aa",
+      "bytes": 7935,
+      "classes": [],
+      "functions": [
+        "digest",
+        "measure",
+        "main"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/diagnostics.py",
+      "sha256": "05b96b927af538a0a08f50403a46a64b0b282af75b6c95d60d8f03a4bd3cdef2",
+      "bytes": 5219,
+      "classes": [
+        "PhaseSample",
+        "PhaseProfile"
+      ],
+      "functions": [
+        "validate_profile",
+        "diagnose"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/e5_benchmark.py",
+      "sha256": "632e028a56504e3a2c9e49bd48d092e97edbae8268749b2d77cc5382122d1462",
+      "bytes": 10566,
+      "classes": [],
+      "functions": [
+        "build_model",
+        "validate",
+        "run",
+        "main"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/fidelity.py",
+      "sha256": "057109f5b06372dc4a61a172f676f6774569fff4226b2e8c42abcb18f10a71c5",
+      "bytes": 17545,
+      "classes": [
+        "CalibrationCell",
+        "FidelityPlan",
+        "FidelityCalibration"
+      ],
+      "functions": []
+    },
+    {
+      "path": "src/resource_advisor/fidelity_qualification.py",
+      "sha256": "c6808adc290099657b11e9ec81cf52cb9c1e28380e7080b129fec78191878d78",
+      "bytes": 15932,
+      "classes": [
+        "FidelityQualificationPlan",
+        "FidelityQualifications"
+      ],
+      "functions": [
+        "paired_assessment",
+        "adaptive_ranks_unchanged"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/fidelity_space.py",
+      "sha256": "3225ccc8916a41ec38ff1880a8dee3ff5963a78b4a4d474c64822fbeeec18b28",
+      "bytes": 20993,
+      "classes": [
+        "FidelitySpace",
+        "FidelityEvidenceRequest",
+        "FidelitySpaces"
+      ],
+      "functions": []
+    },
+    {
+      "path": "src/resource_advisor/gpu_benchmark.py",
+      "sha256": "ae576be1e38924920a2c84b487ab2eace326f908fb781b310d122bccef3205c3",
+      "bytes": 4106,
+      "classes": [],
+      "functions": [
+        "run"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/gpu_training.py",
+      "sha256": "cecc4356a2c26c8b4e5aedeb10ce6ab90e84c1255a2a87aed83dab853dfed814",
+      "bytes": 8055,
+      "classes": [],
+      "functions": [
+        "require_readonly",
+        "run"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/hailo_benchmark.py",
+      "sha256": "eafdf42377a23ec04c3fe02f0cfd62d2564fca3c91f01fddd2fbd545000c22aa",
+      "bytes": 6219,
+      "classes": [
+        "Binding"
+      ],
+      "functions": [
+        "validate_binding",
+        "run",
+        "main"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/hailo_qualification.py",
+      "sha256": "00641ea7b1de447b8656278ebf1c2fa40b947830d5da8823672bc5adb96e3939",
+      "bytes": 8984,
+      "classes": [],
+      "functions": [
+        "digest",
+        "quality_gates",
+        "load_fixture",
+        "qualify",
+        "main"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/health.py",
+      "sha256": "8e5a594d97db91d73e0a2dab4f82f6b24b8fb9de1c0178a8b99bc4dec1c3a066",
+      "bytes": 605,
+      "classes": [],
+      "functions": [
+        "write_heartbeat",
+        "heartbeat_fresh"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/inventory.py",
+      "sha256": "f9ac5aac84c574768c5b3c5cb73d079003574dfa28eca8f4b0f7f04f139c1220",
+      "bytes": 21943,
+      "classes": [
+        "ResourceType",
+        "MetricBinding",
+        "TelemetryConfig",
+        "InventoryConfig",
+        "PrometheusReader",
+        "InventoryCollector"
+      ],
+      "functions": [
+        "quantity",
+        "pod_request",
+        "signal",
+        "fresh_view",
+        "save_inventory",
+        "latest_inventory",
+        "latest_inventory_views"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/kernel_diagnostics.py",
+      "sha256": "bd5eaf8713db0bd9b97d189c9f5d70d1bc7641d56b328f2aeee8af388accc144",
+      "bytes": 7061,
+      "classes": [],
+      "functions": [
+        "trace_evidence",
+        "_interval",
+        "union_duration",
+        "summarize_trace"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/kubernetes_retention.py",
+      "sha256": "3e30b9c3815644ba9dccbebb43fae9cd11f1f35d7327059a156da188a4846dec",
+      "bytes": 5853,
+      "classes": [],
+      "functions": [
+        "observe",
+        "release"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/launcher.py",
+      "sha256": "a8da7737d5404297810f41c9dd5183adc8dec5f4d99a0dde3b0d11f73e0e2dc7",
+      "bytes": 3414,
+      "classes": [],
+      "functions": [
+        "execute",
+        "main"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/load_context.py",
+      "sha256": "cbb0096918c8ee9ed3f879b984a284a78d6d55d6cd439345d0428ea51c49704a",
+      "bytes": 10198,
+      "classes": [
+        "LoadReading",
+        "LoadTrace",
+        "CgroupReader"
+      ],
+      "functions": [
+        "validate_trace",
+        "summarize",
+        "flat_counters",
+        "pressure_total",
+        "io_bytes"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/load_observed_benchmark.py",
+      "sha256": "d704de923471f291ef8e948755947c7a3df42f670152c091140d47bdae5afafe",
+      "bytes": 3737,
+      "classes": [
+        "ResultStream"
+      ],
+      "functions": [
+        "observe",
+        "main"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/mfkg.py",
+      "sha256": "f6d167425b65c963b22b4977e4da8faca891832e02e8b0370433f84962afe6d9",
+      "bytes": 13167,
+      "classes": [
+        "MFOption",
+        "MFObservation",
+        "MFKernelInput"
+      ],
+      "functions": [
+        "_snapshot_value",
+        "ask_mfkg"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/operations.py",
+      "sha256": "ba34ac876d2bedb7a5a1a600fe038625d448601d1bf3f2eff85528121072e0fa",
+      "bytes": 8434,
+      "classes": [],
+      "functions": [
+        "job_attention",
+        "operations_snapshot"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/passive.py",
+      "sha256": "5d2c464603bbc0d9c9a6ac1725f66fa860bcf94e9f1f504109c0d4f4d8723439",
+      "bytes": 11691,
+      "classes": [
+        "PassiveTarget",
+        "ProcessSample",
+        "NodeSample",
+        "DeviceSample",
+        "PassiveSample",
+        "PassiveImport",
+        "PassiveObservations"
+      ],
+      "functions": [
+        "assessment",
+        "summary",
+        "list_page"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/passive_collector.py",
+      "sha256": "53d4450e696b62db004235c3b030a1c0ac3c0f6f3976dda22d044f5a8abcef43",
+      "bytes": 9843,
+      "classes": [
+        "TargetChanged",
+        "ProcReader",
+        "Utilization",
+        "Memory",
+        "PassiveNvml"
+      ],
+      "functions": [
+        "process_stat",
+        "collector_digest",
+        "collect",
+        "main"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/policy.py",
+      "sha256": "24514921e687eb342169d7fc1bf37b4a9c22ba65ce99f789c806306acafa3bbf",
+      "bytes": 4360,
+      "classes": [],
+      "functions": [
+        "context_signature",
+        "compatibility",
+        "execution_compatibility"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/qualifications.py",
+      "sha256": "1cca1777ed68fbef5a9fea50b2d7a47cd606808076028134250021274da9d068",
+      "bytes": 6979,
+      "classes": [
+        "ClassificationSample",
+        "ClassificationGates",
+        "QualificationImport",
+        "Qualifications"
+      ],
+      "functions": [
+        "assessment",
+        "summary",
+        "list_page"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/queue_inventory.py",
+      "sha256": "81c28d36c05788fbe79b0836167dae4d119102bda9fb70b6c2fb71e91143397a",
+      "bytes": 4458,
+      "classes": [],
+      "functions": [
+        "conditions",
+        "condition_value",
+        "amount",
+        "queue_view",
+        "workload_view"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/replication.py",
+      "sha256": "d10dd2e6743b4d70bb48d622601f4bd0e8b78a81994677e3ee5af93c6e89753f",
+      "bytes": 3835,
+      "classes": [],
+      "functions": [
+        "ask_replication"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/research.py",
+      "sha256": "9f21011d0d1eb87817bbefe36e7dc11891cfc411d950cba89c468cdd7c4c74ee",
+      "bytes": 17706,
+      "classes": [
+        "UpstreamUnavailable",
+        "ResearchServices"
+      ],
+      "functions": []
+    },
+    {
+      "path": "src/resource_advisor/rgpe.py",
+      "sha256": "2e51dca973196e0461706ec214b2242b48f26d388b5ac8a015227013a8c7411e",
+      "bytes": 18738,
+      "classes": [
+        "TransferOption",
+        "TransferObservation",
+        "TransferTask",
+        "RGPEInput"
+      ],
+      "functions": [
+        "history_order",
+        "_aggregate",
+        "_fit",
+        "_ensemble",
+        "ask_rgpe"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/runtime_guard.py",
+      "sha256": "20aff8754dccb7266565916cfeb3b085ac20ef23cfb1574b71f2fd959f0b4627",
+      "bytes": 4112,
+      "classes": [
+        "RuntimeMismatch"
+      ],
+      "functions": [
+        "digest",
+        "verify",
+        "main"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/sampled_gpu_benchmark.py",
+      "sha256": "260115fe6688a7c802ebfeed3b7d02b58a0d0dfab8acfaad44112dc55958cb8c",
+      "bytes": 9066,
+      "classes": [],
+      "functions": [
+        "stage_inputs",
+        "validate_context",
+        "run",
+        "_run",
+        "main"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/sampling.py",
+      "sha256": "9dbdc07280fd41d881c9ad64cf08a459712c238bd2e54f1ff6a0ef1c56d83bf4",
+      "bytes": 13782,
+      "classes": [
+        "Sample",
+        "SamplingPolicy",
+        "SamplingPlan",
+        "SamplingBinding",
+        "SamplingBindingRequest",
+        "SamplingPolicies",
+        "ConsumedSample",
+        "SamplingReceipt",
+        "TensorBatch",
+        "SamplingSession"
+      ],
+      "functions": [
+        "selection",
+        "bind",
+        "validate_receipt",
+        "directory_reader"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/scenarios.py",
+      "sha256": "40049c1c23e89b1a2a433597546857fbe8e3375ddc46043c7e66c941979bbd11",
+      "bytes": 3815,
+      "classes": [
+        "QueueScenarioRequest",
+        "QueueScenarios"
+      ],
+      "functions": []
+    },
+    {
+      "path": "src/resource_advisor/scheduler_lab.py",
+      "sha256": "371e253145af143e991184c3d46ca13a402a1b21f0191a33abf16d47b943bf58",
+      "bytes": 12635,
+      "classes": [
+        "LabRequest",
+        "LabReport",
+        "SchedulerLab"
+      ],
+      "functions": []
+    },
+    {
+      "path": "src/resource_advisor/scheduling.py",
+      "sha256": "200b6da5a030460edfb82b530589a28b2e6e2094c8796deb5d84f69a0cb07340",
+      "bytes": 15371,
+      "classes": [
+        "SchedulingPolicy",
+        "SchedulerBinding",
+        "SchedulingProfile",
+        "SchedulingPlanRequest"
+      ],
+      "functions": [
+        "node_observations",
+        "availability",
+        "plan_digest",
+        "compile_plan",
+        "apply_plan",
+        "verify_adapter_plan"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/search.py",
+      "sha256": "979cdc536d6750fc2aad331dd8db1858aa09bff98759596bc49ddea766feafe5",
+      "bytes": 9198,
+      "classes": [],
+      "functions": [
+        "device_unit",
+        "features",
+        "ask",
+        "qlognei"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/service.py",
+      "sha256": "7645f1cf81cbaeac07172243a37a5028b1ac15f96d648951ef915079e60a82a5",
+      "bytes": 40554,
+      "classes": [
+        "NotFound",
+        "Rejected",
+        "Service"
+      ],
+      "functions": [
+        "required"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/slurm_inventory.py",
+      "sha256": "603e65e01e099122f18fc4b9faedf50216c2de7eda5aa41bf1449d5b4560ffb2",
+      "bytes": 15049,
+      "classes": [
+        "SlurmController",
+        "SlurmInventoryConfig",
+        "SlurmInventoryCollector"
+      ],
+      "functions": [
+        "integer",
+        "flags",
+        "tres_values",
+        "gres_used_count",
+        "resource"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/static/console.css",
+      "sha256": "790cb827dde09b26c4ae55a500b363b5a0ee4619ffe8d7b6d6880f30c76a8df8",
+      "bytes": 73222
+    },
+    {
+      "path": "src/resource_advisor/static/console.js",
+      "sha256": "291ffcc5a94038a7ab4906471c0bf9a8a106db4b43f7b70c43526a3bb44b00e7",
+      "bytes": 192725
+    },
+    {
+      "path": "src/resource_advisor/static/index.html",
+      "sha256": "acc20df91faa84965b5533a1c70be766b0819328b6bb79548079b0a16230e0fd",
+      "bytes": 4342
+    },
+    {
+      "path": "src/resource_advisor/static/mark.svg",
+      "sha256": "e06e826c35e431a23d2c6ed943e1c3a11bdd00e9e3f96238f70e36ade1d0d7b8",
+      "bytes": 214
+    },
+    {
+      "path": "src/resource_advisor/store.py",
+      "sha256": "26f870bb41f69eedd35d8ff2c481834a189ba6be7c48b9ee66281493df4c9840",
+      "bytes": 12610,
+      "classes": [
+        "Conflict",
+        "Store"
+      ],
+      "functions": [
+        "job_route_filter"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/study.py",
+      "sha256": "b5981548539955f8e781c3638cd5294a64486f4adc1e0ad520d769e6d1fe84d5",
+      "bytes": 50170,
+      "classes": [
+        "Studies"
+      ],
+      "functions": []
+    },
+    {
+      "path": "src/resource_advisor/thermal.py",
+      "sha256": "6f3eebcb3ad09d80942529a4326c2f5ec682bb5d2936a1411e59b4b508f63a48",
+      "bytes": 10687,
+      "classes": [
+        "Reading",
+        "Window",
+        "ThermalTrace",
+        "NvmlReader"
+      ],
+      "functions": [
+        "validate_trace",
+        "assess"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/training.py",
+      "sha256": "7ad1ff315b7b5488857e735d46ffb5a28455ce0b0d6a8bfcb9eec8aff8c87050",
+      "bytes": 9060,
+      "classes": [
+        "TrainingIsolation",
+        "TrainingReceipt"
+      ],
+      "functions": [
+        "validate_binding",
+        "validate_receipt",
+        "isolate_manifest",
+        "verified_bytes",
+        "prepare"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/transfer.py",
+      "sha256": "d11d39944692fcec2024ced46d2629bf1d13e2f92fe601f523078dcafa7b31c9",
+      "bytes": 20114,
+      "classes": [
+        "TransferSpace",
+        "TransferEvidenceRequest",
+        "TransferSpaces"
+      ],
+      "functions": []
+    },
+    {
+      "path": "src/resource_advisor/transfer_gpu_benchmark.py",
+      "sha256": "1d4c80325a17aecd94b4f95b028ca03543bf598982e340f8d6ee125c1ee6d47f",
+      "bytes": 8614,
+      "classes": [],
+      "functions": [
+        "build_model",
+        "validate",
+        "run"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/uncertainty.py",
+      "sha256": "37a063d3f848c062a7eebee09a24b8e2332a30b261d6bb409342eb2d3428aa89",
+      "bytes": 15638,
+      "classes": [],
+      "functions": [
+        "recent_profile_window",
+        "stamp",
+        "assess_recommendation",
+        "shadow_report"
+      ]
+    },
+    {
+      "path": "src/resource_advisor/worker.py",
+      "sha256": "dbc3c38a9118fe8aad1fcbbe5376ab93d7068df3cc09324e13af6498e0b5076f",
+      "bytes": 33750,
+      "classes": [
+        "Worker",
+        "MLflowDelivery"
+      ],
+      "functions": []
+    },
+    {
+      "path": "src/resource_advisor/workload_uncertainty.py",
+      "sha256": "5ed1dfa82d28eed57e12475462db2418f7d9bdbd89d709a3a718cfb0c804f040",
+      "bytes": 10421,
+      "classes": [
+        "Target",
+        "SourceCell"
+      ],
+      "functions": [
+        "_require",
+        "_positive",
+        "prepare",
+        "forecast",
+        "_fit_predict"
+      ]
+    },
+    {
+      "path": "tests/conftest.py",
+      "sha256": "8d45ae47fade8f08bf02bb8604d059916e59b1f88bdc5f3babbe2529b98bea2e",
+      "bytes": 3847,
+      "classes": [],
+      "functions": [
+        "bundle",
+        "database_store",
+        "service"
+      ]
+    },
+    {
+      "path": "tests/test_accounting.py",
+      "sha256": "d2074a7cfbee8b1c03221c009d5b15736532bc32357946a1343549d1ad00a48a",
+      "bytes": 7859,
+      "classes": [],
+      "functions": [
+        "record",
+        "test_resultless_terminal_usage_is_atomic_and_idempotent",
+        "test_missing_cancellation_timestamps_do_not_mean_zero",
+        "test_cancel_response_loss_preserves_intent_and_observed_allocation",
+        "test_cancel_before_submit_proves_zero_and_backfills_once",
+        "test_legacy_pending_cancel_does_not_invent_original_request_time",
+        "test_summary_preserves_unknown_and_device_units",
+        "test_accounting_does_not_repair_invalid_time_or_double_count_typed_gres"
+      ]
+    },
+    {
+      "path": "tests/test_api_flow.py",
+      "sha256": "e6e6cf8c783e196cca9e2b7c040f9dc136fb00c50356b44dbe16c867cf980f0b",
+      "bytes": 3577,
+      "classes": [],
+      "functions": [
+        "test_http_to_recommendation_and_mlflow_retry"
+      ]
+    },
+    {
+      "path": "tests/test_artifacts.py",
+      "sha256": "91c7c3c4809ce40740ab7749384fa4ddebc08212cd8c57bc4a150cf0504942c6",
+      "bytes": 8460,
+      "classes": [
+        "MemoryS3"
+      ],
+      "functions": [
+        "test_content_addressed_bytes_are_verified_and_never_overwritten",
+        "test_unmapped_owner_or_path_escape_rejected",
+        "test_location_change_does_not_silently_redirect_reads",
+        "test_dotted_contract_references_are_valid_object_key_segments",
+        "test_put_response_loss_backfills_once_without_failing_compute_job",
+        "test_api_authorizes_artifact_download_and_checks_integrity",
+        "test_mlflow_artifact_proxy_upload_verifies_ownership_and_bytes"
+      ]
+    },
+    {
+      "path": "tests/test_backends.py",
+      "sha256": "9b1de492e0520593051c553204af39513b94366027ac1edb46d29e7098050427",
+      "bytes": 16226,
+      "classes": [],
+      "functions": [
+        "row",
+        "native_runtime",
+        "test_kubernetes_submission_suspended_and_bounded",
+        "test_qualified_runtime_mount_is_read_only_and_digest_bound",
+        "test_versioned_variant_explicitly_reuses_approved_runtime_bundle",
+        "test_required_runtime_bundle_fails_preflight_without_native_submission",
+        "test_slurm_is_not_wrapped_in_kueue_and_quotes_payload",
+        "test_slurm_accounting_requests_explicit_timezone",
+        "test_priority_grade_maps_to_distinct_backend_policies",
+        "test_unmapped_priority_is_rejected_before_submission",
+        "test_missing_or_duplicate_envelope_rejected",
+        "test_reconciliation_rejects_foreign_kubernetes_job",
+        "test_pending_pod_is_not_running_even_when_job_active",
+        "test_zero_accelerator_allocation_requires_observed_cpu_only_requests",
+        "test_terminated_container_waits_for_job_condition_without_requeue",
+        "test_deleted_job_with_running_pod_is_not_confirmed_cancel",
+        "test_slurm_cannot_silently_ignore_a_container_image",
+        "test_slurm_reads_node_local_result_only_after_accounting_match",
+        "test_slurm_response_loss_reconciliation_does_not_attach_other_account",
+        "test_kubernetes_queue_time_uses_server_creation_not_submit_response"
+      ]
+    },
+    {
+      "path": "tests/test_backup.py",
+      "sha256": "b36169ab269ec832923a90213f9a48d13ec6c0b22323bf15c2c7ce546ce4b845",
+      "bytes": 9338,
+      "classes": [],
+      "functions": [
+        "test_fresh_backup_process_registers_scheduler_history_without_store_initialization",
+        "test_copy_comparison_detects_changed_json_with_equal_counts",
+        "test_copy_detects_equal_count_corruption_in_scheduler_history",
+        "test_copy_detects_missing_outbox_event",
+        "test_snapshot_archive_and_complete_table_manifest_required",
+        "test_snapshot_verification_detects_equal_count_corruption",
+        "test_exported_snapshot_excludes_concurrent_source_write",
+        "test_capture_failure_preserves_partial_archive_and_closes_snapshot"
+      ]
+    },
+    {
+      "path": "tests/test_concurrent_worker.py",
+      "sha256": "4527e09b04a3829e1f526f6e7ef2719ac6bccaa296ced465676a3cca620f5c6e",
+      "bytes": 9013,
+      "classes": [],
+      "functions": [
+        "test_delayed_submit_response_preserves_newer_worker_state",
+        "test_delayed_submit_response_does_not_reopen_completed_job",
+        "test_delayed_submit_response_preserves_concurrent_cancellation",
+        "test_concurrent_immutable_insert_preserves_first_content",
+        "test_status_observed_before_another_worker_transition_cannot_regress",
+        "test_postgres_concurrent_collectors_commit_one_result_and_ledger",
+        "test_postgres_claim_and_stale_finish_are_fenced"
+      ]
+    },
+    {
+      "path": "tests/test_configuration.py",
+      "sha256": "cd6c9e46d2be8cafa2dd36647b1edc8d05ddc5706b45fb92caa74c6c8a14c7eb",
+      "bytes": 9738,
+      "classes": [],
+      "functions": [
+        "credentials",
+        "deployment",
+        "test_multi_project_mapping_and_subset_workers_are_valid",
+        "test_e6_missing_artifact_mapping_is_rejected",
+        "test_enabled_mlflow_requires_all_worker_project_experiments",
+        "test_cross_service_bucket_mismatch_and_disabled_reader_rejected",
+        "test_unreachable_project_identity_is_rejected_without_requiring_api_only_projects_to_run",
+        "test_optional_integrations_remain_explicitly_disabled",
+        "test_required_optimizer_missing_fails_before_backend_construction",
+        "test_explicit_optimizer_requirement_with_installed_runtime",
+        "test_optimizer_requirement_rejects_ambiguous_flags",
+        "test_distinct_backend_pools_and_invalid_route_options",
+        "test_principal_operator_does_not_accept_truthy_strings_or_numbers",
+        "test_reader_rejects_duplicate_project_key_without_printing_secret",
+        "test_cli_rejects_missing_mapping_before_database_or_remote_construction",
+        "test_check_config_success_has_no_database_network_or_secret_output",
+        "test_incomplete_check_input_rejected"
+      ]
+    },
+    {
+      "path": "tests/test_console.py",
+      "sha256": "5542c0b33964e50459a91a0b180bb6333cdd7f0b6ee1d1a4e4d4212a8b9372da",
+      "bytes": 15504,
+      "classes": [],
+      "functions": [
+        "client_for",
+        "test_job_filters_apply_before_pagination",
+        "test_console_auth_and_project_isolation_without_side_effects",
+        "test_overview_pagination_and_latest_inventory",
+        "test_optional_anonymous_project_keeps_operator_and_other_projects_protected",
+        "test_contract_view_rechecks_expiry_without_promoting_inventory",
+        "test_recommendation_comparison_requires_approved_independent_measured_result",
+        "test_synthetic_result_not_presented_as_independent_hardware_comparison",
+        "test_backend_confirmation_timestamp_is_recorded_only_after_success",
+        "test_named_template_registration_submission_and_isolation"
+      ]
+    },
+    {
+      "path": "tests/test_contract_boundaries_report.py",
+      "sha256": "39e3024adff6f4b09c94e9c110824c1f9e49912fc3d84db38b40d379c13d6f0e",
+      "bytes": 2686,
+      "classes": [],
+      "functions": [
+        "auditor",
+        "report",
+        "test_live_boundary_evidence_rechecks_without_mutation",
+        "test_invalid_boundary_evidence_is_rejected"
+      ]
+    },
+    {
+      "path": "tests/test_contracts.py",
+      "sha256": "c544efba951d7808d8dd94dd7890ffc4323f5defd011b2f49c69ad80f850e3c4",
+      "bytes": 3283,
+      "classes": [],
+      "functions": [
+        "test_two_signatures_separate_environment",
+        "test_explicit_runtime_bundle_is_signed_and_legacy_digest_is_preserved",
+        "test_fail_closed_capabilities",
+        "test_expired_inventory",
+        "test_detected_does_not_mean_model_verified",
+        "test_gpu_count_search_rejected",
+        "test_prediction_is_not_result"
+      ]
+    },
+    {
+      "path": "tests/test_cpu_benchmark.py",
+      "sha256": "b7e3bba70256ec7dddd147013ff47214dc11af6d573d7e894d9287918d96b52b",
+      "bytes": 2340,
+      "classes": [],
+      "functions": [
+        "environment",
+        "test_cpu_computation_checks_every_output_and_result_identity",
+        "test_cpu_fixture_refuses_unqualified_inputs"
+      ]
+    },
+    {
+      "path": "tests/test_cuda_probe.py",
+      "sha256": "7e991c51bd3abde03591009f4e1532701ebd01f257e4823ccebdf6fe56b4c702",
+      "bytes": 2657,
+      "classes": [],
+      "functions": [
+        "test_probe_envelope_matches_existing_result_contract",
+        "test_timed_qualification_cannot_be_registered_from_short_samples"
+      ]
+    },
+    {
+      "path": "tests/test_cuda_userspace.py",
+      "sha256": "45c97462d8b367a4cf4a4eb2f882158d344ffe76c628af4076a4920f77f1fad3",
+      "bytes": 2522,
+      "classes": [],
+      "functions": [
+        "manifest",
+        "test_manifest_rejects_unpinned_or_non_userspace_archive",
+        "test_verified_payload_stays_in_new_directory_and_cannot_be_replayed"
+      ]
+    },
+    {
+      "path": "tests/test_diagnostics.py",
+      "sha256": "f6a62a6587299bf63b9ca96c8a260fd7af6a15a7f3d55b807eb6d49f0d665e30",
+      "bytes": 8855,
+      "classes": [],
+      "functions": [
+        "profile",
+        "test_no_gpu_utilization_shortcut_and_synthetic_abstention",
+        "test_missing_and_mixed_phases_abstain",
+        "test_outlier_does_not_become_a_causal_claim",
+        "test_invalid_or_overlapping_durations_rejected",
+        "setup",
+        "test_worker_atomic_profile_and_project_scoped_diagnostic",
+        "test_mismatched_result_cannot_attach_diagnostics",
+        "test_total_boundary_cannot_disagree_with_measurement",
+        "test_phase_specific_hypotheses_keep_resource_count",
+        "test_durable_phase_artifact_and_mlflow_metrics"
+      ]
+    },
+    {
+      "path": "tests/test_e5_trial.py",
+      "sha256": "6ed18fdaab9135dc5479d866552a8d6e60b80b7cc0ad7a6eaea1703e12eed06d",
+      "bytes": 3768,
+      "classes": [],
+      "functions": [
+        "evidence",
+        "test_complete_trial_report_reproduces",
+        "test_missing_reordered_or_incomplete_trial_rejected",
+        "test_incompatible_result_cannot_be_resigned_into_evidence",
+        "test_profiler_evidence_cannot_be_mixed_or_faked",
+        "test_missing_allocation_is_not_zero_cost",
+        "test_missing_delivery_verification_rejected",
+        "test_failed_predecessor_cost_cannot_disappear"
+      ]
+    },
+    {
+      "path": "tests/test_fidelity.py",
+      "sha256": "d25e66d3dc87398a2feca2770a1eba14e60acc99ad51fbd40bec13b0f6d8d9ad",
+      "bytes": 8974,
+      "classes": [],
+      "functions": [
+        "prepare",
+        "finish",
+        "test_preregistered_balanced_schedule_is_stable_and_sequential",
+        "test_calibration_rejects_uncontrolled_or_unfunded_comparison",
+        "test_complete_pairs_keep_independent_ids_detect_reversal_and_do_not_enable_mfkg",
+        "test_synthetic_measurements_never_qualify_pairing",
+        "test_slot_key_cannot_relabel_another_workload",
+        "test_deadline_stops_new_slots_but_replay_is_stable",
+        "test_calibration_routes_require_operator_creation_and_hide_other_projects"
+      ]
+    },
+    {
+      "path": "tests/test_fidelity_qualification.py",
+      "sha256": "f68ce9ffa5c41cfbf6f444fe4bfe9001a21b39f77c11b0c707798dcd15dbd418",
+      "bytes": 18987,
+      "classes": [
+        "ThermalSchedulerDouble"
+      ],
+      "functions": [
+        "qualified_space",
+        "run_study",
+        "calibrate",
+        "mf_request",
+        "test_real_kernel_drives_mixed_jobs_and_independent_confirmation",
+        "test_observed_pairs_must_pass_preregistered_limits",
+        "test_model_failure_uses_new_target_confirmations_without_fabricated_probes",
+        "test_expiry_rechecked_between_plan_and_submission",
+        "test_expiry_rechecked_before_external_backend_submission",
+        "test_live_observation_drift_stops_before_next_model_call",
+        "test_rank_change_within_latency_envelope_revokes_qualification",
+        "test_qualification_before_completion_and_expiry_status",
+        "test_plan_is_single_trial_immutable_project_scoped_and_operator_only",
+        "test_legacy_unregistered_calibration_cannot_be_retroactively_qualified"
+      ]
+    },
+    {
+      "path": "tests/test_fidelity_space.py",
+      "sha256": "9c5513c641728c56da5561152120bcfab08ae9f423dcf5ce6d6d15f1407b70ad",
+      "bytes": 24376,
+      "classes": [
+        "FidelitySchedulerDouble"
+      ],
+      "functions": [
+        "space_fixture",
+        "with_sampling_fixture",
+        "collect_test_envelopes",
+        "test_immutable_space_derives_numeric_and_target_bindings_without_execution",
+        "test_rejects_different_logical_workload",
+        "test_changed_config_and_invalid_features_are_rejected",
+        "test_evidence_joins_jobs_results_and_real_kernel_but_cannot_authorize",
+        "test_replication_space_never_exports_mf_kernel_input",
+        "test_sampling_evidence_requires_immutable_consumption_receipts",
+        "test_representative_space_requires_registered_policy_digest",
+        "test_untrusted_incomplete_or_leaking_evidence_is_rejected",
+        "test_current_context_rechecked_but_historical_evidence_survives_capability_expiry",
+        "test_routes_operator_scope_and_no_posted_measurements",
+        "start_calibration",
+        "test_mixed_fidelity_durable_execution_and_independent_target_confirmation",
+        "test_mixed_plan_cannot_submit_target_in_place_of_lower_workload",
+        "test_mixed_calibration_stops_without_unapproved_followup",
+        "test_legacy_study_request_digest_does_not_change",
+        "test_canceled_planning_lease_cannot_create_calibration_plan"
+      ]
+    },
+    {
+      "path": "tests/test_gitops.py",
+      "sha256": "fc229e9c377d765894c48fc68d290b9af769e4f46c7f522f160ac8740f0e7882",
+      "bytes": 4245,
+      "classes": [],
+      "functions": [
+        "site_config",
+        "test_invalid_site_does_not_render_privileged_or_floating_deployment",
+        "test_every_component_requires_qualified_image",
+        "test_static_sources_exclude_runtime_jobs_secrets_and_cluster_privileges",
+        "test_optional_slurm_observer_does_not_expand_project_scope_or_change_core_apps"
+      ]
+    },
+    {
+      "path": "tests/test_grid_characterization.py",
+      "sha256": "c219ed98bbcd2c18f4e696ec17c84c517584baec9ba55532abc474f82aac62b8",
+      "bytes": 3310,
+      "classes": [],
+      "functions": [
+        "test_grid_balances_every_candidate_and_confirms_all_without_optimizer",
+        "test_grid_cancellation_does_not_submit_more_jobs",
+        "test_fixed_gpu_benchmark_refuses_unsupported_work",
+        "test_fractional_cpu_budget_keeps_one_physical_gpu"
+      ]
+    },
+    {
+      "path": "tests/test_hailo_access_probe.py",
+      "sha256": "1cbd4a4ee1742d2b918d695bea48e7282c9c41dfaa894a6f34a110c607e64c19",
+      "bytes": 2321,
+      "classes": [],
+      "functions": [
+        "load_probe",
+        "test_expected_device_denial_can_pass_for_non_root",
+        "test_device_failure_is_not_evidence_of_allocation_isolation",
+        "test_device_access_without_request_fails_the_check",
+        "test_root_execution_cannot_satisfy_non_root_probe",
+        "test_runtime_mismatch_is_not_accepted_as_device_denial"
+      ]
+    },
+    {
+      "path": "tests/test_hailo_benchmark.py",
+      "sha256": "0467e430697dc575e8bb72338803daeb55fdaacd831557f5896ccaa747984d0f",
+      "bytes": 5949,
+      "classes": [],
+      "functions": [
+        "case",
+        "test_qualified_report_becomes_one_bound_result",
+        "test_every_quality_failure_retains_failed_result_without_timings",
+        "test_contract_mismatch_prevents_device_execution",
+        "test_bound_context_and_actual_evidence_are_enforced"
+      ]
+    },
+    {
+      "path": "tests/test_hailo_platform_evidence.py",
+      "sha256": "82e374b33fde61b2f4002b171100b7b5a95cde56ad91750f9670e8b3e3620b20",
+      "bytes": 2437,
+      "classes": [],
+      "functions": [
+        "evidence",
+        "test_actual_protocol_has_four_delivered_jobs_and_retains_prediction_limit",
+        "test_audit_rejects_incomplete_or_misattributed_evidence"
+      ]
+    },
+    {
+      "path": "tests/test_hailo_qualification.py",
+      "sha256": "5a57b56405c2a862b3ae3c73ca8eedc9bd9998b32a96eb8041e59cbb68a58f1e",
+      "bytes": 3727,
+      "classes": [],
+      "functions": [
+        "test_reference_agreement_does_not_override_failed_absolute_accuracy",
+        "test_accuracy_alone_does_not_qualify_different_reference_behavior",
+        "test_accuracy_loss_gate_is_independent_and_has_exact_boundary",
+        "test_class_indices_are_bounded_integers",
+        "test_missing_predictions_cannot_be_reported_as_accuracy",
+        "test_changed_manifest_is_rejected_before_array_loading",
+        "test_selection_is_output_independent_balanced_and_order_invariant",
+        "test_new_recipe_excludes_all_previously_inspected_inputs"
+      ]
+    },
+    {
+      "path": "tests/test_hailo_resnet50.py",
+      "sha256": "699fa82cc873c636350263781868463c944bfc3fff58b980ec0dd2117d8e22cd",
+      "bytes": 3844,
+      "classes": [],
+      "functions": [
+        "test_frozen_selection_excludes_both_inspected_cohorts",
+        "test_declared_fixture_pixel_format_is_enforced",
+        "test_float_fixture_rejects_nonfinite_or_out_of_range_pixels"
+      ]
+    },
+    {
+      "path": "tests/test_health.py",
+      "sha256": "93aa4a0864c81448c3ea8577c447578604d41825fc6b0b6768e81acfdd510c33",
+      "bytes": 3685,
+      "classes": [],
+      "functions": [
+        "test_heartbeat_requires_recent_completed_cycle",
+        "test_collector_sigterm_finishes_snapshot_and_exits_without_sleep",
+        "test_worker_finishes_cycle_before_graceful_shutdown"
+      ]
+    },
+    {
+      "path": "tests/test_image_builder.py",
+      "sha256": "2f9d5cf3db2cd0167a4d61d3ad9ecd91a31eb6da2214f05a673d5e91d45ccf71",
+      "bytes": 3464,
+      "classes": [],
+      "functions": [
+        "test_image_builder_rejects_unverified_binary_before_build",
+        "test_source_update_refuses_unmatched_runtime",
+        "test_source_layer_replaces_old_package_without_copying_dependencies"
+      ]
+    },
+    {
+      "path": "tests/test_inventory.py",
+      "sha256": "1d1d5015721d77980342d289d7bbfb8ea4ca28a7f6bc5050934a739d41d63633",
+      "bytes": 10335,
+      "classes": [],
+      "functions": [
+        "test_resource_units",
+        "test_init_sidecars_and_overhead_are_reserved_once",
+        "source",
+        "config",
+        "test_inventory_separates_measurement_and_request_headroom_without_pod_identity",
+        "test_failed_pod_listing_cannot_show_free_capacity",
+        "test_stale_metric_and_stopped_collector_invalidate_values",
+        "test_prometheus_uses_real_sample_time_and_health",
+        "test_inventory_api_is_project_scoped_and_history_is_immutable",
+        "test_missing_prometheus_credential_preserves_kubernetes_data",
+        "test_invalid_metric_bounds_rejected"
+      ]
+    },
+    {
+      "path": "tests/test_kernel_diagnostics.py",
+      "sha256": "0196f6eebb78ff465f5dce3bb13eaa372d6271ef5a7f507116f46385d7281100",
+      "bytes": 8524,
+      "classes": [],
+      "functions": [
+        "trace",
+        "test_overlapping_kernels_use_interval_union_not_sum",
+        "test_nested_and_disjoint_intervals",
+        "test_real_cuda_cpu_and_gpu_annotations_do_not_collide",
+        "test_trace_capture_preserves_replay_and_removes_private_metadata",
+        "test_gpu_annotations_cannot_replace_cpu_forward_ranges",
+        "test_trace_capture_bounds",
+        "test_cpu_only_trace_rejected",
+        "test_bad_forward_ranges_rejected",
+        "test_other_or_unidentified_device_rejected",
+        "test_invalid_kernel_duration_rejected",
+        "test_unowned_kernel_cannot_be_clipped_into_good_evidence",
+        "test_missing_cuda_activity_in_one_block_rejected",
+        "context",
+        "test_runner_rejects_unapproved_configuration",
+        "test_runner_never_falls_back_to_cpu",
+        "test_fixed_schedule_has_three_independent_jobs_per_arm"
+      ]
+    },
+    {
+      "path": "tests/test_kubernetes_retention.py",
+      "sha256": "1e15beffc573ac926ad1a4b02c7abdbc054a3b23fad0a7ac71eea2b1442f4c13",
+      "bytes": 11535,
+      "classes": [
+        "Scheduler"
+      ],
+      "functions": [
+        "setup",
+        "test_delayed_job_condition_does_not_trigger_queue_timeout_or_early_result",
+        "test_cancel_commits_exact_evidence_before_retryable_release",
+        "test_foreign_records_are_not_attached_or_released",
+        "test_completed_during_cancel_is_collected_from_retained_pod",
+        "test_terminal_job_waits_for_container_shutdown",
+        "test_release_does_not_touch_recreated_or_live_pod",
+        "test_retention_is_opt_in",
+        "test_failed_database_commit_cannot_release_terminal_evidence"
+      ]
+    },
+    {
+      "path": "tests/test_launcher.py",
+      "sha256": "be042458408fe3c5ee8f6f23c184e62f8ff05733f8506afcd620a88cbcdba54c",
+      "bytes": 2199,
+      "classes": [],
+      "functions": [
+        "test_launcher_preserves_idempotency_key",
+        "test_launcher_deadline_requests_cancellation",
+        "test_owned_launcher_renews_lease_and_cancels_on_interruption"
+      ]
+    },
+    {
+      "path": "tests/test_load_context.py",
+      "sha256": "07b79f4bdc0c17474d604aec9611563bf83e010a776d39108f35854354422539",
+      "bytes": 11305,
+      "classes": [],
+      "functions": [
+        "start",
+        "test_optional_policy_preserves_legacy_hashes_and_separates_instrumented_context",
+        "test_collector_database_artifact_mlflow_and_project_readback",
+        "test_bad_load_evidence_cannot_create_result_profile_or_artifact",
+        "cgroup_files",
+        "test_read_only_provider_aggregates_io_and_preserves_missing_pressure",
+        "test_provider_fails_closed_on_wrong_scope_or_malformed_counters",
+        "test_counter_parsers_do_not_invent_missing_or_negative_values",
+        "test_zero_period_delta_has_unknown_throttle_fraction"
+      ]
+    },
+    {
+      "path": "tests/test_load_drift_evidence.py",
+      "sha256": "ace2782d05a96289cc3f4218314d99bdec0ff95136df4c3e8a5919d7bb216160",
+      "bytes": 2630,
+      "classes": [],
+      "functions": [
+        "evidence",
+        "test_real_load_drift_record_recomputes_latching_and_total_cost",
+        "test_auditor_rejects_broken_or_contradictory_evidence"
+      ]
+    },
+    {
+      "path": "tests/test_load_observed_benchmark.py",
+      "sha256": "aa440eb50f874db4012d2e13a5b0724e3bc92671547452c05169fbcdf1a10b87",
+      "bytes": 2670,
+      "classes": [],
+      "functions": [
+        "prepared",
+        "test_wrapper_emits_one_bound_envelope_after_reading_both_brackets",
+        "test_unchecked_or_failed_result_never_escapes_wrapper"
+      ]
+    },
+    {
+      "path": "tests/test_lookup_history.py",
+      "sha256": "7c0006f9ac70965d359010b9c79c3e440aeb333a71811b40d25ca87e3705657a",
+      "bytes": 7689,
+      "classes": [],
+      "functions": [
+        "seed",
+        "request",
+        "test_empty_snapshot_cannot_acquire_future_experiment_results",
+        "test_frozen_cohort_survives_restart_and_excludes_later_results",
+        "test_explicit_cohort_stays_identical_across_later_study_creation",
+        "test_unknown_or_wrong_scope_profile_is_rejected_without_study",
+        "test_frozen_evidence_loss_abstains_without_dispatch",
+        "test_expired_profiles_are_not_made_valid_by_freezing",
+        "test_legacy_unfrozen_lookup_fails_closed_but_keeps_idempotency",
+        "test_lookup_options_cannot_affect_another_strategy_or_duplicate_samples"
+      ]
+    },
+    {
+      "path": "tests/test_mfkg.py",
+      "sha256": "4879468e0849eafac9af87eab784cf8e5e15d2da3ceb98340dc59692e1849d09",
+      "bytes": 6444,
+      "classes": [],
+      "functions": [
+        "problem",
+        "changed",
+        "test_actual_mfkg_matches_finite_fantasy_value_and_target_projection",
+        "test_cost_changes_acquisition_without_changing_gp_observations",
+        "test_unit_rescaling_of_wall_time_does_not_change_selection",
+        "test_expensive_low_fidelity_can_select_target_level",
+        "test_invalid_or_unpaired_inputs_are_rejected",
+        "test_fit_failure_is_not_a_fake_random_mfkg_suggestion",
+        "test_analysis_cli_does_not_open_database_or_submit_jobs"
+      ]
+    },
+    {
+      "path": "tests/test_mlflow_outage_verifier.py",
+      "sha256": "26de1311539853446bd156ca23d5bb29cdd5acb4848890fad0cca399da201127",
+      "bytes": 774,
+      "classes": [],
+      "functions": [
+        "test_canonical_memory_quantity_preserves_the_frozen_allocation",
+        "test_different_allocation_is_still_rejected"
+      ]
+    },
+    {
+      "path": "tests/test_numerical_holdout.py",
+      "sha256": "55479a8edf40b849f4394eeec6879d1c6573504c8c928a6ab0b8f421997b7511",
+      "bytes": 10729,
+      "classes": [],
+      "functions": [
+        "inputs",
+        "test_scaling_and_training_noise_use_only_sources",
+        "test_unsupported_targets_abstain_without_importing_or_fitting",
+        "test_target_workload_overlap_is_rejected_even_with_disjoint_attempts",
+        "test_duplicate_attempt_and_incomplete_grid_rejected",
+        "test_invalid_measurements_are_not_fast_training_results",
+        "test_unknown_source_runtime_and_alias_workloads_rejected",
+        "test_alias_or_inconsistent_target_shape_is_not_workload_holdout",
+        "test_model_failure_does_not_leave_partial_predictions_or_substitute_model",
+        "test_real_gp_individual_variance_is_not_divided_by_repeat_count",
+        "test_warning_and_random_state_restored_on_gp_failure",
+        "test_evaluator_changes_heldout_values_only_after_prediction_boundary",
+        "test_published_numerical_report_reproduces_without_mutating_original_capture"
+      ]
+    },
+    {
+      "path": "tests/test_operational_mode.py",
+      "sha256": "93bd88ff0d3d9039740dfd938ded94ec5c92b4aea08b880d8d0d42b547b0159a",
+      "bytes": 1985,
+      "classes": [],
+      "functions": [
+        "test_operational_submission_keeps_evidence_and_worker_policy"
+      ]
+    },
+    {
+      "path": "tests/test_operational_plan.py",
+      "sha256": "78d1d8dc53b38a26ec4e14ec00fe7d9624447b4ba00a52eb046c4ce05aa8436a",
+      "bytes": 1270,
+      "classes": [],
+      "functions": [
+        "test_frozen_operational_schedule_is_balanced_reproducible_and_bounded",
+        "test_unapproved_trial_size_rejected"
+      ]
+    },
+    {
+      "path": "tests/test_operational_report.py",
+      "sha256": "65c339b9d856b35f246a5da87f4c8dcc4bdfc5a0bbefd6770bea15fe2d8eaa13",
+      "bytes": 5196,
+      "classes": [],
+      "functions": [
+        "evidence",
+        "test_published_report_is_reproducible_and_does_not_mutate_evidence",
+        "test_misattributed_or_incomplete_comparison_is_rejected",
+        "test_future_b2_setup_is_charged_once_to_every_actual_use_count",
+        "test_measurement_classifications_are_recomputed",
+        "test_only_contract_defaults_are_normalized",
+        "test_qualification_jobs_cannot_be_recounted"
+      ]
+    },
+    {
+      "path": "tests/test_operations.py",
+      "sha256": "8f3547d5c7044e70a140d378f21740af44b72e3f8e989fc6dc9f1b6f8d8f4f22",
+      "bytes": 3560,
+      "classes": [],
+      "functions": [
+        "test_operations_are_project_scoped_and_independent_of_table_filters",
+        "test_recovered_observation_does_not_keep_old_alarm",
+        "test_slurm_reports_owned_pending_reason",
+        "test_kubernetes_pending_reason_is_observed_not_guessed"
+      ]
+    },
+    {
+      "path": "tests/test_owner_lease.py",
+      "sha256": "693c8670a7c8b2b10d172abe2f346861243b3c45f30b0dbf328230332f9426a6",
+      "bytes": 6397,
+      "classes": [],
+      "functions": [
+        "lease_clock",
+        "owned",
+        "test_heartbeat_extends_opt_in_lease_and_replay_does_not",
+        "test_expired_owner_cancels_before_submit_without_allocating",
+        "test_late_heartbeat_cannot_revive_expired_or_cancelled_owner",
+        "test_lost_submit_response_still_has_durable_expiry_and_single_submission",
+        "test_owner_loss_never_cancels_ordinary_job_or_completed_collection",
+        "test_heartbeat_api_requires_same_project",
+        "test_default_request_keeps_old_idempotency_digest",
+        "test_owner_lease_bounds"
+      ]
+    },
+    {
+      "path": "tests/test_passive_observation.py",
+      "sha256": "7b75ec80993a9351ef00fddea3d67f906f1a1afed29aca593c7be5f1bb76eab9",
+      "bytes": 9942,
+      "classes": [],
+      "functions": [
+        "payload",
+        "api",
+        "headers",
+        "counts",
+        "test_operator_import_scope_idempotency_and_no_execution_authority",
+        "test_missing_metrics_and_scope_cannot_be_promoted",
+        "test_platform_binding_requires_exact_attempt_and_native_identity",
+        "stat_text",
+        "test_process_identity_refuses_pid_reuse",
+        "test_slurm_identity_and_counter_gap_remain_explicit",
+        "test_unsupported_nvml_sensors_are_missing_not_zero",
+        "test_actual_unmodified_program_survives_collection_and_has_no_model_metrics"
+      ]
+    },
+    {
+      "path": "tests/test_pipeline.py",
+      "sha256": "ceb2c377d538282550e0d7c603e4cdf8e812bdc542cb0d8c96fddde64585f311",
+      "bytes": 2926,
+      "classes": [],
+      "functions": [
+        "test_compiled_launcher_does_not_request_gpu_or_cache",
+        "test_server_requires_both_tls_files",
+        "test_cpu_gpu_workflow_has_uncached_execution_dependency"
+      ]
+    },
+    {
+      "path": "tests/test_policy_comparison_report.py",
+      "sha256": "6024af86d72968a05f47132f58e374fa4f5834dfbd96237a1133b8e00061402a",
+      "bytes": 11610,
+      "classes": [],
+      "functions": [
+        "report",
+        "test_history_is_charged_on_first_use_and_once_across_actual_reuse",
+        "test_rejects_oracle_leakage_through_every_selection_path",
+        "test_unknown_or_invalid_cost_is_never_zero",
+        "test_history_cost_cannot_be_omitted_from_lookup_budget",
+        "test_rejects_quality_time_and_search_space_violations",
+        "predecessor_report",
+        "test_separate_trial_retains_failed_predecessor_cost_without_double_charging_policies",
+        "test_prior_failure_cannot_be_hidden_or_reused_as_a_fresh_observation",
+        "test_rejects_unfair_or_incomplete_comparisons"
+      ]
+    },
+    {
+      "path": "tests/test_policy_retry_plan.py",
+      "sha256": "05ca960a52d7119ecd49de33e6147a293f43fb3e56753faa3eba7d215af90b56",
+      "bytes": 2243,
+      "classes": [],
+      "functions": [
+        "inputs",
+        "test_new_trial_preserves_design_and_keeps_the_full_failed_cost",
+        "test_no_new_trial_without_a_retained_terminal_predecessor_and_actual_repair",
+        "test_unknown_or_invalid_predecessor_cost_is_not_discarded"
+      ]
+    },
+    {
+      "path": "tests/test_qualifications.py",
+      "sha256": "80c004632513088e8056f5522b4f1dea3df81f8f8d0bd0b4e5f9f73c21744eec",
+      "bytes": 7484,
+      "classes": [],
+      "functions": [
+        "payload",
+        "client",
+        "headers",
+        "counts",
+        "test_import_recomputes_failed_gate_and_does_not_create_execution_or_usage",
+        "test_authorization_scope_and_immutable_conflict",
+        "test_incomplete_forged_or_invalid_evidence_is_rejected_without_mutation",
+        "test_passing_import_still_does_not_promote_a_variant",
+        "test_paged_overview_omits_samples_and_is_project_scoped"
+      ]
+    },
+    {
+      "path": "tests/test_queue_inventory.py",
+      "sha256": "cefb87982f4ed03b7b7e42478b5d8740456b0c4a3ee9addad8519241d3518155",
+      "bytes": 5521,
+      "classes": [],
+      "functions": [
+        "queue",
+        "test_quota_reservation_admission_and_borrowing_are_distinct",
+        "test_missing_usage_is_unknown_and_stale_generation_not_active",
+        "test_workload_reports_quota_and_pending_reason_without_guessing_priority",
+        "test_named_cluster_queue_read_is_scoped_and_freshness_expires",
+        "test_unconfigured_cluster_queue_is_never_read"
+      ]
+    },
+    {
+      "path": "tests/test_replication.py",
+      "sha256": "f00ca67e4321d855eded9126390ecde190e12db87c340691677f03cff3ac65ac",
+      "bytes": 9826,
+      "classes": [],
+      "functions": [
+        "observations",
+        "test_inner_samples_do_not_replace_independent_runs",
+        "test_noise_directs_additional_measurement_not_faster_mean",
+        "test_balanced_seeded_initial_design",
+        "test_noisy_limit_and_precision_are_distinct",
+        "test_failed_repeat_never_becomes_fast_measurement",
+        "test_options_and_initial_budget_are_explicit",
+        "registered_spec",
+        "test_real_coordinator_adapts_then_confirms_independent_jobs",
+        "test_expired_capability_stops_replication_instead_of_shrinking_space",
+        "test_legacy_study_idempotency_digest_survives_new_options"
+      ]
+    },
+    {
+      "path": "tests/test_research.py",
+      "sha256": "7918a70da362e5967eccc8e28d89a26872fdacf335726891b546782329965f85",
+      "bytes": 10459,
+      "classes": [],
+      "functions": [
+        "pipeline_job",
+        "test_pipeline_links_each_declared_stage_with_project_scope",
+        "test_pipeline_does_not_guess_links_from_parameter_names",
+        "test_pipeline_constant_and_legacy_single_key_links",
+        "test_pipeline_retry_cannot_backfill_prior_failed_workflow",
+        "config",
+        "test_mlflow_scope_checked_before_writing_notes_or_listing_artifacts",
+        "test_kfp_scope_checked_before_termination",
+        "test_notebook_stop_uses_scoped_versioned_patch",
+        "test_upstream_outage_is_not_reported_as_empty_healthy_service",
+        "test_pipeline_create_idempotency_survives_uncertain_response"
+      ]
+    },
+    {
+      "path": "tests/test_rgpe.py",
+      "sha256": "323401db8831027f46de142381d60b227dca67309cb2257507d486a764ad3287",
+      "bytes": 7215,
+      "classes": [],
+      "functions": [
+        "problem",
+        "changed",
+        "test_actual_gp_ensemble_uses_target_loo_and_separate_source_evidence",
+        "test_absolute_source_time_rescaling_never_rescales_target_predictions",
+        "test_reversed_source_ranks_zero_weight_and_target_only_fallback",
+        "test_indistinguishable_target_ranks_disable_transfer",
+        "test_initial_target_checks_are_balanced_and_source_independent",
+        "test_invalid_transfer_inputs_rejected",
+        "test_failure_restores_threads_and_never_invents_rgpe_suggestion"
+      ]
+    },
+    {
+      "path": "tests/test_runtime_guard.py",
+      "sha256": "50ca51dbf478986196d30029418b778da31202244a1ad62dcfd30f1ac148942b",
+      "bytes": 3722,
+      "classes": [],
+      "functions": [
+        "sealed",
+        "test_guard_executes_qualified_command_and_strips_credentials",
+        "test_modified_source_is_rejected_before_workload_execution",
+        "test_guard_rejects_qualification_mismatch"
+      ]
+    },
+    {
+      "path": "tests/test_sampling.py",
+      "sha256": "4e5120230ecb438c4d70cd940ac2aa6ab7ff5d9f19c4db5d5ce1f3e061648cd1",
+      "bytes": 17427,
+      "classes": [],
+      "functions": [
+        "sampled",
+        "register_binding",
+        "start",
+        "consume",
+        "test_selection_preserves_declared_proportions_and_deterministic_order",
+        "test_legacy_identity_is_byte_compatible_and_sampled_execution_requires_binding",
+        "test_consumed_bytes_reach_worker_database_tracking_and_artifact",
+        "test_invalid_receipts_do_not_create_results_or_profiles",
+        "test_input_or_operation_failure_cannot_emit_receipt_or_resume",
+        "test_session_enforces_warmup_and_complete_budget",
+        "test_policy_operator_approval_and_project_scoped_readback",
+        "test_bounded_tensor_and_maximum_receipt_fit_transport",
+        "test_projected_input_staging_verifies_copies_and_preserves_originals",
+        "test_sampled_gpu_runner_refuses_cpu_fallback"
+      ]
+    },
+    {
+      "path": "tests/test_scenarios.py",
+      "sha256": "293e4fef14ccea50777bdd7f3a2940c56e28744a10508f10c876f7069920f8d6",
+      "bytes": 2695,
+      "classes": [],
+      "functions": [
+        "test_scenario_retries_partial_submission_without_duplicate_job",
+        "test_transition_history_preserves_queue_reason_after_completion"
+      ]
+    },
+    {
+      "path": "tests/test_scheduler_lab.py",
+      "sha256": "09441e3d6a3ca3ed8678d318916bab2a9608adcc60d59041f2fef46b4fb05be2",
+      "bytes": 7498,
+      "classes": [],
+      "functions": [
+        "test_native_experiment_scope_idempotency_and_cancellation",
+        "test_multi_gpu_request_capacity_and_idempotency",
+        "test_registered_workload_poc_uses_runner_project_only",
+        "test_node_history_is_project_scoped_frozen_and_samples_resource_changes",
+        "test_missing_inventory_stays_missing_in_node_history",
+        "test_history_listing_keeps_only_latest_replay_and_detail_is_project_scoped"
+      ]
+    },
+    {
+      "path": "tests/test_scheduler_lab_runner.py",
+      "sha256": "c81d07a14f2b684f09a9ac18e11997635719672292796299298e8f46040d8e3d",
+      "bytes": 13233,
+      "classes": [],
+      "functions": [
+        "runner",
+        "test_priority_and_failure_are_fixed_native_job_options",
+        "test_native_lifecycle_and_retired_job_survives",
+        "test_recovery_allowlist_does_not_hide_unrelated_failure",
+        "test_backlog_accepts_native_head_reason_without_fabricating_other_reasons",
+        "test_burst_submits_ten_concurrently_and_requires_native_queue_and_results",
+        "test_registered_batch_recovers_lost_receipt_with_same_key_and_keeps_ten_rows",
+        "test_agent_observation_rpc_retries_transient_disconnect_only",
+        "test_lost_final_report_preserves_terminal_receipt_without_reexecuting",
+        "test_rejected_request_does_not_abort_accepted_independent_job",
+        "test_staggered_plan_reproducible_with_single_and_multi_gpu_requests",
+        "test_aging_steps_stop_below_urgent_priority",
+        "test_requeue_manifest_excludes_failed_node_and_keeps_group_resources",
+        "test_priority_promotion_guards_owner_version_and_reserved_workload"
+      ]
+    },
+    {
+      "path": "tests/test_scheduling.py",
+      "sha256": "16d971db8bf3a81d6236b7e71b788c233bf035c74580cb525cba1cfce1ac6fac",
+      "bytes": 13727,
+      "classes": [],
+      "functions": [
+        "profile",
+        "preview",
+        "test_profile_plan_is_enforced_in_job_and_native_manifest",
+        "test_unsupported_policy_rejected_before_submission",
+        "test_changed_plan_digest_rejected",
+        "test_profile_api_operator_scope_and_immutability",
+        "test_auto_selection_and_slurm_qos_are_compiled_above_backends",
+        "test_automatic_job_selects_fresh_capacity_and_queues_when_busy",
+        "test_stale_capacity_does_not_claim_available",
+        "test_common_pool_selection_accounts_for_accepted_burst_demand"
+      ]
+    },
+    {
+      "path": "tests/test_service.py",
+      "sha256": "335c2987ea6a4de9a28e37761ca298a15c608d8cef950a6372596a581d1eb566",
+      "bytes": 6408,
+      "classes": [],
+      "functions": [
+        "complete",
+        "test_idempotency_and_conflicting_request",
+        "test_consent_does_not_silently_enable_unimplemented_profiling",
+        "test_cross_project_hidden",
+        "test_profile_needs_independent_runs",
+        "test_low_quality_not_a_profile",
+        "test_digest_failure_is_not_success",
+        "test_duplicate_result_immutable_and_no_duplicate_usage",
+        "test_stale_attempt",
+        "test_production_rejects_synthetic",
+        "test_api_auth_operator_and_project",
+        "test_immutable_registry",
+        "test_baseline_cannot_claim_missing_or_expired_approval",
+        "test_baseline_cannot_claim_another_projects_approval"
+      ]
+    },
+    {
+      "path": "tests/test_slurm_cnn_workload.py",
+      "sha256": "c7fe73494aa76c2d40a14bb22c2801c856891e929b0a16654023bae726d7ee4a",
+      "bytes": 4363,
+      "classes": [],
+      "functions": [
+        "environment",
+        "measurement",
+        "test_native_producer_round_trips_through_real_platform_contract",
+        "test_changed_execution_or_identity_is_rejected_before_torch",
+        "test_unqualified_context_rejected",
+        "test_failure_or_incomplete_samples_cannot_become_completed"
+      ]
+    },
+    {
+      "path": "tests/test_slurm_cpu_workload.py",
+      "sha256": "a6331ab5e9e87cc0458a3d6b347b282983274fb67659c81a83f4bac6d281a067",
+      "bytes": 3409,
+      "classes": [],
+      "functions": [
+        "environment",
+        "test_native_cpu_result_round_trips_through_platform_contract",
+        "test_unqualified_execution_rejected_before_compute",
+        "test_changed_host_or_context_rejected"
+      ]
+    },
+    {
+      "path": "tests/test_slurm_executor.py",
+      "sha256": "7642fc15eaa2e8201893d5365c04ad8a0bbdd94f10af36478f24e58601c7fa89",
+      "bytes": 7408,
+      "classes": [],
+      "functions": [
+        "test_real_adapter_script_is_scoped_and_injected_values_remain_literal",
+        "test_adapter_queries_and_cancel_are_forced_to_linux_owner",
+        "test_arbitrary_shell_and_expanded_query_scope_are_rejected",
+        "test_result_scope_is_separate_from_controller_commands",
+        "test_explicit_cpu_gateway_requires_zero_gres_and_qualified_runtime"
+      ]
+    },
+    {
+      "path": "tests/test_slurm_inventory.py",
+      "sha256": "88bab2d2b985fbaa9c5e45fcc44ff2c03a3482bc9225e0812e450ad5e064750e",
+      "bytes": 14320,
+      "classes": [],
+      "functions": [
+        "config",
+        "node",
+        "envelope",
+        "source",
+        "telemetry",
+        "metric_client",
+        "test_reported_allocations_remain_distinct_from_physical_telemetry_and_admission",
+        "test_missing_or_invalid_allocation_never_becomes_free_capacity",
+        "test_explicit_zero_allocation_and_empty_queue_are_observations",
+        "test_actual_idle_controller_shape_retains_explicit_gpu_zero_and_empty_queue",
+        "test_empty_queue_warning_exception_cannot_hide_other_problems",
+        "test_gres_fallback_counts_are_explicit_and_unambiguous",
+        "test_scheduler_failures_do_not_erase_actual_host_telemetry",
+        "test_explicitly_unconfigured_controller_makes_no_scheduler_calls",
+        "test_partial_or_unqualified_parser_cannot_report_zero_queue",
+        "test_duplicate_nodes_are_ambiguous_even_when_one_is_authorized",
+        "job",
+        "test_queue_account_scope_and_base_flags_without_job_identity_leak",
+        "test_ambiguous_or_foreign_queue_is_unknown",
+        "test_missing_drain_information_cannot_become_allocatable_gres",
+        "test_expiry_api_project_isolation_and_no_execution_side_effects",
+        "test_ssh_route_is_pinned_and_cannot_include_shell_options"
+      ]
+    },
+    {
+      "path": "tests/test_slurm_limits_probe.py",
+      "sha256": "cbe0f95348a492680c298e4e0bdc55a8a7e28c9f72a2343d1b9b7d3b850c0f96",
+      "bytes": 3905,
+      "classes": [],
+      "functions": [
+        "test_inherited_limit_uses_tightest_ancestor_not_unlimited_step",
+        "test_absent_or_unlimited_hierarchy_cannot_authorize_memory_probe",
+        "test_invalid_or_outside_hierarchy_is_rejected",
+        "test_memory_probe_refuses_to_run_outside_slurm",
+        "test_negative_requires_each_device_denied_and_a_relevant_cuda_failure"
+      ]
+    },
+    {
+      "path": "tests/test_slurm_observer.py",
+      "sha256": "36b43694f32d6cda903f9fe27ca2ae536d98308f99fe24c88b33a3cf7ac338b6",
+      "bytes": 3875,
+      "classes": [],
+      "functions": [
+        "test_mutating_foreign_and_shell_commands_never_execute",
+        "response",
+        "test_nodes_are_filtered_and_private_attributes_removed",
+        "test_foreign_or_unqualified_response_rejected",
+        "test_queue_keeps_empty_warning_and_only_required_fields"
+      ]
+    },
+    {
+      "path": "tests/test_slurm_ownership.py",
+      "sha256": "04c9c5a1869e585821490d9f028dda782e06841b44edb2c1ed8c2c03f7abbcfb",
+      "bytes": 7619,
+      "classes": [],
+      "functions": [
+        "job",
+        "backend",
+        "queue_record",
+        "accounting_record",
+        "test_status_refuses_unowned_or_ambiguous_records",
+        "test_status_accepts_exact_owner_and_keeps_accounting_boundaries",
+        "test_transport_failure_is_unknown_not_absent_or_terminal",
+        "test_cancel_has_scheduler_side_identity_filters",
+        "test_failed_parent_preserves_contained_step_oom",
+        "test_unrelated_or_unbounded_step_does_not_relabel_failure",
+        "test_step_oom_does_not_override_parent_success_or_cancel",
+        "test_invalid_cancel_id_never_reaches_scheduler",
+        "test_worker_preserves_pending_cancel_without_foreign_ledger_or_mutation"
+      ]
+    },
+    {
+      "path": "tests/test_slurm_priority_transport.py",
+      "sha256": "5bcd6af3b80da382697dc6002be7ec8dd1df9ffb595fd52abf10afdf203299ed",
+      "bytes": 5776,
+      "classes": [],
+      "functions": [
+        "test_observer_failure_keeps_same_job_without_cancel_or_stale_progress",
+        "test_observer_recovers_same_ids",
+        "recovery_fixture",
+        "test_read_only_resume_on_observer_loss_preserves_original",
+        "test_resume_rejects_duplicate_native_id_before_requests"
+      ]
+    },
+    {
+      "path": "tests/test_slurm_recovery_verifier.py",
+      "sha256": "39340adac4a2c9f0bc062aa0fff45fcf6f7e242f42456fdce4f6f49ae8484129",
+      "bytes": 2597,
+      "classes": [],
+      "functions": [
+        "test_capture_keeps_tracking_records_with_only_job_and_run_ids",
+        "test_recovery_evidence_rejects_missing_duplicate_or_unrelated_submit",
+        "test_recovery_evidence_accepts_one_exact_submit_and_pid_receipt"
+      ]
+    },
+    {
+      "path": "tests/test_slurm_response_shim.py",
+      "sha256": "b0ed44e5ab52cd7a71380f82ffd68d1c8ad1457eb6ae40e4f10e8b67575f7b1d",
+      "bytes": 1246,
+      "classes": [],
+      "functions": [
+        "test_response_fault_is_bound_to_one_platform_attempt"
+      ]
+    },
+    {
+      "path": "tests/test_slurm_torch_qualification.py",
+      "sha256": "dc45d4bf7938a2cc716a9738c836fc8448fb00b2637ce0db1e07d31b19619c5f",
+      "bytes": 1941,
+      "classes": [],
+      "functions": [
+        "test_unlimited_step_retains_parent_memory_peak_and_swap_limit",
+        "test_missing_limits_and_escaped_membership_cannot_qualify",
+        "test_qualification_rejects_non_slurm_execution_before_importing_torch"
+      ]
+    },
+    {
+      "path": "tests/test_study.py",
+      "sha256": "68ac949902ff105dfccc9b54dba410c003beaca6ad170a52ae7babfa62db947d",
+      "bytes": 10786,
+      "classes": [],
+      "functions": [
+        "study_fixture",
+        "test_no_consent_means_no_study",
+        "test_durable_loop_has_independent_confirmation",
+        "test_cannot_forge_unreserved_probe",
+        "test_confirmation_reserves_time_for_scheduler_admission",
+        "test_reserved_plan_has_deadline_and_cannot_duplicate_with_another_key",
+        "test_cancel_before_dispatch_never_executes",
+        "test_unqualified_advanced_strategy_is_not_disguised",
+        "test_expired_study_cannot_submit",
+        "test_features_do_not_order_device_names",
+        "test_actual_botorch_acquisition_has_separate_predictions",
+        "test_oom_is_never_learned_as_fast_success"
+      ]
+    },
+    {
+      "path": "tests/test_telemetry_gitops.py",
+      "sha256": "de4299ff96bd9cc8ab370aab349b2ad251ad462290f9b05be4f2a7e44e95d4fb",
+      "bytes": 2115,
+      "classes": [],
+      "functions": [
+        "config",
+        "test_unsafe_or_unqualified_target_rejected",
+        "test_scope_or_revision_bypass_rejected",
+        "test_duplicate_node_identity_cannot_double_count_host",
+        "test_only_scrapeconfig_is_managed_and_no_secret_or_workload_permission"
+      ]
+    },
+    {
+      "path": "tests/test_thermal.py",
+      "sha256": "35822d4b2b5bcd5bb186f8cdfb9476214e50cf28d8a32a7e837385dac23e47d6",
+      "bytes": 19980,
+      "classes": [
+        "NvmlDouble"
+      ],
+      "functions": [
+        "thermal_sampled",
+        "start",
+        "reading",
+        "envelope",
+        "test_old_variant_and_context_signatures_remain_unchanged",
+        "test_trace_acceptance_provenance_permissions_and_terminal_immutability",
+        "test_missing_or_mismatched_traces_roll_back_all_evidence",
+        "test_ineligible_trace_retained_without_recommendation_history",
+        "test_ineligible_pilot_stops_study_without_next_gpu_job",
+        "test_sampling_gaps_and_slow_sensor_queries_never_qualify",
+        "test_nvml_uses_cuda_uuid_and_preserves_unsupported_sensors",
+        "test_nvml_c_abi_types_and_power_units",
+        "test_runtime_mismatches_do_not_leak_raw_uuid",
+        "test_cuda_uuid_without_nvml_prefix_is_resolved_and_confirmed",
+        "test_bounded_trace_and_sampling_receipt_fit_one_collector_envelope",
+        "test_thermal_policy_changes_execution_context_signature",
+        "test_fixed_workload_thermal_trace_ingests_without_sampling_binding"
+      ]
+    },
+    {
+      "path": "tests/test_tracking.py",
+      "sha256": "a407c8a7342673083ebeff11b8bb1446e0e9a0b5d3e635842032e5d346f02be7",
+      "bytes": 8722,
+      "classes": [
+        "TrackingServer"
+      ],
+      "functions": [
+        "delivery",
+        "retry_now",
+        "test_resultless_terminal_attempt_tracks_metadata_without_measurements",
+        "test_invalid_result_is_not_logged_as_success_or_performance",
+        "test_tracking_event_and_usage_roll_back_with_terminal_transition",
+        "test_tracking_backfill_is_missing_only_and_does_not_invent_results",
+        "test_create_response_loss_recovers_same_failure_run",
+        "test_legacy_missing_terminal_timestamp_stays_unknown",
+        "test_foreign_or_ambiguous_search_result_never_modified"
+      ]
+    },
+    {
+      "path": "tests/test_training.py",
+      "sha256": "3d899f5ea24602b59253ef30d392df57ac1eb9bdd10af795c68c42747fe42a14",
+      "bytes": 13257,
+      "classes": [],
+      "functions": [
+        "setup_training",
+        "test_source_copies_are_distinct_and_originals_unchanged",
+        "test_preparation_rejects_mutated_or_symlinked_sources",
+        "test_operator_binding_and_backend_source_required",
+        "test_unbound_training_never_submits",
+        "completed_training",
+        "test_training_receipt_is_atomic_immutable_and_project_scoped",
+        "test_receipt_mutation_and_false_protection_rejected",
+        "test_missing_training_receipt_cannot_complete",
+        "test_binding_rejects_semantic_mutation_and_other_checkpoint",
+        "test_slurm_training_is_explicitly_unqualified",
+        "test_bad_training_binding_abstains_without_breaking_console",
+        "test_malformed_route_rejected_locally"
+      ]
+    },
+    {
+      "path": "tests/test_transfer.py",
+      "sha256": "536a71872e4167179622ef8b8c13d9ed1560728b681231f8606ff96afd55b2a7",
+      "bytes": 18921,
+      "classes": [
+        "TransferSchedulerDouble"
+      ],
+      "functions": [
+        "transfer_fixture",
+        "source_jobs",
+        "bind",
+        "run_study",
+        "command",
+        "test_immutable_registration_provenance_and_no_source_profile_copy",
+        "test_real_kernel_durable_loop_holds_out_target_confirmations",
+        "test_source_evidence_requires_fresh_independent_hardware_profile",
+        "test_target_jobs_cannot_be_reclassified_as_source_evidence",
+        "test_unqualified_family_and_budget_rejected",
+        "test_source_cohort_must_cover_every_configuration",
+        "test_source_capability_can_expire_when_target_has_fresh_same_runtime",
+        "test_source_expiry_after_creation_falls_back_to_target_only",
+        "test_model_failure_uses_real_target_fallback_without_fake_rgpe",
+        "test_operator_routes_scope_and_no_posted_measurements"
+      ]
+    },
+    {
+      "path": "tests/test_transfer_report.py",
+      "sha256": "d0aca91f9857efa5962e76f4229f41042da143601d6ffcfc395b7d5bfb57dc86",
+      "bytes": 8158,
+      "classes": [],
+      "functions": [
+        "report",
+        "test_descriptive_costs_and_posthoc_regret",
+        "test_rejects_source_confirmation_or_oracle_as_target_training",
+        "test_rejects_invalid_allocation_cost_for_every_phase",
+        "test_rejects_cherry_picked_sources",
+        "test_rejects_hidden_warm_start_leakage",
+        "test_rejects_missing_optimizer_plan",
+        "test_rejects_consistently_increased_budgets",
+        "test_rejects_actual_cost_overrun_despite_identical_declared_budgets",
+        "test_rejects_wrong_accounting_owner",
+        "test_rejects_infeasible_oracle",
+        "test_rejects_live_study_and_early_oracle"
+      ]
+    },
+    {
+      "path": "tests/test_uncertainty.py",
+      "sha256": "4dcc805874b29a811b81893d1a0e5122ce65baab95cbb86b78fc4549c12f8509",
+      "bytes": 11041,
+      "classes": [],
+      "functions": [
+        "recommendation",
+        "approve",
+        "test_drift_latches_old_recommendation_and_new_lookup_requires_fresh_evidence",
+        "test_worker_rechecks_previously_approved_queued_submission",
+        "test_mixed_residuals_are_not_three_consecutive_excursions",
+        "test_post_recommendation_quality_failure_blocks_reuse",
+        "test_support_age_and_scope_rechecked_without_mutating_recommendation",
+        "shadow_fixture",
+        "test_shadow_report_measures_out_of_sample_error_and_keeps_workload_scope",
+        "test_shadow_audit_rejects_leakage_and_invalid_provenance",
+        "test_uncertainty_endpoints_require_identity_and_hide_other_projects"
+      ]
+    },
+    {
+      "path": "tests/test_uncertainty_ablation.py",
+      "sha256": "d75de5c34ebac703c6487acea04d3b8b337878476e34a333ee81e5d40d8e9fac",
+      "bytes": 4439,
+      "classes": [],
+      "functions": [
+        "study",
+        "test_only_uncertainty_retention_changes_and_input_is_not_mutated",
+        "test_no_relaxation_of_feasibility_or_repeat_requirements",
+        "test_rejects_leaked_or_changed_decision_evidence",
+        "test_existing_abstention_stays_an_abstention",
+        "test_unconfirmed_and_pilot_options_are_never_added"
+      ]
+    },
+    {
+      "path": "tests/test_uncertainty_drift_ablation.py",
+      "sha256": "99c20e1feb3de9fcacd1610e36a408544fdf47e1c7538197aa1257827ec433ef",
+      "bytes": 3884,
+      "classes": [],
+      "functions": [
+        "evaluator",
+        "capture",
+        "test_real_chronological_masks_do_not_use_the_current_target",
+        "test_only_drift_reason_is_removed_other_reasons_still_abstain",
+        "test_rejects_leakage_or_invalid_evidence",
+        "test_frozen_capture_rejects_changed_plan_or_bytes"
+      ]
+    },
+    {
+      "path": "tests/test_worker.py",
+      "sha256": "837c45f940de0af2722d151efb5e2ad4f0c4199f9d06b86f47a4c9e174585e7f",
+      "bytes": 13989,
+      "classes": [
+        "SchedulerDouble"
+      ],
+      "functions": [
+        "test_preflight_rejection_is_terminal_and_records_zero_allocation",
+        "setup",
+        "expire_retry",
+        "test_response_loss_reconciles_without_resubmission",
+        "test_unknown_absence_is_not_permission_to_retry",
+        "test_cancel_before_submission_needs_no_backend",
+        "test_cancel_ack_is_not_terminal_until_confirmed",
+        "test_completed_execution_wins_cancel_race_and_preserves_result",
+        "test_reconcile_completed_execution_does_not_stick_in_cancel_requested",
+        "test_cancel_does_not_destroy_completed_job_when_collector_temporarily_fails",
+        "test_completed_execution_uses_collection_deadline_not_expired_probe_deadline",
+        "test_automatic_queue_cancel_has_durable_request_timestamp",
+        "test_end_to_end_synthetic_result_and_usage",
+        "test_collection_deadline_invalidates_missing_result",
+        "test_backend_unavailable_preserves_job_and_records_error",
+        "test_mlflow_outage_is_durable_and_does_not_fail_job",
+        "test_claim_lease_prevents_duplicate_worker_claim",
+        "test_unmapped_project_cannot_write_to_mlflow_default_experiment",
+        "test_mlflow_response_loss_reuses_run_and_measurement_timestamp",
+        "test_failed_event_backoff_does_not_block_next_submission"
+      ]
+    },
+    {
+      "path": "tests/test_worker_routes.py",
+      "sha256": "5b64df40e364889a3178c9664bdfc377a890ca893267302cb2504b3c89be7672",
+      "bytes": 7967,
+      "classes": [],
+      "functions": [
+        "submit_route",
+        "snapshot",
+        "test_submit_skips_foreign_head_without_leasing_it",
+        "test_routes_match_pairs_not_independent_project_and_cluster_lists",
+        "test_unowned_worker_does_not_cancel_expire_reconcile_or_release",
+        "test_owned_cancellation_still_works_beside_another_route",
+        "test_scoped_claim_ignores_orphans_and_reclaims_only_its_expired_lease",
+        "test_postgres_concurrent_distinct_routes_claim_and_submit_once"
+      ]
+    },
+    {
+      "path": "tests/test_workload_holdout.py",
+      "sha256": "bbb76f7db74f7d0dc0afed4679faa79c7b9f88a46c47eca7dc0dbdbf4f3bd2f7",
+      "bytes": 8493,
+      "classes": [],
+      "functions": [
+        "capture",
+        "folds",
+        "run_fold",
+        "test_held_out_values_cannot_affect_source_order_or_normalization",
+        "test_future_source_fold_is_labeled_retrospective",
+        "test_source_quality_failure_is_not_silently_filtered",
+        "test_held_out_quality_failure_is_reported_without_changing_prior",
+        "test_repeated_attempt_cannot_cross_workload_boundary",
+        "test_distinct_labels_do_not_make_distinct_tasks",
+        "test_actual_capture_audit_is_read_only_and_covers_every_attempt",
+        "test_modified_captured_result_rejected",
+        "test_execution_time_leakage_rejected",
+        "test_source_profile_result_binding_is_checked",
+        "test_forecast_cannot_use_its_target_as_training",
+        "test_duplicate_training_ids_rejected",
+        "test_invalid_interval_is_explicitly_excluded",
+        "test_nonfinite_capture_cannot_receive_a_canonical_digest",
+        "test_duplicate_candidate_forecast_rejected",
+        "test_result_context_cannot_be_rebound_by_recomputing_its_digest",
+        "test_modified_frozen_space_snapshot_rejected",
+        "test_context_binding_snapshots_required_for_hardware_capture"
+      ]
+    },
+    {
+      "path": "uv.lock",
+      "sha256": "9e65d6e9b2dbc7c6c5ec7c8791947497ca5cab20267227a7c76ab2508975316b",
+      "bytes": 252329
+    }
+  ]
+}
