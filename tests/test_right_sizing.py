@@ -68,6 +68,23 @@ def test_unknown_lifecycle_is_read_only_and_abstains(service):
         lifecycle(service, "team-b", "workload-1")
 
 
+def test_cold_start_abstention_does_not_hide_new_profiles(service):
+    cold = service.recommend("team-a", "workload-1")
+    assert not cold["measured"]
+    complete(service, "observed-once")
+    assert lifecycle(service, "team-a", "workload-1")["state"] == "PROFILED"
+    complete(service, "observed-twice")
+    complete(service, "observed-thrice")
+    report = lifecycle(service, "team-a", "workload-1")
+    assert report["state"] == "RECOMMENDABLE"
+    assert report["recommendability"]["status"] == "MEASURED_RECOMMENDATION"
+    assert report["recommendation_ref"] == cold["ref"]
+    assert report["current_validity"]["reusable"] is False
+    with service.store.transaction() as conn:
+        assert len(service.store.list(conn, "recommendation", "team-a")) == 1
+        assert not service.store.list(conn, "approval", "team-a")
+
+
 def test_approved_terminal_feedback_is_atomic_and_independent(service):
     rec, approval, job = approved(service)
     assert lifecycle(service, "team-a", "workload-1")["state"] == "APPROVED"

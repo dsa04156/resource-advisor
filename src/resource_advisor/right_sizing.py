@@ -217,9 +217,14 @@ def lifecycle(service, project, workload_ref):
             for r in feedback
         ):
             state = "VERIFIED"
-        if any(r["state"] in {"EXPLORING", "CONFIRMING"} for r in workload_studies):
+        profiling = any(
+            r["state"] in {"EXPLORING", "CONFIRMING", "PLANNING"} for r in workload_studies
+        )
+        if profiling:
             state, reasons = "PROFILING", []
-        if rec and not measured:
+        # An earlier cold-start abstention is evidence of the earlier assessment,
+        # not authority to hide profiles collected after that assessment.
+        if rec and not measured and not profile_refs and not profiling:
             state, reasons = (
                 rec["body"]["status"],
                 sorted({e for errors in rec["body"]["excluded"].values() for e in errors}),

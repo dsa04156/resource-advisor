@@ -35,7 +35,10 @@ NPU utilization·NPU memory·power는 unknown이며 메모리 gate는 host RSS�
 첫 관찰 세 번의 lifecycle 표시는 기존 cold-start abstention 기록이 최신
 profile보다 우선하는 projection 문제 때문에 `NEEDS_PROFILE`에 머물렀다.
 별도의 새 추천 API는 측정 이력을 올바르게 사용했고 승인·실행은 통과했다.
-이 표시 문제는 후속 수정 대상이며 원래 캡처는 보존한다.
+이 표시 문제는 후속 코드에서 수정하고, cold-start 기록을 남긴 채 세 관찰이
+`PROFILED` → `RECOMMENDABLE`로 표시되는 회귀 검사를 추가했다. 실행 중인
+고정 실험의 API/worker/image는 중간에 교체하지 않는다. 원래 캡처를 보존하며
+새 표시 코드의 실배포 확인은 별도 검증으로 남긴다.
 
 원시 자료: [실행·품질·feedback](evidence/right-sizing-hailo-v1.json),
 [비용과 원시 파일 hash](evidence/right-sizing-hailo-cost-v1.json),
