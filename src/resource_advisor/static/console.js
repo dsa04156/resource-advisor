@@ -2564,10 +2564,11 @@ function labScenarioGuide(kind){
   if(!(labData?.agent?.scenarios||[]).includes(kind))root.append(el("p","실행기 설정에 이 시나리오가 아직 등록되지 않았습니다.","error"));
   return root;
 }
+function labNodeAlias(ref){return labData?.agent?.gpu_pool?.node_aliases?.[ref]||ref;}
 function labJobNodes(j){
   // Ordinary jobs can contain a routing target before native execution.
   // Only display that target as an execution location once running/terminal.
-  return [...new Set([...(j.pods||[]).map(p=>p.node),...(j.node&&labJobLane(j)>=2?[j.node]:[])].filter(n=>n&&!['None assigned','(null)'].includes(n)))];
+  return [...new Set([...(j.pods||[]).map(p=>p.node),...(j.node&&labJobLane(j)>=2?[j.node]:[])].filter(n=>n&&!['None assigned','(null)'].includes(n)).map(labNodeAlias))];
 }
 function labFlowJobs(snap){
   const jobs=[...(snap.jobs||[])];
@@ -2592,7 +2593,7 @@ function labResourceRack(snap){
     const allocation=el("div");for(const [key,r] of devices){const reserved=value(r.requested,view),total=value(r.allocatable,view),label=(r.device_class||"").toUpperCase()+" "+fmt(reserved)+"/"+fmt(total)+(r.allocation_mode==="virtual_slot"?" 공유":"");const line=el("span",label);line.title=key+" · 미예약 "+fmt(value(r.request_headroom,view));allocation.append(line);}if(!devices.length)allocation.append(el("span","CPU"));
     const utils=Object.entries(n.telemetry||{}).filter(([k])=>k.endsWith(":utilization")),util=el("div");for(const [,v] of utils)util.append(measure("",v,view,100,"%"));if(!utils.length)util.append(el("span",devices.length?"미측정":"—","lab-unknown"));
     const slurm=backend==="slurm",cpu=measure("",slurm?n.telemetry["node:cpu_non_idle_cores"]:n.telemetry.cpu_usage_cores,view,value(slurm?n.telemetry["node:cpu_count"]:n.resources.cpu?.capacity,view),"cores"),mem=measure("",n.telemetry["node:memory_available_bytes"],view,value(slurm?n.telemetry["node:memory_total_bytes"]:n.resources.memory?.capacity,view),"GiB",2**30);
-    const registered=catalog.some(w=>w.candidates.some(c=>c.node_ref===n.node_ref&&c.backend===backend)),cuda=(labData?.agent?.multi_gpu?.nodes||[]).some(x=>x.id===n.node_ref),isGPU=devices.some(([,r])=>r.device_class==="gpu"),inPool=[...(pool.kubernetes_members||[]),...(pool.slurm_members||[])].includes(n.node_ref);
+    const registered=catalog.some(w=>w.candidates.some(c=>labNodeAlias(c.node_ref)===n.node_ref&&c.backend===backend))||labFlowJobs(snap).some(j=>j.backend===backend&&labJobNodes(j).includes(n.node_ref)),cuda=(labData?.agent?.multi_gpu?.nodes||[]).some(x=>x.id===n.node_ref),isGPU=devices.some(([,r])=>r.device_class==="gpu"),inPool=[...(pool.kubernetes_members||[]),...(pool.slurm_members||[])].includes(n.node_ref);
     const scope=labKind==="mixed_batch"?(registered?"등록 작업":devices.length?"모델 미등록":"CPU 노드"):cuda?(labKind==="burst"&&!(labData?.agent?.nodes||[]).some(x=>x.id===n.node_ref)?"비교 큐 제외":"CUDA 대상"):isGPU&&inPool?"전용 작업 필요":devices.length?"요청 종류 다름":"CPU 노드";
     const eligibility=el("span",scope,"lab-node-scope");eligibility.title="공통 GPU 풀: "+(inPool?"등록됨":"GPU 풀 외")+" · 이번 작업 경로: "+scope;rows.push([pick,allocation,util,cpu,mem,eligibility]);
   }

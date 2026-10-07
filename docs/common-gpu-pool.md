@@ -51,3 +51,9 @@ three times. The board keeps all ten requested rows from submission onward; a
 requested row is not native admission evidence. Successful receipts are retained
 for cleanup even if another submission fails. Process death or exhaustion of all
 receipt retries still requires reconciliation; this is not crash-proof ownership.
+
+When native Slurm node identities differ from inventory display aliases, the
+operator config declares `gpu_pool.node_aliases` explicitly. The node table and
+job selection use this display mapping; stored native evidence stays unchanged.
+An actually executing registered job also proves its current participation even
+if that route is absent from the submission catalog.
