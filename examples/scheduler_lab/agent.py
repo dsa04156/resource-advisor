@@ -638,7 +638,11 @@ class Agent:
 
     def mixed_batch(self):
         templates = self.c["mixed"]
-        cuda = next(t for t in templates if t["workload_ref"] == "cuda-smoke-auto-v1")
+        cuda = next(
+            t
+            for t in templates
+            if t["workload_ref"] in {"cuda-smoke-auto-v1", "cuda-sustained-auto-v1"}
+        )
         cnn = next(t for t in templates if t["workload_ref"] == "e5-kernel-cache-v2")
         npu = next(t for t in templates if t["device_class"] == "npu")
         slurm = next(t for t in templates if t["workload_ref"] == "slurm-orin-cnn-api-v1")

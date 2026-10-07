@@ -5,6 +5,7 @@ the known output allocation only, not context/driver peak memory. Shared slots
 are supported without claiming memory isolation or a physical-device reservation.
 """
 
+import argparse
 import ctypes as ct
 import hashlib
 import json
@@ -45,7 +46,9 @@ def digest(value):
     )
 
 
-def measure(context=None):
+def measure(context=None, sustained_seconds=0):
+    if sustained_seconds not in {0, 30, 60, 90}:
+        raise ValueError("Sustained CUDA runs must be 30, 60 or 90 seconds")
     cuda = ct.CDLL("libcuda.so.1")
 
     def call(name, *args):
@@ -89,25 +92,44 @@ def measure(context=None):
         call("cuMemAlloc_v2", ct.byref(pointer), ct.c_size_t(SIZE * 4))
         arguments = (ct.c_void_p * 1)(ct.addressof(pointer))
         timings = []
+        launches = 0
         for iteration in range(ROUNDS + 2):
             start = time.perf_counter()
-            call(
-                "cuLaunchKernel",
-                function,
-                ct.c_uint(SIZE // 256),
-                ct.c_uint(1),
-                ct.c_uint(1),
-                ct.c_uint(256),
-                ct.c_uint(1),
-                ct.c_uint(1),
-                ct.c_uint(0),
-                ct.c_void_p(),
-                arguments,
-                ct.c_void_p(),
-            )
-            call("cuCtxSynchronize")
+            window = sustained_seconds / ROUNDS if iteration >= 2 else 0
+            while True:
+                call(
+                    "cuLaunchKernel",
+                    function,
+                    ct.c_uint(SIZE // 256),
+                    ct.c_uint(1),
+                    ct.c_uint(1),
+                    ct.c_uint(256),
+                    ct.c_uint(1),
+                    ct.c_uint(1),
+                    ct.c_uint(0),
+                    ct.c_void_p(),
+                    arguments,
+                    ct.c_void_p(),
+                )
+                call("cuCtxSynchronize")
+                launches += 1
+                if time.perf_counter() - start >= window:
+                    break
             if iteration >= 2:
                 timings.append(time.perf_counter() - start)
+                if sustained_seconds:
+                    print(
+                        "CUDA_PROGRESS "
+                        + json.dumps(
+                            {
+                                "completed_windows": iteration - 1,
+                                "total_windows": ROUNDS,
+                                "elapsed_compute_seconds": sum(timings),
+                                "kernel_launches": launches,
+                            }
+                        ),
+                        flush=True,
+                    )
         output = (ct.c_uint32 * SIZE)()
         call("cuMemcpyDtoH_v2", output, pointer, ct.c_size_t(SIZE * 4))
         correct = sum(value == i * i for i, value in enumerate(output))
@@ -118,7 +140,13 @@ def measure(context=None):
             "quality_value": 1.0,
             "elements_checked": SIZE,
             "kernel_sha256": hashlib.sha256(PTX).hexdigest(),
-            "measurement_boundary": BOUNDARY,
+            "measurement_boundary": (
+                BOUNDARY
+                if not sustained_seconds
+                else BOUNDARY + f"-timed-{sustained_seconds}s-windows"
+            ),
+            "sustained_seconds": sustained_seconds,
+            "kernel_launches": launches,
             "samples_seconds": timings,
             "output_allocation_bytes": SIZE * 4,
         }
@@ -131,7 +159,11 @@ def measure(context=None):
 
 
 def main():
-    qualification = sys.argv[1:] == ["--qualify"]
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--qualify", action="store_true")
+    parser.add_argument("--sustain-seconds", type=int, choices=(30, 60, 90), default=0)
+    args = parser.parse_args()
+    qualification = args.qualify
     context = None if qualification else json.loads(os.environ["RA_CONTEXT_JSON"])
     if not qualification and (
         json.loads(os.environ["RA_INPUT_SHAPE"]) != [SIZE]
@@ -139,7 +171,12 @@ def main():
         or os.environ["RA_PRECISION"] != "int32"
     ):
         raise ValueError("Only the fixed 4096-element, 10-call int32 contract is supported")
-    report = measure(context)
+    if (
+        context is not None
+        and context.get("parameters", {}).get("sustained_seconds", 0) != args.sustain_seconds
+    ):
+        raise ValueError("Submitted duration differs from qualified context")
+    report = measure(context, args.sustain_seconds)
     print("CUDA_PROBE_REPORT " + json.dumps(report), flush=True)
     if qualification:
         return

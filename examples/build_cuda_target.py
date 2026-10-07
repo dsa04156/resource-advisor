@@ -27,13 +27,18 @@ from resource_advisor.cuda_probe import BOUNDARY, PTX, ROUNDS, SIZE
 
 
 def build(report, *, ref, project, node, image, shared=False):
+    duration = report.get("sustained_seconds", 0)
+    boundary = BOUNDARY if not duration else BOUNDARY + f"-timed-{duration}s-windows"
     if (
-        report["quality_value"] != 1
+        duration not in {0, 30, 60, 90}
+        or report["quality_value"] != 1
         or report["elements_checked"] != SIZE
         or report["kernel_sha256"] != hashlib.sha256(PTX).hexdigest()
-        or report["measurement_boundary"] != BOUNDARY
+        or report["measurement_boundary"] != boundary
         or len(report["samples_seconds"]) != ROUNDS
         or any(not 0 < t < 60 for t in report["samples_seconds"])
+        or (duration and sum(report["samples_seconds"]) < duration)
+        or (duration and report.get("kernel_launches", 0) <= ROUNDS + 2)
     ):
         raise ValueError("A successful matching CUDA qualification is required")
     quality = QualityPolicy(
@@ -50,14 +55,21 @@ def build(report, *, ref, project, node, image, shared=False):
         code_digest=code,
         model_digest=kernel,
         dataset_version="generated-index-0-to-4095-v1",
-        config_digest=signature({"size": SIZE, "rounds": ROUNDS, "warmups": 2}),
+        config_digest=signature(
+            {
+                "size": SIZE,
+                "rounds": ROUNDS,
+                "warmups": 2,
+                **({"sustained_seconds": duration} if duration else {}),
+            }
+        ),
         task_type="benchmark",
         input_shape=(SIZE,),
         batch_size=1,
         precision="int32",
         work_units=ROUNDS,
         quality_contract_digest=signature(quality),
-        measurement_boundary=BOUNDARY,
+        measurement_boundary=boundary,
     )
     environment = signature({"image": image, "runtime": report["runtime_versions"], "code": code})
     mode = "virtual_slot" if shared else "physical_device"
@@ -70,6 +82,7 @@ def build(report, *, ref, project, node, image, shared=False):
         power_mode="observed-default",
         allocation_mode=mode,
         resources=Resources(host_cpu=1, host_memory_mib=512, accelerator_count=1),
+        parameters={"sustained_seconds": duration} if duration else {},
     )
     cap = CapabilitySnapshot(
         ref="cap-" + ref,
@@ -108,7 +121,11 @@ def build(report, *, ref, project, node, image, shared=False):
         model_digest=kernel,
         image=image,
         environment_digest=environment,
-        command=("python", "/opt/cuda_probe.py"),
+        command=(
+            "python",
+            "/opt/cuda_probe.py",
+            *(["--sustain-seconds", str(duration)] if duration else []),
+        ),
         verification="MODEL_VERIFIED",
         validation_refs=("qual-" + ref,),
         supported_shapes=((SIZE,),),
@@ -129,7 +146,7 @@ def build(report, *, ref, project, node, image, shared=False):
         ),
         baseline_candidate_ref="device",
         quality=quality,
-        execution=ExecutionPolicy(max_run_seconds=60, max_queue_seconds=180),
+        execution=ExecutionPolicy(max_run_seconds=max(60, duration + 60), max_queue_seconds=300),
     )
     return {
         k: v.model_dump(mode="json")

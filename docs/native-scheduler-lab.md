@@ -16,7 +16,7 @@ server's audit history; they are no longer offered as new UI scenarios.
 
 | Scenario | Requests and native admission | Evidence |
 |---|---|---|
-| All connected resources (`fleet_batch`) | Five automatically routed CUDA requests, one registered CNN, two registered Hailo inferences, two Slurm Orin CNN requests | Ten ordinary Job API records, actual backend/node/result observations |
+| All connected resources (`fleet_batch`) | Five automatically routed CUDA requests (90-second repeated-kernel variant when qualified/configured), one registered CNN, two registered Hailo inferences, two Slurm Orin CNN requests | Ten ordinary Job API records, actual backend/node/result observations |
 | CUDA-only policy comparison (`pool_batch`) | Ten one-GPU CUDA probes, submitted concurrently to `hairp-gpu-pool` | Concurrent running/pending jobs, native quota reason, ten CUDA correctness results |
 | Quota comparison (`burst`) | Ten one-GPU CUDA probes in the isolated two-GPU comparison queue | Same request count with the original restricted quota; not total platform capacity |
 | Priority batch (`priority_batch`) | Five low-priority and five high-priority one-GPU probes in the common pool | Actual native priority values and observed admission order; no invented FIFO/preemption guarantee |
@@ -556,3 +556,23 @@ three-attempt limit; network retries do not create extra execution attempts.
 Authenticated agent reports also refresh the liveness timestamp, preserving the
 advertised capability body. Long concurrent acceptance no longer appears offline
 while fresh reports are arriving. This does not refresh hardware qualification.
+
+### Execution length and visible queue transitions
+
+The bring-up probe calculates 4096 integer squares only ten times, so its device
+compute finishes in milliseconds. A completed row is not evidence of a long AI
+training workload. `cuda_probe --sustain-seconds 90` instead runs real synchronized
+CUDA kernels continuously in ten nine-second measurement windows, validates all
+4096 outputs and reports actual window progress and launch count. It has no sleep
+padding or invented progress. Timed windows have a separate workload/config digest
+and measurement boundary; they are not single-kernel latency measurements or AI
+model throughput. GPU utilization can remain low for this small launch-bound probe.
+
+Register the timed workload only from matching new immutable images and actual
+reserved qualification reports using `examples/build_cuda_target.py`, then combine
+compatible targets as `cuda-sustained-auto-v1`. The runner accepts that configured
+reference alongside the older smoke reference. Original runtime images and old
+execution records remain unchanged. The other registered CNN/NPU workloads retain
+their actual work sizes and may complete faster; Slurm jobs still follow their
+native quota and execution time. Longer compute does not guarantee a particular
+queue wait when resources are free.
