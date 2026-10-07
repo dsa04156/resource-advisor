@@ -151,3 +151,24 @@ def test_missing_inventory_stays_missing_in_node_history():
     observation = lab.listing("team-a")["items"][0]["body"]["snapshot"]["resource_observation"]
     assert observation["status"] == "missing"
     assert observation["inventory"] == []
+
+
+def test_history_listing_keeps_only_latest_replay_and_detail_is_project_scoped():
+    store = Store("sqlite://")
+    store.initialize()
+    lab = SchedulerLab(store)
+    lab.heartbeat({"scenarios": ["gang"]})
+    old = lab.start("team-a", LabRequest(scenario="gang"), "older")
+    lab.report(
+        old["ref"],
+        LabReport(state="SUCCEEDED", snapshot={"result": "retained"}, event={"title": "done"}),
+    )
+    current = lab.start("team-a", LabRequest(scenario="gang"), "newer")
+    rows = lab.listing("team-a")["items"]
+    assert rows[0]["ref"] == current["ref"] and not rows[0]["summary_only"]
+    assert rows[1]["summary_only"] and "events" not in rows[1]["body"]
+    detail = lab.get("team-a", old["ref"])
+    assert detail["body"]["snapshot"]["result"] == "retained"
+    assert detail["body"]["events"][0]["title"] == "done"
+    with pytest.raises(NotFound):
+        lab.get("team-b", old["ref"])

@@ -2403,7 +2403,7 @@ const labKinds={
 };
 async function refreshLab(){
   if(labPending||!data)return;labPending=true;const session=generation;
-  try{const r=await scenarioFetch("/scheduler-labs");if(session!==generation)return;r.items=r.items.filter(x=>Object.hasOwn(labKinds,x.scenario));labData=r;labReceivedAt=Date.now();if(!labRef||labRef==="empty:"+labKind){labRef=r.items.find(x=>x.scenario===labKind)?.ref||"empty:"+labKind;labGpuCount=r.items[0]?.body?.gpu_count||labGpuCount;}labError="";}
+  try{const r=await scenarioFetch("/scheduler-labs");if(session!==generation)return;r.items=r.items.filter(x=>Object.hasOwn(labKinds,x.scenario));if(!labRef||labRef==="empty:"+labKind){labRef=r.items.find(x=>x.scenario===labKind)?.ref||"empty:"+labKind;labGpuCount=r.items[0]?.body?.gpu_count||labGpuCount;}const selected=r.items.findIndex(x=>x.ref===labRef);if(selected>=0&&r.items[selected].summary_only){r.items[selected]=await scenarioFetch("/scheduler-labs/"+encodeURIComponent(labRef));if(session!==generation)return;}labData=r;labReceivedAt=Date.now();labError="";}
   catch(e){if(session===generation)labError=e.message;}
   finally{if(session===generation){labPending=false;labUpdated=Date.now();if(active==="scheduler-lab"){autoReplayLab();render();}}}
 }
@@ -2421,7 +2421,7 @@ function schedulerLabView(){
   const choices=el("div",null,"lab-setup lab-controls"),scenario=el("select"),scenarioLabel=el("label","시나리오");
   scenario.id="lab-scenario";scenarioLabel.htmlFor=scenario.id;scenario.disabled=labBusy;
   for(const [id,k] of Object.entries(labKinds)){if(k.archived&&id!==labKind)continue;const previous=items.find(r=>r.scenario===id),o=el("option",k.name+" · "+(previous?({SUCCEEDED:"완료 기록",FAILED:"실패 기록",CANCELED:"취소 기록"}[previous.state]||"진행 중"):(labData?.agent?.scenarios||[]).includes(id)?"준비됨":"설정 필요"));o.value=id;o.selected=id===labKind;scenario.append(o);}
-  scenario.onchange=()=>{stopLabReplay();labKind=scenario.value;labKey=null;labRef=items.find(r=>r.scenario===labKind)?.ref||"empty:"+labKind;labCursor=null;labSelected="";labWorker="";autoReplayLab(true);render();};
+  scenario.onchange=async()=>{stopLabReplay();labKind=scenario.value;labKey=null;labRef=items.find(r=>r.scenario===labKind)?.ref||"empty:"+labKind;labCursor=null;labSelected="";labWorker="";await refreshLab();autoReplayLab(true);render();};
   add(choices,scenarioLabel,scenario,header.lastElementChild);root.append(choices);
   if(labKind==="multi_gpu"){
     const capacity=labData?.agent?.multi_gpu?.max_gpus||0,box=el("div",null,"poc-request lab-controls"),label=el("label","작업에 필요한 GPU"),count=el("select");count.id="poc-gpu-count";label.htmlFor=count.id;
@@ -2439,7 +2439,7 @@ function schedulerLabView(){
   if(!run){root.append(guide,labResourceRack({}));root.append(el("div","실험을 시작하면 실제 승인·대기·배치 기록이 이 보드에 나타납니다.","lab-empty"));return root;}
   const events=run.body.events||[],index=labCursor===null?events.length-1:Math.min(labCursor,events.length-1),event=events[index];
   const snap=labCursor===null?run.body.snapshot:(event?.snapshot||{}),jobs=snap.jobs||[],selected=jobs.find(j=>j.id===labSelected)||jobs.find(j=>j.label==="workers")||jobs[0],spec=labKinds[run.scenario];
-  const controls=el("div",null,"lab-controls lab-toolbar"),select=el("select");select.id="lab-history";select.setAttribute("aria-label","실험 기록 선택");items.forEach(r=>{const o=el("option",labKinds[r.scenario].name+" · "+stamp(r.created_at)+" · "+r.state);o.value=r.ref;o.selected=r.ref===labRef;select.append(o);});select.onchange=()=>{stopLabReplay();labRef=select.value;labKind=items.find(r=>r.ref===labRef)?.scenario||labKind;labGpuCount=items.find(r=>r.ref===labRef)?.body?.gpu_count||labGpuCount;labCursor=null;labSelected="";labWorker="";autoReplayLab(true);render();};
+  const controls=el("div",null,"lab-controls lab-toolbar"),select=el("select");select.id="lab-history";select.setAttribute("aria-label","실험 기록 선택");items.forEach(r=>{const o=el("option",labKinds[r.scenario].name+" · "+stamp(r.created_at)+" · "+r.state);o.value=r.ref;o.selected=r.ref===labRef;select.append(o);});select.onchange=async()=>{stopLabReplay();labRef=select.value;labKind=items.find(r=>r.ref===labRef)?.scenario||labKind;labGpuCount=items.find(r=>r.ref===labRef)?.body?.gpu_count||labGpuCount;labCursor=null;labSelected="";labWorker="";await refreshLab();autoReplayLab(true);render();};
   const live=el("button",labCursor===null?(["SUCCEEDED","FAILED","CANCELED"].includes(run.state)?"최종 기록":"● LIVE"):"최신 기록으로");live.onclick=()=>{stopLabReplay();labReplaySeen.add(labRef);labCursor=null;refreshLab();render();};
   const shortcut=el("button",labReplay?"Ⅱ 재생 정지":"▶ 기록 재생");shortcut.disabled=events.length<2;shortcut.onclick=()=>{if(labReplay)stopLabReplay();else startLabReplay();render();};
   add(controls,select,badge(run.state,labTone(run.state)==="done"?"good":"warn"),shortcut,live);

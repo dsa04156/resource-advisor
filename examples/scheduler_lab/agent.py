@@ -47,7 +47,7 @@ class Agent:
         )
         # Job acceptance retries keep their identical key in registered_workloads.
         # Reads and idempotent agent reports survive a transient TLS disconnect.
-        attempts = 1 if path == "/jobs" else 3
+        attempts = 1 if path == "/jobs" else 6
         for attempt in range(attempts):
             try:
                 with urllib.request.urlopen(
@@ -59,7 +59,7 @@ class Agent:
                     isinstance(exc, urllib.error.HTTPError) and exc.code < 500
                 ) or attempt == attempts - 1:
                     raise
-                time.sleep(1)
+                time.sleep(2)
 
     def heartbeat(self):
         return self.api(
@@ -458,6 +458,27 @@ class Agent:
     def mixed(self):
         return self.registered_workloads(self.c["mixed"], "Kubernetes + Slurm", mixed=True)
 
+    def observe_registered_job(self, task):
+        view = self.api("/jobs/" + task["job_id"] + "/view")
+        return {
+            "id": task["job_id"],
+            "label": task["name"],
+            "state": view["state"],
+            "device_class": task["device_class"],
+            "workload_ref": task["workload_ref"],
+            "backend": view.get("backend"),
+            "reason": view.get("scheduler_reason") or view.get("error"),
+            "native_id": view.get("external_id"),
+            "node": view.get("node_ref"),
+            "requested": view.get("requested_resources"),
+            "tracking": view.get("tracking"),
+            "result": view.get("result"),
+            "started_at": view.get("started_at"),
+            "finished_at": view.get("finished_at"),
+            "lifecycle_events": view.get("lifecycle_events", []),
+            "pods": [],
+        }
+
     def registered_workloads(self, tasks, title, mixed=False):
         if not tasks:
             raise RuntimeError("no qualified registered workloads configured")
@@ -517,6 +538,15 @@ class Agent:
                         {**task, "job_id": result["job_id"], "request_index": i}
                     )
                     self.snapshot["jobs"][i].update(id=result["job_id"], state=result["state"])
+                    # Show native execution while remaining requests are still
+                    # accepted; a receipt alone does not indicate the current state.
+                    try:
+                        for accepted in self.snapshot["platform_jobs"]:
+                            self.snapshot["jobs"][accepted["request_index"]] = (
+                                self.observe_registered_job(accepted)
+                            )
+                    except (OSError, RuntimeError, ValueError) as exc:
+                        self.snapshot["acceptance_observation_error"] = type(exc).__name__
                     self.report("등록된 " + task["device_class"].upper() + " 작업 접수")
                 except Exception as exc:  # noqa: BLE001 — retain successful receipts for cleanup
                     failures.append(str(exc)[:300])
@@ -526,27 +556,7 @@ class Agent:
         while True:
             jobs = []
             for task in sorted(self.snapshot["platform_jobs"], key=lambda t: t["request_index"]):
-                view = self.api("/jobs/" + task["job_id"] + "/view")
-                jobs.append(
-                    {
-                        "id": task["job_id"],
-                        "label": task["name"],
-                        "state": view["state"],
-                        "device_class": task["device_class"],
-                        "workload_ref": task["workload_ref"],
-                        "backend": view.get("backend"),
-                        "reason": view.get("scheduler_reason") or view.get("error"),
-                        "native_id": view.get("external_id"),
-                        "node": view.get("node_ref"),
-                        "requested": view.get("requested_resources"),
-                        "tracking": view.get("tracking"),
-                        "result": view.get("result"),
-                        "started_at": view.get("started_at"),
-                        "finished_at": view.get("finished_at"),
-                        "lifecycle_events": view.get("lifecycle_events", []),
-                        "pods": [],
-                    }
-                )
+                jobs.append(self.observe_registered_job(task))
             self.snapshot["jobs"] = jobs
             self.tick("GPU·NPU 네이티브 작업 상태와 결과 관측")
             if any(j["state"] in {"FAILED", "CANCELED", "RESULT_INVALID"} for j in jobs):

@@ -170,6 +170,7 @@ def test_registered_batch_recovers_lost_receipt_with_same_key_and_keeps_ten_rows
     accepted = {}
     retries = []
     sizes = []
+    observed_during_acceptance = []
 
     def api(path, body=None, key=None):
         if path == "/jobs":
@@ -182,7 +183,14 @@ def test_registered_batch_recovers_lost_receipt_with_same_key_and_keeps_ten_rows
         return {"state": "SUCCEEDED", "backend": "kubernetes", "result": {"valid": True}}
 
     a.api = api
-    a.report = lambda *args: sizes.append(len(a.snapshot["jobs"]))
+
+    def report(*args):
+        sizes.append(len(a.snapshot["jobs"]))
+        observed_during_acceptance.append(
+            any(j["state"] == "SUCCEEDED" for j in a.snapshot["jobs"])
+        )
+
+    a.report = report
     tasks = [
         {"name": f"request-{i}", "device_class": "gpu", "workload_ref": "w", "profile_ref": "p"}
         for i in range(10)
@@ -190,6 +198,7 @@ def test_registered_batch_recovers_lost_receipt_with_same_key_and_keeps_ten_rows
     a.registered_workloads(tasks, "ten")
     assert len(accepted) == 10 and set(retries) == set(accepted)
     assert sizes and all(size == 10 for size in sizes)
+    assert any(observed_during_acceptance[:-1])
     assert len(a.snapshot["platform_jobs"]) == 10
     assert [j["label"] for j in a.snapshot["jobs"]] == [t["name"] for t in tasks]
     assert all(j["state"] == "SUCCEEDED" for j in a.snapshot["jobs"])

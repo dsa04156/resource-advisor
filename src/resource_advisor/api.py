@@ -135,6 +135,10 @@ def create_app(
     def scheduler_labs(p=Depends(principal)):
         return labs.listing(p.project)
 
+    @app.get(PREFIX + "/scheduler-labs/{ref}")
+    def get_scheduler_lab(ref: str, p=Depends(principal)):
+        return labs.get(p.project, ref)
+
     @app.post(PREFIX + "/scheduler-labs")
     def start_scheduler_lab(
         value: LabRequest, idempotency_key: str = Header(default=""), p=Depends(principal)

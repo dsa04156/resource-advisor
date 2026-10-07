@@ -576,3 +576,18 @@ execution records remain unchanged. The other registered CNN/NPU workloads retai
 their actual work sizes and may complete faster; Slurm jobs still follow their
 native quota and execution time. Longer compute does not guarantee a particular
 queue wait when resources are free.
+
+### Bounded history reads and acceptance observations
+
+`GET /scheduler-labs` returns metadata for up to forty runs and the full replay
+for the latest run only. Other rows have `summary_only:true`; selecting one loads
+`GET /scheduler-labs/{ref}` with the same project restriction. Stored history and
+replay are preserved. This avoids decoding and serializing forty full resource
+histories on every three-second poll. A real API Pod was OOMKilled at the former
+512Mi limit during concurrent full-history polling; its interrupted run is kept.
+
+Accepted requests are now observed from native Job views during remaining batch
+acceptance, rather than holding every accepted row at its receipt state until all
+ten responses arrive. Unaccepted rows remain visible. Idempotent observation/report
+RPCs retry up to six times with two-second gaps; job submission retains its identical
+idempotency-key retry contract. This is bounded recovery, not an availability SLA.

@@ -79,19 +79,52 @@ class SchedulerLab:
             a = conn.execute(select(agent)).mappings().first()
             fresh = a and (now() - datetime.fromisoformat(a["seen_at"])).total_seconds() < 40
             items = conn.execute(
-                select(runs)
+                select(
+                    *(c for c in runs.c if c.key != "body"),
+                    runs.c.body["gpu_count"].as_integer().label("gpu_count"),
+                )
                 .where(runs.c.project == project)
                 .order_by(runs.c.created_at.desc())
                 .limit(40)
             ).mappings()
+            history = []
+            for row in items:
+                item = dict(row)
+                gpu_count = item.pop("gpu_count")
+                item.update(
+                    body={"gpu_count": gpu_count} if gpu_count is not None else {},
+                    summary_only=True,
+                )
+                history.append(item)
+            # Decode only one replay body per poll, not forty complete histories.
+            if history:
+                history[0] = {
+                    **dict(
+                        conn.execute(select(runs).where(runs.c.ref == history[0]["ref"]))
+                        .mappings()
+                        .one()
+                    ),
+                    "summary_only": False,
+                }
             return {
                 "agent": {
                     "online": bool(fresh),
                     "seen_at": a["seen_at"] if a else None,
                     **(a["body"] if a else {}),
                 },
-                "items": [dict(r) for r in items],
+                "items": history,
             }
+
+    def get(self, project, ref):
+        with self.store.transaction() as conn:
+            row = (
+                conn.execute(select(runs).where(runs.c.ref == ref, runs.c.project == project))
+                .mappings()
+                .first()
+            )
+            if not row:
+                raise NotFound("scheduler experiment not found")
+            return {**dict(row), "summary_only": False}
 
     def start(self, project, request, key):
         if not key or len(key) > 128:
