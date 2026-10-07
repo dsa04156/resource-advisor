@@ -13,6 +13,7 @@ import ssl
 import subprocess
 import time
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 
@@ -49,7 +50,15 @@ class Agent:
         return self.api(
             "/scheduler-lab-agent/heartbeat",
             {
-                "scenarios": ["backfill", "gang", "topology", "quota", "cancel", "recovery"]
+                "scenarios": [
+                    "backfill",
+                    "gang",
+                    "topology",
+                    "quota",
+                    "burst",
+                    "cancel",
+                    "recovery",
+                ]
                 + (["multi_gpu"] if self.c.get("multi_gpu") else [])
                 + (["heterogeneous"] if self.c.get("heterogeneous") else [])
                 + (
@@ -286,6 +295,7 @@ class Agent:
             result.append(
                 {
                     "id": name,
+                    "submitted_at": job["metadata"].get("creationTimestamp"),
                     "label": name.removeprefix(self.ref + "-"),
                     "state": "FAILED"
                     if failed
@@ -538,6 +548,50 @@ class Agent:
         self.snapshot["verdict"] = (
             "3개 요청의 quota 대기를 기록한 뒤 선행 작업 종료, 모든 GPU 요청 완료"
         )
+
+    def burst(self):
+        labels = [f"request-{index:02d}" for index in range(1, 11)]
+        self.snapshot.update(
+            phase="SUBMIT",
+            explanation="1 GPU 요청 10개를 동시에 접수합니다. 2 GPU quota에서 대기·입장·실행을 관측합니다.",
+            request_batch={"count": 10, "labels": labels, "submission": "concurrent"},
+            submitted_requests=[
+                {"id": self.ref + "-" + label, "label": label, "state": "SUBMITTED", "gpu": 1}
+                for label in labels
+            ],
+        )
+        self.report("동시 요청 10개 접수 · 네이티브 Job 생성 시작")
+        # Independent native requests, not a ten-worker gang or an expanded fixture.
+        # Wait for every submission before cleanup, including partial-create failure.
+        with ThreadPoolExecutor(max_workers=10) as pool:
+            submitted = [pool.submit(self.job, label, 1, 20) for label in labels]
+            for future in submitted:
+                future.result()
+        self.snapshot["phase"] = "QUEUE"
+        result = self.wait_kube(
+            lambda rows: (
+                all(label in rows for label in labels)
+                and any(rows[label]["state"] == "PENDING" for label in labels)
+                and any(rows[label]["state"] == "RUNNING" for label in labels)
+                and any("quota" in (rows[label].get("reason") or "").lower() for label in labels)
+            ),
+            "10개 네이티브 요청 · 실행과 quota 대기 동시 관측",
+        )
+        self.snapshot["queue_evidence"] = [result[label] for label in labels]
+        self.snapshot["phase"] = "DRAIN"
+        self.wait_kube(
+            lambda rows: all(
+                rows.get(label, {}).get("state") == "SUCCEEDED"
+                and any(
+                    e.get("phase") == "COMPUTE_FINISHED" and e.get("correctness") is True
+                    for pod in rows[label].get("pods", [])
+                    for e in pod.get("events", [])
+                )
+                for label in labels
+            ),
+            "완료된 작업의 quota 반환 → 대기 요청 입장·실행",
+        )
+        self.snapshot["verdict"] = "동시 요청 10개, 실제 quota 대기와 GPU 실행, 10개 CUDA 검증 완료"
 
     def priority(self):
         self.occupy_pool(

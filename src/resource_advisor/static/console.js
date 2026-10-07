@@ -2394,6 +2394,7 @@ function pipelineDag(run) {
 let labData=null,labPending=false,labUpdated=0,labRef="",labKind="multi_gpu",labSelected="",labCursor=null,labError="",labBusy=false,labKey=null;
 let labGpuCount=3,labWorker="",labResourceMode="recorded";
 const labKinds={
+  burst:{name:"10개 동시 요청",tag:"KUEUE · 10 REQUESTS",title:"10개 요청이 큐에 들어오고, 자원이 돌아오면 실행",desc:"1 GPU 독립 작업 10개를 동시에 요청합니다. 기존 2 GPU quota 안에서 실행 중인 작업과 대기 요청, quota 반환 후 입장을 관측합니다."},
   quota:{name:"큐 적체 · Quota",tag:"KUEUE · BACKLOG",title:"요청이 쌓이고, 자원이 돌아오면 실행",desc:"2 GPU quota를 선행 작업이 점유합니다. 뒤에 1 GPU 요청 3개를 넣고, 실제 대기 사유와 quota 반환 후 실행을 관측합니다."},
   priority:{name:"우선순위",tag:"KUEUE · PRIORITY",title:"먼저 제출한 작업보다 중요한 작업 먼저",desc:"같은 크기의 낮은 우선순위와 높은 우선순위 작업을 순서대로 접수합니다. 선행 작업 종료 후 Kueue의 실제 입장 순서를 확인합니다."},
   cancel:{name:"대기 작업 취소",tag:"QUEUE · CANCELLATION",title:"대기 중인 요청을 철회하고 다음 작업으로",desc:"실제 quota 대기를 만든 뒤 그 요청만 취소합니다. 삭제 확인을 기록하고 선행 점유를 해제한 뒤 후속 GPU 작업을 실행합니다."},
@@ -2448,7 +2449,7 @@ function schedulerLabView(){
   const live=el("button",labCursor===null?(["SUCCEEDED","FAILED","CANCELED"].includes(run.state)?"최종 기록":"● LIVE"):"최신 기록으로");live.onclick=()=>{stopLabReplay();labReplaySeen.add(labRef);labCursor=null;refreshLab();render();};
   const shortcut=el("button",labReplay?"Ⅱ 재생 정지":"▶ 기록 재생");shortcut.disabled=events.length<2;shortcut.onclick=()=>{if(labReplay)stopLabReplay();else startLabReplay();render();};
   add(controls,select,badge(run.state,labTone(run.state)==="done"?"good":"warn"),shortcut,live);
-  if(!["SUCCEEDED","FAILED","CANCELED"].includes(run.state)){const cancel=el("button","실험 중지");cancel.disabled=run.state==="CANCEL_REQUESTED";cancel.onclick=async()=>{cancel.disabled=true;try{const r=await fetch(API+"/scheduler-labs/"+run.ref+"/cancel",{method:"POST",headers:authHeaders()});if(!r.ok)throw new Error("취소 접수 실패");await refreshLab();}catch(e){labError=e.message;render();}};controls.append(cancel);}root.append(controls);
+  if(!["SUCCEEDED","FAILED","CANCELED"].includes(run.state)){const cancel=el("button","실험 중지");cancel.disabled=run.state==="CANCEL_REQUESTED";cancel.onclick=async()=>{cancel.disabled=true;try{const r=await fetch(API+"/scheduler-labs/"+run.ref+"/cancel",{method:"POST",headers:authHeaders()});if(!r.ok)throw new Error("취소 접수 실패");await refreshLab();}catch(e){labError=e.message;render();}};controls.append(cancel);}controls.append(root.querySelector(".lab-mode"));root.append(controls);
   const stage=el("div",null,"lab-stage"),top=add(el("div",null,"lab-stage-title"),el("span",spec.name.toUpperCase(),"eyebrow"),el("strong",snap.phase==="FINISHED"?((snap.error||snap.cleanup_error)?"실험 실행 오류 · 아래 네이티브 기록 확인":(snap.verdict||run.state)):snap.explanation||"실험 접수 완료"),el("small",(labCursor===null?"마지막 관측 ":"기록 재생 ")+stamp(labCursor===null?run.body.observed_at:event?.observed_at)));stage.append(top);
   stage.append(labResourceRack(snap),labFlowBoard(run,snap));root.append(stage);
   if(run.scenario==="multi_gpu"){const workers=el("details",null,"lab-catalog-details");workers.append(el("summary","Worker별 CUDA 실행 근거"),multiGpuPoc(run,snap));root.append(workers);}
@@ -2462,7 +2463,7 @@ function schedulerLabView(){
   events.slice(-12).reverse().forEach((e,offset)=>{const idx=events.length-1-offset,b=el("button",null,"lab-event"+(index===idx?" selected":""));add(b,el("time",stamp(e.observed_at)),el("span",e.title));b.onclick=()=>{stopLabReplay();labReplaySeen.add(labRef);labCursor=idx;render();};log.append(b);});timeline.append(log);stage.insertBefore(timeline,stage.children[1]);
   const inspector=add(el("section",null,"lab-inspector"),el("span","NATIVE EVIDENCE","eyebrow"),el("h3",selected?selected.label:"스케줄러 관측"));
   if(selected){add(inspector,el("p","ID · "+selected.id),el("p","상태 · "+(states[labDisplayState(selected)]||labDisplayState(selected))),labDisplayState(selected)!==selected.state?el("small","원본 관측 상태 · "+selected.state+" · worker 성공 종료, Job 완료 확인 대기"):null,el("p",selected.reason&&selected.reason!=="None"?(labTone(selected.state)==="done"?"이전 대기 사유 · ":"")+selected.reason:"대기 사유 없음"));for(const p of (selected.pods||[]).filter(p=>!labWorker||p.name===labWorker)){inspector.append(el("p",(p.node||"노드 미정")+" · "+p.state));for(const e of p.events||[])inspector.append(el("small",e.phase+(e.correctness?" · CUDA 검증 통과":"")));}}
-  if(snap.queue_evidence){const d=el("details");add(d,el("summary","기록된 대기 사유"),el("pre",JSON.stringify(snap.queue_evidence,null,2)));inspector.append(d);}if(selected?.admission){const d=el("details");add(d,el("summary","실제 Kueue admission / topologyAssignment"),el("pre",JSON.stringify(selected.admission,null,2)));inspector.append(d);}if(snap.reservation){const d=el("details");add(d,el("summary","실제 Slurm 예약 창"),el("pre",snap.reservation));inspector.append(d);}if(snap.error)inspector.append(el("p",snap.error,"error"));if(snap.verdict)inspector.append(el("p",snap.verdict,"lab-verdict"));const evidence=el("details",null,"lab-catalog-details");evidence.append(el("summary","선택 작업 · 네이티브 근거"),inspector);bottom.append(evidence);root.append(guide,bottom);return root;
+  if(snap.queue_evidence){const d=el("details");add(d,el("summary","기록된 대기 사유"),el("pre",JSON.stringify(snap.queue_evidence,null,2)));inspector.append(d);}if(selected?.admission){const d=el("details");add(d,el("summary","실제 Kueue admission / topologyAssignment"),el("pre",JSON.stringify(selected.admission,null,2)));inspector.append(d);}if(snap.reservation){const d=el("details");add(d,el("summary","실제 Slurm 예약 창"),el("pre",snap.reservation));inspector.append(d);}if(snap.error)inspector.append(el("p",snap.error,"error"));if(snap.verdict)inspector.append(el("p",snap.verdict,"lab-verdict"));const evidence=el("details",null,"lab-catalog-details");evidence.append(el("summary","선택 작업 · 네이티브 근거"),inspector);bottom.append(guide,evidence);root.append(bottom);return root;
 }
 
 setInterval(()=>{if(active==="scheduler-lab" && data && !labPending && !labBusy)refreshLab();},3000);
@@ -2557,6 +2558,7 @@ function labJobLane(j){
 }
 function labScenarioGuide(kind){
   const guides={
+    burst:{needs:"Kueue 2 GPU 실험 풀",steps:["1 GPU 요청 10개 동시 접수","실행 + quota 대기 관측","완료 → 다음 요청 입장","10개 CUDA 결과 확인"],pass:"10개 네이티브 Job, 실행·대기의 동시 관측, 네이티브 quota 사유, 10개 계산 검증",scope:"같은 프로젝트의 독립 CUDA probe입니다. 10 GPU 동시 할당이나 FIFO·다중 사용자 공정성을 보장하는 실험은 아닙니다."},
     quota:{needs:"Kueue 2 GPU 실험 풀",steps:["2 GPU 선행 점유","1 GPU 요청 3개 접수","실제 quota 대기 확인","점유 종료 → 요청 완료"],pass:"3개 요청의 동시 대기, 네이티브 quota 부족 사유, 모든 요청 완료",scope:"같은 프로젝트의 독립 요청입니다. 다중 사용자 공정성이나 FIFO 보장은 아닙니다."},
     priority:{needs:"2 GPU 실험 풀 + low/high WorkloadPriorityClass",steps:["선행 점유","low 먼저, high 나중 접수","high 우선 입장 확인","high 완료 → low 실행"],pass:"네이티브 우선순위 값, high 승인·low 대기 동시 관측, 두 작업 완료",scope:"대기열 입장 우선순위 비교입니다. 실행 중 작업 선점 정책은 변경하지 않습니다."},
     cancel:{needs:"Kueue 2 GPU 실험 풀",steps:["선행 점유","요청의 대기 확인","해당 요청 삭제 확인","점유 해제 → 후속 실행"],pass:"취소 Job 삭제 확인과 후속 Job 완료",scope:"취소하는 대기 요청은 GPU를 점유하지 않았습니다. 실제 quota 반환은 선행 작업 종료에서 일어납니다."},
@@ -2583,6 +2585,7 @@ function labJobNodes(j){
 }
 function labFlowJobs(snap){
   const jobs=[...(snap.jobs||[])];
+  for(const request of snap.submitted_requests||[])if(!jobs.some(j=>j.id===request.id))jobs.push(request);
   for(const task of snap.platform_jobs||[])if(!jobs.some(j=>j.id===task.job_id))jobs.push({id:task.job_id,label:task.name,state:"SUBMITTED",device_class:task.device_class,workload_ref:task.workload_ref,reason:"접수 완료 · 네이티브 상태 관측 대기"});
   return jobs;
 }
@@ -2618,34 +2621,42 @@ function labResourceRack(snap){
   box.append(rail);if(!entries.length&&!source.missing)box.append(el("p","이 필터의 등록 자원이 없습니다."));
   return box;
 }
+function labJobStage(j){
+  const lane=labJobLane(j),state=labDisplayState(j);
+  if(lane===3)return 5;
+  if(lane===2)return 4;
+  if(lane===1)return (j.pods||[]).some(p=>p.node)||["STARTING","LAUNCHING","CONFIGURING"].includes(state)?3:2;
+  return ["REQUESTED","SUBMITTED"].includes(state)?0:1;
+}
 function labFlowBoard(run,snap){
-  const jobs=labFlowJobs(snap),root=el("div",null,"lab-flow-board"),lanes=el("div",null,"lab-flow-lanes"),selected=jobs.find(j=>j.id===labSelected);
-  const stages=[["01","접수 · 대기","자원·quota·우선순위 확인"],["02","할당 · 준비","입장 승인 또는 실행 준비"],["03","실행","GPU · NPU에 작업 배치"],["04","결과","완료 · 실패 · 취소 기록"]];
+  const jobs=labFlowJobs(snap).sort((a,b)=>a.label.localeCompare(b.label,undefined,{numeric:true})),root=el("div",null,"lab-flow-board"),lanes=el("div",null,"lab-flow-lanes lab-flow-matrix"),selected=jobs.find(j=>j.id===labSelected);
+  const stages=[["접수","요청 접수"],["대기","자원·quota 확인"],["할당","네이티브 입장 승인"],["준비","Pod 배치·실행 준비"],["실행","관측된 계산 실행"],["결과","완료·실패·취소"]];
+  lanes.setAttribute("aria-label","작업별 접수, 대기, 할당, 준비, 실행, 결과");
+  lanes.style.setProperty("--lab-rows",Math.max(jobs.length,1));
+  lanes.append(el("strong",`요청 ${jobs.length}개`,"lab-flow-index-head"));
   for(let index=0;index<stages.length;index++){
-    const [step,title,desc]=stages[index],items=jobs.filter(j=>labJobLane(j)===index),lane=el("section",null,"lab-flow-lane lane-"+index),head=el("div",null,"lab-flow-lane-head");
-    add(head,el("span",step,"eyebrow"),el("strong",title),el("b",String(items.length)),el("small",desc));lane.append(head);
-    const stack=el("div",null,"lab-flow-stack");stack.dataset.labScroll="lane-"+index;
-    for(const j of items){
-      const displayState=labDisplayState(j),card=el("button",null,"lab-flow-job "+labTone(displayState)+(labSelected===j.id?" selected":""));card.dataset.flowId=run.ref+":"+j.id;card.id="lab-flow-"+j.id;card.setAttribute("aria-pressed",String(labSelected===j.id));
-      add(card,el("span",(j.backend||(run.scenario==="backfill"?"slurm":"kubernetes")).toUpperCase()+" · "+(j.device_class||"gpu").toUpperCase(),"eyebrow"),el("strong",j.label),stateBadge(displayState));
-      if(j.gpu!=null)card.append(el("small",j.gpu+" GPU 요청"));if(j.priority!=null)card.append(el("small","네이티브 우선순위 "+j.priority));
-      const nodes=labJobNodes(j);for(const node of nodes)card.append(el("span","↳ "+node,"lab-flow-target"));
-      if(index===0)card.append(el("small",j.reason&&j.reason!=="None"?String(j.reason):"스케줄러의 다음 상태 관측 대기","lab-flow-reason"));
-      if(index===1)card.append(el("small",j.admission?"Kueue quota 승인 관측 · worker 시작 대기":"실행기 준비 상태 관측"));
-      if(displayState==="FINALIZING")card.append(el("small","worker 성공 종료 · Job 완료 확인 대기"));
-      if(j.result)card.append(el("small","✓ 실행 결과 수집됨"));
-      card.onclick=()=>{labSelected=j.id;labWorker="";labResourceFilter="all";render();const target=document.querySelector(".lab-resource.linked"),rail=document.querySelector(".lab-resource-rail");if(target&&rail)rail.scrollTo({left:rail.scrollLeft+target.getBoundingClientRect().left-rail.getBoundingClientRect().left-2,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"});};stack.append(card);
-    }
-    if(!items.length)stack.append(el("div",index===0?"대기 작업 없음":"이 단계의 작업 없음","lab-flow-empty"));lane.append(stack);lanes.append(lane);
+    const [title,desc]=stages[index],head=el("div",null,"lab-flow-lane-head lane-"+index),count=jobs.filter(j=>labJobStage(j)===index).length;
+    head.style.gridColumn=String(index+2);head.style.gridRow="1";head.title=desc;
+    add(head,el("span",String(index+1).padStart(2,"0"),"eyebrow"),el("strong",title),el("b",String(count)));lanes.append(head);
+    const track=el("div",null,"lab-flow-track lane-"+index);track.style.gridColumn=String(index+2);track.style.gridRow="2 / span "+Math.max(jobs.length,1);track.setAttribute("aria-hidden","true");lanes.append(track);
   }
-  root.append(lanes,el("p","이 실험의 작업 흐름 · 열은 관측된 상태이며 큐 순위를 뜻하지 않습니다. 작업을 누르면 실행 노드와 근거가 연결됩니다.","lab-flow-caption"));
+  jobs.forEach((j,row)=>{
+    const index=labJobStage(j),displayState=labDisplayState(j),nodes=labJobNodes(j),label=j.label.replace(/^request-/,"요청 "),pick=()=>{labSelected=j.id;labWorker="";labResourceFilter="all";render();const target=document.querySelector(".lab-resource.linked"),rail=document.querySelector(".lab-resource-rail");if(target&&rail)rail.scrollTo({left:rail.scrollLeft+target.getBoundingClientRect().left-rail.getBoundingClientRect().left-2,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"});};
+    const name=el("button",label,"lab-flow-row-label"+(labSelected===j.id?" selected":""));name.style.gridRow=String(row+2);name.style.gridColumn="1";name.title=j.id;name.onclick=pick;name.setAttribute("aria-pressed",String(labSelected===j.id));lanes.append(name);
+    const card=el("button",null,"lab-flow-job "+labTone(displayState)+(labSelected===j.id?" selected":""));card.dataset.flowId=run.ref+":"+j.id;card.id="lab-flow-"+j.id;card.style.gridRow=String(row+2);card.style.gridColumn=String(index+2);card.setAttribute("aria-pressed",String(labSelected===j.id));
+    const caption=(states[displayState]||displayState)+(j.gpu!=null?" · "+j.gpu+" GPU":"");card.append(el("strong",caption));card.title=[label,caption,j.backend||"kubernetes",...nodes,j.reason||""].join(" · ");card.setAttribute("aria-label",label+" · "+stages[index][0]+" · "+caption);card.onclick=pick;lanes.append(card);
+  });
+  if(!jobs.length){const empty=el("div","아직 네이티브 작업 관측이 없습니다.","lab-flow-empty");empty.style.gridColumn="2 / -1";lanes.append(empty);}
+  root.append(lanes);
   const inspect=el("div",null,"lab-flow-selection");
   if(selected){
-    const nodes=labJobNodes(selected);add(inspect,el("strong",selected.label),el("span",selected.reason&&selected.reason!=="None"?(labJobLane(selected)===3?"기록된 대기 사유 · ":"대기·상태 사유 · ")+selected.reason:nodes.length?"관측된 실행 노드 · "+nodes.join(" / "):"실행 노드는 아직 관측되지 않았습니다."));
+    const nodes=labJobNodes(selected),reason=selected.reason&&selected.reason!=="None"?selected.reason:"",text=[(selected.backend||(run.scenario==="backfill"?"slurm":"kubernetes")).toUpperCase(),(selected.device_class||"gpu").toUpperCase(),selected.priority!=null?"우선순위 "+selected.priority:"",nodes.length?"실행 노드 · "+nodes.join(" / "):"실행 노드 미관측",reason].filter(Boolean).join(" · ");
+    const detail=el("span",text);detail.title=text;add(inspect,el("strong",selected.label),detail);
     if(["heterogeneous","npu","mixed"].includes(run.scenario)){const b=el("button","작업 상세 · 결과");b.onclick=async()=>{try{showJob(await scenarioFetch("/jobs/"+selected.id+"/view"));}catch(e){$("notice").textContent=e.message;}};inspect.append(b);}
-  }else add(inspect,el("strong","작업을 선택해 보세요"),el("span","대기 사유 → 할당된 노드 → 실행 결과를 따라갈 수 있습니다."));
+  }else add(inspect,el("strong","작업 선택"),el("span","각 행은 한 요청입니다. 상태는 실제 관측 시에만 이동합니다. 짧은 단계는 조회 간격 사이에 지나갈 수 있습니다."));
   root.append(inspect);return root;
 }
+
 function captureLabMotion(){
   const cards=new Map([...document.querySelectorAll("[data-flow-id]")].map(n=>[n.dataset.flowId,n.getBoundingClientRect()]));
   const scrolls=new Map([...document.querySelectorAll("[data-lab-scroll]")].map(n=>[n.dataset.labScroll,{left:n.scrollLeft,top:n.scrollTop}]));

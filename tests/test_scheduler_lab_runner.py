@@ -113,3 +113,46 @@ def test_backlog_accepts_native_head_reason_without_fabricating_other_reasons():
     a.quota()
     assert a.snapshot["queue_evidence"][1]["reason"] is None
     assert "verdict" in a.snapshot
+
+
+def test_burst_submits_ten_concurrently_and_requires_native_queue_and_results():
+    import threading
+
+    a = runner()
+    barrier = threading.Barrier(10, timeout=5)
+    calls = []
+
+    def submit(label, count, duration):
+        calls.append((label, count, duration))
+        barrier.wait()  # Sequential submission would fail this check.
+
+    a.job = submit
+    a.report = lambda *args: None
+    labels = [f"request-{index:02d}" for index in range(1, 11)]
+    queued = {
+        label: {"state": "RUNNING" if i < 2 else "PENDING", "reason": "quota" if i == 2 else None}
+        for i, label in enumerate(labels)
+    }
+    done = {
+        label: {
+            "state": "SUCCEEDED",
+            "pods": [{"events": [{"phase": "COMPUTE_FINISHED", "correctness": True}]}],
+        }
+        for label in labels
+    }
+    waits = []
+
+    def wait(predicate, title):
+        waits.append(predicate)
+        result = queued if len(waits) == 1 else done
+        assert predicate(result)
+        return result
+
+    a.wait_kube = wait
+    a.burst()
+    assert len(calls) == 10 and {c[0] for c in calls} == set(labels)
+    assert all(c[1:] == (1, 20) for c in calls)
+    assert len(a.snapshot["queue_evidence"]) == 10
+    assert not waits[0]({label: {"state": "RUNNING"} for label in labels})
+    done[labels[-1]]["pods"] = []
+    assert not waits[1](done)  # Native success alone is insufficient numerical evidence.

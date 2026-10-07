@@ -41,6 +41,7 @@ class LabRequest(BaseModel):
         "multi_gpu",
         "heterogeneous",
         "quota",
+        "burst",
         "priority",
         "cancel",
         "recovery",

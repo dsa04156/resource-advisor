@@ -208,3 +208,14 @@ existing table/pager/dialog; individual samples keep process metrics apart from
 physical-device-inclusive GPU measurements. Unknown quality/step/throughput and
 missing sensors use explicit text. Mark synthetic fixtures as test data in both
 the list and dialog. Do not present collection completion as native job success.
+
+Six-stage operations matrix supersedes the four-lane scrolling list: one stable
+row per request, six columns (reception/wait/allocation/preparation/run/result),
+26px desktop rows and 24px minimum targets. All ten burst requests stay visible,
+including ten terminal rows. Only the observed-state card moves horizontally;
+request labels retain their rows. Counts describe that observation, not rank.
+Selection preserves the node link and detailed evidence. Desktop resource meters
+pair a compact label with a short bar; mode joins the history toolbar and two
+collapsed help disclosures share one footer row. Desktop 1366×768 is the layout
+budget. Mobile keeps six compact headings and readable request labels, with
+selected evidence underneath. No request or native state is invented for motion.

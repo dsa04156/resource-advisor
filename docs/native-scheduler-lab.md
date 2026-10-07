@@ -7,7 +7,7 @@ Closing the browser does not stop the experiment. **실험 중지** cancels this
 The history selector and timeline replay stored observations, not synthetic progress.
 For GPU and NPU workloads together, choose **GPU + NPU PoC** and its execution button.
 
-## Eleven runnable scenario definitions
+## Twelve runnable scenario definitions
 
 Each selector contains prerequisites, four observation steps, success criteria and
 the boundary of what the experiment demonstrates. The latest recorded outcome is
@@ -16,6 +16,7 @@ History entries include their terminal status. Up to 40 recent runs are returned
 
 | Scenario | Real execution | Required evidence |
 |---|---|---|
+| Ten concurrent requests | Ten independent one-GPU CUDA Jobs submitted concurrently into the existing two-GPU queue | All ten native Jobs observed; running and pending together, a native quota reason, then ten successful CUDA correctness results |
 | Quota backlog | Two-GPU blocker, then three one-GPU requests; release blocker | All three observed pending, native quota shortage reason observed, all three eventually succeed |
 | Priority | Two-GPU blocker; low priority submitted before high, both request two GPUs | Native high value > low, high admitted while low still waits, both succeed |
 | Queued cancellation | Occupy quota, enqueue and cancel one request, release blocker, submit replacement | Owned Job deletion confirmed; cancellation retained; replacement succeeds |
@@ -400,3 +401,29 @@ node detail stayed available. No missing accelerator telemetry was fabricated.
 Sixteen focused scheduler-lab/console tests passed, including project isolation,
 latest-record selection, stale hiding and immutable historical readings.
 Raw node identifiers, timestamps, screenshots and exporter values remain private.
+
+
+## Ten-request operations board
+
+Select **10개 동시 요청** and launch once. This submits ten independent native
+Kubernetes Jobs concurrently; it is not a ten-GPU gang. Each requests one GPU,
+500m CPU and 256 MiB memory, with a bounded 20-second CUDA probe, no retries and
+a 180-second native active deadline. The existing two-GPU quota is unchanged.
+The eight-minute experiment deadline and run-label cleanup apply to partial
+submission failure, cancellation and restart. Success requires native quota
+backlog while another request is running, and a successful COMPUTE_FINISHED
+numerical result for each of the ten requests.
+
+The board uses one fixed row per request and six columns: reception, waiting,
+allocation, preparation, execution and result. All ten rows remain visible;
+there is no scroll inside stage lists. Column counts describe the selected
+observation, not queue rank. Admission without an assigned Pod is allocation;
+assigned but not running is preparation. Running and finalizing remain in
+execution. Terminal failures and cancellations remain in result. Short states
+can occur between samples and are never invented for an animation.
+
+Select a row to link its observed execution node and native evidence. The node
+meters follow the same recorded observation during replay; current inventory
+is an explicit separate choice. GPU, NPU and Slurm scenarios share the six-stage
+board. The ten-request scenario specifically uses the qualified CUDA lab pool;
+it does not assert ten distinct models, NPU qualification or FIFO fairness.
