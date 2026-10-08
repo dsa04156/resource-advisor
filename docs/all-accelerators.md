@@ -72,7 +72,9 @@ NPU 학습과 arbitrary model GPU↔NPU 자동 변환도 이번 범위에 포함
 
 ## 비용과 재계산
 
-확인된 API 예약량은 GPU459초, NPU557초, CPU1016 core초다. 이 중 Rockchip
+확인된 API 예약량은 GPU 요청 단위459초, NPU557초, CPU1016 core초다. GPU 요청 단위는
+`physical_device`273초와 `virtual_slot`186초를 구분해야 한다. 요약의 `gpu_seconds`459는
+이 요청 단위 합이며 물리 GPU459초나 utilization 적분값이 아니다. 이 중 Rockchip
 실패4건의 알려진 NPU 예약량은 514초이며 compute time은 unknown이다.
 남은 실패1건은 미시작 관측과 비용 null을 보존한다. qualification/진단/제어
 Pod의 전체 비용도 아직 완전한 ledger가 없다. 따라서 위 수치는 **알려진 API

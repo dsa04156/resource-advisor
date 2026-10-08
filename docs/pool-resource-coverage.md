@@ -46,5 +46,6 @@ terminal Job state/version836개, usage body digest836개를 확인한다. 소�
 
 그 후 별도 [전체 가속기 cohort](all-accelerators.md)를 추가했다. GPU 5대와 NPU 5개에서
 API 실행을 확인했고 원시 결과는 이전 파일을 덮어쓰지 않았다. 17 API 작업 중 성공12·
-실패5이며 알려진 예약량 GPU459초/NPU557초/CPU1016 core초를 기록했다. 미시작 실패1건과
+실패5이며 알려진 GPU 요청 단위459초(physical273/virtual slot186), NPU557초,
+CPU1016 core초를 기록했다. GPU 요청 단위 합을 물리 GPU 시간으로 해석하지 않는다. 미시작 실패1건과
 qualification/진단의 전체 비용은 unknown이 있어 전체 비용 완료나 성능 이득을 주장하지 않는다.
