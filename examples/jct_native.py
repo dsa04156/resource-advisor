@@ -391,7 +391,11 @@ def build_queues(snapshot, identities, profiles, pool, known, experiment):
                 else:
                     pending.append(
                         WorkItem(
-                            name, occupancy, expected_admission_seconds=profile.readmission_seconds
+                            name,
+                            occupancy,
+                            expected_admission_seconds=item.get(
+                                "expected_admission_seconds", profile.readmission_seconds
+                            ),
                         )
                     )
         else:
@@ -417,7 +421,11 @@ def build_queues(snapshot, identities, profiles, pool, known, experiment):
                 elif row["state"] == "PENDING":
                     pending.append(
                         WorkItem(
-                            name, occupancy, expected_admission_seconds=profile.readmission_seconds
+                            name,
+                            occupancy,
+                            expected_admission_seconds=item.get(
+                                "expected_admission_seconds", profile.readmission_seconds
+                            ),
                         )
                     )
                 else:

@@ -263,3 +263,37 @@ def test_shared_two_jobs_do_not_prove_readmission_but_capacity_plus_one_does():
     unqueued["qualifications"][2]["accepted_at"] = 115.0
     _, profiles, _ = freeze_profiles(unqueued)
     assert profiles[0].readmission_seconds is None
+
+
+def test_native_pending_preserves_its_original_idle_admission_estimate():
+    identity = CandidateIdentity(
+        "gpu", "kubernetes", "lab", "node", "nvidia.com/gpu", "image", "work"
+    )
+    profile = MeasuredProfile(
+        identity, "p", 90.0, 1.0, 1.0, 1.0, 0.0, 2.0, True, True, readmission_seconds=5.0
+    )
+    item = {"attempt_id": "first", "candidate_ref": "gpu", "expected_admission_seconds": 1.0}
+    job = {
+        "metadata": {"name": "first", "uid": "u", "labels": {"resource-advisor/experiment": "exp"}},
+        "status": {},
+    }
+    snapshot = {
+        "observed_at": 100.0,
+        "snapshot_ref": "s",
+        "jobs": [job],
+        "pods": [],
+        "workloads": [],
+        "all_pods": [],
+        "slurm_rows": [],
+        "accounting_rows": [],
+        "errors": [],
+    }
+    queues = build_queues(
+        snapshot,
+        [identity],
+        [profile],
+        [{"ref": "gpu", "node": "node", "nominal_slots": 1}],
+        [item],
+        "exp",
+    )
+    assert queues[0].pending[0].expected_admission_seconds == 1.0

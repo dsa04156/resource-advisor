@@ -725,7 +725,10 @@ def run(directory, v2_directory, private_module, *, observer_cadence=2.0):
                                 profile_map[item["candidate_ref"]].compute_seconds
                                 + profile_map[item["candidate_ref"]].preparation_seconds
                                 + profile_map[item["candidate_ref"]].release_seconds,
-                                profile_map[item["candidate_ref"]].readmission_seconds,
+                                item.get(
+                                    "expected_admission_seconds",
+                                    profile_map[item["candidate_ref"]].readmission_seconds,
+                                ),
                             )
                             for item in current
                             if not item.get("outcome")
@@ -759,6 +762,18 @@ def run(directory, v2_directory, private_module, *, observer_cadence=2.0):
                         )
                         selected = fallback["candidate_ref"]
                     profile = profile_map[selected]
+                    admission_estimate = (
+                        next(
+                            (
+                                p.admission_seconds
+                                for p in decision.predictions
+                                if p.candidate_ref == selected
+                            ),
+                            None,
+                        )
+                        if layout["arm"] == PROFILE_QUEUE
+                        else profile.readmission_seconds
+                    )
                     if layout["arm"] == V2_PROFILE_ONLY:
                         backlog[selected] += profile.v2_service_seconds
                     name = (
@@ -805,6 +820,7 @@ def run(directory, v2_directory, private_module, *, observer_cadence=2.0):
                     write(choice_path, choice)
                     item = dict(
                         attempt_id=name,
+                        expected_admission_seconds=admission_estimate,
                         cohort_ref=layout["load"]
                         + "-"
                         + str(layout["block"])
