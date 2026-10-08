@@ -1,0 +1,154 @@
+{
+  "schema_version": "right-sizing-slurm-plan-v1",
+  "experiment_id": "right-sizing-slurm-20261008-v1",
+  "created_at": "2026-10-08T05:59:50.987082+00:00",
+  "repository_commit": "6b747b6d53415bc3cefa5a6d6a1aef90943fa448",
+  "controller_source_commit": "1b1bb48362fcd0fc78e8e46b34e1a0b13dc85b4c",
+  "scope": "Fixed qualified Slurm candidate observe/recommend/approve/execute/feedback lifecycle; not resource search or a Kubernetes-versus-Slurm performance comparison",
+  "source_workload_ref": "slurm-orin-cnn-api-v1",
+  "source_workload_digest": "sha256:3ab354336fe8292e9dbf1338e099d61081213a33ac1a0f3064484ccf10eed2a9",
+  "workload": {
+    "schema_version": "v1",
+    "ref": "right-sizing-slurm-20261008-v1",
+    "project_ref": "ra-lab",
+    "identity": {
+      "code_digest": "sha256:ae41a73807559871b5d201122298f957282d029818335e4f8a892a3730685a4d",
+      "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+      "dataset_version": "generated-seed20261006-input878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+      "config_digest": "sha256:999180d474d5ab2616abb9be63989b3d89b6a401746d2851011726515dcdb69b",
+      "task_type": "benchmark",
+      "input_shape": [
+        4,
+        3,
+        32,
+        32
+      ],
+      "batch_size": 4,
+      "global_batch_size": null,
+      "gradient_accumulation": 1,
+      "precision": "fp32",
+      "seed": 20261006,
+      "work_units": 10,
+      "quality_contract_digest": "sha256:b56e74cbf6b4099db6255bde62fa9d4b61d749f4c1e4d913ba87cfd23a9553f3",
+      "measurement_boundary": "synchronized-cnn-forward-only-four-inputs-v1"
+    },
+    "candidates": [
+      {
+        "ref": "orin",
+        "variant_ref": "v-right-sizing-slurm-20261008-v1",
+        "capability_ref": "cap-right-sizing-slurm-20261008-v1",
+        "backend": "slurm",
+        "context": {
+          "arch": "arm64",
+          "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+          "runtime_versions": {
+            "pytorch": "2.5.0a0+872d972e41.nv24.08",
+            "cuda": "12.6"
+          },
+          "accelerator_model": "Orin",
+          "memory_model": "unified",
+          "power_mode": "uncontrolled-default",
+          "allocation_mode": "physical_device",
+          "resources": {
+            "host_cpu": 1.0,
+            "host_memory_mib": 1024,
+            "accelerator_count": 1
+          },
+          "parameters": {}
+        }
+      }
+    ],
+    "baseline_candidate_ref": "orin",
+    "profiling": {
+      "consent": false,
+      "max_candidates": 2,
+      "max_wall_seconds_per_candidate": 180,
+      "max_queue_seconds": 300,
+      "total_wall_seconds": 600,
+      "final_validation_seconds": 180,
+      "mutable_parameters": [],
+      "checkpoint_digest": null,
+      "max_probes": 8,
+      "device_seconds": {}
+    },
+    "quality": {
+      "metric": "numerical_agreement",
+      "minimum": 1.0,
+      "minimum_repeats": 3,
+      "maximum_peak_memory_mib": 1024.0,
+      "max_profile_age_seconds": 7200
+    },
+    "execution": {
+      "priority": "normal",
+      "max_run_seconds": 120,
+      "max_queue_seconds": 120,
+      "max_collection_seconds": 180
+    }
+  },
+  "variant": {
+    "ref": "v-right-sizing-slurm-20261008-v1",
+    "workload_ref": "right-sizing-slurm-20261008-v1",
+    "project_ref": "ra-lab",
+    "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+    "arch": "arm64",
+    "accelerator_vendor": "nvidia",
+    "device_class": "gpu",
+    "precision": "fp32",
+    "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+    "compiled_artifact_digest": null,
+    "image": null,
+    "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+    "command": [
+      "/opt/resource-advisor/runtimes/torch-jetson-24.08/venv/bin/python",
+      "-I",
+      "/opt/resource-advisor/qualifications/orin-cnn-contract-v1/slurm_cnn_workload.py"
+    ],
+    "pilot_command": null,
+    "verification": "MODEL_VERIFIED",
+    "validation_refs": [
+      "slurm-orin-torch-v2",
+      "slurm-cnn-contract-v1"
+    ],
+    "supported_shapes": [
+      [
+        4,
+        3,
+        32,
+        32
+      ]
+    ],
+    "runtime_versions": {
+      "pytorch": "2.5.0a0+872d972e41.nv24.08",
+      "cuda": "12.6"
+    }
+  },
+  "native_binding_digest": "sha256:f9cbb8c72f50d6fcfe10ad8192004c7232e16d38b93a5849a0ba685ef16a9b74",
+  "producer_sha256": "a5c020703cdb35ab2c0174ba4b4a34046f12e7e97c07dce7c96b2ee83ed89b81",
+  "qualification": {
+    "count": 1,
+    "mode": "observe",
+    "original_workload_unchanged": true,
+    "current_operational_stale_warning_must_be_retained": true
+  },
+  "observe": {
+    "count": 3,
+    "run_full_original_workload": true,
+    "no_pilot_or_user_code_shortening": true
+  },
+  "main": {
+    "count": 1,
+    "explicit_approval": true,
+    "independent_of_reference_attempts": true
+  },
+  "budget": {
+    "max_native_jobs": 5,
+    "max_run_seconds": 120,
+    "max_queue_seconds": 120,
+    "max_collection_seconds": 180,
+    "max_gpu_reservation_seconds": 600,
+    "whole_protocol_wall_seconds": 1800,
+    "final_validation_reserve_seconds": 120
+  },
+  "retry_policy": "No new attempt on failure; inspect the same idempotent job. Preserve failed results and costs.",
+  "metrics": "Forward-only compute time; native GPU/CPU reservation; queue/startup/accounting/result times; quality; reference/actual residual. Energy and actual model CPU time unknown."
+}
