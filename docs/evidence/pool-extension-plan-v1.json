@@ -1,0 +1,18 @@
+{
+  "schema_version": "pool-extension-plan-v1",
+  "experiment_id": "pool-extension-20261008-v1",
+  "created_at": "2026-10-08T06:03:37.286280+00:00",
+  "scope": "CUDA execution coverage and workload-first routing, not AI performance right-sizing",
+  "qualification_jobs": 1,
+  "qualification_sustained_compute_seconds": 90,
+  "automatic_api_jobs": 1,
+  "max_total_gpu_reservation_seconds": 300,
+  "gpu_count": 1,
+  "preserve_existing_four_bundles": true,
+  "model_conversion": false,
+  "npu_enabled_by_this_extension": false,
+  "image_digest": "sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+  "backend_binding": "existing lab-kubernetes route",
+  "new_workload_ref": "cuda-sustained-auto-v2",
+  "model_agreement_minimum": 1.0
+}
