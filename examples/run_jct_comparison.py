@@ -145,13 +145,43 @@ class NativeTransport:
         selector = (
             "resource-advisor/jct-cohort=" + current_cohort
             if current_cohort
-            else "resource-advisor/experiment=" + self.plan["experiment_id"]
+            else "resource-advisor/jct-run="
+            + self.plan.get("main_attempt_prefix", self.plan["experiment_id"])
         )
 
         def batch_kube():
-            return self.kube(
-                "get", "jobs,pods,workloads.kueue.x-k8s.io", "-l", selector, "-o", "json"
+            began, began_mono = time.time(), time.monotonic()
+            objects = self.kube("get", "jobs,pods", "-l", selector, "-o", "json")
+            jobs_request = dict(
+                started_at=began,
+                finished_at=time.time(),
+                duration_seconds=time.monotonic() - began_mono,
             )
+            uids = [i["metadata"]["uid"] for i in objects["items"] if i["kind"] == "Job"]
+            workloads, workload_request = {"apiVersion": "v1", "kind": "List", "items": []}, None
+            if uids:
+                began, began_mono = time.time(), time.monotonic()
+                workloads = self.kube(
+                    "get",
+                    "workloads.kueue.x-k8s.io",
+                    "-l",
+                    "kueue.x-k8s.io/job-uid in (" + ",".join(uids) + ")",
+                    "-o",
+                    "json",
+                )
+                workload_request = dict(
+                    started_at=began,
+                    finished_at=time.time(),
+                    duration_seconds=time.monotonic() - began_mono,
+                )
+            return {
+                "apiVersion": "v1",
+                "kind": "List",
+                "items": objects["items"]
+                + [dict(i, kind=i.get("kind", "Workload")) for i in workloads["items"]],
+                "native_lists": {"jobs_pods": objects, "workloads": workloads},
+                "native_requests": {"jobs_pods": jobs_request, "workloads": workload_request},
+            }
 
         def all_pods():
             return self.kube(
@@ -426,10 +456,12 @@ def manifest_for(directory, v2_directory, node, item, plan):
         manifest["metadata"]["name"] = item["attempt_id"]
         manifest["metadata"]["labels"]["resource-advisor/experiment"] = plan["experiment_id"]
         manifest["metadata"]["labels"]["resource-advisor/jct-cohort"] = item["cohort_ref"]
+        manifest["metadata"]["labels"]["resource-advisor/jct-run"] = plan["main_attempt_prefix"]
         manifest["spec"]["activeDeadlineSeconds"] = 120
         pod = manifest["spec"]["template"]
         pod["metadata"]["labels"]["resource-advisor/experiment"] = plan["experiment_id"]
         pod["metadata"]["labels"]["resource-advisor/jct-cohort"] = item["cohort_ref"]
+        pod["metadata"]["labels"]["resource-advisor/jct-run"] = plan["main_attempt_prefix"]
         pod["spec"]["containers"][0]["command"][-1] = str(plan["main_rounds"])
         pod["spec"]["volumes"][0]["configMap"]["name"] = plan["experiment_id"] + "-source"
         write(path, manifest)
@@ -579,6 +611,52 @@ def stop_owned(transport, directory, known, plan):
     return dict(at=time.time(), errors=errors)
 
 
+def validate_protocol(plan, schedule):
+    """Permit only registered full/short protocols with collision-free names."""
+    jobs = plan.get("jobs_per_cohort", 12)
+    if type(jobs) is not int or jobs not in {6, 12}:
+        raise ValueError("jobs_per_cohort must be 6 or 12")
+    experiment = plan["experiment_id"]
+    prefix = plan.get("main_attempt_prefix", experiment if jobs == 12 else None)
+    if prefix not in {experiment, experiment + "-short"} or (
+        jobs == 6 and prefix != experiment + "-short"
+    ):
+        raise ValueError("invalid main attempt prefix")
+    rows = schedule["cohorts"]
+    expected = {
+        (load, block, arm)
+        for load in ("sparse", "moderate", "burst")
+        for block in range(3)
+        for arm in (ROUND_ROBIN, V2_PROFILE_ONLY, PROFILE_QUEUE)
+    }
+    intervals = {"sparse": 3.0, "moderate": 0.5, "burst": 0.0}
+    if (
+        len(rows) != 27
+        or schedule["seed"] != 20261008
+        or {(c["load"], c["block"], c["arm"]) for c in rows} != expected
+        or any(
+            c["jobs"] != jobs or c["arrival_interval_seconds"] != intervals[c["load"]] for c in rows
+        )
+    ):
+        raise ValueError("preregistered schedule changed")
+    layouts = [
+        dict(
+            load=row["load"],
+            block=row["block"],
+            arm=row["arm"],
+            interval_seconds=row["arrival_interval_seconds"],
+            order_in_block=position % 3,
+        )
+        for position, row in enumerate(rows)
+    ]
+    return jobs, prefix, layouts
+
+
+def cohort_key(plan, cohort):
+    arm = {ROUND_ROBIN: "rr", V2_PROFILE_ONLY: "po", PROFILE_QUEUE: "pq"}[cohort["arm"]]
+    return plan["main_attempt_prefix"] + "-" + cohort["load"][0] + str(cohort["block"]) + "-" + arm
+
+
 def run(directory, v2_directory, private_module, *, observer_cadence=2.0):
     path = directory / "capture.json"
     calibration = json.loads(path.read_text())
@@ -587,29 +665,7 @@ def run(directory, v2_directory, private_module, *, observer_cadence=2.0):
     identities, profiles, evidence = freeze_profiles(calibration)
     schedule_path = directory / "preregistered-schedule.json"
     schedule = json.loads(schedule_path.read_text())
-    if len(schedule["cohorts"]) != 27 or schedule["seed"] != 20261008:
-        raise ValueError("invalid preregistered schedule")
-    expected = {
-        (load, block, arm)
-        for load in ("sparse", "moderate", "burst")
-        for block in range(3)
-        for arm in (ROUND_ROBIN, V2_PROFILE_ONLY, PROFILE_QUEUE)
-    }
-    if {(c["load"], c["block"], c["arm"]) for c in schedule["cohorts"]} != expected or any(
-        c["jobs"] != 12 for c in schedule["cohorts"]
-    ):
-        raise ValueError("preregistered schedule changed")
-    layouts = []
-    for position, row in enumerate(schedule["cohorts"]):
-        layouts.append(
-            dict(
-                load=row["load"],
-                block=row["block"],
-                arm=row["arm"],
-                interval_seconds=row["arrival_interval_seconds"],
-                order_in_block=position % 3,
-            )
-        )
+    jobs_per_cohort, attempt_prefix, layouts = validate_protocol(calibration["plan"], schedule)
     if (directory / "calibration.json").exists():
         raise ValueError("calibration archival exists; inspect instead of replaying")
     write(directory / "calibration.json", calibration)
@@ -618,7 +674,9 @@ def run(directory, v2_directory, private_module, *, observer_cadence=2.0):
     plan = copy.deepcopy(calibration["plan"])
     plan.update(
         transfer_checksums=calibration["transfer_checksums"],
-        jobs_per_cohort=12,
+        jobs_per_cohort=jobs_per_cohort,
+        jobs_per_arm=jobs_per_cohort,
+        main_attempt_prefix=attempt_prefix,
         paired_blocks=3,
         main_rounds=16384,
         slurm_timezone="UTC",
@@ -631,7 +689,11 @@ def run(directory, v2_directory, private_module, *, observer_cadence=2.0):
         replication="three paired cohort repeats per load; cohorts are replicate units",
         randomization="seeded per-load permutation, rotated across three paired repeats",
         observer_cadence_seconds=observer_cadence,
-        limits=dict(per_job_seconds=120, max_main_jobs=324, protocol_seconds=2700),
+        limits=dict(
+            per_job_seconds=120,
+            max_main_jobs=27 * jobs_per_cohort,
+            protocol_seconds=plan.get("limits", {}).get("protocol_seconds", 2700),
+        ),
         schedule=layouts,
         schedule_file="preregistered-schedule.json",
         schedule_sha256=digest(schedule_path.read_bytes()),
@@ -674,7 +736,7 @@ def run(directory, v2_directory, private_module, *, observer_cadence=2.0):
     try:
         if not observer.ready.wait(timeout=55):
             raise TimeoutError("native observer unavailable")
-        with ThreadPoolExecutor(max_workers=12) as executor:
+        with ThreadPoolExecutor(max_workers=jobs_per_cohort) as executor:
             for layout in plan["schedule"]:
                 if time.monotonic() > protocol_deadline:
                     raise TimeoutError("bounded protocol deadline exceeded")
@@ -691,7 +753,7 @@ def run(directory, v2_directory, private_module, *, observer_cadence=2.0):
                 start = time.monotonic()
                 backlog = {n["ref"]: 0.0 for n in plan["pool"]}
                 futures, jobs = [], []
-                for index in range(12):
+                for index in range(jobs_per_cohort):
                     planned = start + layout["interval_seconds"] * index
                     delay = planned - time.monotonic()
                     if delay > 0:
@@ -776,18 +838,7 @@ def run(directory, v2_directory, private_module, *, observer_cadence=2.0):
                     )
                     if layout["arm"] == V2_PROFILE_ONLY:
                         backlog[selected] += profile.v2_service_seconds
-                    name = (
-                        plan["experiment_id"]
-                        + "-"
-                        + layout["load"][0]
-                        + str(layout["block"])
-                        + "-"
-                        + {ROUND_ROBIN: "rr", V2_PROFILE_ONLY: "po", PROFILE_QUEUE: "pq"}[
-                            layout["arm"]
-                        ]
-                        + "-"
-                        + str(index)
-                    )
+                    name = cohort_key(plan, layout) + "-" + str(index)
                     choice = dict(
                         policy=layout["arm"],
                         candidate_ref=selected,
@@ -821,11 +872,7 @@ def run(directory, v2_directory, private_module, *, observer_cadence=2.0):
                     item = dict(
                         attempt_id=name,
                         expected_admission_seconds=admission_estimate,
-                        cohort_ref=layout["load"]
-                        + "-"
-                        + str(layout["block"])
-                        + "-"
-                        + layout["arm"],
+                        cohort_ref=cohort_key(plan, layout),
                         profile_source=choice["profile_source_refs"][0]
                         if choice["profile_source_refs"]
                         else None,
@@ -961,15 +1008,7 @@ def run(directory, v2_directory, private_module, *, observer_cadence=2.0):
             cohort["jobs"] = [
                 save_job(directory, j)
                 for j in known
-                if j["attempt_id"].startswith(
-                    plan["experiment_id"]
-                    + "-"
-                    + cohort["load"][0]
-                    + str(cohort["block"])
-                    + "-"
-                    + {ROUND_ROBIN: "rr", V2_PROFILE_ONLY: "po", PROFILE_QUEUE: "pq"}[cohort["arm"]]
-                    + "-"
-                )
+                if j["attempt_id"].startswith(cohort_key(plan, cohort) + "-")
             ]
         write(path, state)
         raise
