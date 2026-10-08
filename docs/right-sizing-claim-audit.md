@@ -74,3 +74,9 @@ software 근거만 있다. W2 v1/v2 실패와 비용을 삭제하지 않았다.
 521 GPU 예약초, 14 NPU 예약초와 609 CPU core초를 보고한다.
 [Slurm v3 검사](evidence/right-sizing-slurm-readiness-v3.json)는 controller 접속 실패와
 Orin RPC timeout이 계속됨을 기록한다. 새 Slurm closed loop와 전체 목표는 OPEN이다.
+[Senior infrastructure review](right-sizing-final-review.md)는 얕은 통합, 과장된
+기여, 측정·비용·failure 처리의 수정 사항과 남은 한계를 분리한다.
+[최신 검증](evidence/right-sizing-validation-v3.json)은 CI source e020445에서
+Python3.11/3.13 각각 SQLite 1,150 passed·4 skipped / PostgreSQL 1,154 passed와
+새 native hardware 32회 성공을 구분한다. 배포 controller source1b1bb48과
+고정 benchmark sourcebb2f834도 별도로 기록했다.

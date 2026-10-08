@@ -1,0 +1,39 @@
+{
+  "schema_version": "right-sizing-validation-v3",
+  "verified_at": "2026-10-08T02:05:03.657886+00:00",
+  "ci": {
+    "conclusion": "success",
+    "headSha": "e0204453ed381692656e1bf20acc415efa201de9",
+    "status": "completed",
+    "url": "https://github.com/dsa04156/resource-advisor/actions/runs/37715600437",
+    "run_id": 37715600437,
+    "pytest_summaries": [
+      "contracts (3.13)\tRun uv run pytest -q\t2026-10-08T02:00:45.2983080Z 1150 passed, 4 skipped, 3 warnings in 69.23s (0:01:09)",
+      "contracts (3.13)\tRun uv run pytest -q\t2026-10-08T02:02:54.4010871Z 1154 passed, 3 warnings in 126.68s (0:02:06)",
+      "contracts (3.11)\tRun uv run pytest -q\t2026-10-08T02:00:29.2166619Z 1150 passed, 4 skipped, 3 warnings in 56.08s",
+      "contracts (3.11)\tRun uv run pytest -q\t2026-10-08T02:02:09.6667311Z 1154 passed, 3 warnings in 97.94s (0:01:37)"
+    ]
+  },
+  "local_changed_auditor_tests": {
+    "reference_trial_cost_tests_before_last_addition": 45,
+    "cost_module_after_extension_accounting_test": 6,
+    "scope": "Focused auditor mutation/contract checks; counts overlap and are not summed"
+  },
+  "real_hardware": {
+    "experiment_id": "right-sizing-reference-20261008-v3",
+    "new_qualification_jobs": 2,
+    "new_grid_jobs": 30,
+    "successful_native_jobs": 32,
+    "failed_native_jobs": 0,
+    "mlflow_s3_api_matching_attempts": 30,
+    "source_provenance": "Frozen benchmark bb2f834, controller1b1bb48; example/auditor source e020445"
+  },
+  "existing_public_evidence_files_byte_unchanged": 188,
+  "generated_markdown_matches_audited_raw": true,
+  "figure_pngs_visually_inspected": true,
+  "deployment_readback": "right-sizing-deployment-readback-v2.json",
+  "terminal_pod_cleanup": "right-sizing-reference-cleanup-v3.json",
+  "new_slurm_closed_loop_verified": false,
+  "blocked_evidence": "right-sizing-slurm-readiness-v3.json",
+  "overall_goal_complete": false
+}

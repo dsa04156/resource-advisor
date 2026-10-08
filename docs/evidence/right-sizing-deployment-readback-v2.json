@@ -1,0 +1,28 @@
+{
+  "schema_version": "right-sizing-deployment-readback-v2",
+  "verified_at": "2026-10-08T01:59:23.839054+00:00",
+  "controller_source_commit": "1b1bb48362fcd0fc78e8e46b34e1a0b13dc85b4c",
+  "deployed_source": {
+    "api": {
+      "image_digest": "sha256:55a5666a4f5068e061399230eb14bba2790d94ee6aa725e390399cc209f0fa10",
+      "source_tree_sha256": "073ace2957757d335dbe1547b07c167e05fee657f7a57cdd5dd3d3901db67400",
+      "matches_verified_release": true
+    },
+    "kubernetes_worker": {
+      "image_digest": "sha256:eef4d7afb901facfb448b1757953138673facc4d7d6424054d0df4ddae6d3f90",
+      "source_tree_sha256": "073ace2957757d335dbe1547b07c167e05fee657f7a57cdd5dd3d3901db67400",
+      "matches_verified_release": true
+    },
+    "slurm_worker": {
+      "image_digest": "sha256:f9f256d2fc40debeca6683d66aafbaa20b39ba2fdb493147f2061d71a5351368",
+      "source_tree_sha256": "073ace2957757d335dbe1547b07c167e05fee657f7a57cdd5dd3d3901db67400",
+      "matches_verified_release": true
+    }
+  },
+  "benchmark_configmap_immutable": true,
+  "benchmark_source_digest": "sha256:d02947e57991eb1212432bdf8abc5015afb3709e29c99104e0ba3a8dcad4d4a7",
+  "qualification_queue_idle": true,
+  "new_hardware_jobs": 32,
+  "new_slurm_hardware_jobs": 0,
+  "overall_goal_complete": false
+}

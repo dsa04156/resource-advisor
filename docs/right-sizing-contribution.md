@@ -28,6 +28,11 @@ Resource Advisor는 workload/runtime compatibility, 다음 profiling 후보,
 측정 근거와 불확실성, 추천의 유효 기간, 승인 실행의 actual/reference 차이를
 연결한다. Native scheduler의 최종 placement/admission 권한을 유지한다.
 
+최신 비교·감사 source e020445의 [전체 CI](evidence/right-sizing-validation-v3.json)는
+Python3.11/3.13 각각 SQLite 1,150 passed·4 skipped와 PostgreSQL 1,154 passed다.
+Ruff/format, packaged assets, JS/Ansible syntax도 통과했다. Software 통과를
+새 Slurm 실장비 완료로 해석하지 않는다.
+
 ## 3. Method
 
 Compatibility → observe/cooperative pilot → comparable profile → budgeted
