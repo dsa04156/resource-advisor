@@ -1,0 +1,26 @@
+{
+  "implementation_head": "cfbeb5c63ed285279e62f9995c5b88541f4969ce",
+  "full_suite_at_48bf226": {
+    "passed": 1332,
+    "skipped": 4,
+    "existing_warnings": 3,
+    "seconds": 64.95
+  },
+  "after_accounting_fix": {
+    "focused_tests_passed": 8,
+    "ruff": "passed"
+  },
+  "independent_review_rechecks": {
+    "standards_remaining_findings": 0,
+    "spec_remaining_findings": 0,
+    "reservation_corrected_from_preserved_receipts": true,
+    "original_input_hashes_unchanged": 51
+  },
+  "main_native_successful_jobs": 22,
+  "main_native_failed_jobs": 0,
+  "preparation_native_successful_jobs": 13,
+  "preparation_native_failed_jobs": 2,
+  "hardware_reexecution_for_metric_correction": false,
+  "production_integration": false,
+  "earlier_JCT_final_audit": "remains canceled; not restarted"
+}

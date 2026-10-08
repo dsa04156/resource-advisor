@@ -1,0 +1,2280 @@
+{
+  "scope": "Exact original native evidence remains in private workspace. Public bytes are sanitized projections with separate SHA. No claim that public logs have original raw-byte hashes. Compiled blobs/vendor assets retained locally. Numerical results/model fixture/native timestamps and owned Job/Pod identities retained.",
+  "native_hardware_actions_during_publication": false,
+  "artifact_entries": [
+    {
+      "path": "intel-failed-qualification.json",
+      "original_sha256": "48fc714622a979f5484236c416d6bc57d19b13e9086e9fc798e5acb64dcd79cc",
+      "public_sha256": "48fc714622a979f5484236c416d6bc57d19b13e9086e9fc798e5acb64dcd79cc",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification/job.json",
+      "original_sha256": "485f6c48d06551542bf67633a1207cab49a3167f777314d09d666155bc51d816",
+      "public_sha256": "a03eddaab568f1e188bea7aa77f4bec125d18d19786aa8829afcfd56c1648fe4",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification/native-job.json",
+      "original_sha256": "b3335cb5caf470094e883c8c5b3960e8b440251039b8055a04ba8c0f1e587428",
+      "public_sha256": "96074bd50378914244199aafc46c8eacf57dee9c22f51b3f7a407f6ec7425665",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification/native-workload.json",
+      "original_sha256": "b3ba7d820a236733fd9efb08c9291d6ee3bab386f2251ad5254c5149c65a2396",
+      "public_sha256": "4fefbabb66a7d508ba44ce7ecae69b0fb2b5b53b319ec92c8e80b34df34155ed",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification/native.log",
+      "original_sha256": "303be3bc24cdc6ecb986920c4022abe92c74e0e245d53a0ef6a92ff433dcb128",
+      "public_sha256": "303be3bc24cdc6ecb986920c4022abe92c74e0e245d53a0ef6a92ff433dcb128",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "intel-qualification/pods-after.json",
+      "original_sha256": "ff85ab4ac796f3c81e102713ccc1545b5be59159ee3dfc894547ef5170a9dc7f",
+      "public_sha256": "8c165d879b7974b12e446419b8fcc3d1d36ed3174d1a9d563f0263a99bd44d7d",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification/pods-before.json",
+      "original_sha256": "6107bfe63a14db62a1750737c6ed4c5f4c565d4922a66dc58e98ad4075282920",
+      "public_sha256": "223bf25529136a5f3a38192c6982063e33a74ba4b9a08ed4408733cceb1b5b15",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification/qualification.json",
+      "original_sha256": "64162206134e0ee2a81af3a3ac0b92eda62d87cdfb47fa48bd98de2650a285eb",
+      "public_sha256": "6a5d014bbaf18a8c4cf601ef456e159afc01c7dbd4a303ff80c0000569273b5d",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification/source.json",
+      "original_sha256": "0080bd323a09478bc17c454ad126aabb7c351564aa09f7c1bc3b08284a48f792",
+      "public_sha256": "0080bd323a09478bc17c454ad126aabb7c351564aa09f7c1bc3b08284a48f792",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification-abi-fixed/compiled.blob",
+      "original_sha256": "57344830a0bd519b2e7b4f99462b49a843a7233c6d35e5313331232f4ce8b2cc",
+      "public_sha256": null,
+      "scope": "compiled/vendor binary retained locally"
+    },
+    {
+      "path": "intel-qualification-abi-fixed/job.json",
+      "original_sha256": "f57b4eafb9e3ad4d7dd183be928d6de8c97f01dad54d655ed3528a2c585a39eb",
+      "public_sha256": "8c4ac1b19b6c5b4e0fc093013263471c977b5bfbd6b3e3bbc2c33209915ee67e",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification-abi-fixed/native-job.json",
+      "original_sha256": "45c22d75c06916848626a1da209b2fe16e5eac4197c325356722392258d99d48",
+      "public_sha256": "6e8bd43ae78a454408b6fa4942826dbcb739e3071f54dd2ff8657e0580a04868",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification-abi-fixed/native-workload.json",
+      "original_sha256": "4bf70ce59349a27980d07b078ade80abd933932d0552c7dd9ff6c33040f8f728",
+      "public_sha256": "1fb821f79eba9f9d3d8c36d35d388123d525bf26495e1379c1951f064c1531a0",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification-abi-fixed/native-workloads.json",
+      "original_sha256": "d6c59aef03d4b84aa40b9668db2732bc45129644a58d8ca079b10285939220d9",
+      "public_sha256": "31c7c290b120dc24ef290ed84b1382a856fb66abf7320c7fe05a7e7711d31a10",
+      "scope": [
+        "private configuration substitutions",
+        "only experiment-owned Workloads retained"
+      ]
+    },
+    {
+      "path": "intel-qualification-abi-fixed/native.log",
+      "original_sha256": "8fce9ba6cd890763096e36ed7910008b2d87862048a57f84c0a43140cac04faf",
+      "public_sha256": "1f39144e37bec731a95395d4f7fb9f27bcdc97c576559a55f3d394045be43169",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "intel-qualification-abi-fixed/pods-after.json",
+      "original_sha256": "ef34be7c16031d87915430d5b1070171294e6fa45f7f36b971a39eab0ae87d29",
+      "public_sha256": "c9d98463124f76996246e342c53f4b5c1c01d3ee2468416d990ca915d79db0c1",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification-abi-fixed/qualification.json",
+      "original_sha256": "79a3dbe789e45b45f77d99496f7ff8a9c0744497e34362977372f11d8fe8ff19",
+      "public_sha256": "67d3f1269a52931c9d20f8dbe1e805599133887588bf7316508181be85b82e93",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "intel-qualification-abi-fixed/source.json",
+      "original_sha256": "c989d2658335d62c586ee9af412e96bc529b9d9504b01896069d969e6263086d",
+      "public_sha256": "c989d2658335d62c586ee9af412e96bc529b9d9504b01896069d969e6263086d",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "inventory-nodes.json",
+      "original_sha256": "9eb348ece9f2985fa745b113606bd2b3cb74e85dde208275c76a854983df0074",
+      "public_sha256": "42f5f2c34d220dc5ac4427dfb28f97914e2ec3d6c8a00fe7947f149fd1680033",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "inventory-observation.json",
+      "original_sha256": "e68ec2ab764fc67bf09524f613c05bd4ac2910b78d042f6d6b6a3b7065f40bee",
+      "public_sha256": "f92b1e44f6332a177170b4ed5d76a69d0a5e17f6d2288e55d83fa00b1883db6e",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "inventory-queues.json",
+      "original_sha256": "d7ac19353e4eb80afd03e286a2b0fcd1a89ad5b7642c0a41d8a469a3da2e309b",
+      "public_sha256": "0e1d3fc859cc6da59b843e8fdce7317800c4d509d03fe117f7ca602403dd8b16",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/capture.json",
+      "original_sha256": "d53b91c90bd68e1702e35d59b4542f52c092cdec27dce97d7b3d1c661c3ea38e",
+      "public_sha256": "5b3b9cff3dce48b5a8fb6011f11286de8b029a53884e9a249a852a8cf7e06dea",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/clock-observation-before.json",
+      "original_sha256": "09b10aecfe6211fd128c502654729d9d720c01d2b17c771dfbc798109aa8bdd1",
+      "public_sha256": "09b10aecfe6211fd128c502654729d9d720c01d2b17c771dfbc798109aa8bdd1",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/cuda-qual-capture.json",
+      "original_sha256": "118ea92f14aedd4a7b077cea14ffd7120c9630c60a9ea96de3ad1b4a42e9943b",
+      "public_sha256": "fd8e3a4d53d6756f6ae6e925e280fffa6b3bf675c2c141d5e84e00b81bbb92c6",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/descriptive-derived-metrics.json",
+      "original_sha256": "6ccc9c094d966f5879b64c600b2695464946df08e60cc7c2f7eafeea0cee42a1",
+      "public_sha256": "6ccc9c094d966f5879b64c600b2695464946df08e60cc7c2f7eafeea0cee42a1",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/frozen-profiles-and-schedule.json",
+      "original_sha256": "eedfd9a801c35968dffbc4006d75910cf6c2f74c46754f2a2977cb791fae07c6",
+      "public_sha256": "eedfd9a801c35968dffbc4006d75910cf6c2f74c46754f2a2977cb791fae07c6",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/intent-ledger.jsonl",
+      "original_sha256": "1ae8867a637319321d5ddfbde70a1d7abce5fa07bc75513c6144659b524ca265",
+      "public_sha256": "1ae8867a637319321d5ddfbde70a1d7abce5fa07bc75513c6144659b524ca265",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-baseline-0.json",
+      "original_sha256": "933503c75a5d0a35bd017b245aa29230fb78e94af226a6d3fccd9c23ea99aa49",
+      "public_sha256": "b9ea9f73964a300d4ee3b9af43a9aba7315dc1d868d395bd6fc63a274a162a57",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-baseline-1.json",
+      "original_sha256": "b5ecfb27865c0dd878159cd64abac47ed8eff1d3a3dde30ddf0748b52738de10",
+      "public_sha256": "bc31fa42b82f91a08b9314c8676a5078610f0db812a92efccca54d7b39338e4a",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-baseline-2.json",
+      "original_sha256": "22259266502a75814b68202770c0416bed01de233d888aacc13785b5cb4b6b19",
+      "public_sha256": "2ff6b10d138804c6b9bbcb83bec4588a2b7fd33fd4fb8faecc1726f9ff730a0a",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-baseline-3.json",
+      "original_sha256": "194fdfce69909b728904886d7627f4924ae8d6a5943f64aaaa909d1198eeb203",
+      "public_sha256": "ecfea767d377057022264151f4e3c14b3cf92f58ed4d8da82f4fcd7db1f226a3",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-baseline-4.json",
+      "original_sha256": "0aa6ae85f7ab9ddeca6a335e066995cb052911c8ff97732b29fb68c6246ec1ea",
+      "public_sha256": "51b7e9e9c73c06c0d72903cf10ab3bb762ac26450b2dbebe342f4eaf7eb9238e",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-baseline-5.json",
+      "original_sha256": "0fb9deb0c72e0a12bf8b863189cb767e1833b73c70146373762d8248d47146ad",
+      "public_sha256": "27e008657394a140cd13b49fb3f863fd46b9f4366126b15de7f4a4cd6e06bdb6",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-baseline-6.json",
+      "original_sha256": "2fdd2981f706b6cd25a400c9d41ac10d4cdc793d434e28fac0496e1364333cad",
+      "public_sha256": "a1d09a7dc66b8f71bb2746b17017f38b79c7ab3ea253c325c1b20976b1b2d21c",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-reuse-0.json",
+      "original_sha256": "288eee35a8dddcbd7bbd8d3a4d510df7793866ec8509fd6c02b812bf81bbefde",
+      "public_sha256": "33ab7ab060f455e00adefe76ad857a436fcd7745b7fc0cb69b3c6282ccf6cd56",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-reuse-1.json",
+      "original_sha256": "546c0292d9b84b38f6eb78ddcc9b58229959bbdeb9b1761d454302f74183a2c7",
+      "public_sha256": "8ceb3edd9a993bf7f350e74fa23948717901c196e5f1c684633e934e1af484cf",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-reuse-2.json",
+      "original_sha256": "88ee0864e2a112c0e05caf8feb672d582fc572248066407046b63ec52e6a3b7c",
+      "public_sha256": "a6209e8ba4c46ea26543430c786261a9970efdad33c878b0fedf0f1d893718f8",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-reuse-3.json",
+      "original_sha256": "2aefe97862e16d897b466cff9de786df3be94a0c7168ae0ae6e576fe838f238e",
+      "public_sha256": "551902deaeac2737ef7e487c4a9ef5401cfc46840d1c9ca8f0b94e1a1e419bc2",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-reuse-4.json",
+      "original_sha256": "c7f65b1f4f312a1cb15c04227f6183e8ac5f6fdd1a6fef6ac0c17222e9c2f007",
+      "public_sha256": "f5fd617c00697ed3eb386a28f78d87f7273c793d367d324f5fbff1cb68a68230",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-reuse-5.json",
+      "original_sha256": "1482389fcf1b30bb777a5b0cb0bf6a7bf3811c8f1883400d2815b9c13d8ad572",
+      "public_sha256": "8d397bb06984b377cc9ce7d826084729bb36cdb90023cec8139d6582f0c1edd5",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/jobs/profile-all-20261008-v3-mlp-reuse-6.json",
+      "original_sha256": "af3a59f89861a17851066234400e04d0fba9ec6428deaf16f6d012fb56236e41",
+      "public_sha256": "ef931e507139f29f24c21c76300a0ffc2f47688e199cb1bcf87d15221956f7b6",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-baseline-0.log",
+      "original_sha256": "85c87d87166c891d014a2b8bf6cad5b8a2c18d87ea285a9fc3004548d7bba090",
+      "public_sha256": "85c87d87166c891d014a2b8bf6cad5b8a2c18d87ea285a9fc3004548d7bba090",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-baseline-1.log",
+      "original_sha256": "e40c180a9627af67a6fb0c7974741da098a3ac93eb312e4a3fa8385f79154c50",
+      "public_sha256": "e40c180a9627af67a6fb0c7974741da098a3ac93eb312e4a3fa8385f79154c50",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-baseline-2.log",
+      "original_sha256": "9bd0cd63a2cbeedf5c9a251919a75d10b5587065fa6cdbb7453ec1003d8c5e58",
+      "public_sha256": "9bd0cd63a2cbeedf5c9a251919a75d10b5587065fa6cdbb7453ec1003d8c5e58",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-baseline-3.log",
+      "original_sha256": "d09577f95a2085305a51f5b1899905340e76e20540f2386583dc6f3c72f3fdfd",
+      "public_sha256": "d09577f95a2085305a51f5b1899905340e76e20540f2386583dc6f3c72f3fdfd",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-baseline-4.log",
+      "original_sha256": "ed2d9195a483a8124c197c24e53d9f331ccbea5652c71c6d6ac761302a833e0a",
+      "public_sha256": "ed2d9195a483a8124c197c24e53d9f331ccbea5652c71c6d6ac761302a833e0a",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-baseline-5.log",
+      "original_sha256": "4e9c5bd28b83b84401182e74f0bc4b064c0fe77d00fa3ea1b490bed3e9f59c21",
+      "public_sha256": "4e9c5bd28b83b84401182e74f0bc4b064c0fe77d00fa3ea1b490bed3e9f59c21",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-baseline-6.log",
+      "original_sha256": "1c1002a8a08cfa8797737803b74f0d295c3c22c1b425f72874557090426b66cf",
+      "public_sha256": "1c1002a8a08cfa8797737803b74f0d295c3c22c1b425f72874557090426b66cf",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-micro-jetson-agx.log",
+      "original_sha256": "51f384e0ed358cd9958bc5db330f2549a3e757104640264854372944aeec7556",
+      "public_sha256": "51f384e0ed358cd9958bc5db330f2549a3e757104640264854372944aeec7556",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-micro-jetson-nano.log",
+      "original_sha256": "acf9836fb5d9c559b56f57f220f9c481a443b28cd3e2985e2ffca7b3fa7b2275",
+      "public_sha256": "acf9836fb5d9c559b56f57f220f9c481a443b28cd3e2985e2ffca7b3fa7b2275",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-micro-rtx5060.log",
+      "original_sha256": "0114717316a0f6df25b18194a038acffefb70916b008142caa664807372adff3",
+      "public_sha256": "0114717316a0f6df25b18194a038acffefb70916b008142caa664807372adff3",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-micro-rtx5080.log",
+      "original_sha256": "e26b1258541f316b5f8145bb8395f5da7f48d7595a1447c8d2ed1484e6da851a",
+      "public_sha256": "e26b1258541f316b5f8145bb8395f5da7f48d7595a1447c8d2ed1484e6da851a",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-micro-slurm-orin.log",
+      "original_sha256": "48aa0e6baa56c212881464dd47ca22cd9d0820bff02544d2d520c7623e7f8d82",
+      "public_sha256": "48aa0e6baa56c212881464dd47ca22cd9d0820bff02544d2d520c7623e7f8d82",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-micro-spark.log",
+      "original_sha256": "e1d2278142b9678095361366daa68fb1015db5ddbe70a0232c054a20ee2d7073",
+      "public_sha256": "e1d2278142b9678095361366daa68fb1015db5ddbe70a0232c054a20ee2d7073",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-reuse-0.log",
+      "original_sha256": "a3866ad51cf98eecbfae0c1b558fc2cfc0f602ad28f75f949791c1dc42c5e139",
+      "public_sha256": "a3866ad51cf98eecbfae0c1b558fc2cfc0f602ad28f75f949791c1dc42c5e139",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-reuse-1.log",
+      "original_sha256": "d0f051b74541c4aa75ff068efc8ae6f4626445f252848c4569e4df34f4b0ea98",
+      "public_sha256": "d0f051b74541c4aa75ff068efc8ae6f4626445f252848c4569e4df34f4b0ea98",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-reuse-2.log",
+      "original_sha256": "4fbab0a242a3e49264e3b9b3d1c29270cb1de9850b6a9982612a2ef03d36fc6d",
+      "public_sha256": "4fbab0a242a3e49264e3b9b3d1c29270cb1de9850b6a9982612a2ef03d36fc6d",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-reuse-3.log",
+      "original_sha256": "0eba0f98acbce6f6cc1fa623f6f0a8881eec68ebf7fc6b9f71f51beaea03afd3",
+      "public_sha256": "0eba0f98acbce6f6cc1fa623f6f0a8881eec68ebf7fc6b9f71f51beaea03afd3",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-reuse-4.log",
+      "original_sha256": "8147745c6e80908c26d31c8126ff9cbe3b61311eebe4d577602009a1bf98db95",
+      "public_sha256": "8147745c6e80908c26d31c8126ff9cbe3b61311eebe4d577602009a1bf98db95",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-reuse-5.log",
+      "original_sha256": "5b36c9db17d63335da4cedea4f0cde22bb557d2bdab605b55cea05d101dd5234",
+      "public_sha256": "5b36c9db17d63335da4cedea4f0cde22bb557d2bdab605b55cea05d101dd5234",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/profile-all-20261008-v3-mlp-reuse-6.log",
+      "original_sha256": "3e3ca4e7baced70060719991eab094c01b132fe68683bac2d890a6177c456f6f",
+      "public_sha256": "3e3ca4e7baced70060719991eab094c01b132fe68683bac2d890a6177c456f6f",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/logs/ra-all-intel-mlp-micro2-20261008.log",
+      "original_sha256": "8fce9ba6cd890763096e36ed7910008b2d87862048a57f84c0a43140cac04faf",
+      "public_sha256": "1f39144e37bec731a95395d4f7fb9f27bcdc97c576559a55f3d394045be43169",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/main.csv",
+      "original_sha256": "ca41412d6a429166ea6dcd9970589a758733ec7bbaa90e5d5cab3ebf1685bf78",
+      "public_sha256": "ca41412d6a429166ea6dcd9970589a758733ec7bbaa90e5d5cab3ebf1685bf78",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/manifest.json",
+      "original_sha256": "e9dc11e6a35afe7fa66f81e28b5831442bc960c214146e6eaae67d60f2710669",
+      "public_sha256": "e9dc11e6a35afe7fa66f81e28b5831442bc960c214146e6eaae67d60f2710669",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-baseline-0.json",
+      "original_sha256": "4d110cb596c656cde4ca31244e50044e6b23c8c9cd259873849b707ef2c1c197",
+      "public_sha256": "a309632d0785db19df69778c0524a0e2cbce11a4f8b9e259715d92c9c4267af5",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-baseline-1.json",
+      "original_sha256": "63edc3884fca50b7677199f840881b95178a6bafe4d79a67326c2d85517662a0",
+      "public_sha256": "bfacbb86703833a25f04e9151efb695ca9781eb0cdf1c6156cb0b794199540cf",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-baseline-2.json",
+      "original_sha256": "ae9fc8e725b5c7420828e7b5806ffcb7bb68a023c7591eae5a5dd8dc5b39e554",
+      "public_sha256": "3103e87f79ad84722997f0d88e7bdaddea7d05b80d39062b2b37f9a0cbf87206",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-baseline-3.json",
+      "original_sha256": "cf111d16eac726b7a91ae76e459511fdb8f59a919eab5ca4da630b7a566e815b",
+      "public_sha256": "4be6c63694e4a8cd5d8e88161bb04fa1971eafa31f9eb7d04c1c6ffa1121c8c1",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-baseline-4.json",
+      "original_sha256": "3ba406609c551ff0c0a305ac9e65831e8dc926039647f8d7d34b60ee82a906b8",
+      "public_sha256": "428cf6d4a0420821df6bfd66bd0ba891e173d8cb022407b4fa80f9a57fcc1860",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-baseline-5.sbatch",
+      "original_sha256": "0f3fd8f5c15f989f13b3aa1362d58c6522b8e76edf0be99dd6b84e127b9ac684",
+      "public_sha256": "0f3fd8f5c15f989f13b3aa1362d58c6522b8e76edf0be99dd6b84e127b9ac684",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-baseline-6.json",
+      "original_sha256": "a667129b03e67e762f089612736bcbb70a4f6ee13012d5a8840dee5b74da7918",
+      "public_sha256": "ebc765fe81b7c2599afc15f063657565517c3ded9d149a5320ed435559a13a62",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-micro-jetson-agx.json",
+      "original_sha256": "16edca8c45ef9b466678b05fa4c47a4d9c08e4b84d1baa66409c9caad09bcbd4",
+      "public_sha256": "2a14fbe260adf3672215edc1a5e1076649490eddf986d604a350b73b8711ec82",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-micro-jetson-nano.json",
+      "original_sha256": "b832b5b51ec55f5bc41cfbd8fe362713c1b87ee9832548933726f082ee5b314d",
+      "public_sha256": "92e36b45d955b1e679c0b02eb4c2682c948f812a213988b901a808818ed198d2",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-micro-rtx5060.json",
+      "original_sha256": "2ef16b088733814f22198d16e9909b5d50170228925a28e541dd20f5c36e3239",
+      "public_sha256": "88281f56a1bdbe229979458f012301e0350113053fca3430a6b3a21bcf9dcee5",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-micro-rtx5080.json",
+      "original_sha256": "42b2ece27e7c2bd8ef7bce89699e31c475b3eadf35af5eba821a5fd95ec84135",
+      "public_sha256": "84ef0ec7d30abcb837ca42f896b7895f6d849c3597c7e06d0218651d22582ebe",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-micro-slurm-orin.sbatch",
+      "original_sha256": "a932a7aee6cf451a7b8c10642a47f27608d5f8f9b056e5b4428bb361f3082367",
+      "public_sha256": "a932a7aee6cf451a7b8c10642a47f27608d5f8f9b056e5b4428bb361f3082367",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-micro-spark.json",
+      "original_sha256": "7980f679a8795624d95cf1c0714a76c7689634ff56cd370e2f4e1454c497b131",
+      "public_sha256": "e64aecc318c59df98f2205301980729df91f6428d526e28c2611a12813d24971",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-reuse-0.json",
+      "original_sha256": "e637dd9618882a700ce8d7ec0a5a2d6a223768ce6f0e00bfff36d7844c507550",
+      "public_sha256": "f2678c8e2fa97b1d78df8831898c19fe5e18f9c33e0f9dd2b326a26ee410990c",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-reuse-1.json",
+      "original_sha256": "1dad370d3ddaabf8845f01a5ad5bbf6470d24a5aa42a2091ba93288ba6a68b26",
+      "public_sha256": "4b4a6b97d096057b7e002037397cb521621d9f46fba000be3605b42e7a5e194c",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-reuse-2.json",
+      "original_sha256": "024bd60944820be8cd861fb4d96fdc722df63c1d24749f0bd91cd7b79789522b",
+      "public_sha256": "653fa32daf52a477ddb6c043306ee27feebe6b8328dfdb129bae3aac5fd8c528",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-reuse-3.json",
+      "original_sha256": "e46572fe23a5c24b207ad9bad7f5647f272e12584fce9093cfb764c3b9b0d16a",
+      "public_sha256": "e955f5518121e4462263b7976ca54edcbc1b2584728dd399c88ee4e8501e1e7f",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-reuse-4.json",
+      "original_sha256": "8621cda604f13b67a80f752fbd898473a14c723d2297dcb9b38ab987e677be1b",
+      "public_sha256": "b324bf9a330761640107e1354506f4cb481555f1fefc7fd61690aaf7bf045246",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-reuse-5.json",
+      "original_sha256": "eaada11e2eaaac4d77ce47e0a4f1122fc6f59ab2a7e0f8b6ceda9de8c89dbfc2",
+      "public_sha256": "b7ea8e68b2935ca9da9ca9e9e5d1103974cc38642683438a523941246307a8ba",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/manifests/profile-all-20261008-v3-mlp-reuse-6.json",
+      "original_sha256": "abaa4ac6fa7672e29232a115ebcc3b862781c793bea2cf50d3633c7d14f8de44",
+      "public_sha256": "c8428a7e75780b7e5513768356d4c8fc5bbe40124496eec15c2dfdf9f7e2541e",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/native-preflight.json",
+      "original_sha256": "2794d6b41f9e003cd364e6c1c9262f55176022f6b9bfb7a51e7d0f47a5a7c212",
+      "public_sha256": "39812bb5bcc68b50e7fe3337173e1deb1345d6b548fb8441605d31ffc5cb5912",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/plan.json",
+      "original_sha256": "45513bd5d3747d69cbcc10cc3e84965cebdd3dc85afe7139adab746cc248618f",
+      "public_sha256": "c678646e41825044d05bab15296064ed0cf6d992544b7a2f0760f519d24ce70a",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/qualification/intel-npu.json",
+      "original_sha256": "28ded8e4a5836152bda1d34604344712556077d305c4944e9e108e63abda086d",
+      "public_sha256": "f032e61ca1a2a0b77a1f0337d098683fea1c22a281d3a47e97e709a577b6d91b",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/qualification/jetson-agx.json",
+      "original_sha256": "ed2df92747ebbfb1547df9cb9c38c381f373aa011e26ff09385a037785494dbf",
+      "public_sha256": "b2918a1bfe45978bf9ec277a260e98ce4413a852ab12b95563e5fec4709a220e",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/qualification/jetson-nano.json",
+      "original_sha256": "857fa86250934c460b7c647ad754407db2e79ac1dc7f9c128caa55158b02f45f",
+      "public_sha256": "c458311fc44a338e82b42f2d3de0801a252c5d61f4875dba190b1ede291b3ab3",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/qualification/rtx5060.json",
+      "original_sha256": "4be519e84e4e1d0e18d52b47fcf8ff9042f1a93d7d69128f9bcf09a28adb7db2",
+      "public_sha256": "ff9af35fecaef5d8fd9bd6af253c5fd6624a6710fc6722ecc23695d5fe9a96a5",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/qualification/rtx5080.json",
+      "original_sha256": "a766977aa19c7014cdac1ec3c20a46c5d85f06f3f7432a9b729c4b90ef4e2fc8",
+      "public_sha256": "d1901722223fafcf724f96317407048061dcdf2486f9c2fff36a8d4db7123d58",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/qualification/slurm-orin.json",
+      "original_sha256": "b7e510aa7dfd5889ea0e9d248151bf9983da4738004771aaf4cd24aeea06a6fe",
+      "public_sha256": "b01fa0b626df810607111a98227ecc9807732f71843b21c940a9ccee9d1e5c5a",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/qualification/spark.json",
+      "original_sha256": "c3508a041cbc49d1751aa1a0a5ef8ee57af0bd2d5ca837f24ea858732e59f82f",
+      "public_sha256": "7878f5b830d22d8ad86600322a6b0cb7f24057db0fe0ddc19c9d3e350f80ad54",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/run_profile_all.py",
+      "original_sha256": "1df9691e507db21ff587e5e8b1939e72f8f9dc10092bc8b5fecfcc5145dc1011",
+      "public_sha256": "1df9691e507db21ff587e5e8b1939e72f8f9dc10092bc8b5fecfcc5145dc1011",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000000.json",
+      "original_sha256": "112f7425a35acb580842ea6e5ce260dbffc403fd7efc7451cfa2cb8d75715a9e",
+      "public_sha256": "b312af50090f335f39d465e777908e41dacdce0f0452ce675ccda91060a7efae",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000001.json",
+      "original_sha256": "5ca200c323a6141457b4a551b976f419f7478fb92b29c200ef2568cfe09b9236",
+      "public_sha256": "29beceed83c05e2cbe62f5eb3a09f0cf6a1df31d0dde7e409f49746107415250",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000002.json",
+      "original_sha256": "9ab33adce685f9df3a3ad79b80aa2d63aa077c19cf39fe15312a0545810cca48",
+      "public_sha256": "b8215f81a09456fb0059518a7da24aab24d237f731c6d2d024ac74aeeb8fef2d",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000003.json",
+      "original_sha256": "d81c72ada9cf57646b2df995cd9cb1dba3d94415526efaf5c00803fef3fdec6e",
+      "public_sha256": "a8030b32799d0650b113cf7faf8f7af1a95bebb893ad13aded2160cdd5cf0b48",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000004.json",
+      "original_sha256": "2f20d7bdac2de92edbbc8dc127dc1353b8b5f305086217010fce5993ff20104d",
+      "public_sha256": "14cc385c3981eaf06bfdbbbd7b65d21ae7133a39b7c8f1a2bb32913a16d19061",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000005.json",
+      "original_sha256": "f7933bad3adda1fa90bc85a39f151182214e854c0462c92ac5cf2b5050e5b798",
+      "public_sha256": "c18027b6cb98f10384a95a53a2359f2a2c8def10ff6b1baeffab4093461b52c3",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000006.json",
+      "original_sha256": "3974b8a6bef553a45ce466499ebdd539889ff0f3603d7bc3f0608abd0317a47d",
+      "public_sha256": "187db62c1022102e88b3955a2747a2c0057c350a2b68e9f0969e503324d6101e",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000007.json",
+      "original_sha256": "0822df4a48a113dd6e36b484244b6c46a74f764e206834bf2a4b61eb28e0388c",
+      "public_sha256": "03777f64890efae718abc16405fb96f71c0b55ff62d8285b30c1600238c9a184",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000008.json",
+      "original_sha256": "d0fe7b20f3ecde0c13616868449e2b73146232a71c33af45683c170130987e2a",
+      "public_sha256": "9716434c8357fdc79f1ab3307791c7202a280da4849619f8c6125a2bc1f72ba6",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000009.json",
+      "original_sha256": "31d18564eeb2b7fdd0a5fae1f65bd4dd4f7ca26db96c7070a5075c70077581ca",
+      "public_sha256": "df83bfdaa6d383616e413f751f90cb103c7d7e823ec9d7d4c395fcda69a5d9d0",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000010.json",
+      "original_sha256": "6e8ec71d6368bed01bb4604a42b42dab2d2abbfd0806cfb95488b41ab529977c",
+      "public_sha256": "9cbd164a3f91d976d62e1d31e47ec23772aeeb06e4e0d63f0db30cf9f8059a90",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000011.json",
+      "original_sha256": "9763a7c9e9251014545f0fb23ef0e006481b7ce43c0ad0498352de5f759d7f6a",
+      "public_sha256": "96e33e4f747e59cf3565e046f7a32fb0ae8854faf00381a9f889b2fdf69bb79c",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000012.json",
+      "original_sha256": "7c55349a37ccf4f483981190ca2d13c6ea5df9d2d854a30530cb519a3316e3f5",
+      "public_sha256": "722af50491e68cf2e66fad577909fe070ed75c64810811dc1a8977e9f23fc3c3",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000013.json",
+      "original_sha256": "a2fb1c6e9ca489b73539a8c30d195d67312cf2d9ef5c93f211e2a3abdff81d1d",
+      "public_sha256": "c0d5a98ffe5bb187bd8cbd02d06e8aca00698974b4d1cc9e31c202b2ba49f314",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000014.json",
+      "original_sha256": "8c958e9265f0bec2e9ab129341311045012d7726c46f54c0d302b8fbb63e8f54",
+      "public_sha256": "5f7572280356eca5bc953e8b7e782916fc7d38a6e443b9bec72e3de55bddabb2",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000015.json",
+      "original_sha256": "ed1b976935644d0352c1d1db92c810a680e709ae1d84e33bd33d476adef12dc6",
+      "public_sha256": "574739a86f9ca9a39c36a8570f17aa6f8fb9d5de92dee4ac4d6b8ef16a08dbc9",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000016.json",
+      "original_sha256": "f296e30517aa4ea995544d1aafcdad1dd2fcb9becae9276440be454812d9760a",
+      "public_sha256": "8d20581792e87c0b9c955c6962b8a0c0fc5d68fa28c6cc7fe24c3aa937eb2738",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000017.json",
+      "original_sha256": "642f62ad3606c4071dfa0df84c13a73351897529a05e53395a9c4da17f9293bd",
+      "public_sha256": "23dc26e5ce1cf33e514131e430dd8e48332f8806e387e979b0edfd3328db37f0",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000018.json",
+      "original_sha256": "43e8cbd9faa9139953afa487987b5c0bcd31fe23c476e6da929bb2509699cd1d",
+      "public_sha256": "da66101779691aa82321ca92fcf3ea4d8b727b6bdb34bb4e03169958346ffef7",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000019.json",
+      "original_sha256": "789ce6146716929b5561727fcb71c5be33024f75f32be5d31121949c5d361ec2",
+      "public_sha256": "a901235b353fa3aec64e2e148abd2454a89e29f20014ec4525d8663aab3b0f7a",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/000020.json",
+      "original_sha256": "5f091c2e7bb48f8365555d3e41551c2f0385fc3c7b6684a8d207823c028478f3",
+      "public_sha256": "32b3b79757c7cc4349b221d5da219684f1cb9b0f5ddb8d9a058381c8dff5f567",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/micro-0000.json",
+      "original_sha256": "3acd8029209ff139bffae83070f2d942e8f5fca39fb5a482960fe3eee9447d23",
+      "public_sha256": "d5e73ca00a0bbbd5fa4492138dd13e5a197728aead29a920ce6b743cf35cf345",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/micro-0001.json",
+      "original_sha256": "05e8896bd19d074c7562fcc630af0767147641a0bd9531939dd3222ba45ce1e1",
+      "public_sha256": "281f72d69cebf63e794e0f5419a7d060fb4ae82a2195f53d81a3907b97de99d2",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/snapshots/micro-0002.json",
+      "original_sha256": "69a6d05b3d0e618b6283acbfd1762402646c0a34bdebd72ead966bce85c05dc7",
+      "public_sha256": "da8e1b2db4914d3cfe1a69ba7ed3a496f18a67228799a1d4588e644ad42b0fdb",
+      "scope": [
+        "private configuration substitutions",
+        "foreign Pod configuration projection"
+      ]
+    },
+    {
+      "path": "mlp/source-preflight.json",
+      "original_sha256": "e8e97d67b8942e36d26e2670d3d6919c89b37de623b3f1ae8a747f441c25398a",
+      "public_sha256": "89ec95c6cd678b016fa62c3057a62353180353d21f7f843d720d4220c3521960",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/source.json",
+      "original_sha256": "1097a391d3f482b7b733165f3db8319bdea0c39547c4885e29f5ec1377ee285d",
+      "public_sha256": "1097a391d3f482b7b733165f3db8319bdea0c39547c4885e29f5ec1377ee285d",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/summary.json",
+      "original_sha256": "448dad6aadc974f72e994ae6addec8ddecab363727c25cb2f5996f0a20828b75",
+      "public_sha256": "448dad6aadc974f72e994ae6addec8ddecab363727c25cb2f5996f0a20828b75",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/templates/f0-jetson-agx.json",
+      "original_sha256": "5daf9a9985b6767c172c3d2a41551acf6c7fe7cc9e04d014bcea13d10ba72339",
+      "public_sha256": "e0ac62223ccb611f8a793ac6278ed01fbb0f741fbf827b5923f8a4bf7271a7e0",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/templates/f0-jetson-nano.json",
+      "original_sha256": "014f9ec63f62ef7ead957752386d86622b0c6f3c5de31a740569a9176e21a7e7",
+      "public_sha256": "665c88f4eb5553bee4589a6edc927fabfcdfba74dc6e386c79314e766b51a67a",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/templates/f0-rtx5060.json",
+      "original_sha256": "211d7227dd59086c4bea234813cdaa70eb019d97d9b9d973083f942005644212",
+      "public_sha256": "e7ff4f017100d22522d8a033897e4a0a8ec4281b53e73a73957ff097f23f1ebc",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/templates/f0-rtx5080.json",
+      "original_sha256": "1069b384ce4f7edea7d1a7390124e82fa0fe30d89d6b915315bc439946ac6aae",
+      "public_sha256": "9d64522492b61a685f375f25b4b83614fcf76fe5fafcee957b26d79ef37e24df",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/templates/f0-spark-runtime.json",
+      "original_sha256": "06b123262bef92026c021067e34ebccd76d3490e32471b621f2358603894d87f",
+      "public_sha256": "13443139155f91f85783d8990da079e6ffe4da05f77bad9b92950dd24bba0957",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "mlp/templates/intel-npu.json",
+      "original_sha256": "f57b4eafb9e3ad4d7dd183be928d6de8c97f01dad54d655ed3528a2c585a39eb",
+      "public_sha256": "8c4ac1b19b6c5b4e0fc093013263471c977b5bfbd6b3e3bbc2c33209915ee67e",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/capture.json",
+      "original_sha256": "e856267e87b2e1402c5891a9be3b2a7ce07755a7bb91f4c0a3de38e4a9cd152e",
+      "public_sha256": "716c2f2f80677750e29670d9ebd8fe5d4a1ca07566e4b1b407dcb561a38ae818",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/checksums.json",
+      "original_sha256": "dacc235e2292ddb44919ffe75536698d97dc10c3cb42a8356b6ba5d7773a134f",
+      "public_sha256": "dacc235e2292ddb44919ffe75536698d97dc10c3cb42a8356b6ba5d7773a134f",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/cohorts/hailo-profile-reuse-intent.json",
+      "original_sha256": "92ca41534338bef72b29a039366dc306a64c29e135202914571dc95a344ac626",
+      "public_sha256": "92ca41534338bef72b29a039366dc306a64c29e135202914571dc95a344ac626",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/cohorts/hailo-round-robin-intent.json",
+      "original_sha256": "a1e5aac15c0030a21b32fef2176be8b2f37686752ae6d3966d6cf3f7ce2c6290",
+      "public_sha256": "a1e5aac15c0030a21b32fef2176be8b2f37686752ae6d3966d6cf3f7ce2c6290",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/cohorts/mobilint-profile-reuse-intent.json",
+      "original_sha256": "76b36cd3f076bebc59c1cc54cfebb8e4fe9aa42bc5a171c52bfcc7bfc1b6b23f",
+      "public_sha256": "76b36cd3f076bebc59c1cc54cfebb8e4fe9aa42bc5a171c52bfcc7bfc1b6b23f",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/cohorts/mobilint-round-robin-intent.json",
+      "original_sha256": "e8542f108a04b34506e53c2fe22265239f0782eb472afa6f40afd42b43486a50",
+      "public_sha256": "e8542f108a04b34506e53c2fe22265239f0782eb472afa6f40afd42b43486a50",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/cohorts/rockchip-profile-reuse-intent.json",
+      "original_sha256": "647f5e2a2b6585f079d1e205a718e9eb77972c2c2271c207adfc0e8706c9e65b",
+      "public_sha256": "647f5e2a2b6585f079d1e205a718e9eb77972c2c2271c207adfc0e8706c9e65b",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/cohorts/rockchip-round-robin-intent.json",
+      "original_sha256": "72ed91ef01f6c4f25723693141647494864bfede82ad54cc166649a2dcfa4206",
+      "public_sha256": "72ed91ef01f6c4f25723693141647494864bfede82ad54cc166649a2dcfa4206",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/corrected-rows.csv",
+      "original_sha256": "0beef61264c351ac88e0656f4e8289b3b85e291c9d3c771c3cdeb89cba4d0755",
+      "public_sha256": "0beef61264c351ac88e0656f4e8289b3b85e291c9d3c771c3cdeb89cba4d0755",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/corrected-summary.json",
+      "original_sha256": "9a39273eefc10ee543d127334965d2031f2b57fbe2478cf708ed2ca5569e1c6a",
+      "public_sha256": "9a39273eefc10ee543d127334965d2031f2b57fbe2478cf708ed2ca5569e1c6a",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/experiment-driver.py",
+      "original_sha256": "12841db42b0c4cb5c3c1e30d5690f97d2b28cb89719633afe9ba2f312e84c4c8",
+      "public_sha256": "c6d758e1cc6489ed608d46d1c1d272ffd00c8220b920e1edef38c16e9a0b07dc",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/frozen-profiles.json",
+      "original_sha256": "8f9bffc3ee858b06dd473f85741addc6b7fe0978f08c9d56c43e487020910820",
+      "public_sha256": "8f9bffc3ee858b06dd473f85741addc6b7fe0978f08c9d56c43e487020910820",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-0/created.json",
+      "original_sha256": "a3b86bce34a5f7ad42e826e2754a6d8f4bf22565b5fed8d005633fc3e655d567",
+      "public_sha256": "fb4c8151cad88444a669d8924c88bb9d7183dbc20861300a38c6e50fb902fc02",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-0/job.json",
+      "original_sha256": "6df1252a3522bb0968f792333e5c667cd62715f68b3dba02fadc1b6fdf5e8d0f",
+      "public_sha256": "b22e574e31df0a1e53e5b9617eda178d1fb895fd78e193fa933ee7a21a5101a1",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-0/manifest.json",
+      "original_sha256": "630b500144624686022ec86e0cec7f23b689162d6ce804a2c476c6b37775a9c9",
+      "public_sha256": "94d0ca8dfeb9db450a40667a5855ba93ea728a54ec50ca7fce6a6939f092f2a2",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-0/pods.json",
+      "original_sha256": "bfa135c2d8e87f63c4270095684b10d0a17cb55f558f7a350d5abd722f901e02",
+      "public_sha256": "a5cb1fc5f61e9df7ff5ee53ecc462ba7c59b6674d1bc30928403a2ecf831b107",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-0/profile-all-npu-v3-hailo-profile-reuse-0-shxpf.log",
+      "original_sha256": "f0a2c5810b13c8713e6291d31ac0b8c2995b48442e34072ab654e2bf36097f18",
+      "public_sha256": "f0a2c5810b13c8713e6291d31ac0b8c2995b48442e34072ab654e2bf36097f18",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-0/result.json",
+      "original_sha256": "d245f6188e876cebe642afcda0ea0fadc828d9cc7441b43303238ab11cae8eb6",
+      "public_sha256": "645659b6d006cc8a4d6a76dc923fa67ab434e13274431077f74b424d050d8edd",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-0/submit-intent.json",
+      "original_sha256": "6c2015d19438a5aaee63a1eb3ede34935efc16548bed64519f7d6d21790b356d",
+      "public_sha256": "6c2015d19438a5aaee63a1eb3ede34935efc16548bed64519f7d6d21790b356d",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-0/workloads.json",
+      "original_sha256": "19a88b95cea7df06121b865d2a6c0484a14894088ee17b86deb0bf71fdad5a87",
+      "public_sha256": "1bca647f491435504ac1c6abb5da7f14c13c0f56ac01b26d593cb9c476c7b9e8",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-1/created.json",
+      "original_sha256": "5d6828efcc1ba4871161ddb7c136aa41cf27a302d3e48acbebf90bbf8c2a7ff4",
+      "public_sha256": "0453d249fed4b54bde42ff95c66e02aa716b449fc6f6a33402de28bf8b3e68a9",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-1/job.json",
+      "original_sha256": "a14d41be53f9767a34fdd23cac536b98b7fd76a4358d87b811d8e58d5d4aa5d3",
+      "public_sha256": "2c821cbfa276953191762f0fb9d8131c36d0785ac03db46426a771d32eb40e88",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-1/manifest.json",
+      "original_sha256": "5f94f29a4d843e64d111e083c948474f3d529cda54fb3c240ffbb2678ac3bf12",
+      "public_sha256": "e13a7f7ebc9c3b2740bc485ce68635673c2215196c4e89a09d3f29ad108455f8",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-1/pods.json",
+      "original_sha256": "85054a77ceb8b4bc486410c7a5c9ccde9ef22d1aefc119f73b5e012ad98c5478",
+      "public_sha256": "503635bbff2d990ef7f8a5ec6b348e63d182a78e7521cd62ce365cf01f6e9e32",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-1/profile-all-npu-v3-hailo-profile-reuse-1-49rmr.log",
+      "original_sha256": "2d5cb409f9b90fd2627507281b67de3dd6b44afc812fa03ad1f9b0b2f0f93baa",
+      "public_sha256": "2d5cb409f9b90fd2627507281b67de3dd6b44afc812fa03ad1f9b0b2f0f93baa",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-1/result.json",
+      "original_sha256": "57bfbbf887d8eb664c021dd028cb973054d47f4a62f0bcc3d703fb574ea44b90",
+      "public_sha256": "b6f533890c864a1c387bd999675b65d97ab809446ee04fc7e2059125bce111a0",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-1/submit-intent.json",
+      "original_sha256": "a949c25b9aa4e333e150e74d12b0a1e7bd357c90d8e573301c7314d956e9e355",
+      "public_sha256": "a949c25b9aa4e333e150e74d12b0a1e7bd357c90d8e573301c7314d956e9e355",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-profile-reuse-1/workloads.json",
+      "original_sha256": "033a003c2f500408823466838b27371b2ccc9872e12c5d67c42d61a687de30c0",
+      "public_sha256": "2d6b53c238d88854947cf5cd2464f6dfc00ee9b8c149d049b5a5e1a3ec8d6061",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-0/created.json",
+      "original_sha256": "51f7ec8da8c2df1710bdf8ed1602eabaf19ccb1dac0de0dc8bdf208ab324844c",
+      "public_sha256": "f64088f20244463cb1c0bfe7e123d268ea5a450290d8e0bd61e9f5a88e35107b",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-0/job.json",
+      "original_sha256": "8dd490cf7990347e49efa26ccf01d188a2d1893c35e66b888fb5edd0e66148bf",
+      "public_sha256": "46689b2a6b01fc2681548be70b5cb5e376d73608e36d06d6ff5a2ee27f281939",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-0/manifest.json",
+      "original_sha256": "8c282f8e3992cb4ce983318186cd5760de9bbeff460bf2096e80eda197056e1b",
+      "public_sha256": "7038396ff0eaafda6f52019235944e26672d1e2b2b8cbcd4301f855ba63d117e",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-0/pods.json",
+      "original_sha256": "269b190a0387117395bade25cbbf97102ad32a193087700851cee9fac6350c0b",
+      "public_sha256": "7c190f74f6cbd4becac211430b012e50feb8b90f9ae5c94542895dc21e65ec55",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-0/profile-all-npu-v3-hailo-round-robin-0-wmxhn.log",
+      "original_sha256": "d63965a8f16f126f88e7d40c1c8cdb5d353ecc1db0e9427b41b8372e14997d29",
+      "public_sha256": "d63965a8f16f126f88e7d40c1c8cdb5d353ecc1db0e9427b41b8372e14997d29",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-0/result.json",
+      "original_sha256": "05120e27dcdb1f8b578cbb64f988b9288962a6e12d63894b9aabe84ef7ee9799",
+      "public_sha256": "3f5cf2cefd09fac786caa863c1b7b1a94cc6bafcbae37c704a888f4a0906e3c0",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-0/submit-intent.json",
+      "original_sha256": "a77cfe76bba6cb74d5a16a504cb504cad5e9764bf390c5c6e85d124971233849",
+      "public_sha256": "a77cfe76bba6cb74d5a16a504cb504cad5e9764bf390c5c6e85d124971233849",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-0/workloads.json",
+      "original_sha256": "46744fa90b8c8cbd87739d5b9d80f244987bde2c3e4646d0efbfdbabd09e2752",
+      "public_sha256": "5c70b0964405d0c7b9909e7e45593a9843f74616508caa4add8abb5f6d7c5ee7",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-1/created.json",
+      "original_sha256": "b522cf32e5dc75ab58362cd8304fe7a2d89f1ad1b5c0dcdd29d22c084b5e4495",
+      "public_sha256": "620c612d37a4c06fa557cb710ec4fc06b3e543f11a9935080bdb04f503149f72",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-1/job.json",
+      "original_sha256": "fda3d3a0a3863a63a81a020e287ac863621aec554605034b40e1712eef2346e3",
+      "public_sha256": "5e836f4cbb4d9c183b06d51d26502ded790a0ed88bf3a987baf916fc5849217e",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-1/manifest.json",
+      "original_sha256": "235f52af5221974d7e8c3f999168e4e49c40195e74c4019d4a94deca3290367d",
+      "public_sha256": "ad6b3d25e682f6d07428ba8f8a62ba565a4acb6fd012cb1a476b4cdd1104a534",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-1/pods.json",
+      "original_sha256": "cfb97feb97e786fe5830d71e02e3b25e51c7f7d4c527a87c8cf9bedb8302b146",
+      "public_sha256": "b7259d69dcd3b98c9ed8e96436a21e6329d5e4328b9f24e1cfbedfee5d47b989",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-1/profile-all-npu-v3-hailo-round-robin-1-2r92v.log",
+      "original_sha256": "45aa65905872d7acfd438814e71acce3e81297b11a75d3f99c47d66c5b1a8793",
+      "public_sha256": "45aa65905872d7acfd438814e71acce3e81297b11a75d3f99c47d66c5b1a8793",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-1/result.json",
+      "original_sha256": "068a34573c7143f012217e2b50e3a3b667056d42130fd5b8a470fdf5c39b8a8b",
+      "public_sha256": "6cdaef10f18f251974855f7c665832c0601c3ea19f52c6d59dced809ed91c3c9",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-1/submit-intent.json",
+      "original_sha256": "9b371e9b7f9bbd881715fc666979f0a54188b3f2d9b1e16e4ad9f35ef39b6dc2",
+      "public_sha256": "9b371e9b7f9bbd881715fc666979f0a54188b3f2d9b1e16e4ad9f35ef39b6dc2",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-hailo-round-robin-1/workloads.json",
+      "original_sha256": "3065b99af42847a64ad7442e7a978a3877b7005522506b8422a9bcabbc9f805c",
+      "public_sha256": "04cdd1c722c5ea9455223e7ecfd61dc55fd39f6f098a0175829dff9664478ac0",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-profile-reuse-0/created.json",
+      "original_sha256": "7319b2dd59c800e598ea798610d61288a028c6555f86184b8a4fa00fdfe9b5e0",
+      "public_sha256": "21c103e164f95e3580ed1f6ef18a8005997e9cd0c3619d1c0ebdc40dc6e42e9c",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-profile-reuse-0/job.json",
+      "original_sha256": "15eac7f4ef304d1d431e67341047d31fefa1ee873ab44be2b16421cf70e7dde6",
+      "public_sha256": "29c37188c0a73dcb4b7a910c36a6fbc3c7b39954891e0e9f5751c12852cdea38",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-profile-reuse-0/manifest.json",
+      "original_sha256": "ffe443a63863bd19e456f9743df885c8dedb2ea8c68cdd9b7d539f8ce3630d37",
+      "public_sha256": "6d76430270c15f6b511857a2b8b42e49ebbf7d673f71f79c5b9b14c97500c826",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-profile-reuse-0/pods.json",
+      "original_sha256": "b66ca76f5d69924f35591af1a6fbd227318858e01ad59407e944354c0ff7d62b",
+      "public_sha256": "244697920e7a5ca2f09f99413908e9e8fd20a0e9abe72bb9ee6fe940901edb91",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-profile-reuse-0/profile-all-npu-v3-mobilint-profile-reuse-0-zbrd6.log",
+      "original_sha256": "c941ca92f70d612779ca695c8ed26759f807178fa2e74073e722e219479ec244",
+      "public_sha256": "c941ca92f70d612779ca695c8ed26759f807178fa2e74073e722e219479ec244",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-profile-reuse-0/result.json",
+      "original_sha256": "ddf8f3bc0cf5b535d559c9481a544872cf906e98fca62a73637ad4005d54153e",
+      "public_sha256": "841212c4cee53289c6e209ff98d1b1c38774b5594fe4ce5e04c1c464558cbc2b",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-profile-reuse-0/submit-intent.json",
+      "original_sha256": "25b8f523eebd30b6fe3540d6795bfb4e16549089f1ec65a01e9b95e64e7126da",
+      "public_sha256": "25b8f523eebd30b6fe3540d6795bfb4e16549089f1ec65a01e9b95e64e7126da",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-profile-reuse-0/workloads.json",
+      "original_sha256": "9c6cf5d8397084a56bcf58c8a58f1638902602bbe271ed75256dff0aec4a8a3c",
+      "public_sha256": "7b2808b634f1f651d7a9efeac3e65396208b219f914022824d505b8423b4d710",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-round-robin-0/created.json",
+      "original_sha256": "8fa0685453526ebc5bec1313eb20d57937d8585dcaf3db0b36933ee71e8566f7",
+      "public_sha256": "4df038fbede30a4522665bdaf0544dff4817bbfb5a243aefe5ce89d28d420918",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-round-robin-0/job.json",
+      "original_sha256": "f8cfc7073f6cb89db0d3314ad4c87139cf824ee68b56dd23c3db821a3dfea1ca",
+      "public_sha256": "908f5f24ccb9d91cabf115831ff0ad5222157384ff903ff0a523c90cdd6cf9af",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-round-robin-0/manifest.json",
+      "original_sha256": "1669ff46265c09ace23b577458317b628d10d4cd810a340579e4f4f4c9514747",
+      "public_sha256": "4157a9fed4131ebae1c555ef4c8c90f7f4694d2c566b6eefdcd765a1c92af107",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-round-robin-0/pods.json",
+      "original_sha256": "10b13b0fd93001980b545fd4ce84988adcbd4874b43234cd10ad40efaa7aef94",
+      "public_sha256": "4f6760ea699f3b01656adb2da63c3be09133f030ea31e742340672f1bc6d52f0",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-round-robin-0/profile-all-npu-v3-mobilint-round-robin-0-zkphx.log",
+      "original_sha256": "2d2afd0cfec0ab860aba500d7352d928c0e209e1c158d7245e353a881f78fbea",
+      "public_sha256": "2d2afd0cfec0ab860aba500d7352d928c0e209e1c158d7245e353a881f78fbea",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-round-robin-0/result.json",
+      "original_sha256": "135fe4dedeaeb7cac1689a418f7d46c0f5f8ffad0666d4a19cf918c0d5478fa5",
+      "public_sha256": "c5e8763438147ec35679d175c8919d7cafcfa72bc0d1c0b855fe19f4998c31c9",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-round-robin-0/submit-intent.json",
+      "original_sha256": "100a4ca44b5df643b8b1db78088b6bbd3ef7b35d4e3eb83056ecf6971c647b2b",
+      "public_sha256": "100a4ca44b5df643b8b1db78088b6bbd3ef7b35d4e3eb83056ecf6971c647b2b",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-mobilint-round-robin-0/workloads.json",
+      "original_sha256": "51092dd86a1dc915bfc059040add4a47b21e0111ecd21f5582c32855ff6093fb",
+      "public_sha256": "0ae49ab3c96d124855ee0fdf2daedeafa50cadee42d17e125ef337f5aa6ea3b7",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-1/created.json",
+      "original_sha256": "db3a1c316ab6620413cc00003fe10eacad392a12dd080054c2d8dde79984c9e8",
+      "public_sha256": "2c6a4edfeb165fe91a2a19a84088127c8be0d43cfd7d8968f2fd6d0a90565882",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-1/job.json",
+      "original_sha256": "add64b57cb56781e370d9d5b345179ae0cbc1a33eb990185e491e25f51d7e4a3",
+      "public_sha256": "f39952af57f71219e360b3172b1fe9ecddc8f0f94100e0c0ac2536384ea15984",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-1/manifest.json",
+      "original_sha256": "51db73f402c1e47b52765478209267274ac9d0391aa195d99d31ec4d08c24de0",
+      "public_sha256": "bd891fe162c3dd51da642c5ba20e74098329d10a22c04bce7204ab751ec2f4a8",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-1/pods.json",
+      "original_sha256": "d357e2f557cda85ba08177ca03dd098d6f35f207ed099aaeae021d7ed5817f59",
+      "public_sha256": "ef6b9e0a61d0a6c0f77665c3bd52aa20c0449e0d6c889a7a6940861dc67eb1bb",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-1/profile-all-npu-v3-profile-hailo-1-8dhpw.log",
+      "original_sha256": "58efcb9c943962979d03d1bcbdc149d806d498c63e2bea1955785c87f9b2ebdd",
+      "public_sha256": "58efcb9c943962979d03d1bcbdc149d806d498c63e2bea1955785c87f9b2ebdd",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-1/result.json",
+      "original_sha256": "19b49d277160362bd8987c60bad5ee736762647f57b36397f1894e7216d64301",
+      "public_sha256": "90ed020f6bedd901d54f29f770f9e0243c958a8c2e03ba84d8cbd25e919c9784",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-1/submit-intent.json",
+      "original_sha256": "a61522c4dc4071e2f2f1dbcc3396e743366fbd67c6f6d997f717c369bc0cbb56",
+      "public_sha256": "a61522c4dc4071e2f2f1dbcc3396e743366fbd67c6f6d997f717c369bc0cbb56",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-1/workloads.json",
+      "original_sha256": "7f1581601b5f3adcc5ba2989b9e57e0624276086f4c6bf712470670d3566fbcc",
+      "public_sha256": "6779f06a7d23c5cbecac565464881246404592805c16f44b453bd9f58e910c14",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-2/created.json",
+      "original_sha256": "58215a411543f52c7873949e405334c91bae3867557ea50abc143db8b7fc2ef7",
+      "public_sha256": "ebbc61bfaaac44abad10b7ae7fbec9cb9d6b671d1f98023f2414aba8939f0777",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-2/job.json",
+      "original_sha256": "d763ae0d16cf1138e361ca958f36d89b8c0cf70d3d8afdd864522b0a0a849616",
+      "public_sha256": "e69b4c086514ee5f4892ffff7cc8710513a09b9dda4702197b73919a0704bbb2",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-2/manifest.json",
+      "original_sha256": "64266c2bec470751718ef0c6b366a5cbe32a48f679e0506336df7c426bbcdea7",
+      "public_sha256": "d882f2b271649a9a1df9f94835e5b01847507254ec1bfe342e022751e106555b",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-2/pods.json",
+      "original_sha256": "2c1dbfc326afd70afd7f6382a473d0dce8397cb684ba74aa7dc4f542fd444e8e",
+      "public_sha256": "81c6fea1870a3918d3d06d33381197c5f1466130ed37b65a95dd0b73796f43fc",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-2/profile-all-npu-v3-profile-hailo-2-c8wdf.log",
+      "original_sha256": "bb13bbeb06de885fd545473c8700cc3d6178aeedcd9f030fc7cd376895fafcf0",
+      "public_sha256": "bb13bbeb06de885fd545473c8700cc3d6178aeedcd9f030fc7cd376895fafcf0",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-2/result.json",
+      "original_sha256": "9f3b824b00ba20050721349993d940ea8f2a4db57656021b7b603adc96e4917e",
+      "public_sha256": "0ae181afa0103c526e96099046ca7612321f116dffbdf1e043e45171120a1440",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-2/submit-intent.json",
+      "original_sha256": "73ce9ff59cd2e0b9e075a2f45580918f379677132add4afa4fec9f4e382a2a3d",
+      "public_sha256": "73ce9ff59cd2e0b9e075a2f45580918f379677132add4afa4fec9f4e382a2a3d",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-hailo-2/workloads.json",
+      "original_sha256": "677f3e3bbc34b09b5644032e2de8eab9a6a4ab576262fed0d4a47f18390b69be",
+      "public_sha256": "25827bcab3e24c4a73a16a4fe07bcf12312c2f7c04009960d2f0dce6b7d28270",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-mobilint/created.json",
+      "original_sha256": "510bf7df621062fd3b5627d91062f76bfcac5147309252c66b0365ccc33c8561",
+      "public_sha256": "a75c194c05f9482f7b4db8f5fc9896a9a79867af3385272a49527f221f9044b0",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-mobilint/job.json",
+      "original_sha256": "b338823449e2c8585cf523bddd44f53a53fc5c6745e81d610fd451afdf8617d5",
+      "public_sha256": "74fc64759191a75af896c5a31bc75e14f8d7ca52fb86e1247eeba94b351f65d9",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-mobilint/manifest.json",
+      "original_sha256": "d7c125f25454412c156b75318a991716fad6ea1f13b215ce566452a90446651f",
+      "public_sha256": "e31b1f38f9acc222e6d26a6edd97fea8bf20b0ae6d97d785dd5d39f1bb38da15",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-mobilint/pods.json",
+      "original_sha256": "72cadb0d0e8b366a31d3b40d5cae929bf86daca18702bf2300bb9dda2b026e54",
+      "public_sha256": "d78c575b734103e8c9bcc5022fee42d76b001f75d5b1513892b10ac428248db6",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-mobilint/profile-all-npu-v3-profile-mobilint-kgn4d.log",
+      "original_sha256": "19ac8234f078da772c4af5e6b60e5f091dd7f208dbe2b26e582353da22b9d036",
+      "public_sha256": "19ac8234f078da772c4af5e6b60e5f091dd7f208dbe2b26e582353da22b9d036",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-mobilint/result.json",
+      "original_sha256": "4554eb958d3f5716cfd5ca23995aa7fe0604f5780249b2c18e25c9aa069afc30",
+      "public_sha256": "bf436703c5904ca9420c57b9fd40f28df2aa21adfe701956706441eb3f73da04",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-mobilint/submit-intent.json",
+      "original_sha256": "afbd30d84ca280821671743ced7796051d4f74a419ae86959f8f301f7aef261e",
+      "public_sha256": "afbd30d84ca280821671743ced7796051d4f74a419ae86959f8f301f7aef261e",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-mobilint/workloads.json",
+      "original_sha256": "964170402804652fad494c3fda98fd2c1491b0f0e1074fd73753d96d5e89c7c3",
+      "public_sha256": "9876d27dd5d19282d15786366fe079ecc1c39f96ac0f300552df0902f79469a8",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-rockchip/created.json",
+      "original_sha256": "91ba39145856881838069a7f8e8ffb5527e47a3a06f8c94c2afd1de31df1c01e",
+      "public_sha256": "13265471f69f8a7d1a56243e6220225c10987cbfbe4f02f82ec9d8f941a1766d",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-rockchip/job.json",
+      "original_sha256": "46a6507acfd9019259075078b8d67fa3c773e7fb26db1e00ae63e077bd478863",
+      "public_sha256": "61353b469f5cf4983165a8d6232c55593d3a97546e8ddb7a7a927906c55fc665",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-rockchip/manifest.json",
+      "original_sha256": "f24fb5333020215e2d958f6e50e3964cc575aec5a245e3dbcefa0dec8af3cd7f",
+      "public_sha256": "4d22bcf7f6caa7c603b8dbb3b3c7d91f534721d142427ecd32043dfbcebbe0b3",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-rockchip/pods.json",
+      "original_sha256": "57df720a0c9839f4d354908596bb5e2b33fc1e9130da3cfa934953e23ac48954",
+      "public_sha256": "6f8dff17eabe6861f9602eb421de17adfad603ca19797184dedc01a5e821639e",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-rockchip/profile-all-npu-v3-profile-rockchip-hkqgf.log",
+      "original_sha256": "b7429cff1c4ae84e83a4ea83adf8960399a44e5645fa05ffbb47e7e787d2b9f0",
+      "public_sha256": "b7429cff1c4ae84e83a4ea83adf8960399a44e5645fa05ffbb47e7e787d2b9f0",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-rockchip/result.json",
+      "original_sha256": "b5c22a6814ec72958f8ddeb36545a864ffc077ecbc8f3c5a3cb7952c48eb57da",
+      "public_sha256": "d6f55ce631614368ed3c4d0352ed0847e9c96f3ab121aea8cbd8a80cf216dc8a",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-rockchip/running-preview.log",
+      "original_sha256": "b7429cff1c4ae84e83a4ea83adf8960399a44e5645fa05ffbb47e7e787d2b9f0",
+      "public_sha256": "b7429cff1c4ae84e83a4ea83adf8960399a44e5645fa05ffbb47e7e787d2b9f0",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-rockchip/submit-intent.json",
+      "original_sha256": "2b08b64386719da0b5c361d172abf95a955bd1b83898737bff4f5473b04ece94",
+      "public_sha256": "2b08b64386719da0b5c361d172abf95a955bd1b83898737bff4f5473b04ece94",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-profile-rockchip/workloads.json",
+      "original_sha256": "34eb7d3c6db9839cee8e0691b69fbbcfab7a1f3f763840251bf3752411c8ec2e",
+      "public_sha256": "fbc2fac7c34dcadc234d6cc6ba3a0df1058c359a33f3ed133096ad784dc249dc",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-profile-reuse-0/created.json",
+      "original_sha256": "de81895b3df4844ebf5a69b54642ffcdeb63aca4c62d741d1f75899f9ca2f872",
+      "public_sha256": "950bdcc32acdc941a0cf1a11a88e58c45cf9670afbe816b8757547e37e812f2d",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-profile-reuse-0/job.json",
+      "original_sha256": "3c7d5242d7a642b4e764afc180f70d568fc72568494d30194da7a52712d1a792",
+      "public_sha256": "f85812ea1bd054e1af6cda71132c04007d4f6f5855d7bb6b49ab0bb60f771802",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-profile-reuse-0/manifest.json",
+      "original_sha256": "b14f50d785102f6ad0d8d81548934b092ba7726e8549baed5cd27c0bd343c4ef",
+      "public_sha256": "c59a39cf5e10b315ce406c88624795203728f7a449ee331ffe41599f1ac5cf46",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-profile-reuse-0/pods.json",
+      "original_sha256": "b2aebafd21967b4ff2c7315b5aad9d485ed96cfde64f535914706312698a3724",
+      "public_sha256": "672c2e0bb991901474bb088c6009639665765ad542d916ad976cc81f853eb8a1",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-profile-reuse-0/profile-all-npu-v3-rockchip-profile-reuse-0-lnjxw.log",
+      "original_sha256": "389b13f86c6b5518a50fc3263a0c62dcf90509ba14d739b779680aa1dff413cf",
+      "public_sha256": "389b13f86c6b5518a50fc3263a0c62dcf90509ba14d739b779680aa1dff413cf",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-profile-reuse-0/result.json",
+      "original_sha256": "7d60ecd96358781a922db8571312210ee44b8e52e9f6f901d2eade410c4e7e29",
+      "public_sha256": "4fe6f5370c8b5f0ed6f12b8b4367eaebe6c7090a35ba1bf2caab02ecb0ecb297",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-profile-reuse-0/submit-intent.json",
+      "original_sha256": "6377644f99917752cc2745bcbc40ae06a712214e2f42973ea7cc6c9533f7bee6",
+      "public_sha256": "6377644f99917752cc2745bcbc40ae06a712214e2f42973ea7cc6c9533f7bee6",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-profile-reuse-0/workloads.json",
+      "original_sha256": "695c6c99554e92f746f2673a49e0f62b4d4483090de1c04accb35ccc6e4f8086",
+      "public_sha256": "8e495df7f1e79282adbfbe779da1524c77dc84e8db3e1c2d5e9020287123df6f",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-round-robin-0/created.json",
+      "original_sha256": "7ed0381a0fbe9e2eb3244a5ba60f35208dc0d127d59284337fda4bcd12fbc826",
+      "public_sha256": "4d88284cc24c8599ec36bd52a02fd17e88755c622aa569b48963772a6c3f89cd",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-round-robin-0/job.json",
+      "original_sha256": "aef300fcae79869702db4708558ae9b2b38c503ac06935dbd4c80fe6ca8fc598",
+      "public_sha256": "f6f9200228ed6c706c2e0a4a3d26caab689c932e66af9dd397c0d9de8f0788b7",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-round-robin-0/manifest.json",
+      "original_sha256": "ca6e3bc5d43945f4cb937784ab1878e99cc5e2c44fefaeed6ebfaa5521047ef1",
+      "public_sha256": "23557b7e85c13cc9403eee6f94191e51833283a17fbf89ebd726cb614723f245",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-round-robin-0/pods.json",
+      "original_sha256": "bdd9f163357df1e95292381eb1f2e6866d688f2d0294fdcaae5af23982d64c38",
+      "public_sha256": "3d8741709fd1b3882d01eabfec65758c76843518f42d769f78a70a2b9a549bc3",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-round-robin-0/profile-all-npu-v3-rockchip-round-robin-0-75csf.log",
+      "original_sha256": "cfab67e96e19687afd94acc777bc3b881612496c42a0d82ced19ec310df09c34",
+      "public_sha256": "cfab67e96e19687afd94acc777bc3b881612496c42a0d82ced19ec310df09c34",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-round-robin-0/result.json",
+      "original_sha256": "9b87a47344763c878e26b1869d32612428adf8f1da06a25a72a2d06b4648a184",
+      "public_sha256": "fb629d8252fbd6416409ec2a273ddbf2dee0b6442cfa77fc57a3125e978df7ca",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-round-robin-0/submit-intent.json",
+      "original_sha256": "d46155ba471990ac47ff24c21ad1013b15aaf0beb5a1dbb3c05d3da218b141d5",
+      "public_sha256": "d46155ba471990ac47ff24c21ad1013b15aaf0beb5a1dbb3c05d3da218b141d5",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/jobs/profile-all-npu-v3-rockchip-round-robin-0/workloads.json",
+      "original_sha256": "cfc3f3fcd92bfc56fd1bede860226df97429b3d5dc96e181154aaac8ab3e14f4",
+      "public_sha256": "85a4c308e7df6ea45526d71ed1c48f33f89f5aa02242a2d6da84e479b1c9ac21",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/metric-correction.json",
+      "original_sha256": "41e12fbb490b19b783faaa1b45092ba9fc00d5f3f6659cbf6237bf042db8a8bf",
+      "public_sha256": "41e12fbb490b19b783faaa1b45092ba9fc00d5f3f6659cbf6237bf042db8a8bf",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/metric-recalculation.py",
+      "original_sha256": "9df324bd90c38b4e0b65332a38d24e58ebfe65cc093862bb7c5ef440218e2d84",
+      "public_sha256": "9df324bd90c38b4e0b65332a38d24e58ebfe65cc093862bb7c5ef440218e2d84",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/plan.json",
+      "original_sha256": "26ab40d3ae2b30c126eb93ea2094f165391030901aa5dd8a4399b76aaa41bec5",
+      "public_sha256": "c425621fbc0e0843099c7fb6fe4bab290bac7749049c787d1e3453193b52e687",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/pre-review-metric-output/checksums.json",
+      "original_sha256": "a8539d2dc0215feb928d6dc61a72c6063247adc217311c4a02b0043dda3c4673",
+      "public_sha256": "a8539d2dc0215feb928d6dc61a72c6063247adc217311c4a02b0043dda3c4673",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/pre-review-metric-output/recording-scope.json",
+      "original_sha256": "613d7c04ec31ba485cee461d8c24f492b6c1e565aa32202e8ddb35af295857be",
+      "public_sha256": "613d7c04ec31ba485cee461d8c24f492b6c1e565aa32202e8ddb35af295857be",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/pre-review-metric-output/rows.csv",
+      "original_sha256": "9bfee615373e7a24a4ba122246f659bc52e38de6ec66b759cb119dfc5cc72e5c",
+      "public_sha256": "9bfee615373e7a24a4ba122246f659bc52e38de6ec66b759cb119dfc5cc72e5c",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/pre-review-metric-output/summary.json",
+      "original_sha256": "bd898502bbe976848c38150e69d69fe729f9247e1604570dbe07751a41ca1804",
+      "public_sha256": "bd898502bbe976848c38150e69d69fe729f9247e1604570dbe07751a41ca1804",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/recording-scope.json",
+      "original_sha256": "93178a91630d1baf25e4bfcce6b002efbd1b54dba8588e58586b8bee2849b367",
+      "public_sha256": "93178a91630d1baf25e4bfcce6b002efbd1b54dba8588e58586b8bee2849b367",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "npu-groups/rows.csv",
+      "original_sha256": "9bfee615373e7a24a4ba122246f659bc52e38de6ec66b759cb119dfc5cc72e5c",
+      "public_sha256": "9bfee615373e7a24a4ba122246f659bc52e38de6ec66b759cb119dfc5cc72e5c",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "npu-groups/summary.json",
+      "original_sha256": "bd898502bbe976848c38150e69d69fe729f9247e1604570dbe07751a41ca1804",
+      "public_sha256": "bd898502bbe976848c38150e69d69fe729f9247e1604570dbe07751a41ca1804",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/checksums.json",
+      "original_sha256": "7a82cec3a977c7c7f3fa226b486856b7d7059cca92ca3f7ea008a7fb5da513a3",
+      "public_sha256": "7a82cec3a977c7c7f3fa226b486856b7d7059cca92ca3f7ea008a7fb5da513a3",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/hailo-create-stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "toolchain-probes/hailo-created.json",
+      "original_sha256": "b1e1e7cad9525790431bea843ef34757a72b4b1aa1b894343182e3ce07f83d11",
+      "public_sha256": "6c2fdf0a4cb4d017bd1be6fafe1cbff052c1eb8cce05686a9123588b63e5a186",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/hailo-job.json",
+      "original_sha256": "76061170ae4dca317e01a3781de0868b37cef9c94780c04862846c000bed94db",
+      "public_sha256": "a84ed5d1438caf1196bbb010d96bf25d7728f37fe82cbf71015bd60cc5574fcb",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/hailo-log-stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "toolchain-probes/hailo-manifest.json",
+      "original_sha256": "b69ecbb58ab917c6c88d192272bc9e9082be434d3db3baa90602d86b729503c5",
+      "public_sha256": "8317ea5a3e900070478d98bad692254dbc9c1439ba32b869dd57b6655ace1c6b",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/hailo-pods.json",
+      "original_sha256": "35dddba4c3448cd30ab60f1be4fb6b0a1b953aa7ca1b887904c38c73f4d68cc0",
+      "public_sha256": "ec02c09c06b8a3094a69e54a19d751b87c9ad4a94f6860d3ea2b5180e996a499",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/hailo.log",
+      "original_sha256": "6b08b9e883f7cc74dc353fea270e959635a7a21894a1dc54dbc4baa9507bf548",
+      "public_sha256": "6b08b9e883f7cc74dc353fea270e959635a7a21894a1dc54dbc4baa9507bf548",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "toolchain-probes/localqueues-before.json",
+      "original_sha256": "a7f54e33a5a260e63c019fb0b05aa9d19db3344bc5422701ae0808e1a55aad5f",
+      "public_sha256": "a7f54e33a5a260e63c019fb0b05aa9d19db3344bc5422701ae0808e1a55aad5f",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/mobilint-create-stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "toolchain-probes/mobilint-created.json",
+      "original_sha256": "3e5c71c8920c3b39a23193aeaa72be4e8f72581ca418cfd39d6f8d72f74dd380",
+      "public_sha256": "67eaeb58a252d705f1f0f4af12d27341f6b5f7b94280be1d4fcb95b94d4264e4",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/mobilint-job.json",
+      "original_sha256": "a759ddea70ab5a0c1201c7dc8a6d982bb7d306cc4cf2d66147cb352c13ceb8e7",
+      "public_sha256": "a43e23707a35651e58584abdb984a5a25810b6888d7e9be81425cc0eee36b097",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/mobilint-log-stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "toolchain-probes/mobilint-manifest.json",
+      "original_sha256": "333ef61a03f41eb573559628b224ec1d28bbdc0bfc688a6cd101eb7f2c746c1a",
+      "public_sha256": "0ee48228734510f58e49089662e805b35da300b438b79a9bfd4892d86301eca2",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/mobilint-pods.json",
+      "original_sha256": "3e5c6f3110af2af9c59be64dc6c3f0c09107686fe2b5d98f5d7bcf1c43b58aa3",
+      "public_sha256": "af7659cfd236ec3ad38967f73f557e62831803d6bec4bc569df434d147c039f1",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/mobilint.log",
+      "original_sha256": "78adf5406f7e85eafc218e2bd7a53024eb3a91fb99e9bd49d25efd560749e101",
+      "public_sha256": "78adf5406f7e85eafc218e2bd7a53024eb3a91fb99e9bd49d25efd560749e101",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "toolchain-probes/native-workloads.json",
+      "original_sha256": "9f6355602119bcded1c0687a2762cae85f1605473270b098bc01f5e372a211fa",
+      "public_sha256": "37e106a0f2d358b3b433d407c69670a367f703e7ea78a6d1fd3651c08407726b",
+      "scope": [
+        "private configuration substitutions",
+        "only experiment-owned Workloads retained"
+      ]
+    },
+    {
+      "path": "toolchain-probes/registry-runtime-repositories.json",
+      "original_sha256": "26c740bf15fbcdaa1d5ceda6ba64c2562730160e6c89e6d9aa81452e78a72c64",
+      "public_sha256": "26c740bf15fbcdaa1d5ceda6ba64c2562730160e6c89e6d9aa81452e78a72c64",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/rockchip-create-stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "toolchain-probes/rockchip-created.json",
+      "original_sha256": "21834fd4aefcd2107a2ec4db5f8abbde839f4a8856e99ffb3df4ad9c734e2f14",
+      "public_sha256": "c7037d5394ce38aedf406dec92214eb4c8f915360429e6651fd8059f8d9c819d",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/rockchip-job.json",
+      "original_sha256": "833eff873d92b8e21bb7848610c804dab0e769a93c301826a5c03f70c0392c0d",
+      "public_sha256": "dccb3b0de04a0c0a3ddcce8e358789f14094df9ec54c8ec41469e45d10100e39",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/rockchip-lite-wheel-metadata.txt",
+      "original_sha256": "bf60a09f1cc9043b4035c2e30dd3466ae2eb6546857a0931369608547a139744",
+      "public_sha256": "bf60a09f1cc9043b4035c2e30dd3466ae2eb6546857a0931369608547a139744",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "toolchain-probes/rockchip-log-stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "toolchain-probes/rockchip-manifest.json",
+      "original_sha256": "9d110d1a279c6a33d9fa515d1002605f1434d77d8506bb5d5829cf2952eee0e3",
+      "public_sha256": "dc4ea3c9e3a191d658107f496377e1436c750d7d09fbb08ce629251c5eb241e9",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/rockchip-pods.json",
+      "original_sha256": "6c9ade69055ec79aa3ead197732bd77187a2adfb6d4780d8c8026a7d74df22f0",
+      "public_sha256": "5ccc93b9738bd5d7b370260ed04d570d3534b9b57ff09946032a484dc595097e",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/rockchip-sdk-layer-members.json",
+      "original_sha256": "98ea2bc037c742b94e0732ef751323222aaa4d6ed1752ac23507fdd0ec5a3d4d",
+      "public_sha256": "98ea2bc037c742b94e0732ef751323222aaa4d6ed1752ac23507fdd0ec5a3d4d",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "toolchain-probes/rockchip.log",
+      "original_sha256": "c16378c3d21eb427a7ba5120e177257c1e5c38de30742b79ed87473ad8f2e3ee",
+      "public_sha256": "c16378c3d21eb427a7ba5120e177257c1e5c38de30742b79ed87473ad8f2e3ee",
+      "scope": [
+        "private configuration substitutions; compiled blob payload omitted if present"
+      ]
+    },
+    {
+      "path": "toolchain-probes/summary.json",
+      "original_sha256": "b13477569f8108addfa179fff3e557d553aadcca284f0308276962b847f7c468",
+      "public_sha256": "061db1380b136f1eabc38b275a4a6d675176b9f272aa2fbabeea9a9efb909d66",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    },
+    {
+      "path": "verification-record.json",
+      "original_sha256": "6c75ab1493e019dd9fe882c6c001c61014dea994a2773e771e1118cecc5f9a78",
+      "public_sha256": "6c75ab1493e019dd9fe882c6c001c61014dea994a2773e771e1118cecc5f9a78",
+      "scope": [
+        "private configuration substitutions"
+      ]
+    }
+  ],
+  "archive_sha256": "621ea2a890395fe534239860c63dfd1f55cbc7460ef10956c770400d07fb7e03",
+  "archive_bytes": 14183437,
+  "privacy_substitution_events": 0,
+  "public_files_outside_archive": {
+    "recompute.py": {
+      "sha256": "b5f57813533f6bef4b15551eb235439ac27bb9ea419eb82ba5159dadd43fe79e",
+      "bytes": 7010
+    },
+    "mlp-summary.json": {
+      "sha256": "448dad6aadc974f72e994ae6addec8ddecab363727c25cb2f5996f0a20828b75",
+      "bytes": 1601
+    },
+    "verification-record.json": {
+      "sha256": "6c75ab1493e019dd9fe882c6c001c61014dea994a2773e771e1118cecc5f9a78",
+      "bytes": 773
+    },
+    "toolchain-availability.md": {
+      "sha256": "757ba1ab4e3077e7d59569939ee258fc761deadf518c82b64418d004ae8113d9",
+      "bytes": 6042
+    },
+    "mlp-main.csv": {
+      "sha256": "ca41412d6a429166ea6dcd9970589a758733ec7bbaa90e5d5cab3ebf1685bf78",
+      "bytes": 3306
+    },
+    "verification-final.json": {
+      "sha256": "4620e0d23a8d50cd556cbc0854bfdb84217113432ac78edc1b15d301384d482e",
+      "bytes": 798
+    },
+    "mlp-derived-metrics.json": {
+      "sha256": "6ccc9c094d966f5879b64c600b2695464946df08e60cc7c2f7eafeea0cee42a1",
+      "bytes": 896
+    },
+    "npu-corrected-summary.json": {
+      "sha256": "9a39273eefc10ee543d127334965d2031f2b57fbe2478cf708ed2ca5569e1c6a",
+      "bytes": 3745
+    },
+    "npu-metric-correction.json": {
+      "sha256": "41e12fbb490b19b783faaa1b45092ba9fc00d5f3f6659cbf6237bf042db8a8bf",
+      "bytes": 9966
+    },
+    "npu-corrected-rows.csv": {
+      "sha256": "0beef61264c351ac88e0656f4e8289b3b85e291c9d3c771c3cdeb89cba4d0755",
+      "bytes": 2431
+    }
+  },
+  "offline_native_recomputation": {
+    "passed": true,
+    "hardware_submissions": 0,
+    "scope": "owned native acceptance/allocation/end timestamps +16384measuredrounds andquality perMLPjob; correctedNPUallocationfrom12savedPodreceipts; CSV/cohortmetricsmatch"
+  }
+}

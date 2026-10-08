@@ -1,0 +1,13 @@
+phase,arm,group,candidate,attempt,qualified,native_jct_seconds_point,measured_inference_seconds,pod_scheduled_at,container_started_at,container_finished_at,allocated_device_seconds_point,allocated_seconds_lower,allocated_seconds_upper,container_running_seconds_point,pre_container_preparation_seconds_point,native_clock_offset_qualified,quality_value
+profiling,profiling,hailo,hailo-1,profile-all-npu-v3-profile-hailo-1,True,3.0,0.3392751210340066,1791459227.0,1791459227.0,1791459229.0,2.0,1.0,3.0,2.0,0.0,False,0.8
+profiling,profiling,hailo,hailo-2,profile-all-npu-v3-profile-hailo-2,True,2.0,0.3407242634566501,1791459235.0,1791459235.0,1791459237.0,2.0,1.0,3.0,2.0,0.0,False,0.8
+profiling,profiling,mobilint,mobilint,profile-all-npu-v3-profile-mobilint,True,1.0,0.2449757049762411,1791459242.0,1791459242.0,1791459243.0,1.0,0,2.0,1.0,0.0,False,1.0
+profiling,profiling,rockchip,rockchip,profile-all-npu-v3-profile-rockchip,True,11.0,0.14477674686349928,1791459248.0,1791459249.0,1791459259.0,11.0,10.0,12.0,10.0,1.0,False,1.0
+main,round_robin,hailo,hailo-1,profile-all-npu-v3-hailo-round-robin-0,True,3.0,0.3397377298679203,1791459264.0,1791459265.0,1791459267.0,3.0,2.0,4.0,2.0,1.0,False,0.8
+main,round_robin,hailo,hailo-2,profile-all-npu-v3-hailo-round-robin-1,True,3.0,0.3393455302575603,1791459264.0,1791459265.0,1791459267.0,3.0,2.0,4.0,2.0,1.0,False,0.8
+main,profile_reuse,hailo,hailo-2,profile-all-npu-v3-hailo-profile-reuse-0,True,2.0,0.33835294423624873,1791459273.0,1791459273.0,1791459275.0,2.0,1.0,3.0,2.0,0.0,False,0.8
+main,profile_reuse,hailo,hailo-1,profile-all-npu-v3-hailo-profile-reuse-1,True,2.0,0.3406065729504917,1791459273.0,1791459273.0,1791459275.0,2.0,1.0,3.0,2.0,0.0,False,0.8
+main,profile_reuse,mobilint,mobilint,profile-all-npu-v3-mobilint-profile-reuse-0,True,2.0,0.2603665890201228,1791459285.0,1791459285.0,1791459286.0,1.0,0,2.0,1.0,0.0,False,1.0
+main,round_robin,mobilint,mobilint,profile-all-npu-v3-mobilint-round-robin-0,True,1.0,0.26190529101586435,1791459289.0,1791459290.0,1791459290.0,1.0,0,2.0,0.0,1.0,False,1.0
+main,round_robin,rockchip,rockchip,profile-all-npu-v3-rockchip-round-robin-0,True,12.0,0.1284189629368484,1791459294.0,1791459295.0,1791459306.0,12.0,11.0,13.0,11.0,1.0,False,1.0
+main,profile_reuse,rockchip,rockchip,profile-all-npu-v3-rockchip-profile-reuse-0,True,12.0,0.17546914494596422,1791459365.0,1791459366.0,1791459377.0,12.0,11.0,13.0,11.0,1.0,False,1.0

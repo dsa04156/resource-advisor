@@ -1,0 +1,37 @@
+{
+  "baseline": {
+    "compute_seconds_sum": 25.961240362055833,
+    "mean_wait_seconds": 0.7142857142857143,
+    "native_arrival_spread_seconds": 0.0,
+    "allocation_to_finish_seconds_mean": 5.142857142857143,
+    "choices": [
+      "rtx5060",
+      "spark",
+      "jetson-nano",
+      "jetson-agx",
+      "rtx5080",
+      "slurm-orin",
+      "intel-npu"
+    ]
+  },
+  "reuse": {
+    "compute_seconds_sum": 5.838880384253571,
+    "mean_wait_seconds": 15.571428571428571,
+    "native_arrival_spread_seconds": 1.0,
+    "allocation_to_finish_seconds_mean": 3.142857142857143,
+    "choices": [
+      "rtx5080",
+      "rtx5060",
+      "spark",
+      "rtx5080",
+      "rtx5080",
+      "rtx5060",
+      "spark"
+    ]
+  },
+  "descriptive_changes": {
+    "compute_reduction_percent": 77.50923953237803,
+    "mean_jct_increase_percent": 219.51219512195124,
+    "throughput_reduction_percent": 68.75
+  }
+}

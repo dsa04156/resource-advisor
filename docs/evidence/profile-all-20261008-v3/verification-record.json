@@ -1,0 +1,28 @@
+{
+  "tested_commit": "48bf226600238b9711ac9ed55a3128f7332d8ff0",
+  "full_suite": {
+    "passed": 1332,
+    "skipped": 4,
+    "warnings": 3,
+    "seconds": 64.95
+  },
+  "command": "PYTHONPATH=src python -m pytest -q",
+  "new_initial_focused_tests": {
+    "intel_adapter": 16,
+    "mlp_runner": 10,
+    "npu_runner": 5
+  },
+  "review_baseline": "6133968",
+  "reviews": {
+    "standards": {
+      "findings": 1,
+      "issue": "private Hailo hostnames hardcoded, fix in progress"
+    },
+    "spec": {
+      "findings": 1,
+      "issue": "NPU cost used container lifetime instead of PodScheduled reservation, correction from saved receipts in progress"
+    }
+  },
+  "production_integration": false,
+  "previous_JCT_final_audit": "still canceled per earlier user instruction"
+}

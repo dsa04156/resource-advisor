@@ -60,8 +60,9 @@
 </details>
 
 <details>
-<summary>추천·프로파일링·비교 · 23개</summary>
+<summary>추천·프로파일링·비교 · 24개</summary>
 
+- [동일 MLP 프로파일 재사용: GPU·NPU 재실험](profile-all-20261008-v3-results.ko.md)
 - [Noise-aware adaptive replication](reference/adaptive-replication.md)
 - [Real GPU recommendation → approval → independent result](reference/approved-gpu-demo.md)
 - [Cooperative phase diagnostics and the live CNN trial](reference/bottleneck-diagnostics.md)

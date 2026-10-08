@@ -1,0 +1,44 @@
+{
+  "arms": {
+    "baseline": {
+      "jobs": 7,
+      "successful_jobs": 7,
+      "complete": true,
+      "reservation_seconds": {
+        "kubernetes_gpu_exclusive_seconds": 6.0,
+        "kubernetes_gpu_shared_slot_seconds": 17.0,
+        "slurm_gpu_gres_seconds": 8.0,
+        "kubernetes_npu_reservation_seconds": 5.0
+      },
+      "mean_jct_seconds": 5.857142857142857,
+      "p95_jct_seconds": 10.0,
+      "native_wall_seconds": 10.0,
+      "native_throughput_jobs_per_second": 0.7
+    },
+    "reuse": {
+      "jobs": 7,
+      "successful_jobs": 7,
+      "complete": true,
+      "reservation_seconds": {
+        "kubernetes_gpu_exclusive_seconds": 22.0
+      },
+      "mean_jct_seconds": 18.714285714285715,
+      "p95_jct_seconds": 31.0,
+      "native_wall_seconds": 32.0,
+      "native_throughput_jobs_per_second": 0.21875
+    }
+  },
+  "profiling_reservation_seconds": {
+    "kubernetes_gpu_exclusive_seconds": 5.0,
+    "kubernetes_gpu_shared_slot_seconds": 5.0,
+    "slurm_gpu_gres_seconds": 0.0,
+    "kubernetes_npu_reservation_seconds": 1.0
+  },
+  "statistical_significance_established": false,
+  "replication_unit": "one cohort per arm; descriptive only",
+  "native_jct_boundary": "native acceptance to Kubernetes container exit / Slurm allocation EndTime",
+  "profile_scope": "eight-forward compute scaled to full work plus observed startup/release; static cohort backlog",
+  "physical_gpu_hours": null,
+  "physical_energy_savings_established": false,
+  "additional_failed_profile_cost": "preserved separately in plan.additional_failed_qualifications; charge in final combined report"
+}

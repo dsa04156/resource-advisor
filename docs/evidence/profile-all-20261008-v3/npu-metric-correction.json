@@ -1,0 +1,138 @@
+{
+  "native_actions_performed": false,
+  "old_boundary": "container.startedAt-to-container.finishedAt",
+  "new_boundary": "PodScheduled=True.lastTransitionTime-to-container-terminated.finishedAt",
+  "jct_compute_and_quality_unchanged": true,
+  "execution_profiles_and_choices_unchanged": true,
+  "selection_cost_at_execution": "max(native Job-creation-to-container-end JCT, measured inference); unchanged frozen-profiles.json",
+  "cost_correction_scope": "usage accounting; old container-running cost omitted PodScheduled-to-container-start allocation",
+  "original_metric_outputs": "pre-review-metric-output/",
+  "job_changes": [
+    {
+      "attempt": "profile-all-npu-v3-profile-hailo-1",
+      "prior_container_running_seconds": 2.0,
+      "corrected_pod_scheduled_to_end_seconds": 2.0,
+      "missing_pre_container_seconds": 0.0
+    },
+    {
+      "attempt": "profile-all-npu-v3-profile-hailo-2",
+      "prior_container_running_seconds": 2.0,
+      "corrected_pod_scheduled_to_end_seconds": 2.0,
+      "missing_pre_container_seconds": 0.0
+    },
+    {
+      "attempt": "profile-all-npu-v3-profile-mobilint",
+      "prior_container_running_seconds": 1.0,
+      "corrected_pod_scheduled_to_end_seconds": 1.0,
+      "missing_pre_container_seconds": 0.0
+    },
+    {
+      "attempt": "profile-all-npu-v3-profile-rockchip",
+      "prior_container_running_seconds": 10.0,
+      "corrected_pod_scheduled_to_end_seconds": 11.0,
+      "missing_pre_container_seconds": 1.0
+    },
+    {
+      "attempt": "profile-all-npu-v3-hailo-round-robin-0",
+      "prior_container_running_seconds": 2.0,
+      "corrected_pod_scheduled_to_end_seconds": 3.0,
+      "missing_pre_container_seconds": 1.0
+    },
+    {
+      "attempt": "profile-all-npu-v3-hailo-round-robin-1",
+      "prior_container_running_seconds": 2.0,
+      "corrected_pod_scheduled_to_end_seconds": 3.0,
+      "missing_pre_container_seconds": 1.0
+    },
+    {
+      "attempt": "profile-all-npu-v3-hailo-profile-reuse-0",
+      "prior_container_running_seconds": 2.0,
+      "corrected_pod_scheduled_to_end_seconds": 2.0,
+      "missing_pre_container_seconds": 0.0
+    },
+    {
+      "attempt": "profile-all-npu-v3-hailo-profile-reuse-1",
+      "prior_container_running_seconds": 2.0,
+      "corrected_pod_scheduled_to_end_seconds": 2.0,
+      "missing_pre_container_seconds": 0.0
+    },
+    {
+      "attempt": "profile-all-npu-v3-mobilint-profile-reuse-0",
+      "prior_container_running_seconds": 1.0,
+      "corrected_pod_scheduled_to_end_seconds": 1.0,
+      "missing_pre_container_seconds": 0.0
+    },
+    {
+      "attempt": "profile-all-npu-v3-mobilint-round-robin-0",
+      "prior_container_running_seconds": 0.0,
+      "corrected_pod_scheduled_to_end_seconds": 1.0,
+      "missing_pre_container_seconds": 1.0
+    },
+    {
+      "attempt": "profile-all-npu-v3-rockchip-round-robin-0",
+      "prior_container_running_seconds": 11.0,
+      "corrected_pod_scheduled_to_end_seconds": 12.0,
+      "missing_pre_container_seconds": 1.0
+    },
+    {
+      "attempt": "profile-all-npu-v3-rockchip-profile-reuse-0",
+      "prior_container_running_seconds": 11.0,
+      "corrected_pod_scheduled_to_end_seconds": 12.0,
+      "missing_pre_container_seconds": 1.0
+    }
+  ],
+  "source_sha256": "9df324bd90c38b4e0b65332a38d24e58ebfe65cc093862bb7c5ef440218e2d84",
+  "unchanged_input_sha256": {
+    "capture.json": "e856267e87b2e1402c5891a9be3b2a7ce07755a7bb91f4c0a3de38e4a9cd152e",
+    "plan.json": "26ab40d3ae2b30c126eb93ea2094f165391030901aa5dd8a4399b76aaa41bec5",
+    "frozen-profiles.json": "8f9bffc3ee858b06dd473f85741addc6b7fe0978f08c9d56c43e487020910820",
+    "jobs/profile-all-npu-v3-profile-hailo-1/job.json": "add64b57cb56781e370d9d5b345179ae0cbc1a33eb990185e491e25f51d7e4a3",
+    "jobs/profile-all-npu-v3-profile-hailo-1/pods.json": "d357e2f557cda85ba08177ca03dd098d6f35f207ed099aaeae021d7ed5817f59",
+    "jobs/profile-all-npu-v3-profile-hailo-1/submit-intent.json": "a61522c4dc4071e2f2f1dbcc3396e743366fbd67c6f6d997f717c369bc0cbb56",
+    "jobs/profile-all-npu-v3-profile-hailo-1/manifest.json": "51db73f402c1e47b52765478209267274ac9d0391aa195d99d31ec4d08c24de0",
+    "jobs/profile-all-npu-v3-profile-hailo-2/job.json": "d763ae0d16cf1138e361ca958f36d89b8c0cf70d3d8afdd864522b0a0a849616",
+    "jobs/profile-all-npu-v3-profile-hailo-2/pods.json": "2c1dbfc326afd70afd7f6382a473d0dce8397cb684ba74aa7dc4f542fd444e8e",
+    "jobs/profile-all-npu-v3-profile-hailo-2/submit-intent.json": "73ce9ff59cd2e0b9e075a2f45580918f379677132add4afa4fec9f4e382a2a3d",
+    "jobs/profile-all-npu-v3-profile-hailo-2/manifest.json": "64266c2bec470751718ef0c6b366a5cbe32a48f679e0506336df7c426bbcdea7",
+    "jobs/profile-all-npu-v3-profile-mobilint/job.json": "b338823449e2c8585cf523bddd44f53a53fc5c6745e81d610fd451afdf8617d5",
+    "jobs/profile-all-npu-v3-profile-mobilint/pods.json": "72cadb0d0e8b366a31d3b40d5cae929bf86daca18702bf2300bb9dda2b026e54",
+    "jobs/profile-all-npu-v3-profile-mobilint/submit-intent.json": "afbd30d84ca280821671743ced7796051d4f74a419ae86959f8f301f7aef261e",
+    "jobs/profile-all-npu-v3-profile-mobilint/manifest.json": "d7c125f25454412c156b75318a991716fad6ea1f13b215ce566452a90446651f",
+    "jobs/profile-all-npu-v3-profile-rockchip/job.json": "46a6507acfd9019259075078b8d67fa3c773e7fb26db1e00ae63e077bd478863",
+    "jobs/profile-all-npu-v3-profile-rockchip/pods.json": "57df720a0c9839f4d354908596bb5e2b33fc1e9130da3cfa934953e23ac48954",
+    "jobs/profile-all-npu-v3-profile-rockchip/submit-intent.json": "2b08b64386719da0b5c361d172abf95a955bd1b83898737bff4f5473b04ece94",
+    "jobs/profile-all-npu-v3-profile-rockchip/manifest.json": "f24fb5333020215e2d958f6e50e3964cc575aec5a245e3dbcefa0dec8af3cd7f",
+    "jobs/profile-all-npu-v3-hailo-round-robin-0/job.json": "8dd490cf7990347e49efa26ccf01d188a2d1893c35e66b888fb5edd0e66148bf",
+    "jobs/profile-all-npu-v3-hailo-round-robin-0/pods.json": "269b190a0387117395bade25cbbf97102ad32a193087700851cee9fac6350c0b",
+    "jobs/profile-all-npu-v3-hailo-round-robin-0/submit-intent.json": "a77cfe76bba6cb74d5a16a504cb504cad5e9764bf390c5c6e85d124971233849",
+    "jobs/profile-all-npu-v3-hailo-round-robin-0/manifest.json": "8c282f8e3992cb4ce983318186cd5760de9bbeff460bf2096e80eda197056e1b",
+    "jobs/profile-all-npu-v3-hailo-round-robin-1/job.json": "fda3d3a0a3863a63a81a020e287ac863621aec554605034b40e1712eef2346e3",
+    "jobs/profile-all-npu-v3-hailo-round-robin-1/pods.json": "cfb97feb97e786fe5830d71e02e3b25e51c7f7d4c527a87c8cf9bedb8302b146",
+    "jobs/profile-all-npu-v3-hailo-round-robin-1/submit-intent.json": "9b371e9b7f9bbd881715fc666979f0a54188b3f2d9b1e16e4ad9f35ef39b6dc2",
+    "jobs/profile-all-npu-v3-hailo-round-robin-1/manifest.json": "235f52af5221974d7e8c3f999168e4e49c40195e74c4019d4a94deca3290367d",
+    "jobs/profile-all-npu-v3-hailo-profile-reuse-0/job.json": "6df1252a3522bb0968f792333e5c667cd62715f68b3dba02fadc1b6fdf5e8d0f",
+    "jobs/profile-all-npu-v3-hailo-profile-reuse-0/pods.json": "bfa135c2d8e87f63c4270095684b10d0a17cb55f558f7a350d5abd722f901e02",
+    "jobs/profile-all-npu-v3-hailo-profile-reuse-0/submit-intent.json": "6c2015d19438a5aaee63a1eb3ede34935efc16548bed64519f7d6d21790b356d",
+    "jobs/profile-all-npu-v3-hailo-profile-reuse-0/manifest.json": "630b500144624686022ec86e0cec7f23b689162d6ce804a2c476c6b37775a9c9",
+    "jobs/profile-all-npu-v3-hailo-profile-reuse-1/job.json": "a14d41be53f9767a34fdd23cac536b98b7fd76a4358d87b811d8e58d5d4aa5d3",
+    "jobs/profile-all-npu-v3-hailo-profile-reuse-1/pods.json": "85054a77ceb8b4bc486410c7a5c9ccde9ef22d1aefc119f73b5e012ad98c5478",
+    "jobs/profile-all-npu-v3-hailo-profile-reuse-1/submit-intent.json": "a949c25b9aa4e333e150e74d12b0a1e7bd357c90d8e573301c7314d956e9e355",
+    "jobs/profile-all-npu-v3-hailo-profile-reuse-1/manifest.json": "5f94f29a4d843e64d111e083c948474f3d529cda54fb3c240ffbb2678ac3bf12",
+    "jobs/profile-all-npu-v3-mobilint-profile-reuse-0/job.json": "15eac7f4ef304d1d431e67341047d31fefa1ee873ab44be2b16421cf70e7dde6",
+    "jobs/profile-all-npu-v3-mobilint-profile-reuse-0/pods.json": "b66ca76f5d69924f35591af1a6fbd227318858e01ad59407e944354c0ff7d62b",
+    "jobs/profile-all-npu-v3-mobilint-profile-reuse-0/submit-intent.json": "25b8f523eebd30b6fe3540d6795bfb4e16549089f1ec65a01e9b95e64e7126da",
+    "jobs/profile-all-npu-v3-mobilint-profile-reuse-0/manifest.json": "ffe443a63863bd19e456f9743df885c8dedb2ea8c68cdd9b7d539f8ce3630d37",
+    "jobs/profile-all-npu-v3-mobilint-round-robin-0/job.json": "f8cfc7073f6cb89db0d3314ad4c87139cf824ee68b56dd23c3db821a3dfea1ca",
+    "jobs/profile-all-npu-v3-mobilint-round-robin-0/pods.json": "10b13b0fd93001980b545fd4ce84988adcbd4874b43234cd10ad40efaa7aef94",
+    "jobs/profile-all-npu-v3-mobilint-round-robin-0/submit-intent.json": "100a4ca44b5df643b8b1db78088b6bbd3ef7b35d4e3eb83056ecf6971c647b2b",
+    "jobs/profile-all-npu-v3-mobilint-round-robin-0/manifest.json": "1669ff46265c09ace23b577458317b628d10d4cd810a340579e4f4f4c9514747",
+    "jobs/profile-all-npu-v3-rockchip-round-robin-0/job.json": "aef300fcae79869702db4708558ae9b2b38c503ac06935dbd4c80fe6ca8fc598",
+    "jobs/profile-all-npu-v3-rockchip-round-robin-0/pods.json": "bdd9f163357df1e95292381eb1f2e6866d688f2d0294fdcaae5af23982d64c38",
+    "jobs/profile-all-npu-v3-rockchip-round-robin-0/submit-intent.json": "d46155ba471990ac47ff24c21ad1013b15aaf0beb5a1dbb3c05d3da218b141d5",
+    "jobs/profile-all-npu-v3-rockchip-round-robin-0/manifest.json": "ca6e3bc5d43945f4cb937784ab1878e99cc5e2c44fefaeed6ebfaa5521047ef1",
+    "jobs/profile-all-npu-v3-rockchip-profile-reuse-0/job.json": "3c7d5242d7a642b4e764afc180f70d568fc72568494d30194da7a52712d1a792",
+    "jobs/profile-all-npu-v3-rockchip-profile-reuse-0/pods.json": "b2aebafd21967b4ff2c7315b5aad9d485ed96cfde64f535914706312698a3724",
+    "jobs/profile-all-npu-v3-rockchip-profile-reuse-0/submit-intent.json": "6377644f99917752cc2745bcbc40ae06a712214e2f42973ea7cc6c9533f7bee6",
+    "jobs/profile-all-npu-v3-rockchip-profile-reuse-0/manifest.json": "b14f50d785102f6ad0d8d81548934b092ba7726e8549baed5cd27c0bd343c4ef"
+  }
+}
