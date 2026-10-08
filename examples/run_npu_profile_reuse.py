@@ -11,6 +11,7 @@ import hashlib
 import json
 import math
 import random
+import shutil
 import statistics
 import subprocess
 import time
@@ -72,24 +73,38 @@ def native_timing(job, pods, candidate):
     term = status[0]["state"]["terminated"]
     if term["exitCode"] != 0 or not job.get("status", {}).get("succeeded"):
         raise ValueError("native execution failed")
+    scheduled = [
+        condition
+        for condition in pod["status"].get("conditions", [])
+        if condition["type"] == "PodScheduled" and condition["status"] == "True"
+    ]
+    if len(scheduled) != 1:
+        raise ValueError("one observed PodScheduled allocation boundary required")
+    allocated = epoch(scheduled[0]["lastTransitionTime"])
     created = epoch(job["metadata"]["creationTimestamp"])
     start, end = epoch(term["startedAt"]), epoch(term["finishedAt"])
-    if created > start or start > end:
+    if not created <= allocated <= start <= end:
         raise ValueError("native timestamp order differs")
-    duration = end - start
+    reservation = end - allocated
+    running = end - start
     return {
         "accepted_at": created,
+        "allocated_at": allocated,
         "container_started_at": start,
         "container_finished_at": end,
         "native_jct_seconds": end - created,
-        "accelerator_reservation_seconds": duration,
-        "reservation_interval_bounds_seconds": [max(0, duration - 1), duration + 1],
+        "accelerator_reservation_seconds": reservation,
+        "reservation_interval_bounds_seconds": [max(0, reservation - 1), reservation + 1],
+        "container_running_seconds": running,
+        "container_running_interval_bounds_seconds": [max(0, running - 1), running + 1],
+        "pre_container_preparation_seconds": start - allocated,
         "native_jct_interval_bounds_seconds": [max(0, end - created - 1), end - created + 1],
         "timestamp_uncertainty_seconds": 1,
         "image_id": status[0]["imageID"],
         "pod_uid": pod["metadata"]["uid"],
         "job_uid": job["metadata"]["uid"],
         "reservation_unit": "native_extended_resource_device_second",
+        "reservation_boundary": "PodScheduled=True.lastTransitionTime-to-container-terminated.finishedAt",
     }
 
 
@@ -172,19 +187,43 @@ def qualify_result(log, candidate):
     return report
 
 
+def hailo_routes(contract, templates):
+    """Derive physical routes exclusively from supplied private configuration."""
+    capabilities = {cap["ref"]: cap for cap in contract["capabilities"]}
+    by_node = {
+        template["spec"]["template"]["spec"]["nodeSelector"]["kubernetes.io/hostname"]: template
+        for template in templates
+    }
+    if len(by_node) != len(templates):
+        raise ValueError("distinct bound Hailo templates required")
+    routes = []
+    for candidate in contract["workload"]["candidates"]:
+        node = capabilities[candidate["capability_ref"]]["node_ref"]
+        template = by_node[node]
+        routes.append(
+            {
+                "node": node,
+                "queue": template["metadata"]["labels"]["kueue.x-k8s.io/queue-name"],
+                "pod_spec": template["spec"]["template"]["spec"],
+                "context": candidate.get("context"),
+            }
+        )
+    return routes
+
+
 def build_plan(artifacts):
     """Reuse current immutable contracts; preserve fingerprint restrictions."""
     hailo = json.loads((artifacts / "hailo-combined-contracts.json").read_text())
-    template = json.loads((artifacts / "hailo-second-job.json").read_text())
-    spec = template["spec"]["template"]["spec"]
+    templates = [
+        json.loads((artifacts / source).read_text())
+        for source in (
+            "ra-hailo-first-qual-20261008-job.json",
+            "hailo-second-job.json",
+        )
+    ]
     candidates = []
-    for index, (node, queue) in enumerate(
-        [
-            ("etri-dev0006-raspi5", "ra-hailo-lab"),
-            ("etri-dev0002-raspi5", "ra-hailo-second"),
-        ]
-    ):
-        context = hailo["workload"]["candidates"][index]["context"]
+    for index, route in enumerate(hailo_routes(hailo, templates)):
+        node, queue, context, spec = (route[k] for k in ("node", "queue", "context", "pod_spec"))
         env = {v["name"]: v["value"] for v in spec["containers"][0]["env"]}
         candidates.append(
             {
@@ -422,7 +461,14 @@ class NativeExecutor:
                 time.sleep(1)
             else:
                 raise TimeoutError("terminal workload release not observed")
-        except (KeyError, TypeError, ValueError, OSError, RuntimeError, subprocess.SubprocessError) as error:
+        except (
+            KeyError,
+            TypeError,
+            ValueError,
+            OSError,
+            RuntimeError,
+            subprocess.SubprocessError,
+        ) as error:
             row["qualified"] = False
             row["error"] = type(error).__name__ + ": " + str(error)
             try:
@@ -434,9 +480,23 @@ class NativeExecutor:
                             ["logs", pod["metadata"]["name"], "-n", NAMESPACE, "--timestamps"]
                         )
                         (root / (pod["metadata"]["name"] + ".log")).write_text(log)
-                    except (KeyError, TypeError, ValueError, OSError, RuntimeError, subprocess.SubprocessError):
+                    except (
+                        KeyError,
+                        TypeError,
+                        ValueError,
+                        OSError,
+                        RuntimeError,
+                        subprocess.SubprocessError,
+                    ):
                         pass
-            except (KeyError, TypeError, ValueError, OSError, RuntimeError, subprocess.SubprocessError):
+            except (
+                KeyError,
+                TypeError,
+                ValueError,
+                OSError,
+                RuntimeError,
+                subprocess.SubprocessError,
+            ):
                 pass
         write_json(root / "result.json", row)
         print(
@@ -457,7 +517,14 @@ class NativeExecutor:
                         ["delete", "job", name, "-n", NAMESPACE, "--wait=true", "--timeout=20s"]
                     )
                     (self.directory / "jobs" / name / "cancellation.log").write_text(raw)
-            except (KeyError, TypeError, ValueError, OSError, RuntimeError, subprocess.SubprocessError) as error:
+            except (
+                KeyError,
+                TypeError,
+                ValueError,
+                OSError,
+                RuntimeError,
+                subprocess.SubprocessError,
+            ) as error:
                 write_json(
                     self.directory / "jobs" / name / "cleanup-error.json", {"error": str(error)}
                 )
@@ -533,7 +600,14 @@ def run(directory, artifacts):
             if not all(row["qualified"] for row in rows):
                 raise RuntimeError("main native/quality failure; no repair or retry")
         capture["completed_at"], capture["status"] = time.time(), "COMPLETED"
-    except (KeyError, TypeError, ValueError, OSError, RuntimeError, subprocess.SubprocessError) as error:
+    except (
+        KeyError,
+        TypeError,
+        ValueError,
+        OSError,
+        RuntimeError,
+        subprocess.SubprocessError,
+    ) as error:
         capture["status"], capture["error"], capture["stopped_at"] = (
             "STOPPED",
             str(error),
@@ -560,6 +634,9 @@ def run(directory, artifacts):
                     "compute_seconds_sum": sum(r["report"]["elapsed_seconds"] for r in rows),
                     "reservation_seconds_sum": sum(
                         r["timing"]["accelerator_reservation_seconds"] for r in rows
+                    ),
+                    "container_running_seconds_sum": sum(
+                        r["timing"]["container_running_seconds"] for r in rows
                     ),
                     "native_wall_seconds": native_wall,
                     "native_throughput_jobs_per_second": len(rows) / native_wall
@@ -589,11 +666,187 @@ def run(directory, artifacts):
     return capture
 
 
+def correct_metrics(directory):
+    """Recalculate allocation costs from saved receipts without native actions.
+
+    Preserve execution-time profiles, choices and raw files. Their selection
+    costs were native-JCT proxies, whereas the old usage metric counted only
+    the container-running interval. This correction changes usage accounting.
+    """
+    capture_path = directory / "capture.json"
+    plan_path = directory / "plan.json"
+    capture = json.loads(capture_path.read_text())
+    plan = json.loads(plan_path.read_text())
+    backup = directory / "pre-review-metric-output"
+    backup.mkdir(exist_ok=True)
+    for name in ("summary.json", "rows.csv", "checksums.json", "recording-scope.json"):
+        source, target = directory / name, backup / name
+        if source.exists() and not target.exists():
+            shutil.copyfile(source, target)
+    candidates = {candidate["ref"]: candidate for candidate in plan["candidates"]}
+    sources = [capture_path, plan_path, directory / "frozen-profiles.json"]
+    timings, corrected_rows, changes = {}, [], []
+    cohorts = [("profiling", "profiling", capture["profiles"])] + [
+        ("main", cohort["arm"], cohort["jobs"]) for cohort in capture["cohorts"]
+    ]
+    for phase, arm, rows in cohorts:
+        for row in rows:
+            root = directory / "jobs" / row["name"]
+            job_path, pod_path = root / "job.json", root / "pods.json"
+            job, pods = json.loads(job_path.read_text()), json.loads(pod_path.read_text())["items"]
+            timing = native_timing(job, pods, candidates[row["candidate_ref"]])
+            if timing["native_jct_seconds"] != row["timing"]["native_jct_seconds"]:
+                raise ValueError("correction unexpectedly changed the native JCT endpoint")
+            timings[row["name"]] = timing
+            sources.extend(
+                [job_path, pod_path, root / "submit-intent.json", root / "manifest.json"]
+            )
+            prior = row["timing"]["accelerator_reservation_seconds"]
+            changes.append(
+                {
+                    "attempt": row["name"],
+                    "prior_container_running_seconds": prior,
+                    "corrected_pod_scheduled_to_end_seconds": timing[
+                        "accelerator_reservation_seconds"
+                    ],
+                    "missing_pre_container_seconds": timing["pre_container_preparation_seconds"],
+                }
+            )
+            report = row["report"]
+            corrected_rows.append(
+                {
+                    "phase": phase,
+                    "arm": arm,
+                    "group": row["group"],
+                    "candidate": row["candidate_ref"],
+                    "attempt": row["name"],
+                    "qualified": row["qualified"],
+                    "native_jct_seconds_point": timing["native_jct_seconds"],
+                    "measured_inference_seconds": report["elapsed_seconds"],
+                    "pod_scheduled_at": timing["allocated_at"],
+                    "container_started_at": timing["container_started_at"],
+                    "container_finished_at": timing["container_finished_at"],
+                    "allocated_device_seconds_point": timing["accelerator_reservation_seconds"],
+                    "allocated_seconds_lower": timing["reservation_interval_bounds_seconds"][0],
+                    "allocated_seconds_upper": timing["reservation_interval_bounds_seconds"][1],
+                    "container_running_seconds_point": timing["container_running_seconds"],
+                    "pre_container_preparation_seconds_point": timing[
+                        "pre_container_preparation_seconds"
+                    ],
+                    "native_clock_offset_qualified": False,
+                    "quality_value": report.get(
+                        "quality_value", report.get("quality", {}).get("accuracy")
+                    ),
+                }
+            )
+    summary = json.loads((backup / "summary.json").read_text())
+    for output in summary["cohorts"]:
+        cohort = next(
+            c
+            for c in capture["cohorts"]
+            if (c["group"], c["arm"]) == (output["group"], output["arm"])
+        )
+        current = [timings[row["name"]] for row in cohort["jobs"]]
+        output["prior_container_running_seconds_sum"] = output["reservation_seconds_sum"]
+        output["reservation_seconds_sum"] = sum(
+            t["accelerator_reservation_seconds"] for t in current
+        )
+        output["container_running_seconds_sum"] = sum(
+            t["container_running_seconds"] for t in current
+        )
+        output["pre_container_preparation_seconds_sum"] = sum(
+            t["pre_container_preparation_seconds"] for t in current
+        )
+    summary["allocation_boundary"] = (
+        "PodScheduled=True.lastTransitionTime-to-container-terminated.finishedAt"
+    )
+    summary["profiling_allocated_device_seconds_point"] = sum(
+        timings[row["name"]]["accelerator_reservation_seconds"] for row in capture["profiles"]
+    )
+    summary["main_allocated_device_seconds_point"] = sum(
+        timings[row["name"]]["accelerator_reservation_seconds"]
+        for c in capture["cohorts"]
+        for row in c["jobs"]
+    )
+    summary["limitations"] += (
+        "; allocation bounds cover whole-second quantization only, not unqualified cross-host clock offsets; pre-PodScheduled Kueue quota hold excluded"
+    )
+    write_json(directory / "corrected-summary.json", summary)
+    import csv
+
+    with (directory / "corrected-rows.csv").open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=corrected_rows[0].keys())
+        writer.writeheader()
+        writer.writerows(corrected_rows)
+    source = directory / "metric-recalculation.py"
+    shutil.copyfile(Path(__file__), source)
+    correction = {
+        "native_actions_performed": False,
+        "old_boundary": "container.startedAt-to-container.finishedAt",
+        "new_boundary": summary["allocation_boundary"],
+        "jct_compute_and_quality_unchanged": True,
+        "execution_profiles_and_choices_unchanged": True,
+        "selection_cost_at_execution": "max(native Job-creation-to-container-end JCT, measured inference); unchanged frozen-profiles.json",
+        "cost_correction_scope": "usage accounting; old container-running cost omitted PodScheduled-to-container-start allocation",
+        "original_metric_outputs": "pre-review-metric-output/",
+        "job_changes": changes,
+        "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+        "unchanged_input_sha256": {
+            str(path.relative_to(directory)): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sources
+        },
+    }
+    write_json(directory / "metric-correction.json", correction)
+    scope_path = directory / "recording-scope.json"
+    scope = (
+        json.loads((backup / "recording-scope.json").read_text())
+        if (backup / "recording-scope.json").exists()
+        else {}
+    )
+    scope["previous_reservation_scope"] = scope.get("reservation_scope")
+    scope["reservation_scope"] = (
+        "PodScheduled-to-container-end native extended-resource request1 duration; excludes earlier Kueue quota hold and physical activity"
+    )
+    scope["metric_correction"] = {
+        key: correction[key]
+        for key in (
+            "old_boundary",
+            "new_boundary",
+            "execution_profiles_and_choices_unchanged",
+            "selection_cost_at_execution",
+        )
+    }
+    scope["current_metrics"] = {"summary": "corrected-summary.json", "rows": "corrected-rows.csv"}
+    write_json(scope_path, scope)
+    write_json(
+        directory / "checksums.json",
+        {
+            str(path.relative_to(directory)): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sorted(directory.rglob("*"))
+            if path.is_file() and path != directory / "checksums.json"
+        },
+    )
+    return summary
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", type=Path, required=True)
-    parser.add_argument("--artifacts", type=Path, required=True)
+    parser.add_argument("--artifacts", type=Path)
+    parser.add_argument(
+        "--correct-metrics-only",
+        action="store_true",
+        help="Saved-receipt recalculation, no native submissions",
+    )
     args = parser.parse_args()
+    if args.correct_metrics_only:
+        summary = correct_metrics(args.directory)
+        print(
+            json.dumps({"status": summary["status"], "corrected_cohorts": len(summary["cohorts"])})
+        )
+        return 0
+    if args.artifacts is None:
+        parser.error("--artifacts is required for native execution")
     result = run(args.directory, args.artifacts)
     print(
         json.dumps(
