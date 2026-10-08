@@ -111,7 +111,13 @@ def _native_identity(job, node, plan):
             "foreign native Pod owner",
         )
         _require(pod["spec"]["nodeName"] == node["node"], "wrong execution node")
-        _require(pod["status"]["phase"] == "Succeeded", "native Pod did not succeed")
+        # The declared K8s endpoint is successful container exit. Pod/Job phase
+        # reconciliation can lag that endpoint in the same native snapshot.
+        _require(
+            pod["status"]["phase"] in {"Running", "Succeeded"},
+            "native Pod failed or lacks terminal container evidence",
+        )
+        _require(not native_job.get("status", {}).get("failed"), "native Job failed")
         for spec in (pod["spec"], native_job["spec"]["template"]["spec"]):
             containers = spec["containers"]
             _require(len(containers) == 1, "ambiguous native containers")

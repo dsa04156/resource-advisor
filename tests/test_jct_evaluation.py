@@ -800,3 +800,13 @@ def test_archive_rejects_complete_queue_claim_that_omits_own_workload(tmp_path):
     (tmp_path / "capture.json").write_text(json.dumps(capture))
     with pytest.raises(ValueError, match="Workload"):
         audit_capture(tmp_path)
+
+
+def test_audit_accepts_successful_container_exit_before_pod_phase_reconciliation():
+    capture = capture_fixture()
+    pod = capture["cohorts"][0]["jobs"][0]["native_receipt"]["pod"]
+    pod["status"]["phase"] = "Running"
+    assert summarize_capture(capture)["main_jobs"] == 324
+    pod["status"]["phase"] = "Failed"
+    with pytest.raises(ValueError, match="Pod"):
+        summarize_capture(capture)
