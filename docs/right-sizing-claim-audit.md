@@ -10,7 +10,7 @@
 | 승인된 pilot/observe로 profile 생성 | study.py, passive.py | study/passive tests | GPU 4 studies / Hailo 원본 observe 3회 | PASS |
 | Workload/context signature로 이력 구분 | contracts.py, policy.py | contracts/right_sizing tests | 신규 GPU·Hailo digest/context, strict auditor | PASS; shape range는 자동 qualification 아님 |
 | ≥2 실제 accelerator/runtime qualification | policy.py, qualifications.py | qualification tests | GPU F0 4 / Hailo F0 1 | PASS; 등록 장치 전체를 supported로 처리 안 함 |
-| 동일 logical workload 후보 비교 | policy.py, study.py | search/study tests | GPU CPU×memory 6개 구성, W1 v2 full reference / W2 incomplete | PASS 자원 비교; GPU/NPU task간 NOT_COMPARABLE |
+| 동일 logical workload 후보 비교 | policy.py, study.py | search/study tests, reference auditor mutation tests | GPU CPU×memory 6개 구성, W1 v2 / W2 v3 full reference | PASS 자원 비교; GPU/NPU task간 NOT_COMPARABLE |
 | 실제 BoTorch ask→native probe→observe | search.py, study.py | test_study.py | 신규 actual BO choices 4개, fallback 0 | PASS; 성능 우위 아님 |
 | Random/BO 같은 예산 | study.py | trial mutation tests | 각 5 probes, 같은 wall/device/confirmation budget | PASS |
 | 독립 final confirmation | study.py | study/trial auditor tests | W1 3 jobs/study, W2 6 jobs/study | PASS; training profile 재사용 금지 |
@@ -61,3 +61,16 @@ source/CI/보존 hash별로 분리했다. [Slurm read-only check](evidence/right
 새 native execution이 0개임을 명시한다. Source가 배포됐다는 이유로 그 gate를
 PASS로 바꾸지 않는다. C4는 finite-N 비용 판별이며 online ROI policy나 외삽한
 손익분기 예측이 아니다.
+
+2026-10-08 추가 검증: [W2 v3 raw](evidence/right-sizing-reference-v3.json),
+[audit](evidence/right-sizing-reference-audit-v3.json), [계획](right-sizing-reference-plan-v3.md).
+2개 fresh qualification과 30개 grid Jobs가 모두 성공했다. Native startup guard의
+own-pilot readback/fit branch도 실제 검증됐으며 insufficient-budget 거절 branch는
+software 근거만 있다. W2 v1/v2 실패와 비용을 삭제하지 않았다.
+[자동 생성 비교표](right-sizing-comparison-results.md)의 W1/W2 reference 거리는
+각각 0.6428% / 0.08547%다. 날짜별 descriptive mean reference이며 optimizer
+우위, calibrated forecast 또는 순이익을 뜻하지 않는다.
+[확장 총계](evidence/right-sizing-total-cost-audit-v2.json)는 183 native Jobs,
+521 GPU 예약초, 14 NPU 예약초와 609 CPU core초를 보고한다.
+[Slurm v3 검사](evidence/right-sizing-slurm-readiness-v3.json)는 controller 접속 실패와
+Orin RPC timeout이 계속됨을 기록한다. 새 Slurm closed loop와 전체 목표는 OPEN이다.

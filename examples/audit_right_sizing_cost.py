@@ -6,6 +6,7 @@ import json
 import math
 from pathlib import Path
 
+from audit_right_sizing_reference import audit as audit_extension
 from audit_right_sizing_trial import audit_hailo_feedback, compare_reference, require
 
 from resource_advisor.uncertainty import stamp
@@ -23,7 +24,7 @@ def audit_cost(capture, evidence_root):
     reference = inputs["right-sizing-reference-recovery-v2.json"]
     reference_plan = inputs["right-sizing-reference-recovery-plan-v2.json"]
     hailo = inputs["right-sizing-hailo-v1.json"]
-    comparison = compare_reference(report, plan, reference, reference_plan)
+    compare_reference(report, plan, reference, reference_plan)
     npu = audit_hailo_feedback(hailo, inputs["hailo-resnet50-inputs.json"])
     hailo_cost = inputs["right-sizing-hailo-cost-v1.json"]
     require(
@@ -56,7 +57,24 @@ def audit_cost(capture, evidence_root):
         )
         protocols[name] = {"elapsed_seconds": seconds, **times}
     all_gpu = report["attempts"] + report["qualifications"] + reference["attempts"]
+    extensions = []
+    for extension in capture.get("additional_references", []):
+        raw, frozen = inputs[extension["report"]], inputs[extension["plan"]]
+        checked = audit_extension(report, plan, raw, frozen)
+        extensions.append(checked)
+        all_gpu += raw["attempts"] + raw["qualifications"]
+        protocols[raw["experiment_id"]] = {
+            "started_at": raw["protocol_started_at"],
+            "ended_at": raw["protocol_finished_at"],
+            "elapsed_seconds": checked["protocol_wall_seconds"],
+        }
     gpu_uids = {a["native"]["job_uid"] for a in all_gpu}
+    require(len(gpu_uids) == len(all_gpu), "reused additional reference Job")
+    require(
+        len({a["attempt_id"] for a in all_gpu if a.get("attempt_id")})
+        == sum(bool(a.get("attempt_id")) for a in all_gpu),
+        "reused additional reference attempt",
+    )
     npu_uids = {r["backend"]["uid"] for r in hailo["runs"]} | {hailo["qualification"]["job_uid"]}
     require(not gpu_uids & npu_uids, "reused cross-device Job")
     npu_cpu = sum(r["ledger"]["body"]["allocated_cpu_seconds"] for r in hailo["runs"])
@@ -83,7 +101,8 @@ def audit_cost(capture, evidence_root):
     return {
         "schema_version": "right-sizing-total-cost-audit-v1",
         "input_sha256": capture["input_sha256"],
-        "experiments": [report["experiment_id"], reference["experiment_id"]],
+        "experiments": [report["experiment_id"], reference["experiment_id"]]
+        + [e["reference_experiment_id"] for e in extensions],
         "native_gpu_jobs": len(all_gpu),
         "native_npu_jobs": len(npu_uids),
         "native_total_jobs": len(all_gpu) + len(npu_uids),
@@ -93,12 +112,13 @@ def audit_cost(capture, evidence_root):
         "gpu_attempts_host_memory_reservation_mib_seconds": sum(
             a["memory_mib_seconds"] for a in all_gpu
         ),
-        "failed_gpu_jobs": comparison["failures_including_original_reference"],
+        "failed_gpu_jobs": sum(a.get("state", "SUCCEEDED") != "SUCCEEDED" for a in all_gpu),
         "protocols": protocols,
+        "measured_protocol_wall_sum_seconds": sum(p["elapsed_seconds"] for p in protocols.values()),
         "observed_research_wall_envelope_seconds": (max(ends) - min(starts)).total_seconds(),
         "hailo_protocol_wall_seconds": hailo_cost["observed_protocol_wall_seconds"],
-        "timing_scope": "GPU controller start to final reference terminal observation, including intervening control waits. Hailo ran concurrently: do not add its wall time. Artifact readback/deployment/testing after execution are outside this envelope.",
-        "cost_scope": "All fresh GPU/NPU qualifications, probes, independent confirmations, main runs and three failed references. GPU/NPU reservations remain separate. Finite-N deployment curves charge qualification/setup once per arm; characterization is additional research usage.",
+        "timing_scope": "Research calendar envelope includes pauses between protocols; separately report sum of measured protocol wall times. Hailo ran concurrently with primary: do not add it again. Artifact readback/deployment/testing after execution are outside these windows.",
+        "cost_scope": "All fresh GPU/NPU qualifications, probes, independent confirmations, main runs and failed references. GPU/NPU reservations remain separate. Finite-N deployment curves charge qualification/setup once per arm; characterization is additional research usage.",
         "unknown": capture["unknown"],
         "overall_goal_complete": False,
     }

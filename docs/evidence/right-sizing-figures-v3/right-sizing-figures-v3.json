@@ -1,0 +1,327 @@
+{
+  "schema_version": "right-sizing-figure-provenance-v1",
+  "destination": "portfolio web/docs; no journal specification",
+  "experiment_id": "right-sizing-20261007-v1",
+  "matplotlib_version": "3.11.1",
+  "inputs": [
+    {
+      "path": "docs/evidence/right-sizing-gpu-v1.json",
+      "sha256": "980d668402c4a857422fba04489492ce2d2308c08ea4e39e9c0d4ced1e1ca2bd"
+    },
+    {
+      "path": "docs/evidence/right-sizing-trial-plan-v1.json",
+      "sha256": "9663e1b34d57c4de5be767e1582c9bddceb2dd4e153d0caea8faa403b086c479"
+    },
+    {
+      "path": "docs/evidence/right-sizing-reference-recovery-v2.json",
+      "sha256": "83d3b18e0b114e3c1737faeb7752f9906ebca5c6ffb662bc2ce6e900013c2f02"
+    },
+    {
+      "path": "docs/evidence/right-sizing-reference-recovery-plan-v2.json",
+      "sha256": "9aa7311acfb1543f522d69d27e957c84e2e3d5f7b275f61530555189c26b2786"
+    },
+    {
+      "path": "docs/evidence/right-sizing-reference-v3.json",
+      "sha256": "436b58d67c1cbff194662c9d9413843d24cc000a0a9a16e1fc1d1ddb672ee892"
+    },
+    {
+      "path": "docs/evidence/right-sizing-reference-plan-v3.json",
+      "sha256": "b481c028ef9b26884c1ac2dc819e4a24e992811fed5b92e8fca7bf6071e75995"
+    }
+  ],
+  "reference_comparison": {
+    "original_reference": {
+      "schema_version": "right-sizing-reference-comparison-v1",
+      "primary_experiment_id": "right-sizing-20261007-v1",
+      "reference_experiment_id": "right-sizing-reference-recovery-20261007-v2",
+      "comparison": [
+        {
+          "workload": "W1",
+          "strategy": "random",
+          "selected_candidate": "cpu1-mem2048",
+          "reference_complete": true,
+          "reference_means_seconds": {
+            "cpu2-mem2048": 0.046661845912846424,
+            "cpu1-mem1024": 0.04726442551085105,
+            "cpu2-mem1024": 0.04667807285053035,
+            "cpu1-mem2048": 0.04696179224022975,
+            "cpu0-5-mem2048": 0.09395237045828253,
+            "cpu0-5-mem1024": 0.09587783059881379
+          },
+          "reference_best_candidate": "cpu2-mem2048",
+          "relative_distance_to_measured_reference": 0.006428085334291206,
+          "reference_attempt_ids": [
+            "a-fb9127fee5d04dcbb635893c7eda835a",
+            "a-5073f02581d3469b93b4de105c88a94b",
+            "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+            "a-cab29de55860407199180a79544ef54f",
+            "a-7d78ddb39dc0466f96e1f0c120b81af8",
+            "a-0672aeb86a3f4c06bd14d9a497874155",
+            "a-88f6010e389142528f4e6c1d7ff80d05",
+            "a-f77f0925a1624548940325d533d40eab",
+            "a-0708be129a94418c998e86c0a22daddb",
+            "a-dfb45341f29b4705a7670043b61d411a",
+            "a-54deecc2a5124ec0acb61cb960fb997a",
+            "a-bab527001a124f5484138c451452ec31",
+            "a-9acaa6def25b44ac9b83977687790fcb",
+            "a-ff532a49c22a450484635334e9a0770c",
+            "a-457d04d0f32443428273631aa0b56655",
+            "a-352d30e521b04ec880bfe4e242b33dce",
+            "a-2cf7e7a4120b4ea69fac96b3f5816d7a",
+            "a-ba6be0832af841a088ab17ea52b931c8"
+          ],
+          "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+        },
+        {
+          "workload": "W1",
+          "strategy": "qlognei",
+          "selected_candidate": "cpu1-mem2048",
+          "reference_complete": true,
+          "reference_means_seconds": {
+            "cpu2-mem2048": 0.046661845912846424,
+            "cpu1-mem1024": 0.04726442551085105,
+            "cpu2-mem1024": 0.04667807285053035,
+            "cpu1-mem2048": 0.04696179224022975,
+            "cpu0-5-mem2048": 0.09395237045828253,
+            "cpu0-5-mem1024": 0.09587783059881379
+          },
+          "reference_best_candidate": "cpu2-mem2048",
+          "relative_distance_to_measured_reference": 0.006428085334291206,
+          "reference_attempt_ids": [
+            "a-fb9127fee5d04dcbb635893c7eda835a",
+            "a-5073f02581d3469b93b4de105c88a94b",
+            "a-afbc8f4c06d648b0a4fb01f8f0641bf9",
+            "a-cab29de55860407199180a79544ef54f",
+            "a-7d78ddb39dc0466f96e1f0c120b81af8",
+            "a-0672aeb86a3f4c06bd14d9a497874155",
+            "a-88f6010e389142528f4e6c1d7ff80d05",
+            "a-f77f0925a1624548940325d533d40eab",
+            "a-0708be129a94418c998e86c0a22daddb",
+            "a-dfb45341f29b4705a7670043b61d411a",
+            "a-54deecc2a5124ec0acb61cb960fb997a",
+            "a-bab527001a124f5484138c451452ec31",
+            "a-9acaa6def25b44ac9b83977687790fcb",
+            "a-ff532a49c22a450484635334e9a0770c",
+            "a-457d04d0f32443428273631aa0b56655",
+            "a-352d30e521b04ec880bfe4e242b33dce",
+            "a-2cf7e7a4120b4ea69fac96b3f5816d7a",
+            "a-ba6be0832af841a088ab17ea52b931c8"
+          ],
+          "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+        },
+        {
+          "workload": "W2",
+          "strategy": "random",
+          "selected_candidate": "cpu2-mem2048",
+          "reference_complete": false,
+          "reference_means_seconds": {},
+          "reference_best_candidate": null,
+          "relative_distance_to_measured_reference": null,
+          "reference_attempt_ids": [
+            "a-85049b46af55468f91d630853a7aa891",
+            "a-ce3657a6dcc342caa39ce9c897ac5e2d",
+            "a-ce5d985b448143f78b6ee915f239e1a5"
+          ],
+          "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+        },
+        {
+          "workload": "W2",
+          "strategy": "qlognei",
+          "selected_candidate": "cpu2-mem2048",
+          "reference_complete": false,
+          "reference_means_seconds": {},
+          "reference_best_candidate": null,
+          "relative_distance_to_measured_reference": null,
+          "reference_attempt_ids": [
+            "a-85049b46af55468f91d630853a7aa891",
+            "a-ce3657a6dcc342caa39ce9c897ac5e2d",
+            "a-ce5d985b448143f78b6ee915f239e1a5"
+          ],
+          "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+        }
+      ],
+      "total_gpu_native_jobs": 146,
+      "primary_reservation_by_unit": {
+        "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 285.0
+      },
+      "supplementary_reservation_by_unit": {
+        "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 136.0
+      },
+      "combined_reservation_by_unit": {
+        "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 421.0
+      },
+      "failures_including_original_reference": 3,
+      "cost_policy": "Primary finite-N deployment curves unchanged. Failed and supplementary characterizations, including fresh qualifications, remain in total research usage.",
+      "overall_goal_complete": false
+    },
+    "additional_reference": {
+      "schema_version": "right-sizing-reference-audit-v3",
+      "primary_experiment_id": "right-sizing-20261007-v1",
+      "reference_experiment_id": "right-sizing-reference-20261008-v3",
+      "comparison": [
+        {
+          "workload": "W2",
+          "strategy": "random",
+          "selected_candidate": "cpu2-mem2048",
+          "reference_complete": true,
+          "reference_means_seconds": {
+            "cpu2-mem2048": 0.26074073238608736,
+            "cpu0-5-mem1024": 0.41703073199217516,
+            "cpu0-5-mem2048": 0.400347004023691,
+            "cpu1-mem2048": 0.2635793473649149,
+            "cpu2-mem1024": 0.26051806348065537,
+            "cpu1-mem1024": 0.2639465428655967
+          },
+          "reference_best_candidate": "cpu2-mem1024",
+          "relative_distance_to_measured_reference": 0.0008547158014957483,
+          "reference_attempt_ids": [
+            "a-293c878239534a5caa0a231d4cdd48a7",
+            "a-46b12e1ae6e340a0a5be2a26dd0941b7",
+            "a-b9abd1d7230e43bcb5ddb024aec59f83",
+            "a-96dd2d9ae422410c8daed4fa5c606c90",
+            "a-b101bd6d7159452a9dec6305d61bffa4",
+            "a-efdcb0c95bea4f78bc8a4973339333a0",
+            "a-5663438f4b0245168552e6a58111d6b7",
+            "a-ed58f65bbccb40fca8901ec48e4cb189",
+            "a-0f23c419cbfb4994afa5138d208158c6",
+            "a-0f1605c1fde74a72ad48c818f8937272",
+            "a-6ffee2ab554e481fa38f2d798e3ced73",
+            "a-15ab3643218648158dca88f86dc82161",
+            "a-628dbef5278545e6a6beab0a568e4381",
+            "a-1d4ae3b920014ff7b19675e63f3ddf1d",
+            "a-400f94379b1c46c09fa07bee2cf54f8a",
+            "a-d91dc1a3c351478a9368deebd1948cdb",
+            "a-09f348c730864e11a8604456ad6c2442",
+            "a-4347089c19754d2a990c77ec67e85ea9"
+          ],
+          "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+        },
+        {
+          "workload": "W2",
+          "strategy": "qlognei",
+          "selected_candidate": "cpu2-mem2048",
+          "reference_complete": true,
+          "reference_means_seconds": {
+            "cpu2-mem2048": 0.26074073238608736,
+            "cpu0-5-mem1024": 0.41703073199217516,
+            "cpu0-5-mem2048": 0.400347004023691,
+            "cpu1-mem2048": 0.2635793473649149,
+            "cpu2-mem1024": 0.26051806348065537,
+            "cpu1-mem1024": 0.2639465428655967
+          },
+          "reference_best_candidate": "cpu2-mem1024",
+          "relative_distance_to_measured_reference": 0.0008547158014957483,
+          "reference_attempt_ids": [
+            "a-293c878239534a5caa0a231d4cdd48a7",
+            "a-46b12e1ae6e340a0a5be2a26dd0941b7",
+            "a-b9abd1d7230e43bcb5ddb024aec59f83",
+            "a-96dd2d9ae422410c8daed4fa5c606c90",
+            "a-b101bd6d7159452a9dec6305d61bffa4",
+            "a-efdcb0c95bea4f78bc8a4973339333a0",
+            "a-5663438f4b0245168552e6a58111d6b7",
+            "a-ed58f65bbccb40fca8901ec48e4cb189",
+            "a-0f23c419cbfb4994afa5138d208158c6",
+            "a-0f1605c1fde74a72ad48c818f8937272",
+            "a-6ffee2ab554e481fa38f2d798e3ced73",
+            "a-15ab3643218648158dca88f86dc82161",
+            "a-628dbef5278545e6a6beab0a568e4381",
+            "a-1d4ae3b920014ff7b19675e63f3ddf1d",
+            "a-400f94379b1c46c09fa07bee2cf54f8a",
+            "a-d91dc1a3c351478a9368deebd1948cdb",
+            "a-09f348c730864e11a8604456ad6c2442",
+            "a-4347089c19754d2a990c77ec67e85ea9"
+          ],
+          "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+        }
+      ],
+      "total_gpu_native_jobs": 133,
+      "primary_reservation_by_unit": {
+        "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 285.0
+      },
+      "supplementary_reservation_by_unit": {
+        "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 100.0
+      },
+      "combined_reservation_by_unit": {
+        "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 385.0
+      },
+      "failures_including_original_reference": 2,
+      "cost_policy": "Primary finite-N deployment curves unchanged. Failed and supplementary characterizations, including fresh qualifications, remain in total research usage.",
+      "overall_goal_complete": false,
+      "fresh_native_jobs": 32,
+      "fresh_qualification_jobs": 2,
+      "protocol_wall_seconds": 942.773818,
+      "cpu_core_reservation_seconds": 108.5,
+      "memory_mib_reservation_seconds": 156672.0,
+      "startup_guard": [
+        {
+          "status": "OBSERVED_STARTUP_FITS_BOUND",
+          "native_active_deadline_seconds": 60,
+          "maximum_observed_startup_seconds": 2.0,
+          "source_attempts": [
+            {
+              "attempt_id": "a-b228538645094b288584dd66b55bb50b",
+              "startup_upper_observation_seconds": 2.0
+            },
+            {
+              "attempt_id": "a-de9ce2dc69f3402bbef54a5e180f9dcb",
+              "startup_upper_observation_seconds": 1.0
+            }
+          ],
+          "scope": "Own same-candidate hardware pilot submission-to-container-start intervals; includes admission; not calibrated future startup or success assurance"
+        }
+      ],
+      "reference_day_scope": "Later-day descriptive reference; neither a contemporaneous oracle nor evidence of causal optimizer advantage."
+    },
+    "reference_experiment_by_workload": {
+      "W1": "right-sizing-reference-recovery-20261007-v2",
+      "W2": "right-sizing-reference-20261008-v3"
+    }
+  },
+  "transformations": [
+    "Run strict trial auditor first",
+    "Sum actual qualification/study/main costs as defined in raw capture",
+    "No projection beyond N=3",
+    "Reference plot shows every valid fresh confirmation, with arithmetic means"
+  ],
+  "uncertainty": "Reference plot shows raw spread; no confidence/predictive bars or significance claim",
+  "missing_data": "Abstained arms are omitted from lines and explicitly labeled; failed/censored costs remain in audit",
+  "cost_semantics": "Cumulative latency cost: sum of qualification Job latencies, study elapsed (including confirmation/planning/control), and each main API lifecycle latency. Overlapping F0 queue waits are conservatively counted per Job; this is not end-to-end experiment wall time. Reservation uses native scheduled-to-finished duration. Historical image/fixture construction and energy are unmeasured.",
+  "color_redundancy": "markers and line styles identify every arm",
+  "export": {
+    "size_inches": {
+      "cost": [
+        11,
+        9
+      ],
+      "reference": [
+        11,
+        4.8
+      ]
+    },
+    "png_dpi": 160,
+    "opaque_white": true,
+    "svg_fonts": "text; depends on viewer font availability"
+  },
+  "outputs": [
+    {
+      "path": "right-sizing-cost-v3.png",
+      "sha256": "05a9268bc6a83e98d6f9c753d09a123d84c4fa0b08089ed92b71252ea055e130"
+    },
+    {
+      "path": "right-sizing-cost-v3.svg",
+      "sha256": "0e186b4581e2246b65e367013fcf3464253bf60e695fc2d804efc74d2df762c4"
+    },
+    {
+      "path": "right-sizing-reference-v3.png",
+      "sha256": "bc41f1d26f8a9b03760a434c52ce54308c9e428755e4288d7175405b9204cb4f"
+    },
+    {
+      "path": "right-sizing-reference-v3.svg",
+      "sha256": "e1c3be1605bb7446e48e73d627d43c47cc757df1499d2ad4c5c173802d061f2d"
+    },
+    {
+      "path": "right-sizing-cost-v3.csv",
+      "sha256": "df70dabd5446760c9ac8168b995d0dbd1ffeadcb70efe3c03ee6a9b74517f527"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": "right-sizing-total-cost-audit-v1",
+  "input_sha256": {
+    "right-sizing-gpu-v1.json": "980d668402c4a857422fba04489492ce2d2308c08ea4e39e9c0d4ced1e1ca2bd",
+    "right-sizing-trial-plan-v1.json": "9663e1b34d57c4de5be767e1582c9bddceb2dd4e153d0caea8faa403b086c479",
+    "right-sizing-reference-recovery-v2.json": "83d3b18e0b114e3c1737faeb7752f9906ebca5c6ffb662bc2ce6e900013c2f02",
+    "right-sizing-reference-recovery-plan-v2.json": "9aa7311acfb1543f522d69d27e957c84e2e3d5f7b275f61530555189c26b2786",
+    "right-sizing-hailo-v1.json": "ae69a99b02f31f043a946018ab394aec5bb5d792c79d2c31b2e59fef714d63b3",
+    "hailo-resnet50-inputs.json": "7740c3420918e1264024dd41dbe6c0db18a2f1d283789afc89ef3d0db522d30f",
+    "right-sizing-hailo-cost-v1.json": "9688aaf3e001da02aba41fb7ffc738801dd74197f561104c24382029eb4f086c",
+    "right-sizing-reference-v3.json": "436b58d67c1cbff194662c9d9413843d24cc000a0a9a16e1fc1d1ddb672ee892",
+    "right-sizing-reference-plan-v3.json": "b481c028ef9b26884c1ac2dc819e4a24e992811fed5b92e8fca7bf6071e75995"
+  },
+  "experiments": [
+    "right-sizing-20261007-v1",
+    "right-sizing-reference-recovery-20261007-v2",
+    "right-sizing-reference-20261008-v3"
+  ],
+  "native_gpu_jobs": 178,
+  "native_npu_jobs": 5,
+  "native_total_jobs": 183,
+  "gpu_reservation_seconds": 521.0,
+  "npu_reservation_seconds": 14.0,
+  "cpu_reservation_core_seconds": 609.0,
+  "gpu_attempts_host_memory_reservation_mib_seconds": 878592.0,
+  "failed_gpu_jobs": 3,
+  "protocols": {
+    "primary": {
+      "elapsed_seconds": 2923.710901,
+      "started_at": "2026-10-07T10:28:33.566506+00:00",
+      "ended_at": "2026-10-07T11:17:17.277407+00:00"
+    },
+    "supplementary": {
+      "elapsed_seconds": 1217.059258,
+      "started_at": "2026-10-07T11:18:11.763121+00:00",
+      "ended_at": "2026-10-07T11:38:28.822379+00:00"
+    },
+    "right-sizing-reference-20261008-v3": {
+      "started_at": "2026-10-08T01:37:21.408324+00:00",
+      "ended_at": "2026-10-08T01:53:04.182142+00:00",
+      "elapsed_seconds": 942.773818
+    }
+  },
+  "measured_protocol_wall_sum_seconds": 5083.543977,
+  "observed_research_wall_envelope_seconds": 55470.615636,
+  "hailo_protocol_wall_seconds": 73.276937,
+  "timing_scope": "Research calendar envelope includes pauses between protocols; separately report sum of measured protocol wall times. Hailo ran concurrently with primary: do not add it again. Artifact readback/deployment/testing after execution are outside these windows.",
+  "cost_scope": "All fresh GPU/NPU qualifications, probes, independent confirmations, main runs and failed references. GPU/NPU reservations remain separate. Finite-N deployment curves charge qualification/setup once per arm; characterization is additional research usage.",
+  "unknown": [
+    "historical image/model/fixture construction",
+    "energy",
+    "monetary rates",
+    "unattributed shared-service CPU utilization"
+  ],
+  "overall_goal_complete": false
+}

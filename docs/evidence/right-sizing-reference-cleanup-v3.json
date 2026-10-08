@@ -1,0 +1,28 @@
+{
+  "schema_version": "right-sizing-reference-cleanup-v3",
+  "experiment_id": "right-sizing-reference-20261008-v3",
+  "captured_at": "2026-10-08T01:56:54.214753+00:00",
+  "owned_native_jobs": 32,
+  "removed_terminal_pods": [
+    {
+      "pod_uid": "b7db31ad-6821-4324-b315-a4fdff9cd009",
+      "job_uid": "d8d69b10-0676-4ac5-a0f8-a1ff0f0d2805",
+      "phase": "Succeeded"
+    },
+    {
+      "pod_uid": "e336fe23-8e1e-40bf-a821-bc885fbb9ecf",
+      "job_uid": "a1632160-440e-4a04-aadd-069f65ae0355",
+      "phase": "Succeeded"
+    }
+  ],
+  "remaining_owned_pods": 0,
+  "unrelated_pods_deleted": 0,
+  "native_jobs_results_artifacts_retained": true,
+  "previous_immutable_entity_count_verified": 3981,
+  "previous_job_states_versions_verified": 806,
+  "previous_usage_ids_preserved": 806,
+  "baseline_private_snapshot_digest": "sha256:722209696fd26f82b7504b4e8dde5d4a0d271fb216faf3f955dc7d70ee2673ab",
+  "usage_scope": "Presence of previous IDs; old ledger bodies were not separately snapshotted",
+  "fresh_api_result_delivery_verified": 30,
+  "overall_goal_complete": false
+}

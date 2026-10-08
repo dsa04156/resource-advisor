@@ -1,0 +1,124 @@
+{
+  "schema_version": "right-sizing-reference-audit-v3",
+  "primary_experiment_id": "right-sizing-20261007-v1",
+  "reference_experiment_id": "right-sizing-reference-20261008-v3",
+  "comparison": [
+    {
+      "workload": "W2",
+      "strategy": "random",
+      "selected_candidate": "cpu2-mem2048",
+      "reference_complete": true,
+      "reference_means_seconds": {
+        "cpu2-mem2048": 0.26074073238608736,
+        "cpu0-5-mem1024": 0.41703073199217516,
+        "cpu0-5-mem2048": 0.400347004023691,
+        "cpu1-mem2048": 0.2635793473649149,
+        "cpu2-mem1024": 0.26051806348065537,
+        "cpu1-mem1024": 0.2639465428655967
+      },
+      "reference_best_candidate": "cpu2-mem1024",
+      "relative_distance_to_measured_reference": 0.0008547158014957483,
+      "reference_attempt_ids": [
+        "a-293c878239534a5caa0a231d4cdd48a7",
+        "a-46b12e1ae6e340a0a5be2a26dd0941b7",
+        "a-b9abd1d7230e43bcb5ddb024aec59f83",
+        "a-96dd2d9ae422410c8daed4fa5c606c90",
+        "a-b101bd6d7159452a9dec6305d61bffa4",
+        "a-efdcb0c95bea4f78bc8a4973339333a0",
+        "a-5663438f4b0245168552e6a58111d6b7",
+        "a-ed58f65bbccb40fca8901ec48e4cb189",
+        "a-0f23c419cbfb4994afa5138d208158c6",
+        "a-0f1605c1fde74a72ad48c818f8937272",
+        "a-6ffee2ab554e481fa38f2d798e3ced73",
+        "a-15ab3643218648158dca88f86dc82161",
+        "a-628dbef5278545e6a6beab0a568e4381",
+        "a-1d4ae3b920014ff7b19675e63f3ddf1d",
+        "a-400f94379b1c46c09fa07bee2cf54f8a",
+        "a-d91dc1a3c351478a9368deebd1948cdb",
+        "a-09f348c730864e11a8604456ad6c2442",
+        "a-4347089c19754d2a990c77ec67e85ea9"
+      ],
+      "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+    },
+    {
+      "workload": "W2",
+      "strategy": "qlognei",
+      "selected_candidate": "cpu2-mem2048",
+      "reference_complete": true,
+      "reference_means_seconds": {
+        "cpu2-mem2048": 0.26074073238608736,
+        "cpu0-5-mem1024": 0.41703073199217516,
+        "cpu0-5-mem2048": 0.400347004023691,
+        "cpu1-mem2048": 0.2635793473649149,
+        "cpu2-mem1024": 0.26051806348065537,
+        "cpu1-mem1024": 0.2639465428655967
+      },
+      "reference_best_candidate": "cpu2-mem1024",
+      "relative_distance_to_measured_reference": 0.0008547158014957483,
+      "reference_attempt_ids": [
+        "a-293c878239534a5caa0a231d4cdd48a7",
+        "a-46b12e1ae6e340a0a5be2a26dd0941b7",
+        "a-b9abd1d7230e43bcb5ddb024aec59f83",
+        "a-96dd2d9ae422410c8daed4fa5c606c90",
+        "a-b101bd6d7159452a9dec6305d61bffa4",
+        "a-efdcb0c95bea4f78bc8a4973339333a0",
+        "a-5663438f4b0245168552e6a58111d6b7",
+        "a-ed58f65bbccb40fca8901ec48e4cb189",
+        "a-0f23c419cbfb4994afa5138d208158c6",
+        "a-0f1605c1fde74a72ad48c818f8937272",
+        "a-6ffee2ab554e481fa38f2d798e3ced73",
+        "a-15ab3643218648158dca88f86dc82161",
+        "a-628dbef5278545e6a6beab0a568e4381",
+        "a-1d4ae3b920014ff7b19675e63f3ddf1d",
+        "a-400f94379b1c46c09fa07bee2cf54f8a",
+        "a-d91dc1a3c351478a9368deebd1948cdb",
+        "a-09f348c730864e11a8604456ad6c2442",
+        "a-4347089c19754d2a990c77ec67e85ea9"
+      ],
+      "scope": "Later measured finite-space mean reference, not a true oracle, confidence bound, or causal optimizer advantage"
+    }
+  ],
+  "total_gpu_native_jobs": 133,
+  "primary_reservation_by_unit": {
+    "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 285.0
+  },
+  "supplementary_reservation_by_unit": {
+    "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 100.0
+  },
+  "combined_reservation_by_unit": {
+    "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 385.0
+  },
+  "failures_including_original_reference": 2,
+  "cost_policy": "Primary finite-N deployment curves unchanged. Failed and supplementary characterizations, including fresh qualifications, remain in total research usage.",
+  "overall_goal_complete": false,
+  "fresh_native_jobs": 32,
+  "fresh_qualification_jobs": 2,
+  "protocol_wall_seconds": 942.773818,
+  "cpu_core_reservation_seconds": 108.5,
+  "memory_mib_reservation_seconds": 156672.0,
+  "startup_guard": [
+    {
+      "status": "OBSERVED_STARTUP_FITS_BOUND",
+      "native_active_deadline_seconds": 60,
+      "maximum_observed_startup_seconds": 2.0,
+      "source_attempts": [
+        {
+          "attempt_id": "a-b228538645094b288584dd66b55bb50b",
+          "startup_upper_observation_seconds": 2.0
+        },
+        {
+          "attempt_id": "a-de9ce2dc69f3402bbef54a5e180f9dcb",
+          "startup_upper_observation_seconds": 1.0
+        }
+      ],
+      "scope": "Own same-candidate hardware pilot submission-to-container-start intervals; includes admission; not calibrated future startup or success assurance"
+    }
+  ],
+  "reference_day_scope": "Later-day descriptive reference; neither a contemporaneous oracle nor evidence of causal optimizer advantage.",
+  "inputs": {
+    "right-sizing-gpu-v1.json": "980d668402c4a857422fba04489492ce2d2308c08ea4e39e9c0d4ced1e1ca2bd",
+    "right-sizing-trial-plan-v1.json": "9663e1b34d57c4de5be767e1582c9bddceb2dd4e153d0caea8faa403b086c479",
+    "right-sizing-reference-v3.json": "436b58d67c1cbff194662c9d9413843d24cc000a0a9a16e1fc1d1ddb672ee892",
+    "right-sizing-reference-plan-v3.json": "b481c028ef9b26884c1ac2dc819e4a24e992811fed5b92e8fca7bf6071e75995"
+  }
+}

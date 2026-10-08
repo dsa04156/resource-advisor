@@ -141,6 +141,20 @@ confirmation 중 native deadline 실패가 있어 abstain했다. W2의 regret은
 추가 제출을 보류하며, native limit/승인 시간 예산을 임의로 늘리지 않는다.
 이 guard는 software 검증이며 이번 고정 BB-source hardware 결과를 바꾸지 않는다.
 
+후속 [W2 v3 계획](right-sizing-reference-plan-v3.md)은 다음 날 새 qualification
+2회와 grid 30회를 한 번 실행했다. [raw](evidence/right-sizing-reference-v3.json)와
+[auditor](evidence/right-sizing-reference-audit-v3.json)는 여섯 후보의 3회 독립
+확인을 모두 검증했다. Random/BO가 고른 CPU2/memory2GiB는 뒤에 측정한
+최소 평균(CPU2/memory1GiB)보다 0.08547% 길었다. 이는 날짜가 다른 descriptive
+reference와의 거리다. v2의 W2 regret은 여전히 null이며 기존 실패를 성공으로
+바꾸지 않았다. 새 source의 startup guard는 실제 own-pilot 시작 기록을 읽어
+`OBSERVED_STARTUP_FITS_BOUND`를 반환했다. 부족한 cap의 실장비 거절 branch나
+미래 startup 보장은 이번 v3에서 검증하지 않았다.
+
+모든 비교 숫자를 다시 계산하는 [자동 생성 결과표](right-sizing-comparison-results.md)를
+추가했다. [report generator](../examples/report_right_sizing.py)는 signed result와
+study observation의 일치 여부까지 감사한 뒤 Markdown을 생성한다.
+
 GPU 승인 실행 12개에 immutable comparable feedback이 생성됐다. 실행 이후
 다음 read-only lookup은 W1의 실제 main profile 6개, W2의 9개를 근거로 사용했다.
 추천 4개는 실제 TTL 만료 뒤 재사용 요청에서 모두 422로 거부됐고 새 Job은
@@ -200,6 +214,16 @@ artifact readback·배포·소프트웨어 테스트는 이 envelope 밖이다.
 기존 [operational comparison](operational-comparison.md)의 compute 약 1% 단축,
 실제 6회 반복에서 profiling 비용 회수 실패도 유지한다.
 
+W2 v3의 추가 비용은 qualification 포함 32 Jobs / 100 GPU 예약초 / 108.5 CPU
+core초 / 실제 protocol 942.773818초다. [확장 비용 입력](evidence/right-sizing-total-cost-capture-v2.json)과
+[audit](evidence/right-sizing-total-cost-audit-v2.json)의 최신 합계는 GPU 178 Jobs /
+521 예약초, NPU 5 Jobs / 14 예약초, CPU 609 core초다. 실패 3개도 포함한다.
+GPU protocol wall 합계는 5,083.543977초이며, 다음 날까지 중단 시간을 포함한
+calendar envelope 55,470.615636초와 구분한다. Primary N=1..3 곡선과 비용 회수
+실패는 바뀌지 않는다. [새 전체 reference 그림](evidence/right-sizing-figures-v3/right-sizing-reference-v3.png)과
+[누적 비용 그림](evidence/right-sizing-figures-v3/right-sizing-cost-v3.png)은 auditor를
+통과한 raw에서 생성하며 기존 v1/v2 그림도 보존한다.
+
 ## 10. Negative and Null Results
 
 기존 qLogNEI는 random/lookup 대비 우위가 확인되지 않았다. Transfer의 네
@@ -244,6 +268,9 @@ timeout이다. 기존 Slurm native 실행과 response-loss/crash recovery 증거
 controller 연결, authenticated native inventory/accounting, qualified runtime과
 같은 승인 실행의 result/usage/feedback 검증이 필요하다. Running scheduler,
 driver, KubeEdge 설정을 바꿔 이 문제를 숨기지 않는다.
+[새 read-only 검사](evidence/right-sizing-slurm-readiness-v3.json)는 Orin의 active
+slurmd, controller TCP6817 연결 실패와 sinfo timeout을 구분한다. 전원 꺼짐을
+단정하지 않으며 새 Slurm Job은 제출하지 않았다.
 
 동일 logical GPU/NPU 성능 비교, AMD 실측, DEEPX qualification, 실제 DDP
 right-sizing, large-cluster 일반화, shared-GPU interference predictor와 job-attributed

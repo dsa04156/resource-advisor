@@ -40,3 +40,21 @@ def test_cost_auditor_rejects_inconsistent_clock_and_scope(capture, fault):
         value["protocols"]["primary"]["ended_at"] = "2099-01-01T00:00:00+00:00"
     with pytest.raises(ValueError):
         audit_cost(value, root)
+
+
+def test_extension_qualification_and_failure_costs_are_not_dropped(capture):
+    _, root = capture
+    value = json.loads((root / "right-sizing-total-cost-capture-v2.json").read_text())
+    checked = audit_cost(value, root)
+    old = audit_cost(
+        json.loads((root / "right-sizing-total-cost-capture-v1.json").read_text()), root
+    )
+    extension = json.loads((root / "right-sizing-reference-v3.json").read_text())
+    rows = extension["attempts"] + extension["qualifications"]
+    assert checked["native_gpu_jobs"] == old["native_gpu_jobs"] + len(rows)
+    assert checked["gpu_reservation_seconds"] == old["gpu_reservation_seconds"] + sum(
+        r["device_seconds"] for r in rows
+    )
+    assert checked["failed_gpu_jobs"] == old["failed_gpu_jobs"] + sum(
+        r.get("state", "SUCCEEDED") != "SUCCEEDED" for r in rows
+    )

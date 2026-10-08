@@ -224,6 +224,18 @@ def audit(report, plan):
             row = attempts[ref]
             require(row["job_id"] == observation["job_id"], "study Job ID mismatch")
             require(row["candidate"]["ref"] == observation["candidate_ref"], "candidate mismatch")
+            if row["state"] == "SUCCEEDED":
+                require(
+                    observation["outcome"] == row["result"]["outcome"] == "COMPLETED"
+                    and observation["measurements"] == row["result"]["measurements"]
+                    and observation["evidence_kind"] == row["result"]["evidence_kind"],
+                    "observation differs from signed execution result",
+                )
+            else:
+                require(
+                    observation["outcome"] != "COMPLETED" and observation["measurements"] is None,
+                    "censored execution used as successful measurement",
+                )
             require(
                 abs(row["device_seconds"] - observation["device_seconds"]) < 1e-7,
                 "study cost mismatch",
@@ -602,7 +614,7 @@ def audit_phase_readback(supplement, report, report_sha256):
     }
 
 
-def compare_reference(report, plan, reference, reference_plan):
+def compare_reference(report, plan, reference, reference_plan, *, workloads=("W1", "W2")):
     """Join an immutable later characterization without leaking it into selection."""
     primary, later = audit(report, plan), audit(reference, reference_plan)
     require(
@@ -640,8 +652,12 @@ def compare_reference(report, plan, reference, reference_plan):
     require(
         stamp(reference_plan["declared_at"]) > last_main, "recovery plan predates main evidence"
     )
+    require(
+        workloads and len(set(workloads)) == len(workloads) and set(workloads) <= {"W1", "W2"},
+        "invalid declared reference workload subset",
+    )
     comparisons = []
-    for name in ("W1", "W2"):
+    for name in workloads:
         entries = [s for s in reference["studies"] if s["workload"] == name]
         require(
             len(entries) == 1 and entries[0]["strategy"] == "grid_characterization",
@@ -744,12 +760,13 @@ def compare_reference(report, plan, reference, reference_plan):
         "comparison": comparisons,
         "total_gpu_native_jobs": primary["attempt_count"]
         + primary["qualification_count"]
-        + later["attempt_count"],
+        + later["attempt_count"]
+        + later["qualification_count"],
         "primary_reservation_by_unit": primary["reservation_by_unit"],
         "supplementary_reservation_by_unit": later["reservation_by_unit"],
         "combined_reservation_by_unit": total,
         "failures_including_original_reference": primary["failures"] + later["failures"],
-        "cost_policy": "Primary finite-N deployment curves unchanged. Both failed v1 and supplementary v2 characterization costs retained in total research usage.",
+        "cost_policy": "Primary finite-N deployment curves unchanged. Failed and supplementary characterizations, including fresh qualifications, remain in total research usage.",
         "overall_goal_complete": False,
     }
 
@@ -762,6 +779,7 @@ if __name__ == "__main__":
     parser.add_argument("--phase", type=Path)
     parser.add_argument("--reference", type=Path)
     parser.add_argument("--reference-plan", type=Path)
+    parser.add_argument("--reference-workload", action="append", choices=("W1", "W2"))
     args = parser.parse_args()
     report, plan = json.loads(args.report.read_text()), json.loads(args.plan.read_text())
     result = (
@@ -771,6 +789,8 @@ if __name__ == "__main__":
     )
     if bool(args.reference) != bool(args.reference_plan):
         parser.error("--reference and --reference-plan must be supplied together")
+    if args.reference_workload and not args.reference:
+        parser.error("--reference-workload requires --reference")
     if args.phase:
         import hashlib
 
@@ -785,6 +805,7 @@ if __name__ == "__main__":
             plan,
             json.loads(args.reference.read_text()),
             json.loads(args.reference_plan.read_text()),
+            workloads=tuple(args.reference_workload or ("W1", "W2")),
         )
     rendered = json.dumps(result, indent=2, allow_nan=False) + "\n"
     if args.output:

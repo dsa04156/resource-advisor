@@ -95,6 +95,8 @@ def test_gpu_capture_includes_failed_reference_cost_and_finite_n(gpu_evidence):
         "planning",
         "budget",
         "stale",
+        "observation",
+        "censored",
     ],
 )
 def test_gpu_auditor_rejects_corrupted_capture(gpu_evidence, fault):
@@ -123,6 +125,17 @@ def test_gpu_auditor_rejects_corrupted_capture(gpu_evidence, fault):
         entry["study"]["charged_device_seconds"][unit] = (
             entry["study"]["spec"]["profiling"]["device_seconds"][unit] + 1
         )
+    elif fault == "observation":
+        entry["study"]["observations"][0]["measurements"]["elapsed_seconds"] *= 0.1
+    elif fault == "censored":
+        failed = next(a for a in report["attempts"] if a["state"] != "SUCCEEDED")
+        observation = next(
+            o
+            for s in report["studies"]
+            for o in s["study"]["observations"]
+            if o["attempt_id"] == failed["attempt_id"]
+        )
+        observation["outcome"] = "COMPLETED"
     else:
         report["stale_reuse"][0]["submission_http_status"] = 202
     with pytest.raises(ValueError):
@@ -179,3 +192,15 @@ def test_later_reference_cannot_change_primary_selection_or_leak(gpu_evidence, f
             if c["workload"] == "W2"
         )
         assert result["failures_including_original_reference"] > 0
+
+
+def test_declared_partial_reference_does_not_invent_other_workload(gpu_evidence):
+    report, plan = gpu_evidence
+    root = Path(__file__).resolve().parents[1] / "docs/evidence"
+    later = json.loads((root / "right-sizing-reference-recovery-v2.json").read_text())
+    later_plan = json.loads((root / "right-sizing-reference-recovery-plan-v2.json").read_text())
+    result = compare_reference(report, plan, later, later_plan, workloads=("W2",))
+    assert {c["workload"] for c in result["comparison"]} == {"W2"}
+    assert all(c["relative_distance_to_measured_reference"] is None for c in result["comparison"])
+    with pytest.raises(ValueError, match="subset"):
+        compare_reference(report, plan, later, later_plan, workloads=("W2", "W2"))

@@ -6,11 +6,19 @@ import hashlib
 import json
 from pathlib import Path
 
+from audit_right_sizing_reference import audit as audit_extension
 from audit_right_sizing_trial import audit, compare_reference
 
 
 def generate(
-    report_path, plan_path, output, reference_path=None, reference_plan_path=None, version="v1"
+    report_path,
+    plan_path,
+    output,
+    reference_path=None,
+    reference_plan_path=None,
+    version="v1",
+    additional_reference_path=None,
+    additional_reference_plan_path=None,
 ):
     import matplotlib
 
@@ -27,6 +35,20 @@ def generate(
         comparison = compare_reference(
             report, plan, reference_report, json.loads(reference_plan_path.read_bytes())
         )
+    reference_by_workload = {name: reference_report for name in ("W1", "W2")}
+    if additional_reference_path:
+        extra = json.loads(additional_reference_path.read_bytes())
+        extra_plan = json.loads(additional_reference_plan_path.read_bytes())
+        extra_checked = audit_extension(report, plan, extra, extra_plan)
+        for contract in extra_plan["contracts"]:
+            reference_by_workload[contract["name"]] = extra
+        comparison = {
+            "original_reference": comparison,
+            "additional_reference": extra_checked,
+            "reference_experiment_by_workload": {
+                name: value["experiment_id"] for name, value in reference_by_workload.items()
+            },
+        }
     output.mkdir(parents=True, exist_ok=True)
     stems = ["right-sizing-cost-" + version, "right-sizing-reference-" + version]
     paths = [output / (stem + ext) for stem in stems for ext in (".png", ".svg")]
@@ -104,7 +126,7 @@ def generate(
         for ax, workload in zip(axes, ("W1", "W2"), strict=True):
             reference = next(
                 s
-                for s in reference_report["studies"]
+                for s in reference_by_workload[workload]["studies"]
                 if s["workload"] == workload and s["strategy"] == "grid_characterization"
             )
             grouped = {}
@@ -164,6 +186,8 @@ def generate(
     input_paths = [report_path, plan_path] + (
         [reference_path, reference_plan_path] if reference_path else []
     )
+    if additional_reference_path:
+        input_paths += [additional_reference_path, additional_reference_plan_path]
     manifest = {
         "schema_version": "right-sizing-figure-provenance-v1",
         "destination": "portfolio web/docs; no journal specification",
@@ -209,10 +233,14 @@ if __name__ == "__main__":
     parser.add_argument("output", type=Path)
     parser.add_argument("--reference", type=Path)
     parser.add_argument("--reference-plan", type=Path)
-    parser.add_argument("--version", choices=["v1", "v2"], default="v1")
+    parser.add_argument("--version", choices=["v1", "v2", "v3"], default="v1")
+    parser.add_argument("--additional-reference", type=Path)
+    parser.add_argument("--additional-reference-plan", type=Path)
     args = parser.parse_args()
     if bool(args.reference) != bool(args.reference_plan):
         parser.error("--reference and --reference-plan must be supplied together")
+    if bool(args.additional_reference) != bool(args.additional_reference_plan):
+        parser.error("--additional-reference and --additional-reference-plan are required together")
     print(
         json.dumps(
             generate(
@@ -222,6 +250,8 @@ if __name__ == "__main__":
                 args.reference,
                 args.reference_plan,
                 args.version,
+                args.additional_reference,
+                args.additional_reference_plan,
             ),
             indent=2,
         )

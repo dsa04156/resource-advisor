@@ -253,6 +253,10 @@ effectiveness and live harmful-transfer injection remain unverified.
 
 ### Profile-guided right-sizing audit
 
+[실제 Static / Random / BO / Grid 비교표와 전체 비용](docs/right-sizing-comparison-results.md).
+W1/W2 전체 후보 reference를 독립 확인했고, 실제 N=1..3에서는 profiling 비용을
+회수하지 못했다. 새 Slurm feedback loop는 controller 연결 복구가 필요하다.
+
 [기여와 실제 비용](docs/right-sizing-contribution.md),
 [주장별 acceptance gate](docs/right-sizing-claim-audit.md),
 [기존 저장소 기준선 감사](docs/right-sizing-gap-audit.md)를 함께 확인한다.

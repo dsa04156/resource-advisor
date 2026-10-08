@@ -86,3 +86,13 @@ a functional gate does not imply an advantage over random/grid/static requests.
 
 Overall acceptance remains **OPEN**. This audit identifies implementation gaps;
 it does not retrospectively mark current records as a new experiment.
+
+## Additive validation after baseline
+
+The immutable baseline above is preserved. The [current claim audit](right-sizing-claim-audit.md)
+and [generated comparison results](right-sizing-comparison-results.md) now link the new
+lifecycle/feedback implementation, three qualified workload paths, primary equal-budget
+Random/BO results and complete later finite references (W1 v2, W2 v3). The original
+failed references remain separately recorded and charged. Fresh W2 v3 adds 32 native
+Jobs with no failures; it does not replace the primary comparison or imply BO advantage.
+New Slurm approved-feedback hardware validation remains blocked by controller connectivity.
