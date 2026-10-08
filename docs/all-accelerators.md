@@ -78,6 +78,10 @@ NPU 학습과 arbitrary model GPU↔NPU 자동 변환도 이번 범위에 포함
 Pod의 전체 비용도 아직 완전한 ledger가 없다. 따라서 위 수치는 **알려진 API
 예약량의 합**이며 전체 실험 비용이나 zero-cost failure 주장으로 사용할 수 없다.
 예약량은 실제 utilization이 아니다. profiling 비용 회수·성능 향상·ROI를 주장하지 않는다.
+이전 worker가 제출한 GPU4건은 원본 Pod termination receipt가 없어 retained native
+Job UID/Complete와 captured ledger로 연결했다. 그 4건의 원본 Pod 시간을 별도로
+재검증했다고 주장하지 않는다. 나머지 captured receipt 경로는 종료 phase/exitCode와
+scheduled/container 종료 시각을 usage에 대조한다.
 
 기본 auditor는 missing reservation을 거절한다. 불완전한 비용을 그대로 보고하려면:
 
@@ -112,3 +116,6 @@ Focused software tests와 real hardware 성공은 별도 증거다.
 새 템플릿은 manual submission 가능 상태로 확인했다. 종료한 소유 lab Pod21개를
 로그·UID 보존 후 정리했고 잔여0이다.
 [정리 증거](evidence/all-accelerators-20261008-cleanup-v1.json)를 별도로 남겼다.
+추가 auditor review에서 native 실패 receipt와 시간 변조의 false acceptance를 찾았고
+수정했다. 회귀검사2개를 추가한 auditor replay8개가 통과했다. 원본 hardware evidence와
+재계산 요약 숫자는 변경하지 않았다.

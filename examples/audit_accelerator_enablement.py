@@ -66,6 +66,16 @@ def audit(report, receipts, *, allow_incomplete_cost=False):
             and receipt["allocation"] != allocation
         ):
             raise ValueError("termination allocation differs from usage")
+        if receipt["source"] == "captured-termination-receipt":
+            container = receipt["container"] or {}
+            if state == "SUCCEEDED" and (
+                receipt["phase"] != "Succeeded" or container.get("exitCode") != 0
+            ):
+                raise ValueError("native successful termination proof required")
+            if stamp(usage["started_at"]) != stamp(receipt["scheduled_at"]) or stamp(
+                usage["backend_finished_at"]
+            ) != stamp(container.get("finishedAt")):
+                raise ValueError("usage timing differs from native receipt")
         missing = not allocation or any(
             usage[k] is None
             for k in (

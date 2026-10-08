@@ -32,7 +32,8 @@ def test_unknown_cost_rejects_complete_cost_claim(records):
 
 
 @pytest.mark.parametrize(
-    "corruption", ["duplicate", "digest", "quality", "reservation", "native_id"]
+    "corruption",
+    ["duplicate", "digest", "quality", "reservation", "native_id", "native_outcome", "native_time"],
 )
 def test_corrupted_captures_are_rejected(records, corruption):
     report, receipts = copy.deepcopy(records)
@@ -45,7 +46,24 @@ def test_corrupted_captures_are_rejected(records, corruption):
         row["quality_passed"] = False
     elif corruption == "reservation":
         row["usage"]["allocated_device_seconds"] += 1
-    else:
+    elif corruption == "native_id":
         receipts[row["attempt_id"]]["job_id"] = "unrelated-job"
+    elif corruption == "native_outcome":
+        receipts[row["attempt_id"]]["phase"] = "Failed"
+        receipts[row["attempt_id"]]["container"]["exitCode"] = 42
+    else:
+        from datetime import datetime, timedelta
+
+        u = row["usage"]
+        for key in (
+            "allocation_interval_seconds",
+            "allocated_device_seconds",
+            "allocated_cpu_seconds",
+        ):
+            u[key] += 1
+        u["backend_finished_at"] = (
+            datetime.fromisoformat(u["backend_finished_at"].replace("Z", "+00:00"))
+            + timedelta(seconds=1)
+        ).isoformat()
     with pytest.raises(ValueError):
         audit(report, receipts, allow_incomplete_cost=True)
