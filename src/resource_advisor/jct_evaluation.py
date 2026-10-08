@@ -20,6 +20,14 @@ FROZEN_SCHEDULES = {
     12: "8b393225e42b905d7302d8c11029db401b2c8ca7f43561b747a0622c0e804355",
     6: "bb992b5f69dc7fe7a96fa085785e9cff604ed50df820b61081fb30fa0d9e88f8",
 }
+FROZEN_ROUTES = {
+    "rtx5060": ("kubernetes", "etri-ser0001-cg0msb", "nvidia.com/gpu", 1),
+    "spark": ("kubernetes", "etri-ser0003-cg0ms0", "nvidia.com/gpu", 1),
+    "jetson-nano": ("kubernetes", "etri-dev0001-jetorn", "nvidia.com/gpu.shared", 2),
+    "jetson-agx": ("kubernetes", "etri-dev0005-jetagx", "nvidia.com/gpu.shared", 2),
+    "rtx5080": ("kubernetes", "etri-ser0002-cgnmsb", "nvidia.com/gpu", 1),
+    "slurm-orin": ("slurm", "slurm-w2", "gres/gpu:orin_nano", 1),
+}
 FROZEN_WORKLOAD = {
     "fixture_sha256": "644a0c537bd997d18ce29e22ca5074ba5d8dccf340b8b39a2fb435de2113ba25",
     "source_sha256": "d1f5a96f0a8896d4710c77c698e883df3cd0c09fb1cd4ad2037f6e118093bd6d",
@@ -80,6 +88,11 @@ def _validate_plan(plan):
         "complete Kubernetes and Slurm pool required",
     )
     _require(len({(n["backend"], n["node"]) for n in pool}) == 6, "duplicate physical candidate")
+    _require(
+        {n["ref"]: (n["backend"], n["node"], n["resource_key"], n["nominal_slots"]) for n in pool}
+        == FROZEN_ROUTES,
+        "changed preregistered resource route/capacity",
+    )
 
 
 def _native_identity(job, node, plan):
@@ -181,18 +194,9 @@ def _native_identity(job, node, plan):
         if accounting is None:
             _require(fields["TresPerNode"] == node["resource_key"] + ":1", "wrong Slurm GRES")
         timezone = receipt.get("native_timezone", plan.get("slurm_timezone"))
-        if timezone != "UTC" and any(
-            "+" not in fields[k] and not fields[k].endswith("Z")
-            for k in ("SubmitTime", "StartTime", "EndTime")
-        ):
-            # Numeric native boundaries remain auditable, but lack of native UTC
-            # command provenance is carried to the promotion gate by audit_capture.
-            accepted = receipt["accepted_at"]
-            started, finished = receipt["scheduled_at"], receipt["finished_at"]
-        else:
-            accepted, started, finished = (
-                _epoch(fields[k], timezone) for k in ("SubmitTime", "StartTime", "EndTime")
-            )
+        accepted, started, finished = (
+            _epoch(fields[k], timezone) for k in ("SubmitTime", "StartTime", "EndTime")
+        )
         if accounting is not None:
             _require(
                 accounting["accepted_at"] == accepted
@@ -318,6 +322,22 @@ def _validate_jobs(capture):
                 and detail["compute_started_at"] <= detail["compute_finished_at"],
                 "unknown or reversed compute clock",
             )
+            _require(
+                detail["compute_started_at"] >= job["started_at"] - 1
+                and detail["compute_finished_at"] <= job["finished_at"] + 1,
+                "compute lies outside native allocation and one-second uncertainty",
+            )
+            if "round_seconds" in detail:
+                seconds = detail["round_seconds"]
+                _require(
+                    isinstance(seconds, list)
+                    and len(seconds) == rounds
+                    and all(_finite(value) and value >= 0 for value in seconds)
+                    and math.isclose(
+                        math.fsum(seconds), detail["elapsed_seconds"], rel_tol=0, abs_tol=1e-9
+                    ),
+                    "incomplete or fabricated synchronized compute rounds",
+                )
             identity = _native_identity(job, node, plan)
             _require(identity not in native_seen, "duplicate native allocation")
             native_seen.add(identity)
@@ -720,6 +740,13 @@ def audit_capture(directory):
             _validate_terminal_snapshot(snapshot, receipt, job)
     summary = summarize_capture(capture)
     summary["archive_integrity_verified"] = True
+    summary["round_level_compute_evidence_complete"] = all(
+        "round_seconds" in j["details"] for j in all_jobs
+    )
+    main_jobs = [j for c in capture["cohorts"] for j in c["jobs"]]
+    summary["native_terminal_snapshots_verified"] = sum(
+        bool(j["native_receipt"].get("native_snapshot_ref")) for j in main_jobs
+    )
     ambiguities = [
         "clock alignment unqualified",
         "actual arrival comparability unqualified",
@@ -758,6 +785,12 @@ def audit_capture(directory):
         )
     if not decision_stats["selector_source_archived"]:
         ambiguities.append("committed selector source archive missing")
+    if not summary["round_level_compute_evidence_complete"]:
+        ambiguities.append("per-round synchronized compute evidence missing")
+    if summary["native_terminal_snapshots_verified"] != summary["expected_main_jobs"]:
+        ambiguities.append("raw terminal native snapshot provenance incomplete")
+    if decision_stats["queue_scope_snapshots_verified"] != summary["expected_main_jobs"]:
+        ambiguities.append("native queue observation scope incomplete")
     schedule_name = "preregistered-schedule.json"
     if (directory / schedule_name).exists():
         schedule = read_json(schedule_name, FROZEN_SCHEDULES[plan["jobs_per_cohort"]])
@@ -871,7 +904,7 @@ def _audit_decisions(capture, read_json, read):
         )
     else:
         calibration = capture
-    replayed = fallbacks = complete_queue = 0
+    replayed = fallbacks = complete_queue = scope_verified = 0
     for cohort in capture["cohorts"]:
         for index, job in enumerate(cohort["jobs"]):
             evidence = job.get("choice_evidence")
@@ -901,6 +934,7 @@ def _audit_decisions(capture, read_json, read):
                 snapshot["observed_at"] <= snapshot["finished_at"] <= selected_at,
                 "future or unresolved queue observation",
             )
+            scope_verified += _validate_queue_scope(snapshot, choice["queues"])
             profiles = []
             for raw in choice["profiles"]:
                 identity = jct_selection.CandidateIdentity(**raw["identity"])
@@ -1011,6 +1045,7 @@ def _audit_decisions(capture, read_json, read):
         "queue_fallback_jobs": fallbacks,
         "queue_policy_selected_jobs": complete_queue,
         "selector_source_archived": bool(plan.get("policy_sha256")),
+        "queue_scope_snapshots_verified": scope_verified,
     }
 
 
@@ -1244,3 +1279,43 @@ def _validate_terminal_snapshot(snapshot, receipt, job):
         _require(
             all(native[key] == rows[0][key] for key in keys), "changed raw Slurm primary allocation"
         )
+
+
+def _validate_queue_scope(snapshot, queues):
+    raw = snapshot.get("raw", {}).get("kubernetes")
+    if not raw or "native_lists" not in raw:
+        return False
+    native_lists = raw["native_lists"]
+    items = native_lists["jobs_pods"]["items"] + native_lists["workloads"]["items"]
+    _require(raw["items"] == items, "changed native Workload UID query result")
+    for key, kind in (("jobs", "Job"), ("pods", "Pod"), ("workloads", "Workload")):
+        _require(
+            snapshot[key] == [item for item in items if item["kind"] == kind],
+            "changed normalized native queue observation",
+        )
+    for queue in queues:
+        if not queue["complete"]:
+            continue
+        _require(not snapshot.get("errors"), "complete queue claims failed native observations")
+        if queue["identity"]["backend"] != "kubernetes":
+            continue
+        node = queue["identity"]["node_ref"]
+        for job in snapshot["jobs"]:
+            spec = job["spec"]["template"]["spec"]
+            if spec.get("nodeSelector", {}).get("kubernetes.io/hostname") != node:
+                continue
+            if job.get("status", {}).get("succeeded") or job.get("status", {}).get("failed"):
+                continue
+            owner = job["metadata"]
+            workloads = [
+                w
+                for w in snapshot["workloads"]
+                if any(
+                    o.get("kind") == "Job"
+                    and o.get("uid") == owner["uid"]
+                    and o.get("name") == owner["name"]
+                    for o in w["metadata"].get("ownerReferences", [])
+                )
+            ]
+            _require(len(workloads) == 1, "complete queue omitted or duplicated own Workload")
+    return True

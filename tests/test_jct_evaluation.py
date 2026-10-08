@@ -109,6 +109,9 @@ def native_job(plan, candidate, attempt, accepted, duration, profile=False):
                 "JobId": native_id,
                 "JobName": attempt,
                 "JobState": "COMPLETED",
+                "Account": "ra-lab",
+                "QOS": "ra-normal",
+                "Partition": "compute",
                 "ExitCode": "0:0",
                 "NodeList": candidate["node"],
                 "NumCPUs": "1",
@@ -701,3 +704,99 @@ def test_user_shortening_preserves_all_27_cohorts_and_three_independent_repeats(
     capture["cohorts"][0]["jobs"].pop()
     with pytest.raises(ValueError, match="incomplete"):
         summarize_capture(capture)
+
+
+@pytest.mark.parametrize(
+    "tamper",
+    ["round_sum", "round_count", "round_nan", "future_compute", "changed_pool", "naive_slurm"],
+)
+def test_audit_rejects_fabricated_compute_or_changed_preregistered_route(tamper):
+    capture = capture_fixture()
+    job = capture["cohorts"][0]["jobs"][0]
+    detail = job["details"]
+    if tamper == "round_sum":
+        detail["round_seconds"] = [0] * 16384
+    elif tamper == "round_count":
+        detail["round_seconds"] = [1]
+    elif tamper == "round_nan":
+        detail["round_seconds"] = [float("nan")] * 16384
+    elif tamper == "future_compute":
+        detail["compute_finished_at"] = job["finished_at"] + 10
+    elif tamper == "changed_pool":
+        capture["plan"]["pool"][0]["node"] = "replacement-node"
+        for cohort in capture["cohorts"]:
+            for j in cohort["jobs"]:
+                if j["candidate_ref"] == "rtx5060":
+                    j["native_receipt"]["pod"]["spec"]["nodeName"] = "replacement-node"
+        capture["qualifications"][0]["native_receipt"]["pod"]["spec"]["nodeName"] = (
+            "replacement-node"
+        )
+    else:
+        fields = capture["cohorts"][0]["jobs"][5]["native_receipt"]["native_fields"]
+        for key in ("SubmitTime", "StartTime", "EndTime"):
+            fields[key] = fields[key].replace("Z", "")
+    job["native_receipt"]["result"] = {
+        k: v for k, v in detail.items() if k not in ("model_digest", "input_digest")
+    }
+    with pytest.raises(ValueError):
+        summarize_capture(capture)
+
+
+def test_archive_rejects_complete_queue_claim_that_omits_own_workload(tmp_path):
+    capture = write_archive(tmp_path)
+    archive_one_choice(tmp_path, capture)
+    choice_path = tmp_path / "choice.json"
+    snapshot_path = tmp_path / "snapshot.json"
+    choice = json.loads(choice_path.read_text())
+    snapshot = json.loads(snapshot_path.read_text())
+    node = capture["plan"]["pool"][0]
+    native_job = {
+        "kind": "Job",
+        "metadata": {"name": "queued-own", "uid": "own-uid"},
+        "spec": {"template": {"spec": {"nodeSelector": {"kubernetes.io/hostname": node["node"]}}}},
+        "status": {"active": 1},
+    }
+    native_lists = {"jobs_pods": {"items": [native_job]}, "workloads": {"items": []}}
+    snapshot.update(
+        raw={"kubernetes": {"items": [native_job], "native_lists": native_lists}},
+        jobs=[native_job],
+        pods=[],
+        workloads=[],
+    )
+    snapshot_path.write_text(json.dumps(snapshot))
+    first_prediction = choice["decision"]["predictions"][0]
+    identity = {
+        "candidate_ref": first_prediction["candidate_ref"],
+        "backend": "kubernetes",
+        "cluster_ref": "local-native-pool",
+        "node_ref": node["node"],
+        "resource_key": node["resource_key"],
+        "runtime_digest": node["image"] + ":default",
+        "workload_digest": capture["plan"]["source_sha256"]
+        + ":"
+        + capture["plan"]["fixture_sha256"],
+    }
+    choice["queues"] = [
+        {
+            "identity": identity,
+            "snapshot_ref": "snapshot.json",
+            "observed_at": snapshot["observed_at"],
+            "capacity": 1,
+            "complete": True,
+            "running": [],
+            "pending": [],
+            "capacity_unit": "physical_device",
+            "observed_job_ids": ["queued-own"],
+        }
+    ]
+    choice["snapshot_sha256"] = hashlib.sha256(snapshot_path.read_bytes()).hexdigest()
+    choice_path.write_text(json.dumps(choice))
+    ref = capture["cohorts"][0]["jobs"][0]
+    job_path = tmp_path / ref["job_file"]
+    job = json.loads(job_path.read_text())
+    job["choice_evidence"]["choice_sha256"] = hashlib.sha256(choice_path.read_bytes()).hexdigest()
+    job_path.write_text(json.dumps(job))
+    ref["job_sha256"] = hashlib.sha256(job_path.read_bytes()).hexdigest()
+    (tmp_path / "capture.json").write_text(json.dumps(capture))
+    with pytest.raises(ValueError, match="Workload"):
+        audit_capture(tmp_path)
