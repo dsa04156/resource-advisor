@@ -1,0 +1,8 @@
+{
+  "user_instruction": "\uac80\uc99d\u3134\u3134 \uacb0\uacfc \uae30\ub85d",
+  "final_verification": "stopped",
+  "observed_results_recorded": true,
+  "after_run_clock_probe": "not run",
+  "independent_final_audit": "not run",
+  "production_integration": "not performed"
+}

@@ -1,0 +1,196 @@
+{
+  "seed": 20261008,
+  "method": "experimental-design assign_factorial_runs randomized nine paired load/repeat blocks; seeded block_randomization arm order rotated across repeats per load",
+  "cohorts": [
+    {
+      "load": "burst",
+      "block": 2,
+      "arm": "profile_only",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.0
+    },
+    {
+      "load": "burst",
+      "block": 2,
+      "arm": "round_robin",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.0
+    },
+    {
+      "load": "burst",
+      "block": 2,
+      "arm": "profile_queue",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.0
+    },
+    {
+      "load": "sparse",
+      "block": 1,
+      "arm": "profile_only",
+      "jobs": 6,
+      "arrival_interval_seconds": 3.0
+    },
+    {
+      "load": "sparse",
+      "block": 1,
+      "arm": "round_robin",
+      "jobs": 6,
+      "arrival_interval_seconds": 3.0
+    },
+    {
+      "load": "sparse",
+      "block": 1,
+      "arm": "profile_queue",
+      "jobs": 6,
+      "arrival_interval_seconds": 3.0
+    },
+    {
+      "load": "sparse",
+      "block": 0,
+      "arm": "profile_queue",
+      "jobs": 6,
+      "arrival_interval_seconds": 3.0
+    },
+    {
+      "load": "sparse",
+      "block": 0,
+      "arm": "profile_only",
+      "jobs": 6,
+      "arrival_interval_seconds": 3.0
+    },
+    {
+      "load": "sparse",
+      "block": 0,
+      "arm": "round_robin",
+      "jobs": 6,
+      "arrival_interval_seconds": 3.0
+    },
+    {
+      "load": "moderate",
+      "block": 2,
+      "arm": "round_robin",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.5
+    },
+    {
+      "load": "moderate",
+      "block": 2,
+      "arm": "profile_queue",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.5
+    },
+    {
+      "load": "moderate",
+      "block": 2,
+      "arm": "profile_only",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.5
+    },
+    {
+      "load": "moderate",
+      "block": 0,
+      "arm": "profile_queue",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.5
+    },
+    {
+      "load": "moderate",
+      "block": 0,
+      "arm": "profile_only",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.5
+    },
+    {
+      "load": "moderate",
+      "block": 0,
+      "arm": "round_robin",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.5
+    },
+    {
+      "load": "moderate",
+      "block": 1,
+      "arm": "profile_only",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.5
+    },
+    {
+      "load": "moderate",
+      "block": 1,
+      "arm": "round_robin",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.5
+    },
+    {
+      "load": "moderate",
+      "block": 1,
+      "arm": "profile_queue",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.5
+    },
+    {
+      "load": "sparse",
+      "block": 2,
+      "arm": "round_robin",
+      "jobs": 6,
+      "arrival_interval_seconds": 3.0
+    },
+    {
+      "load": "sparse",
+      "block": 2,
+      "arm": "profile_queue",
+      "jobs": 6,
+      "arrival_interval_seconds": 3.0
+    },
+    {
+      "load": "sparse",
+      "block": 2,
+      "arm": "profile_only",
+      "jobs": 6,
+      "arrival_interval_seconds": 3.0
+    },
+    {
+      "load": "burst",
+      "block": 1,
+      "arm": "profile_queue",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.0
+    },
+    {
+      "load": "burst",
+      "block": 1,
+      "arm": "profile_only",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.0
+    },
+    {
+      "load": "burst",
+      "block": 1,
+      "arm": "round_robin",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.0
+    },
+    {
+      "load": "burst",
+      "block": 0,
+      "arm": "round_robin",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.0
+    },
+    {
+      "load": "burst",
+      "block": 0,
+      "arm": "profile_queue",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.0
+    },
+    {
+      "load": "burst",
+      "block": 0,
+      "arm": "profile_only",
+      "jobs": 6,
+      "arrival_interval_seconds": 0.0
+    }
+  ],
+  "amendment_reason": "User requested half remaining experiment time before this new confirmatory run. No pilot outcomes used to tune policy, gates, loads, fixedwork, or frozen profiles."
+}

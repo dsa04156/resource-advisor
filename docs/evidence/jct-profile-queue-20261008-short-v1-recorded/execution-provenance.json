@@ -1,0 +1,23 @@
+{
+  "git_commit": "f3ac72d39771fe1bbe6563e9b351a04eeccfa25c",
+  "source_files": [
+    {
+      "path": "executed-source/examples/run_jct_comparison.py",
+      "sha256": "7a4c9cae1b75391fda122bb34f6e05f8aedbf8934e2194d28179bdf594fc0591",
+      "git_path": "examples/run_jct_comparison.py"
+    },
+    {
+      "path": "executed-source/examples/jct_native.py",
+      "sha256": "fef65d6d89060de2806a95c4487d9b59706a9a656dcc1019d8e4c6bbaac337ad",
+      "git_path": "examples/jct_native.py"
+    },
+    {
+      "path": "executed-source/src/resource_advisor/jct_selection.py",
+      "sha256": "b698fe7ecbfcf283924fa63c0cfa28b33696bbe3103344941b3dbaa666af29cf",
+      "git_path": "src/resource_advisor/jct_selection.py"
+    }
+  ],
+  "recorded_at": 1791456597.0732574,
+  "command": "PYTHONPATH=src resource-advisor/.venv/bin/python examples/run_jct_comparison.py --directory <this-directory> --v2-directory ../profile-pool-20261008-v2 --private-remote-module ../slurm_resume_remote.py",
+  "private_remote_module": "External authenticated remote(role,code) interface; credentials omitted."
+}

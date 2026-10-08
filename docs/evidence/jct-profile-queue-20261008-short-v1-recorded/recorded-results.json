@@ -1,0 +1,287 @@
+{
+  "status": "recorded_without_final_verification_at_user_request",
+  "independent_final_audit_completed": false,
+  "production_integrated": false,
+  "performance_improvement_established": false,
+  "nais_verified_improvement_claim": null,
+  "experiment_id": "jct-profile-queue-20261008-v1",
+  "main_attempt_prefix": "jct-profile-queue-20261008-v1-short",
+  "main_jobs": 162,
+  "cohorts": 27,
+  "outcomes": {
+    "SUCCEEDED": 162
+  },
+  "main_wall_seconds": 726.564435005188,
+  "completed_at_utc": "2026-10-08T11:01:41.960810+00:00",
+  "conditions": {
+    "policies": [
+      "round_robin",
+      "profile_only",
+      "profile_queue"
+    ],
+    "loads": {
+      "sparse": 3,
+      "moderate": 0.5,
+      "burst": 0
+    },
+    "repeats": 3,
+    "jobs_per_cohort": 6,
+    "forwards_per_job": 16384,
+    "heldout_images": 256,
+    "repeated_inferences_per_job": 4194304,
+    "model": "trained FP32 Digits MLP 64\u2192256\u2192256\u219210",
+    "pool_candidates": 6,
+    "nominal_slots": 8,
+    "profile_only_definition": "v2 decision rule using identical fresh full-work frozen calibration plus synthetic cohort backlog; no live queue reconciliation"
+  },
+  "overall": {
+    "round_robin": {
+      "jobs": 54,
+      "cohorts": 9,
+      "mean_jct_seconds": 6.537037037037037,
+      "p95_jct_seconds": 11.0,
+      "native_throughput_jobs_per_second": 0.4,
+      "native_cohort_wall_seconds": 135.0,
+      "reservation_seconds": {
+        "kubernetes_exclusive": 62.0,
+        "kubernetes_shared_slot": 162.0,
+        "slurm_gres": 72.0
+      },
+      "mixed_slot_seconds": 296.0,
+      "synchronized_inference_seconds": 201.83222296630265,
+      "queue_fallback_jobs": 0
+    },
+    "profile_only": {
+      "jobs": 54,
+      "cohorts": 9,
+      "mean_jct_seconds": 6.388888888888889,
+      "p95_jct_seconds": 17.0,
+      "native_throughput_jobs_per_second": 0.35294117647058826,
+      "native_cohort_wall_seconds": 153.0,
+      "reservation_seconds": {
+        "kubernetes_exclusive": 112.0,
+        "kubernetes_shared_slot": 0,
+        "slurm_gres": 0
+      },
+      "mixed_slot_seconds": 112.0,
+      "synchronized_inference_seconds": 43.94889784893894,
+      "queue_fallback_jobs": 0
+    },
+    "profile_queue": {
+      "jobs": 54,
+      "cohorts": 9,
+      "mean_jct_seconds": 6.555555555555555,
+      "p95_jct_seconds": 14.0,
+      "native_throughput_jobs_per_second": 0.3698630136986301,
+      "native_cohort_wall_seconds": 146.0,
+      "reservation_seconds": {
+        "kubernetes_exclusive": 108.0,
+        "kubernetes_shared_slot": 17.0,
+        "slurm_gres": 78.0
+      },
+      "mixed_slot_seconds": 203.0,
+      "synchronized_inference_seconds": 123.53265533443482,
+      "queue_fallback_jobs": 6
+    }
+  },
+  "loads": {
+    "sparse": {
+      "round_robin": {
+        "jobs": 18,
+        "cohorts": 3,
+        "mean_jct_seconds": 6.722222222222222,
+        "p95_jct_seconds": 14.0,
+        "native_throughput_jobs_per_second": 0.26865671641791045,
+        "native_cohort_wall_seconds": 67.0,
+        "reservation_seconds": {
+          "kubernetes_exclusive": 20.0,
+          "kubernetes_shared_slot": 56.0,
+          "slurm_gres": 24.0
+        },
+        "mixed_slot_seconds": 100.0,
+        "synchronized_inference_seconds": 67.35342958691763,
+        "queue_fallback_jobs": 0
+      },
+      "profile_only": {
+        "jobs": 18,
+        "cohorts": 3,
+        "mean_jct_seconds": 3.888888888888889,
+        "p95_jct_seconds": 7.0,
+        "native_throughput_jobs_per_second": 0.35294117647058826,
+        "native_cohort_wall_seconds": 51.0,
+        "reservation_seconds": {
+          "kubernetes_exclusive": 38.0,
+          "kubernetes_shared_slot": 0,
+          "slurm_gres": 0
+        },
+        "mixed_slot_seconds": 38.0,
+        "synchronized_inference_seconds": 14.6394619835919,
+        "queue_fallback_jobs": 0
+      },
+      "profile_queue": {
+        "jobs": 18,
+        "cohorts": 3,
+        "mean_jct_seconds": 6.444444444444445,
+        "p95_jct_seconds": 15.0,
+        "native_throughput_jobs_per_second": 0.2608695652173913,
+        "native_cohort_wall_seconds": 69.0,
+        "reservation_seconds": {
+          "kubernetes_exclusive": 46.0,
+          "kubernetes_shared_slot": 8.0,
+          "slurm_gres": 32.0
+        },
+        "mixed_slot_seconds": 86.0,
+        "synchronized_inference_seconds": 45.57561395072844,
+        "queue_fallback_jobs": 4
+      }
+    },
+    "moderate": {
+      "round_robin": {
+        "jobs": 18,
+        "cohorts": 3,
+        "mean_jct_seconds": 6.444444444444445,
+        "p95_jct_seconds": 11.0,
+        "native_throughput_jobs_per_second": 0.5294117647058824,
+        "native_cohort_wall_seconds": 34.0,
+        "reservation_seconds": {
+          "kubernetes_exclusive": 20.0,
+          "kubernetes_shared_slot": 54.0,
+          "slurm_gres": 24.0
+        },
+        "mixed_slot_seconds": 98.0,
+        "synchronized_inference_seconds": 67.26596034954127,
+        "queue_fallback_jobs": 0
+      },
+      "profile_only": {
+        "jobs": 18,
+        "cohorts": 3,
+        "mean_jct_seconds": 7.777777777777778,
+        "p95_jct_seconds": 17.0,
+        "native_throughput_jobs_per_second": 0.34615384615384615,
+        "native_cohort_wall_seconds": 52.0,
+        "reservation_seconds": {
+          "kubernetes_exclusive": 38.0,
+          "kubernetes_shared_slot": 0,
+          "slurm_gres": 0
+        },
+        "mixed_slot_seconds": 38.0,
+        "synchronized_inference_seconds": 14.648795447748853,
+        "queue_fallback_jobs": 0
+      },
+      "profile_queue": {
+        "jobs": 18,
+        "cohorts": 3,
+        "mean_jct_seconds": 7.055555555555555,
+        "p95_jct_seconds": 14.0,
+        "native_throughput_jobs_per_second": 0.42857142857142855,
+        "native_cohort_wall_seconds": 42.0,
+        "reservation_seconds": {
+          "kubernetes_exclusive": 31.0,
+          "kubernetes_shared_slot": 9.0,
+          "slurm_gres": 23.0
+        },
+        "mixed_slot_seconds": 63.0,
+        "synchronized_inference_seconds": 42.17250866624818,
+        "queue_fallback_jobs": 2
+      }
+    },
+    "burst": {
+      "round_robin": {
+        "jobs": 18,
+        "cohorts": 3,
+        "mean_jct_seconds": 6.444444444444445,
+        "p95_jct_seconds": 11.0,
+        "native_throughput_jobs_per_second": 0.5294117647058824,
+        "native_cohort_wall_seconds": 34.0,
+        "reservation_seconds": {
+          "kubernetes_exclusive": 22.0,
+          "kubernetes_shared_slot": 52.0,
+          "slurm_gres": 24.0
+        },
+        "mixed_slot_seconds": 98.0,
+        "synchronized_inference_seconds": 67.21283302984375,
+        "queue_fallback_jobs": 0
+      },
+      "profile_only": {
+        "jobs": 18,
+        "cohorts": 3,
+        "mean_jct_seconds": 7.5,
+        "p95_jct_seconds": 20.0,
+        "native_throughput_jobs_per_second": 0.36,
+        "native_cohort_wall_seconds": 50.0,
+        "reservation_seconds": {
+          "kubernetes_exclusive": 36.0,
+          "kubernetes_shared_slot": 0,
+          "slurm_gres": 0
+        },
+        "mixed_slot_seconds": 36.0,
+        "synchronized_inference_seconds": 14.660640417598188,
+        "queue_fallback_jobs": 0
+      },
+      "profile_queue": {
+        "jobs": 18,
+        "cohorts": 3,
+        "mean_jct_seconds": 6.166666666666667,
+        "p95_jct_seconds": 10.0,
+        "native_throughput_jobs_per_second": 0.5142857142857142,
+        "native_cohort_wall_seconds": 35.0,
+        "reservation_seconds": {
+          "kubernetes_exclusive": 31.0,
+          "kubernetes_shared_slot": 0,
+          "slurm_gres": 23.0
+        },
+        "mixed_slot_seconds": 54.0,
+        "synchronized_inference_seconds": 35.784532717458205,
+        "queue_fallback_jobs": 0
+      }
+    }
+  },
+  "observed_mean_jct_reduction_percent_not_verified": {
+    "round_robin": -0.28328611898016387,
+    "profile_only": -2.608695652173898
+  },
+  "profiling": {
+    "source_attempts": [
+      "jct-profile-queue-20261008-v1-profile-rtx5060-0",
+      "jct-profile-queue-20261008-v1-profile-rtx5060-1",
+      "jct-profile-queue-20261008-v1-profile-spark-0",
+      "jct-profile-queue-20261008-v1-profile-spark-1",
+      "jct-profile-queue-20261008-v1-profile-jetson-nano-0",
+      "jct-profile-queue-20261008-v1-profile-jetson-nano-1",
+      "jct-profile-queue-20261008-v1-profile-jetson-nano-2",
+      "jct-profile-queue-20261008-v1-profile-jetson-agx-0",
+      "jct-profile-queue-20261008-v1-profile-jetson-agx-1",
+      "jct-profile-queue-20261008-v1-profile-jetson-agx-2",
+      "jct-profile-queue-20261008-v1-profile-rtx5080-0",
+      "jct-profile-queue-20261008-v1-profile-rtx5080-1",
+      "jct-profile-queue-20261008-v1-profile-slurm-orin-0",
+      "jct-profile-queue-20261008-v1-profile-slurm-orin-1"
+    ],
+    "gpu_seconds": 124.0,
+    "wall_seconds": 44.0,
+    "scope": "14 native fixed-work capacity+1 calibration attempts, all costs; mixed exclusive physical GPU reservations and shared logical slots kept distinct in calibration-summary.json; training/common preparation cost unknown"
+  },
+  "separate_excluded_pilot": {
+    "recorded_at": 1791456395.3895109,
+    "attempted_main_jobs": 43,
+    "completed_original_jobs": 36,
+    "separate_pilot_excluded_from_confirmatory_metrics": true,
+    "native_reservation_seconds_known": {
+      "kubernetes_exclusive": 75.0,
+      "kubernetes_shared_slot": 107.0,
+      "slurm_gres": 41.0
+    },
+    "unknown_cost_attempts": [],
+    "clusterqueue_reserving_workloads": 0,
+    "clusterqueue_pending_workloads": 0,
+    "slurm_queue_rows": 0
+  },
+  "limitations": [
+    "Final native/queue/source replay and after-run clock qualification were stopped at user request.",
+    "Native JCT:K8s Job creation\u2192container exit; Slurm Submit\u2192allocation End. Whole-second timestamps have quantization uncertainty.",
+    "Three independent cohort repeats; jobs/forwards are not independent policy repeats. No statistical significance claim.",
+    "Exclusive GPU reservation, shared GPU slot occupation, and Slurm GRES seconds are separate units; mixed slot sum does not establish physical GPU-hours, energy, or continuous whole-pool utilization.",
+    "Reviewer found saved queue payload needs stronger corroboration against raw native demand; no production integration.",
+    "Profiling cost and initial pilot cost remain charged separately; common model training/preparation CPU cost is unknown, not zero."
+  ]
+}
