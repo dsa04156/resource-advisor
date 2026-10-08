@@ -111,4 +111,3 @@
 - [Worker ownership across Kubernetes and Slurm routes](reference/worker-route-ownership.md)
 
 </details>
-
