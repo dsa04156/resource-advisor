@@ -1,0 +1,2127 @@
+{
+  "schema_version": "accelerator-enablement-v1",
+  "experiment_id": "all-accelerators-20261008-v1",
+  "scope": "native-api-cohort-only",
+  "synthetic": false,
+  "source_parent_commit": "e735a10",
+  "source_note": "Qualified images contain dirty source snapshots; code_digest, not the parent commit, identifies executed source.",
+  "jobs": [
+    {
+      "job_id": "j-58370c0710ce4233af669374707b5f20",
+      "attempt_id": "a-8a060c8cd0cb4eb3b808009f4bd8d7d0",
+      "state": "SUCCEEDED",
+      "error": null,
+      "backend": "kubernetes",
+      "native_job_uid": "04a2e6b7-0bf2-4427-9c3f-3629c8d84ad0",
+      "native_job_id": "a-8a060c8cd0cb4eb3b808009f4bd8d7d0",
+      "node_alias": "npu-1",
+      "accelerator_model": "ARIES2",
+      "device_class": "npu",
+      "workload_ref": "mobilint-candy-20261008-v1",
+      "candidate_ref": "device",
+      "runtime_variant": "v-mobilint-candy-20261008-v1",
+      "code_digest": "sha256:2df02c841c0c74909132e6c2ba43b81dce20758661e6e1e1a4d8d456e0b62fe6",
+      "image_digest": "sha256:3e1760cdef820206d262488dc60a5047acd551b95e81f914e1f516fda1a496da",
+      "model_digest": "sha256:aa158a35735a876cc9f9220f9967b711b8e49ce5de49126f0597e994c6b543da",
+      "quality_contract": {
+        "metric": "finite_output_repeat_element_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "workload_signature": "sha256:e3d860c34a40243ba463939431ff346dae85d0c55bdb329935c04f08f9c55c11",
+      "context_signature": "sha256:51863886ceaed1edfd2abc5afb2029b8c82423c59a287e4924d08c216bcc7e3b",
+      "created_at": "2026-10-08T07:22:15.316126+00:00",
+      "finished_at": "2026-10-08T07:22:50.778902+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "accelerator_count": 1
+      },
+      "quality_passed": true,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-58370c0710ce4233af669374707b5f20",
+        "attempt_id": "a-8a060c8cd0cb4eb3b808009f4bd8d7d0",
+        "epoch": 1,
+        "workload_signature": "sha256:e3d860c34a40243ba463939431ff346dae85d0c55bdb329935c04f08f9c55c11",
+        "context_signature": "sha256:51863886ceaed1edfd2abc5afb2029b8c82423c59a287e4924d08c216bcc7e3b",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.26127630400878843,
+          "peak_memory_mib": 66.33203125,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 26.048539504699875,
+          "latency_p95_ms": 26.31216699955985,
+          "latency_p99_ms": 26.31216699955985,
+          "throughput": 38.27365837073244,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:f7a577093d5c9990d78c991b4e23e47f070f2d24a13a66cc240d07d0a7f4e194",
+      "profile_recorded": true,
+      "mlflow_run_id": "621c1e823c18489e8a02eb8342f6be0b",
+      "artifact_digest": "sha256:49f7d1737f8311e8ed47d112fea52b9e9a4d47e108ad0121e4132e738b9b2a93",
+      "artifact_tracking_digest": "sha256:49f7d1737f8311e8ed47d112fea52b9e9a4d47e108ad0121e4132e738b9b2a93",
+      "usage": {
+        "attempt_id": "a-8a060c8cd0cb4eb3b808009f4bd8d7d0",
+        "device_class": "npu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 1.0,
+        "measured_compute_seconds": 0.26127630400878843,
+        "queue_seconds": 0.0,
+        "job_id": "j-58370c0710ce4233af669374707b5f20",
+        "outcome": "SUCCEEDED",
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "allocation_interval_seconds": 1.0,
+        "allocated_cpu_seconds": 1.0,
+        "allocation_memory_mib": 1024.0,
+        "started_at": "2026-10-08T07:22:45Z",
+        "backend_finished_at": "2026-10-08T07:22:46Z",
+        "submitted_at": "2026-10-08T07:22:45Z",
+        "collection_seconds": 0.065791,
+        "preparation_seconds": 0.0,
+        "container_runtime_seconds": 1.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-a101d8019f63421383dce8b62b49f84f",
+      "attempt_id": "a-14278ba6ea024a0fa363655bfd833b6f",
+      "state": "SUCCEEDED",
+      "error": null,
+      "backend": "kubernetes",
+      "native_job_uid": "7f3028f0-406a-4ccc-9be9-99fbdc3c2b1b",
+      "native_job_id": "a-14278ba6ea024a0fa363655bfd833b6f",
+      "node_alias": "npu-2",
+      "accelerator_model": "HAILO8",
+      "device_class": "npu",
+      "workload_ref": "hailo-resnet50-auto-20261008-v2",
+      "candidate_ref": "candidate-1",
+      "runtime_variant": "hailo-resnet50-auto-20261008-v2-runtime-1",
+      "code_digest": "sha256:09948eaa47161551020330f9dd5c27f713f60d3ee3d0a57a9a92f223dc1bd258",
+      "image_digest": "sha256:53ff138554921d149051fdef586c1d32d09737b546b9bc413b77037a7217059c",
+      "model_digest": "sha256:2625772f5e1324c1e2781856926a445b4fe6494b9e0bb0161a7d86df7f095d38",
+      "quality_contract": {
+        "metric": "top1_accuracy_with_reference_agreement_gate",
+        "minimum": 0.75,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "workload_signature": "sha256:8a74c00b467fa7e601b48c7ba6369329844b92361a86baaf7ad680827fdf3b8d",
+      "context_signature": "sha256:61155185436f70f4ac5b0438a161f3e95bc2c396e0ceee9e835f0d23a2bed620",
+      "created_at": "2026-10-08T07:22:17.157629+00:00",
+      "finished_at": "2026-10-08T07:22:28.336484+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "accelerator_count": 1
+      },
+      "quality_passed": true,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-a101d8019f63421383dce8b62b49f84f",
+        "attempt_id": "a-14278ba6ea024a0fa363655bfd833b6f",
+        "epoch": 1,
+        "workload_signature": "sha256:8a74c00b467fa7e601b48c7ba6369329844b92361a86baaf7ad680827fdf3b8d",
+        "context_signature": "sha256:61155185436f70f4ac5b0438a161f3e95bc2c396e0ceee9e835f0d23a2bed620",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.34127725491998717,
+          "peak_memory_mib": 138.28125,
+          "quality_value": 0.8,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 3.396507498109713,
+          "latency_p95_ms": 3.5307759972056374,
+          "latency_p99_ms": 3.575276001356542,
+          "throughput": 293.0168903973548,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:07f4639327d3a2904043fbb2a1aa2359ee5db7a001ddb6a7fd46acdc58a2ae72",
+      "profile_recorded": true,
+      "mlflow_run_id": "013acbae7f6d4b2786798c8e7dcbc8b8",
+      "artifact_digest": "sha256:506b4515d656f354782024a48550783693cc861cb1be386cb8a17bbfde273b52",
+      "artifact_tracking_digest": "sha256:506b4515d656f354782024a48550783693cc861cb1be386cb8a17bbfde273b52",
+      "usage": {
+        "attempt_id": "a-14278ba6ea024a0fa363655bfd833b6f",
+        "device_class": "npu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 3.0,
+        "measured_compute_seconds": 0.34127725491998717,
+        "queue_seconds": 0.0,
+        "job_id": "j-a101d8019f63421383dce8b62b49f84f",
+        "outcome": "SUCCEEDED",
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "allocation_interval_seconds": 3.0,
+        "allocated_cpu_seconds": 3.0,
+        "allocation_memory_mib": 1024.0,
+        "started_at": "2026-10-08T07:22:17Z",
+        "backend_finished_at": "2026-10-08T07:22:20Z",
+        "submitted_at": "2026-10-08T07:22:17Z",
+        "collection_seconds": 0.05867,
+        "preparation_seconds": 1.0,
+        "container_runtime_seconds": 2.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-f21bb640390942908706300d73e4ee90",
+      "attempt_id": "a-d798ee3510fa46909ac6d09ac916a238",
+      "state": "SUCCEEDED",
+      "error": null,
+      "backend": "kubernetes",
+      "native_job_uid": "ddf662e1-c7ff-4048-8334-b425c2575ca9",
+      "native_job_id": "a-d798ee3510fa46909ac6d09ac916a238",
+      "node_alias": "npu-3",
+      "accelerator_model": "HAILO8",
+      "device_class": "npu",
+      "workload_ref": "hailo-resnet50-auto-20261008-v2",
+      "candidate_ref": "candidate-2",
+      "runtime_variant": "hailo-resnet50-auto-20261008-v2-runtime-2",
+      "code_digest": "sha256:09948eaa47161551020330f9dd5c27f713f60d3ee3d0a57a9a92f223dc1bd258",
+      "image_digest": "sha256:53ff138554921d149051fdef586c1d32d09737b546b9bc413b77037a7217059c",
+      "model_digest": "sha256:2625772f5e1324c1e2781856926a445b4fe6494b9e0bb0161a7d86df7f095d38",
+      "quality_contract": {
+        "metric": "top1_accuracy_with_reference_agreement_gate",
+        "minimum": 0.75,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "workload_signature": "sha256:8a74c00b467fa7e601b48c7ba6369329844b92361a86baaf7ad680827fdf3b8d",
+      "context_signature": "sha256:61155185436f70f4ac5b0438a161f3e95bc2c396e0ceee9e835f0d23a2bed620",
+      "created_at": "2026-10-08T07:22:19.138454+00:00",
+      "finished_at": "2026-10-08T07:23:02.890076+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "accelerator_count": 1
+      },
+      "quality_passed": true,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-f21bb640390942908706300d73e4ee90",
+        "attempt_id": "a-d798ee3510fa46909ac6d09ac916a238",
+        "epoch": 1,
+        "workload_signature": "sha256:8a74c00b467fa7e601b48c7ba6369329844b92361a86baaf7ad680827fdf3b8d",
+        "context_signature": "sha256:61155185436f70f4ac5b0438a161f3e95bc2c396e0ceee9e835f0d23a2bed620",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.34055401757359505,
+          "peak_memory_mib": 138.609375,
+          "quality_value": 0.8,
+          "sample_count": 100,
+          "work_units": 100,
+          "latency_p50_ms": 3.388050536159426,
+          "latency_p95_ms": 3.4917539451271296,
+          "latency_p99_ms": 3.6492360522970557,
+          "throughput": 293.6391727588109,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:ad9f7c21909ff53ffc613deef08c6553fb95d91603a41686b0382f37c27371e9",
+      "profile_recorded": true,
+      "mlflow_run_id": "97d8138625c244418d23d7d8158098a7",
+      "artifact_digest": "sha256:25af2289841c0f938a20335d749468cee103b1784a7dece5c8822a0fee4b2b5f",
+      "artifact_tracking_digest": "sha256:25af2289841c0f938a20335d749468cee103b1784a7dece5c8822a0fee4b2b5f",
+      "usage": {
+        "attempt_id": "a-d798ee3510fa46909ac6d09ac916a238",
+        "device_class": "npu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 3.0,
+        "measured_compute_seconds": 0.34055401757359505,
+        "queue_seconds": 0.0,
+        "job_id": "j-f21bb640390942908706300d73e4ee90",
+        "outcome": "SUCCEEDED",
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "allocation_interval_seconds": 3.0,
+        "allocated_cpu_seconds": 3.0,
+        "allocation_memory_mib": 1024.0,
+        "started_at": "2026-10-08T07:22:50Z",
+        "backend_finished_at": "2026-10-08T07:22:53Z",
+        "submitted_at": "2026-10-08T07:22:50Z",
+        "collection_seconds": 0.057036,
+        "preparation_seconds": 1.0,
+        "container_runtime_seconds": 2.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-c1f5a0563efa4fc0948a44c63857a06f",
+      "attempt_id": "a-e8450b3d3319411d9dc2b3f75c849018",
+      "state": "SUCCEEDED",
+      "error": null,
+      "backend": "kubernetes",
+      "native_job_uid": "bba89540-6162-4dd6-8d9d-55e84a1066b5",
+      "native_job_id": "a-e8450b3d3319411d9dc2b3f75c849018",
+      "node_alias": "npu-4",
+      "accelerator_model": "Intel-NPU-3720",
+      "device_class": "npu",
+      "workload_ref": "intel-conv-20261008-v1",
+      "candidate_ref": "device",
+      "runtime_variant": "v-intel-conv-20261008-v1",
+      "code_digest": "sha256:c819384cb62d9d601f72726faa44721fe100ea8283aad9fe8588f1f5fca8f083",
+      "image_digest": "sha256:09dedfc5150d8e67a310e7213862e04ffb6a696421945921ccd26cf3e7077d26",
+      "model_digest": "sha256:9e6268a0a1d6ee57b35102ff20c3e50bc921ef2674f1e19ca7c875dd4c5530f0",
+      "quality_contract": {
+        "metric": "all_output_elements_within_absolute_tolerance_0.002",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "workload_signature": "sha256:1895d0980c0961871fe35f6a985ebec9badcd4b925b6ede9d683275d1da2dd2f",
+      "context_signature": "sha256:e6c908d4956aab3af04b6ee4151be9f708d067a4cc10fd1f842305ae30ba2491",
+      "created_at": "2026-10-08T07:29:10.270990+00:00",
+      "finished_at": "2026-10-08T07:29:20.246374+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "accelerator_count": 1
+      },
+      "quality_passed": true,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-c1f5a0563efa4fc0948a44c63857a06f",
+        "attempt_id": "a-e8450b3d3319411d9dc2b3f75c849018",
+        "epoch": 1,
+        "workload_signature": "sha256:1895d0980c0961871fe35f6a985ebec9badcd4b925b6ede9d683275d1da2dd2f",
+        "context_signature": "sha256:e6c908d4956aab3af04b6ee4151be9f708d067a4cc10fd1f842305ae30ba2491",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.005935184890404344,
+          "peak_memory_mib": 196.390625,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 0.5741390050388873,
+          "latency_p95_ms": 0.7156669162213802,
+          "latency_p99_ms": 0.7156669162213802,
+          "throughput": 1684.8674783775327,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:78dcb703630639fd0c854b22fec3405a81b244474b93a208c724a90ee1d2e10c",
+      "profile_recorded": true,
+      "mlflow_run_id": "ab281c1e051b4ad7943a049bdca794bb",
+      "artifact_digest": "sha256:54a4a50cfd9a95adeb42357d00b63a69c9522e7ed5865f969576af7d26ec0b56",
+      "artifact_tracking_digest": "sha256:54a4a50cfd9a95adeb42357d00b63a69c9522e7ed5865f969576af7d26ec0b56",
+      "usage": {
+        "attempt_id": "a-e8450b3d3319411d9dc2b3f75c849018",
+        "device_class": "npu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 2.0,
+        "measured_compute_seconds": 0.005935184890404344,
+        "queue_seconds": 0.0,
+        "job_id": "j-c1f5a0563efa4fc0948a44c63857a06f",
+        "outcome": "SUCCEEDED",
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "allocation_interval_seconds": 2.0,
+        "allocated_cpu_seconds": 2.0,
+        "allocation_memory_mib": 1024.0,
+        "started_at": "2026-10-08T07:29:14Z",
+        "backend_finished_at": "2026-10-08T07:29:16Z",
+        "submitted_at": "2026-10-08T07:29:14Z",
+        "collection_seconds": 0.066106,
+        "preparation_seconds": 1.0,
+        "container_runtime_seconds": 1.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-01ad8e137842486ba2cd5cf14cf7c512",
+      "attempt_id": "a-ed9116703f1c4193b4000d6f5f6e889d",
+      "state": "SUCCEEDED",
+      "error": null,
+      "backend": "kubernetes",
+      "native_job_uid": null,
+      "native_job_id": "a-ed9116703f1c4193b4000d6f5f6e889d",
+      "node_alias": "gpu-1",
+      "accelerator_model": "NVIDIA GeForce RTX 5060 Ti",
+      "device_class": "gpu",
+      "workload_ref": "cuda-sustained-auto-v2",
+      "candidate_ref": "candidate-1",
+      "runtime_variant": "cuda-sustained-auto-v2-runtime-1",
+      "code_digest": "sha256:44d440dfe62873ad153a1233dd2c4fea4ae0d3d3d78ae9d7074a627df58d45aa",
+      "image_digest": "sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+      "model_digest": "sha256:940c8bdbe83b1c9ba4dd1c2107fb7073402d1100888444840ab502f42c658ceb",
+      "quality_contract": {
+        "metric": "integer_element_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1.0,
+        "max_profile_age_seconds": 86400
+      },
+      "workload_signature": "sha256:fd9ae6f3b17eee98a92990fb4f42f9bbadd0c2021d0b3a82ab1744d694114303",
+      "context_signature": "sha256:37fc25cb697a574cc53a401927748014dc101f9e40f7513aec2396a1276ec592",
+      "created_at": "2026-10-08T07:31:47.911525+00:00",
+      "finished_at": "2026-10-08T07:34:05.154054+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 512,
+        "accelerator_count": 1
+      },
+      "quality_passed": true,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-01ad8e137842486ba2cd5cf14cf7c512",
+        "attempt_id": "a-ed9116703f1c4193b4000d6f5f6e889d",
+        "epoch": 1,
+        "workload_signature": "sha256:fd9ae6f3b17eee98a92990fb4f42f9bbadd0c2021d0b3a82ab1744d694114303",
+        "context_signature": "sha256:37fc25cb697a574cc53a401927748014dc101f9e40f7513aec2396a1276ec592",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 90.00004118308425,
+          "peak_memory_mib": 0.015625,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 9000.004560046364,
+          "latency_p95_ms": 9000.006031012163,
+          "latency_p99_ms": 9000.006031012163,
+          "throughput": 0.11111106026782049,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:e8c16fb3c1c40c2167365c8b394cb478767b4843e4c336da100c21b6fcb3c510",
+      "profile_recorded": true,
+      "mlflow_run_id": "764c87a4d539496e803bab8f3ee4eafe",
+      "artifact_digest": "sha256:a0744cc0c84894b99199afed9fc5c59dc0f9e55296d8c3cdfaa88a113620ad37",
+      "artifact_tracking_digest": "sha256:a0744cc0c84894b99199afed9fc5c59dc0f9e55296d8c3cdfaa88a113620ad37",
+      "usage": {
+        "attempt_id": "a-ed9116703f1c4193b4000d6f5f6e889d",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 91.0,
+        "measured_compute_seconds": 90.00004118308425,
+        "queue_seconds": 1.0,
+        "job_id": "j-01ad8e137842486ba2cd5cf14cf7c512",
+        "outcome": "SUCCEEDED",
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 512,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 512.0
+        },
+        "allocation_interval_seconds": 91.0,
+        "allocated_cpu_seconds": 91.0,
+        "allocation_memory_mib": 512.0,
+        "started_at": "2026-10-08T07:32:26Z",
+        "backend_finished_at": "2026-10-08T07:33:57Z",
+        "submitted_at": "2026-10-08T07:32:25Z",
+        "collection_seconds": 0.061819,
+        "preparation_seconds": 1.0,
+        "container_runtime_seconds": 90.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-b76165531cf64dbcb001bb5781df8fcb",
+      "attempt_id": "a-15b5b9365f444c35b0060931fc3c8ef9",
+      "state": "SUCCEEDED",
+      "error": null,
+      "backend": "kubernetes",
+      "native_job_uid": null,
+      "native_job_id": "a-15b5b9365f444c35b0060931fc3c8ef9",
+      "node_alias": "gpu-2",
+      "accelerator_model": "NVIDIA GB10",
+      "device_class": "gpu",
+      "workload_ref": "cuda-sustained-auto-v2",
+      "candidate_ref": "candidate-2",
+      "runtime_variant": "cuda-sustained-auto-v2-runtime-2",
+      "code_digest": "sha256:44d440dfe62873ad153a1233dd2c4fea4ae0d3d3d78ae9d7074a627df58d45aa",
+      "image_digest": "sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+      "model_digest": "sha256:940c8bdbe83b1c9ba4dd1c2107fb7073402d1100888444840ab502f42c658ceb",
+      "quality_contract": {
+        "metric": "integer_element_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1.0,
+        "max_profile_age_seconds": 86400
+      },
+      "workload_signature": "sha256:fd9ae6f3b17eee98a92990fb4f42f9bbadd0c2021d0b3a82ab1744d694114303",
+      "context_signature": "sha256:b59b15c808ea2be3ae234279263285562d20951831dc28e030e0718adf8aef82",
+      "created_at": "2026-10-08T07:31:50.766300+00:00",
+      "finished_at": "2026-10-08T07:33:31.798158+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 512,
+        "accelerator_count": 1
+      },
+      "quality_passed": true,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-b76165531cf64dbcb001bb5781df8fcb",
+        "attempt_id": "a-15b5b9365f444c35b0060931fc3c8ef9",
+        "epoch": 1,
+        "workload_signature": "sha256:fd9ae6f3b17eee98a92990fb4f42f9bbadd0c2021d0b3a82ab1744d694114303",
+        "context_signature": "sha256:b59b15c808ea2be3ae234279263285562d20951831dc28e030e0718adf8aef82",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 90.00004421501944,
+          "peak_memory_mib": 0.015625,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 9000.00502650073,
+          "latency_p95_ms": 9000.006039001164,
+          "latency_p99_ms": 9000.006039001164,
+          "throughput": 0.11111105652469418,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:b85d19d12e49fb8bddf2c04ffbc51d822bd7a7c9a745243c6fecd18e73287c1c",
+      "profile_recorded": true,
+      "mlflow_run_id": "db3855f74aab46898c2eef4f7af87e71",
+      "artifact_digest": "sha256:746af7b619c5436b2a79fbafb90d4386400fdbf28c4bcce2247b6f294aadfdaa",
+      "artifact_tracking_digest": "sha256:746af7b619c5436b2a79fbafb90d4386400fdbf28c4bcce2247b6f294aadfdaa",
+      "usage": {
+        "attempt_id": "a-15b5b9365f444c35b0060931fc3c8ef9",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 91.0,
+        "measured_compute_seconds": 90.00004421501944,
+        "queue_seconds": 2.0,
+        "job_id": "j-b76165531cf64dbcb001bb5781df8fcb",
+        "outcome": "SUCCEEDED",
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 512,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 512.0
+        },
+        "allocation_interval_seconds": 91.0,
+        "allocated_cpu_seconds": 91.0,
+        "allocation_memory_mib": 512.0,
+        "started_at": "2026-10-08T07:31:57Z",
+        "backend_finished_at": "2026-10-08T07:33:28Z",
+        "submitted_at": "2026-10-08T07:31:55Z",
+        "collection_seconds": 0.045861,
+        "preparation_seconds": 0.0,
+        "container_runtime_seconds": 91.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-d236619731c64ec6860179194cf1fcef",
+      "attempt_id": "a-4643042f63e548a5a8aa261bd5f622e1",
+      "state": "SUCCEEDED",
+      "error": null,
+      "backend": "kubernetes",
+      "native_job_uid": null,
+      "native_job_id": "a-4643042f63e548a5a8aa261bd5f622e1",
+      "node_alias": "gpu-3",
+      "accelerator_model": "Orin",
+      "device_class": "gpu",
+      "workload_ref": "cuda-sustained-auto-v2",
+      "candidate_ref": "candidate-3",
+      "runtime_variant": "cuda-sustained-auto-v2-runtime-3",
+      "code_digest": "sha256:44d440dfe62873ad153a1233dd2c4fea4ae0d3d3d78ae9d7074a627df58d45aa",
+      "image_digest": "sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+      "model_digest": "sha256:940c8bdbe83b1c9ba4dd1c2107fb7073402d1100888444840ab502f42c658ceb",
+      "quality_contract": {
+        "metric": "integer_element_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1.0,
+        "max_profile_age_seconds": 86400
+      },
+      "workload_signature": "sha256:fd9ae6f3b17eee98a92990fb4f42f9bbadd0c2021d0b3a82ab1744d694114303",
+      "context_signature": "sha256:20bbf2a7e60d6a76777b4c0ab6198870f0da46520f68c829daf047029fb656fc",
+      "created_at": "2026-10-08T07:31:53.638222+00:00",
+      "finished_at": "2026-10-08T07:33:48.901140+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 512,
+        "accelerator_count": 1
+      },
+      "quality_passed": true,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-d236619731c64ec6860179194cf1fcef",
+        "attempt_id": "a-4643042f63e548a5a8aa261bd5f622e1",
+        "epoch": 1,
+        "workload_signature": "sha256:fd9ae6f3b17eee98a92990fb4f42f9bbadd0c2021d0b3a82ab1744d694114303",
+        "context_signature": "sha256:20bbf2a7e60d6a76777b4c0ab6198870f0da46520f68c829daf047029fb656fc",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 90.00021741002274,
+          "peak_memory_mib": 0.015625,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 9000.02190500527,
+          "latency_p95_ms": 9000.03396300599,
+          "latency_p99_ms": 9000.03396300599,
+          "throughput": 0.111110842704324,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:6551d44b79dd9123cbaad6a8356c3c395d8c858613624939308e2a27f7f20cb4",
+      "profile_recorded": true,
+      "mlflow_run_id": "60a3fa8dad7a48d5b93d0fbc7eaa9217",
+      "artifact_digest": "sha256:5aff0f566442fd491979c1efc9bc477498851bcaf8a2dd8920f8a9e1e4e3201a",
+      "artifact_tracking_digest": "sha256:5aff0f566442fd491979c1efc9bc477498851bcaf8a2dd8920f8a9e1e4e3201a",
+      "usage": {
+        "attempt_id": "a-4643042f63e548a5a8aa261bd5f622e1",
+        "device_class": "gpu",
+        "allocation_mode": "virtual_slot",
+        "allocated_device_seconds": 93.0,
+        "measured_compute_seconds": 90.00021741002274,
+        "queue_seconds": 1.0,
+        "job_id": "j-d236619731c64ec6860179194cf1fcef",
+        "outcome": "SUCCEEDED",
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 512,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 512.0
+        },
+        "allocation_interval_seconds": 93.0,
+        "allocated_cpu_seconds": 93.0,
+        "allocation_memory_mib": 512.0,
+        "started_at": "2026-10-08T07:32:10Z",
+        "backend_finished_at": "2026-10-08T07:33:43Z",
+        "submitted_at": "2026-10-08T07:32:09Z",
+        "collection_seconds": 0.083898,
+        "preparation_seconds": 2.0,
+        "container_runtime_seconds": 91.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-390b9bee1078434d90dfbeb4f02b66f4",
+      "attempt_id": "a-5624df86e0fe4c2887dd676d42e41090",
+      "state": "SUCCEEDED",
+      "error": null,
+      "backend": "kubernetes",
+      "native_job_uid": null,
+      "native_job_id": "a-5624df86e0fe4c2887dd676d42e41090",
+      "node_alias": "gpu-4",
+      "accelerator_model": "Orin",
+      "device_class": "gpu",
+      "workload_ref": "cuda-sustained-auto-v2",
+      "candidate_ref": "candidate-4",
+      "runtime_variant": "cuda-sustained-auto-v2-runtime-4",
+      "code_digest": "sha256:44d440dfe62873ad153a1233dd2c4fea4ae0d3d3d78ae9d7074a627df58d45aa",
+      "image_digest": "sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+      "model_digest": "sha256:940c8bdbe83b1c9ba4dd1c2107fb7073402d1100888444840ab502f42c658ceb",
+      "quality_contract": {
+        "metric": "integer_element_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1.0,
+        "max_profile_age_seconds": 86400
+      },
+      "workload_signature": "sha256:fd9ae6f3b17eee98a92990fb4f42f9bbadd0c2021d0b3a82ab1744d694114303",
+      "context_signature": "sha256:7c757f0f0126721b84b2a99e2b0115b84025dc459f732a95faca2826aa223098",
+      "created_at": "2026-10-08T07:31:58.643325+00:00",
+      "finished_at": "2026-10-08T07:33:54.563192+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 512,
+        "accelerator_count": 1
+      },
+      "quality_passed": true,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-390b9bee1078434d90dfbeb4f02b66f4",
+        "attempt_id": "a-5624df86e0fe4c2887dd676d42e41090",
+        "epoch": 1,
+        "workload_signature": "sha256:fd9ae6f3b17eee98a92990fb4f42f9bbadd0c2021d0b3a82ab1744d694114303",
+        "context_signature": "sha256:7c757f0f0126721b84b2a99e2b0115b84025dc459f732a95faca2826aa223098",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 90.00028831699456,
+          "peak_memory_mib": 0.015625,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 9000.025077999453,
+          "latency_p95_ms": 9000.050470000133,
+          "latency_p99_ms": 9000.050470000133,
+          "throughput": 0.11111075516534454,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:136d2088471b82571218f6aaac1507659f2be21786f72fded84e07ad5fe62ae6",
+      "profile_recorded": true,
+      "mlflow_run_id": "5cbeb1191e7a4931b08d1b7ff1302cbc",
+      "artifact_digest": "sha256:2be9b63a3d900068a4e13678186e420acb952ee1a365d90269b46e1269eb57d5",
+      "artifact_tracking_digest": "sha256:2be9b63a3d900068a4e13678186e420acb952ee1a365d90269b46e1269eb57d5",
+      "usage": {
+        "attempt_id": "a-5624df86e0fe4c2887dd676d42e41090",
+        "device_class": "gpu",
+        "allocation_mode": "virtual_slot",
+        "allocated_device_seconds": 93.0,
+        "measured_compute_seconds": 90.00028831699456,
+        "queue_seconds": 1.0,
+        "job_id": "j-390b9bee1078434d90dfbeb4f02b66f4",
+        "outcome": "SUCCEEDED",
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 512,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 512.0
+        },
+        "allocation_interval_seconds": 93.0,
+        "allocated_cpu_seconds": 93.0,
+        "allocation_memory_mib": 512.0,
+        "started_at": "2026-10-08T07:32:17Z",
+        "backend_finished_at": "2026-10-08T07:33:50Z",
+        "submitted_at": "2026-10-08T07:32:16Z",
+        "collection_seconds": 0.121559,
+        "preparation_seconds": 2.0,
+        "container_runtime_seconds": 91.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-0e55b9a7bdc949efa19a1e7b4a0d9d7b",
+      "attempt_id": "a-3b7fe46a9d48439daceaa630cb0b33a9",
+      "state": "SUCCEEDED",
+      "error": null,
+      "backend": "kubernetes",
+      "native_job_uid": "166ca880-5100-49d0-a1c9-cdc19a5d12e1",
+      "native_job_id": "a-3b7fe46a9d48439daceaa630cb0b33a9",
+      "node_alias": "npu-4",
+      "accelerator_model": "NVIDIA GeForce RTX 5080",
+      "device_class": "gpu",
+      "workload_ref": "cuda-sustained-auto-v2",
+      "candidate_ref": "candidate-5",
+      "runtime_variant": "cuda-sustained-auto-v2-runtime-5",
+      "code_digest": "sha256:44d440dfe62873ad153a1233dd2c4fea4ae0d3d3d78ae9d7074a627df58d45aa",
+      "image_digest": "sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+      "model_digest": "sha256:940c8bdbe83b1c9ba4dd1c2107fb7073402d1100888444840ab502f42c658ceb",
+      "quality_contract": {
+        "metric": "integer_element_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1.0,
+        "max_profile_age_seconds": 86400
+      },
+      "workload_signature": "sha256:fd9ae6f3b17eee98a92990fb4f42f9bbadd0c2021d0b3a82ab1744d694114303",
+      "context_signature": "sha256:f28601f7a143aa172f1b596bffacda019bb9aad9cd3a2262cdcee1202ef36c46",
+      "created_at": "2026-10-08T07:32:01.036033+00:00",
+      "finished_at": "2026-10-08T07:33:43.008543+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 512,
+        "accelerator_count": 1
+      },
+      "quality_passed": true,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-0e55b9a7bdc949efa19a1e7b4a0d9d7b",
+        "attempt_id": "a-3b7fe46a9d48439daceaa630cb0b33a9",
+        "epoch": 1,
+        "workload_signature": "sha256:fd9ae6f3b17eee98a92990fb4f42f9bbadd0c2021d0b3a82ab1744d694114303",
+        "context_signature": "sha256:f28601f7a143aa172f1b596bffacda019bb9aad9cd3a2262cdcee1202ef36c46",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 90.0000313790515,
+          "peak_memory_mib": 0.015625,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 9000.00276195351,
+          "latency_p95_ms": 9000.004608067684,
+          "latency_p99_ms": 9000.004608067684,
+          "throughput": 0.11111107237155486,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:d1e1165b8d995c247d4c2a0ac760016c3b275a9c9d3e7596855b4ab37d031c16",
+      "profile_recorded": true,
+      "mlflow_run_id": "4a16a16fc462431da14161bdb61d0a88",
+      "artifact_digest": "sha256:542a0a24b5e990587d7b41bc765e02f63810b36120cb9bc86a45efc7fb52eb0c",
+      "artifact_tracking_digest": "sha256:542a0a24b5e990587d7b41bc765e02f63810b36120cb9bc86a45efc7fb52eb0c",
+      "usage": {
+        "attempt_id": "a-3b7fe46a9d48439daceaa630cb0b33a9",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 91.0,
+        "measured_compute_seconds": 90.0000313790515,
+        "queue_seconds": 1.0,
+        "job_id": "j-0e55b9a7bdc949efa19a1e7b4a0d9d7b",
+        "outcome": "SUCCEEDED",
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 512,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 512.0
+        },
+        "allocation_interval_seconds": 91.0,
+        "allocated_cpu_seconds": 91.0,
+        "allocation_memory_mib": 512.0,
+        "started_at": "2026-10-08T07:32:04Z",
+        "backend_finished_at": "2026-10-08T07:33:35Z",
+        "submitted_at": "2026-10-08T07:32:03Z",
+        "collection_seconds": 0.050148,
+        "preparation_seconds": 1.0,
+        "container_runtime_seconds": 90.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-26fdef86db264bc481a0948f5bed77d1",
+      "attempt_id": "a-baef7f8bb2034c6bb9fbedcbb92d8c7c",
+      "state": "FAILED",
+      "error": "DeadlineExceeded",
+      "backend": "kubernetes",
+      "native_job_uid": "a134b553-ddbd-4fc5-b8b9-5875a5d1531f",
+      "native_job_id": "a-baef7f8bb2034c6bb9fbedcbb92d8c7c",
+      "node_alias": "npu-5",
+      "accelerator_model": "RK3399Pro",
+      "device_class": "npu",
+      "workload_ref": "rockchip-resnet18-20261008-v1",
+      "candidate_ref": "device",
+      "runtime_variant": "v-rockchip-resnet18-20261008-v1",
+      "code_digest": "sha256:d5bc3480023bd49dddef7f72d1e72ee3b4e83ecce2d54aaeafafa82420bbd736",
+      "image_digest": "sha256:5fc52fbd4a8ae5706fe4ea3fb3c04af0b94dbd8351843eb7425e02e0cc9e74c7",
+      "model_digest": "sha256:a7363451bde07a8915f9ce08bbe874cfc2db812b424505184efbf9cce6c0ad3c",
+      "quality_contract": {
+        "metric": "official_space_shuttle_top1_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "workload_signature": "sha256:581cf3c60bba6daaef172ba98abe6d1746a6ed3bc9095662ea08ee66106d2e36",
+      "context_signature": "sha256:2caa0fc4772d7a7b6ad79116c24928905558fbd3c3ff86d7833160f25982f6b9",
+      "created_at": "2026-10-08T07:36:18.425272+00:00",
+      "finished_at": "2026-10-08T07:38:31.348229+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "accelerator_count": 1
+      },
+      "quality_passed": null,
+      "result": null,
+      "result_digest": null,
+      "profile_recorded": false,
+      "mlflow_run_id": "743c982891974d848f00c3ccd92332bc",
+      "artifact_digest": null,
+      "artifact_tracking_digest": null,
+      "usage": {
+        "attempt_id": "a-baef7f8bb2034c6bb9fbedcbb92d8c7c",
+        "device_class": "npu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 125.0,
+        "measured_compute_seconds": null,
+        "queue_seconds": 0.0,
+        "job_id": "j-26fdef86db264bc481a0948f5bed77d1",
+        "outcome": "FAILED",
+        "result_valid": false,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "allocation_interval_seconds": 125.0,
+        "allocated_cpu_seconds": 125.0,
+        "allocation_memory_mib": 1024.0,
+        "started_at": "2026-10-08T07:36:22Z",
+        "backend_finished_at": "2026-10-08T07:38:27Z",
+        "submitted_at": "2026-10-08T07:36:22Z",
+        "collection_seconds": null,
+        "preparation_seconds": 2.0,
+        "container_runtime_seconds": 123.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-901f9be95737409d9e7dacbdedf7b86f",
+      "attempt_id": "a-f371aca57ca9492eb958891dfbd41128",
+      "state": "FAILED",
+      "error": "DeadlineExceeded",
+      "backend": "kubernetes",
+      "native_job_uid": "e695186e-9b77-4b24-9a48-1a70dc86f30d",
+      "native_job_id": "a-f371aca57ca9492eb958891dfbd41128",
+      "node_alias": "npu-5",
+      "accelerator_model": "RK3399Pro",
+      "device_class": "npu",
+      "workload_ref": "rockchip-resnet18-20261008-v1",
+      "candidate_ref": "device",
+      "runtime_variant": "v-rockchip-resnet18-20261008-v1",
+      "code_digest": "sha256:d5bc3480023bd49dddef7f72d1e72ee3b4e83ecce2d54aaeafafa82420bbd736",
+      "image_digest": "sha256:5fc52fbd4a8ae5706fe4ea3fb3c04af0b94dbd8351843eb7425e02e0cc9e74c7",
+      "model_digest": "sha256:a7363451bde07a8915f9ce08bbe874cfc2db812b424505184efbf9cce6c0ad3c",
+      "quality_contract": {
+        "metric": "official_space_shuttle_top1_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "workload_signature": "sha256:581cf3c60bba6daaef172ba98abe6d1746a6ed3bc9095662ea08ee66106d2e36",
+      "context_signature": "sha256:2caa0fc4772d7a7b6ad79116c24928905558fbd3c3ff86d7833160f25982f6b9",
+      "created_at": "2026-10-08T08:03:03.857836+00:00",
+      "finished_at": "2026-10-08T08:05:20.593993+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "accelerator_count": 1
+      },
+      "quality_passed": null,
+      "result": null,
+      "result_digest": null,
+      "profile_recorded": false,
+      "mlflow_run_id": "ecf3eeb3b63d4ca6ae3bf3bfb7f38c5d",
+      "artifact_digest": null,
+      "artifact_tracking_digest": null,
+      "usage": {
+        "attempt_id": "a-f371aca57ca9492eb958891dfbd41128",
+        "device_class": "npu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 125.0,
+        "measured_compute_seconds": null,
+        "queue_seconds": 1.0,
+        "job_id": "j-901f9be95737409d9e7dacbdedf7b86f",
+        "outcome": "FAILED",
+        "result_valid": false,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "allocation_interval_seconds": 125.0,
+        "allocated_cpu_seconds": 125.0,
+        "allocation_memory_mib": 1024.0,
+        "started_at": "2026-10-08T08:03:09Z",
+        "backend_finished_at": "2026-10-08T08:05:14Z",
+        "submitted_at": "2026-10-08T08:03:08Z",
+        "collection_seconds": null,
+        "preparation_seconds": 61.0,
+        "container_runtime_seconds": 64.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-08f82a0a048241ab85d1757e68564156",
+      "attempt_id": "a-6157361afcc34e6785b49b67e37b73e6",
+      "state": "FAILED",
+      "error": "DeadlineExceeded",
+      "backend": "kubernetes",
+      "native_job_uid": "4c7bacb7-45e3-4d15-8996-0883dd63205d",
+      "native_job_id": "a-6157361afcc34e6785b49b67e37b73e6",
+      "node_alias": "npu-5",
+      "accelerator_model": "RK3399Pro",
+      "device_class": "npu",
+      "workload_ref": "rockchip-resnet18-20261008-v1",
+      "candidate_ref": "device",
+      "runtime_variant": "v-rockchip-resnet18-20261008-v1",
+      "code_digest": "sha256:d5bc3480023bd49dddef7f72d1e72ee3b4e83ecce2d54aaeafafa82420bbd736",
+      "image_digest": "sha256:5fc52fbd4a8ae5706fe4ea3fb3c04af0b94dbd8351843eb7425e02e0cc9e74c7",
+      "model_digest": "sha256:a7363451bde07a8915f9ce08bbe874cfc2db812b424505184efbf9cce6c0ad3c",
+      "quality_contract": {
+        "metric": "official_space_shuttle_top1_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "workload_signature": "sha256:581cf3c60bba6daaef172ba98abe6d1746a6ed3bc9095662ea08ee66106d2e36",
+      "context_signature": "sha256:2caa0fc4772d7a7b6ad79116c24928905558fbd3c3ff86d7833160f25982f6b9",
+      "created_at": "2026-10-08T08:08:37.559187+00:00",
+      "finished_at": "2026-10-08T08:10:50.016844+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "accelerator_count": 1
+      },
+      "quality_passed": null,
+      "result": null,
+      "result_digest": null,
+      "profile_recorded": false,
+      "mlflow_run_id": "4a2e5882dc77427c965ab966bcd62273",
+      "artifact_digest": null,
+      "artifact_tracking_digest": null,
+      "usage": {
+        "attempt_id": "a-6157361afcc34e6785b49b67e37b73e6",
+        "device_class": "npu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": null,
+        "measured_compute_seconds": null,
+        "queue_seconds": null,
+        "job_id": "j-08f82a0a048241ab85d1757e68564156",
+        "outcome": "FAILED",
+        "result_valid": false,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": null,
+        "allocation_interval_seconds": null,
+        "allocated_cpu_seconds": null,
+        "allocation_memory_mib": null,
+        "started_at": null,
+        "backend_finished_at": null,
+        "submitted_at": "2026-10-08T08:08:38Z",
+        "collection_seconds": null,
+        "preparation_seconds": null,
+        "container_runtime_seconds": null,
+        "uncertainty": [
+          "ALLOCATION_INTERVAL_UNKNOWN",
+          "ACCELERATOR_ALLOCATION_UNKNOWN",
+          "QUEUE_INTERVAL_UNKNOWN"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-4fe970e7866e49c49b96b1308909408c",
+      "attempt_id": "a-8291f99cb8e34ca59f53ff01183857eb",
+      "state": "SUCCEEDED",
+      "error": null,
+      "backend": "kubernetes",
+      "native_job_uid": "801e2f17-7709-4329-9609-fbbc9b090e1f",
+      "native_job_id": "a-8291f99cb8e34ca59f53ff01183857eb",
+      "node_alias": "npu-5",
+      "accelerator_model": "RK3399Pro",
+      "device_class": "npu",
+      "workload_ref": "rockchip-resnet18-20261008-v1",
+      "candidate_ref": "device",
+      "runtime_variant": "v-rockchip-resnet18-20261008-v1",
+      "code_digest": "sha256:d5bc3480023bd49dddef7f72d1e72ee3b4e83ecce2d54aaeafafa82420bbd736",
+      "image_digest": "sha256:5fc52fbd4a8ae5706fe4ea3fb3c04af0b94dbd8351843eb7425e02e0cc9e74c7",
+      "model_digest": "sha256:a7363451bde07a8915f9ce08bbe874cfc2db812b424505184efbf9cce6c0ad3c",
+      "quality_contract": {
+        "metric": "official_space_shuttle_top1_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "workload_signature": "sha256:581cf3c60bba6daaef172ba98abe6d1746a6ed3bc9095662ea08ee66106d2e36",
+      "context_signature": "sha256:2caa0fc4772d7a7b6ad79116c24928905558fbd3c3ff86d7833160f25982f6b9",
+      "created_at": "2026-10-08T08:22:53.712438+00:00",
+      "finished_at": "2026-10-08T08:23:13.073932+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "accelerator_count": 1
+      },
+      "quality_passed": true,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-4fe970e7866e49c49b96b1308909408c",
+        "attempt_id": "a-8291f99cb8e34ca59f53ff01183857eb",
+        "epoch": 1,
+        "workload_signature": "sha256:581cf3c60bba6daaef172ba98abe6d1746a6ed3bc9095662ea08ee66106d2e36",
+        "context_signature": "sha256:2caa0fc4772d7a7b6ad79116c24928905558fbd3c3ff86d7833160f25982f6b9",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.11793580511584878,
+          "peak_memory_mib": 71.328125,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 11.774205486290157,
+          "latency_p95_ms": 12.980201048776507,
+          "latency_p99_ms": 12.980201048776507,
+          "throughput": 84.79189157336029,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:8f28ba6551c036e49873a5417e69d34d0a2b642227b1fb929778d2b24b2c56cc",
+      "profile_recorded": true,
+      "mlflow_run_id": "a38336cb056c4d5da09292f10ed5abee",
+      "artifact_digest": "sha256:2f8bbf27a942c2b2d33c08f6d4d5cbdf3a49209184f6685bb694af0489cc7386",
+      "artifact_tracking_digest": "sha256:2f8bbf27a942c2b2d33c08f6d4d5cbdf3a49209184f6685bb694af0489cc7386",
+      "usage": {
+        "attempt_id": "a-8291f99cb8e34ca59f53ff01183857eb",
+        "device_class": "npu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 11.0,
+        "measured_compute_seconds": 0.11793580511584878,
+        "queue_seconds": 0.0,
+        "job_id": "j-4fe970e7866e49c49b96b1308909408c",
+        "outcome": "SUCCEEDED",
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "allocation_interval_seconds": 11.0,
+        "allocated_cpu_seconds": 11.0,
+        "allocation_memory_mib": 1024.0,
+        "started_at": "2026-10-08T08:22:57Z",
+        "backend_finished_at": "2026-10-08T08:23:08Z",
+        "submitted_at": "2026-10-08T08:22:57Z",
+        "collection_seconds": 0.116702,
+        "preparation_seconds": 1.0,
+        "container_runtime_seconds": 10.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-92ad8359fc784205adcb44aafcf84539",
+      "attempt_id": "a-c49a1290ddb24182bbe733543a101a9d",
+      "state": "FAILED",
+      "error": "DeadlineExceeded",
+      "backend": "kubernetes",
+      "native_job_uid": "1f99c5d9-b35d-4e82-a377-b5c04e2d9c57",
+      "native_job_id": "a-c49a1290ddb24182bbe733543a101a9d",
+      "node_alias": "npu-5",
+      "accelerator_model": "RK3399Pro",
+      "device_class": "npu",
+      "workload_ref": "rockchip-resnet18-20261008-v1",
+      "candidate_ref": "device",
+      "runtime_variant": "v-rockchip-resnet18-20261008-v1",
+      "code_digest": "sha256:d5bc3480023bd49dddef7f72d1e72ee3b4e83ecce2d54aaeafafa82420bbd736",
+      "image_digest": "sha256:5fc52fbd4a8ae5706fe4ea3fb3c04af0b94dbd8351843eb7425e02e0cc9e74c7",
+      "model_digest": "sha256:a7363451bde07a8915f9ce08bbe874cfc2db812b424505184efbf9cce6c0ad3c",
+      "quality_contract": {
+        "metric": "official_space_shuttle_top1_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "workload_signature": "sha256:581cf3c60bba6daaef172ba98abe6d1746a6ed3bc9095662ea08ee66106d2e36",
+      "context_signature": "sha256:2caa0fc4772d7a7b6ad79116c24928905558fbd3c3ff86d7833160f25982f6b9",
+      "created_at": "2026-10-08T08:25:24.520435+00:00",
+      "finished_at": "2026-10-08T08:27:34.365568+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "accelerator_count": 1
+      },
+      "quality_passed": null,
+      "result": null,
+      "result_digest": null,
+      "profile_recorded": false,
+      "mlflow_run_id": "372d760bc7f24e769994a19e5e920fac",
+      "artifact_digest": null,
+      "artifact_tracking_digest": null,
+      "usage": {
+        "attempt_id": "a-c49a1290ddb24182bbe733543a101a9d",
+        "device_class": "npu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 125.0,
+        "measured_compute_seconds": null,
+        "queue_seconds": 0.0,
+        "job_id": "j-92ad8359fc784205adcb44aafcf84539",
+        "outcome": "FAILED",
+        "result_valid": false,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "allocation_interval_seconds": 125.0,
+        "allocated_cpu_seconds": 125.0,
+        "allocation_memory_mib": 1024.0,
+        "started_at": "2026-10-08T08:25:25Z",
+        "backend_finished_at": "2026-10-08T08:27:30Z",
+        "submitted_at": "2026-10-08T08:25:25Z",
+        "collection_seconds": null,
+        "preparation_seconds": 1.0,
+        "container_runtime_seconds": 124.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-8955667798a64c7bb579a86faa70db76",
+      "attempt_id": "a-8059b7b714d04ffbb56e6629bd7a5839",
+      "state": "FAILED",
+      "error": "DeadlineExceeded",
+      "backend": "kubernetes",
+      "native_job_uid": "6f84a182-597d-4468-b3b6-50496c76b7aa",
+      "native_job_id": "a-8059b7b714d04ffbb56e6629bd7a5839",
+      "node_alias": "npu-5",
+      "accelerator_model": "RK3399Pro",
+      "device_class": "npu",
+      "workload_ref": "rockchip-resnet18-host-20261008-v2",
+      "candidate_ref": "device",
+      "runtime_variant": "v-rockchip-resnet18-host-20261008-v2",
+      "code_digest": "sha256:4c0b1aa9878868b8e94add7c2aacf393850aea400bf28698fb300141f55cb308",
+      "image_digest": "sha256:a2cbd5d497958b95ae187aa4310286993269e79d29ca9c32e79d29a31f019169",
+      "model_digest": "sha256:a7363451bde07a8915f9ce08bbe874cfc2db812b424505184efbf9cce6c0ad3c",
+      "quality_contract": {
+        "metric": "official_space_shuttle_top1_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "workload_signature": "sha256:550e03a82ffd9faee6d9e750404dcbb94934a1b989360b444dc85d5fc26ff89f",
+      "context_signature": "sha256:206fae942c91a5387a1003ffca067fcd8e0b8103d8418b6c0033673a7bef45ad",
+      "created_at": "2026-10-08T09:09:58.923440+00:00",
+      "finished_at": "2026-10-08T09:12:29.359577+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "accelerator_count": 1
+      },
+      "quality_passed": null,
+      "result": null,
+      "result_digest": null,
+      "profile_recorded": false,
+      "mlflow_run_id": "10b0f8b6cf0a4bb58dc4e349a402dc66",
+      "artifact_digest": null,
+      "artifact_tracking_digest": null,
+      "usage": {
+        "attempt_id": "a-8059b7b714d04ffbb56e6629bd7a5839",
+        "device_class": "npu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 139.0,
+        "measured_compute_seconds": null,
+        "queue_seconds": 0.0,
+        "job_id": "j-8955667798a64c7bb579a86faa70db76",
+        "outcome": "FAILED",
+        "result_valid": false,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "allocation_interval_seconds": 139.0,
+        "allocated_cpu_seconds": 139.0,
+        "allocation_memory_mib": 1024.0,
+        "started_at": "2026-10-08T09:10:03Z",
+        "backend_finished_at": "2026-10-08T09:12:22Z",
+        "submitted_at": "2026-10-08T09:10:03Z",
+        "collection_seconds": null,
+        "preparation_seconds": 2.0,
+        "container_runtime_seconds": 137.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-a79b2434c9fe485eaf42a8f4821deb18",
+      "attempt_id": "a-b2d23f4fc25a46ce9ea353a86c50cd81",
+      "state": "SUCCEEDED",
+      "error": null,
+      "backend": "kubernetes",
+      "native_job_uid": "cd3bd186-5f26-423b-acdf-44eb9114f050",
+      "native_job_id": "a-b2d23f4fc25a46ce9ea353a86c50cd81",
+      "node_alias": "npu-5",
+      "accelerator_model": "RK3399Pro",
+      "device_class": "npu",
+      "workload_ref": "rockchip-resnet18-host-20261008-v2",
+      "candidate_ref": "device",
+      "runtime_variant": "v-rockchip-resnet18-host-20261008-v2",
+      "code_digest": "sha256:4c0b1aa9878868b8e94add7c2aacf393850aea400bf28698fb300141f55cb308",
+      "image_digest": "sha256:a2cbd5d497958b95ae187aa4310286993269e79d29ca9c32e79d29a31f019169",
+      "model_digest": "sha256:a7363451bde07a8915f9ce08bbe874cfc2db812b424505184efbf9cce6c0ad3c",
+      "quality_contract": {
+        "metric": "official_space_shuttle_top1_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "workload_signature": "sha256:550e03a82ffd9faee6d9e750404dcbb94934a1b989360b444dc85d5fc26ff89f",
+      "context_signature": "sha256:206fae942c91a5387a1003ffca067fcd8e0b8103d8418b6c0033673a7bef45ad",
+      "created_at": "2026-10-08T09:13:48.690632+00:00",
+      "finished_at": "2026-10-08T09:14:06.514207+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "accelerator_count": 1
+      },
+      "quality_passed": true,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-a79b2434c9fe485eaf42a8f4821deb18",
+        "attempt_id": "a-b2d23f4fc25a46ce9ea353a86c50cd81",
+        "epoch": 1,
+        "workload_signature": "sha256:550e03a82ffd9faee6d9e750404dcbb94934a1b989360b444dc85d5fc26ff89f",
+        "context_signature": "sha256:206fae942c91a5387a1003ffca067fcd8e0b8103d8418b6c0033673a7bef45ad",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.1405596318654716,
+          "peak_memory_mib": 71.3828125,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 12.08764547482133,
+          "latency_p95_ms": 27.26869599428028,
+          "latency_p99_ms": 27.26869599428028,
+          "throughput": 71.14418177738906,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:2e278e9d11da0761f98465e836086ff8307631f21973ba977989632590082f37",
+      "profile_recorded": true,
+      "mlflow_run_id": "647899aa92e747a98b9b93a2415a532d",
+      "artifact_digest": "sha256:bd9011934448c13489c824c00bee69a3e7f99912e9f5aad97911a487756ac9ed",
+      "artifact_tracking_digest": "sha256:bd9011934448c13489c824c00bee69a3e7f99912e9f5aad97911a487756ac9ed",
+      "usage": {
+        "attempt_id": "a-b2d23f4fc25a46ce9ea353a86c50cd81",
+        "device_class": "npu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 12.0,
+        "measured_compute_seconds": 0.1405596318654716,
+        "queue_seconds": 0.0,
+        "job_id": "j-a79b2434c9fe485eaf42a8f4821deb18",
+        "outcome": "SUCCEEDED",
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "allocation_interval_seconds": 12.0,
+        "allocated_cpu_seconds": 12.0,
+        "allocation_memory_mib": 1024.0,
+        "started_at": "2026-10-08T09:13:50Z",
+        "backend_finished_at": "2026-10-08T09:14:02Z",
+        "submitted_at": "2026-10-08T09:13:50Z",
+        "collection_seconds": 0.084943,
+        "preparation_seconds": 2.0,
+        "container_runtime_seconds": 10.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    },
+    {
+      "job_id": "j-82bea2f57763449c86b3fdcac342b3fc",
+      "attempt_id": "a-5252f01cecae42f7a6e2c2dda7cae991",
+      "state": "SUCCEEDED",
+      "error": null,
+      "backend": "kubernetes",
+      "native_job_uid": "f00d0138-ec02-408d-8d6e-ce8e5efc6760",
+      "native_job_id": "a-5252f01cecae42f7a6e2c2dda7cae991",
+      "node_alias": "npu-5",
+      "accelerator_model": "RK3399Pro",
+      "device_class": "npu",
+      "workload_ref": "rockchip-resnet18-host-20261008-v2",
+      "candidate_ref": "device",
+      "runtime_variant": "v-rockchip-resnet18-host-20261008-v2",
+      "code_digest": "sha256:4c0b1aa9878868b8e94add7c2aacf393850aea400bf28698fb300141f55cb308",
+      "image_digest": "sha256:a2cbd5d497958b95ae187aa4310286993269e79d29ca9c32e79d29a31f019169",
+      "model_digest": "sha256:a7363451bde07a8915f9ce08bbe874cfc2db812b424505184efbf9cce6c0ad3c",
+      "quality_contract": {
+        "metric": "official_space_shuttle_top1_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "workload_signature": "sha256:550e03a82ffd9faee6d9e750404dcbb94934a1b989360b444dc85d5fc26ff89f",
+      "context_signature": "sha256:206fae942c91a5387a1003ffca067fcd8e0b8103d8418b6c0033673a7bef45ad",
+      "created_at": "2026-10-08T09:14:55.161186+00:00",
+      "finished_at": "2026-10-08T09:15:13.858834+00:00",
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "accelerator_count": 1
+      },
+      "quality_passed": true,
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-82bea2f57763449c86b3fdcac342b3fc",
+        "attempt_id": "a-5252f01cecae42f7a6e2c2dda7cae991",
+        "epoch": 1,
+        "workload_signature": "sha256:550e03a82ffd9faee6d9e750404dcbb94934a1b989360b444dc85d5fc26ff89f",
+        "context_signature": "sha256:206fae942c91a5387a1003ffca067fcd8e0b8103d8418b6c0033673a7bef45ad",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.1624711798503995,
+          "peak_memory_mib": 71.3671875,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 12.667622475419194,
+          "latency_p95_ms": 49.7779919533059,
+          "latency_p99_ms": 49.7779919533059,
+          "throughput": 61.54937761397325,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:0ef10927416c3348675e6e725e77687c6e10f6c0cee5f348609947322d5b62fd",
+      "profile_recorded": true,
+      "mlflow_run_id": "49276502e2244073824a609dd6bb8c1a",
+      "artifact_digest": "sha256:0d7c31c4f22ccd4dfaea3eed89a13138cdc3ba0fbc0274697ff800bf4560d129",
+      "artifact_tracking_digest": "sha256:0d7c31c4f22ccd4dfaea3eed89a13138cdc3ba0fbc0274697ff800bf4560d129",
+      "usage": {
+        "attempt_id": "a-5252f01cecae42f7a6e2c2dda7cae991",
+        "device_class": "npu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 11.0,
+        "measured_compute_seconds": 0.1624711798503995,
+        "queue_seconds": 0.0,
+        "job_id": "j-82bea2f57763449c86b3fdcac342b3fc",
+        "outcome": "SUCCEEDED",
+        "result_valid": true,
+        "requested_resources": {
+          "host_cpu": 1.0,
+          "host_memory_mib": 1024,
+          "accelerator_count": 1
+        },
+        "observed_allocation": {
+          "source": "kubernetes:scheduled workload container requests",
+          "accelerator_count": 1.0,
+          "cpu": 1.0,
+          "memory_mib": 1024.0
+        },
+        "allocation_interval_seconds": 11.0,
+        "allocated_cpu_seconds": 11.0,
+        "allocation_memory_mib": 1024.0,
+        "started_at": "2026-10-08T09:14:58Z",
+        "backend_finished_at": "2026-10-08T09:15:09Z",
+        "submitted_at": "2026-10-08T09:14:58Z",
+        "collection_seconds": 0.08798,
+        "preparation_seconds": 1.0,
+        "container_runtime_seconds": 10.0,
+        "uncertainty": [
+          "QUEUE_WHOLE_SECOND_RESOLUTION"
+        ],
+        "semantics": "allocated reservations, not utilization; unknowns are null"
+      }
+    }
+  ],
+  "qualifications": [
+    {
+      "job_name": "ra-mobilint-stack-qual-20261008",
+      "native_job_uid": "4bf043ea-34a5-48e5-8962-022f58646277",
+      "pod_uid": "4e7c3c23-5344-4186-bc7a-e68c5855c480",
+      "phase": "Succeeded",
+      "image_digest": "sha256:b24a3f1c0c57a5b2aa04c2404a925b3bd53de4771b97c8d94381d601ddefed51",
+      "report": {
+        "runtime": "mobilint-candy",
+        "accelerator_model": "ARIES2",
+        "arch": "amd64",
+        "model_digest": "sha256:aa158a35735a876cc9f9220f9967b711b8e49ce5de49126f0597e994c6b543da",
+        "input_shape": [
+          224,
+          344,
+          3
+        ],
+        "precision": "mxq-float32-io",
+        "runtime_versions": {
+          "qbruntime": "1.4.0",
+          "numpy": "1.26.4",
+          "python": "3.11.16",
+          "host_kernel": "6.8.0-138-generic",
+          "host_module_version": "unobserved",
+          "host_module_srcversion": "unobserved",
+          "profile_reuse": "blocked-unobserved-host-firmware"
+        },
+        "input_digest": "sha256:005d18ceb13076219f5a4cead7611755c19859334d0671e7545cbded1bad6edc",
+        "output_digests": [
+          "84a129f8e708fb38a476a5f5ef55a5986327513a53d97aac7d05f0e7a6909c6e",
+          "84a129f8e708fb38a476a5f5ef55a5986327513a53d97aac7d05f0e7a6909c6e",
+          "84a129f8e708fb38a476a5f5ef55a5986327513a53d97aac7d05f0e7a6909c6e",
+          "84a129f8e708fb38a476a5f5ef55a5986327513a53d97aac7d05f0e7a6909c6e",
+          "84a129f8e708fb38a476a5f5ef55a5986327513a53d97aac7d05f0e7a6909c6e",
+          "84a129f8e708fb38a476a5f5ef55a5986327513a53d97aac7d05f0e7a6909c6e",
+          "84a129f8e708fb38a476a5f5ef55a5986327513a53d97aac7d05f0e7a6909c6e",
+          "84a129f8e708fb38a476a5f5ef55a5986327513a53d97aac7d05f0e7a6909c6e",
+          "84a129f8e708fb38a476a5f5ef55a5986327513a53d97aac7d05f0e7a6909c6e",
+          "84a129f8e708fb38a476a5f5ef55a5986327513a53d97aac7d05f0e7a6909c6e"
+        ],
+        "target_cores": [
+          "CoreId(cluster=Cluster.Cluster0, core=Core.Core0)"
+        ],
+        "samples_seconds": [
+          0.024663768999744207,
+          0.024749114003498107,
+          0.024843603008775972,
+          0.024795250996248797,
+          0.02474270699894987,
+          0.024298368996824138,
+          0.024163340000086464,
+          0.024618837007437833,
+          0.024657866000779904,
+          0.024615791990072466
+        ],
+        "quality_value": 1.0,
+        "quality_metric": "finite_output_repeat_element_agreement",
+        "task_accuracy": null,
+        "quality_scope": "runtime-repeatability-only",
+        "reference_output_digest": "sha256:84a129f8e708fb38a476a5f5ef55a5986327513a53d97aac7d05f0e7a6909c6e",
+        "started_at": "2026-10-08T08:40:28.333099+00:00",
+        "ended_at": "2026-10-08T08:40:28.961461+00:00",
+        "kind": "npu-runtime-qualification",
+        "evidence_kind": "hardware",
+        "seed": 20261008,
+        "work_units": 10,
+        "warmup": 1,
+        "measurement_boundary": "blocking-host-input-to-NPU-output; memory=host-process-peak-RSS",
+        "elapsed_seconds": 0.24614864800241776,
+        "host_process_peak_rss_mib": 62.60546875,
+        "npu_memory_mib": null,
+        "npu_power_watts": null,
+        "runner_digest": "sha256:4c0b1aa9878868b8e94add7c2aacf393850aea400bf28698fb300141f55cb308"
+      },
+      "reservation_cost": null,
+      "cost_note": "Not part of API ledger; not counted as zero."
+    },
+    {
+      "job_name": "ra-intel-stack-qual-20261008",
+      "native_job_uid": "c79b4e7f-05f4-4c92-aa95-67a05b9fd0a5",
+      "pod_uid": "5191e344-5c67-4aef-86cf-d8c4c4479bb8",
+      "phase": "Succeeded",
+      "image_digest": "sha256:725d604c11e02c7ddce47c7ab4e362d98245860644ce40679bf9c5e2dec1ea1a",
+      "report": {
+        "runtime": "intel-conv",
+        "accelerator_model": "Intel-NPU-3720",
+        "arch": "amd64",
+        "model_digest": "sha256:9e6268a0a1d6ee57b35102ff20c3e50bc921ef2674f1e19ca7c875dd4c5530f0",
+        "serialized_model_digest": "sha256:148553d8edf7f9131c32f5be8c32ce963d6656e2741cb7ad213959b45ffa84a6",
+        "input_shape": [
+          1,
+          3,
+          16,
+          16
+        ],
+        "precision": "fp32-io-npu-default-internal",
+        "runtime_versions": {
+          "openvino": "2026.3.1-22476-759c5a6ab8c-releases/2026/3",
+          "npu_driver_version_raw": "1776845405",
+          "npu_compiler_version_raw": "458781",
+          "npu_compiler_type": "CompilerType.DRIVER",
+          "numpy": "1.26.4",
+          "python": "3.12.3",
+          "host_kernel": "7.0.0-31-generic",
+          "host_module_version": "1.0.0 7.0.0-31-generic",
+          "host_module_srcversion": "C39F2478EC352783F7B1B50",
+          "profile_reuse": "blocked-unobserved-host-firmware"
+        },
+        "input_digest": "sha256:211262836fafbc947c6f0b32450f4b7eba9a256589a86b191acdc3786e65498e",
+        "model_spec": {
+          "opset": 13,
+          "input": [
+            1,
+            3,
+            16,
+            16
+          ],
+          "weights": [
+            [
+              [
+                [
+                  0.0
+                ]
+              ],
+              [
+                [
+                  0.03125
+                ]
+              ],
+              [
+                [
+                  0.0625
+                ]
+              ]
+            ],
+            [
+              [
+                [
+                  0.09375
+                ]
+              ],
+              [
+                [
+                  0.125
+                ]
+              ],
+              [
+                [
+                  0.15625
+                ]
+              ]
+            ],
+            [
+              [
+                [
+                  0.1875
+                ]
+              ],
+              [
+                [
+                  0.21875
+                ]
+              ],
+              [
+                [
+                  0.25
+                ]
+              ]
+            ],
+            [
+              [
+                [
+                  0.28125
+                ]
+              ],
+              [
+                [
+                  0.3125
+                ]
+              ],
+              [
+                [
+                  0.34375
+                ]
+              ]
+            ]
+          ],
+          "bias": [
+            -0.5,
+            -0.25,
+            0.0,
+            0.25
+          ],
+          "operations": [
+            "conv1x1",
+            "bias",
+            "relu",
+            "spatial_mean"
+          ],
+          "absolute_tolerance": 0.002
+        },
+        "outputs": [
+          [
+            [
+              0.0,
+              0.005619049072265625,
+              0.321533203125,
+              0.70947265625
+            ]
+          ],
+          [
+            [
+              0.0,
+              0.005619049072265625,
+              0.321533203125,
+              0.70947265625
+            ]
+          ],
+          [
+            [
+              0.0,
+              0.005619049072265625,
+              0.321533203125,
+              0.70947265625
+            ]
+          ],
+          [
+            [
+              0.0,
+              0.005619049072265625,
+              0.321533203125,
+              0.70947265625
+            ]
+          ],
+          [
+            [
+              0.0,
+              0.005619049072265625,
+              0.321533203125,
+              0.70947265625
+            ]
+          ],
+          [
+            [
+              0.0,
+              0.005619049072265625,
+              0.321533203125,
+              0.70947265625
+            ]
+          ],
+          [
+            [
+              0.0,
+              0.005619049072265625,
+              0.321533203125,
+              0.70947265625
+            ]
+          ],
+          [
+            [
+              0.0,
+              0.005619049072265625,
+              0.321533203125,
+              0.70947265625
+            ]
+          ],
+          [
+            [
+              0.0,
+              0.005619049072265625,
+              0.321533203125,
+              0.70947265625
+            ]
+          ],
+          [
+            [
+              0.0,
+              0.005619049072265625,
+              0.321533203125,
+              0.70947265625
+            ]
+          ]
+        ],
+        "reference_output": [
+          [
+            0.0,
+            0.005618126597255468,
+            0.3215067386627197,
+            0.7094739675521851
+          ]
+        ],
+        "maximum_absolute_errors": [
+          2.6464462280273438e-05,
+          2.6464462280273438e-05,
+          2.6464462280273438e-05,
+          2.6464462280273438e-05,
+          2.6464462280273438e-05,
+          2.6464462280273438e-05,
+          2.6464462280273438e-05,
+          2.6464462280273438e-05,
+          2.6464462280273438e-05,
+          2.6464462280273438e-05
+        ],
+        "absolute_tolerance": 0.002,
+        "execution_devices": [
+          "NPU"
+        ],
+        "device_full_name": "Intel(R) AI Boost",
+        "compilation_seconds": 0.05867784610018134,
+        "samples_seconds": [
+          0.0005733669968321919,
+          0.00059780094306916,
+          0.000827113981358707,
+          0.00051171297673136,
+          0.0007526689441874623,
+          0.0006325320573523641,
+          0.0005592770176008344,
+          0.00060539401602,
+          0.0006870659999549389,
+          0.0004683809820562601
+        ],
+        "quality_value": 1.0,
+        "quality_metric": "all_output_elements_within_absolute_tolerance_0.002",
+        "task_accuracy": null,
+        "quality_scope": "generated-CNN-numerical-reference",
+        "started_at": "2026-10-08T08:40:27.866545+00:00",
+        "ended_at": "2026-10-08T08:40:28.258912+00:00",
+        "kind": "npu-runtime-qualification",
+        "evidence_kind": "hardware",
+        "seed": 20261008,
+        "work_units": 10,
+        "warmup": 1,
+        "measurement_boundary": "blocking-host-input-to-NPU-output; memory=host-process-peak-RSS",
+        "elapsed_seconds": 0.006215313915163279,
+        "host_process_peak_rss_mib": 196.69921875,
+        "npu_memory_mib": null,
+        "npu_power_watts": null,
+        "runner_digest": "sha256:4c0b1aa9878868b8e94add7c2aacf393850aea400bf28698fb300141f55cb308"
+      },
+      "reservation_cost": null,
+      "cost_note": "Not part of API ledger; not counted as zero."
+    },
+    {
+      "job_name": "ra-rockchip-host21-qual2-20261008",
+      "native_job_uid": "861938f3-08c7-49bc-863b-39b04df7796f",
+      "pod_uid": "7d272fa5-63f7-4e03-b9bf-3534cc768e9b",
+      "phase": "Succeeded",
+      "image_digest": "sha256:728d43e5dc99879a8366cf638eeb47720341e19addcda0c26e665fc9470e870f",
+      "report": {
+        "runtime": "rockchip-resnet18",
+        "accelerator_model": "RK3399Pro",
+        "arch": "arm64",
+        "model_digest": "sha256:a7363451bde07a8915f9ce08bbe874cfc2db812b424505184efbf9cce6c0ad3c",
+        "compiled_artifact_digest": "sha256:a7363451bde07a8915f9ce08bbe874cfc2db812b424505184efbf9cce6c0ad3c",
+        "input_shape": [
+          224,
+          224,
+          3
+        ],
+        "precision": "rknn-compiled-uint8-io",
+        "runtime_versions": {
+          "rknn_toolkit_lite": "1.7.1",
+          "transport_mode": "host-persistent",
+          "transport_proxy_sha256": "sha256:c6961f392030a71272e53263246f688ad74ea7410d302c9ba9988cd5e5d30b68",
+          "sdk": "==============================================\nRKNN VERSION:\n  API: 1.7.1 (566a9b6 build: 2021-10-28 14:56:17)\n  DRV: 1.6.0 (159d2d3 build: 2021-01-12 15:23:09)\n==============================================\n",
+          "numpy": "1.21.6",
+          "python": "3.7.17",
+          "host_kernel": "4.4.194",
+          "host_module_version": "unobserved",
+          "host_module_srcversion": "unobserved",
+          "profile_reuse": "blocked-unobserved-host-firmware"
+        },
+        "input_digest": "sha256:f36e0734e1f08d3ef7d380ee568fee2daa12b6c0e26d7446da9278ccb66e35f2",
+        "samples_seconds": [
+          0.011280874954536557,
+          0.011302332975901663,
+          0.010940085048787296,
+          0.011978581082075834,
+          0.011331499903462827,
+          0.0120093310251832,
+          0.011794373043812811,
+          0.018633639090694487,
+          0.011849788948893547,
+          0.012047247029840946
+        ],
+        "predictions": [
+          812,
+          812,
+          812,
+          812,
+          812,
+          812,
+          812,
+          812,
+          812,
+          812
+        ],
+        "top1_values": [
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695
+        ],
+        "expected_class": 812,
+        "quality_value": 1.0,
+        "quality_metric": "official_space_shuttle_top1_agreement",
+        "quality_scope": "one-official-example-not-dataset-accuracy",
+        "task_accuracy": null,
+        "started_at": "2026-10-08T08:45:33.420234+00:00",
+        "ended_at": "2026-10-08T08:45:42.820414+00:00",
+        "kind": "npu-runtime-qualification",
+        "evidence_kind": "hardware",
+        "seed": 20261008,
+        "work_units": 10,
+        "warmup": 1,
+        "measurement_boundary": "blocking-host-input-to-NPU-output; memory=host-process-peak-RSS",
+        "elapsed_seconds": 0.12316775310318917,
+        "host_process_peak_rss_mib": 70.94921875,
+        "npu_memory_mib": null,
+        "npu_power_watts": null,
+        "runner_digest": "sha256:4c0b1aa9878868b8e94add7c2aacf393850aea400bf28698fb300141f55cb308"
+      },
+      "reservation_cost": null,
+      "cost_note": "Not part of API ledger; not counted as zero."
+    },
+    {
+      "job_name": "ra-rockchip-host21-qual3-20261008",
+      "native_job_uid": "a1928792-a2f3-43d1-a8ea-205d1468f9de",
+      "pod_uid": "49aa2dc7-4d5d-4370-ae27-09730ed798e7",
+      "phase": "Succeeded",
+      "image_digest": "sha256:728d43e5dc99879a8366cf638eeb47720341e19addcda0c26e665fc9470e870f",
+      "report": {
+        "runtime": "rockchip-resnet18",
+        "accelerator_model": "RK3399Pro",
+        "arch": "arm64",
+        "model_digest": "sha256:a7363451bde07a8915f9ce08bbe874cfc2db812b424505184efbf9cce6c0ad3c",
+        "compiled_artifact_digest": "sha256:a7363451bde07a8915f9ce08bbe874cfc2db812b424505184efbf9cce6c0ad3c",
+        "input_shape": [
+          224,
+          224,
+          3
+        ],
+        "precision": "rknn-compiled-uint8-io",
+        "runtime_versions": {
+          "rknn_toolkit_lite": "1.7.1",
+          "transport_mode": "host-persistent",
+          "transport_proxy_sha256": "sha256:c6961f392030a71272e53263246f688ad74ea7410d302c9ba9988cd5e5d30b68",
+          "sdk": "==============================================\nRKNN VERSION:\n  API: 1.7.1 (566a9b6 build: 2021-10-28 14:56:17)\n  DRV: 1.6.0 (159d2d3 build: 2021-01-12 15:23:09)\n==============================================\n",
+          "numpy": "1.21.6",
+          "python": "3.7.17",
+          "host_kernel": "4.4.194",
+          "host_module_version": "unobserved",
+          "host_module_srcversion": "unobserved",
+          "profile_reuse": "blocked-unobserved-host-firmware"
+        },
+        "input_digest": "sha256:f36e0734e1f08d3ef7d380ee568fee2daa12b6c0e26d7446da9278ccb66e35f2",
+        "samples_seconds": [
+          0.01061196206137538,
+          0.052225354011170566,
+          0.015169237041845918,
+          0.01430269901175052,
+          0.014288990991190076,
+          0.012250330997630954,
+          0.010306212934665382,
+          0.012879079091362655,
+          0.01231587294023484,
+          0.009789173025637865
+        ],
+        "predictions": [
+          812,
+          812,
+          812,
+          812,
+          812,
+          812,
+          812,
+          812,
+          812,
+          812
+        ],
+        "top1_values": [
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695,
+          22.596208572387695
+        ],
+        "expected_class": 812,
+        "quality_value": 1.0,
+        "quality_metric": "official_space_shuttle_top1_agreement",
+        "quality_scope": "one-official-example-not-dataset-accuracy",
+        "task_accuracy": null,
+        "started_at": "2026-10-08T08:48:38.935464+00:00",
+        "ended_at": "2026-10-08T08:48:48.397659+00:00",
+        "kind": "npu-runtime-qualification",
+        "evidence_kind": "hardware",
+        "seed": 20261008,
+        "work_units": 10,
+        "warmup": 1,
+        "measurement_boundary": "blocking-host-input-to-NPU-output; memory=host-process-peak-RSS",
+        "elapsed_seconds": 0.16413891210686415,
+        "host_process_peak_rss_mib": 71.14453125,
+        "npu_memory_mib": null,
+        "npu_power_watts": null,
+        "runner_digest": "sha256:4c0b1aa9878868b8e94add7c2aacf393850aea400bf28698fb300141f55cb308"
+      },
+      "reservation_cost": null,
+      "cost_note": "Not part of API ledger; not counted as zero."
+    }
+  ],
+  "diagnostics_cost_complete": false,
+  "executed_runner_snapshots": [
+    "sha256:2df02c841c0c74909132e6c2ba43b81dce20758661e6e1e1a4d8d456e0b62fe6",
+    "sha256:4c0b1aa9878868b8e94add7c2aacf393850aea400bf28698fb300141f55cb308",
+    "sha256:c819384cb62d9d601f72726faa44721fe100ea8283aad9fe8588f1f5fca8f083",
+    "sha256:d5bc3480023bd49dddef7f72d1e72ee3b4e83ecce2d54aaeafafa82420bbd736"
+  ]
+}

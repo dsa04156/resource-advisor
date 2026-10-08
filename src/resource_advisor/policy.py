@@ -35,6 +35,14 @@ def compatibility(
     age = ((at or now()) - cap.observed_at).total_seconds()
     checks = {
         "CAPABILITY_STALE": age < -5 or age > cap.valid_for_seconds,
+        "RUNTIME_FINGERPRINT_INCOMPLETE": (
+            ctx.runtime_versions.get("profile_reuse", "").startswith("blocked-")
+            or (
+                cap.device_class == "npu"
+                and variant.accelerator_vendor in {"intel", "mobilint", "rockchip"}
+                and not ctx.runtime_versions.get("firmware_identity")
+            )
+        ),
         "NODE_UNAVAILABLE": not cap.ready,
         "WRONG_PROJECT_OR_WORKLOAD": (
             variant.project_ref != spec.project_ref or variant.workload_ref != spec.ref
@@ -90,5 +98,9 @@ def execution_compatibility(spec, candidate, variant, cap, *, operational=False)
     """Manual lab runs may use older observations; never forge renewed evidence."""
     errors = compatibility(spec, candidate, variant, cap)
     if operational and cap.observed_at <= now():
-        errors = [reason for reason in errors if reason != "CAPABILITY_STALE"]
+        errors = [
+            reason
+            for reason in errors
+            if reason not in {"CAPABILITY_STALE", "RUNTIME_FINGERPRINT_INCOMPLETE"}
+        ]
     return errors

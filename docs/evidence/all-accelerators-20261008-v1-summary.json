@@ -1,0 +1,71 @@
+{
+  "states": {
+    "SUCCEEDED": 12,
+    "FAILED": 5
+  },
+  "successful_nodes": {
+    "npu": [
+      "npu-1",
+      "npu-2",
+      "npu-3",
+      "npu-4",
+      "npu-5"
+    ],
+    "gpu": [
+      "gpu-1",
+      "gpu-2",
+      "gpu-3",
+      "gpu-4",
+      "npu-4"
+    ]
+  },
+  "known_reservations": {
+    "npu_seconds": 557.0,
+    "cpu_core_seconds": 1016.0,
+    "gpu_seconds": 459.0
+  },
+  "unknown_cost_attempts": [
+    "a-6157361afcc34e6785b49b67e37b73e6"
+  ],
+  "api_cost_complete": false,
+  "failures": [
+    {
+      "job_id": "j-26fdef86db264bc481a0948f5bed77d1",
+      "reason": "DeadlineExceeded",
+      "device_seconds": 125.0,
+      "cpu_core_seconds": 125.0,
+      "compute_seconds": null
+    },
+    {
+      "job_id": "j-901f9be95737409d9e7dacbdedf7b86f",
+      "reason": "DeadlineExceeded",
+      "device_seconds": 125.0,
+      "cpu_core_seconds": 125.0,
+      "compute_seconds": null
+    },
+    {
+      "job_id": "j-08f82a0a048241ab85d1757e68564156",
+      "reason": "DeadlineExceeded",
+      "device_seconds": null,
+      "cpu_core_seconds": null,
+      "compute_seconds": null
+    },
+    {
+      "job_id": "j-92ad8359fc784205adcb44aafcf84539",
+      "reason": "DeadlineExceeded",
+      "device_seconds": 125.0,
+      "cpu_core_seconds": 125.0,
+      "compute_seconds": null
+    },
+    {
+      "job_id": "j-8955667798a64c7bb579a86faa70db76",
+      "reason": "DeadlineExceeded",
+      "device_seconds": 139.0,
+      "cpu_core_seconds": 139.0,
+      "compute_seconds": null
+    }
+  ],
+  "cost_scope": "API cohort only; qualification/diagnostic/control effort is not a complete cost ledger",
+  "performance_improvement_claim": false,
+  "overall_right_sizing_goal_complete": false
+}

@@ -119,4 +119,60 @@ def test_qualification_rejects_forged_numerical_success():
             cluster="test",
             image="example.invalid/image@sha256:" + "a" * 64,
             evidence_ref="synthetic-software-fixture",
+            observed_at="2000-01-01T00:00:00+00:00",
         )
+
+
+def test_unknown_firmware_allows_manual_observe_but_blocks_recommendation(bundle):
+    from resource_advisor.policy import compatibility, execution_compatibility
+
+    spec, candidate, variant, cap = bundle
+    versions = {"profile_reuse": "blocked-unobserved-host-firmware"}
+    context = candidate.context.model_copy(update={"runtime_versions": versions})
+    candidate = candidate.model_copy(update={"context": context})
+    variant = variant.model_copy(update={"runtime_versions": versions})
+    cap = cap.model_copy(update={"runtime_versions": versions})
+    assert "RUNTIME_FINGERPRINT_INCOMPLETE" in compatibility(spec, candidate, variant, cap)
+    assert execution_compatibility(spec, candidate, variant, cap, operational=True) == []
+
+
+@pytest.mark.parametrize("failure", ["construction", "release"])
+def test_proxy_cleanup_even_when_sdk_initialization_or_release_fails(failure):
+    import subprocess
+    import sys
+
+    from resource_advisor.npu_probe import rknn_session
+
+    processes = []
+
+    def launch(command):
+        process = subprocess.Popen(command)
+        processes.append(process)
+        return process
+
+    class SDK:
+        def release(self):
+            if failure == "release":
+                raise RuntimeError("SDK release failure")
+
+    def construct():
+        if failure == "construction":
+            raise RuntimeError("SDK construction failure")
+        return SDK()
+
+    with pytest.raises(RuntimeError, match="SDK"):
+        with rknn_session(
+            [sys.executable, "-c", "import time; time.sleep(30)"], construct, launch=launch
+        ):
+            pass
+    assert processes[0].poll() is not None
+
+
+def test_legacy_npu_without_firmware_fingerprint_cannot_reuse_profile(bundle):
+    from resource_advisor.policy import compatibility, execution_compatibility
+
+    spec, candidate, variant, cap = bundle
+    variant = variant.model_copy(update={"accelerator_vendor": "intel", "device_class": "npu"})
+    cap = cap.model_copy(update={"accelerator_vendor": "intel", "device_class": "npu"})
+    assert "RUNTIME_FINGERPRINT_INCOMPLETE" in compatibility(spec, candidate, variant, cap)
+    assert execution_compatibility(spec, candidate, variant, cap, operational=True) == []

@@ -1,0 +1,398 @@
+{
+  "a-14278ba6ea024a0fa363655bfd833b6f": {
+    "job_id": "j-a101d8019f63421383dce8b62b49f84f",
+    "job_uid": "7f3028f0-406a-4ccc-9be9-99fbdc3c2b1b",
+    "pod_uid": "1e6acdf0-7bba-4652-b146-a6249e43717e",
+    "phase": "Succeeded",
+    "scheduled_at": "2026-10-08T07:22:17Z",
+    "container": {
+      "startedAt": "2026-10-08T07:22:18Z",
+      "finishedAt": "2026-10-08T07:22:20Z",
+      "exitCode": 0,
+      "signal": null,
+      "reason": "Completed"
+    },
+    "allocation": {
+      "source": "kubernetes:scheduled workload container requests",
+      "accelerator_count": 1.0,
+      "cpu": 1.0,
+      "memory_mib": 1024.0
+    },
+    "source": "captured-termination-receipt"
+  },
+  "a-d798ee3510fa46909ac6d09ac916a238": {
+    "job_id": "j-f21bb640390942908706300d73e4ee90",
+    "job_uid": "ddf662e1-c7ff-4048-8334-b425c2575ca9",
+    "pod_uid": "b5418f35-739a-4826-8dfb-87fcaf6686e3",
+    "phase": "Succeeded",
+    "scheduled_at": "2026-10-08T07:22:50Z",
+    "container": {
+      "startedAt": "2026-10-08T07:22:51Z",
+      "finishedAt": "2026-10-08T07:22:53Z",
+      "exitCode": 0,
+      "signal": null,
+      "reason": "Completed"
+    },
+    "allocation": {
+      "source": "kubernetes:scheduled workload container requests",
+      "accelerator_count": 1.0,
+      "cpu": 1.0,
+      "memory_mib": 1024.0
+    },
+    "source": "captured-termination-receipt"
+  },
+  "a-8a060c8cd0cb4eb3b808009f4bd8d7d0": {
+    "job_id": "j-58370c0710ce4233af669374707b5f20",
+    "job_uid": "04a2e6b7-0bf2-4427-9c3f-3629c8d84ad0",
+    "pod_uid": "74fc63de-fced-418d-834c-c72f23895ac5",
+    "phase": "Succeeded",
+    "scheduled_at": "2026-10-08T07:22:45Z",
+    "container": {
+      "startedAt": "2026-10-08T07:22:45Z",
+      "finishedAt": "2026-10-08T07:22:46Z",
+      "exitCode": 0,
+      "signal": null,
+      "reason": "Completed"
+    },
+    "allocation": {
+      "source": "kubernetes:scheduled workload container requests",
+      "accelerator_count": 1.0,
+      "cpu": 1.0,
+      "memory_mib": 1024.0
+    },
+    "source": "captured-termination-receipt"
+  },
+  "a-e8450b3d3319411d9dc2b3f75c849018": {
+    "job_id": "j-c1f5a0563efa4fc0948a44c63857a06f",
+    "job_uid": "bba89540-6162-4dd6-8d9d-55e84a1066b5",
+    "pod_uid": "642558e2-9d05-4adb-87c3-ee0e20e49e72",
+    "phase": "Succeeded",
+    "scheduled_at": "2026-10-08T07:29:14Z",
+    "container": {
+      "startedAt": "2026-10-08T07:29:15Z",
+      "finishedAt": "2026-10-08T07:29:16Z",
+      "exitCode": 0,
+      "signal": null,
+      "reason": "Completed"
+    },
+    "allocation": {
+      "source": "kubernetes:scheduled workload container requests",
+      "accelerator_count": 1.0,
+      "cpu": 1.0,
+      "memory_mib": 1024.0
+    },
+    "source": "captured-termination-receipt"
+  },
+  "a-3b7fe46a9d48439daceaa630cb0b33a9": {
+    "job_id": "j-0e55b9a7bdc949efa19a1e7b4a0d9d7b",
+    "job_uid": "166ca880-5100-49d0-a1c9-cdc19a5d12e1",
+    "pod_uid": "f6209b2f-454e-4524-a78f-3e079a1cad64",
+    "phase": "Succeeded",
+    "scheduled_at": "2026-10-08T07:32:04Z",
+    "container": {
+      "startedAt": "2026-10-08T07:32:05Z",
+      "finishedAt": "2026-10-08T07:33:35Z",
+      "exitCode": 0,
+      "signal": null,
+      "reason": "Completed"
+    },
+    "allocation": {
+      "source": "kubernetes:scheduled workload container requests",
+      "accelerator_count": 1.0,
+      "cpu": 1.0,
+      "memory_mib": 512.0
+    },
+    "source": "captured-termination-receipt"
+  },
+  "a-baef7f8bb2034c6bb9fbedcbb92d8c7c": {
+    "job_id": "j-26fdef86db264bc481a0948f5bed77d1",
+    "job_uid": "a134b553-ddbd-4fc5-b8b9-5875a5d1531f",
+    "pod_uid": "a2241375-9875-4fb0-a4d5-a7fd00de6827",
+    "phase": "Failed",
+    "scheduled_at": "2026-10-08T07:36:22Z",
+    "container": {
+      "startedAt": "2026-10-08T07:36:24Z",
+      "finishedAt": "2026-10-08T07:38:27Z",
+      "exitCode": 137,
+      "signal": null,
+      "reason": "Error"
+    },
+    "allocation": {
+      "source": "kubernetes:scheduled workload container requests",
+      "accelerator_count": 1.0,
+      "cpu": 1.0,
+      "memory_mib": 1024.0
+    },
+    "source": "captured-termination-receipt"
+  },
+  "a-f371aca57ca9492eb958891dfbd41128": {
+    "job_id": "j-901f9be95737409d9e7dacbdedf7b86f",
+    "job_uid": "e695186e-9b77-4b24-9a48-1a70dc86f30d",
+    "pod_uid": "5e8d67d5-0a3a-4343-b67e-8f969b443636",
+    "phase": "Failed",
+    "scheduled_at": "2026-10-08T08:03:09Z",
+    "container": {
+      "startedAt": "2026-10-08T08:04:10Z",
+      "finishedAt": "2026-10-08T08:05:14Z",
+      "exitCode": 137,
+      "signal": null,
+      "reason": "Error"
+    },
+    "allocation": {
+      "source": "kubernetes:scheduled workload container requests",
+      "accelerator_count": 1.0,
+      "cpu": 1.0,
+      "memory_mib": 1024.0
+    },
+    "source": "captured-termination-receipt"
+  },
+  "a-6157361afcc34e6785b49b67e37b73e6": {
+    "job_id": "j-08f82a0a048241ab85d1757e68564156",
+    "job_uid": "4c7bacb7-45e3-4d15-8996-0883dd63205d",
+    "pod_uid": "266bbead-26dd-4e8f-a1a4-369c00dee0d1",
+    "phase": "Failed",
+    "scheduled_at": null,
+    "container": {
+      "startedAt": null,
+      "finishedAt": null,
+      "exitCode": null,
+      "signal": null,
+      "reason": null
+    },
+    "allocation": null,
+    "source": "captured-termination-receipt"
+  },
+  "a-8291f99cb8e34ca59f53ff01183857eb": {
+    "job_id": "j-4fe970e7866e49c49b96b1308909408c",
+    "job_uid": "801e2f17-7709-4329-9609-fbbc9b090e1f",
+    "pod_uid": "bbebb734-24cd-44de-96df-b21fee2a4998",
+    "phase": "Succeeded",
+    "scheduled_at": "2026-10-08T08:22:57Z",
+    "container": {
+      "startedAt": "2026-10-08T08:22:58Z",
+      "finishedAt": "2026-10-08T08:23:08Z",
+      "exitCode": 0,
+      "signal": null,
+      "reason": "Completed"
+    },
+    "allocation": {
+      "source": "kubernetes:scheduled workload container requests",
+      "accelerator_count": 1.0,
+      "cpu": 1.0,
+      "memory_mib": 1024.0
+    },
+    "source": "captured-termination-receipt"
+  },
+  "a-c49a1290ddb24182bbe733543a101a9d": {
+    "job_id": "j-92ad8359fc784205adcb44aafcf84539",
+    "job_uid": "1f99c5d9-b35d-4e82-a377-b5c04e2d9c57",
+    "pod_uid": "fd052bd9-a52a-44df-a0bd-46be574f2808",
+    "phase": "Failed",
+    "scheduled_at": "2026-10-08T08:25:25Z",
+    "container": {
+      "startedAt": "2026-10-08T08:25:26Z",
+      "finishedAt": "2026-10-08T08:27:30Z",
+      "exitCode": 137,
+      "signal": null,
+      "reason": "Error"
+    },
+    "allocation": {
+      "source": "kubernetes:scheduled workload container requests",
+      "accelerator_count": 1.0,
+      "cpu": 1.0,
+      "memory_mib": 1024.0
+    },
+    "source": "captured-termination-receipt"
+  },
+  "a-8059b7b714d04ffbb56e6629bd7a5839": {
+    "job_id": "j-8955667798a64c7bb579a86faa70db76",
+    "job_uid": "6f84a182-597d-4468-b3b6-50496c76b7aa",
+    "pod_uid": "929e9a20-7e9f-457f-9d47-825cb4041e52",
+    "phase": "Failed",
+    "scheduled_at": "2026-10-08T09:10:03Z",
+    "container": {
+      "startedAt": "2026-10-08T09:10:05Z",
+      "finishedAt": "2026-10-08T09:12:22Z",
+      "exitCode": 137,
+      "signal": null,
+      "reason": "Error"
+    },
+    "allocation": {
+      "source": "kubernetes:scheduled workload container requests",
+      "accelerator_count": 1.0,
+      "cpu": 1.0,
+      "memory_mib": 1024.0
+    },
+    "source": "captured-termination-receipt"
+  },
+  "a-b2d23f4fc25a46ce9ea353a86c50cd81": {
+    "job_id": "j-a79b2434c9fe485eaf42a8f4821deb18",
+    "job_uid": "cd3bd186-5f26-423b-acdf-44eb9114f050",
+    "pod_uid": "715d78ac-2769-48cf-88f8-8062cf568910",
+    "phase": "Succeeded",
+    "scheduled_at": "2026-10-08T09:13:50Z",
+    "container": {
+      "startedAt": "2026-10-08T09:13:52Z",
+      "finishedAt": "2026-10-08T09:14:02Z",
+      "exitCode": 0,
+      "signal": null,
+      "reason": "Completed"
+    },
+    "allocation": {
+      "source": "kubernetes:scheduled workload container requests",
+      "accelerator_count": 1.0,
+      "cpu": 1.0,
+      "memory_mib": 1024.0
+    },
+    "source": "captured-termination-receipt"
+  },
+  "a-5252f01cecae42f7a6e2c2dda7cae991": {
+    "job_id": "j-82bea2f57763449c86b3fdcac342b3fc",
+    "job_uid": "f00d0138-ec02-408d-8d6e-ce8e5efc6760",
+    "pod_uid": "519876d9-bac0-4dc9-9274-5df06a21a47a",
+    "phase": "Succeeded",
+    "scheduled_at": "2026-10-08T09:14:58Z",
+    "container": {
+      "startedAt": "2026-10-08T09:14:59Z",
+      "finishedAt": "2026-10-08T09:15:09Z",
+      "exitCode": 0,
+      "signal": null,
+      "reason": "Completed"
+    },
+    "allocation": {
+      "source": "kubernetes:scheduled workload container requests",
+      "accelerator_count": 1.0,
+      "cpu": 1.0,
+      "memory_mib": 1024.0
+    },
+    "source": "captured-termination-receipt"
+  },
+  "a-ed9116703f1c4193b4000d6f5f6e889d": {
+    "source": "current-retained-native-job",
+    "job_id": "j-01ad8e137842486ba2cd5cf14cf7c512",
+    "job_uid": "fba87f48-2e43-4293-bb19-2f77e0ea52b8",
+    "context_signature": "sha256:37fc25cb697a574cc53a401927748014dc101f9e40f7513aec2396a1276ec592",
+    "conditions": [
+      {
+        "lastProbeTime": "2026-10-08T07:32:25Z",
+        "lastTransitionTime": "2026-10-08T07:32:25Z",
+        "message": "Job resumed",
+        "reason": "JobResumed",
+        "status": "False",
+        "type": "Suspended"
+      },
+      {
+        "lastProbeTime": "2026-10-08T07:34:00Z",
+        "lastTransitionTime": "2026-10-08T07:34:00Z",
+        "message": "Reached expected number of succeeded pods",
+        "reason": "CompletionsReached",
+        "status": "True",
+        "type": "SuccessCriteriaMet"
+      },
+      {
+        "lastProbeTime": "2026-10-08T07:34:00Z",
+        "lastTransitionTime": "2026-10-08T07:34:00Z",
+        "message": "Reached expected number of succeeded pods",
+        "reason": "CompletionsReached",
+        "status": "True",
+        "type": "Complete"
+      }
+    ]
+  },
+  "a-15b5b9365f444c35b0060931fc3c8ef9": {
+    "source": "current-retained-native-job",
+    "job_id": "j-b76165531cf64dbcb001bb5781df8fcb",
+    "job_uid": "2db54eb3-6136-4c01-a900-4ca002614a9c",
+    "context_signature": "sha256:b59b15c808ea2be3ae234279263285562d20951831dc28e030e0718adf8aef82",
+    "conditions": [
+      {
+        "lastProbeTime": "2026-10-08T07:31:56Z",
+        "lastTransitionTime": "2026-10-08T07:31:56Z",
+        "message": "Job resumed",
+        "reason": "JobResumed",
+        "status": "False",
+        "type": "Suspended"
+      },
+      {
+        "lastProbeTime": "2026-10-08T07:33:31Z",
+        "lastTransitionTime": "2026-10-08T07:33:31Z",
+        "message": "Reached expected number of succeeded pods",
+        "reason": "CompletionsReached",
+        "status": "True",
+        "type": "SuccessCriteriaMet"
+      },
+      {
+        "lastProbeTime": "2026-10-08T07:33:31Z",
+        "lastTransitionTime": "2026-10-08T07:33:31Z",
+        "message": "Reached expected number of succeeded pods",
+        "reason": "CompletionsReached",
+        "status": "True",
+        "type": "Complete"
+      }
+    ]
+  },
+  "a-4643042f63e548a5a8aa261bd5f622e1": {
+    "source": "current-retained-native-job",
+    "job_id": "j-d236619731c64ec6860179194cf1fcef",
+    "job_uid": "5d06f96a-a5b7-4ca0-a3ee-fe6acd0b0657",
+    "context_signature": "sha256:20bbf2a7e60d6a76777b4c0ab6198870f0da46520f68c829daf047029fb656fc",
+    "conditions": [
+      {
+        "lastProbeTime": "2026-10-08T07:32:09Z",
+        "lastTransitionTime": "2026-10-08T07:32:09Z",
+        "message": "Job resumed",
+        "reason": "JobResumed",
+        "status": "False",
+        "type": "Suspended"
+      },
+      {
+        "lastProbeTime": "2026-10-08T07:33:46Z",
+        "lastTransitionTime": "2026-10-08T07:33:46Z",
+        "message": "Reached expected number of succeeded pods",
+        "reason": "CompletionsReached",
+        "status": "True",
+        "type": "SuccessCriteriaMet"
+      },
+      {
+        "lastProbeTime": "2026-10-08T07:33:46Z",
+        "lastTransitionTime": "2026-10-08T07:33:46Z",
+        "message": "Reached expected number of succeeded pods",
+        "reason": "CompletionsReached",
+        "status": "True",
+        "type": "Complete"
+      }
+    ]
+  },
+  "a-5624df86e0fe4c2887dd676d42e41090": {
+    "source": "current-retained-native-job",
+    "job_id": "j-390b9bee1078434d90dfbeb4f02b66f4",
+    "job_uid": "ca638f30-6b6c-4a41-8820-3c30575f8440",
+    "context_signature": "sha256:7c757f0f0126721b84b2a99e2b0115b84025dc459f732a95faca2826aa223098",
+    "conditions": [
+      {
+        "lastProbeTime": "2026-10-08T07:32:16Z",
+        "lastTransitionTime": "2026-10-08T07:32:16Z",
+        "message": "Job resumed",
+        "reason": "JobResumed",
+        "status": "False",
+        "type": "Suspended"
+      },
+      {
+        "lastProbeTime": "2026-10-08T07:33:53Z",
+        "lastTransitionTime": "2026-10-08T07:33:53Z",
+        "message": "Reached expected number of succeeded pods",
+        "reason": "CompletionsReached",
+        "status": "True",
+        "type": "SuccessCriteriaMet"
+      },
+      {
+        "lastProbeTime": "2026-10-08T07:33:53Z",
+        "lastTransitionTime": "2026-10-08T07:33:53Z",
+        "message": "Reached expected number of succeeded pods",
+        "reason": "CompletionsReached",
+        "status": "True",
+        "type": "Complete"
+      }
+    ]
+  }
+}

@@ -167,6 +167,7 @@ class KubernetesBackend:
         priority_classes=None,
         retain_termination_evidence=False,
         runtime_class_name=None,
+        host_network_variants=None,
         execute=run,
     ):
         if not namespace or not local_queue or not node_selector:
@@ -189,6 +190,14 @@ class KubernetesBackend:
         ):
             raise ValueError("invalid Kubernetes runtime class")
         self.runtime_class_name = runtime_class_name
+        self.host_network_variants = dict(host_network_variants or {})
+        if any(
+            not isinstance(ref, str)
+            or not isinstance(digest, str)
+            or not re.fullmatch(r"sha256:[0-9a-f]{64}", digest)
+            for ref, digest in self.host_network_variants.items()
+        ):
+            raise ValueError("host network requires explicit variant/environment digest bindings")
         self.prefix = ["kubectl"]
         if kubeconfig:
             self.prefix += ["--kubeconfig", kubeconfig]
@@ -282,6 +291,22 @@ class KubernetesBackend:
                 },
             },
         }
+        host_transport = (
+            b["candidate"]["context"]["runtime_versions"].get("transport_mode") == "host-persistent"
+        )
+        approved_environment = self.host_network_variants.get(b["variant"]["ref"])
+        if self.host_network_variants and not host_transport:
+            raise BackendError(
+                "dedicated host network route requires a qualified transport variant"
+            )
+        if host_transport:
+            if approved_environment != b["variant"]["environment_digest"]:
+                raise BackendError(
+                    "host network transport requires an operator-qualified variant binding"
+                )
+            manifest["spec"]["template"]["spec"].update(
+                hostNetwork=True, dnsPolicy="ClusterFirstWithHostNet"
+            )
         if self.runtime_class_name:
             manifest["spec"]["template"]["spec"]["runtimeClassName"] = self.runtime_class_name
         bundle_ref = b["variant"].get("kubernetes_runtime_bundle_ref")

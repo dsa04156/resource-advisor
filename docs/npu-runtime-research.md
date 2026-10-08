@@ -114,9 +114,13 @@ image revision의 동일성은 별도 검증 대상이다. process가 살아 있
 
 ## 로컬 증거와 이 조사 문서의 경계
 
-현재 운영 검증 담당자가 보고한 결과는 Hailo 두 장치, Mobilint Candy와 Intel
-생성 CNN의 native API 실행 성공이다. Rockchip은 직접 F0 성공 후 후속
-초기화 hang이 있어 플랫폼 사용 가능 판정을 보류한다. 이 문서는 장비에 직접
+초기 조사 당시 Hailo 두 장치, Mobilint Candy와 Intel 생성 CNN의 native API 실행은
+성공했고 Rockchip은 후속 초기화 hang으로 판정을 보류했다. 이후 별도
+[실행 기록](all-accelerators.md)에 host-persistent proxy2.1 + allowlisted hostNetwork
+client의 fresh Pod2건과 연속 API2건 성공을 추가했다. 공식 Docker recipe가 아닌
+trusted lab adaptation이며 firmware/isolation/장기간 안정성은 미검증이다.
+SDK1.6.0 matched-version 실험은 ARM64/NTB 요구와 현재 USB 구성 불일치로 실패했다.
+이 조사 문서는 장비에 직접
 작업을 제출하지 않았으며 전체 비용·native UID·품질 evidence를 재감사한 결과를
 대신하지 않는다. 실패와 timeout 비용은 성공 결과와 함께 보존해야 한다.
 

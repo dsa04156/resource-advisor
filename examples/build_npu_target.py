@@ -16,13 +16,12 @@ from resource_advisor.contracts import (
     RuntimeVariant,
     WorkloadIdentity,
     WorkloadSpec,
-    now,
     signature,
 )
 from resource_advisor.npu_probe import BOUNDARY, ROUNDS, SEED, npu_execution_devices
 
 
-def build(report, *, ref, project, node, cluster, image, evidence_ref):
+def build(report, *, ref, project, node, cluster, image, evidence_ref, observed_at):
     runtime = report["runtime"]
     scope = {
         "mobilint-candy": ("mobilint", "mobilint.com/npu", (224, 344, 3)),
@@ -143,7 +142,7 @@ def build(report, *, ref, project, node, cluster, image, evidence_ref):
         node_ref=node,
         backend_cluster_id=cluster,
         backend="kubernetes",
-        observed_at=now(),
+        observed_at=observed_at,
         valid_for_seconds=7200,
         ready=True,
         arch=context.arch,

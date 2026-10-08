@@ -1,0 +1,133 @@
+{
+  "owned_terminal_pods_removed": 21,
+  "pods": [
+    {
+      "name": "ra-intel-stack-qual-20261008-tl48m",
+      "uid": "5191e344-5c67-4aef-86cf-d8c4c4479bb8",
+      "phase": "Succeeded",
+      "job_uid": "c79b4e7f-05f4-4c92-aa95-67a05b9fd0a5"
+    },
+    {
+      "name": "ra-mobilint-stack-qual-20261008-xfv7z",
+      "uid": "4e7c3c23-5344-4186-bc7a-e68c5855c480",
+      "phase": "Succeeded",
+      "job_uid": "4bf043ea-34a5-48e5-8962-022f58646277"
+    },
+    {
+      "name": "ra-rockchip-host-state-20261008-wmcdh",
+      "uid": "b538c4d9-e109-4f95-b507-a78a0e81ac29",
+      "phase": "Succeeded",
+      "job_uid": "b6e0b6af-c424-43ca-b4ee-5751697e725a"
+    },
+    {
+      "name": "ra-rockchip-host-state2-20261008-x7cx5",
+      "uid": "197330f8-99cd-4fa6-b7be-0a353086b027",
+      "phase": "Succeeded",
+      "job_uid": "52bdf955-1786-4db2-a8bb-26bb23cce06b"
+    },
+    {
+      "name": "ra-rockchip-host21-qual1-20261008-ccrx4",
+      "uid": "a0440601-d444-4937-ace0-6c34076a21d8",
+      "phase": "Failed",
+      "job_uid": "85e8ee87-afe3-40b6-a2b5-4bf18e4ba9bd"
+    },
+    {
+      "name": "ra-rockchip-host21-qual2-20261008-tbvgb",
+      "uid": "7d272fa5-63f7-4e03-b9bf-3534cc768e9b",
+      "phase": "Succeeded",
+      "job_uid": "861938f3-08c7-49bc-863b-39b04df7796f"
+    },
+    {
+      "name": "ra-rockchip-host21-qual3-20261008-ttlnh",
+      "uid": "49aa2dc7-4d5d-4370-ae27-09730ed798e7",
+      "phase": "Succeeded",
+      "job_uid": "a1928792-a2f3-43d1-a8ea-205d1468f9de"
+    },
+    {
+      "name": "ra-rockchip-persistent-transport-20261008-5vqq2",
+      "uid": "674bb0a2-ab11-482f-93a2-1340ae62aad1",
+      "phase": "Failed",
+      "job_uid": "2b72d8b1-afe9-4ebf-9516-407c0d97699f"
+    },
+    {
+      "name": "ra-rockchip-persistent-transport2-20261008-bt85f",
+      "uid": "f18a40a2-20ef-4e79-85d3-701328a01031",
+      "phase": "Failed",
+      "job_uid": "2f2fd2ca-fcd3-4daf-a9dc-bff54d6e2d76"
+    },
+    {
+      "name": "ra-rockchip-persistent-transport3-20261008-jdmbg",
+      "uid": "31dfb888-b934-49c3-b304-41c47b030717",
+      "phase": "Succeeded",
+      "job_uid": "8626a4c8-6895-44ae-b329-e7f4d97c5b6b"
+    },
+    {
+      "name": "ra-rockchip-post-reset-20261008-2kmtm",
+      "uid": "1ab8698b-5530-458b-80a8-3604a2ddcd7f",
+      "phase": "Succeeded",
+      "job_uid": "19d1ff9d-b245-4ad3-8985-e9ebe4335307"
+    },
+    {
+      "name": "ra-rockchip-proxy21-service-20261008-gsb4h",
+      "uid": "74964198-796f-4fdb-8718-57dad5229c4b",
+      "phase": "Succeeded",
+      "job_uid": "330fdd8b-a7b6-4fa9-8a7b-35c60d59d4c2"
+    },
+    {
+      "name": "ra-rockchip-sdk16-qual2-20261008-rq8dp",
+      "uid": "975186f7-12db-4ca2-a2e2-21ea6124b803",
+      "phase": "Failed",
+      "job_uid": "b5e339ae-8e97-49f3-9643-590941ad3853"
+    },
+    {
+      "name": "ra-rockchip-service-check-20261008-j59h6",
+      "uid": "42234345-b08f-45a4-a772-fa827b7b2241",
+      "phase": "Succeeded",
+      "job_uid": "b597e4cc-cd72-4403-acf9-b04d57b526c5"
+    },
+    {
+      "name": "ra-rockchip-start-proxy21-20261008-7f4rf",
+      "uid": "acb7edfb-22d2-43a1-ba91-b5778fae4d7f",
+      "phase": "Succeeded",
+      "job_uid": "bdf11658-fe6b-4d31-9934-a984cfcbd8df"
+    },
+    {
+      "name": "ra-rockchip-transport-persist-20261008-c9zrv",
+      "uid": "ce029cbd-44b7-4b21-9ab4-ef0199838cbf",
+      "phase": "Failed",
+      "job_uid": "fff0c2fe-be6a-4653-af44-8b17b6f73d61"
+    },
+    {
+      "name": "ra-rockchip-transport-persist2-20261008-q78f7",
+      "uid": "329cc132-c646-4166-846b-efbd4f434e5e",
+      "phase": "Succeeded",
+      "job_uid": "c486d0ac-483e-492d-b32e-84f99890a819"
+    },
+    {
+      "name": "ra-rockchip-usb-reset-20261008-vhj66",
+      "uid": "03de5af3-e748-4ddf-b322-b94d13c49706",
+      "phase": "Failed",
+      "job_uid": "6abca313-6e51-409b-bbae-a654e553eca5"
+    },
+    {
+      "name": "ra-rockchip-usb-reset2-20261008-c8mjp",
+      "uid": "c3d9f057-743d-406c-8cc5-9ee7505b2456",
+      "phase": "Failed",
+      "job_uid": "afee8a81-2712-4a8b-9beb-87a55fbe17d3"
+    },
+    {
+      "name": "ra-rockchip-usb-reset3-20261008-bnkzf",
+      "uid": "c0874547-f0d5-429f-a969-9a766bfac619",
+      "phase": "Failed",
+      "job_uid": "02a2d5a1-a417-44ea-8cf1-145041ab7217"
+    },
+    {
+      "name": "ra-rockchip-usb-reset4-20261008-jv2sb",
+      "uid": "e3508ca7-2612-446c-8c4b-1b70e7436ad7",
+      "phase": "Failed",
+      "job_uid": "4e891ed6-7eda-41ce-95d9-f503e091e75d"
+    }
+  ],
+  "remaining_owned_job_pods": 0,
+  "jobs_workloads_db_results_preserved": true
+}

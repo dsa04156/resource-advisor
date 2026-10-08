@@ -85,3 +85,14 @@ Orin RPC timeout이 계속됨을 기록한다. 새 Slurm closed loop와 전체 �
 Python3.11/3.13 각각 SQLite 1,150 passed·4 skipped / PostgreSQL 1,154 passed와
 새 native hardware 32회 성공을 구분한다. 배포 controller source1b1bb48과
 고정 benchmark sourcebb2f834도 별도로 기록했다.
+
+2026-10-08 별도 [전체 가속기 연결 cohort](all-accelerators.md)를 추가했다.
+이 기록은 위 기존 연구/비교 결과를 수정하지 않으며 전체 목표를 완료로 승격하지 않는다.
+
+| 추가 주장 | 코드 | 테스트 | 실제 실험 | 상태 |
+|---|---|---|---|---|
+| GPU5와 NPU5에서 검증 템플릿의 native API 실행 | npu_probe.py / build_npu_target.py / 기존 scheduler adapter | focused108 + accelerator auditor | all-accelerators-20261008-v1.json / native-proof-v2 | PASS 제한된 모델별 lab 실행 |
+| 불완전 NPU fingerprint를 추천 근거로 자동 재사용하지 않음 | policy.py | test_npu_probe.py | Console submission warning 및 capability provenance | PASS software guard; firmware qualification 미완료 |
+| Rockchip 재실행 transport | backends.py / explicit operator allowlist | test_backends.py | host v2 연속 API2 성공, 전환 뒤 timeout도 보존 | EXPERIMENTAL; 장기 안정성·격리 미검증 |
+| 실패 비용을 성공과 함께 보존 | 기존 accounting + audit_accelerator_enablement.py | missing-cost/tamper replay tests | 실패5, 알려진 GPU459/NPU557/CPU1016초, 실패1 비용null | PARTIAL; 전체 비용/ROI 주장 거절 |
+| 새로운 이기종 모델 성능 비교/추천 우위 | 없음 | 없음 | 모델·quality가 달라 NOT_COMPARABLE | OPEN; 주장 금지 |

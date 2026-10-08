@@ -427,3 +427,35 @@ def test_kubernetes_queue_time_uses_server_creation_not_submit_response(service)
     assert record["queue_seconds"] == 1
     assert record["body"]["submission_time_source"] == "scheduler"
     assert "QUEUE_WHOLE_SECOND_RESOLUTION" in record["body"]["uncertainty"]
+
+
+def test_host_network_requires_operator_variant_and_environment_binding(service):
+    job = row(service)
+    job["body"]["candidate"]["context"]["runtime_versions"]["transport_mode"] = "host-persistent"
+    options = dict(namespace="research-a", local_queue="batch", node_selector={"pool": "lab"})
+    with pytest.raises(BackendError, match="host network"):
+        KubernetesBackend(**options).manifest(job)
+    with pytest.raises(BackendError, match="host network"):
+        KubernetesBackend(
+            **options, host_network_variants={"variant-1": "sha256:" + "0" * 64}
+        ).manifest(job)
+    backend = KubernetesBackend(
+        **options, host_network_variants={"variant-1": job["body"]["variant"]["environment_digest"]}
+    )
+    pod = backend.manifest(job)["spec"]["template"]["spec"]
+    assert pod["hostNetwork"] is True
+    assert pod["dnsPolicy"] == "ClusterFirstWithHostNet"
+    assert pod["containers"][0]["securityContext"]["capabilities"] == {"drop": ["ALL"]}
+    assert pod["securityContext"]["seccompProfile"]["type"] == "RuntimeDefault"
+
+
+def test_default_route_keeps_pod_network_and_dedicated_transport_rejects_legacy(service):
+    job = row(service)
+    options = dict(namespace="research-a", local_queue="batch", node_selector={"pool": "lab"})
+    assert (
+        "hostNetwork" not in KubernetesBackend(**options).manifest(job)["spec"]["template"]["spec"]
+    )
+    with pytest.raises(BackendError, match="host network"):
+        KubernetesBackend(
+            **options, host_network_variants={"different-variant": "sha256:" + "0" * 64}
+        ).manifest(job)

@@ -252,6 +252,10 @@ effectiveness and live harmful-transfer injection remain unverified.
 
 공통 정책 API와 웹 제출 흐름: [SchedulingProfile 가이드](docs/scheduling-profiles.md).
 
+현재 GPU 5대·NPU 5개의 검증 템플릿과 실제 실행/실패/비용:
+[전체 가속기 연결 결과](docs/all-accelerators.md). NPU는 검증한 모델별 lab 실행 범위이며
+임의 모델 자동 변환이나 GPU↔NPU 성능 우위를 의미하지 않습니다.
+
 연구 운영 화면과 MLflow/Kubeflow 연결: [Research Console](docs/research-console.md).
 
 

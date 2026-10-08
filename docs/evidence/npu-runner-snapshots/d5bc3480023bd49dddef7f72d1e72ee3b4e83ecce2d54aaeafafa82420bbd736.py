@@ -16,8 +16,6 @@ import resource
 import statistics
 import subprocess
 import time
-from contextlib import contextmanager
-from datetime import datetime, timezone
 from pathlib import Path
 
 ROUNDS = 10
@@ -197,14 +195,11 @@ def intel_conv():
         "accelerator_model": "Intel-NPU-3720",
         "arch": "amd64",
         "model_digest": digest(spec),
-        "serialized_model_digest": artifact,
+        "compiled_artifact_digest": artifact,
         "input_shape": list(data.shape),
         "precision": "fp32-io-npu-default-internal",
         "runtime_versions": {
             "openvino": ov.__version__,
-            "npu_driver_version_raw": str(core.get_property("NPU", "NPU_DRIVER_VERSION")),
-            "npu_compiler_version_raw": str(compiled.get_property("NPU_COMPILER_VERSION")),
-            "npu_compiler_type": str(compiled.get_property("NPU_COMPILER_TYPE")),
             "numpy": np.__version__,
             "python": platform.python_version(),
         },
@@ -225,28 +220,6 @@ def intel_conv():
     }
 
 
-@contextmanager
-def rknn_session(command, sdk_factory, launch=subprocess.Popen):
-    """Always stop the USB helper, including constructor/release failures."""
-    proxy = launch(command) if command is not None else None
-    sdk = None
-    try:
-        sdk = sdk_factory()
-        yield sdk
-    finally:
-        try:
-            if sdk is not None:
-                sdk.release()
-        finally:
-            if proxy is not None and proxy.poll() is None:
-                proxy.terminate()
-                try:
-                    proxy.wait(timeout=5)
-                except subprocess.TimeoutExpired:
-                    proxy.kill()
-                    proxy.wait(timeout=5)
-
-
 def rockchip_resnet18():
     import numpy as np
     from rknnlite.api import RKNNLite
@@ -258,24 +231,15 @@ def rockchip_resnet18():
         raise ValueError("official RKNN artifact digest mismatch")
     data = np.load(str(root / "input.npy"), allow_pickle=False)
     input_digest = "sha256:" + hashlib.sha256(data.tobytes()).hexdigest()
-    if (
-        data.shape != (224, 224, 3)
-        or data.dtype != np.uint8
-        or input_digest != "sha256:f36e0734e1f08d3ef7d380ee568fee2daa12b6c0e26d7446da9278ccb66e35f2"
-    ):
+    if (data.shape != (224, 224, 3) or data.dtype != np.uint8
+            or input_digest != "sha256:f36e0734e1f08d3ef7d380ee568fee2daa12b6c0e26d7446da9278ccb66e35f2"):
         raise ValueError("official RGB input tensor digest mismatch")
     # The helper is confined to this Pod and its allocated USB device. The
     # operator must rule out an active host proxy before starting this runner.
-    transport_path = root / "transport.json"
-    transport = (
-        json.loads(transport_path.read_text())
-        if transport_path.is_file()
-        else {"mode": "pod-owned"}
-    )
-    if transport["mode"] not in {"pod-owned", "host-persistent"}:
-        raise ValueError("unqualified USB transport ownership")
-    command = [str(root / "bin/npu_transfer_proxy")] if transport["mode"] == "pod-owned" else None
-    with rknn_session(command, lambda: RKNNLite(verbose=False)) as rknn:
+    proxy = subprocess.Popen([str(root / "bin/npu_transfer_proxy")],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    rknn = RKNNLite(verbose=False)
+    try:
         time.sleep(0.5)
         if rknn.load_rknn(str(model)) != 0 or rknn.init_runtime(target="rk3399pro") != 0:
             raise ValueError("RK3399Pro hardware initialization failed; no CPU fallback")
@@ -295,68 +259,37 @@ def rockchip_resnet18():
             predictions.append(prediction)
             probabilities.append(float(output[prediction]))
         return {
-            "runtime": "rockchip-resnet18",
-            "accelerator_model": "RK3399Pro",
-            "arch": "arm64",
-            "model_digest": model_digest,
-            "compiled_artifact_digest": model_digest,
-            "input_shape": list(data.shape),
-            "precision": "rknn-compiled-uint8-io",
-            "runtime_versions": {
-                "rknn_toolkit_lite": re.search(r"API:\s*([\d.]+)", version).group(1),
-                "transport_mode": transport["mode"],
-                "transport_proxy_sha256": transport.get(
-                    "proxy_sha256", file_digest(root / "bin/npu_transfer_proxy")
-                ),
-                "sdk": version,
-                "numpy": np.__version__,
-                "python": platform.python_version(),
-            },
-            "input_digest": input_digest,
-            "samples_seconds": samples,
-            "predictions": predictions,
-            "top1_values": probabilities,
-            "expected_class": 812,
+            "runtime": "rockchip-resnet18", "accelerator_model": "RK3399Pro", "arch": "arm64",
+            "model_digest": model_digest, "compiled_artifact_digest": model_digest,
+            "input_shape": list(data.shape), "precision": "rknn-compiled-uint8-io",
+            "runtime_versions": {"rknn_toolkit_lite": "1.7.1", "sdk": version,
+                                 "numpy": np.__version__, "python": platform.python_version()},
+            "input_digest": input_digest, "samples_seconds": samples,
+            "predictions": predictions, "top1_values": probabilities, "expected_class": 812,
             "quality_value": sum(p == 812 for p in predictions) / ROUNDS,
             "quality_metric": "official_space_shuttle_top1_agreement",
-            "quality_scope": "one-official-example-not-dataset-accuracy",
-            "task_accuracy": None,
+            "quality_scope": "one-official-example-not-dataset-accuracy", "task_accuracy": None,
         }
+    finally:
+        rknn.release()
+        proxy.terminate()
+        try:
+            proxy.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            proxy.kill()
+            proxy.wait(timeout=5)
 
 
 def qualify(runtime):
-    providers = {
-        "mobilint-candy": mobilint,
-        "intel-conv": intel_conv,
-        "rockchip-resnet18": rockchip_resnet18,
-    }
+    providers = {"mobilint-candy": mobilint, "intel-conv": intel_conv,
+                 "rockchip-resnet18": rockchip_resnet18}
     if runtime not in providers:
         raise ValueError("unqualified NPU runtime")
-    started_at = datetime.now(timezone.utc).isoformat()
     report = providers[runtime]()
-    versions = report["runtime_versions"]
-    versions["host_kernel"] = platform.release()
-    module = (
-        "maccel"
-        if runtime == "mobilint-candy"
-        else "intel_vpu"
-        if runtime == "intel-conv"
-        else "not-host-accessible"
-    )
-    for field in ("version", "srcversion"):
-        path = Path("/sys/module") / module / field
-        versions["host_module_" + field] = (
-            path.read_text().strip() if path.is_file() else "unobserved"
-        )
-    # No public firmware identity getter was qualified for these three devices.
-    # Manual native execution remains possible; profile-based reuse must abstain.
-    versions["profile_reuse"] = "blocked-unobserved-host-firmware"
     samples = report["samples_seconds"]
     if len(samples) != ROUNDS or any(not math.isfinite(t) or t <= 0 for t in samples):
         raise ValueError("positive measured sample times required")
     report.update(
-        started_at=started_at,
-        ended_at=datetime.now(timezone.utc).isoformat(),
         kind="npu-runtime-qualification",
         evidence_kind="hardware",
         seed=SEED,
@@ -383,8 +316,6 @@ def execute(binding, env=None):
         or report["precision"] != identity["precision"]
         or report["accelerator_model"] != context["accelerator_model"]
         or report["runtime_versions"] != context["runtime_versions"]
-        or report["runner_digest"] != identity["code_digest"]
-        or identity["dataset_version"] != "generated-fixed-input:" + report["input_digest"]
     ):
         raise ValueError("actual NPU runtime differs from qualified contract")
     valid = report["quality_value"] >= binding["minimum_quality"]
@@ -404,14 +335,14 @@ def execute(binding, env=None):
     if valid:
         ordered = sorted(report["samples_seconds"])
         result["measurements"] = {
-            "elapsed_seconds": float(report["elapsed_seconds"]),
-            "peak_memory_mib": float(report["host_process_peak_rss_mib"]),
-            "quality_value": float(report["quality_value"]),
+            "elapsed_seconds": report["elapsed_seconds"],
+            "peak_memory_mib": report["host_process_peak_rss_mib"],
+            "quality_value": report["quality_value"],
             "sample_count": ROUNDS,
             "work_units": ROUNDS,
             "latency_p50_ms": statistics.median(ordered) * 1000,
-            "latency_p95_ms": ordered[math.ceil(ROUNDS * 0.95) - 1] * 1000,
-            "latency_p99_ms": ordered[math.ceil(ROUNDS * 0.99) - 1] * 1000,
+            "latency_p95_ms": ordered[int((ROUNDS - 1) * 0.95)] * 1000,
+            "latency_p99_ms": ordered[int((ROUNDS - 1) * 0.99)] * 1000,
             "throughput": ROUNDS / report["elapsed_seconds"],
             "gpu_utilization": None,
             "power_watts": None,
