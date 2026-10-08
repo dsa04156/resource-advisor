@@ -297,3 +297,35 @@ def test_native_pending_preserves_its_original_idle_admission_estimate():
         "exp",
     )
     assert queues[0].pending[0].expected_admission_seconds == 1.0
+
+
+def test_existing_main_capture_is_never_replayed_or_mutated(tmp_path):
+    import json
+
+    from run_jct_comparison import run
+
+    capture = tmp_path / "capture.json"
+    original = json.dumps({"cohorts": [{"arm": "round_robin"}]})
+    capture.write_text(original)
+    with pytest.raises(ValueError, match="never replay"):
+        run(tmp_path, tmp_path, tmp_path / "missing-private-module.py")
+    assert capture.read_text() == original
+    assert not (tmp_path / "calibration.json").exists()
+
+
+def test_native_pod_must_have_the_exact_job_uid_owner():
+    from jct_native import normalize_kubernetes
+
+    job = {
+        "metadata": {
+            "name": "own",
+            "uid": "own-uid",
+            "labels": {"resource-advisor/experiment": "exp"},
+        }
+    }
+    pod = {
+        "metadata": {"ownerReferences": [{"kind": "Job", "uid": "foreign-uid"}]},
+        "status": {"containerStatuses": [{"state": {"terminated": {"exitCode": 0}}}]},
+    }
+    with pytest.raises(ValueError, match="foreign Pod owner"):
+        normalize_kubernetes(job, [pod], {"attempt_id": "own"}, {}, "exp", "", {})
