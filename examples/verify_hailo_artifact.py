@@ -1,4 +1,4 @@
-"""Two real lab Jobs for docs/hailo-artifact-plan.md; keep config/report private."""
+"""Two real lab Jobs for docs/reference/hailo-artifact.md; keep config/report private."""
 
 import argparse
 import copy

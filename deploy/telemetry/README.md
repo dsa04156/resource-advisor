@@ -87,7 +87,7 @@ then its dedicated client Secret once no consumers remain. Stop/retire the
 dedicated exporters separately using the Ansible runbook. There is no cascading
 Argo deletion or automated prune.
 
-See [acceptance gates](../../docs/central-telemetry-plan.md).
-The [actual central telemetry report](../../docs/central-telemetry.md) records
+See [acceptance gates](../../docs/reference/central-telemetry.md).
+The [actual central telemetry report](../../docs/reference/central-telemetry.md) records
 TLS rejection checks, source observations, exporter interruption and preserved
 preexisting monitoring configuration.

@@ -1,7 +1,7 @@
 """Two bounded Kueue qualification Jobs; reports/config are private.
 
 Config: lab_only, namespace, base_manifest (qualified Job file), database_url,
-run_ref. No API registration/ingestion. See docs/cuda-fallback-plan.md.
+run_ref. No API registration/ingestion. See docs/reference/kubernetes-runtime-bundles.md.
 """
 
 import argparse

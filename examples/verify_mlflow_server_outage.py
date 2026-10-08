@@ -1,7 +1,7 @@
 """One live API Job while the dedicated lab MLflow server is stopped.
 
 Requires private operator configuration and the prospectively frozen protocol
-in docs/mlflow-server-outage-plan.md. No replacement computation on failure.
+in docs/reference/mlflow-server-outage-v2.md. No replacement computation on failure.
 """
 
 import argparse

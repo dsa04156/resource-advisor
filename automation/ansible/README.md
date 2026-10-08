@@ -9,11 +9,11 @@ Active Kubernetes/EdgeCore hosts and production inventory are rejected.
 The separately invoked [Slurm limits play](slurm-limits.yml) changes a reviewed,
 allocation-free standalone worker's configuration under explicit ownership guards.
 It is not included in `site.yml`; see its
-[bounded adoption and acceptance plan](../../docs/slurm-limits-plan.md).
+[bounded adoption and acceptance plan](../../docs/reference/slurm-runtime.md).
 
 The separate [controller observer play](slurm-observer.yml) provisions only a
 restricted read-only SSH identity. See its
-[scope, ownership and verification contract](../../docs/slurm-observer-transport.md).
+[scope, ownership and verification contract](../../docs/reference/slurm-observer-transport.md).
 
 ## Operator environment
 
@@ -97,6 +97,6 @@ To retire this installation, first stop and disable only
 then remove only that unit and `/opt/resource-advisor/node-exporter`, followed by
 `systemctl daemon-reload`. Never remove another exporter's files or Slurm units.
 
-See the [acceptance plan](../../docs/ansible-lab-plan.md) for the evidence boundary.
-The [actual two-host report](../../docs/ansible-lab.md) includes the initial
+See the [acceptance plan](../../docs/reference/ansible-lab.md) for the evidence boundary.
+The [actual two-host report](../../docs/reference/ansible-lab.md) includes the initial
 collector failure, correction, preserved configuration and zero-change rerun.

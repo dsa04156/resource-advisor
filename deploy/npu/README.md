@@ -46,5 +46,5 @@ plugin image에는 고정 static BusyBox를 `/probe/busybox`에 넣고 probes를
 연결했다. `/health`의 writable generation state와 기존 socket recovery는 유지한다.
 공급사 driver/firmware는 변경하지 않았다. 실제 deployment는 private operator overlay에 있다.
 
-[공식 조사와 local evidence 구분](../../docs/npu-runtime-research.md),
+[공식 조사와 local evidence 구분](../../docs/reference/npu-runtime-research.md),
 [실행·비용·한계](../../docs/all-accelerators.md)를 먼저 읽는다.

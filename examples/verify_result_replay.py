@@ -3,7 +3,7 @@
 Private config: api_url, ca_file, database_url, mlflow_url, project,
 operator_token, user_token, foreign_operator_token, success_job_id,
 canceled_job_id. Report contains private identifiers; never commit it.
-See docs/result-replay-plan.md for scope, preconditions and negative envelopes.
+See docs/reference/result-replay.md for scope, preconditions and negative envelopes.
 """
 
 import argparse

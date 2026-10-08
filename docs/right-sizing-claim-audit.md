@@ -1,7 +1,7 @@
 # Right-sizing claim acceptance audit
 
 상태: **K8s core 및 새 Slurm feedback 검증 / 전체 범위 완료 아님**. 코드 검사, 이전 실장비 증거, 새 실험을
-분리한다. 이전 결과는 [baseline audit](right-sizing-gap-audit.md)와
+분리한다. 이전 결과는 [baseline audit](right-sizing-claim-audit.md)와
 [재계산 기록](evidence/right-sizing-baseline-audit-v2.json)에 보존했다.
 
 | 주장 | 코드 | 테스트 | 실제 실험 | 상태 |
@@ -45,10 +45,10 @@
 
 필수 gate 전체가 닫히기 전에는 전체 완료와 최적화 성공을 선언하지 않는다.
 
-2026-10-08 복귀 후의 [새 Slurm loop](right-sizing-slurm-feedback.md)는 아래 과거 BLOCKED
+2026-10-08 복귀 후의 [새 Slurm loop](reference/right-sizing-slurm-feedback.md)는 아래 과거 BLOCKED
 관측과 구분한다. [Raw](evidence/right-sizing-slurm-feedback-v1.json)와
 [audit](evidence/right-sizing-slurm-audit-v1.json)은 실제 Job5개/421 GPU 예약초, 독립 승인
-결과와 다음 source4를 검증한다. [GPU5후보](pool-resource-coverage.md)는 운영 확장이다.
+결과와 다음 source4를 검증한다. [GPU5후보](all-accelerators.md)는 운영 확장이다.
 
 
 새 총 사용량은 [cost capture](evidence/right-sizing-total-cost-capture-v1.json),
@@ -68,7 +68,7 @@ PASS로 바꾸지 않는다. C4는 finite-N 비용 판별이며 online ROI polic
 손익분기 예측이 아니다.
 
 2026-10-08 추가 검증: [W2 v3 raw](evidence/right-sizing-reference-v3.json),
-[audit](evidence/right-sizing-reference-audit-v3.json), [계획](right-sizing-reference-plan-v3.md).
+[audit](evidence/right-sizing-reference-audit-v3.json), [계획](evidence/right-sizing-reference-plan-v3.json).
 2개 fresh qualification과 30개 grid Jobs가 모두 성공했다. Native startup guard의
 own-pilot readback/fit branch도 실제 검증됐으며 insufficient-budget 거절 branch는
 software 근거만 있다. W2 v1/v2 실패와 비용을 삭제하지 않았다.
@@ -79,7 +79,7 @@ software 근거만 있다. W2 v1/v2 실패와 비용을 삭제하지 않았다.
 521 GPU 예약초, 14 NPU 예약초와 609 CPU core초를 보고한다.
 [Slurm v3 검사](evidence/right-sizing-slurm-readiness-v3.json)는 controller 접속 실패와
 Orin RPC timeout이 계속됨을 기록한다. 새 Slurm closed loop와 전체 목표는 OPEN이다.
-[Senior infrastructure review](right-sizing-final-review.md)는 얕은 통합, 과장된
+[Senior infrastructure review](right-sizing-contribution.md)는 얕은 통합, 과장된
 기여, 측정·비용·failure 처리의 수정 사항과 남은 한계를 분리한다.
 [최신 검증](evidence/right-sizing-validation-v3.json)은 CI source e020445에서
 Python3.11/3.13 각각 SQLite 1,150 passed·4 skipped / PostgreSQL 1,154 passed와

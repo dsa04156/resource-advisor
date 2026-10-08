@@ -10,8 +10,8 @@ private site file. Its example intentionally contains rejected placeholders.
 Replace them with the reviewed **full Git commit** and qualified image digests;
 use the exact node selectors already qualified for each pool. Keep the worker at
 zero until its routes, credentials and runtime have passed the existing
-[configuration](../../docs/configuration-checks.md) and
-[worker](../../docs/worker-recovery.md) checks. One qualified replica is supported;
+[configuration](../../docs/reference/configuration-checks.md) and
+[worker](../../docs/reference/service-deployment.md) checks. One qualified replica is supported;
 this is not an HA deployment.
 
 An optional fifth image key, `slurm-inventory`, adds a fourth Application for
@@ -117,4 +117,4 @@ Official behavior used here: [Argo CD 3.2 inline Kustomize patches](https://argo
 [project scopes](https://argo-cd.readthedocs.io/en/release-3.2/user-guide/projects/),
 [resource tracking](https://argo-cd.readthedocs.io/en/release-3.2/user-guide/resource_tracking/)
 and [shared-resource sync checks](https://argo-cd.readthedocs.io/en/release-3.2/user-guide/sync-options/#fail-the-sync-if-a-shared-resource-is-found).
-See the [actual adoption report](../../docs/gitops-adoption.md) for measured scope.
+See the [actual adoption report](../../docs/reference/gitops-adoption.md) for measured scope.

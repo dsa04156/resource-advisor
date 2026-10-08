@@ -24,7 +24,7 @@ execution. This first version does not resolve stable capability aliases to new
 snapshots automatically.
 
 Mounted Kubernetes runtimes may declare an operator-owned
-[`kubernetes_runtime_bundle_ref`](kubernetes-runtime-bundles.md). New variant
+[`kubernetes_runtime_bundle_ref`](reference/kubernetes-runtime-bundles.md). New variant
 versions then explicitly select the approved read-only attachments; a missing
 required bundle fails preflight. The reference is part of context scope while
 its absence preserves legacy signatures. This does not replace model/runtime
@@ -55,7 +55,7 @@ remains explicitly unqualified; preparation, energy and utilization coverage is 
 
 ## Current operational limits
 
-The [completion audit](goal-audit.md) maps each required gate to its current
+The [completion audit](right-sizing-claim-audit.md) maps each required gate to its current
 evidence. A bounded live test qualifies only its stated workload and failure
 window; it does not qualify the whole backend or a production deployment.
 
@@ -64,9 +64,9 @@ window; it does not qualify the whole backend or a production deployment.
   passed; none establishes comprehensive cross-user/device isolation.
 - Slurm supports explicitly bound, hash-checked native runtimes. Container
   variants fail preflight until an actual container executor exists. Results
-  use shared storage or a verified node-to-SSH mapping; see [the runtime boundary](slurm-runtime.md).
-  The [native Orin browser/API path](slurm-api-results.md) now has actual result,
-  artifact and MLflow evidence; [console cancellation](slurm-cancellation.md) also
+  use shared storage or a verified node-to-SSH mapping; see [the runtime boundary](reference/slurm-runtime.md).
+  The [native Orin browser/API path](reference/slurm-api-results.md) now has actual result,
+  artifact and MLflow evidence; [console cancellation](reference/slurm-runtime.md) also
   has bounded live evidence. Other runtime and recovery scenarios remain unverified.
 - Model/runtime qualification remains operator-attested. The native guard checks
   listed files/probes, not the completeness of that manifest or signed supply-chain
@@ -74,32 +74,32 @@ window; it does not qualify the whole backend or a production deployment.
 - Compute Pods use scoped credentials and operator-qualified read-only runtime
   mounts. This is not a device-isolation or Pod-security certification.
 - Bounded JSON results have conditional S3 storage, authenticated API readback
-  and MLflow artifacts. [Isolated deterministic training](training-isolation.md)
+  and MLflow artifacts. [Isolated deterministic training](reference/training-isolation.md)
   also verifies unchanged input/checkpoint originals and separate restored
   outputs. General training, large checkpoints/models, dataset transfer,
   retention, object backup and production storage availability remain open.
 - MLflow delivery is retryable, not globally exactly-once.
-  [Resultless failure/cancellation tracking](failure-tracking.md), connection
+  [Resultless failure/cancellation tracking](reference/accounting.md), connection
   refusal and accepted-create response loss have live evidence. Direct
   server-side tenant authorization and model registration remain open.
-- [Independent PostgreSQL restore](restore-rehearsal.md),
-  [accepted-submit crash recovery](worker-recovery.md),
-  [cancellation evidence retention](termination-retention.md) and
-  [two concurrent workers](concurrent-workers.md) have bounded live evidence.
+- [Independent PostgreSQL restore](reference/persistent-postgres.md),
+  [accepted-submit crash recovery](reference/service-deployment.md),
+  [cancellation evidence retention](reference/accounting.md) and
+  [two concurrent workers](reference/worker-route-ownership.md) have bounded live evidence.
   Expired-lease external-service fencing, disconnected-node accounting, Slurm
   recovery and the complete E0–E7 scenario matrix still need verification.
-- Actual fixed-fidelity qLogNEI and [RGPE/warm-start transfer](transfer-gpu.md)
+- Actual fixed-fidelity qLogNEI and [RGPE/warm-start transfer](reference/transfer-gpu.md)
   loops have live evidence; the transfer comparison did not demonstrate a
-  selection advantage. A [completed equal-budget S0/S1/S2 comparison](policy-comparison-v2.md)
+  selection advantage. A [completed equal-budget S0/S1/S2 comparison](reference/policy-comparison-v2.md)
   reports no BO selection advantage; its predecessor stopped after exposing
   missing optimizer dependencies.
   The repaired worker now requires those dependencies before startup. Physical
   multi-fidelity qualification, broad transfer effectiveness, calibrated
   uncertainty and shared-device interference remain open.
-- The [four-view console](console.md) exposes scoped inventory, jobs, queues,
-  accounting and recommendation evidence. [Slurm host telemetry](slurm-inventory.md)
+- The [four-view console](reference/console.md) exposes scoped inventory, jobs, queues,
+  accounting and recommendation evidence. [Slurm host telemetry](reference/slurm-inventory.md)
   is live independently of controller availability. The
-  [restricted controller collector](slurm-controller-results.md) also supplies
+  [restricted controller collector](reference/slurm-inventory.md) also supplies
   queue and reservation observations, which become unknown when stale. Broad production observability and
   direct MLflow/S3 tenant access controls remain open.
 
@@ -121,10 +121,10 @@ the GPU, checks numerical agreement, and emits the result envelope. It has been 
 it is not total board memory. Power, temperature and utilization remain null
 until a qualified telemetry source supplies them. It does not implement CNN,
 transformer or NPU model benchmarks itself. A separate generated CNN fixture
-has qualified CUDA execution and [execution-bound thermal evidence](policy-comparison-v2.md);
+has qualified CUDA execution and [execution-bound thermal evidence](reference/policy-comparison-v2.md);
 its exact numerical agreement is not trained-model accuracy. Two separate
-real Hailo model qualifications [failed their fixed quality gates](hailo-efficientformer.md).
-A third, separately preregistered [ResNet-50 contract](hailo-resnet50.md) passed
+real Hailo model qualifications [failed their fixed quality gates](reference/hailo-efficientformer.md).
+A third, separately preregistered [ResNet-50 contract](reference/hailo-resnet50.md) passed
 and completed four API Jobs with Kueue allocation, measured lookup/approval and
 PostgreSQL/S3/MLflow delivery. Its runner checks all quality gates on every run;
 host RSS and unknown NPU memory remain distinct. No arbitrary-NPU qualification

@@ -18,7 +18,7 @@ Before enabling a route:
    storage, or configure `result_ssh_targets` for verified node-local log reads.
    Native variants require explicit `native_runtimes` bindings; container variants
    are rejected until a container executor is implemented. See
-   [Slurm runtime qualification](../docs/slurm-runtime.md). The API host does not
+   [Slurm runtime qualification](../docs/reference/slurm-runtime.md). The API host does not
    need a filesystem mount from the Slurm cluster.
 5. Keep site addresses, tokens, SSH configuration and private device identities
    outside the repository. Runtime job submission belongs to the worker, not
@@ -34,9 +34,9 @@ uv run resource-advisor worker --config /run/resource-advisor/routes.json
 Do not use a production database for tests: `RA_TEST_DATABASE_URL` targets only
 a disposable `ra_test_*` database. Versioned schema migrations and complete backend qualification remain open.
 Qualified image builders and scoped static service manifests are implemented;
-the linked runbooks document their actual deployment and verification scope. See [the Kubeflow launch guide](../docs/kubeflow-pipeline.md)
+the linked runbooks document their actual deployment and verification scope. See [the Kubeflow launch guide](../docs/reference/kubeflow-pipeline.md)
 for a rootless launcher build and the TLS/Secret contract.
 
 The [Argo CD runbook](argocd/README.md) now provides revision-pinned static
-service adoption. See [live GitOps evidence](../docs/gitops-adoption.md); compute
+service adoption. See [live GitOps evidence](../docs/reference/gitops-adoption.md); compute
 Jobs remain outside GitOps, and host provisioning remains separately scoped.

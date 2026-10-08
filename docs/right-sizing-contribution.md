@@ -1,7 +1,7 @@
 # Profile-Guided Heterogeneous Resource Right-Sizing
 
 상태: **Kubernetes/Kueue 및 새 Slurm feedback 검증**. Controller 복귀 후
-[새 Slurm loop](right-sizing-slurm-feedback.md)가 통과했다. GPU/NPU의 동일 AI logical
+[새 Slurm loop](reference/right-sizing-slurm-feedback.md)가 통과했다. GPU/NPU의 동일 AI logical
 workload 성능 비교는 성립하지 않는다. 전체 범위 완료,
 일반적인 최적화 성공, 모든 이기종 가속기의 성능 예측을 주장하지 않는다.
 
@@ -32,7 +32,7 @@ Resource Advisor는 workload/runtime compatibility, 다음 profiling 후보,
 최신 비교·감사 source e020445의 [전체 CI](evidence/right-sizing-validation-v3.json)는
 Python3.11/3.13 각각 SQLite 1,150 passed·4 skipped와 PostgreSQL 1,154 passed다.
 Ruff/format, packaged assets, JS/Ansible syntax도 통과했다. Software 통과를
-실장비 완료로 해석하지 않는다. 이후 [Slurm 신규 증거](right-sizing-slurm-feedback.md)는
+실장비 완료로 해석하지 않는다. 이후 [Slurm 신규 증거](reference/right-sizing-slurm-feedback.md)는
 별도 실제 Job5개와 native/accounting/feedback auditor로 확인했다.
 
 ## 3. Method
@@ -87,7 +87,7 @@ read-only lifecycle API와 terminal transaction 안의 immutable feedback을 추
 추천·source profile·workload/context·native ID·result digest·usage ID·residual을
 같이 보존한다. 실패/취소/invalid result는 censored 결과이며 비용은 ledger에
 남긴다. 기존 SQL entity table을 사용하고 과거 receipt를 만들어 넣지 않는다.
-[API와 rollback 계약](right-sizing-api.md)에 범위를 명시했다.
+[API와 rollback 계약](reference/right-sizing-api.md)에 범위를 명시했다.
 
 Optional model/optimizer/input range/host CPU/runtime flag 서술자는 새 scope에
 포함되며 absent field는 legacy serialization에서 생략한다. 따라서 기존
@@ -97,7 +97,7 @@ signature가 유지되고 선언한 input range가 미검증 shape를 허용하�
 
 기존 실장비 증거는 RTX5080 CUDA/PyTorch, Slurm Orin GPU, Hailo8 ResNet50과
 KFP→API→Kueue→GPU→Result다. 새 trial은 접근 가능한 RTX5080과 Hailo8을
-사용한다. [갱신된 hardware matrix](right-sizing-hardware-matrix.md)와 [고정 계획](right-sizing-trial-plan.md)은 W1 synchronized matmul,
+사용한다. [갱신된 hardware matrix](reference/right-sizing-hardware-matrix.md)와 [고정 계획](evidence/right-sizing-trial-plan-v1.json)은 W1 synchronized matmul,
 W2 input/preprocess 포함 generated CNN, W3 qualified Hailo ResNet50을 정의한다.
 
 W1/W2는 CPU 0.5/1/2 × memory 1/2GiB의 여섯 구성이다. W3는 기존 단일
@@ -134,7 +134,7 @@ W2 -1.1500%지만, **Random과 BO가 같은 구성을 선택했으므로 BO의 �
 `DeadlineExceeded`가 발생해 두 study 모두 abstain했다. 컨테이너가 exit 0이어도
 실패 Job을 유효 성능으로 채택하지 않았다. 원시 실패 2개와 비용을 유지한다.
 
-[추가 reference v2 계획](right-sizing-reference-recovery-plan.md)은 별도 ID로
+[추가 reference v2 계획](evidence/right-sizing-reference-recovery-plan-v2.json)은 별도 ID로
 실행 전에 고정했다. 최초 search/main 선택·후보·품질 조건을 바꾸지 않고,
 reference confirmation 보호 예산만 늘렸다. 양쪽 workload에 같은 새 reference를
 사용하며 v1의 실패를 덮어쓰지 않는다. [별도 reference 캡처](evidence/right-sizing-reference-recovery-v2.json)와
@@ -148,7 +148,7 @@ confirmation 중 native deadline 실패가 있어 abstain했다. W2의 regret은
 추가 제출을 보류하며, native limit/승인 시간 예산을 임의로 늘리지 않는다.
 이 guard는 software 검증이며 이번 고정 BB-source hardware 결과를 바꾸지 않는다.
 
-후속 [W2 v3 계획](right-sizing-reference-plan-v3.md)은 다음 날 새 qualification
+후속 [W2 v3 계획](evidence/right-sizing-reference-plan-v3.json)은 다음 날 새 qualification
 2회와 grid 30회를 한 번 실행했다. [raw](evidence/right-sizing-reference-v3.json)와
 [auditor](evidence/right-sizing-reference-audit-v3.json)는 여섯 후보의 3회 독립
 확인을 모두 검증했다. Random/BO가 고른 CPU2/memory2GiB는 뒤에 측정한
@@ -171,7 +171,7 @@ GPU 승인 실행 12개에 immutable comparable feedback이 생성됐다. 실행
 API 실행 4회다. 독립 승인 실행의 actual/reference residual이 DB에 남았고
 S3/API/MLflow bytes를 다시 읽어 일치 여부를 확인했다. 평균 call time
 0.339591987초에 대해 actual 0.340695216초, 차이 +0.324869%였다.
-[구체적인 범위와 결과](right-sizing-hailo.md)를 참고한다.
+[구체적인 범위와 결과](reference/right-sizing-hailo.md)를 참고한다.
 
 ## 9. Profiling Cost and Net Benefit
 
@@ -218,7 +218,7 @@ reference terminal 관측까지 4,195.255873초를 보고한다. Hailo는 그 �
 artifact readback·배포·소프트웨어 테스트는 이 envelope 밖이다.
 기존 fixture/image construction과 에너지는 이번에 측정하지 않았으므로 0으로
 쓰지 않는다. [Hailo 비용](evidence/right-sizing-hailo-cost-v1.json)에 이를 명시했다.
-기존 [operational comparison](operational-comparison.md)의 compute 약 1% 단축,
+기존 [operational comparison](reference/operational-comparison.md)의 compute 약 1% 단축,
 실제 6회 반복에서 profiling 비용 회수 실패도 유지한다.
 
 W2 v3의 추가 비용은 qualification 포함 32 Jobs / 100 GPU 예약초 / 108.5 CPU
@@ -271,7 +271,7 @@ C4는 실제 N 범위의 비용 평가와 회수 실패 판별이며, 미래 반
 
 10-08 재가동 전 Slurm controller 연결 실패와 worker RPC timeout은
 [보존된 read-only 검사](evidence/right-sizing-slurm-readiness-v3.json)의 과거 BLOCKED
-상태다. 이후 [새 loop](right-sizing-slurm-feedback.md)는 fresh qualification,
+상태다. 이후 [새 loop](reference/right-sizing-slurm-feedback.md)는 fresh qualification,
 observe3, 명시적 승인 실행과 다음 history 반영을 실제 Job5개로 확인했다.
 단일 고정 Slurm 후보이며 Slurm active search, 같은 AI workload의 backend 전환
 성능 비교는 검증하지 않았다. 기존 response-loss/crash recovery 증거도 보존한다.
@@ -300,7 +300,7 @@ uv run --with matplotlib==3.11.1 python examples/plot_right_sizing.py docs/evide
 
 각 구절은 [claim audit](right-sizing-claim-audit.md)의 cold-start, compatibility,
 actual acquisition, confirmation, approved feedback, post-main lookup, expiry
-행에 연결한다. Slurm은 새 [고정 후보 feedback](right-sizing-slurm-feedback.md)의
+행에 연결한다. Slurm은 새 [고정 후보 feedback](reference/right-sizing-slurm-feedback.md)의
 실제 source/target/native ID에도 연결한다. 같은 AI task의 GPU↔NPU 최적 후보를
 비교·선택했다는 넓은 해석은 채택하지 않는다.
 

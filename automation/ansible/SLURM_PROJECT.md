@@ -42,6 +42,6 @@ ANSIBLE_CONFIG=automation/ansible/ansible.cfg ansible-playbook \
 Check fresh host/GPU readiness before executing any work. Provisioning or a
 zero-change repeat is not model/runtime qualification. API credentials, worker
 routes, MLflow/artifact mappings and immutable profiles are separate steps.
-The [two-project acceptance protocol](../../docs/slurm-project-isolation-plan.md)
+The [two-project acceptance protocol](../../docs/reference/slurm-policy.md)
 defines subsequent real Job tests. Record all changes and preserve configuration/
 association evidence; never delete shared accounts or result files as cleanup.

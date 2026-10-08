@@ -1,273 +1,83 @@
 # Resource Advisor
 
-**GPU·NPU 자원을 보고, 작업을 실행하고, 결과와 사용 시간을 확인하는 연구용 프로젝트입니다.**
+**GPU·NPU 자원을 확인하고, 검증된 AI 작업을 큐에 제출하며, 결과·실험 기록·사용량을 연결하는 연구 플랫폼입니다.**
+Kubernetes/Kueue와 Slurm 위에서 실행 가능성 검증과 profile-guided 자원 추천을 담당합니다.
+전체 HAIRP 설계와 모든 장비의 자동 right-sizing은 아직 완료되지 않았습니다.
 
-처음이면 [한국어 사용 가이드](docs/quickstart-ko.md)부터 보세요.
-현재 [자원 풀과 실행 후보](docs/pool-resource-coverage.md)는 GPU5대 자동 선택과
-Hailo/Mobilint 지원 차이를 설명합니다. 2026-10-08 새
-[Slurm 관측→추천→승인→피드백](docs/right-sizing-slurm-feedback.md)은 실제 GPU 작업5개로
-검증했으며 이전 실패와 비용 기록은 보존했습니다.
-[직접 만든 차별점과 원래 설계의 완료 기준](docs/differentiation-ko.md)도 확인할 수 있습니다.
-핵심 실행 경로에는 실장비 근거가 있지만 전체 설계는 미완료입니다.
-[실제 CPU→GPU 계산 파이프라인](docs/cpu-gpu-pipeline-results.md)과 사용자 코드를
-바꾸지 않는 [CUDA 관측 전용 시험](docs/passive-gpu-observation-results.md)은 통과했습니다.
-Slurm의 미확정 종료·비용, Pi NPU 실행 및 최초 HAIRP의 Edge 재계획·HAMi·eBPF 연결은 남아 있습니다.
-[구성요소와 차별점을 쉽게 설명한 안내](docs/platform-explained-ko.md)는 도구별 역할,
-직접 만든 기능과 최초 HAIRP의 미완료 범위를 함께 설명합니다.
-설정된 API 주소의 `/console`에서 다음 순서로 사용합니다.
+## 처음 읽을 문서
 
-1. **실행 현황** — CPU·메모리·가속기 자원과 작업 상태 확인
-2. **작업 제출 → 작업·정책 선택 → 스케줄러에 제출** — 호환 자원 선택과 네이티브 큐 입장
-3. **실행 상세 · 결과 · MLflow** — 완료 결과 확인; 실행 중에는 **작업 취소** 가능
-4. **대기 · 할당 이력** — 기다린 시간과 실제 예약한 자원 시간 확인
-5. **[스케줄링 실험실](docs/native-scheduler-lab.md)** — 공통 GPU 풀의 10개 동시 요청·GPU/NPU 혼합 실행, 전체 노드 표와 기록 재생
+| 내용 | 문서 |
+|---|---|
+| 어떻게 사용하는가 | [사용법](docs/quickstart-ko.md) |
+| 무엇을 직접 만들었는가 | [구성요소와 차별점](docs/platform-explained-ko.md) |
+| 어떤 장비에서 실제 실행되는가 | [GPU·NPU 실행 범위](docs/all-accelerators.md) |
+| 기존 방식과 비교하면 어떤가 | [비교 결과와 비용](docs/right-sizing-comparison-results.md) |
+| 어디까지 기여로 말할 수 있는가 | [연구 기여와 한계](docs/right-sizing-contribution.md) |
 
-Kubernetes/Kueue 및 Slurm 실행을 연결한 실장비 데모입니다.
-장비·모델별 지원 범위는 다르며, 모든 가속기와 운영 환경의 검증이 끝난 상태는 아닙니다.
+구현·장애·복구·실험별 상세 기록은 [문서 목차](docs/README.md)에서 필요한 항목만 펼쳐 보세요.
 
-<details>
-<summary>기존 실행 결과와 기술 보고서 펼치기</summary>
+## 사용 흐름
 
-An independent, evidence-based resource recommendation and execution service
-for heterogeneous Kubernetes/KubeEdge and Slurm compute pools.
+설정된 API 주소의 `/console`에서 사용합니다.
 
-**Status: initial implementation, not a completed production platform.**
-Unit-test performance fixtures use explicitly synthetic data. A separate live
-experiment has run on a physical RTX 5080 through Kueue, with measured results
-in PostgreSQL and MLflow. See the [hardware report](docs/gpu-experiment.md) for
-failures, raw measurements and limits. Separate [Slurm CUDA qualification](docs/slurm-verification.md)
-and [quota/priority enforcement](docs/slurm-policy.md) now have live evidence;
-a bounded [browser → API → Orin → S3/MLflow result path](docs/slurm-api-results.md)
-now also passes, with the initial failed attempt retained. Bounded
-[accepted-submit SIGKILL recovery](docs/slurm-response-recovery.md) now verifies
-the same native job/result/ledger/MLflow run. The corrected public verifier's
-fourth trial also retains one submit invocation and passes the prospective
-protocol, with all previous trial costs retained. Full Slurm
-multi-user and node-loss qualification remains open. A separately qualified
-[Hailo-8 ResNet-50 API path](docs/hailo-resnet50.md) now completes three
-observations, measured lookup, approval and a fourth verification, with matching
-PostgreSQL/S3/MLflow evidence. Earlier NPU model failures remain visible.
-The [uncached Kubeflow workflow](docs/kubeflow-pipeline.md) has also completed
-the API → Kueue → GPU → result path and a duplicate-free replay.
-The [Kueue policy trial](docs/kueue-policy.md) also verifies real GPU queueing,
-oversized admission refusal and high-before-normal execution.
-[Terminal accounting](docs/accounting.md) retains failed/cancelled attempts and
-distinguishes observed allocation from requested resources and unknown data.
-The [terminal-result replay trial](docs/result-replay.md) also verifies nine
-actual API replay/rejection requests with unchanged DB/artifact/MLflow records
-and no new compute, including late-result denial after confirmed cancellation.
+1. **자원 현황**에서 CPU·메모리·GPU/NPU와 현재 예약 상태를 확인합니다.
+2. **작업 제출**에서 검증된 템플릿과 SchedulingProfile을 선택합니다.
+3. 네이티브 큐의 **대기 → 할당 → 실행** 상태를 확인합니다.
+4. **실행 상세**에서 결과·MLflow·예약 사용량을 확인합니다. 진행 중인 작업은 취소할 수 있습니다.
 
-[Read-only inventory](docs/inventory.md) now separates scheduler requests from
-measured CPU/memory/GPU/NPU telemetry and returns unknown for stale data.
-Two standalone hosts now also reach the [Slurm inventory and console](docs/slurm-inventory.md)
-through actual mTLS Prometheus observations. A
-[restricted controller collector](docs/slurm-controller-results.md) now also
-supplies live Slurm node state, CPU/memory/GPU reservations and scoped queue counts.
-GPU utilization and Pi NPU execution remain unqualified; registration is not model
-execution acceptance. An [isolated Orin runtime](docs/slurm-jetson-runtime-results.md)
-now passes its fixed GPU CNN gate under enforced memory limits. A subsequent
-[real Slurm CNN job](docs/slurm-cnn-contract-results.md) also emits a validated
-platform result envelope. The subsequent [browser/API trial](docs/slurm-api-results.md)
-now verifies real submission, result collection and publication.
+공통 GPU 작업은 장비를 먼저 고르지 않고 호환 후보 안에서 자동 선택합니다.
+NPU는 장치별로 검증한 모델·SDK·입력 계약을 사용합니다. 등록된 장비라는 이유만으로
+임의 모델을 실행하거나 GPU↔NPU로 자동 변환하지 않습니다.
 
-Open `/console` on the API origin for the [four-view research console](docs/console.md):
-resources/jobs, compatibility, queue/allocation history, and recommendation evidence.
-Compatible candidates offer observed execution; active jobs offer cancellation.
-[Actual Slurm cancellation](docs/slurm-cancellation.md) now verifies terminal
-confirmation, retained costs and project/owner filtering.
-The [high-priority Slurm profile](docs/slurm-priority-gateway.md) also now reaches
-the scoped native gateway and an actual completed GPU/result/MLflow path;
-a [two-project trial](docs/slurm-project-isolation.md) now observes high-first
-ordering in both directions and eight native quota/account rejections.
-The last attempt is unresolved after controller connectivity loss, so full
-acceptance remains open.
+## 현재 검증 범위
 
-The [approved GPU demo](docs/approved-gpu-demo.md) now connects fresh qualification,
-three observations, recommendation, approval and independent measured comparison.
-The [CNN diagnostic trial](docs/bottleneck-diagnostics.md) connects serial phase
-measurements to cautious bottleneck hypotheses and a controlled input-reuse test.
-The [CUDA kernel follow-up](docs/e5-kernel-results.md) adds actual kernel traces,
-separate profiler-off/on comparisons and all failed qualification costs:
-17 total GPU Jobs, 54 reservation seconds, unchanged one-GPU allocation.
-The [isolated training trial](docs/training-isolation.md) protects the initial
-checkpoint/input, verifies repeated GPU training and retains separate output states.
-The [failure tracking recovery](docs/failure-tracking.md) retains cancelled and
-resultless failed attempts in MLflow, including outage and response-loss checks.
-The [uncertainty audit](docs/uncertainty.md) rechecks recommendation evidence before
-reuse and compares saved forecasts only with later, unseen measurements.
-The [persistent metadata cutover](docs/persistent-postgres.md) preserves all five
-database tables across Pod recreation and verifies existing artifact references.
-The [supervised API and inventory deployment](docs/service-deployment.md) uses
-separate permissions and verifies Pod replacement/collector termination recovery.
-The [supervised worker crash trial](docs/worker-recovery.md) kills the controller
-after accepted GPU submission and verifies recovery without another Job creation.
-The [GPU cancellation trials](docs/cancellation-verification.md) separate request
-from confirmed cancellation and preserve completed results across worker restart.
-The [termination-retention trial](docs/termination-retention.md) commits kubelet
-termination evidence before deleting the Pod record, preserving cancellation
-reservation time across worker interruption without estimating unknown intervals.
-The [Kubeflow cancellation trials](docs/kubeflow-cancellation.md) confirm external
-GPU cleanup after workflow termination and uncatchable launcher process loss.
-The [paired calibration protocol](docs/fidelity-calibration.md) preregisters
-short/long measurement comparisons and prevents replication-only evidence from
-being mislabeled as qualified multi-fidelity optimization.
+- Kubernetes GPU5대와 NPU5개에서 모델별 lab 템플릿의 실제 API 실행을 확인했습니다.
+  CUDA smoke, 수치 검증, 모델 품질 검증의 범위는 서로 다릅니다.
+- Slurm Orin의 관측 → 추천 → 승인 → 실행 → 결과 피드백도 실제 GPU 작업으로 확인했습니다.
+- Kubeflow workflow → API → Kueue → GPU → result 경로의 실제 실행 증거가 있습니다.
+- Random/BO 비교는 BO의 우위나 profiling 비용 회수를 입증하지 못했습니다.
+- Rockchip 연결은 trusted lab 실험용이고, 일부 NPU firmware identity는 미확인입니다.
+  DEEPX, AMD, 다중 GPU 학습과 최초 HAIRP의 Edge 재계획·HAMi 간섭·eBPF 연결에는 미완료 범위가 있습니다.
 
-The [completed S0/S1/S2 comparison](docs/policy-comparison-v2.md) runs lookup,
-random search and qLogNEI in three temporal blocks, with fresh frozen history and
-a later reference grid. All 129 application results plus three F0 Jobs are accounted
-for; no BO selection advantage is demonstrated. Raw data, cost-aware figures,
-[offline uncertainty replay](docs/uncertainty-ablation.md), and the retained
-failed predecessor are published. The [full acceptance audit](docs/goal-audit.md)
-still lists required Slurm and broader failure scenarios. The new
-[numerical workload holdout](docs/numerical-workload-holdout.md) reuses existing
-GPU results: 18 out-of-range Jobs abstain; nine in-range Jobs are covered by
-wide, uncalibrated intervals with 14.71% point error. It is an offline shadow
-evaluation and grants no execution authority.
+성공·실패·취소와 unknown 비용을 함께 보존합니다. Software test 통과와 실제 장비 검증을 구분합니다.
 
-</details>
+## 책임 경계
 
-## Responsibility
-
-The service validates workload/environment contracts, submits a selected
-configuration, collects results and recommends from comparable measured history.
-Kueue admits Kubernetes Jobs; Kubernetes and Slurm retain their own scheduling.
-Existing edge runtime behavior is unchanged. No runtime migration is implemented.
+플랫폼은 workload/runtime 계약, 비교 가능한 이력, profiling 예산, 추천·승인과
+실행 결과를 연결합니다. Kueue의 admission·quota, Kubernetes의 node binding과
+Slurm의 native scheduling은 기존 도구가 담당합니다. 기존 Edge runtime 동작은 유지합니다.
 
 ```mermaid
 flowchart LR
-    U[Researcher / KFP launcher] --> A[Compute API]
-    A --> D[(Independent SQL database)]
-    D --> W[Durable worker]
-    W --> K[Suspended Kubernetes Job]
-    K --> Q[Kueue admission]
-    Q --> E[Kubernetes / KubeEdge execution]
-    W --> S[Slurm sbatch]
-    E --> R[Validated result]
+    U[Researcher / Kubeflow] --> A[Compute API]
+    A --> V[Compatibility / Profile / Recommendation]
+    V --> P[Approved or observed execution]
+    P --> K[Kubernetes / Kueue]
+    P --> S[Slurm]
+    K --> R[Result / Usage / Profile]
     S --> R
-    R --> D
-    D --> L[Measured-history recommendation]
-    L --> P[Explicit approval]
-    P --> A
-    D --> M[MLflow delivery outbox]
+    R --> V
+    R --> M[MLflow / Artifacts]
 ```
 
-## Run locally
+## 로컬 실행
 
-Python 3.11–3.13 and `uv` are required. Commands below assume this directory.
+Python3.11–3.13과 `uv`를 사용합니다. 아래 명령은 이 저장소 디렉터리 기준입니다.
 
 ```sh
 uv sync --locked
 uv run pytest -q
 uv run resource-advisor init-db
-```
-
-Create a private credentials JSON outside version control. Its keys are SHA-256
-hashes of bearer tokens; values are `{"project":"team-a","operator":false}`.
-Only operators may register device/runtime qualification and collect results.
-Use a separate scoped operator token, never grant researchers operator access.
-
-```sh
 uv run resource-advisor serve --credentials /path/to/private/credentials.json
 ```
 
-API documentation: <http://127.0.0.1:18040/docs>. Authenticated API prefix:
-`/api/v1/compute`. Serving the API does not enable backend execution. A worker
-needs explicit project-to-cluster routes and externally provisioned permissions.
-Use TLS via a reverse proxy or the server certificate/key options beyond localhost.
+Credentials JSON은 저장소 밖에 두며 bearer token의 SHA256을 key로,
+`{"project":"team-a","operator":false}`를 value로 사용합니다.
+장비/runtime 등록과 결과 수집은 별도의 scoped operator 권한이 필요합니다.
+연구실의 토큰 없는 Console 접속은 private deployment 설정이며 다른 설치의 기본 인증을 대신하지 않습니다.
 
-Set `RA_DATABASE_URL` to an independent PostgreSQL database for deployment.
-SQLite is a local development option. `init-db` creates the initial schema;
-schema upgrades and an operational migration process are not yet implemented.
-
-## Implemented boundary
-
-- Immutable workload, runtime variant and capability contracts; separate logical
-  workload and execution-context signatures.
-- Project-derived authorization; stable idempotency keys; durable submit and
-  MLflow outboxes; conservative response-loss reconciliation.
-- Kubernetes suspended Job builder and Slurm adapters with explicit native
-  runtime qualification and verified node-local result transport.
-- Digest/schema/attempt validation; quality-gated historical profiles.
-- Lookup recommendations with independent-run counts, uncertainty and approval.
-- Device allocation units stay separate; missing scheduler times remain null.
-- S3 result bundles with verified read-back, project-authorized downloads and
-  separate MLflow artifact delivery; see [artifact setup](docs/artifacts.md).
-- Prometheus job/outbox metrics; hardware-verified CPU-only KFP launcher with
-  caching off, HTTPS verification and Secret-supplied project credentials.
-- Cooperative CUDA matmul runner qualified on one physical GPU/runtime combination.
-
-Consent-bound pilot studies, seeded random search and constrained qLogNEI now
-use the durable worker with reserved confirmation budgets. Random search and
-qLogNEI completed a real GPU loop and independent confirmation, retaining the
-baseline; this small smoke experiment does not establish strategy superiority.
-NPU readiness requires actual model validation; hardware detection alone is insufficient.
-
-See [implementation ledger](docs/implementation.md) and
-[architecture and operational limits](docs/architecture.md).
-For the current evidence see [verification](docs/verification.md); for an easy
-Korean explanation see [the walkthrough](docs/walkthrough.ko.md).
-See [optimization contracts](docs/optimization.md) and the
-[full completion audit](docs/goal-audit.md) for the complete remaining scope.
-
-Noise-aware [adaptive replication](docs/adaptive-replication.md) adds independent
-probes when descriptive measurement precision is unresolved, with explicit caps
-and separate final confirmation. It is distinct from multi-fidelity BO.
-
-The [MF-GP/MF-KG numerical kernel](docs/mfkg-kernel.md) now supports finite-space
-configuration/fidelity analysis and a synthetic ask/observe demo. Hardware
-qualification and live qualified MF-KG execution remain open gates.
-[Immutable fidelity spaces](docs/fidelity-spaces.md) now bind measurement levels
-to separate workloads and execute preregistered mixed-workload calibration through
-the durable study/Job path. The new path completed 12 actual GPU probes and six
-independent target confirmations, with matching S3/API/MLflow results.
-[Approved input sampling](docs/sampling.md) additionally completed 18 actual GPU
-runs over a finite generated input population, with verified byte-consumption
-receipts and matching result bundles. Offline MF-GP/MF-KG analysis uses the 12
-probes without submitting jobs; independent confirmations retained the baseline
-because improvement was uncertain. Real-dataset fidelity, thermal/rank
-qualification and live qualified MF-KG execution remain open.
-
-[Execution-bound thermal observations](docs/thermal-evidence.md) add read-only
-NVML measurements around each sampled GPU forward. Missing or ineligible
-observations exclude a result from recommendation history and stop the study.
-An actual 18-Job GPU trial verified all 240 sensor reads and matching
-S3/API/MLflow bundles. Measurement overhead is reported; sustained thermal and
-paired-rank qualification remain open.
-
-[Preregistered MF-KG execution](docs/qualified-mfkg.md) now connects accepted
-fidelity groups to mixed-workload ask/execute/observe and independent target
-confirmation. Qualification, expiry, rank drift and failure fallback are tested
-with actual BoTorch and scheduler doubles; a qualified physical GPU trial remains
-open. Existing unqualified reports do not authorize this strategy.
-
-[Conditional rank transfer](docs/transfer.md) distinguishes history-guided warm
-start from actual RGPE. Operator-approved families and immutable source Job/profile
-evidence enable a durable target-check → model → reserved Job → observation loop,
-with source-expiry/negative-transfer fallback and independent target confirmation.
-The [completed physical GPU comparison](docs/transfer-gpu.md) records 157 API Jobs,
-two method blocks, full source costs and equal target budgets. All four methods
-selected the same configuration: this fixture demonstrates no selection advantage
-for transfer. Numerical failure tests remain explicitly synthetic; broader
-effectiveness and live harmful-transfer injection remain unverified.
-
-공통 정책 API와 웹 제출 흐름: [SchedulingProfile 가이드](docs/scheduling-profiles.md).
-
-현재 GPU 5대·NPU 5개의 검증 템플릿과 실제 실행/실패/비용:
-[전체 가속기 연결 결과](docs/all-accelerators.md). NPU는 검증한 모델별 lab 실행 범위이며
-임의 모델 자동 변환이나 GPU↔NPU 성능 우위를 의미하지 않습니다.
-
-연구 운영 화면과 MLflow/Kubeflow 연결: [Research Console](docs/research-console.md).
-
-
-### Profile-guided right-sizing audit
-
-[실제 Static / Random / BO / Grid 비교표와 전체 비용](docs/right-sizing-comparison-results.md).
-W1/W2 전체 후보 reference를 독립 확인했고, 실제 N=1..3에서는 profiling 비용을
-회수하지 못했다. 새 Slurm feedback loop는 controller 연결 복구가 필요하다.
-
-[기여와 실제 비용](docs/right-sizing-contribution.md),
-[주장별 acceptance gate](docs/right-sizing-claim-audit.md),
-[기존 저장소 기준선 감사](docs/right-sizing-gap-audit.md)를 함께 확인한다.
-신규 Kubernetes GPU/Hailo feedback은 실장비에서 검증했지만, 새 Slurm feedback
-loop는 controller 연결 문제로 BLOCKED다. Random/BO 우위나 profiling 순이익,
-전체 목표 완료를 주장하지 않는다.
+API 문서: <http://127.0.0.1:18040/docs>. API prefix: `/api/v1/compute`.
+실제 backend 실행에는 별도 worker·project route·권한 설정이 필요합니다.
+배포에는 `RA_DATABASE_URL`로 독립 PostgreSQL을 지정하고 localhost 밖에서는 TLS를 사용합니다.
+SQLite는 로컬 개발용이며 `init-db`는 초기 schema 생성 명령입니다.
+배포 설정은 [deploy/](deploy/README.md), 핵심 구현은 [src/resource_advisor/](src/resource_advisor)에서 확인합니다.
