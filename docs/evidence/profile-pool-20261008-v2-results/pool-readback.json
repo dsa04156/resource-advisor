@@ -1,0 +1,366 @@
+{
+  "recorded_at": "2026-10-08T09:58:22.589172+00:00",
+  "scope": "post-run allocatable readback; not an unchanged-infrastructure digest claim",
+  "nodes": [
+    {
+      "name": "etri-dev0001-jetorn",
+      "uid": "0773ff3d-6845-4b4c-9034-a6aca4b5dad8",
+      "allocatable": {
+        "cpu": "6",
+        "ephemeral-storage": "451876913224",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "hugepages-32Mi": "0",
+        "hugepages-64Ki": "0",
+        "memory": "7700340Ki",
+        "nvidia.com/gpu.shared": "2",
+        "pods": "110"
+      }
+    },
+    {
+      "name": "etri-dev0005-jetagx",
+      "uid": "afe2103b-b519-4c4f-924c-700c41aa6b14",
+      "allocatable": {
+        "cpu": "12",
+        "ephemeral-storage": "52025455326",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "hugepages-32Mi": "0",
+        "hugepages-64Ki": "0",
+        "memory": "64284984Ki",
+        "nvidia.com/gpu.shared": "2",
+        "pods": "110"
+      }
+    },
+    {
+      "name": "etri-ser0001-cg0msb",
+      "uid": "5d12790a-6588-4729-b085-d05c4729d635",
+      "allocatable": {
+        "cpu": "24",
+        "ephemeral-storage": "451628671048",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "memory": "131496784Ki",
+        "nvidia.com/gpu": "1",
+        "pods": "110"
+      }
+    },
+    {
+      "name": "etri-ser0002-cgnmsb",
+      "uid": "4b770e6c-dcac-4293-9932-a08f1989e91a",
+      "allocatable": {
+        "cpu": "24",
+        "ephemeral-storage": "927870306816",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "memory": "32000272Ki",
+        "npu.intel.com/accel": "1",
+        "nvidia.com/gpu": "1",
+        "pods": "110"
+      }
+    },
+    {
+      "name": "etri-ser0003-cg0ms0",
+      "uid": "4b0730fc-30ed-4e99-b6f0-b060eb0df9dd",
+      "allocatable": {
+        "cpu": "20",
+        "ephemeral-storage": "3628684392175",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "hugepages-32Mi": "0",
+        "hugepages-64Ki": "0",
+        "memory": "127498348Ki",
+        "nvidia.com/gpu": "1",
+        "pods": "110"
+      }
+    }
+  ],
+  "clusterqueue": {
+    "apiVersion": "kueue.x-k8s.io/v1beta2",
+    "kind": "ClusterQueue",
+    "metadata": {
+      "annotations": {
+        "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"kueue.x-k8s.io/v1beta1\",\"kind\":\"ClusterQueue\",\"metadata\":{\"annotations\":{},\"name\":\"hairp-gpu-pool\"},\"spec\":{\"namespaceSelector\":{\"matchExpressions\":[{\"key\":\"kubernetes.io/metadata.name\",\"operator\":\"In\",\"values\":[\"resource-advisor-lab\",\"hairp-scheduling-lab\"]}]},\"queueingStrategy\":\"BestEffortFIFO\",\"resourceGroups\":[{\"coveredResources\":[\"cpu\",\"memory\",\"nvidia.com/gpu\",\"nvidia.com/gpu.shared\"],\"flavors\":[{\"name\":\"hairp-multi-gpu\",\"resources\":[{\"name\":\"cpu\",\"nominalQuota\":\"3\"},{\"name\":\"memory\",\"nominalQuota\":\"3Gi\"},{\"name\":\"nvidia.com/gpu\",\"nominalQuota\":\"3\"},{\"name\":\"nvidia.com/gpu.shared\",\"nominalQuota\":\"0\"}]},{\"name\":\"hairp-pool-jetson-a\",\"resources\":[{\"name\":\"cpu\",\"nominalQuota\":\"2\"},{\"name\":\"memory\",\"nominalQuota\":\"1Gi\"},{\"name\":\"nvidia.com/gpu\",\"nominalQuota\":\"0\"},{\"name\":\"nvidia.com/gpu.shared\",\"nominalQuota\":\"2\"}]},{\"name\":\"hairp-pool-jetson-b\",\"resources\":[{\"name\":\"cpu\",\"nominalQuota\":\"2\"},{\"name\":\"memory\",\"nominalQuota\":\"1Gi\"},{\"name\":\"nvidia.com/gpu\",\"nominalQuota\":\"0\"},{\"name\":\"nvidia.com/gpu.shared\",\"nominalQuota\":\"2\"}]}]}]}}\n"
+      },
+      "creationTimestamp": "2026-10-07T02:36:39Z",
+      "finalizers": [
+        "kueue.x-k8s.io/resource-in-use"
+      ],
+      "generation": 2,
+      "name": "hairp-gpu-pool",
+      "resourceVersion": "39847910",
+      "uid": "9614129e-835b-48fd-b518-d6ef29b52c3e"
+    },
+    "spec": {
+      "flavorFungibility": {
+        "whenCanBorrow": "MayStopSearch",
+        "whenCanPreempt": "TryNextFlavor"
+      },
+      "namespaceSelector": {
+        "matchExpressions": [
+          {
+            "key": "kubernetes.io/metadata.name",
+            "operator": "In",
+            "values": [
+              "resource-advisor-lab",
+              "hairp-scheduling-lab"
+            ]
+          }
+        ]
+      },
+      "preemption": {
+        "borrowWithinCohort": {
+          "policy": "Never"
+        },
+        "reclaimWithinCohort": "Never",
+        "withinClusterQueue": "Never"
+      },
+      "queueingStrategy": "BestEffortFIFO",
+      "resourceGroups": [
+        {
+          "coveredResources": [
+            "cpu",
+            "memory",
+            "nvidia.com/gpu",
+            "nvidia.com/gpu.shared"
+          ],
+          "flavors": [
+            {
+              "name": "hairp-multi-gpu",
+              "resources": [
+                {
+                  "name": "cpu",
+                  "nominalQuota": "3"
+                },
+                {
+                  "name": "memory",
+                  "nominalQuota": "3Gi"
+                },
+                {
+                  "name": "nvidia.com/gpu",
+                  "nominalQuota": "3"
+                },
+                {
+                  "name": "nvidia.com/gpu.shared",
+                  "nominalQuota": "0"
+                }
+              ]
+            },
+            {
+              "name": "hairp-pool-jetson-a",
+              "resources": [
+                {
+                  "name": "cpu",
+                  "nominalQuota": "2"
+                },
+                {
+                  "name": "memory",
+                  "nominalQuota": "1Gi"
+                },
+                {
+                  "name": "nvidia.com/gpu",
+                  "nominalQuota": "0"
+                },
+                {
+                  "name": "nvidia.com/gpu.shared",
+                  "nominalQuota": "2"
+                }
+              ]
+            },
+            {
+              "name": "hairp-pool-jetson-b",
+              "resources": [
+                {
+                  "name": "cpu",
+                  "nominalQuota": "2"
+                },
+                {
+                  "name": "memory",
+                  "nominalQuota": "1Gi"
+                },
+                {
+                  "name": "nvidia.com/gpu",
+                  "nominalQuota": "0"
+                },
+                {
+                  "name": "nvidia.com/gpu.shared",
+                  "nominalQuota": "2"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "stopPolicy": "None"
+    },
+    "status": {
+      "admittedWorkloads": 0,
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-10-07T02:36:39Z",
+          "message": "Can admit new workloads",
+          "observedGeneration": 2,
+          "reason": "Ready",
+          "status": "True",
+          "type": "Active"
+        }
+      ],
+      "flavorsReservation": [
+        {
+          "name": "hairp-multi-gpu",
+          "resources": [
+            {
+              "borrowed": "0",
+              "name": "cpu",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "memory",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "nvidia.com/gpu",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "nvidia.com/gpu.shared",
+              "total": "0"
+            }
+          ]
+        },
+        {
+          "name": "hairp-pool-jetson-a",
+          "resources": [
+            {
+              "borrowed": "0",
+              "name": "cpu",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "memory",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "nvidia.com/gpu",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "nvidia.com/gpu.shared",
+              "total": "0"
+            }
+          ]
+        },
+        {
+          "name": "hairp-pool-jetson-b",
+          "resources": [
+            {
+              "borrowed": "0",
+              "name": "cpu",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "memory",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "nvidia.com/gpu",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "nvidia.com/gpu.shared",
+              "total": "0"
+            }
+          ]
+        }
+      ],
+      "flavorsUsage": [
+        {
+          "name": "hairp-multi-gpu",
+          "resources": [
+            {
+              "borrowed": "0",
+              "name": "cpu",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "memory",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "nvidia.com/gpu",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "nvidia.com/gpu.shared",
+              "total": "0"
+            }
+          ]
+        },
+        {
+          "name": "hairp-pool-jetson-a",
+          "resources": [
+            {
+              "borrowed": "0",
+              "name": "cpu",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "memory",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "nvidia.com/gpu",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "nvidia.com/gpu.shared",
+              "total": "0"
+            }
+          ]
+        },
+        {
+          "name": "hairp-pool-jetson-b",
+          "resources": [
+            {
+              "borrowed": "0",
+              "name": "cpu",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "memory",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "nvidia.com/gpu",
+              "total": "0"
+            },
+            {
+              "borrowed": "0",
+              "name": "nvidia.com/gpu.shared",
+              "total": "0"
+            }
+          ]
+        }
+      ],
+      "pendingWorkloads": 0,
+      "reservingWorkloads": 0
+    }
+  }
+}

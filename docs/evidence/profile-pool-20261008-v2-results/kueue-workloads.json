@@ -1,0 +1,2840 @@
+{
+  "items": [
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:47:53Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "81c8aeb7-2d83-4e83-a615-ece7cd4083fc"
+        },
+        "name": "job-profile-pool-20261008-v2-baseline-0-d84f1",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-baseline-0",
+            "uid": "81c8aeb7-2d83-4e83-a615-ece7cd4083fc"
+          }
+        ],
+        "resourceVersion": "39847408",
+        "uid": "f997bee4-9394-4abc-befc-f2344e23022c"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-baseline-0",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "16384"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "amd64",
+                  "kubernetes.io/hostname": "etri-ser0001-cg0msb"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-multi-gpu",
+                "memory": "hairp-multi-gpu",
+                "nvidia.com/gpu": "hairp-multi-gpu"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-ser0001-cg0msb"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:47:53Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:47:53Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:00Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:47:59Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:47:53Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "d89c5717-b8f1-45de-8443-069bee4eb220"
+        },
+        "name": "job-profile-pool-20261008-v2-baseline-1-ee784",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-baseline-1",
+            "uid": "d89c5717-b8f1-45de-8443-069bee4eb220"
+          }
+        ],
+        "resourceVersion": "39847397",
+        "uid": "b70cd8e7-6bd5-45de-b8c1-46fe35869a85"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-baseline-1",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "16384"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "arm64",
+                  "kubernetes.io/hostname": "etri-ser0003-cg0ms0"
+                },
+                "restartPolicy": "Never",
+                "runtimeClassName": "nvidia-spark",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-multi-gpu",
+                "memory": "hairp-multi-gpu",
+                "nvidia.com/gpu": "hairp-multi-gpu"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-ser0003-cg0ms0"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:47:53Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:47:53Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:47:59Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:47:59Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:47:53Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "0106dfa1-7236-4ff2-94b6-980f82d691d1"
+        },
+        "name": "job-profile-pool-20261008-v2-baseline-2-4c46e",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-baseline-2",
+            "uid": "0106dfa1-7236-4ff2-94b6-980f82d691d1"
+          }
+        ],
+        "resourceVersion": "39847607",
+        "uid": "a0f00840-cffc-4e7f-9000-04623ed320d0"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-baseline-2",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "16384"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu.shared": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu.shared": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "arm64",
+                  "kubernetes.io/hostname": "etri-dev0001-jetorn"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-pool-jetson-a",
+                "memory": "hairp-pool-jetson-a",
+                "nvidia.com/gpu.shared": "hairp-pool-jetson-a"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu.shared": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-dev0001-jetorn"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:47:53Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:47:53Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:10Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:10Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:47:53Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "9c9e2311-a401-44f6-ae4e-3ffbad8807a9"
+        },
+        "name": "job-profile-pool-20261008-v2-baseline-3-b8ecf",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-baseline-3",
+            "uid": "9c9e2311-a401-44f6-ae4e-3ffbad8807a9"
+          }
+        ],
+        "resourceVersion": "39847473",
+        "uid": "a3bba760-ee41-4621-ab23-3cc2127e6769"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-baseline-3",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "16384"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu.shared": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu.shared": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "arm64",
+                  "kubernetes.io/hostname": "etri-dev0005-jetagx"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-pool-jetson-b",
+                "memory": "hairp-pool-jetson-b",
+                "nvidia.com/gpu.shared": "hairp-pool-jetson-b"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu.shared": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-dev0005-jetagx"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:47:53Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:47:53Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:04Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:04Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:47:53Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "3281bcbf-2a2b-49dc-a878-4bac810c0d3e"
+        },
+        "name": "job-profile-pool-20261008-v2-baseline-4-2ee4b",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-baseline-4",
+            "uid": "3281bcbf-2a2b-49dc-a878-4bac810c0d3e"
+          }
+        ],
+        "resourceVersion": "39847384",
+        "uid": "a437a746-13a4-41b4-b1ec-4bd9c593cc04"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-baseline-4",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "16384"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "amd64",
+                  "kubernetes.io/hostname": "etri-ser0002-cgnmsb"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-multi-gpu",
+                "memory": "hairp-multi-gpu",
+                "nvidia.com/gpu": "hairp-multi-gpu"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-ser0002-cgnmsb"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:47:53Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:47:53Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:47:58Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:47:58Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:44:40Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "a084e8a6-4fe0-4838-a63d-51f9ce8bc2f8"
+        },
+        "name": "job-profile-pool-20261008-v2-f0-jetson-agx-3464a",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-f0-jetson-agx",
+            "uid": "a084e8a6-4fe0-4838-a63d-51f9ce8bc2f8"
+          }
+        ],
+        "resourceVersion": "39845339",
+        "uid": "af1deac0-67ad-4c32-9a74-d6c1762b678b"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-f0-jetson-agx",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "8"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu.shared": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu.shared": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "arm64",
+                  "kubernetes.io/hostname": "etri-dev0005-jetagx"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-pool-jetson-b",
+                "memory": "hairp-pool-jetson-b",
+                "nvidia.com/gpu.shared": "hairp-pool-jetson-b"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu.shared": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-dev0005-jetagx"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:44:40Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:40Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:46Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:46Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Started",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:44:40Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "8ff17d99-d6c8-4631-a90b-78f7becf081b"
+        },
+        "name": "job-profile-pool-20261008-v2-f0-jetson-nano-7fab2",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-f0-jetson-nano",
+            "uid": "8ff17d99-d6c8-4631-a90b-78f7becf081b"
+          }
+        ],
+        "resourceVersion": "39845329",
+        "uid": "a569ca96-6477-45d0-a041-1bc9321e8db2"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-f0-jetson-nano",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "8"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu.shared": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu.shared": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "arm64",
+                  "kubernetes.io/hostname": "etri-dev0001-jetorn"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-pool-jetson-a",
+                "memory": "hairp-pool-jetson-a",
+                "nvidia.com/gpu.shared": "hairp-pool-jetson-a"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu.shared": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-dev0001-jetorn"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:44:40Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:40Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:46Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:46Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:44:40Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "2e4e1ba4-8a25-43bd-83ff-393d015e2f04"
+        },
+        "name": "job-profile-pool-20261008-v2-f0-rtx5060-8a3b2",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-f0-rtx5060",
+            "uid": "2e4e1ba4-8a25-43bd-83ff-393d015e2f04"
+          }
+        ],
+        "resourceVersion": "39845312",
+        "uid": "75f3943e-adde-44ec-ab00-99140195c3a5"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-f0-rtx5060",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "8"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "amd64",
+                  "kubernetes.io/hostname": "etri-ser0001-cg0msb"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-multi-gpu",
+                "memory": "hairp-multi-gpu",
+                "nvidia.com/gpu": "hairp-multi-gpu"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-ser0001-cg0msb"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:44:40Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:40Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:46Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:46Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:44:40Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "b22ffbf0-edfd-4315-9d78-0635262b7bd6"
+        },
+        "name": "job-profile-pool-20261008-v2-f0-rtx5080-d367e",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-f0-rtx5080",
+            "uid": "b22ffbf0-edfd-4315-9d78-0635262b7bd6"
+          }
+        ],
+        "resourceVersion": "39845291",
+        "uid": "be70bfa6-e084-4c9c-8cb5-9db4319316b6"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-f0-rtx5080",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "8"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "amd64",
+                  "kubernetes.io/hostname": "etri-ser0002-cgnmsb"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-multi-gpu",
+                "memory": "hairp-multi-gpu",
+                "nvidia.com/gpu": "hairp-multi-gpu"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-ser0002-cgnmsb"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:44:40Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:40Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:45Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:45Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Started",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:44:40Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "c794010d-e362-4be5-ba76-e92dc0b2c23c"
+        },
+        "name": "job-profile-pool-20261008-v2-f0-spark-a4fcf",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-f0-spark",
+            "uid": "c794010d-e362-4be5-ba76-e92dc0b2c23c"
+          }
+        ],
+        "resourceVersion": "39845267",
+        "uid": "4b21d1f7-a845-4df3-9eca-dd07cbf7793a"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-f0-spark",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "8"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "arm64",
+                  "kubernetes.io/hostname": "etri-ser0003-cg0ms0"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-multi-gpu",
+                "memory": "hairp-multi-gpu",
+                "nvidia.com/gpu": "hairp-multi-gpu"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-ser0003-cg0ms0"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:44:40Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:40Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:44Z",
+            "message": "Job has reached the specified backoff limit",
+            "observedGeneration": 1,
+            "reason": "Failed",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:44:43Z",
+            "message": "At least one pod has failed, waiting for recovery",
+            "observedGeneration": 1,
+            "reason": "WaitForRecovery",
+            "status": "False",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:46:35Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "57c142db-81bf-4aa0-81da-736809b8f874"
+        },
+        "name": "job-profile-pool-20261008-v2-f0-spark-runtime-515eb",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-f0-spark-runtime",
+            "uid": "57c142db-81bf-4aa0-81da-736809b8f874"
+          }
+        ],
+        "resourceVersion": "39846458",
+        "uid": "d4ab8818-00a1-4edd-a7ce-3c0b1245383a"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-f0-spark-runtime",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "8"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "arm64",
+                  "kubernetes.io/hostname": "etri-ser0003-cg0ms0"
+                },
+                "restartPolicy": "Never",
+                "runtimeClassName": "nvidia-spark",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-multi-gpu",
+                "memory": "hairp-multi-gpu",
+                "nvidia.com/gpu": "hairp-multi-gpu"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-ser0003-cg0ms0"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:46:35Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:46:35Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:46:40Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:46:40Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Started",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:48:09Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "a45b3679-fea3-4909-9601-d8ee6fa0b4e4"
+        },
+        "name": "job-profile-pool-20261008-v2-reuse-0-6a357",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-reuse-0",
+            "uid": "a45b3679-fea3-4909-9601-d8ee6fa0b4e4"
+          }
+        ],
+        "resourceVersion": "39847690",
+        "uid": "e635f0bd-d31d-4227-960b-2dcb45c18c74"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-reuse-0",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "16384"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "amd64",
+                  "kubernetes.io/hostname": "etri-ser0002-cgnmsb"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-multi-gpu",
+                "memory": "hairp-multi-gpu",
+                "nvidia.com/gpu": "hairp-multi-gpu"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-ser0002-cgnmsb"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:48:09Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:09Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:15Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:14Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Started",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:48:09Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "9f4da7af-a714-474d-a3b5-808a3e408e22"
+        },
+        "name": "job-profile-pool-20261008-v2-reuse-1-67fdd",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-reuse-1",
+            "uid": "9f4da7af-a714-474d-a3b5-808a3e408e22"
+          }
+        ],
+        "resourceVersion": "39847754",
+        "uid": "62711ee2-f164-41bf-bdd3-40d000d07ab4"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-reuse-1",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "16384"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "arm64",
+                  "kubernetes.io/hostname": "etri-ser0003-cg0ms0"
+                },
+                "restartPolicy": "Never",
+                "runtimeClassName": "nvidia-spark",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-multi-gpu",
+                "memory": "hairp-multi-gpu",
+                "nvidia.com/gpu": "hairp-multi-gpu"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-ser0003-cg0ms0"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:48:09Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:09Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:17Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:17Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:48:10Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "aff7666a-e6df-4402-bcdf-b86bf8d700e9"
+        },
+        "name": "job-profile-pool-20261008-v2-reuse-2-994c5",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-reuse-2",
+            "uid": "aff7666a-e6df-4402-bcdf-b86bf8d700e9"
+          }
+        ],
+        "resourceVersion": "39847727",
+        "uid": "226a92bb-eba5-417d-ab60-33eec9112245"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-reuse-2",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "16384"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "amd64",
+                  "kubernetes.io/hostname": "etri-ser0001-cg0msb"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-multi-gpu",
+                "memory": "hairp-multi-gpu",
+                "nvidia.com/gpu": "hairp-multi-gpu"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-ser0001-cg0msb"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:48:10Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:10Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:16Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:16Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:48:10Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "84749895-79b6-4fe8-b68f-ac53b4956b9a"
+        },
+        "name": "job-profile-pool-20261008-v2-reuse-3-914dd",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-reuse-3",
+            "uid": "84749895-79b6-4fe8-b68f-ac53b4956b9a"
+          }
+        ],
+        "resourceVersion": "39847843",
+        "uid": "a53f5189-5cc1-4347-859a-cd97098bb05d"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-reuse-3",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "16384"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "amd64",
+                  "kubernetes.io/hostname": "etri-ser0002-cgnmsb"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-multi-gpu",
+                "memory": "hairp-multi-gpu",
+                "nvidia.com/gpu": "hairp-multi-gpu"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-ser0002-cgnmsb"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:48:16Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:16Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:22Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:22Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "kueue.x-k8s.io/v1beta2",
+      "kind": "Workload",
+      "metadata": {
+        "creationTimestamp": "2026-10-08T09:48:10Z",
+        "generation": 1,
+        "labels": {
+          "kueue.x-k8s.io/job-uid": "6e26dbee-bd14-4530-b5f6-a3033f7da33b"
+        },
+        "name": "job-profile-pool-20261008-v2-reuse-4-d136e",
+        "namespace": "resource-advisor-lab",
+        "ownerReferences": [
+          {
+            "apiVersion": "batch/v1",
+            "blockOwnerDeletion": true,
+            "controller": true,
+            "kind": "Job",
+            "name": "profile-pool-20261008-v2-reuse-4",
+            "uid": "6e26dbee-bd14-4530-b5f6-a3033f7da33b"
+          }
+        ],
+        "resourceVersion": "39847905",
+        "uid": "ac329d38-0dcf-4f3d-b88e-e78ed5445b45"
+      },
+      "spec": {
+        "active": true,
+        "podSets": [
+          {
+            "count": 1,
+            "name": "main",
+            "template": {
+              "metadata": {
+                "labels": {
+                  "batch.kubernetes.io/job-name": "profile-pool-20261008-v2-reuse-4",
+                  "resource-advisor/experiment": "profile-pool-20261008-v2"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "command": [
+                      "python",
+                      "-u",
+                      "/experiment/workload.py",
+                      "--fixture",
+                      "/experiment/fixture.json",
+                      "--rounds",
+                      "16384"
+                    ],
+                    "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+                    "imagePullPolicy": "IfNotPresent",
+                    "name": "inference",
+                    "resources": {
+                      "limits": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      },
+                      "requests": {
+                        "cpu": "1",
+                        "memory": "512Mi",
+                        "nvidia.com/gpu": "1"
+                      }
+                    },
+                    "terminationMessagePath": "/dev/termination-log",
+                    "terminationMessagePolicy": "File",
+                    "volumeMounts": [
+                      {
+                        "mountPath": "/experiment",
+                        "name": "experiment",
+                        "readOnly": true
+                      }
+                    ]
+                  }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                  "kubernetes.io/arch": "arm64",
+                  "kubernetes.io/hostname": "etri-ser0003-cg0ms0"
+                },
+                "restartPolicy": "Never",
+                "runtimeClassName": "nvidia-spark",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                  {
+                    "configMap": {
+                      "defaultMode": 420,
+                      "name": "profile-pool-20261008-v2-source"
+                    },
+                    "name": "experiment"
+                  }
+                ]
+              }
+            },
+            "topologyRequest": {
+              "podIndexLabel": "batch.kubernetes.io/job-completion-index"
+            }
+          }
+        ],
+        "priority": 0,
+        "queueName": "ra-f0-gpu"
+      },
+      "status": {
+        "admission": {
+          "clusterQueue": "hairp-gpu-pool",
+          "podSetAssignments": [
+            {
+              "count": 1,
+              "flavors": {
+                "cpu": "hairp-multi-gpu",
+                "memory": "hairp-multi-gpu",
+                "nvidia.com/gpu": "hairp-multi-gpu"
+              },
+              "name": "main",
+              "resourceUsage": {
+                "cpu": "1",
+                "memory": "512Mi",
+                "nvidia.com/gpu": "1"
+              },
+              "topologyAssignment": {
+                "levels": [
+                  "kubernetes.io/hostname"
+                ],
+                "slices": [
+                  {
+                    "domainCount": 1,
+                    "podCounts": {
+                      "universal": 1
+                    },
+                    "valuesPerLevel": [
+                      {
+                        "universal": "etri-ser0003-cg0ms0"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-10-08T09:48:18Z",
+            "message": "Quota reserved in ClusterQueue hairp-gpu-pool",
+            "observedGeneration": 1,
+            "reason": "QuotaReserved",
+            "status": "True",
+            "type": "QuotaReserved"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:18Z",
+            "message": "The workload is admitted",
+            "observedGeneration": 1,
+            "reason": "Admitted",
+            "status": "True",
+            "type": "Admitted"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:27Z",
+            "message": "Reached expected number of succeeded pods",
+            "observedGeneration": 1,
+            "reason": "Succeeded",
+            "status": "True",
+            "type": "Finished"
+          },
+          {
+            "lastTransitionTime": "2026-10-08T09:48:27Z",
+            "message": "All pods reached readiness and the workload is running",
+            "observedGeneration": 1,
+            "reason": "Recovered",
+            "status": "True",
+            "type": "PodsReady"
+          }
+        ]
+      }
+    }
+  ]
+}

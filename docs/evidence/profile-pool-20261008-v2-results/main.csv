@@ -1,0 +1,11 @@
+arm,attempt_id,candidate,resource_key,jct_seconds,wait_seconds,accelerator_slot_seconds,synchronized_inference_seconds,images,quality,accuracy
+baseline,profile-pool-20261008-v2-baseline-0,rtx5060,nvidia.com/gpu,3.0,1.0,2.0,1.0428474332438782,4194304,1.0,0.98046875
+baseline,profile-pool-20261008-v2-baseline-1,spark,nvidia.com/gpu,4.0,1.0,3.0,0.9296542499942007,4194304,1.0,0.98046875
+baseline,profile-pool-20261008-v2-baseline-2,jetson-nano,nvidia.com/gpu.shared,11.0,1.0,10.0,7.285137895451044,4194304,1.0,0.98046875
+baseline,profile-pool-20261008-v2-baseline-3,jetson-agx,nvidia.com/gpu.shared,9.0,1.0,8.0,5.090875094654621,4194304,1.0,0.98046875
+baseline,profile-pool-20261008-v2-baseline-4,rtx5080,nvidia.com/gpu,3.0,1.0,2.0,0.6189208389259875,4194304,1.0,0.98046875
+reuse,profile-pool-20261008-v2-reuse-0,rtx5080,nvidia.com/gpu,3.0,1.0,2.0,0.6183369730133563,4194304,1.0,0.98046875
+reuse,profile-pool-20261008-v2-reuse-1,spark,nvidia.com/gpu,4.0,2.0,2.0,0.9327882213838166,4194304,1.0,0.98046875
+reuse,profile-pool-20261008-v2-reuse-2,rtx5060,nvidia.com/gpu,3.0,1.0,2.0,1.0439351309323683,4194304,1.0,0.98046875
+reuse,profile-pool-20261008-v2-reuse-3,rtx5080,nvidia.com/gpu,9.0,7.0,2.0,0.619069586507976,4194304,1.0,0.98046875
+reuse,profile-pool-20261008-v2-reuse-4,spark,nvidia.com/gpu,12.0,10.0,2.0,0.9392468819569331,4194304,1.0,0.98046875

@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "scope": "actual one cohort per arm; no new execution during export/audit",
+  "frozen_source": true,
+  "qualification_jobs": 6,
+  "main_jobs": 10,
+  "successful_jobs": 15,
+  "failed_jobs": 1,
+  "slurm_jobs": 0,
+  "kueue_workload_records": 16,
+  "artifacts": [
+    {
+      "path": "capture.json",
+      "sha256": "349d9e277e213be085ded3fd6901b1a8fd6b7afc131a0ec1b72fba79bd5eebba",
+      "bytes": 12873567
+    },
+    {
+      "path": "fixture.json",
+      "sha256": "644a0c537bd997d18ce29e22ca5074ba5d8dccf340b8b39a2fb435de2113ba25",
+      "bytes": 564033
+    },
+    {
+      "path": "frozen-workload.py.txt",
+      "sha256": "d1f5a96f0a8896d4710c77c698e883df3cd0c09fb1cd4ad2037f6e118093bd6d",
+      "bytes": 9825
+    },
+    {
+      "path": "kueue-workloads.json",
+      "sha256": "6ea808d754360931718dd44254528360a842b7ba2fa3a6d13a7ff4a7d0d70072",
+      "bytes": 94921
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-baseline-0.log",
+      "sha256": "cbb4431661da6157096a102457972b8ee94b0dfc44672461f9d6a220d7e8d940",
+      "bytes": 381248
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-baseline-1.log",
+      "sha256": "32b1363c5ce39c659693843bb258255ae48f1807bd8b125da7838819dfd9b54f",
+      "bytes": 386710
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-baseline-2.log",
+      "sha256": "df940f34584cf445182be30e962aea63212c5c6a78d08883c8941569785fb880",
+      "bytes": 393452
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-baseline-3.log",
+      "sha256": "7e2c044fd4e4dffd3c87566ee4f41f72b1d1f4ea8aeee250c636f485ec170f2b",
+      "bytes": 392048
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-baseline-4.log",
+      "sha256": "6eff60a6d6e5b58f22ec4ba5d41d5c3c6cf6d45405465a7ea2a2f869a67711dd",
+      "bytes": 386669
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-f0-jetson-agx.log",
+      "sha256": "c9268377e22e70835324106403925ffaf707083638ba86a3030b54338c86d261",
+      "bytes": 1148
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-f0-jetson-nano.log",
+      "sha256": "69c9e41fc7ce930929732491c8ca7aa17bd21324eb635345e6a26e1a4889914d",
+      "bytes": 1148
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-f0-rtx5060.log",
+      "sha256": "293bf3cce3082dd49fa2b1770234c4d41919c0aaa0ba16999397c5c3933b56f8",
+      "bytes": 1128
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-f0-rtx5080.log",
+      "sha256": "265a4947ada940cce152c17d4d8f33a919490ca38b4544a7b8c3ba9cad5677e6",
+      "bytes": 1129
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-f0-spark-runtime.log",
+      "sha256": "360ae6a1d529f422907308157c6480b8d5d3b17d004d8d244e6eb15cca8a42e3",
+      "bytes": 1113
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-f0-spark.log",
+      "sha256": "8667d78c383385d255056e16179e5df17a561da942abf0c316e36a786124b295",
+      "bytes": 632
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-reuse-0.log",
+      "sha256": "d6f5a706605e7f9587eec000d799d72354310cfa001c2a4eb4a3e1d73211fd18",
+      "bytes": 386569
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-reuse-1.log",
+      "sha256": "35b09b57b2ff86d7bcc946eb5a033f20fd764d5e3017d0e2cea73f416c49c955",
+      "bytes": 386648
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-reuse-2.log",
+      "sha256": "f3e80114955e07b06f4e16637a0ad1ae79056fe89c156535fff8c39c0be0fc5e",
+      "bytes": 381342
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-reuse-3.log",
+      "sha256": "b725a3650f60811d42c32063209baded6cbfe0e700cc72ada9365b696099eaa9",
+      "bytes": 386666
+    },
+    {
+      "path": "logs/profile-pool-20261008-v2-reuse-4.log",
+      "sha256": "7e07e236d2bdb80e85d1189f92294952ac138286e9cfacc426dceacea0a318d1",
+      "bytes": 386497
+    },
+    {
+      "path": "main.csv",
+      "sha256": "dd241930fcd93c8ddf8005051977f8917324372fe4dc2987184492ddee2a0a9c",
+      "bytes": 1349
+    },
+    {
+      "path": "plan-before-user-shortening.json",
+      "sha256": "f7eca7feeb5f5e105676fbf42f68953157dd4501c42cb1c9b44fddd88aa0bf8e",
+      "bytes": 2552
+    },
+    {
+      "path": "plan.json",
+      "sha256": "b3a431d41a2ffffca2879361e238e32130303e9e6e4a41112ab3dd53ed524f51",
+      "bytes": 3219
+    },
+    {
+      "path": "pool-readback.json",
+      "sha256": "601fffb31604b6f7e5af91ee7e89bcc223358e5572393fdef194a108cc97c1aa",
+      "bytes": 10532
+    },
+    {
+      "path": "source.json",
+      "sha256": "bae664fc8271ca42789256b8c4741bb5558dd725b96a4e73358e6124f89f6396",
+      "bytes": 574594
+    },
+    {
+      "path": "summary.json",
+      "sha256": "2f86748a782d9dd73f650d6986e3da2399e7cbee9fc76ff0d0252ad2bc24e623",
+      "bytes": 8190
+    }
+  ],
+  "reproduction_code": [
+    {
+      "path": "examples/prepare_pool_inference.py",
+      "sha256": "364cb3e74486671508704d3f5218960f2c4b5b0f12b2f06f59bc8a5d1246554f"
+    },
+    {
+      "path": "examples/run_pool_inference.py",
+      "sha256": "65d9a415a7150ecb12eabcd08638e6153e8c570a12f58683d150ad80a016d934"
+    },
+    {
+      "path": "examples/analyze_pool_inference.py",
+      "sha256": "3e5c4910e5d37e712bbe3c6d40cbf66df1990a325e1c573b716193acf9afc717"
+    },
+    {
+      "path": "src/resource_advisor/profile_reuse_evaluation.py",
+      "sha256": "193a41de975c832eeece1f3375641d59d981dccacc9829cad491e6e9b9f2b48b"
+    }
+  ],
+  "report": {
+    "path": "docs/profile-pool-20261008-v2-results.md",
+    "sha256": "4c87bc8b5d0cc9ded399490d3381a7e290ec5cb44865af2f9cf798ad1c2797e8"
+  }
+}

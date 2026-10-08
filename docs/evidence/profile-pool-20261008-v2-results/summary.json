@@ -1,0 +1,205 @@
+{
+  "arms": {
+    "baseline": {
+      "jobs": 5,
+      "mean_jct_seconds": 6.0,
+      "p95_jct_seconds": 11.0,
+      "mean_wait_seconds": 1.0,
+      "wall_seconds": 11.0,
+      "throughput_jobs_per_hour": 1636.3636363636363,
+      "throughput_images_per_second": 1906501.8181818181,
+      "accelerator_slot_seconds": 25.0,
+      "accelerator_slot_hours": 0.006944444444444444,
+      "physical_gpu_hours": null,
+      "slot_occupancy_percent": 227.27272727272728,
+      "nominal_pool_slot_occupancy_percent": 32.46753246753247,
+      "synchronized_inference_seconds": 14.96743551226973,
+      "mean_synchronized_inference_seconds": 2.9934871024539462,
+      "sensors_by_native_job": [
+        {
+          "attempt_id": "profile-pool-20261008-v2-baseline-0",
+          "node": "rtx5060",
+          "sources": [
+            "nvml-physical-uuid"
+          ],
+          "sampled_load_percent": 64.19357947239263,
+          "observed_seconds": 1.0021483898162842,
+          "samples": 6,
+          "scope": "physical-device load in sampled execution windows; source-specific, no per-job attribution"
+        },
+        {
+          "attempt_id": "profile-pool-20261008-v2-baseline-1",
+          "node": "spark",
+          "sources": [
+            "nvml-physical-uuid"
+          ],
+          "sampled_load_percent": 0.0,
+          "observed_seconds": 0.8059871196746826,
+          "samples": 5,
+          "scope": "physical-device load in sampled execution windows; source-specific, no per-job attribution"
+        },
+        {
+          "attempt_id": "profile-pool-20261008-v2-baseline-2",
+          "node": "jetson-nano",
+          "sources": [
+            "jetson-gpu-load-permille"
+          ],
+          "sampled_load_percent": 87.64739120619528,
+          "observed_seconds": 7.231211185455322,
+          "samples": 37,
+          "scope": "physical-device load in sampled execution windows; source-specific, no per-job attribution"
+        },
+        {
+          "attempt_id": "profile-pool-20261008-v2-baseline-3",
+          "node": "jetson-agx",
+          "sources": [
+            "jetson-gpu-load-permille"
+          ],
+          "sampled_load_percent": 77.93957689555756,
+          "observed_seconds": 5.021929502487183,
+          "samples": 26,
+          "scope": "physical-device load in sampled execution windows; source-specific, no per-job attribution"
+        },
+        {
+          "attempt_id": "profile-pool-20261008-v2-baseline-4",
+          "node": "rtx5080",
+          "sources": [
+            "nvml-physical-uuid"
+          ],
+          "sampled_load_percent": 73.25547476455307,
+          "observed_seconds": 0.6024084091186523,
+          "samples": 4,
+          "scope": "physical-device load in sampled execution windows; source-specific, no per-job attribution"
+        }
+      ],
+      "continuous_pool_gpu_utilization_percent": null
+    },
+    "reuse": {
+      "jobs": 5,
+      "mean_jct_seconds": 6.2,
+      "p95_jct_seconds": 12.0,
+      "mean_wait_seconds": 4.2,
+      "wall_seconds": 13.0,
+      "throughput_jobs_per_hour": 1384.6153846153848,
+      "throughput_images_per_second": 1613193.8461538462,
+      "accelerator_slot_seconds": 10.0,
+      "accelerator_slot_hours": 0.002777777777777778,
+      "physical_gpu_hours": null,
+      "slot_occupancy_percent": 76.92307692307693,
+      "nominal_pool_slot_occupancy_percent": 10.98901098901099,
+      "synchronized_inference_seconds": 4.15337679379445,
+      "mean_synchronized_inference_seconds": 0.8306753587588901,
+      "sensors_by_native_job": [
+        {
+          "attempt_id": "profile-pool-20261008-v2-reuse-0",
+          "node": "rtx5080",
+          "sources": [
+            "nvml-physical-uuid"
+          ],
+          "sampled_load_percent": 43.2636782739857,
+          "observed_seconds": 0.6025447845458984,
+          "samples": 4,
+          "scope": "physical-device load in sampled execution windows; source-specific, no per-job attribution"
+        },
+        {
+          "attempt_id": "profile-pool-20261008-v2-reuse-1",
+          "node": "spark",
+          "sources": [
+            "nvml-physical-uuid"
+          ],
+          "sampled_load_percent": 31.388732910264775,
+          "observed_seconds": 0.8045182228088379,
+          "samples": 5,
+          "scope": "physical-device load in sampled execution windows; source-specific, no per-job attribution"
+        },
+        {
+          "attempt_id": "profile-pool-20261008-v2-reuse-2",
+          "node": "rtx5060",
+          "sources": [
+            "nvml-physical-uuid"
+          ],
+          "sampled_load_percent": 64.7079352849256,
+          "observed_seconds": 1.0019500255584717,
+          "samples": 6,
+          "scope": "physical-device load in sampled execution windows; source-specific, no per-job attribution"
+        },
+        {
+          "attempt_id": "profile-pool-20261008-v2-reuse-3",
+          "node": "rtx5080",
+          "sources": [
+            "nvml-physical-uuid"
+          ],
+          "sampled_load_percent": 15.791400136100714,
+          "observed_seconds": 0.6026124954223633,
+          "samples": 4,
+          "scope": "physical-device load in sampled execution windows; source-specific, no per-job attribution"
+        },
+        {
+          "attempt_id": "profile-pool-20261008-v2-reuse-4",
+          "node": "spark",
+          "sources": [
+            "nvml-physical-uuid"
+          ],
+          "sampled_load_percent": 31.386366638334167,
+          "observed_seconds": 0.8050370216369629,
+          "samples": 5,
+          "scope": "physical-device load in sampled execution windows; source-specific, no per-job attribution"
+        }
+      ],
+      "continuous_pool_gpu_utilization_percent": null
+    }
+  },
+  "improvements_percent": {
+    "mean_jct_seconds": -3.333333333333336,
+    "p95_jct_seconds": -9.090909090909092,
+    "mean_wait_seconds": -320.0,
+    "throughput_jobs_per_hour": -15.38461538461537,
+    "throughput_images_per_second": -15.384615384615378,
+    "main_accelerator_slot_seconds": 60.0,
+    "synchronized_inference_seconds": 72.25057832793286
+  },
+  "p95_method": "nearest rank over five Jobs per arm = maximum; descriptive only",
+  "utilization_scope": "per-node NVML/sysfs sampled windows and native slot occupancy; continuous pool utilization unknown",
+  "profile_upfront": {
+    "accelerator_slot_seconds": 10.0,
+    "wall_seconds": 117.0,
+    "failed_native_attempts": 1,
+    "successful_microprofiles": 5,
+    "cpu_model_training_cost": "shared preparation; not measured, not zero"
+  },
+  "net_cost": {
+    "baseline_slot_seconds": 25.0,
+    "reuse_with_profile_slot_seconds": 20.0,
+    "nominal_slot_reduction_percent": 19.999999999999996,
+    "observed_at_jobs": 5,
+    "established_physical_gpu_payback": false,
+    "interpretation": "whole-second mixed accelerator-slot allocation proxy; no prices or exclusive physical GPU-hours verified",
+    "net_difference_timestamp_resolution_bound_seconds": 16,
+    "net_difference_direction_established": false,
+    "baseline_wall_seconds": 11.0,
+    "reuse_with_setup_wall_seconds": 130.0,
+    "observed_wall_payback_jobs": null,
+    "net_wall_reduction_percent": -1081.8181818181818
+  },
+  "policy_runs_per_arm": 1,
+  "native_main_jobs_per_arm": 5,
+  "physical_k8s_gpu_nodes": 5,
+  "nominal_gpu_slots": 7,
+  "main_successes": 10,
+  "main_failures": 0,
+  "unique_validation_images": 256,
+  "reused_images_per_main_job": 4194304,
+  "accuracy": 0.98046875,
+  "reference_agreement": 1,
+  "slurm_native_jobs": 0,
+  "slurm_status": "controller unavailable; two compute hosts reachable; no Slurm jobs submitted",
+  "deployed_production_scheduling_changed": false,
+  "limitations": [
+    "single cohort; no confidence interval or repeatability claim",
+    "mixed exclusive/shared accelerator-slot time is not verified physical GPU-hours",
+    "native timestamps have whole-second resolution; net five-slot-second saving can reverse within quantization bound",
+    "profile work-size scaling only informed placement; profile/main source digests identical",
+    "fixture contains256 actual held-out images repeatedly inferred; no model training speedup",
+    "Slurm controller unavailable; this is not a complete Kubernetes+Slurm comparison"
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "experiment_id": "profile-pool-20261008-v2",
+  "created_at": "2026-10-08T09:44:39.942072+00:00",
+  "seed": 20261008,
+  "pool": [
+    {
+      "ref": "rtx5060",
+      "node": "etri-ser0001-cg0msb",
+      "arch": "amd64",
+      "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+      "resource_key": "nvidia.com/gpu"
+    },
+    {
+      "ref": "spark",
+      "node": "etri-ser0003-cg0ms0",
+      "arch": "arm64",
+      "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+      "resource_key": "nvidia.com/gpu"
+    },
+    {
+      "ref": "jetson-nano",
+      "node": "etri-dev0001-jetorn",
+      "arch": "arm64",
+      "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+      "resource_key": "nvidia.com/gpu.shared"
+    },
+    {
+      "ref": "jetson-agx",
+      "node": "etri-dev0005-jetagx",
+      "arch": "arm64",
+      "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:57f7bb3fe29c18ab3cc1dfc4b0296dbfb707c45fd872ab0315b4997c7f577a3a",
+      "resource_key": "nvidia.com/gpu.shared"
+    },
+    {
+      "ref": "rtx5080",
+      "node": "etri-ser0002-cgnmsb",
+      "arch": "amd64",
+      "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+      "resource_key": "nvidia.com/gpu"
+    }
+  ],
+  "slurm_status": "controller unreachable at preflight; no claim of Slurm execution",
+  "fixture_sha256": "644a0c537bd997d18ce29e22ca5074ba5d8dccf340b8b39a2fb435de2113ba25",
+  "source_sha256": "d1f5a96f0a8896d4710c77c698e883df3cd0c09fb1cd4ad2037f6e118093bd6d",
+  "qualification_rounds": 8,
+  "main_rounds": 2048,
+  "profile_independent_jobs_per_node": 1,
+  "jobs_per_arm": 30,
+  "paired_blocks": 1,
+  "resources": {
+    "cpu": 1,
+    "memory_mib": 512,
+    "accelerators": 1
+  },
+  "queue": "ra-f0-gpu",
+  "baseline_policy": "balanced physical-node round robin without measured profiles",
+  "profile_policy": "min predicted completion time with frozen same-work profiles and per-physical-node queued work",
+  "limits": {
+    "per_job_seconds": 300,
+    "protocol_seconds": 3600
+  },
+  "quality": {
+    "minimum_accuracy": 0.9,
+    "reference_top1_agreement": 1,
+    "atol": 0.003,
+    "rtol": 0.001
+  },
+  "replication": "one cohort per arm; descriptive results only; one profile per candidate, no production recommendation override"
+}
