@@ -1,0 +1,444 @@
+{
+  "schema_version": "right-sizing-reference-plan-v3",
+  "experiment_id": "right-sizing-reference-20261008-v3",
+  "parent_experiment_id": "right-sizing-20261007-v1",
+  "source_commit": "bb2f8342a54e9ae0f3fc53fd2a83baf854449a4f",
+  "source_digest": "sha256:d02947e57991eb1212432bdf8abc5015afb3709e29c99104e0ba3a8dcad4d4a7",
+  "declared_at": "2026-10-08T01:36:19.841267+00:00",
+  "purpose": "Complete W2 finite reference once with adequate native startup allowance; retain both earlier failed characterizations and all fixed search/main results.",
+  "reason": "Native activeDeadlineSeconds includes startup. v2 W2 13s cap was consumed by 11s container startup; use predeclared 1500s confirmation reserve, never add queue allowance to native deadline silently.",
+  "unchanged": [
+    "logical workload identity",
+    "model/data/input/precision/work units",
+    "quality thresholds",
+    "six CPU/memory configurations",
+    "original random/qLogNEI budgets and decisions"
+  ],
+  "whole_protocol_wall_seconds": 2400,
+  "reference_strategy": "grid_characterization",
+  "probes_per_candidate": 2,
+  "confirmations_per_candidate": 3,
+  "reference_selection_rule": "Use all six candidates with three independent confirmations each. No retry until successful; incomplete means no finite-space distance claim. W1 v2 remains separately reported. Later-day descriptive reference is not contemporaneous oracle.",
+  "first_use_cost_policy": "Reference characterization costs are reported separately and in total protocol usage; not hidden inside a claimed deployment saving",
+  "controller_source_commit": "1b1bb48362fcd0fc78e8e46b34e1a0b13dc85b4c",
+  "maximum_jobs": {
+    "gpu_qualification": 2,
+    "gpu_reference": 30,
+    "total": 32
+  },
+  "qualification": "Two fresh model/shape/runtime qualifications. Verify unchanged signatures and source ConfigMap digest; abort if hardware/runtime differs. No capability timestamp extension.",
+  "per_study_budget": {
+    "max_probes": 12,
+    "candidate_count": 6,
+    "total_wall_seconds": 2100,
+    "final_validation_seconds": 1500,
+    "physical_gpu_seconds": 2100,
+    "max_run_seconds": 60,
+    "max_queue_seconds": 120
+  },
+  "seed": 20261008,
+  "contracts": [
+    {
+      "name": "W2",
+      "workload": {
+        "schema_version": "v1",
+        "ref": "right-sizing-w2-reference-20261008-v3",
+        "project_ref": "ra-lab",
+        "identity": {
+          "code_digest": "sha256:d02947e57991eb1212432bdf8abc5015afb3709e29c99104e0ba3a8dcad4d4a7",
+          "model_digest": "sha256:8214aaa63bcd908f735169fc2b2ef4846a926a58b8527c5c7424004e063ec855",
+          "dataset_version": "right-sizing-generated-w2-20261007",
+          "config_digest": "sha256:02452b30b7728a406fcf2de4fc1fb738d5e87ffae6c518f9ad808537596e8b03",
+          "task_type": "inference",
+          "input_shape": [
+            1,
+            3,
+            256,
+            256
+          ],
+          "batch_size": 1,
+          "global_batch_size": null,
+          "gradient_accumulation": 1,
+          "precision": "fp32",
+          "seed": 20261007,
+          "work_units": 12,
+          "quality_contract_digest": "sha256:6b99f576ffccb0aafad4d98064bb6b5ce7c001a8cbb044ec7aff9ed828a5f88d",
+          "measurement_boundary": "cnn-preprocess-transfer-32-forwards-synchronize-per-block-v1",
+          "model_name": "generated-three-convolution-CNN"
+        },
+        "candidates": [
+          {
+            "ref": "cpu0-5-mem1024",
+            "variant_ref": "variant-right-sizing-w2-reference-20261008-v3",
+            "capability_ref": "cap-right-sizing-w2-20261008-v3",
+            "backend": "kubernetes",
+            "context": {
+              "arch": "amd64",
+              "environment_digest": "sha256:e61b117fc737546490a7126399cb551947f78e4de88de78220f8e77f35382396",
+              "runtime_versions": {
+                "pytorch": "2.8.0+cu128",
+                "cuda": "12.8",
+                "driver": "595.84"
+              },
+              "accelerator_model": "NVIDIA GeForce RTX 5080",
+              "memory_model": "discrete",
+              "power_mode": "unmanaged-default",
+              "allocation_mode": "physical_device",
+              "resources": {
+                "host_cpu": 0.5,
+                "host_memory_mib": 1024,
+                "accelerator_count": 1
+              },
+              "parameters": {},
+              "runtime_flags": {
+                "driver_version": "595.84",
+                "tf32": false,
+                "threads_from_cpu": true
+              },
+              "host_cpu_model": "Intel(R) Core(TM) Ultra 9 285"
+            }
+          },
+          {
+            "ref": "cpu0-5-mem2048",
+            "variant_ref": "variant-right-sizing-w2-reference-20261008-v3",
+            "capability_ref": "cap-right-sizing-w2-20261008-v3",
+            "backend": "kubernetes",
+            "context": {
+              "arch": "amd64",
+              "environment_digest": "sha256:e61b117fc737546490a7126399cb551947f78e4de88de78220f8e77f35382396",
+              "runtime_versions": {
+                "pytorch": "2.8.0+cu128",
+                "cuda": "12.8",
+                "driver": "595.84"
+              },
+              "accelerator_model": "NVIDIA GeForce RTX 5080",
+              "memory_model": "discrete",
+              "power_mode": "unmanaged-default",
+              "allocation_mode": "physical_device",
+              "resources": {
+                "host_cpu": 0.5,
+                "host_memory_mib": 2048,
+                "accelerator_count": 1
+              },
+              "parameters": {},
+              "runtime_flags": {
+                "driver_version": "595.84",
+                "tf32": false,
+                "threads_from_cpu": true
+              },
+              "host_cpu_model": "Intel(R) Core(TM) Ultra 9 285"
+            }
+          },
+          {
+            "ref": "cpu1-mem1024",
+            "variant_ref": "variant-right-sizing-w2-reference-20261008-v3",
+            "capability_ref": "cap-right-sizing-w2-20261008-v3",
+            "backend": "kubernetes",
+            "context": {
+              "arch": "amd64",
+              "environment_digest": "sha256:e61b117fc737546490a7126399cb551947f78e4de88de78220f8e77f35382396",
+              "runtime_versions": {
+                "pytorch": "2.8.0+cu128",
+                "cuda": "12.8",
+                "driver": "595.84"
+              },
+              "accelerator_model": "NVIDIA GeForce RTX 5080",
+              "memory_model": "discrete",
+              "power_mode": "unmanaged-default",
+              "allocation_mode": "physical_device",
+              "resources": {
+                "host_cpu": 1,
+                "host_memory_mib": 1024,
+                "accelerator_count": 1
+              },
+              "parameters": {},
+              "runtime_flags": {
+                "driver_version": "595.84",
+                "tf32": false,
+                "threads_from_cpu": true
+              },
+              "host_cpu_model": "Intel(R) Core(TM) Ultra 9 285"
+            }
+          },
+          {
+            "ref": "cpu1-mem2048",
+            "variant_ref": "variant-right-sizing-w2-reference-20261008-v3",
+            "capability_ref": "cap-right-sizing-w2-20261008-v3",
+            "backend": "kubernetes",
+            "context": {
+              "arch": "amd64",
+              "environment_digest": "sha256:e61b117fc737546490a7126399cb551947f78e4de88de78220f8e77f35382396",
+              "runtime_versions": {
+                "pytorch": "2.8.0+cu128",
+                "cuda": "12.8",
+                "driver": "595.84"
+              },
+              "accelerator_model": "NVIDIA GeForce RTX 5080",
+              "memory_model": "discrete",
+              "power_mode": "unmanaged-default",
+              "allocation_mode": "physical_device",
+              "resources": {
+                "host_cpu": 1,
+                "host_memory_mib": 2048,
+                "accelerator_count": 1
+              },
+              "parameters": {},
+              "runtime_flags": {
+                "driver_version": "595.84",
+                "tf32": false,
+                "threads_from_cpu": true
+              },
+              "host_cpu_model": "Intel(R) Core(TM) Ultra 9 285"
+            }
+          },
+          {
+            "ref": "cpu2-mem1024",
+            "variant_ref": "variant-right-sizing-w2-reference-20261008-v3",
+            "capability_ref": "cap-right-sizing-w2-20261008-v3",
+            "backend": "kubernetes",
+            "context": {
+              "arch": "amd64",
+              "environment_digest": "sha256:e61b117fc737546490a7126399cb551947f78e4de88de78220f8e77f35382396",
+              "runtime_versions": {
+                "pytorch": "2.8.0+cu128",
+                "cuda": "12.8",
+                "driver": "595.84"
+              },
+              "accelerator_model": "NVIDIA GeForce RTX 5080",
+              "memory_model": "discrete",
+              "power_mode": "unmanaged-default",
+              "allocation_mode": "physical_device",
+              "resources": {
+                "host_cpu": 2,
+                "host_memory_mib": 1024,
+                "accelerator_count": 1
+              },
+              "parameters": {},
+              "runtime_flags": {
+                "driver_version": "595.84",
+                "tf32": false,
+                "threads_from_cpu": true
+              },
+              "host_cpu_model": "Intel(R) Core(TM) Ultra 9 285"
+            }
+          },
+          {
+            "ref": "cpu2-mem2048",
+            "variant_ref": "variant-right-sizing-w2-reference-20261008-v3",
+            "capability_ref": "cap-right-sizing-w2-20261008-v3",
+            "backend": "kubernetes",
+            "context": {
+              "arch": "amd64",
+              "environment_digest": "sha256:e61b117fc737546490a7126399cb551947f78e4de88de78220f8e77f35382396",
+              "runtime_versions": {
+                "pytorch": "2.8.0+cu128",
+                "cuda": "12.8",
+                "driver": "595.84"
+              },
+              "accelerator_model": "NVIDIA GeForce RTX 5080",
+              "memory_model": "discrete",
+              "power_mode": "unmanaged-default",
+              "allocation_mode": "physical_device",
+              "resources": {
+                "host_cpu": 2,
+                "host_memory_mib": 2048,
+                "accelerator_count": 1
+              },
+              "parameters": {},
+              "runtime_flags": {
+                "driver_version": "595.84",
+                "tf32": false,
+                "threads_from_cpu": true
+              },
+              "host_cpu_model": "Intel(R) Core(TM) Ultra 9 285"
+            }
+          }
+        ],
+        "baseline_candidate_ref": "cpu1-mem2048",
+        "profiling": {
+          "consent": true,
+          "max_candidates": 6,
+          "max_wall_seconds_per_candidate": 60,
+          "max_queue_seconds": 120,
+          "total_wall_seconds": 2100,
+          "final_validation_seconds": 1500,
+          "mutable_parameters": [
+            "host_cpu",
+            "host_memory_mib"
+          ],
+          "checkpoint_digest": null,
+          "max_probes": 12,
+          "device_seconds": {
+            "kubernetes:gpu:NVIDIA GeForce RTX 5080:physical_device": 2100
+          }
+        },
+        "quality": {
+          "metric": "numerical_agreement",
+          "minimum": 1.0,
+          "minimum_repeats": 3,
+          "maximum_peak_memory_mib": 2048.0,
+          "max_profile_age_seconds": 7200
+        },
+        "execution": {
+          "max_run_seconds": 60,
+          "max_queue_seconds": 120,
+          "max_collection_seconds": 120
+        }
+      },
+      "variants": [
+        {
+          "ref": "variant-right-sizing-w2-reference-20261008-v3",
+          "workload_ref": "right-sizing-w2-reference-20261008-v3",
+          "project_ref": "ra-lab",
+          "workload_signature": "sha256:4ef5789a814dfcfd891e2ff607912313bdcc711d93a162fccb674d0e4242e2ec",
+          "arch": "amd64",
+          "accelerator_vendor": "nvidia",
+          "device_class": "gpu",
+          "precision": "fp32",
+          "model_digest": "sha256:8214aaa63bcd908f735169fc2b2ef4846a926a58b8527c5c7424004e063ec855",
+          "compiled_artifact_digest": null,
+          "image": "ghcr.io/mlflow/mlflow:v3.16.1@sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984",
+          "environment_digest": "sha256:e61b117fc737546490a7126399cb551947f78e4de88de78220f8e77f35382396",
+          "command": [
+            "python",
+            "-m",
+            "resource_advisor.transfer_gpu_benchmark"
+          ],
+          "pilot_command": [
+            "python",
+            "-m",
+            "resource_advisor.transfer_gpu_benchmark"
+          ],
+          "verification": "MODEL_VERIFIED",
+          "validation_refs": [
+            "ra-rs-v3-f0-w2-cpu1",
+            "ra-rs-v3-f0-w2-cpu2"
+          ],
+          "supported_shapes": [
+            [
+              1,
+              3,
+              256,
+              256
+            ]
+          ],
+          "runtime_versions": {
+            "pytorch": "2.8.0+cu128",
+            "cuda": "12.8",
+            "driver": "595.84"
+          },
+          "thermal_policy": {
+            "provider": "nvml-brackets-v1",
+            "driver_version": "595.84",
+            "device_uuid_digest": "sha256:0cbccca232e46b160588b3862c16c1cc6be79f3a314143ed1bf791203bfd0a4d",
+            "maximum_temperature_c": 80,
+            "maximum_gap_seconds": 0.5,
+            "maximum_query_seconds": 0.05
+          }
+        }
+      ]
+    }
+  ],
+  "independent_confirmation_layout": [
+    {
+      "unit_id": 1,
+      "block": 0,
+      "arm": "cpu0-5-mem1024"
+    },
+    {
+      "unit_id": 2,
+      "block": 0,
+      "arm": "cpu0-5-mem2048"
+    },
+    {
+      "unit_id": 3,
+      "block": 0,
+      "arm": "cpu1-mem2048"
+    },
+    {
+      "unit_id": 4,
+      "block": 0,
+      "arm": "cpu1-mem1024"
+    },
+    {
+      "unit_id": 5,
+      "block": 0,
+      "arm": "cpu2-mem2048"
+    },
+    {
+      "unit_id": 6,
+      "block": 0,
+      "arm": "cpu1-mem1024"
+    },
+    {
+      "unit_id": 7,
+      "block": 0,
+      "arm": "cpu2-mem1024"
+    },
+    {
+      "unit_id": 8,
+      "block": 0,
+      "arm": "cpu2-mem1024"
+    },
+    {
+      "unit_id": 9,
+      "block": 0,
+      "arm": "cpu1-mem2048"
+    },
+    {
+      "unit_id": 10,
+      "block": 0,
+      "arm": "cpu2-mem2048"
+    },
+    {
+      "unit_id": 11,
+      "block": 0,
+      "arm": "cpu0-5-mem2048"
+    },
+    {
+      "unit_id": 12,
+      "block": 0,
+      "arm": "cpu0-5-mem1024"
+    },
+    {
+      "unit_id": 13,
+      "block": 1,
+      "arm": "cpu0-5-mem2048"
+    },
+    {
+      "unit_id": 14,
+      "block": 1,
+      "arm": "cpu1-mem1024"
+    },
+    {
+      "unit_id": 15,
+      "block": 1,
+      "arm": "cpu1-mem2048"
+    },
+    {
+      "unit_id": 16,
+      "block": 1,
+      "arm": "cpu1-mem1024"
+    },
+    {
+      "unit_id": 17,
+      "block": 1,
+      "arm": "cpu0-5-mem1024"
+    },
+    {
+      "unit_id": 18,
+      "block": 1,
+      "arm": "cpu2-mem1024"
+    }
+  ],
+  "layout_scope": "Archived balanced randomization for prospective design; native grid planner uses its own deterministic shuffled schedule with the same seed. Layout is not asserted identical to planner schedule.",
+  "source_revision_scope": "Frozen benchmark/source ConfigMap remains bb2f834; controller is 1b1bb48, startup guard added after primary results. No new BO competitor and no retroactive timer attribution.",
+  "new_control_metrics": [
+    "native_startup_assessment"
+  ],
+  "missing_historical_costs": [
+    "image/fixture preparation",
+    "energy",
+    "shared-service CPU"
+  ]
+}
