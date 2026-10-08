@@ -1,0 +1,14 @@
+{
+  "recorded_at": 1791456347.7041972,
+  "reason": "user requested half remaining experiment time",
+  "previous_directory": "jct-profile-queue-20261008-v1",
+  "previous_schedule_sha256": "8b393225e42b905d7302d8c11029db401b2c8ca7f43561b747a0622c0e804355",
+  "amended_schedule_sha256": "bb992b5f69dc7fe7a96fa085785e9cff604ed50df820b61081fb30fa0d9e88f8",
+  "previous_attempted_main_jobs": 43,
+  "new_main_jobs": 162,
+  "new_cohorts": 27,
+  "jobs_per_cohort": 6,
+  "profiles_reused": 14,
+  "pilot_excluded_from_confirmatory_comparison": true,
+  "gate_unchanged": true
+}
