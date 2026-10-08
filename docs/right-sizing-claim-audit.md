@@ -1,6 +1,6 @@
 # Right-sizing claim acceptance audit
 
-상태: **K8s core 검증 / Slurm 신규 gate BLOCKED / 전체 완료 아님**. 코드 검사, 이전 실장비 증거, 새 실험을
+상태: **K8s core 및 새 Slurm feedback 검증 / 전체 범위 완료 아님**. 코드 검사, 이전 실장비 증거, 새 실험을
 분리한다. 이전 결과는 [baseline audit](right-sizing-gap-audit.md)와
 [재계산 기록](evidence/right-sizing-baseline-audit-v2.json)에 보존했다.
 
@@ -15,15 +15,15 @@
 | Random/BO 같은 예산 | study.py | trial mutation tests | 각 5 probes, 같은 wall/device/confirmation budget | PASS |
 | 독립 final confirmation | study.py | study/trial auditor tests | W1 3 jobs/study, W2 6 jobs/study | PASS; training profile 재사용 금지 |
 | Actual/reference residual+source ID | right_sizing.py, store.py | right_sizing/trial tests | GPU feedback12 / Hailo feedback1 | PASS; descriptive interval만 |
-| Actual 결과가 다음 결정에 반영 | service.py, right_sizing.py | lifecycle tests | post-main lookup W1 source6, W2 source9 | PASS K8s; 새 Slurm loop 미완료 |
+| Actual 결과가 다음 결정에 반영 | service.py, right_sizing.py | lifecycle / Slurm auditor tests | post-main lookup W1 source6, W2 source9 / Slurm source4 | PASS 두 backend; Slurm 단일 고정 후보 |
 | Stale/OOD/drift 거부 | uncertainty.py, policy.py | uncertainty/drift tests | 신규 TTL4개 422·Job0 / 기존 load-drift-v1 | PASS; 미래 predictive calibration 보장 안 함 |
 | Kubernetes/Kueue native 실행 | backends.py | backend/worker tests | primary GPU101 native Jobs, Hailo5 | PASS |
-| Slurm native 실행 보존 | backends.py | Slurm recovery tests | 기존 Orin 실제 실행·cancel·response loss/crash recovery | 기존 PASS; 새 controller 접근 BLOCKED |
-| 새 Slurm approved feedback loop | right_sizing.py, backends.py | 공통 terminal tests | 신규 Slurm run 없음 | BLOCKED: controller route / native RPC timeout |
+| Slurm native 실행 보존 | backends.py | Slurm recovery tests | 기존 recovery + 신규 Orin Job77–81 | PASS; scheduler 설정 불변 |
+| 새 Slurm approved feedback loop | right_sizing.py, backends.py | test_right_sizing_slurm_audit.py | right-sizing-slurm-feedback-v1.json / audit-v1 | PASS: qualification / observe3 / approve / execute / residual / next history |
 | Profiling/confirmation/fitting 비용 | study.py, accounting.py | strict cost/budget rejection tests | 신규 GPU/Hailo raw+total-cost audit | PASS; historical image/energy unknown |
 | 실패/취소/invalid 비용 | accounting.py | terminal/recovery tests | 신규 실패 grid3 / 기존 invalid Slurm·stopped predecessor | PASS; 실패 runtime을 0으로 학습 안 함 |
 | Positive/null/negative 보존 | domain auditors | baseline/trial mutation tests | 기존 BO/transfer/MF, 신규 same-selection·비용 회수 실패 | PASS |
-| 목표 기여 문장 전체 채택 | 이 표, contribution 문서 | evidence auditors | 새 Slurm loop / 같은 logical GPU↔NPU ranking 미증명 | OPEN; 전체 완료·최적화 성공 금지 |
+| 목표 기여 문장 전체 채택 | 이 표, contribution 문서 | evidence auditors | 양 backend feedback, GPU 자원 비교 / 같은 AI task GPU↔NPU ranking 미증명 | 넓은 가속기 최적 추천 주장은 OPEN; 성능 최적화 성공 금지 |
 | Qualified MF-KG | mfkg.py | numerical tests | 실제 calibration NOT_QUALIFIED | 조건부 비활성 |
 | Transfer/RGPE | transfer.py, rgpe.py | transfer tests | 기존 157 API jobs, 네 전략 같은 선택 | 기존 null result |
 | HAMi/eBPF 개선 | 별도 범위 | 실제 attribution과 분리 | 신규 core trial 없음 | 선택 확장 미완료 |
@@ -40,10 +40,15 @@
 | 실행 가능성을 검증 | RuntimeVariant, capability, digest·shape·quality gates | 검증 runtime만, 등록된 모든 장치 supported 아님 |
 | 제한된 profiling과 불확실성 기반 탐색 | 실제 constrained qLogNEI + budget + independent confirmation | 방법 구현·실제 탐색, 성능 우위와 calibrated forecast 제외 |
 | 적합한 이기종 가속기와 자원 구성 추천 | GPU resource 후보 비교; Hailo 단일 qualified candidate | 동일 task GPU/NPU 성능 ranking은 미증명 |
-| Kubernetes와 Slurm 결과를 다음 결정에 반영 | 기존 공통 계약/실행·history; 신규 immutable feedback | 새 K8s closed loop PASS, 새 Slurm loop BLOCKED |
+| Kubernetes와 Slurm 결과를 다음 결정에 반영 | 기존 공통 계약/실행·history; 신규 immutable feedback | 새 K8s loop 및 Slurm observe3→승인 실행→source4 PASS |
 | Profile-guided right-sizing 설계·구현 | 기존 모듈 재사용 + 신규 lifecycle/receipt/auditor | 시스템 계층 기여; native scheduler 기능 개발 주장 금지 |
 
 필수 gate 전체가 닫히기 전에는 전체 완료와 최적화 성공을 선언하지 않는다.
+
+2026-10-08 복귀 후의 [새 Slurm loop](right-sizing-slurm-feedback.md)는 아래 과거 BLOCKED
+관측과 구분한다. [Raw](evidence/right-sizing-slurm-feedback-v1.json)와
+[audit](evidence/right-sizing-slurm-audit-v1.json)은 실제 Job5개/421 GPU 예약초, 독립 승인
+결과와 다음 source4를 검증한다. [GPU5후보](pool-resource-coverage.md)는 운영 확장이다.
 
 
 새 총 사용량은 [cost capture](evidence/right-sizing-total-cost-capture-v1.json),

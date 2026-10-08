@@ -1,0 +1,74 @@
+{
+  "schema_version": "pool-resume-readback-v1",
+  "captured_at": "2026-10-08T06:26:09.167154+00:00",
+  "api_authenticated": true,
+  "pools": [
+    {
+      "backend": "kubernetes",
+      "status": "ok",
+      "node_count": 10
+    },
+    {
+      "backend": "slurm",
+      "status": "ok",
+      "node_count": 2
+    }
+  ],
+  "catalog": [
+    {
+      "workload_ref": "cuda-sustained-auto-v2",
+      "candidate_count": 5,
+      "models": [
+        "NVIDIA GeForce RTX 5060 Ti",
+        "NVIDIA GB10",
+        "Orin",
+        "Orin",
+        "NVIDIA GeForce RTX 5080"
+      ]
+    },
+    {
+      "workload_ref": "right-sizing-slurm-20261008-v1",
+      "candidate_count": 1,
+      "models": [
+        "Orin"
+      ]
+    },
+    {
+      "workload_ref": "cuda-smoke-auto-v1",
+      "candidate_count": 4,
+      "models": [
+        "NVIDIA GeForce RTX 5060 Ti",
+        "NVIDIA GB10",
+        "Orin",
+        "Orin"
+      ]
+    },
+    {
+      "workload_ref": "e5-kernel-cache-v2",
+      "candidate_count": 1,
+      "models": [
+        "NVIDIA GeForce RTX 5080"
+      ]
+    },
+    {
+      "workload_ref": "hailo-resnet50-disjoint100-v1",
+      "candidate_count": 1,
+      "models": [
+        "HAILO8"
+      ]
+    }
+  ],
+  "gpu_auto_template_visible": true,
+  "gitops_synced": true,
+  "gitops_healthy": true,
+  "source_commit_unchanged": true,
+  "new_slurm_feedback_lifecycle": "NEEDS_RECONFIRMATION",
+  "local_tests": {
+    "passed": 1170,
+    "skipped": 4,
+    "warnings": 3,
+    "seconds": 44.59,
+    "postgresql_ci_new_revision": "not_yet_checked"
+  },
+  "new_auditor_tests": 14
+}

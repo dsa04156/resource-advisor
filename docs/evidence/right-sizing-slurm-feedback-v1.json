@@ -1,0 +1,2969 @@
+{
+  "schema_version": "right-sizing-slurm-feedback-v1",
+  "evidence_kind": "hardware",
+  "experiment_id": "right-sizing-slurm-20261008-v1",
+  "plan_digest": "sha256:e8b137e1c43e6973833b846f0b5185fe0117e49985de1ee06d4a6595685362d0",
+  "started_at": "2026-10-08T05:59:50.989236+00:00",
+  "completed_at": "2026-10-08T06:09:00.039844+00:00",
+  "contracts": {
+    "capability": {
+      "ref": "cap-right-sizing-slurm-20261008-v1",
+      "node_ref": "slurm-w2",
+      "backend_cluster_id": "lab-slurm",
+      "backend": "slurm",
+      "observed_at": "2026-10-08T06:01:33.064600+00:00",
+      "valid_for_seconds": 7200,
+      "ready": true,
+      "arch": "arm64",
+      "accelerator_vendor": "nvidia",
+      "accelerator_model": "Orin",
+      "device_class": "gpu",
+      "allocation_mode": "physical_device",
+      "allocatable_count": 1,
+      "host_cpu": 1.0,
+      "host_memory_mib": 1024,
+      "resource_key": "gpu:orin_nano",
+      "runtime_versions": {
+        "pytorch": "2.5.0a0+872d972e41.nv24.08",
+        "cuda": "12.6"
+      },
+      "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+      "memory_model": "unified",
+      "power_mode": "uncontrolled-default",
+      "reservation_verified": true,
+      "isolation_verified": false,
+      "evidence_refs": [
+        "a-24cce27e733e4dd89328a1493378257a"
+      ]
+    },
+    "variant": {
+      "ref": "v-right-sizing-slurm-20261008-v1",
+      "workload_ref": "right-sizing-slurm-20261008-v1",
+      "project_ref": "ra-lab",
+      "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+      "arch": "arm64",
+      "accelerator_vendor": "nvidia",
+      "device_class": "gpu",
+      "precision": "fp32",
+      "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+      "compiled_artifact_digest": null,
+      "image": null,
+      "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+      "command": [
+        "/opt/resource-advisor/runtimes/torch-jetson-24.08/venv/bin/python",
+        "-I",
+        "/opt/resource-advisor/qualifications/orin-cnn-contract-v1/slurm_cnn_workload.py"
+      ],
+      "pilot_command": null,
+      "verification": "MODEL_VERIFIED",
+      "validation_refs": [
+        "a-24cce27e733e4dd89328a1493378257a"
+      ],
+      "supported_shapes": [
+        [
+          4,
+          3,
+          32,
+          32
+        ]
+      ],
+      "runtime_versions": {
+        "pytorch": "2.5.0a0+872d972e41.nv24.08",
+        "cuda": "12.6"
+      }
+    },
+    "workload": {
+      "schema_version": "v1",
+      "ref": "right-sizing-slurm-20261008-v1",
+      "project_ref": "ra-lab",
+      "identity": {
+        "code_digest": "sha256:ae41a73807559871b5d201122298f957282d029818335e4f8a892a3730685a4d",
+        "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+        "dataset_version": "generated-seed20261006-input878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+        "config_digest": "sha256:999180d474d5ab2616abb9be63989b3d89b6a401746d2851011726515dcdb69b",
+        "task_type": "benchmark",
+        "input_shape": [
+          4,
+          3,
+          32,
+          32
+        ],
+        "batch_size": 4,
+        "global_batch_size": null,
+        "gradient_accumulation": 1,
+        "precision": "fp32",
+        "seed": 20261006,
+        "work_units": 10,
+        "quality_contract_digest": "sha256:b56e74cbf6b4099db6255bde62fa9d4b61d749f4c1e4d913ba87cfd23a9553f3",
+        "measurement_boundary": "synchronized-cnn-forward-only-four-inputs-v1"
+      },
+      "candidates": [
+        {
+          "ref": "orin",
+          "variant_ref": "v-right-sizing-slurm-20261008-v1",
+          "capability_ref": "cap-right-sizing-slurm-20261008-v1",
+          "backend": "slurm",
+          "context": {
+            "arch": "arm64",
+            "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+            "runtime_versions": {
+              "pytorch": "2.5.0a0+872d972e41.nv24.08",
+              "cuda": "12.6"
+            },
+            "accelerator_model": "Orin",
+            "memory_model": "unified",
+            "power_mode": "uncontrolled-default",
+            "allocation_mode": "physical_device",
+            "resources": {
+              "host_cpu": 1.0,
+              "host_memory_mib": 1024,
+              "accelerator_count": 1
+            },
+            "parameters": {}
+          }
+        }
+      ],
+      "baseline_candidate_ref": "orin",
+      "profiling": {
+        "consent": false,
+        "max_candidates": 2,
+        "max_wall_seconds_per_candidate": 180,
+        "max_queue_seconds": 300,
+        "total_wall_seconds": 600,
+        "final_validation_seconds": 180,
+        "mutable_parameters": [],
+        "checkpoint_digest": null,
+        "max_probes": 8,
+        "device_seconds": {}
+      },
+      "quality": {
+        "metric": "numerical_agreement",
+        "minimum": 1.0,
+        "minimum_repeats": 3,
+        "maximum_peak_memory_mib": 1024.0,
+        "max_profile_age_seconds": 7200
+      },
+      "execution": {
+        "priority": "normal",
+        "max_run_seconds": 120,
+        "max_queue_seconds": 120,
+        "max_collection_seconds": 180
+      }
+    }
+  },
+  "cold_start": {
+    "recommendation": {
+      "ref": "rec-d946e58ef8a8412db3af80c4ad34e69e",
+      "workload_ref": "right-sizing-slurm-20261008-v1",
+      "workload_digest": "sha256:c542e03013072aaf095f12aff4121d6edc6deaf4e0b38545a6852b323676d382",
+      "status": "NEEDS_PROFILE",
+      "candidate_ref": null,
+      "measured": false,
+      "ranking": [],
+      "excluded": {
+        "orin": [
+          "NEEDS_PROFILE"
+        ]
+      },
+      "drift_evidence_refs": {},
+      "approval_required": true,
+      "created_at": "2026-10-08T06:02:08.513061+00:00",
+      "expires_at": "2026-10-08T06:17:08.513066+00:00",
+      "evidence_policy": "lookup-v2; last 2*max(3,minimum_repeats) runs; adjacent-block drift gate; mean +/- 3 standard errors, not a predictive interval",
+      "digest": "sha256:0095828d1543936ad889ecf3070f97e90300412eaab13f8d425ad1bdea93d884"
+    },
+    "lifecycle": {
+      "schema_version": "right-sizing-lifecycle-v1",
+      "workload_ref": "right-sizing-slurm-20261008-v1",
+      "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+      "workload_digest": "sha256:c542e03013072aaf095f12aff4121d6edc6deaf4e0b38545a6852b323676d382",
+      "state": "NEEDS_PROFILE",
+      "recommendability": {
+        "status": "NEEDS_PROFILE",
+        "ranking": [],
+        "excluded": {
+          "orin": [
+            "NEEDS_PROFILE"
+          ]
+        },
+        "approval_authorized": false
+      },
+      "distribution": {
+        "status": "UNSEEN_OR_INSUFFICIENT_EVIDENCE",
+        "in_distribution": null,
+        "predictive_interval_calibration": "NOT_QUALIFIED",
+        "semantics": "Exact workload/context evidence scope, not statistical OOD probability"
+      },
+      "reasons": [
+        "NEEDS_PROFILE"
+      ],
+      "assessed_at": "2026-10-08T06:02:08.696532+00:00",
+      "candidates": [
+        {
+          "candidate_ref": "orin",
+          "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+          "compatible": true,
+          "reasons": []
+        }
+      ],
+      "profile_refs": [],
+      "study_refs": [],
+      "recommendation_ref": "rec-d946e58ef8a8412db3af80c4ad34e69e",
+      "current_validity": {
+        "policy_version": "recommendation-reuse-v1",
+        "assessed_at": "2026-10-08T06:02:08.693084+00:00",
+        "recommendation_ref": "rec-d946e58ef8a8412db3af80c4ad34e69e",
+        "reusable": false,
+        "reasons": [
+          "NO_MEASURED_RECOMMENDATION"
+        ],
+        "residuals": [],
+        "drift_policy": {
+          "relative_error_limit": 0.25,
+          "consecutive_independent_runs": 3,
+          "semantics": "heuristic recheck trigger, not calibrated probability or root cause"
+        }
+      },
+      "feedback": [],
+      "additional_profiling_required": true,
+      "milestones": [
+        {
+          "state": "UNKNOWN",
+          "evidence_refs": [
+            "right-sizing-slurm-20261008-v1"
+          ],
+          "observed": true
+        },
+        {
+          "state": "COMPATIBILITY_CHECKED",
+          "evidence_refs": [
+            "orin"
+          ],
+          "observed": true
+        },
+        {
+          "state": "NEEDS_PROFILE",
+          "evidence_refs": [],
+          "observed": false
+        },
+        {
+          "state": "PROFILING",
+          "evidence_refs": [],
+          "observed": false
+        },
+        {
+          "state": "PROFILED",
+          "evidence_refs": [],
+          "observed": false
+        },
+        {
+          "state": "RECOMMENDABLE",
+          "evidence_refs": [],
+          "observed": false
+        },
+        {
+          "state": "RECOMMENDED",
+          "evidence_refs": [],
+          "observed": false
+        },
+        {
+          "state": "APPROVED",
+          "evidence_refs": [],
+          "observed": false
+        },
+        {
+          "state": "EXECUTED",
+          "evidence_refs": [],
+          "observed": false
+        },
+        {
+          "state": "VERIFIED",
+          "evidence_refs": [],
+          "observed": false
+        }
+      ],
+      "semantics": "Evidence projection, not a new Job state machine. VERIFIED means independent actual/reference comparison; no speedup or calibrated coverage guarantee."
+    },
+    "observed_at": "2026-10-08T06:02:08.698629+00:00"
+  },
+  "recommendation": {
+    "ref": "rec-af91d125964549a0af02cd1777831c66",
+    "workload_ref": "right-sizing-slurm-20261008-v1",
+    "workload_digest": "sha256:c542e03013072aaf095f12aff4121d6edc6deaf4e0b38545a6852b323676d382",
+    "status": "MEASURED_RECOMMENDATION",
+    "candidate_ref": "orin",
+    "measured": true,
+    "ranking": [
+      {
+        "candidate_ref": "orin",
+        "mean_seconds": 0.012069606610263387,
+        "interval_seconds": [
+          0.010187056281486785,
+          0.013952156939039988
+        ],
+        "independent_runs": 3,
+        "evidence_refs": [
+          "a-c89f8952180d4ed0ab758840b5e6653c",
+          "a-2b7b6e67ee124564a1a490bcfe78dfed",
+          "a-1c8261a25b3a4440a762fd3ab43f2354"
+        ]
+      }
+    ],
+    "excluded": {},
+    "drift_evidence_refs": {},
+    "approval_required": true,
+    "created_at": "2026-10-08T06:07:19.579505+00:00",
+    "expires_at": "2026-10-08T06:22:19.579513+00:00",
+    "evidence_policy": "lookup-v2; last 2*max(3,minimum_repeats) runs; adjacent-block drift gate; mean +/- 3 standard errors, not a predictive interval",
+    "digest": "sha256:ee5bb17d1699a7de7a615dcac8f82f3c0252c33868242d0a887f0cac65cf6c80"
+  },
+  "approval": {
+    "ref": "apr-f859cd8a75304fe18623c048f1ebfc8e",
+    "recommendation_ref": "rec-af91d125964549a0af02cd1777831c66",
+    "recommendation_digest": "sha256:ee5bb17d1699a7de7a615dcac8f82f3c0252c33868242d0a887f0cac65cf6c80",
+    "candidate_ref": "orin",
+    "workload_digest": "sha256:c542e03013072aaf095f12aff4121d6edc6deaf4e0b38545a6852b323676d382",
+    "expires_at": "2026-10-08T06:22:19.579513+00:00"
+  },
+  "next_recommendation": {
+    "ref": "rec-55893afb8421457691c33a7594d18373",
+    "workload_ref": "right-sizing-slurm-20261008-v1",
+    "workload_digest": "sha256:c542e03013072aaf095f12aff4121d6edc6deaf4e0b38545a6852b323676d382",
+    "status": "MEASURED_RECOMMENDATION",
+    "candidate_ref": "orin",
+    "measured": true,
+    "ranking": [
+      {
+        "candidate_ref": "orin",
+        "mean_seconds": 0.012048883480019867,
+        "interval_seconds": [
+          0.010716268418071275,
+          0.01338149854196846
+        ],
+        "independent_runs": 4,
+        "evidence_refs": [
+          "a-c89f8952180d4ed0ab758840b5e6653c",
+          "a-2b7b6e67ee124564a1a490bcfe78dfed",
+          "a-1c8261a25b3a4440a762fd3ab43f2354",
+          "a-a965ad6c371f4454bbf1522e8bec8105"
+        ]
+      }
+    ],
+    "excluded": {},
+    "drift_evidence_refs": {},
+    "approval_required": true,
+    "created_at": "2026-10-08T06:09:00.021633+00:00",
+    "expires_at": "2026-10-08T06:24:00.021641+00:00",
+    "evidence_policy": "lookup-v2; last 2*max(3,minimum_repeats) runs; adjacent-block drift gate; mean +/- 3 standard errors, not a predictive interval",
+    "digest": "sha256:ae4bcc3e0f256cef8b67e48cb27fceb845650f1dce959ad388eac9d05bcfee8b"
+  },
+  "attempts": [
+    {
+      "role": "qualification",
+      "index": 0,
+      "job_id": "j-86e6bf03770a497eb72b34bf0233ac38",
+      "attempt_id": "a-24cce27e733e4dd89328a1493378257a",
+      "native_job_id": "77",
+      "state": "SUCCEEDED",
+      "created_at": "2026-10-08T05:59:54.911081+00:00",
+      "request": {
+        "workload_ref": "slurm-orin-cnn-api-v1",
+        "mode": "observe",
+        "scheduling_profile_ref": "lab-standard-v1"
+      },
+      "spec": {
+        "schema_version": "v1",
+        "ref": "slurm-orin-cnn-api-v1",
+        "project_ref": "ra-lab",
+        "identity": {
+          "code_digest": "sha256:ae41a73807559871b5d201122298f957282d029818335e4f8a892a3730685a4d",
+          "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+          "dataset_version": "generated-seed20261006-input878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+          "config_digest": "sha256:999180d474d5ab2616abb9be63989b3d89b6a401746d2851011726515dcdb69b",
+          "task_type": "benchmark",
+          "input_shape": [
+            4,
+            3,
+            32,
+            32
+          ],
+          "batch_size": 4,
+          "global_batch_size": null,
+          "gradient_accumulation": 1,
+          "precision": "fp32",
+          "seed": 20261006,
+          "work_units": 10,
+          "quality_contract_digest": "sha256:ee1cb1e6bf3343341a9b677cacf861666714aae8e43d356d2ff42634444b9664",
+          "measurement_boundary": "synchronized-cnn-forward-only-four-inputs-v1"
+        },
+        "candidates": [
+          {
+            "ref": "orin",
+            "variant_ref": "v-slurm-orin-cnn-api-v1",
+            "capability_ref": "cap-slurm-orin-api-v1",
+            "backend": "slurm",
+            "context": {
+              "arch": "arm64",
+              "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+              "runtime_versions": {
+                "pytorch": "2.5.0a0+872d972e41.nv24.08",
+                "cuda": "12.6"
+              },
+              "accelerator_model": "Orin",
+              "memory_model": "unified",
+              "power_mode": "uncontrolled-default",
+              "allocation_mode": "physical_device",
+              "resources": {
+                "host_cpu": 1.0,
+                "host_memory_mib": 1024,
+                "accelerator_count": 1
+              },
+              "parameters": {}
+            }
+          }
+        ],
+        "baseline_candidate_ref": "orin",
+        "profiling": {
+          "consent": false,
+          "max_candidates": 2,
+          "max_wall_seconds_per_candidate": 180,
+          "max_queue_seconds": 300,
+          "total_wall_seconds": 600,
+          "final_validation_seconds": 180,
+          "mutable_parameters": [],
+          "checkpoint_digest": null,
+          "max_probes": 8,
+          "device_seconds": {}
+        },
+        "quality": {
+          "metric": "numerical_agreement",
+          "minimum": 1.0,
+          "minimum_repeats": 1,
+          "maximum_peak_memory_mib": 1024.0,
+          "max_profile_age_seconds": 86400
+        },
+        "execution": {
+          "priority": "normal",
+          "max_run_seconds": 120,
+          "max_queue_seconds": 120,
+          "max_collection_seconds": 180
+        }
+      },
+      "candidate": {
+        "ref": "orin",
+        "variant_ref": "v-slurm-orin-cnn-api-v1",
+        "capability_ref": "cap-slurm-orin-api-v1",
+        "backend": "slurm",
+        "context": {
+          "arch": "arm64",
+          "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+          "runtime_versions": {
+            "pytorch": "2.5.0a0+872d972e41.nv24.08",
+            "cuda": "12.6"
+          },
+          "accelerator_model": "Orin",
+          "memory_model": "unified",
+          "power_mode": "uncontrolled-default",
+          "allocation_mode": "physical_device",
+          "resources": {
+            "host_cpu": 1.0,
+            "host_memory_mib": 1024,
+            "accelerator_count": 1
+          },
+          "parameters": {}
+        }
+      },
+      "variant": {
+        "ref": "v-slurm-orin-cnn-api-v1",
+        "workload_ref": "slurm-orin-cnn-api-v1",
+        "project_ref": "ra-lab",
+        "workload_signature": "sha256:e9cf688cdf5357d023ad229974fcb2427559304dc2b00bdea5172c9cfeaa7140",
+        "arch": "arm64",
+        "accelerator_vendor": "nvidia",
+        "device_class": "gpu",
+        "precision": "fp32",
+        "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+        "compiled_artifact_digest": null,
+        "image": null,
+        "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+        "command": [
+          "/opt/resource-advisor/runtimes/torch-jetson-24.08/venv/bin/python",
+          "-I",
+          "/opt/resource-advisor/qualifications/orin-cnn-contract-v1/slurm_cnn_workload.py"
+        ],
+        "pilot_command": null,
+        "verification": "MODEL_VERIFIED",
+        "validation_refs": [
+          "slurm-orin-torch-v2",
+          "slurm-cnn-contract-v1"
+        ],
+        "supported_shapes": [
+          [
+            4,
+            3,
+            32,
+            32
+          ]
+        ],
+        "runtime_versions": {
+          "pytorch": "2.5.0a0+872d972e41.nv24.08",
+          "cuda": "12.6"
+        }
+      },
+      "capability": {
+        "ref": "cap-slurm-orin-api-v1",
+        "node_ref": "slurm-w2",
+        "backend_cluster_id": "lab-slurm",
+        "backend": "slurm",
+        "observed_at": "2026-10-06T04:33:26.936891Z",
+        "valid_for_seconds": 86400,
+        "ready": true,
+        "arch": "arm64",
+        "accelerator_vendor": "nvidia",
+        "accelerator_model": "Orin",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocatable_count": 1,
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "resource_key": "gpu:orin_nano",
+        "runtime_versions": {
+          "pytorch": "2.5.0a0+872d972e41.nv24.08",
+          "cuda": "12.6"
+        },
+        "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+        "memory_model": "unified",
+        "power_mode": "uncontrolled-default",
+        "reservation_verified": true,
+        "isolation_verified": false,
+        "evidence_refs": [
+          "slurm-limits-v2-positive-and-denial",
+          "slurm-orin-torch-v2",
+          "slurm-cnn-contract-v1"
+        ]
+      },
+      "submission_warnings": [
+        "CAPABILITY_STALE"
+      ],
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-86e6bf03770a497eb72b34bf0233ac38",
+        "attempt_id": "a-24cce27e733e4dd89328a1493378257a",
+        "epoch": 1,
+        "workload_signature": "sha256:e9cf688cdf5357d023ad229974fcb2427559304dc2b00bdea5172c9cfeaa7140",
+        "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.014932958991266787,
+          "peak_memory_mib": 33.05615234375,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 1.4656665152870119,
+          "latency_p95_ms": 1.5401639975607395,
+          "latency_p99_ms": 1.5401639975607395,
+          "throughput": 669.6596438688595,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:69d4af199359bc2e72b092dde83c3f9dfa93ed655c5d1cff8dfdfd1054a3d5c9",
+      "profile": {
+        "job_id": "j-86e6bf03770a497eb72b34bf0233ac38",
+        "candidate_ref": "orin",
+        "recorded_at": "2026-10-08T06:01:33.064600+00:00",
+        "result": {
+          "schema_version": "v1",
+          "job_id": "j-86e6bf03770a497eb72b34bf0233ac38",
+          "attempt_id": "a-24cce27e733e4dd89328a1493378257a",
+          "epoch": 1,
+          "workload_signature": "sha256:e9cf688cdf5357d023ad229974fcb2427559304dc2b00bdea5172c9cfeaa7140",
+          "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+          "outcome": "COMPLETED",
+          "measured": true,
+          "evidence_kind": "hardware",
+          "measurements": {
+            "elapsed_seconds": 0.014932958991266787,
+            "peak_memory_mib": 33.05615234375,
+            "quality_value": 1.0,
+            "sample_count": 10,
+            "work_units": 10,
+            "latency_p50_ms": 1.4656665152870119,
+            "latency_p95_ms": 1.5401639975607395,
+            "latency_p99_ms": 1.5401639975607395,
+            "throughput": 669.6596438688595,
+            "gpu_utilization": null,
+            "power_watts": null,
+            "temperature_celsius": null
+          },
+          "error_code": null
+        }
+      },
+      "feedback": null,
+      "ledger": {
+        "attempt_id": "a-24cce27e733e4dd89328a1493378257a",
+        "project": "ra-lab",
+        "backend": "slurm",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 89.0,
+        "measured_compute_seconds": 0.014932958991266787,
+        "queue_seconds": 1.0,
+        "body": {
+          "schema_version": "v2",
+          "accelerator_model": "Orin",
+          "backend_cluster_id": "lab-slurm",
+          "job_id": "j-86e6bf03770a497eb72b34bf0233ac38",
+          "outcome": "SUCCEEDED",
+          "error": null,
+          "result_valid": true,
+          "requested_resources": {
+            "host_cpu": 1.0,
+            "host_memory_mib": 1024,
+            "accelerator_count": 1
+          },
+          "observed_allocation": {
+            "source": "slurm:sacct AllocTRES",
+            "accelerator_count": 1.0,
+            "cpu": 1.0,
+            "memory_mib": 1024.0
+          },
+          "termination_receipt_ref": null,
+          "never_submitted": false,
+          "allocation_interval_seconds": 89.0,
+          "started_at": "2026-10-08T06:00:00+0000",
+          "backend_finished_at": "2026-10-08T06:01:29+0000",
+          "terminal_observed_at": "2026-10-08T06:01:33.064600+00:00",
+          "cancel_requested_at": null,
+          "cancel_dispatch_started_at": null,
+          "cancel_acknowledged_at": null,
+          "cancel_confirmed_at": null,
+          "cancel_dispatch_wait_seconds": null,
+          "cancel_confirmation_seconds": null,
+          "submitted_at": "2026-10-08T05:59:59+0000",
+          "submission_time_source": "scheduler",
+          "collection_seconds": 2.050574,
+          "preparation_seconds": null,
+          "container_runtime_seconds": null,
+          "allocated_cpu_seconds": 89.0,
+          "allocation_memory_mib": 1024.0,
+          "allocation_scope": "slurm:sacct AllocTRES",
+          "uncertainty": [
+            "QUEUE_WHOLE_SECOND_RESOLUTION"
+          ],
+          "semantics": "allocated reservations, not utilization; unknowns are null"
+        }
+      },
+      "native_accounting": "77|a-24cce27e733e4dd89328a1493378257a|ra-lab|compute|slurm-w2|COMPLETED|0:0|2026-10-08T05:59:59+0000|2026-10-08T06:00:00+0000|2026-10-08T06:01:29+0000|billing=1,cpu=1,gres/gpu=1,mem=1G,node=1|89|89||00:00.032\n77.batch|batch|ra-lab||slurm-w2|COMPLETED|0:0|2026-10-08T06:00:00+0000|2026-10-08T06:00:00+0000|2026-10-08T06:01:29+0000|cpu=1,gres/gpu=1,mem=1G,node=1|89|89|4508K|00:00.032\n77.0|python3|ra-lab||slurm-w2|COMPLETED|0:0|2026-10-08T06:00:02+0000|2026-10-08T06:00:02+0000|2026-10-08T06:01:29+0000|cpu=1,gres/gpu=1,mem=1G,node=1|87|87||00:00:00\n",
+      "numerical_qualification": {
+        "schema_version": "v1",
+        "result": "PASS",
+        "scope": "deterministic generated CNN numerical qualification, not model accuracy",
+        "torch": "2.5.0a0+872d972e41.nv24.08",
+        "cuda": "12.6",
+        "device": "Orin",
+        "capability": [
+          8,
+          7
+        ],
+        "cuda_arch_list": [
+          "sm_70",
+          "sm_72",
+          "sm_75",
+          "sm_80",
+          "sm_86",
+          "sm_87",
+          "compute_87"
+        ],
+        "input_shape": [
+          4,
+          3,
+          32,
+          32
+        ],
+        "precision": "fp32",
+        "seed": 20261006,
+        "input_sha256": "878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+        "weights_sha256": "b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+        "warmup_forwards": 3,
+        "measured_forwards": 10,
+        "compared_elements": 400,
+        "reference_rtol": 0.0001,
+        "reference_atol": 0.0001,
+        "max_absolute_error": 1.4901161193847656e-08,
+        "samples_seconds": [
+          0.0017732579726725817,
+          0.0015126119833439589,
+          0.001422240980900824,
+          0.0015401639975607395,
+          0.0014253139961510897,
+          0.001456099096685648,
+          0.0014242249308153987,
+          0.001487842993810773,
+          0.001415969105437398,
+          0.0014752339338883758
+        ],
+        "median_forward_ms": 1.4656665152870119,
+        "peak_tensor_allocation_mib": 33.05615234375,
+        "peak_process_rss_kib": 796140,
+        "cpu_fallback": false,
+        "enforced_boundary": {
+          "memory_max_bytes": 1073741824,
+          "swap_max_bytes": 0,
+          "memory_peak_bytes": 1067835392,
+          "cpu_affinity_count": 1
+        }
+      },
+      "delivery": {
+        "mlflow_run_id": "8418da784b294885b1161ec2f8264f37",
+        "artifact_digest": "sha256:e1213f0f2db35e34c7aeb4b49ebd764bad2c4bdf46a04ae2c5c938eb5775839d",
+        "result_digest": "sha256:69d4af199359bc2e72b092dde83c3f9dfa93ed655c5d1cff8dfdfd1054a3d5c9",
+        "bundle_sha256": "e1213f0f2db35e34c7aeb4b49ebd764bad2c4bdf46a04ae2c5c938eb5775839d",
+        "matching_s3_api_mlflow_bytes": true,
+        "ledger_rows": 1,
+        "mlflow_runs": 1
+      },
+      "lifecycle": {
+        "schema_version": "right-sizing-lifecycle-v1",
+        "workload_ref": "slurm-orin-cnn-api-v1",
+        "workload_signature": "sha256:e9cf688cdf5357d023ad229974fcb2427559304dc2b00bdea5172c9cfeaa7140",
+        "workload_digest": "sha256:3ab354336fe8292e9dbf1338e099d61081213a33ac1a0f3064484ccf10eed2a9",
+        "state": "NO_COMPATIBLE_VARIANT",
+        "recommendability": {
+          "status": "NO_COMPATIBLE_VARIANT",
+          "ranking": [],
+          "excluded": {
+            "orin": [
+              "CAPABILITY_STALE"
+            ]
+          },
+          "approval_authorized": false
+        },
+        "distribution": {
+          "status": "OUTSIDE_QUALIFIED_SCOPE",
+          "in_distribution": false,
+          "predictive_interval_calibration": "NOT_QUALIFIED",
+          "semantics": "Exact workload/context evidence scope, not statistical OOD probability"
+        },
+        "reasons": [
+          "CAPABILITY_STALE"
+        ],
+        "assessed_at": "2026-10-08T06:02:04.431895+00:00",
+        "candidates": [
+          {
+            "candidate_ref": "orin",
+            "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+            "compatible": false,
+            "reasons": [
+              "CAPABILITY_STALE"
+            ]
+          }
+        ],
+        "profile_refs": [
+          "a-085895b72ff841bda59eb86fe5f65dc1",
+          "a-0bdda894831f478595bee62371c48846",
+          "a-16eba014bf78480499c31936c4173087",
+          "a-1906a9a304be43d487d516322aca8a87",
+          "a-1cc91309ccd0402a8d16c9b154d66e36",
+          "a-24cce27e733e4dd89328a1493378257a",
+          "a-317931d479444baebb8dbe2be1140040",
+          "a-3aba013922bf432c8130d8a47d121de8",
+          "a-4555b2c054a84e8ba57d8cf9b66c8c99",
+          "a-4e0847752b224a90b2ef9804f88c9eda",
+          "a-548ac8306cf444ecb36579aa5ec955da",
+          "a-6d3bac047d09428892b6f515f74c2772",
+          "a-6f0c7d0817b140948e0fe2bbaf913ca6",
+          "a-73681c04d56c4a80a12d841b9f02c2f2",
+          "a-843fe219afe54f958d69edb3e62c4d58",
+          "a-84e5522d5e5b4b9b9b21da617eb72a25",
+          "a-9db13032e9c1452abad2edc7eed89aea",
+          "a-a505f39f3e3642c499f41e86c4f50405",
+          "a-bfc6a9264d5545f4aaa18d851fd67bd7",
+          "a-c12f9bd40cd948a882e8238d9c559c70",
+          "a-d10801c92ca74d388403de6159872810",
+          "a-d6d9a9696020403b924fa92374929d02",
+          "a-ef55cff108ef4c3ea8edc3fd25c4441f",
+          "a-f5c0ad6d1d0542bd85b843a5b4c60a95"
+        ],
+        "study_refs": [],
+        "recommendation_ref": null,
+        "current_validity": null,
+        "feedback": [],
+        "additional_profiling_required": false,
+        "milestones": [
+          {
+            "state": "UNKNOWN",
+            "evidence_refs": [
+              "slurm-orin-cnn-api-v1"
+            ],
+            "observed": true
+          },
+          {
+            "state": "COMPATIBILITY_CHECKED",
+            "evidence_refs": [
+              "orin"
+            ],
+            "observed": true
+          },
+          {
+            "state": "NEEDS_PROFILE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILING",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILED",
+            "evidence_refs": [
+              "a-085895b72ff841bda59eb86fe5f65dc1",
+              "a-0bdda894831f478595bee62371c48846",
+              "a-16eba014bf78480499c31936c4173087",
+              "a-1906a9a304be43d487d516322aca8a87",
+              "a-1cc91309ccd0402a8d16c9b154d66e36",
+              "a-24cce27e733e4dd89328a1493378257a",
+              "a-317931d479444baebb8dbe2be1140040",
+              "a-3aba013922bf432c8130d8a47d121de8",
+              "a-4555b2c054a84e8ba57d8cf9b66c8c99",
+              "a-4e0847752b224a90b2ef9804f88c9eda",
+              "a-548ac8306cf444ecb36579aa5ec955da",
+              "a-6d3bac047d09428892b6f515f74c2772",
+              "a-6f0c7d0817b140948e0fe2bbaf913ca6",
+              "a-73681c04d56c4a80a12d841b9f02c2f2",
+              "a-843fe219afe54f958d69edb3e62c4d58",
+              "a-84e5522d5e5b4b9b9b21da617eb72a25",
+              "a-9db13032e9c1452abad2edc7eed89aea",
+              "a-a505f39f3e3642c499f41e86c4f50405",
+              "a-bfc6a9264d5545f4aaa18d851fd67bd7",
+              "a-c12f9bd40cd948a882e8238d9c559c70",
+              "a-d10801c92ca74d388403de6159872810",
+              "a-d6d9a9696020403b924fa92374929d02",
+              "a-ef55cff108ef4c3ea8edc3fd25c4441f",
+              "a-f5c0ad6d1d0542bd85b843a5b4c60a95"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDABLE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "RECOMMENDED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "APPROVED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "EXECUTED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "VERIFIED",
+            "evidence_refs": [],
+            "observed": false
+          }
+        ],
+        "semantics": "Evidence projection, not a new Job state machine. VERIFIED means independent actual/reference comparison; no speedup or calibrated coverage guarantee."
+      }
+    },
+    {
+      "role": "observe",
+      "index": 1,
+      "job_id": "j-5629cd1987304aa6a35ce914ac621ac9",
+      "attempt_id": "a-c89f8952180d4ed0ab758840b5e6653c",
+      "native_job_id": "78",
+      "state": "SUCCEEDED",
+      "created_at": "2026-10-08T06:02:08.710136+00:00",
+      "request": {
+        "workload_ref": "right-sizing-slurm-20261008-v1",
+        "candidate_ref": "orin",
+        "mode": "observe"
+      },
+      "spec": {
+        "schema_version": "v1",
+        "ref": "right-sizing-slurm-20261008-v1",
+        "project_ref": "ra-lab",
+        "identity": {
+          "code_digest": "sha256:ae41a73807559871b5d201122298f957282d029818335e4f8a892a3730685a4d",
+          "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+          "dataset_version": "generated-seed20261006-input878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+          "config_digest": "sha256:999180d474d5ab2616abb9be63989b3d89b6a401746d2851011726515dcdb69b",
+          "task_type": "benchmark",
+          "input_shape": [
+            4,
+            3,
+            32,
+            32
+          ],
+          "batch_size": 4,
+          "global_batch_size": null,
+          "gradient_accumulation": 1,
+          "precision": "fp32",
+          "seed": 20261006,
+          "work_units": 10,
+          "quality_contract_digest": "sha256:b56e74cbf6b4099db6255bde62fa9d4b61d749f4c1e4d913ba87cfd23a9553f3",
+          "measurement_boundary": "synchronized-cnn-forward-only-four-inputs-v1"
+        },
+        "candidates": [
+          {
+            "ref": "orin",
+            "variant_ref": "v-right-sizing-slurm-20261008-v1",
+            "capability_ref": "cap-right-sizing-slurm-20261008-v1",
+            "backend": "slurm",
+            "context": {
+              "arch": "arm64",
+              "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+              "runtime_versions": {
+                "pytorch": "2.5.0a0+872d972e41.nv24.08",
+                "cuda": "12.6"
+              },
+              "accelerator_model": "Orin",
+              "memory_model": "unified",
+              "power_mode": "uncontrolled-default",
+              "allocation_mode": "physical_device",
+              "resources": {
+                "host_cpu": 1.0,
+                "host_memory_mib": 1024,
+                "accelerator_count": 1
+              },
+              "parameters": {}
+            }
+          }
+        ],
+        "baseline_candidate_ref": "orin",
+        "profiling": {
+          "consent": false,
+          "max_candidates": 2,
+          "max_wall_seconds_per_candidate": 180,
+          "max_queue_seconds": 300,
+          "total_wall_seconds": 600,
+          "final_validation_seconds": 180,
+          "mutable_parameters": [],
+          "checkpoint_digest": null,
+          "max_probes": 8,
+          "device_seconds": {}
+        },
+        "quality": {
+          "metric": "numerical_agreement",
+          "minimum": 1.0,
+          "minimum_repeats": 3,
+          "maximum_peak_memory_mib": 1024.0,
+          "max_profile_age_seconds": 7200
+        },
+        "execution": {
+          "priority": "normal",
+          "max_run_seconds": 120,
+          "max_queue_seconds": 120,
+          "max_collection_seconds": 180
+        }
+      },
+      "candidate": {
+        "ref": "orin",
+        "variant_ref": "v-right-sizing-slurm-20261008-v1",
+        "capability_ref": "cap-right-sizing-slurm-20261008-v1",
+        "backend": "slurm",
+        "context": {
+          "arch": "arm64",
+          "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+          "runtime_versions": {
+            "pytorch": "2.5.0a0+872d972e41.nv24.08",
+            "cuda": "12.6"
+          },
+          "accelerator_model": "Orin",
+          "memory_model": "unified",
+          "power_mode": "uncontrolled-default",
+          "allocation_mode": "physical_device",
+          "resources": {
+            "host_cpu": 1.0,
+            "host_memory_mib": 1024,
+            "accelerator_count": 1
+          },
+          "parameters": {}
+        }
+      },
+      "variant": {
+        "ref": "v-right-sizing-slurm-20261008-v1",
+        "workload_ref": "right-sizing-slurm-20261008-v1",
+        "project_ref": "ra-lab",
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "arch": "arm64",
+        "accelerator_vendor": "nvidia",
+        "device_class": "gpu",
+        "precision": "fp32",
+        "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+        "compiled_artifact_digest": null,
+        "image": null,
+        "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+        "command": [
+          "/opt/resource-advisor/runtimes/torch-jetson-24.08/venv/bin/python",
+          "-I",
+          "/opt/resource-advisor/qualifications/orin-cnn-contract-v1/slurm_cnn_workload.py"
+        ],
+        "pilot_command": null,
+        "verification": "MODEL_VERIFIED",
+        "validation_refs": [
+          "a-24cce27e733e4dd89328a1493378257a"
+        ],
+        "supported_shapes": [
+          [
+            4,
+            3,
+            32,
+            32
+          ]
+        ],
+        "runtime_versions": {
+          "pytorch": "2.5.0a0+872d972e41.nv24.08",
+          "cuda": "12.6"
+        }
+      },
+      "capability": {
+        "ref": "cap-right-sizing-slurm-20261008-v1",
+        "node_ref": "slurm-w2",
+        "backend_cluster_id": "lab-slurm",
+        "backend": "slurm",
+        "observed_at": "2026-10-08T06:01:33.064600Z",
+        "valid_for_seconds": 7200,
+        "ready": true,
+        "arch": "arm64",
+        "accelerator_vendor": "nvidia",
+        "accelerator_model": "Orin",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocatable_count": 1,
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "resource_key": "gpu:orin_nano",
+        "runtime_versions": {
+          "pytorch": "2.5.0a0+872d972e41.nv24.08",
+          "cuda": "12.6"
+        },
+        "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+        "memory_model": "unified",
+        "power_mode": "uncontrolled-default",
+        "reservation_verified": true,
+        "isolation_verified": false,
+        "evidence_refs": [
+          "a-24cce27e733e4dd89328a1493378257a"
+        ]
+      },
+      "submission_warnings": [],
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-5629cd1987304aa6a35ce914ac621ac9",
+        "attempt_id": "a-c89f8952180d4ed0ab758840b5e6653c",
+        "epoch": 1,
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.01330578385386616,
+          "peak_memory_mib": 33.05615234375,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 1.340847578831017,
+          "latency_p95_ms": 1.4394900063052773,
+          "latency_p99_ms": 1.4394900063052773,
+          "throughput": 751.552866770369,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:d464837e1785e8c9ea8112f2ceda7e2a5e334a21ad31e16c5b3743d21d2db78c",
+      "profile": {
+        "job_id": "j-5629cd1987304aa6a35ce914ac621ac9",
+        "candidate_ref": "orin",
+        "recorded_at": "2026-10-08T06:03:46.330684+00:00",
+        "result": {
+          "schema_version": "v1",
+          "job_id": "j-5629cd1987304aa6a35ce914ac621ac9",
+          "attempt_id": "a-c89f8952180d4ed0ab758840b5e6653c",
+          "epoch": 1,
+          "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+          "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+          "outcome": "COMPLETED",
+          "measured": true,
+          "evidence_kind": "hardware",
+          "measurements": {
+            "elapsed_seconds": 0.01330578385386616,
+            "peak_memory_mib": 33.05615234375,
+            "quality_value": 1.0,
+            "sample_count": 10,
+            "work_units": 10,
+            "latency_p50_ms": 1.340847578831017,
+            "latency_p95_ms": 1.4394900063052773,
+            "latency_p99_ms": 1.4394900063052773,
+            "throughput": 751.552866770369,
+            "gpu_utilization": null,
+            "power_watts": null,
+            "temperature_celsius": null
+          },
+          "error_code": null
+        }
+      },
+      "feedback": null,
+      "ledger": {
+        "attempt_id": "a-c89f8952180d4ed0ab758840b5e6653c",
+        "project": "ra-lab",
+        "backend": "slurm",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 85.0,
+        "measured_compute_seconds": 0.01330578385386616,
+        "queue_seconds": 1.0,
+        "body": {
+          "schema_version": "v2",
+          "accelerator_model": "Orin",
+          "backend_cluster_id": "lab-slurm",
+          "job_id": "j-5629cd1987304aa6a35ce914ac621ac9",
+          "outcome": "SUCCEEDED",
+          "error": null,
+          "result_valid": true,
+          "requested_resources": {
+            "host_cpu": 1.0,
+            "host_memory_mib": 1024,
+            "accelerator_count": 1
+          },
+          "observed_allocation": {
+            "source": "slurm:sacct AllocTRES",
+            "accelerator_count": 1.0,
+            "cpu": 1.0,
+            "memory_mib": 1024.0
+          },
+          "termination_receipt_ref": null,
+          "never_submitted": false,
+          "allocation_interval_seconds": 85.0,
+          "started_at": "2026-10-08T06:02:15+0000",
+          "backend_finished_at": "2026-10-08T06:03:40+0000",
+          "terminal_observed_at": "2026-10-08T06:03:46.330684+00:00",
+          "cancel_requested_at": null,
+          "cancel_dispatch_started_at": null,
+          "cancel_acknowledged_at": null,
+          "cancel_confirmed_at": null,
+          "cancel_dispatch_wait_seconds": null,
+          "cancel_confirmation_seconds": null,
+          "submitted_at": "2026-10-08T06:02:14+0000",
+          "submission_time_source": "scheduler",
+          "collection_seconds": 2.03892,
+          "preparation_seconds": null,
+          "container_runtime_seconds": null,
+          "allocated_cpu_seconds": 85.0,
+          "allocation_memory_mib": 1024.0,
+          "allocation_scope": "slurm:sacct AllocTRES",
+          "uncertainty": [
+            "QUEUE_WHOLE_SECOND_RESOLUTION"
+          ],
+          "semantics": "allocated reservations, not utilization; unknowns are null"
+        }
+      },
+      "native_accounting": "78|a-c89f8952180d4ed0ab758840b5e6653c|ra-lab|compute|slurm-w2|COMPLETED|0:0|2026-10-08T06:02:14+0000|2026-10-08T06:02:15+0000|2026-10-08T06:03:40+0000|billing=1,cpu=1,gres/gpu=1,mem=1G,node=1|85|85||00:00.036\n78.batch|batch|ra-lab||slurm-w2|COMPLETED|0:0|2026-10-08T06:02:15+0000|2026-10-08T06:02:15+0000|2026-10-08T06:03:40+0000|cpu=1,gres/gpu=1,mem=1G,node=1|85|85|4244K|00:00.036\n78.0|python3|ra-lab||slurm-w2|COMPLETED|0:0|2026-10-08T06:02:18+0000|2026-10-08T06:02:18+0000|2026-10-08T06:03:40+0000|cpu=1,gres/gpu=1,mem=1G,node=1|82|82||00:00:00\n",
+      "numerical_qualification": {
+        "schema_version": "v1",
+        "result": "PASS",
+        "scope": "deterministic generated CNN numerical qualification, not model accuracy",
+        "torch": "2.5.0a0+872d972e41.nv24.08",
+        "cuda": "12.6",
+        "device": "Orin",
+        "capability": [
+          8,
+          7
+        ],
+        "cuda_arch_list": [
+          "sm_70",
+          "sm_72",
+          "sm_75",
+          "sm_80",
+          "sm_86",
+          "sm_87",
+          "compute_87"
+        ],
+        "input_shape": [
+          4,
+          3,
+          32,
+          32
+        ],
+        "precision": "fp32",
+        "seed": 20261006,
+        "input_sha256": "878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+        "weights_sha256": "b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+        "warmup_forwards": 3,
+        "measured_forwards": 10,
+        "compared_elements": 400,
+        "reference_rtol": 0.0001,
+        "reference_atol": 0.0001,
+        "max_absolute_error": 1.4901161193847656e-08,
+        "samples_seconds": [
+          0.001076537068001926,
+          0.0012617899337783456,
+          0.0013499200576916337,
+          0.001305021927691996,
+          0.001312029897235334,
+          0.0014394900063052773,
+          0.0013317750999704003,
+          0.0013794249389320612,
+          0.0014736989978700876,
+          0.0013760959263890982
+        ],
+        "median_forward_ms": 1.340847578831017,
+        "peak_tensor_allocation_mib": 33.05615234375,
+        "peak_process_rss_kib": 796788,
+        "cpu_fallback": false,
+        "enforced_boundary": {
+          "memory_max_bytes": 1073741824,
+          "swap_max_bytes": 0,
+          "memory_peak_bytes": 1068105728,
+          "cpu_affinity_count": 1
+        }
+      },
+      "delivery": {
+        "mlflow_run_id": "6445a288393148c1ac1c0f54f6d2f9cd",
+        "artifact_digest": "sha256:b2141788fdec6193d13227394fdf64709e3c549a581b82792da60138f6260ee7",
+        "result_digest": "sha256:d464837e1785e8c9ea8112f2ceda7e2a5e334a21ad31e16c5b3743d21d2db78c",
+        "bundle_sha256": "b2141788fdec6193d13227394fdf64709e3c549a581b82792da60138f6260ee7",
+        "matching_s3_api_mlflow_bytes": true,
+        "ledger_rows": 1,
+        "mlflow_runs": 1
+      },
+      "lifecycle": {
+        "schema_version": "right-sizing-lifecycle-v1",
+        "workload_ref": "right-sizing-slurm-20261008-v1",
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "workload_digest": "sha256:c542e03013072aaf095f12aff4121d6edc6deaf4e0b38545a6852b323676d382",
+        "state": "PROFILED",
+        "recommendability": {
+          "status": "NEEDS_PROFILE",
+          "ranking": [],
+          "excluded": {
+            "orin": [
+              "NEEDS_PROFILE"
+            ]
+          },
+          "approval_authorized": false
+        },
+        "distribution": {
+          "status": "UNSEEN_OR_INSUFFICIENT_EVIDENCE",
+          "in_distribution": null,
+          "predictive_interval_calibration": "NOT_QUALIFIED",
+          "semantics": "Exact workload/context evidence scope, not statistical OOD probability"
+        },
+        "reasons": [
+          "NO_COMPARABLE_RECOMMENDATION"
+        ],
+        "assessed_at": "2026-10-08T06:03:57.623538+00:00",
+        "candidates": [
+          {
+            "candidate_ref": "orin",
+            "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+            "compatible": true,
+            "reasons": []
+          }
+        ],
+        "profile_refs": [
+          "a-c89f8952180d4ed0ab758840b5e6653c"
+        ],
+        "study_refs": [],
+        "recommendation_ref": "rec-d946e58ef8a8412db3af80c4ad34e69e",
+        "current_validity": {
+          "policy_version": "recommendation-reuse-v1",
+          "assessed_at": "2026-10-08T06:03:57.621064+00:00",
+          "recommendation_ref": "rec-d946e58ef8a8412db3af80c4ad34e69e",
+          "reusable": false,
+          "reasons": [
+            "NO_MEASURED_RECOMMENDATION"
+          ],
+          "residuals": [],
+          "drift_policy": {
+            "relative_error_limit": 0.25,
+            "consecutive_independent_runs": 3,
+            "semantics": "heuristic recheck trigger, not calibrated probability or root cause"
+          }
+        },
+        "feedback": [],
+        "additional_profiling_required": true,
+        "milestones": [
+          {
+            "state": "UNKNOWN",
+            "evidence_refs": [
+              "right-sizing-slurm-20261008-v1"
+            ],
+            "observed": true
+          },
+          {
+            "state": "COMPATIBILITY_CHECKED",
+            "evidence_refs": [
+              "orin"
+            ],
+            "observed": true
+          },
+          {
+            "state": "NEEDS_PROFILE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILING",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILED",
+            "evidence_refs": [
+              "a-c89f8952180d4ed0ab758840b5e6653c"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDABLE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "RECOMMENDED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "APPROVED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "EXECUTED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "VERIFIED",
+            "evidence_refs": [],
+            "observed": false
+          }
+        ],
+        "semantics": "Evidence projection, not a new Job state machine. VERIFIED means independent actual/reference comparison; no speedup or calibrated coverage guarantee."
+      }
+    },
+    {
+      "role": "observe",
+      "index": 2,
+      "job_id": "j-73ef09ae86e347ef9145fd4fdfade6b6",
+      "attempt_id": "a-2b7b6e67ee124564a1a490bcfe78dfed",
+      "native_job_id": "79",
+      "state": "SUCCEEDED",
+      "created_at": "2026-10-08T06:03:57.632643+00:00",
+      "request": {
+        "workload_ref": "right-sizing-slurm-20261008-v1",
+        "candidate_ref": "orin",
+        "mode": "observe"
+      },
+      "spec": {
+        "schema_version": "v1",
+        "ref": "right-sizing-slurm-20261008-v1",
+        "project_ref": "ra-lab",
+        "identity": {
+          "code_digest": "sha256:ae41a73807559871b5d201122298f957282d029818335e4f8a892a3730685a4d",
+          "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+          "dataset_version": "generated-seed20261006-input878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+          "config_digest": "sha256:999180d474d5ab2616abb9be63989b3d89b6a401746d2851011726515dcdb69b",
+          "task_type": "benchmark",
+          "input_shape": [
+            4,
+            3,
+            32,
+            32
+          ],
+          "batch_size": 4,
+          "global_batch_size": null,
+          "gradient_accumulation": 1,
+          "precision": "fp32",
+          "seed": 20261006,
+          "work_units": 10,
+          "quality_contract_digest": "sha256:b56e74cbf6b4099db6255bde62fa9d4b61d749f4c1e4d913ba87cfd23a9553f3",
+          "measurement_boundary": "synchronized-cnn-forward-only-four-inputs-v1"
+        },
+        "candidates": [
+          {
+            "ref": "orin",
+            "variant_ref": "v-right-sizing-slurm-20261008-v1",
+            "capability_ref": "cap-right-sizing-slurm-20261008-v1",
+            "backend": "slurm",
+            "context": {
+              "arch": "arm64",
+              "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+              "runtime_versions": {
+                "pytorch": "2.5.0a0+872d972e41.nv24.08",
+                "cuda": "12.6"
+              },
+              "accelerator_model": "Orin",
+              "memory_model": "unified",
+              "power_mode": "uncontrolled-default",
+              "allocation_mode": "physical_device",
+              "resources": {
+                "host_cpu": 1.0,
+                "host_memory_mib": 1024,
+                "accelerator_count": 1
+              },
+              "parameters": {}
+            }
+          }
+        ],
+        "baseline_candidate_ref": "orin",
+        "profiling": {
+          "consent": false,
+          "max_candidates": 2,
+          "max_wall_seconds_per_candidate": 180,
+          "max_queue_seconds": 300,
+          "total_wall_seconds": 600,
+          "final_validation_seconds": 180,
+          "mutable_parameters": [],
+          "checkpoint_digest": null,
+          "max_probes": 8,
+          "device_seconds": {}
+        },
+        "quality": {
+          "metric": "numerical_agreement",
+          "minimum": 1.0,
+          "minimum_repeats": 3,
+          "maximum_peak_memory_mib": 1024.0,
+          "max_profile_age_seconds": 7200
+        },
+        "execution": {
+          "priority": "normal",
+          "max_run_seconds": 120,
+          "max_queue_seconds": 120,
+          "max_collection_seconds": 180
+        }
+      },
+      "candidate": {
+        "ref": "orin",
+        "variant_ref": "v-right-sizing-slurm-20261008-v1",
+        "capability_ref": "cap-right-sizing-slurm-20261008-v1",
+        "backend": "slurm",
+        "context": {
+          "arch": "arm64",
+          "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+          "runtime_versions": {
+            "pytorch": "2.5.0a0+872d972e41.nv24.08",
+            "cuda": "12.6"
+          },
+          "accelerator_model": "Orin",
+          "memory_model": "unified",
+          "power_mode": "uncontrolled-default",
+          "allocation_mode": "physical_device",
+          "resources": {
+            "host_cpu": 1.0,
+            "host_memory_mib": 1024,
+            "accelerator_count": 1
+          },
+          "parameters": {}
+        }
+      },
+      "variant": {
+        "ref": "v-right-sizing-slurm-20261008-v1",
+        "workload_ref": "right-sizing-slurm-20261008-v1",
+        "project_ref": "ra-lab",
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "arch": "arm64",
+        "accelerator_vendor": "nvidia",
+        "device_class": "gpu",
+        "precision": "fp32",
+        "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+        "compiled_artifact_digest": null,
+        "image": null,
+        "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+        "command": [
+          "/opt/resource-advisor/runtimes/torch-jetson-24.08/venv/bin/python",
+          "-I",
+          "/opt/resource-advisor/qualifications/orin-cnn-contract-v1/slurm_cnn_workload.py"
+        ],
+        "pilot_command": null,
+        "verification": "MODEL_VERIFIED",
+        "validation_refs": [
+          "a-24cce27e733e4dd89328a1493378257a"
+        ],
+        "supported_shapes": [
+          [
+            4,
+            3,
+            32,
+            32
+          ]
+        ],
+        "runtime_versions": {
+          "pytorch": "2.5.0a0+872d972e41.nv24.08",
+          "cuda": "12.6"
+        }
+      },
+      "capability": {
+        "ref": "cap-right-sizing-slurm-20261008-v1",
+        "node_ref": "slurm-w2",
+        "backend_cluster_id": "lab-slurm",
+        "backend": "slurm",
+        "observed_at": "2026-10-08T06:01:33.064600Z",
+        "valid_for_seconds": 7200,
+        "ready": true,
+        "arch": "arm64",
+        "accelerator_vendor": "nvidia",
+        "accelerator_model": "Orin",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocatable_count": 1,
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "resource_key": "gpu:orin_nano",
+        "runtime_versions": {
+          "pytorch": "2.5.0a0+872d972e41.nv24.08",
+          "cuda": "12.6"
+        },
+        "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+        "memory_model": "unified",
+        "power_mode": "uncontrolled-default",
+        "reservation_verified": true,
+        "isolation_verified": false,
+        "evidence_refs": [
+          "a-24cce27e733e4dd89328a1493378257a"
+        ]
+      },
+      "submission_warnings": [],
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-73ef09ae86e347ef9145fd4fdfade6b6",
+        "attempt_id": "a-2b7b6e67ee124564a1a490bcfe78dfed",
+        "epoch": 1,
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.011263818014413118,
+          "peak_memory_mib": 33.05615234375,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 1.1095940135419369,
+          "latency_p95_ms": 1.1798361083492637,
+          "latency_p99_ms": 1.1798361083492637,
+          "throughput": 887.7984345276225,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:331652d0d953c3689297e24c8fc12bdad72aa54965e18f052dd8e8877d269b3d",
+      "profile": {
+        "job_id": "j-73ef09ae86e347ef9145fd4fdfade6b6",
+        "candidate_ref": "orin",
+        "recorded_at": "2026-10-08T06:05:29.742463+00:00",
+        "result": {
+          "schema_version": "v1",
+          "job_id": "j-73ef09ae86e347ef9145fd4fdfade6b6",
+          "attempt_id": "a-2b7b6e67ee124564a1a490bcfe78dfed",
+          "epoch": 1,
+          "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+          "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+          "outcome": "COMPLETED",
+          "measured": true,
+          "evidence_kind": "hardware",
+          "measurements": {
+            "elapsed_seconds": 0.011263818014413118,
+            "peak_memory_mib": 33.05615234375,
+            "quality_value": 1.0,
+            "sample_count": 10,
+            "work_units": 10,
+            "latency_p50_ms": 1.1095940135419369,
+            "latency_p95_ms": 1.1798361083492637,
+            "latency_p99_ms": 1.1798361083492637,
+            "throughput": 887.7984345276225,
+            "gpu_utilization": null,
+            "power_watts": null,
+            "temperature_celsius": null
+          },
+          "error_code": null
+        }
+      },
+      "feedback": null,
+      "ledger": {
+        "attempt_id": "a-2b7b6e67ee124564a1a490bcfe78dfed",
+        "project": "ra-lab",
+        "backend": "slurm",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 83.0,
+        "measured_compute_seconds": 0.011263818014413118,
+        "queue_seconds": 0.0,
+        "body": {
+          "schema_version": "v2",
+          "accelerator_model": "Orin",
+          "backend_cluster_id": "lab-slurm",
+          "job_id": "j-73ef09ae86e347ef9145fd4fdfade6b6",
+          "outcome": "SUCCEEDED",
+          "error": null,
+          "result_valid": true,
+          "requested_resources": {
+            "host_cpu": 1.0,
+            "host_memory_mib": 1024,
+            "accelerator_count": 1
+          },
+          "observed_allocation": {
+            "source": "slurm:sacct AllocTRES",
+            "accelerator_count": 1.0,
+            "cpu": 1.0,
+            "memory_mib": 1024.0
+          },
+          "termination_receipt_ref": null,
+          "never_submitted": false,
+          "allocation_interval_seconds": 83.0,
+          "started_at": "2026-10-08T06:04:03+0000",
+          "backend_finished_at": "2026-10-08T06:05:26+0000",
+          "terminal_observed_at": "2026-10-08T06:05:29.742463+00:00",
+          "cancel_requested_at": null,
+          "cancel_dispatch_started_at": null,
+          "cancel_acknowledged_at": null,
+          "cancel_confirmed_at": null,
+          "cancel_dispatch_wait_seconds": null,
+          "cancel_confirmation_seconds": null,
+          "submitted_at": "2026-10-08T06:04:03+0000",
+          "submission_time_source": "scheduler",
+          "collection_seconds": 2.1573,
+          "preparation_seconds": null,
+          "container_runtime_seconds": null,
+          "allocated_cpu_seconds": 83.0,
+          "allocation_memory_mib": 1024.0,
+          "allocation_scope": "slurm:sacct AllocTRES",
+          "uncertainty": [
+            "QUEUE_WHOLE_SECOND_RESOLUTION"
+          ],
+          "semantics": "allocated reservations, not utilization; unknowns are null"
+        }
+      },
+      "native_accounting": "79|a-2b7b6e67ee124564a1a490bcfe78dfed|ra-lab|compute|slurm-w2|COMPLETED|0:0|2026-10-08T06:04:03+0000|2026-10-08T06:04:03+0000|2026-10-08T06:05:26+0000|billing=1,cpu=1,gres/gpu=1,mem=1G,node=1|83|83||00:00.026\n79.batch|batch|ra-lab||slurm-w2|COMPLETED|0:0|2026-10-08T06:04:03+0000|2026-10-08T06:04:03+0000|2026-10-08T06:05:26+0000|cpu=1,gres/gpu=1,mem=1G,node=1|83|83|4304K|00:00.026\n79.0|python3|ra-lab||slurm-w2|COMPLETED|0:0|2026-10-08T06:04:05+0000|2026-10-08T06:04:05+0000|2026-10-08T06:05:26+0000|cpu=1,gres/gpu=1,mem=1G,node=1|81|81||00:00:00\n",
+      "numerical_qualification": {
+        "schema_version": "v1",
+        "result": "PASS",
+        "scope": "deterministic generated CNN numerical qualification, not model accuracy",
+        "torch": "2.5.0a0+872d972e41.nv24.08",
+        "cuda": "12.6",
+        "device": "Orin",
+        "capability": [
+          8,
+          7
+        ],
+        "cuda_arch_list": [
+          "sm_70",
+          "sm_72",
+          "sm_75",
+          "sm_80",
+          "sm_86",
+          "sm_87",
+          "compute_87"
+        ],
+        "input_shape": [
+          4,
+          3,
+          32,
+          32
+        ],
+        "precision": "fp32",
+        "seed": 20261006,
+        "input_sha256": "878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+        "weights_sha256": "b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+        "warmup_forwards": 3,
+        "measured_forwards": 10,
+        "compared_elements": 400,
+        "reference_rtol": 0.0001,
+        "reference_atol": 0.0001,
+        "max_absolute_error": 1.4901161193847656e-08,
+        "samples_seconds": [
+          0.0011798361083492637,
+          0.0013681919081136584,
+          0.0011198660358786583,
+          0.0011150659993290901,
+          0.0011361869983375072,
+          0.0011041220277547836,
+          0.0010454648872837424,
+          0.001091737998649478,
+          0.001050904975272715,
+          0.0010524410754442215
+        ],
+        "median_forward_ms": 1.1095940135419369,
+        "peak_tensor_allocation_mib": 33.05615234375,
+        "peak_process_rss_kib": 797196,
+        "cpu_fallback": false,
+        "enforced_boundary": {
+          "memory_max_bytes": 1073741824,
+          "swap_max_bytes": 0,
+          "memory_peak_bytes": 1067892736,
+          "cpu_affinity_count": 1
+        }
+      },
+      "delivery": {
+        "mlflow_run_id": "76992e66a1f4493493151687049cd6f8",
+        "artifact_digest": "sha256:b9a614ffb1795d7f05bdcd82f8e70b348c9c886761b124da781be7435ecf6729",
+        "result_digest": "sha256:331652d0d953c3689297e24c8fc12bdad72aa54965e18f052dd8e8877d269b3d",
+        "bundle_sha256": "b9a614ffb1795d7f05bdcd82f8e70b348c9c886761b124da781be7435ecf6729",
+        "matching_s3_api_mlflow_bytes": true,
+        "ledger_rows": 1,
+        "mlflow_runs": 1
+      },
+      "lifecycle": {
+        "schema_version": "right-sizing-lifecycle-v1",
+        "workload_ref": "right-sizing-slurm-20261008-v1",
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "workload_digest": "sha256:c542e03013072aaf095f12aff4121d6edc6deaf4e0b38545a6852b323676d382",
+        "state": "PROFILED",
+        "recommendability": {
+          "status": "NEEDS_PROFILE",
+          "ranking": [],
+          "excluded": {
+            "orin": [
+              "NEEDS_PROFILE"
+            ]
+          },
+          "approval_authorized": false
+        },
+        "distribution": {
+          "status": "UNSEEN_OR_INSUFFICIENT_EVIDENCE",
+          "in_distribution": null,
+          "predictive_interval_calibration": "NOT_QUALIFIED",
+          "semantics": "Exact workload/context evidence scope, not statistical OOD probability"
+        },
+        "reasons": [
+          "NO_COMPARABLE_RECOMMENDATION"
+        ],
+        "assessed_at": "2026-10-08T06:05:39.505874+00:00",
+        "candidates": [
+          {
+            "candidate_ref": "orin",
+            "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+            "compatible": true,
+            "reasons": []
+          }
+        ],
+        "profile_refs": [
+          "a-2b7b6e67ee124564a1a490bcfe78dfed",
+          "a-c89f8952180d4ed0ab758840b5e6653c"
+        ],
+        "study_refs": [],
+        "recommendation_ref": "rec-d946e58ef8a8412db3af80c4ad34e69e",
+        "current_validity": {
+          "policy_version": "recommendation-reuse-v1",
+          "assessed_at": "2026-10-08T06:05:39.503651+00:00",
+          "recommendation_ref": "rec-d946e58ef8a8412db3af80c4ad34e69e",
+          "reusable": false,
+          "reasons": [
+            "NO_MEASURED_RECOMMENDATION"
+          ],
+          "residuals": [],
+          "drift_policy": {
+            "relative_error_limit": 0.25,
+            "consecutive_independent_runs": 3,
+            "semantics": "heuristic recheck trigger, not calibrated probability or root cause"
+          }
+        },
+        "feedback": [],
+        "additional_profiling_required": true,
+        "milestones": [
+          {
+            "state": "UNKNOWN",
+            "evidence_refs": [
+              "right-sizing-slurm-20261008-v1"
+            ],
+            "observed": true
+          },
+          {
+            "state": "COMPATIBILITY_CHECKED",
+            "evidence_refs": [
+              "orin"
+            ],
+            "observed": true
+          },
+          {
+            "state": "NEEDS_PROFILE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILING",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILED",
+            "evidence_refs": [
+              "a-2b7b6e67ee124564a1a490bcfe78dfed",
+              "a-c89f8952180d4ed0ab758840b5e6653c"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDABLE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "RECOMMENDED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "APPROVED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "EXECUTED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "VERIFIED",
+            "evidence_refs": [],
+            "observed": false
+          }
+        ],
+        "semantics": "Evidence projection, not a new Job state machine. VERIFIED means independent actual/reference comparison; no speedup or calibrated coverage guarantee."
+      }
+    },
+    {
+      "role": "observe",
+      "index": 3,
+      "job_id": "j-f9ffd89ef5ee42eeac8fd92bd3f42cdd",
+      "attempt_id": "a-1c8261a25b3a4440a762fd3ab43f2354",
+      "native_job_id": "80",
+      "state": "SUCCEEDED",
+      "created_at": "2026-10-08T06:05:39.519732+00:00",
+      "request": {
+        "workload_ref": "right-sizing-slurm-20261008-v1",
+        "candidate_ref": "orin",
+        "mode": "observe"
+      },
+      "spec": {
+        "schema_version": "v1",
+        "ref": "right-sizing-slurm-20261008-v1",
+        "project_ref": "ra-lab",
+        "identity": {
+          "code_digest": "sha256:ae41a73807559871b5d201122298f957282d029818335e4f8a892a3730685a4d",
+          "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+          "dataset_version": "generated-seed20261006-input878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+          "config_digest": "sha256:999180d474d5ab2616abb9be63989b3d89b6a401746d2851011726515dcdb69b",
+          "task_type": "benchmark",
+          "input_shape": [
+            4,
+            3,
+            32,
+            32
+          ],
+          "batch_size": 4,
+          "global_batch_size": null,
+          "gradient_accumulation": 1,
+          "precision": "fp32",
+          "seed": 20261006,
+          "work_units": 10,
+          "quality_contract_digest": "sha256:b56e74cbf6b4099db6255bde62fa9d4b61d749f4c1e4d913ba87cfd23a9553f3",
+          "measurement_boundary": "synchronized-cnn-forward-only-four-inputs-v1"
+        },
+        "candidates": [
+          {
+            "ref": "orin",
+            "variant_ref": "v-right-sizing-slurm-20261008-v1",
+            "capability_ref": "cap-right-sizing-slurm-20261008-v1",
+            "backend": "slurm",
+            "context": {
+              "arch": "arm64",
+              "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+              "runtime_versions": {
+                "pytorch": "2.5.0a0+872d972e41.nv24.08",
+                "cuda": "12.6"
+              },
+              "accelerator_model": "Orin",
+              "memory_model": "unified",
+              "power_mode": "uncontrolled-default",
+              "allocation_mode": "physical_device",
+              "resources": {
+                "host_cpu": 1.0,
+                "host_memory_mib": 1024,
+                "accelerator_count": 1
+              },
+              "parameters": {}
+            }
+          }
+        ],
+        "baseline_candidate_ref": "orin",
+        "profiling": {
+          "consent": false,
+          "max_candidates": 2,
+          "max_wall_seconds_per_candidate": 180,
+          "max_queue_seconds": 300,
+          "total_wall_seconds": 600,
+          "final_validation_seconds": 180,
+          "mutable_parameters": [],
+          "checkpoint_digest": null,
+          "max_probes": 8,
+          "device_seconds": {}
+        },
+        "quality": {
+          "metric": "numerical_agreement",
+          "minimum": 1.0,
+          "minimum_repeats": 3,
+          "maximum_peak_memory_mib": 1024.0,
+          "max_profile_age_seconds": 7200
+        },
+        "execution": {
+          "priority": "normal",
+          "max_run_seconds": 120,
+          "max_queue_seconds": 120,
+          "max_collection_seconds": 180
+        }
+      },
+      "candidate": {
+        "ref": "orin",
+        "variant_ref": "v-right-sizing-slurm-20261008-v1",
+        "capability_ref": "cap-right-sizing-slurm-20261008-v1",
+        "backend": "slurm",
+        "context": {
+          "arch": "arm64",
+          "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+          "runtime_versions": {
+            "pytorch": "2.5.0a0+872d972e41.nv24.08",
+            "cuda": "12.6"
+          },
+          "accelerator_model": "Orin",
+          "memory_model": "unified",
+          "power_mode": "uncontrolled-default",
+          "allocation_mode": "physical_device",
+          "resources": {
+            "host_cpu": 1.0,
+            "host_memory_mib": 1024,
+            "accelerator_count": 1
+          },
+          "parameters": {}
+        }
+      },
+      "variant": {
+        "ref": "v-right-sizing-slurm-20261008-v1",
+        "workload_ref": "right-sizing-slurm-20261008-v1",
+        "project_ref": "ra-lab",
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "arch": "arm64",
+        "accelerator_vendor": "nvidia",
+        "device_class": "gpu",
+        "precision": "fp32",
+        "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+        "compiled_artifact_digest": null,
+        "image": null,
+        "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+        "command": [
+          "/opt/resource-advisor/runtimes/torch-jetson-24.08/venv/bin/python",
+          "-I",
+          "/opt/resource-advisor/qualifications/orin-cnn-contract-v1/slurm_cnn_workload.py"
+        ],
+        "pilot_command": null,
+        "verification": "MODEL_VERIFIED",
+        "validation_refs": [
+          "a-24cce27e733e4dd89328a1493378257a"
+        ],
+        "supported_shapes": [
+          [
+            4,
+            3,
+            32,
+            32
+          ]
+        ],
+        "runtime_versions": {
+          "pytorch": "2.5.0a0+872d972e41.nv24.08",
+          "cuda": "12.6"
+        }
+      },
+      "capability": {
+        "ref": "cap-right-sizing-slurm-20261008-v1",
+        "node_ref": "slurm-w2",
+        "backend_cluster_id": "lab-slurm",
+        "backend": "slurm",
+        "observed_at": "2026-10-08T06:01:33.064600Z",
+        "valid_for_seconds": 7200,
+        "ready": true,
+        "arch": "arm64",
+        "accelerator_vendor": "nvidia",
+        "accelerator_model": "Orin",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocatable_count": 1,
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "resource_key": "gpu:orin_nano",
+        "runtime_versions": {
+          "pytorch": "2.5.0a0+872d972e41.nv24.08",
+          "cuda": "12.6"
+        },
+        "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+        "memory_model": "unified",
+        "power_mode": "uncontrolled-default",
+        "reservation_verified": true,
+        "isolation_verified": false,
+        "evidence_refs": [
+          "a-24cce27e733e4dd89328a1493378257a"
+        ]
+      },
+      "submission_warnings": [],
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-f9ffd89ef5ee42eeac8fd92bd3f42cdd",
+        "attempt_id": "a-1c8261a25b3a4440a762fd3ab43f2354",
+        "epoch": 1,
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.011639217962510884,
+          "peak_memory_mib": 33.05615234375,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 1.1349869892001152,
+          "latency_p95_ms": 1.2628769036382437,
+          "latency_p99_ms": 1.2628769036382437,
+          "throughput": 859.1642524617469,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:275d033c0509bf7c1867b90005061ee577f81ee1b84b6d5b3ce926b6d3b3070e",
+      "profile": {
+        "job_id": "j-f9ffd89ef5ee42eeac8fd92bd3f42cdd",
+        "candidate_ref": "orin",
+        "recorded_at": "2026-10-08T06:07:08.344066+00:00",
+        "result": {
+          "schema_version": "v1",
+          "job_id": "j-f9ffd89ef5ee42eeac8fd92bd3f42cdd",
+          "attempt_id": "a-1c8261a25b3a4440a762fd3ab43f2354",
+          "epoch": 1,
+          "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+          "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+          "outcome": "COMPLETED",
+          "measured": true,
+          "evidence_kind": "hardware",
+          "measurements": {
+            "elapsed_seconds": 0.011639217962510884,
+            "peak_memory_mib": 33.05615234375,
+            "quality_value": 1.0,
+            "sample_count": 10,
+            "work_units": 10,
+            "latency_p50_ms": 1.1349869892001152,
+            "latency_p95_ms": 1.2628769036382437,
+            "latency_p99_ms": 1.2628769036382437,
+            "throughput": 859.1642524617469,
+            "gpu_utilization": null,
+            "power_watts": null,
+            "temperature_celsius": null
+          },
+          "error_code": null
+        }
+      },
+      "feedback": null,
+      "ledger": {
+        "attempt_id": "a-1c8261a25b3a4440a762fd3ab43f2354",
+        "project": "ra-lab",
+        "backend": "slurm",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 84.0,
+        "measured_compute_seconds": 0.011639217962510884,
+        "queue_seconds": 1.0,
+        "body": {
+          "schema_version": "v2",
+          "accelerator_model": "Orin",
+          "backend_cluster_id": "lab-slurm",
+          "job_id": "j-f9ffd89ef5ee42eeac8fd92bd3f42cdd",
+          "outcome": "SUCCEEDED",
+          "error": null,
+          "result_valid": true,
+          "requested_resources": {
+            "host_cpu": 1.0,
+            "host_memory_mib": 1024,
+            "accelerator_count": 1
+          },
+          "observed_allocation": {
+            "source": "slurm:sacct AllocTRES",
+            "accelerator_count": 1.0,
+            "cpu": 1.0,
+            "memory_mib": 1024.0
+          },
+          "termination_receipt_ref": null,
+          "never_submitted": false,
+          "allocation_interval_seconds": 84.0,
+          "started_at": "2026-10-08T06:05:41+0000",
+          "backend_finished_at": "2026-10-08T06:07:05+0000",
+          "terminal_observed_at": "2026-10-08T06:07:08.344066+00:00",
+          "cancel_requested_at": null,
+          "cancel_dispatch_started_at": null,
+          "cancel_acknowledged_at": null,
+          "cancel_confirmed_at": null,
+          "cancel_dispatch_wait_seconds": null,
+          "cancel_confirmation_seconds": null,
+          "submitted_at": "2026-10-08T06:05:40+0000",
+          "submission_time_source": "scheduler",
+          "collection_seconds": 2.081943,
+          "preparation_seconds": null,
+          "container_runtime_seconds": null,
+          "allocated_cpu_seconds": 84.0,
+          "allocation_memory_mib": 1024.0,
+          "allocation_scope": "slurm:sacct AllocTRES",
+          "uncertainty": [
+            "QUEUE_WHOLE_SECOND_RESOLUTION"
+          ],
+          "semantics": "allocated reservations, not utilization; unknowns are null"
+        }
+      },
+      "native_accounting": "80|a-1c8261a25b3a4440a762fd3ab43f2354|ra-lab|compute|slurm-w2|COMPLETED|0:0|2026-10-08T06:05:40+0000|2026-10-08T06:05:41+0000|2026-10-08T06:07:05+0000|billing=1,cpu=1,gres/gpu=1,mem=1G,node=1|84|84||00:00.032\n80.batch|batch|ra-lab||slurm-w2|COMPLETED|0:0|2026-10-08T06:05:41+0000|2026-10-08T06:05:41+0000|2026-10-08T06:07:05+0000|cpu=1,gres/gpu=1,mem=1G,node=1|84|84|4248K|00:00.032\n80.0|python3|ra-lab||slurm-w2|COMPLETED|0:0|2026-10-08T06:05:42+0000|2026-10-08T06:05:42+0000|2026-10-08T06:07:05+0000|cpu=1,gres/gpu=1,mem=1G,node=1|83|83||00:00:00\n",
+      "numerical_qualification": {
+        "schema_version": "v1",
+        "result": "PASS",
+        "scope": "deterministic generated CNN numerical qualification, not model accuracy",
+        "torch": "2.5.0a0+872d972e41.nv24.08",
+        "cuda": "12.6",
+        "device": "Orin",
+        "capability": [
+          8,
+          7
+        ],
+        "cuda_arch_list": [
+          "sm_70",
+          "sm_72",
+          "sm_75",
+          "sm_80",
+          "sm_86",
+          "sm_87",
+          "compute_87"
+        ],
+        "input_shape": [
+          4,
+          3,
+          32,
+          32
+        ],
+        "precision": "fp32",
+        "seed": 20261006,
+        "input_sha256": "878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+        "weights_sha256": "b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+        "warmup_forwards": 3,
+        "measured_forwards": 10,
+        "compared_elements": 400,
+        "reference_rtol": 0.0001,
+        "reference_atol": 0.0001,
+        "max_absolute_error": 1.4901161193847656e-08,
+        "samples_seconds": [
+          0.0012888310011476278,
+          0.0012628769036382437,
+          0.0012175970477983356,
+          0.0011333390139043331,
+          0.0011225539492443204,
+          0.0011366349644958973,
+          0.001115577993914485,
+          0.0011981719871982932,
+          0.001110810087993741,
+          0.0010528250131756067
+        ],
+        "median_forward_ms": 1.1349869892001152,
+        "peak_tensor_allocation_mib": 33.05615234375,
+        "peak_process_rss_kib": 795556,
+        "cpu_fallback": false,
+        "enforced_boundary": {
+          "memory_max_bytes": 1073741824,
+          "swap_max_bytes": 0,
+          "memory_peak_bytes": 1068068864,
+          "cpu_affinity_count": 1
+        }
+      },
+      "delivery": {
+        "mlflow_run_id": "361692054f6d4f96875f7a91430c1838",
+        "artifact_digest": "sha256:fd5f141570509bb7afc3076705006623700a319dbe6e9324ecffce8a4d8b0f24",
+        "result_digest": "sha256:275d033c0509bf7c1867b90005061ee577f81ee1b84b6d5b3ce926b6d3b3070e",
+        "bundle_sha256": "fd5f141570509bb7afc3076705006623700a319dbe6e9324ecffce8a4d8b0f24",
+        "matching_s3_api_mlflow_bytes": true,
+        "ledger_rows": 1,
+        "mlflow_runs": 1
+      },
+      "lifecycle": {
+        "schema_version": "right-sizing-lifecycle-v1",
+        "workload_ref": "right-sizing-slurm-20261008-v1",
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "workload_digest": "sha256:c542e03013072aaf095f12aff4121d6edc6deaf4e0b38545a6852b323676d382",
+        "state": "RECOMMENDABLE",
+        "recommendability": {
+          "status": "MEASURED_RECOMMENDATION",
+          "ranking": [
+            {
+              "candidate_ref": "orin",
+              "mean_seconds": 0.012069606610263387,
+              "interval_seconds": [
+                0.010187056281486785,
+                0.013952156939039988
+              ],
+              "independent_runs": 3,
+              "evidence_refs": [
+                "a-c89f8952180d4ed0ab758840b5e6653c",
+                "a-2b7b6e67ee124564a1a490bcfe78dfed",
+                "a-1c8261a25b3a4440a762fd3ab43f2354"
+              ]
+            }
+          ],
+          "excluded": {},
+          "approval_authorized": false
+        },
+        "distribution": {
+          "status": "OBSERVED_QUALIFIED_SCOPE",
+          "in_distribution": true,
+          "predictive_interval_calibration": "NOT_QUALIFIED",
+          "semantics": "Exact workload/context evidence scope, not statistical OOD probability"
+        },
+        "reasons": [],
+        "assessed_at": "2026-10-08T06:07:19.550995+00:00",
+        "candidates": [
+          {
+            "candidate_ref": "orin",
+            "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+            "compatible": true,
+            "reasons": []
+          }
+        ],
+        "profile_refs": [
+          "a-1c8261a25b3a4440a762fd3ab43f2354",
+          "a-2b7b6e67ee124564a1a490bcfe78dfed",
+          "a-c89f8952180d4ed0ab758840b5e6653c"
+        ],
+        "study_refs": [],
+        "recommendation_ref": "rec-d946e58ef8a8412db3af80c4ad34e69e",
+        "current_validity": {
+          "policy_version": "recommendation-reuse-v1",
+          "assessed_at": "2026-10-08T06:07:19.548008+00:00",
+          "recommendation_ref": "rec-d946e58ef8a8412db3af80c4ad34e69e",
+          "reusable": false,
+          "reasons": [
+            "NO_MEASURED_RECOMMENDATION"
+          ],
+          "residuals": [],
+          "drift_policy": {
+            "relative_error_limit": 0.25,
+            "consecutive_independent_runs": 3,
+            "semantics": "heuristic recheck trigger, not calibrated probability or root cause"
+          }
+        },
+        "feedback": [],
+        "additional_profiling_required": false,
+        "milestones": [
+          {
+            "state": "UNKNOWN",
+            "evidence_refs": [
+              "right-sizing-slurm-20261008-v1"
+            ],
+            "observed": true
+          },
+          {
+            "state": "COMPATIBILITY_CHECKED",
+            "evidence_refs": [
+              "orin"
+            ],
+            "observed": true
+          },
+          {
+            "state": "NEEDS_PROFILE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILING",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILED",
+            "evidence_refs": [
+              "a-1c8261a25b3a4440a762fd3ab43f2354",
+              "a-2b7b6e67ee124564a1a490bcfe78dfed",
+              "a-c89f8952180d4ed0ab758840b5e6653c"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDABLE",
+            "evidence_refs": [
+              "a-c89f8952180d4ed0ab758840b5e6653c",
+              "a-2b7b6e67ee124564a1a490bcfe78dfed",
+              "a-1c8261a25b3a4440a762fd3ab43f2354"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "APPROVED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "EXECUTED",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "VERIFIED",
+            "evidence_refs": [],
+            "observed": false
+          }
+        ],
+        "semantics": "Evidence projection, not a new Job state machine. VERIFIED means independent actual/reference comparison; no speedup or calibrated coverage guarantee."
+      }
+    },
+    {
+      "role": "approved_main",
+      "index": 4,
+      "job_id": "j-da6b7c97d37443999430d2e537700b7f",
+      "attempt_id": "a-a965ad6c371f4454bbf1522e8bec8105",
+      "native_job_id": "81",
+      "state": "SUCCEEDED",
+      "created_at": "2026-10-08T06:07:19.855994+00:00",
+      "request": {
+        "workload_ref": "right-sizing-slurm-20261008-v1",
+        "candidate_ref": "orin",
+        "mode": "fixed",
+        "approval_ref": "apr-f859cd8a75304fe18623c048f1ebfc8e"
+      },
+      "spec": {
+        "schema_version": "v1",
+        "ref": "right-sizing-slurm-20261008-v1",
+        "project_ref": "ra-lab",
+        "identity": {
+          "code_digest": "sha256:ae41a73807559871b5d201122298f957282d029818335e4f8a892a3730685a4d",
+          "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+          "dataset_version": "generated-seed20261006-input878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+          "config_digest": "sha256:999180d474d5ab2616abb9be63989b3d89b6a401746d2851011726515dcdb69b",
+          "task_type": "benchmark",
+          "input_shape": [
+            4,
+            3,
+            32,
+            32
+          ],
+          "batch_size": 4,
+          "global_batch_size": null,
+          "gradient_accumulation": 1,
+          "precision": "fp32",
+          "seed": 20261006,
+          "work_units": 10,
+          "quality_contract_digest": "sha256:b56e74cbf6b4099db6255bde62fa9d4b61d749f4c1e4d913ba87cfd23a9553f3",
+          "measurement_boundary": "synchronized-cnn-forward-only-four-inputs-v1"
+        },
+        "candidates": [
+          {
+            "ref": "orin",
+            "variant_ref": "v-right-sizing-slurm-20261008-v1",
+            "capability_ref": "cap-right-sizing-slurm-20261008-v1",
+            "backend": "slurm",
+            "context": {
+              "arch": "arm64",
+              "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+              "runtime_versions": {
+                "pytorch": "2.5.0a0+872d972e41.nv24.08",
+                "cuda": "12.6"
+              },
+              "accelerator_model": "Orin",
+              "memory_model": "unified",
+              "power_mode": "uncontrolled-default",
+              "allocation_mode": "physical_device",
+              "resources": {
+                "host_cpu": 1.0,
+                "host_memory_mib": 1024,
+                "accelerator_count": 1
+              },
+              "parameters": {}
+            }
+          }
+        ],
+        "baseline_candidate_ref": "orin",
+        "profiling": {
+          "consent": false,
+          "max_candidates": 2,
+          "max_wall_seconds_per_candidate": 180,
+          "max_queue_seconds": 300,
+          "total_wall_seconds": 600,
+          "final_validation_seconds": 180,
+          "mutable_parameters": [],
+          "checkpoint_digest": null,
+          "max_probes": 8,
+          "device_seconds": {}
+        },
+        "quality": {
+          "metric": "numerical_agreement",
+          "minimum": 1.0,
+          "minimum_repeats": 3,
+          "maximum_peak_memory_mib": 1024.0,
+          "max_profile_age_seconds": 7200
+        },
+        "execution": {
+          "priority": "normal",
+          "max_run_seconds": 120,
+          "max_queue_seconds": 120,
+          "max_collection_seconds": 180
+        }
+      },
+      "candidate": {
+        "ref": "orin",
+        "variant_ref": "v-right-sizing-slurm-20261008-v1",
+        "capability_ref": "cap-right-sizing-slurm-20261008-v1",
+        "backend": "slurm",
+        "context": {
+          "arch": "arm64",
+          "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+          "runtime_versions": {
+            "pytorch": "2.5.0a0+872d972e41.nv24.08",
+            "cuda": "12.6"
+          },
+          "accelerator_model": "Orin",
+          "memory_model": "unified",
+          "power_mode": "uncontrolled-default",
+          "allocation_mode": "physical_device",
+          "resources": {
+            "host_cpu": 1.0,
+            "host_memory_mib": 1024,
+            "accelerator_count": 1
+          },
+          "parameters": {}
+        }
+      },
+      "variant": {
+        "ref": "v-right-sizing-slurm-20261008-v1",
+        "workload_ref": "right-sizing-slurm-20261008-v1",
+        "project_ref": "ra-lab",
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "arch": "arm64",
+        "accelerator_vendor": "nvidia",
+        "device_class": "gpu",
+        "precision": "fp32",
+        "model_digest": "sha256:b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+        "compiled_artifact_digest": null,
+        "image": null,
+        "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+        "command": [
+          "/opt/resource-advisor/runtimes/torch-jetson-24.08/venv/bin/python",
+          "-I",
+          "/opt/resource-advisor/qualifications/orin-cnn-contract-v1/slurm_cnn_workload.py"
+        ],
+        "pilot_command": null,
+        "verification": "MODEL_VERIFIED",
+        "validation_refs": [
+          "a-24cce27e733e4dd89328a1493378257a"
+        ],
+        "supported_shapes": [
+          [
+            4,
+            3,
+            32,
+            32
+          ]
+        ],
+        "runtime_versions": {
+          "pytorch": "2.5.0a0+872d972e41.nv24.08",
+          "cuda": "12.6"
+        }
+      },
+      "capability": {
+        "ref": "cap-right-sizing-slurm-20261008-v1",
+        "node_ref": "slurm-w2",
+        "backend_cluster_id": "lab-slurm",
+        "backend": "slurm",
+        "observed_at": "2026-10-08T06:01:33.064600Z",
+        "valid_for_seconds": 7200,
+        "ready": true,
+        "arch": "arm64",
+        "accelerator_vendor": "nvidia",
+        "accelerator_model": "Orin",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocatable_count": 1,
+        "host_cpu": 1.0,
+        "host_memory_mib": 1024,
+        "resource_key": "gpu:orin_nano",
+        "runtime_versions": {
+          "pytorch": "2.5.0a0+872d972e41.nv24.08",
+          "cuda": "12.6"
+        },
+        "environment_digest": "sha256:46e6630d5d019720b3eb378f627ea205451d3e53e83d95992d5fb5f5157f62c9",
+        "memory_model": "unified",
+        "power_mode": "uncontrolled-default",
+        "reservation_verified": true,
+        "isolation_verified": false,
+        "evidence_refs": [
+          "a-24cce27e733e4dd89328a1493378257a"
+        ]
+      },
+      "submission_warnings": [],
+      "result": {
+        "schema_version": "v1",
+        "job_id": "j-da6b7c97d37443999430d2e537700b7f",
+        "attempt_id": "a-a965ad6c371f4454bbf1522e8bec8105",
+        "epoch": 1,
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+        "outcome": "COMPLETED",
+        "measured": true,
+        "evidence_kind": "hardware",
+        "measurements": {
+          "elapsed_seconds": 0.011986714089289308,
+          "peak_memory_mib": 33.05615234375,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 1.12183450255543,
+          "latency_p95_ms": 1.2141410261392593,
+          "latency_p99_ms": 1.2141410261392593,
+          "throughput": 834.2569886550868,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "error_code": null
+      },
+      "result_digest": "sha256:b2ea3516b23f5897b7942d9bb51ad06885e1152eefdea1b1ce4f3ff15333401f",
+      "profile": {
+        "job_id": "j-da6b7c97d37443999430d2e537700b7f",
+        "candidate_ref": "orin",
+        "recorded_at": "2026-10-08T06:08:48.971029+00:00",
+        "result": {
+          "schema_version": "v1",
+          "job_id": "j-da6b7c97d37443999430d2e537700b7f",
+          "attempt_id": "a-a965ad6c371f4454bbf1522e8bec8105",
+          "epoch": 1,
+          "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+          "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+          "outcome": "COMPLETED",
+          "measured": true,
+          "evidence_kind": "hardware",
+          "measurements": {
+            "elapsed_seconds": 0.011986714089289308,
+            "peak_memory_mib": 33.05615234375,
+            "quality_value": 1.0,
+            "sample_count": 10,
+            "work_units": 10,
+            "latency_p50_ms": 1.12183450255543,
+            "latency_p95_ms": 1.2141410261392593,
+            "latency_p99_ms": 1.2141410261392593,
+            "throughput": 834.2569886550868,
+            "gpu_utilization": null,
+            "power_watts": null,
+            "temperature_celsius": null
+          },
+          "error_code": null
+        }
+      },
+      "feedback": {
+        "schema_version": "recommendation-feedback-v1",
+        "job_id": "j-da6b7c97d37443999430d2e537700b7f",
+        "attempt_id": "a-a965ad6c371f4454bbf1522e8bec8105",
+        "epoch": 1,
+        "approval_ref": "apr-f859cd8a75304fe18623c048f1ebfc8e",
+        "recommendation_ref": "rec-af91d125964549a0af02cd1777831c66",
+        "recommendation_digest": "sha256:ee5bb17d1699a7de7a615dcac8f82f3c0252c33868242d0a887f0cac65cf6c80",
+        "source_profile_refs": [
+          "a-c89f8952180d4ed0ab758840b5e6653c",
+          "a-2b7b6e67ee124564a1a490bcfe78dfed",
+          "a-1c8261a25b3a4440a762fd3ab43f2354"
+        ],
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+        "backend": "slurm",
+        "native_job_id": "81",
+        "result_digest": "sha256:b2ea3516b23f5897b7942d9bb51ad06885e1152eefdea1b1ce4f3ff15333401f",
+        "usage_attempt_id": "a-a965ad6c371f4454bbf1522e8bec8105",
+        "evidence_kind": "hardware",
+        "terminal_state": "SUCCEEDED",
+        "recorded_at": "2026-10-08T06:08:48.971029+00:00",
+        "status": "COMPARABLE",
+        "reasons": [],
+        "constraint_passed": true,
+        "reference_mean_seconds": 0.012069606610263387,
+        "actual_measurements": {
+          "elapsed_seconds": 0.011986714089289308,
+          "peak_memory_mib": 33.05615234375,
+          "quality_value": 1.0,
+          "sample_count": 10,
+          "work_units": 10,
+          "latency_p50_ms": 1.12183450255543,
+          "latency_p95_ms": 1.2141410261392593,
+          "latency_p99_ms": 1.2141410261392593,
+          "throughput": 834.2569886550868,
+          "gpu_utilization": null,
+          "power_watts": null,
+          "temperature_celsius": null
+        },
+        "actual_seconds": 0.011986714089289308,
+        "residual_seconds": -8.289252097407919e-05,
+        "relative_residual": -0.006867872636676622,
+        "reference_interval_seconds": [
+          0.010187056281486785,
+          0.013952156939039988
+        ],
+        "semantics": "Comparison with measured reference mean, not a calibrated forecast or speedup proof"
+      },
+      "ledger": {
+        "attempt_id": "a-a965ad6c371f4454bbf1522e8bec8105",
+        "project": "ra-lab",
+        "backend": "slurm",
+        "device_class": "gpu",
+        "allocation_mode": "physical_device",
+        "allocated_device_seconds": 80.0,
+        "measured_compute_seconds": 0.011986714089289308,
+        "queue_seconds": 1.0,
+        "body": {
+          "schema_version": "v2",
+          "accelerator_model": "Orin",
+          "backend_cluster_id": "lab-slurm",
+          "job_id": "j-da6b7c97d37443999430d2e537700b7f",
+          "outcome": "SUCCEEDED",
+          "error": null,
+          "result_valid": true,
+          "requested_resources": {
+            "host_cpu": 1.0,
+            "host_memory_mib": 1024,
+            "accelerator_count": 1
+          },
+          "observed_allocation": {
+            "source": "slurm:sacct AllocTRES",
+            "accelerator_count": 1.0,
+            "cpu": 1.0,
+            "memory_mib": 1024.0
+          },
+          "termination_receipt_ref": null,
+          "never_submitted": false,
+          "allocation_interval_seconds": 80.0,
+          "started_at": "2026-10-08T06:07:25+0000",
+          "backend_finished_at": "2026-10-08T06:08:45+0000",
+          "terminal_observed_at": "2026-10-08T06:08:48.971029+00:00",
+          "cancel_requested_at": null,
+          "cancel_dispatch_started_at": null,
+          "cancel_acknowledged_at": null,
+          "cancel_confirmed_at": null,
+          "cancel_dispatch_wait_seconds": null,
+          "cancel_confirmation_seconds": null,
+          "submitted_at": "2026-10-08T06:07:24+0000",
+          "submission_time_source": "scheduler",
+          "collection_seconds": 2.184182,
+          "preparation_seconds": null,
+          "container_runtime_seconds": null,
+          "allocated_cpu_seconds": 80.0,
+          "allocation_memory_mib": 1024.0,
+          "allocation_scope": "slurm:sacct AllocTRES",
+          "uncertainty": [
+            "QUEUE_WHOLE_SECOND_RESOLUTION"
+          ],
+          "semantics": "allocated reservations, not utilization; unknowns are null"
+        }
+      },
+      "native_accounting": "81|a-a965ad6c371f4454bbf1522e8bec8105|ra-lab|compute|slurm-w2|COMPLETED|0:0|2026-10-08T06:07:24+0000|2026-10-08T06:07:25+0000|2026-10-08T06:08:45+0000|billing=1,cpu=1,gres/gpu=1,mem=1G,node=1|80|80||00:00.034\n81.batch|batch|ra-lab||slurm-w2|COMPLETED|0:0|2026-10-08T06:07:25+0000|2026-10-08T06:07:25+0000|2026-10-08T06:08:45+0000|cpu=1,gres/gpu=1,mem=1G,node=1|80|80|4304K|00:00.034\n81.0|python3|ra-lab||slurm-w2|COMPLETED|0:0|2026-10-08T06:07:26+0000|2026-10-08T06:07:26+0000|2026-10-08T06:08:45+0000|cpu=1,gres/gpu=1,mem=1G,node=1|79|79||00:00:00\n",
+      "numerical_qualification": {
+        "schema_version": "v1",
+        "result": "PASS",
+        "scope": "deterministic generated CNN numerical qualification, not model accuracy",
+        "torch": "2.5.0a0+872d972e41.nv24.08",
+        "cuda": "12.6",
+        "device": "Orin",
+        "capability": [
+          8,
+          7
+        ],
+        "cuda_arch_list": [
+          "sm_70",
+          "sm_72",
+          "sm_75",
+          "sm_80",
+          "sm_86",
+          "sm_87",
+          "compute_87"
+        ],
+        "input_shape": [
+          4,
+          3,
+          32,
+          32
+        ],
+        "precision": "fp32",
+        "seed": 20261006,
+        "input_sha256": "878ab68049a9bab81597f2fe5345fd5ee5265132855cdff6e29b08702e7963e7",
+        "weights_sha256": "b8609d8ea4b81cbaa307fbb0b1da35851af6f04e6af74ece60822538c54f7347",
+        "warmup_forwards": 3,
+        "measured_forwards": 10,
+        "compared_elements": 400,
+        "reference_rtol": 0.0001,
+        "reference_atol": 0.0001,
+        "max_absolute_error": 1.4901161193847656e-08,
+        "samples_seconds": [
+          0.0010905530070886016,
+          0.00184977101162076,
+          0.0011352909496054053,
+          0.0010987459681928158,
+          0.0011083780555054545,
+          0.0010826500365510583,
+          0.0010673210490494967,
+          0.0012141410261392593,
+          0.0011994519736617804,
+          0.0011404110118746758
+        ],
+        "median_forward_ms": 1.12183450255543,
+        "peak_tensor_allocation_mib": 33.05615234375,
+        "peak_process_rss_kib": 796764,
+        "cpu_fallback": false,
+        "enforced_boundary": {
+          "memory_max_bytes": 1073741824,
+          "swap_max_bytes": 0,
+          "memory_peak_bytes": 1067855872,
+          "cpu_affinity_count": 1
+        }
+      },
+      "delivery": {
+        "mlflow_run_id": "4da9c661c81c42dba29d71ee0ba85a9f",
+        "artifact_digest": "sha256:3c5ef1bb23e91bfc5dd587628167056250e39f6d512982b300866aca19b8e162",
+        "result_digest": "sha256:b2ea3516b23f5897b7942d9bb51ad06885e1152eefdea1b1ce4f3ff15333401f",
+        "bundle_sha256": "3c5ef1bb23e91bfc5dd587628167056250e39f6d512982b300866aca19b8e162",
+        "matching_s3_api_mlflow_bytes": true,
+        "ledger_rows": 1,
+        "mlflow_runs": 1
+      },
+      "lifecycle": {
+        "schema_version": "right-sizing-lifecycle-v1",
+        "workload_ref": "right-sizing-slurm-20261008-v1",
+        "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+        "workload_digest": "sha256:c542e03013072aaf095f12aff4121d6edc6deaf4e0b38545a6852b323676d382",
+        "state": "VERIFIED",
+        "recommendability": {
+          "status": "MEASURED_RECOMMENDATION",
+          "ranking": [
+            {
+              "candidate_ref": "orin",
+              "mean_seconds": 0.012048883480019867,
+              "interval_seconds": [
+                0.010716268418071275,
+                0.01338149854196846
+              ],
+              "independent_runs": 4,
+              "evidence_refs": [
+                "a-c89f8952180d4ed0ab758840b5e6653c",
+                "a-2b7b6e67ee124564a1a490bcfe78dfed",
+                "a-1c8261a25b3a4440a762fd3ab43f2354",
+                "a-a965ad6c371f4454bbf1522e8bec8105"
+              ]
+            }
+          ],
+          "excluded": {},
+          "approval_authorized": false
+        },
+        "distribution": {
+          "status": "OBSERVED_QUALIFIED_SCOPE",
+          "in_distribution": true,
+          "predictive_interval_calibration": "NOT_QUALIFIED",
+          "semantics": "Exact workload/context evidence scope, not statistical OOD probability"
+        },
+        "reasons": [],
+        "assessed_at": "2026-10-08T06:08:59.991252+00:00",
+        "candidates": [
+          {
+            "candidate_ref": "orin",
+            "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+            "compatible": true,
+            "reasons": []
+          }
+        ],
+        "profile_refs": [
+          "a-1c8261a25b3a4440a762fd3ab43f2354",
+          "a-2b7b6e67ee124564a1a490bcfe78dfed",
+          "a-a965ad6c371f4454bbf1522e8bec8105",
+          "a-c89f8952180d4ed0ab758840b5e6653c"
+        ],
+        "study_refs": [],
+        "recommendation_ref": "rec-af91d125964549a0af02cd1777831c66",
+        "current_validity": {
+          "policy_version": "recommendation-reuse-v1",
+          "assessed_at": "2026-10-08T06:08:59.848549+00:00",
+          "recommendation_ref": "rec-af91d125964549a0af02cd1777831c66",
+          "reusable": true,
+          "reasons": [],
+          "residuals": [
+            {
+              "attempt_id": "a-a965ad6c371f4454bbf1522e8bec8105",
+              "recorded_at": "2026-10-08T06:08:48.971029+00:00",
+              "actual_seconds": 0.011986714089289308,
+              "relative_error": -0.006867872636676622
+            }
+          ],
+          "drift_policy": {
+            "relative_error_limit": 0.25,
+            "consecutive_independent_runs": 3,
+            "semantics": "heuristic recheck trigger, not calibrated probability or root cause"
+          },
+          "drift_evidence_refs": [],
+          "constraint_failure_refs": []
+        },
+        "feedback": [
+          {
+            "schema_version": "recommendation-feedback-v1",
+            "job_id": "j-da6b7c97d37443999430d2e537700b7f",
+            "attempt_id": "a-a965ad6c371f4454bbf1522e8bec8105",
+            "epoch": 1,
+            "approval_ref": "apr-f859cd8a75304fe18623c048f1ebfc8e",
+            "recommendation_ref": "rec-af91d125964549a0af02cd1777831c66",
+            "recommendation_digest": "sha256:ee5bb17d1699a7de7a615dcac8f82f3c0252c33868242d0a887f0cac65cf6c80",
+            "source_profile_refs": [
+              "a-c89f8952180d4ed0ab758840b5e6653c",
+              "a-2b7b6e67ee124564a1a490bcfe78dfed",
+              "a-1c8261a25b3a4440a762fd3ab43f2354"
+            ],
+            "workload_signature": "sha256:9f95a2facb7e9a1b76c757501b33bec8e51fc4191351742c6d3cb61ee3f369fe",
+            "context_signature": "sha256:9644a82dae61652711566c729ba410f4a70c50ef7b300de0bb5557999558588c",
+            "backend": "slurm",
+            "native_job_id": "81",
+            "result_digest": "sha256:b2ea3516b23f5897b7942d9bb51ad06885e1152eefdea1b1ce4f3ff15333401f",
+            "usage_attempt_id": "a-a965ad6c371f4454bbf1522e8bec8105",
+            "evidence_kind": "hardware",
+            "terminal_state": "SUCCEEDED",
+            "recorded_at": "2026-10-08T06:08:48.971029+00:00",
+            "status": "COMPARABLE",
+            "reasons": [],
+            "constraint_passed": true,
+            "reference_mean_seconds": 0.012069606610263387,
+            "actual_measurements": {
+              "elapsed_seconds": 0.011986714089289308,
+              "peak_memory_mib": 33.05615234375,
+              "quality_value": 1.0,
+              "sample_count": 10,
+              "work_units": 10,
+              "latency_p50_ms": 1.12183450255543,
+              "latency_p95_ms": 1.2141410261392593,
+              "latency_p99_ms": 1.2141410261392593,
+              "throughput": 834.2569886550868,
+              "gpu_utilization": null,
+              "power_watts": null,
+              "temperature_celsius": null
+            },
+            "actual_seconds": 0.011986714089289308,
+            "residual_seconds": -8.289252097407919e-05,
+            "relative_residual": -0.006867872636676622,
+            "reference_interval_seconds": [
+              0.010187056281486785,
+              0.013952156939039988
+            ],
+            "semantics": "Comparison with measured reference mean, not a calibrated forecast or speedup proof"
+          }
+        ],
+        "additional_profiling_required": false,
+        "milestones": [
+          {
+            "state": "UNKNOWN",
+            "evidence_refs": [
+              "right-sizing-slurm-20261008-v1"
+            ],
+            "observed": true
+          },
+          {
+            "state": "COMPATIBILITY_CHECKED",
+            "evidence_refs": [
+              "orin"
+            ],
+            "observed": true
+          },
+          {
+            "state": "NEEDS_PROFILE",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILING",
+            "evidence_refs": [],
+            "observed": false
+          },
+          {
+            "state": "PROFILED",
+            "evidence_refs": [
+              "a-1c8261a25b3a4440a762fd3ab43f2354",
+              "a-2b7b6e67ee124564a1a490bcfe78dfed",
+              "a-a965ad6c371f4454bbf1522e8bec8105",
+              "a-c89f8952180d4ed0ab758840b5e6653c"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDABLE",
+            "evidence_refs": [
+              "rec-af91d125964549a0af02cd1777831c66"
+            ],
+            "observed": true
+          },
+          {
+            "state": "RECOMMENDED",
+            "evidence_refs": [
+              "rec-af91d125964549a0af02cd1777831c66"
+            ],
+            "observed": true
+          },
+          {
+            "state": "APPROVED",
+            "evidence_refs": [
+              "apr-f859cd8a75304fe18623c048f1ebfc8e"
+            ],
+            "observed": true
+          },
+          {
+            "state": "EXECUTED",
+            "evidence_refs": [
+              "j-da6b7c97d37443999430d2e537700b7f"
+            ],
+            "observed": true
+          },
+          {
+            "state": "VERIFIED",
+            "evidence_refs": [
+              "a-a965ad6c371f4454bbf1522e8bec8105"
+            ],
+            "observed": true
+          }
+        ],
+        "semantics": "Evidence projection, not a new Job state machine. VERIFIED means independent actual/reference comparison; no speedup or calibrated coverage guarantee."
+      }
+    }
+  ],
+  "binding_applied": {
+    "at": "2026-10-08T06:02:08.400670+00:00",
+    "variant_ref": "v-right-sizing-slurm-20261008-v1",
+    "existing_tail_unchanged": true,
+    "scheduler_or_gateway_config_changed": false
+  },
+  "limitations": [
+    "Single fixed candidate; observe original workload, no cooperative pilot or Slurm search.",
+    "Not comparable to the different W1/W2 or Hailo workloads.",
+    "Descriptive reference/actual residual is not a speedup.",
+    "Image/native environment preparation, service CPU, power and energy costs unknown."
+  ]
+}

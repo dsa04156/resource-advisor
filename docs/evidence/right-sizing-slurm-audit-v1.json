@@ -1,0 +1,29 @@
+{
+  "schema_version": "right-sizing-slurm-audit-v1",
+  "experiment_id": "right-sizing-slurm-20261008-v1",
+  "native_jobs": 5,
+  "qualification_jobs": 1,
+  "observe_jobs": 3,
+  "independent_approved_jobs": 1,
+  "gpu_reservation_seconds": 421.0,
+  "cpu_core_reservation_seconds": 421.0,
+  "host_memory_mib_seconds": 431104.0,
+  "protocol_wall_seconds": 549.050608,
+  "reference_mean_seconds": 0.012069606610263387,
+  "reference_interval_seconds": [
+    0.010187056281486785,
+    0.013952156939039988
+  ],
+  "actual_seconds": 0.011986714089289308,
+  "relative_residual": -0.006867872636676622,
+  "actual_inside_descriptive_interval": true,
+  "next_history_source_count": 4,
+  "closed_loop_verified": true,
+  "performance_improvement_claim": false,
+  "limitations": [
+    "One fixed qualified candidate; not Slurm resource search or a cross-backend comparison.",
+    "Forward-only timing excludes initialization, full native guard and scheduler reservation.",
+    "Descriptive mean interval is not a calibrated predictive interval.",
+    "Energy, actual model CPU time and reused environment preparation cost remain unknown."
+  ]
+}

@@ -95,4 +95,11 @@ lifecycle/feedback implementation, three qualified workload paths, primary equal
 Random/BO results and complete later finite references (W1 v2, W2 v3). The original
 failed references remain separately recorded and charged. Fresh W2 v3 adds 32 native
 Jobs with no failures; it does not replace the primary comparison or imply BO advantage.
-New Slurm approved-feedback hardware validation remains blocked by controller connectivity.
+At the first reference checkpoint Slurm feedback was blocked by controller connectivity.
+The later [Slurm increment](right-sizing-slurm-feedback.md) adds five real GPU Jobs,
+three new original-workload profiles, explicit approval, immutable feedback and a next
+lookup containing the approved execution. Its [auditor](../examples/audit_right_sizing_slurm.py)
+checks native ownership/digests/quality/chronology/cost. It is a fixed-candidate lifecycle,
+not Slurm active search or equivalent AI-workload cross-backend performance qualification.
+The [five-GPU extension](pool-resource-coverage.md) separately repairs CUDA workload
+candidate coverage; Mobilint model execution and GPU/NPU AI comparability remain open.

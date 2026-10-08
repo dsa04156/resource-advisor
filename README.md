@@ -3,6 +3,10 @@
 **GPU·NPU 자원을 보고, 작업을 실행하고, 결과와 사용 시간을 확인하는 연구용 프로젝트입니다.**
 
 처음이면 [한국어 사용 가이드](docs/quickstart-ko.md)부터 보세요.
+현재 [자원 풀과 실행 후보](docs/pool-resource-coverage.md)는 GPU5대 자동 선택과
+Hailo/Mobilint 지원 차이를 설명합니다. 2026-10-08 새
+[Slurm 관측→추천→승인→피드백](docs/right-sizing-slurm-feedback.md)은 실제 GPU 작업5개로
+검증했으며 이전 실패와 비용 기록은 보존했습니다.
 [직접 만든 차별점과 원래 설계의 완료 기준](docs/differentiation-ko.md)도 확인할 수 있습니다.
 핵심 실행 경로에는 실장비 근거가 있지만 전체 설계는 미완료입니다.
 [실제 CPU→GPU 계산 파이프라인](docs/cpu-gpu-pipeline-results.md)과 사용자 코드를

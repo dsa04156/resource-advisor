@@ -1,13 +1,13 @@
 # Right-sizing hardware evidence matrix
 
 장치 등록, runtime 동작, 모델 검증과 현재 접근 가능성을 분리한다. 이 표는
-2026-10-07 새 실험과 보존된 기존 증거의 범위이며 자동 capability 승격이 아니다.
+2026-10-07 실험 및 10-08 Slurm 복귀 증거의 범위이며 자동 capability 승격이 아니다.
 
 | 장치/runtime | 등록/접근 | 실행 검증 | 이번 새 증거 | 추천에 허용되는 범위 |
 |---|---|---|---|---|
 | RTX5080 / PyTorch2.8.0+cu128, CUDA12.8, driver595.84 | 실제 접근 | MODEL_VERIFIED | GPU F0 4개, 신규 GPU API97개 + reference45개 | W1 matmul/W2 CNN의 고정 logical identity, 6 CPU/memory 구성, physical GPU1 |
 | Hailo8 / HailoRT·driver·firmware4.23.0 | 실제 접근 | MODEL_VERIFIED | ResNet50 F0 1개, 원본 observe3 + approved fixed1 | 같은 HEF/100 input/80% accuracy/97% agreement 계약의 단일 구성 |
-| Orin GPU / 기존 Slurm qualified PyTorch runtime | Orin SSH 가능, controller/native RPC 불가 | 기존 MODEL_VERIFIED | 이번 새 Slurm 실행 없음 | 기존 모델 실행·cancel·response-loss/crash recovery만 증거; 새 feedback BLOCKED |
+| Orin GPU / 기존 Slurm qualified PyTorch runtime | 10-08 controller/native RPC 복구 | 새 고정 CNN MODEL_VERIFIED | 새 native Job5 / observe3 / 승인 feedback / next source4 | 단일 고정 후보 lifecycle; Slurm search/backend 속도 비교 아님 |
 | 다른 NVIDIA/Jetson node | 기존 inventory/CUDA smoke | workload별 별도 확인 필요 | 새 W1/W2 model qualification 없음 | 등록 또는 smoke만으로 신규 model performance profile을 재사용하지 않음 |
 | Mobilint/Rockchip 등 NPU | 기존 inventory/일부 telemetry | 신규 logical model evidence 없음 | 없음 | 해당 SDK/모델/quality qualification 전 resource-selection 후보 승격 금지 |
 | Pi DEEPX | 기존 PCIe 조사에서 endpoint 미탐지 | BLOCKED | 새 runtime/model 성공 없음 | supported·실측 완료 주장 금지 |

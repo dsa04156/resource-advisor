@@ -1,0 +1,23 @@
+{
+  "schema_version": "pool-resume-preservation-v1",
+  "captured_at": "2026-10-08T06:19:34.348422+00:00",
+  "unchanged_entity_body_digests": 31962,
+  "unchanged_terminal_jobs": 836,
+  "unchanged_usage_body_digests": 836,
+  "removed_owned_terminal_pods": 1,
+  "owned_pods_remaining": 0,
+  "native_queue_empty": true,
+  "native_gpu_and_cpu_nodes_idle": true,
+  "scheduler_config_changed": false,
+  "driver_or_kubeedge_changed": false,
+  "slurm_state_resume_actions": 2,
+  "new_slurm_jobs": 5,
+  "new_kubernetes_jobs": 2,
+  "all_new_jobs_succeeded": true,
+  "new_slurm_gpu_seconds": 421,
+  "new_cuda_coverage_gpu_seconds": 182,
+  "new_total_gpu_seconds": 603,
+  "new_total_cpu_core_reservation_seconds": 603,
+  "new_npu_jobs": 0,
+  "scope": "Right-sizing Slurm validation and separate CUDA fleet coverage; earlier cost evidence unchanged"
+}

@@ -1,8 +1,8 @@
 # AI infrastructure 관점 최종 검토
 
 검토 범위: 기존 저장소를 유지한 right-sizing core와 새 비교 증거.
-전체 목표 완료와 production-ready 판정은 하지 않는다. 새 Slurm 승인 feedback
-loop가 실장비에서 닫히지 않았다.
+전체 범위 완료와 production-ready 판정은 하지 않는다. 10-08 새 Slurm 승인 feedback
+loop는 실제 고정 후보에서 검증됐다. 가속기 간 AI 성능 비교와 production 운영은 별도다.
 
 | 검토 항목 | 발견 / 수정 / 증거 | 남은 범위 |
 |---|---|---|
@@ -14,7 +14,7 @@ loop가 실장비에서 닫히지 않았다.
 | 초기 비용 숨김 | Qualification/profiling/confirmation/main과 실패 reservation 포함; GPU/NPU/CPU 단위 분리 | Energy/image construction/shared-service CPU unknown |
 | BO를 기본 승자로 표현 | 같은 5-probe 예산에서 Random/BO 동일 선택, 실제 N=1..3 비용 회수 실패 기록 | Superiority, 통계적 유의성, 외삽한 손익분기 주장 금지 |
 | 장치 탐지를 workload 지원으로 표현 | GPU model/runtime 및 Hailo HEF/quality qualification과 inventory 분리 | DEEPX/AMD/다른 NPU 지원이나 같은-task GPU/NPU ranking 미증명 |
-| 배포됐으므로 Slurm 완료라고 표현 | API/GPU/Slurm worker source/image 일치 확인과 실제 native run을 분리; controller TCP 실패·sinfo timeout 공개 | Controller 복구 뒤 fresh qualification→observe→approval→execution→feedback 필요 |
+| 배포됐으므로 Slurm 완료라고 표현 | 과거 접속 실패 보존; 10-08 실제 Job5개, observe3/승인/feedback/next history 검증 | 단일 고정 후보; Slurm active search/backend 성능 비교 아님 |
 | 선택 기법·기술을 불필요하게 활성화 | MF-KG는 physical fidelity qualification 실패 시 비활성; 기존 transfer null 보존 | Sharing/eBPF/DDP/large-cluster 성과를 core에 포함하지 않음 |
 | 실험이 기존 작업에 미치는 영향 | 기존 immutable entity 3,981개 digest, terminal Job 806개 state/version 보존; 기존 usage 806개 ID 보존 | Old ledger body 전체는 새 실험 preflight에서 따로 hash하지 않았음 |
 | 실험 후 자원 정리 | Own Job UID/Pod UID를 확인해 terminal Pod 2개 삭제, 관련 Pod 잔여0; Job/result/artifact 유지 | 다른 작업이나 cluster/driver 설정 변경 없음 |
@@ -29,5 +29,5 @@ loop가 실장비에서 닫히지 않았다.
 
 면접에서 설명할 수 있는 범위는 검증된 compatibility, 제한된 profiling,
 독립 확인과 승인, native 실행, immutable feedback, 비용 평가와 null result다.
-모든 이기종 장치의 최적 배치나 새 Slurm closed loop를 완료했다는 설명은
-[claim audit](right-sizing-claim-audit.md)의 OPEN gate가 닫힌 뒤에만 가능하다.
+새 Slurm fixed-candidate loop는 [raw/audit](right-sizing-slurm-feedback.md)로 설명할 수
+있다. 모든 이기종 장치의 최적 배치나 GPU↔NPU 성능 우위는 주장하지 않는다.

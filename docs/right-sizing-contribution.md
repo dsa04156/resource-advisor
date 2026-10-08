@@ -1,7 +1,8 @@
 # Profile-Guided Heterogeneous Resource Right-Sizing
 
-상태: **필수 gate 감사 진행 중**. 현재 Slurm controller 연결이 막혀 있으며,
-GPU/NPU의 동일 logical workload 성능 비교는 성립하지 않는다. 전체 완료,
+상태: **Kubernetes/Kueue 및 새 Slurm feedback 검증**. Controller 복귀 후
+[새 Slurm loop](right-sizing-slurm-feedback.md)가 통과했다. GPU/NPU의 동일 AI logical
+workload 성능 비교는 성립하지 않는다. 전체 범위 완료,
 일반적인 최적화 성공, 모든 이기종 가속기의 성능 예측을 주장하지 않는다.
 
 ## 1. Problem
@@ -31,7 +32,8 @@ Resource Advisor는 workload/runtime compatibility, 다음 profiling 후보,
 최신 비교·감사 source e020445의 [전체 CI](evidence/right-sizing-validation-v3.json)는
 Python3.11/3.13 각각 SQLite 1,150 passed·4 skipped와 PostgreSQL 1,154 passed다.
 Ruff/format, packaged assets, JS/Ansible syntax도 통과했다. Software 통과를
-새 Slurm 실장비 완료로 해석하지 않는다.
+실장비 완료로 해석하지 않는다. 이후 [Slurm 신규 증거](right-sizing-slurm-feedback.md)는
+별도 실제 Job5개와 native/accounting/feedback auditor로 확인했다.
 
 ## 3. Method
 
@@ -267,15 +269,12 @@ C4는 실제 N 범위의 비용 평가와 회수 실패 판별이며, 미래 반
 
 ## 12. Limitations
 
-현재 Slurm controller는 network unreachable이고 worker의 `sinfo` RPC가
-timeout이다. 기존 Slurm native 실행과 response-loss/crash recovery 증거는
-보존하지만 새 feedback loop의 Slurm 실장비 완료는 **BLOCKED**다. 재개에는
-controller 연결, authenticated native inventory/accounting, qualified runtime과
-같은 승인 실행의 result/usage/feedback 검증이 필요하다. Running scheduler,
-driver, KubeEdge 설정을 바꿔 이 문제를 숨기지 않는다.
-[새 read-only 검사](evidence/right-sizing-slurm-readiness-v3.json)는 Orin의 active
-slurmd, controller TCP6817 연결 실패와 sinfo timeout을 구분한다. 전원 꺼짐을
-단정하지 않으며 새 Slurm Job은 제출하지 않았다.
+10-08 재가동 전 Slurm controller 연결 실패와 worker RPC timeout은
+[보존된 read-only 검사](evidence/right-sizing-slurm-readiness-v3.json)의 과거 BLOCKED
+상태다. 이후 [새 loop](right-sizing-slurm-feedback.md)는 fresh qualification,
+observe3, 명시적 승인 실행과 다음 history 반영을 실제 Job5개로 확인했다.
+단일 고정 Slurm 후보이며 Slurm active search, 같은 AI workload의 backend 전환
+성능 비교는 검증하지 않았다. 기존 response-loss/crash recovery 증거도 보존한다.
 
 동일 logical GPU/NPU 성능 비교, AMD 실측, DEEPX qualification, 실제 DDP
 right-sizing, large-cluster 일반화, shared-GPU interference predictor와 job-attributed
@@ -295,14 +294,15 @@ uv run --with matplotlib==3.11.1 python examples/plot_right_sizing.py docs/evide
 근거 있게 채택할 문장은 다음 범위다.
 
 > 처음 등록된 GPU·NPU AI 워크로드의 실행 조건을 검증하고, 승인된 profiling과
-> 실측 기반 탐색·독립 확인을 Kubernetes/Kueue 실행에 연결해, 추천 근거·실행
+> 실측 기반 탐색·독립 확인과 Kubernetes/Kueue 및 Slurm 실행 결과를 연결해, 추천 근거·실행
 > 오차·유효성을 다음 자원 판단에 반영하는 profile-guided resource advisor 계층을
 > 구현·검증하고, profiling을 포함한 실제 비용과 순효과를 평가했다.
 
 각 구절은 [claim audit](right-sizing-claim-audit.md)의 cold-start, compatibility,
 actual acquisition, confirmation, approved feedback, post-main lookup, expiry
-행에 연결한다. Slurm 공통 계약과 기존 실행 복구는 재사용했지만 이번 새
-Slurm feedback hardware gate가 막혀 있어 목표 문장 전체를 채택하지 않는다.
+행에 연결한다. Slurm은 새 [고정 후보 feedback](right-sizing-slurm-feedback.md)의
+실제 source/target/native ID에도 연결한다. 같은 AI task의 GPU↔NPU 최적 후보를
+비교·선택했다는 넓은 해석은 채택하지 않는다.
 
 
 최종 [배포/보존 검증](evidence/right-sizing-deployment-verification-v1.json)은
@@ -313,6 +313,7 @@ owner/Pod UID precondition으로 남은 5개만 삭제했고 다른 Pod는 0개 
 CI는 Python3.11/3.13 각각 SQLite 1,137 passed/4 skipped, PostgreSQL 1,141 passed였다.
 이 CI는 software 계약 검증이며 hardware benchmark가 아니다.
 
-[새 Slurm readiness](evidence/right-sizing-slurm-readiness-v2.json)는 controller
+[이전 Slurm readiness](evidence/right-sizing-slurm-readiness-v2.json)는 controller
 SSH network unreachable, Orin SSH 성공 뒤 native `sinfo` RPC timeout을 구분한다.
-Slurm worker의 새 source 배포가 이 물리적 막힘을 해결했다는 뜻은 아니다.
+Slurm worker의 새 source 배포가 물리적 막힘을 해결했다는 뜻은 아니다.
+10-08 재가동/RESUME 이후의 실장비 결과는 위 새 loop에 별도로 추가했다.

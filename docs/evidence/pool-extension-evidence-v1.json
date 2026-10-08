@@ -1,0 +1,202 @@
+{
+  "schema_version": "pool-extension-evidence-v1",
+  "evidence_kind": "hardware",
+  "experiment_id": "pool-extension-20261008-v1",
+  "qualification": {
+    "job_uid": "0dafaf4d-6c68-449a-8f72-b7889dcce227",
+    "job_name": "ra-pool-qual-rtx5080-20261008",
+    "scheduled_at": "2026-10-08T06:03:38Z",
+    "container_finished_at": "2026-10-08T06:05:09Z",
+    "exit_code": 0,
+    "image_digest": "sha256:eccb4ba1dcfee01ffa5eeca481bf71247b24c12f733f785c58110b2b733c8194",
+    "report": {
+      "arch": "amd64",
+      "accelerator_model": "NVIDIA GeForce RTX 5080",
+      "runtime_versions": {
+        "cuda_driver_api": "13020"
+      },
+      "quality_value": 1.0,
+      "elements_checked": 4096,
+      "kernel_sha256": "940c8bdbe83b1c9ba4dd1c2107fb7073402d1100888444840ab502f42c658ceb",
+      "measurement_boundary": "cuda-squares-4096-sync-kernel-v1-output-buffer-memory-timed-90s-windows",
+      "sustained_seconds": 90,
+      "kernel_launches": 16161349,
+      "samples_seconds": [
+        9.00000279804226,
+        9.000000450992957,
+        9.00000478909351,
+        9.000000593950972,
+        9.00000394100789,
+        9.000005098991096,
+        9.00000437698327,
+        9.000001425971277,
+        9.000003454042599,
+        9.000004885019735
+      ],
+      "output_allocation_bytes": 16384
+    },
+    "gpu_reservation_seconds": 91.0,
+    "cpu_core_reservation_seconds": 91.0
+  },
+  "workload_ref": "cuda-sustained-auto-v2",
+  "workload_signature": "sha256:fd9ae6f3b17eee98a92990fb4f42f9bbadd0c2021d0b3a82ab1744d694114303",
+  "candidate_models": {
+    "candidate-1": "NVIDIA GeForce RTX 5060 Ti",
+    "candidate-2": "NVIDIA GB10",
+    "candidate-3": "Orin",
+    "candidate-4": "Orin",
+    "candidate-5": "NVIDIA GeForce RTX 5080"
+  },
+  "candidate_count": 5,
+  "automatic_request": {
+    "workload_ref": "cuda-sustained-auto-v2",
+    "template_ref": "gpu-fleet-auto-v2",
+    "mode": "observe",
+    "scheduling_profile_ref": "lab-standard-v1"
+  },
+  "automatic_job": {
+    "job_id": "j-6ed47c65e9fa4af89258431db007604a",
+    "attempt_id": "a-016e5464781a45e59df95f82dc969451",
+    "state": "SUCCEEDED",
+    "candidate_ref": "candidate-1",
+    "result": {
+      "schema_version": "v1",
+      "job_id": "j-6ed47c65e9fa4af89258431db007604a",
+      "attempt_id": "a-016e5464781a45e59df95f82dc969451",
+      "epoch": 1,
+      "workload_signature": "sha256:fd9ae6f3b17eee98a92990fb4f42f9bbadd0c2021d0b3a82ab1744d694114303",
+      "context_signature": "sha256:37fc25cb697a574cc53a401927748014dc101f9e40f7513aec2396a1276ec592",
+      "outcome": "COMPLETED",
+      "measured": true,
+      "evidence_kind": "hardware",
+      "measurements": {
+        "elapsed_seconds": 90.00003497034777,
+        "peak_memory_mib": 0.015625,
+        "quality_value": 1.0,
+        "sample_count": 10,
+        "work_units": 10,
+        "latency_p50_ms": 9000.003567547537,
+        "latency_p95_ms": 9000.005849986337,
+        "latency_p99_ms": 9000.005849986337,
+        "throughput": 0.11111106793785903,
+        "gpu_utilization": null,
+        "power_watts": null,
+        "temperature_celsius": null
+      },
+      "error_code": null
+    },
+    "result_digest": "sha256:dfba1a6c046bdbfd2530a756e1d1f18c18842abecefcca997bb9a9c6785dbdc6",
+    "backend": "kubernetes",
+    "context_signature": "sha256:37fc25cb697a574cc53a401927748014dc101f9e40f7513aec2396a1276ec592"
+  },
+  "evaluation": [
+    {
+      "candidate_ref": "candidate-1",
+      "model": "NVIDIA GeForce RTX 5060 Ti",
+      "status": "available",
+      "errors": []
+    },
+    {
+      "candidate_ref": "candidate-2",
+      "model": "NVIDIA GB10",
+      "status": "available",
+      "errors": []
+    },
+    {
+      "candidate_ref": "candidate-3",
+      "model": "Orin",
+      "status": "available",
+      "errors": []
+    },
+    {
+      "candidate_ref": "candidate-4",
+      "model": "Orin",
+      "status": "available",
+      "errors": []
+    },
+    {
+      "candidate_ref": "candidate-5",
+      "model": "NVIDIA GeForce RTX 5080",
+      "status": "available",
+      "errors": []
+    }
+  ],
+  "template": {
+    "ref": "gpu-fleet-auto-v2",
+    "name": "GPU 5\ub300 \u00b7 \uc790\ub3d9 \uc790\uc6d0 \uc120\ud0dd \u00b7 90\ucd08",
+    "workload_ref": "cuda-sustained-auto-v2",
+    "candidate_ref": null,
+    "priority": "normal",
+    "max_run_seconds": 150,
+    "max_queue_seconds": 300
+  },
+  "ledger": {
+    "attempt_id": "a-016e5464781a45e59df95f82dc969451",
+    "project": "ra-lab",
+    "backend": "kubernetes",
+    "device_class": "gpu",
+    "allocation_mode": "physical_device",
+    "allocated_device_seconds": 91.0,
+    "measured_compute_seconds": 90.00003497034777,
+    "queue_seconds": 1.0,
+    "body": {
+      "schema_version": "v2",
+      "accelerator_model": "NVIDIA GeForce RTX 5060 Ti",
+      "backend_cluster_id": "lab-cuda-rtx5060-v1",
+      "job_id": "j-6ed47c65e9fa4af89258431db007604a",
+      "outcome": "SUCCEEDED",
+      "error": null,
+      "result_valid": true,
+      "requested_resources": {
+        "host_cpu": 1.0,
+        "host_memory_mib": 512,
+        "accelerator_count": 1
+      },
+      "observed_allocation": {
+        "source": "kubernetes:scheduled workload container requests",
+        "accelerator_count": 1.0,
+        "cpu": 1.0,
+        "memory_mib": 512.0
+      },
+      "termination_receipt_ref": null,
+      "never_submitted": false,
+      "allocation_interval_seconds": 91.0,
+      "started_at": "2026-10-08T06:06:16Z",
+      "backend_finished_at": "2026-10-08T06:07:47Z",
+      "terminal_observed_at": "2026-10-08T06:07:54.783083+00:00",
+      "cancel_requested_at": null,
+      "cancel_dispatch_started_at": null,
+      "cancel_acknowledged_at": null,
+      "cancel_confirmed_at": null,
+      "cancel_dispatch_wait_seconds": null,
+      "cancel_confirmation_seconds": null,
+      "submitted_at": "2026-10-08T06:06:15Z",
+      "submission_time_source": "scheduler",
+      "collection_seconds": 0.089581,
+      "preparation_seconds": 1.0,
+      "container_runtime_seconds": 90.0,
+      "allocated_cpu_seconds": 91.0,
+      "allocation_memory_mib": 512.0,
+      "allocation_scope": "kubernetes:scheduled workload container requests",
+      "uncertainty": [
+        "QUEUE_WHOLE_SECOND_RESOLUTION"
+      ],
+      "semantics": "allocated reservations, not utilization; unknowns are null"
+    }
+  },
+  "delivery": {
+    "mlflow_run_id": "5a0862dbde444a858de67071f5a02675",
+    "artifact_digest": "sha256:58ce86c93673aa16baa5a3ac1d7e6c32bce9cd3bcc1f2049916ce06c58dda705",
+    "result_digest": "sha256:dfba1a6c046bdbfd2530a756e1d1f18c18842abecefcca997bb9a9c6785dbdc6",
+    "bundle_sha256": "58ce86c93673aa16baa5a3ac1d7e6c32bce9cd3bcc1f2049916ce06c58dda705",
+    "matching_s3_api_mlflow_bytes": true,
+    "ledger_rows": 1,
+    "mlflow_runs": 1
+  },
+  "limitations": [
+    "CUDA integer kernel coverage, not AI model performance or arbitrary model portability.",
+    "One new RTX5080 qualification; original four candidate qualifications preserved without renewing expired capability timestamps.",
+    "GPU shared slots are not additional physical devices.",
+    "Template registration initially rejected an extra project_ref field before any automatic job; corrected to existing API schema."
+  ]
+}

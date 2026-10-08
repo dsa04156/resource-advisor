@@ -1,0 +1,6 @@
+experiment_id,role,job_id,attempt_id,native_job_id,forward_compute_seconds,gpu_reservation_seconds,cpu_core_reservation_seconds,queue_seconds,quality
+right-sizing-slurm-20261008-v1,qualification,j-86e6bf03770a497eb72b34bf0233ac38,a-24cce27e733e4dd89328a1493378257a,77,0.014932958991266787,89.0,89.0,1.0,1.0
+right-sizing-slurm-20261008-v1,observe,j-5629cd1987304aa6a35ce914ac621ac9,a-c89f8952180d4ed0ab758840b5e6653c,78,0.01330578385386616,85.0,85.0,1.0,1.0
+right-sizing-slurm-20261008-v1,observe,j-73ef09ae86e347ef9145fd4fdfade6b6,a-2b7b6e67ee124564a1a490bcfe78dfed,79,0.011263818014413118,83.0,83.0,0.0,1.0
+right-sizing-slurm-20261008-v1,observe,j-f9ffd89ef5ee42eeac8fd92bd3f42cdd,a-1c8261a25b3a4440a762fd3ab43f2354,80,0.011639217962510884,84.0,84.0,1.0,1.0
+right-sizing-slurm-20261008-v1,approved_main,j-da6b7c97d37443999430d2e537700b7f,a-a965ad6c371f4454bbf1522e8bec8105,81,0.011986714089289308,80.0,80.0,1.0,1.0
