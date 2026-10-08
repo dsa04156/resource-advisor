@@ -353,6 +353,19 @@ def build_queues(snapshot, identities, profiles, pool, known, experiment):
                 if len(pods) > 1 or len(workloads) > 1:
                     complete = False
                     continue
+                terminal_job = bool(
+                    job.get("status", {}).get("succeeded") or job.get("status", {}).get("failed")
+                )
+                if not terminal_job and len(workloads) != 1:
+                    complete = False
+                if any(
+                    not any(
+                        o.get("kind") == "Job" and o.get("uid") == uid and o.get("name") == name
+                        for o in w["metadata"].get("ownerReferences", [])
+                    )
+                    for w in workloads
+                ):
+                    complete = False
                 held = any(
                     any(
                         c.get("type") == "QuotaReserved" and c.get("status") == "True"

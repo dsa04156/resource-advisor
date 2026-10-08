@@ -105,7 +105,7 @@ def test_terminal_quota_hold_is_not_idle_and_visible_intent_is_not_doubled():
         "status": {"succeeded": 1},
     }
     workload = {
-        "metadata": {"ownerReferences": [{"kind": "Job", "uid": "u"}]},
+        "metadata": {"ownerReferences": [{"kind": "Job", "uid": "u", "name": "own"}]},
         "status": {"conditions": [{"type": "QuotaReserved", "status": "True"}]},
     }
     snapshot = {
@@ -297,3 +297,77 @@ def test_native_pending_preserves_its_original_idle_admission_estimate():
         "exp",
     )
     assert queues[0].pending[0].expected_admission_seconds == 1.0
+
+
+def test_existing_main_capture_is_never_replayed_or_mutated(tmp_path):
+    import json
+
+    from run_jct_comparison import run
+
+    capture = tmp_path / "capture.json"
+    original = json.dumps({"cohorts": [{"arm": "round_robin"}]})
+    capture.write_text(original)
+    with pytest.raises(ValueError, match="never replay"):
+        run(tmp_path, tmp_path, tmp_path / "missing-private-module.py")
+    assert capture.read_text() == original
+    assert not (tmp_path / "calibration.json").exists()
+
+
+def test_native_pod_must_have_the_exact_job_uid_owner():
+    from jct_native import normalize_kubernetes
+
+    job = {
+        "metadata": {
+            "name": "own",
+            "uid": "own-uid",
+            "labels": {"resource-advisor/experiment": "exp"},
+        }
+    }
+    pod = {
+        "metadata": {"ownerReferences": [{"kind": "Job", "uid": "foreign-uid"}]},
+        "status": {"containerStatuses": [{"state": {"terminated": {"exitCode": 0}}}]},
+    }
+    with pytest.raises(ValueError, match="foreign Pod owner"):
+        normalize_kubernetes(job, [pod], {"attempt_id": "own"}, {}, "exp", "", {})
+
+
+def test_short_protocol_preserves_27_cohorts_and_uses_a_separate_attempt_prefix():
+    from run_jct_comparison import validate_protocol
+
+    cohorts = [
+        dict(
+            load=c["load"],
+            block=c["block"],
+            arm=c["arm"],
+            arrival_interval_seconds=c["interval_seconds"],
+            jobs=6,
+        )
+        for c in balanced_schedule(20261008)
+    ]
+    jobs, prefix, layouts = validate_protocol(
+        {"experiment_id": "exp", "jobs_per_cohort": 6, "main_attempt_prefix": "exp-short"},
+        {"seed": 20261008, "cohorts": cohorts},
+    )
+    assert jobs == 6 and prefix == "exp-short" and len(layouts) == 27
+    from run_jct_comparison import NativeTransport, cohort_key
+
+    assert cohort_key({"main_attempt_prefix": prefix}, layouts[0]).startswith("exp-short-")
+    assert (
+        NativeTransport(
+            None, Path("/unused"), {"experiment_id": "exp", "main_attempt_prefix": prefix}
+        ).remote_directory
+        == "/tmp/ra-exp"
+    )
+    with pytest.raises(ValueError, match="prefix"):
+        validate_protocol(
+            {"experiment_id": "exp", "jobs_per_cohort": 6, "main_attempt_prefix": "other"},
+            {"seed": 20261008, "cohorts": cohorts},
+        )
+    with pytest.raises(ValueError, match="prefix"):
+        validate_protocol(
+            {"experiment_id": "exp", "jobs_per_cohort": 6}, {"seed": 20261008, "cohorts": cohorts}
+        )
+    with pytest.raises(ValueError, match="6 or 12"):
+        validate_protocol(
+            {"experiment_id": "exp", "jobs_per_cohort": 3}, {"seed": 20261008, "cohorts": cohorts}
+        )
