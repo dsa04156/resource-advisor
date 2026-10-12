@@ -468,7 +468,7 @@ def test_simultaneous_retry_returns_same_deployment(service, bundle, tmp_path, m
 
 
 @pytest.mark.parametrize(
-    "tamper", ["account", "token", "privilege", "command", "mount", "credentials"]
+    "tamper", ["account", "token", "privilege", "command", "mount", "credentials", "seccomp"]
 )
 def test_changed_native_runtime_contract_never_becomes_ready(service, bundle, tamper):
     client, ref, registry, _ = registered_fixture(service, bundle)
@@ -493,6 +493,8 @@ def test_changed_native_runtime_contract_never_becomes_ready(service, bundle, ta
                 pod["automountServiceAccountToken"] = True
             elif tamper == "privilege":
                 container["securityContext"]["allowPrivilegeEscalation"] = True
+            elif tamper == "seccomp":
+                container["securityContext"]["seccompProfile"] = {"type": "Unconfined"}
             elif tamper == "command":
                 container["command"] = ["python", "-m", "unexpected.module"]
             elif tamper == "mount":

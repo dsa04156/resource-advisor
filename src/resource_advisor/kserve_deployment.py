@@ -123,6 +123,8 @@ class KServeAdapter:
                     },
                     "securityContext": {
                         "allowPrivilegeEscalation": False,
+                        "seccompProfile": {"type": "RuntimeDefault"},
+                        "procMount": "Default",
                         "readOnlyRootFilesystem": True,
                         "capabilities": {"drop": ["ALL"]},
                     },
