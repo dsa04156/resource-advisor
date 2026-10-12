@@ -57,71 +57,89 @@ class ModelDeployments:
         ref = "mdp-" + hashlib.sha256(f"{project}:{key}".encode()).hexdigest()[:40]
         operation = "rollback" if isinstance(value, RollbackRequest) else "deploy"
         request = {"operation": operation, **value.model_dump(mode="json")}
-        with self.store.transaction() as conn:
-            existing = self.store.get(conn, "model_deployment", ref)
-            if existing:
-                if existing["project"] != project or existing["body"]["request"] != request:
-                    raise Conflict("deployment key is already bound to another command")
-            else:
-                rows = history(self.store, conn, project, value.service_ref)
-                current = rows[0]["ref"] if rows else None
-                if value.expected_deployment_ref != current:
-                    raise Conflict(
-                        "expected deployment differs from the current desired deployment"
-                    )
-                if operation == "rollback":
-                    target = required(
-                        self.store, conn, "model_deployment", value.target_deployment_ref, project
-                    )
-                    ready = self.store.get(
-                        conn, "model_deployment_ready", value.target_deployment_ref
-                    )
-                    if target["service_ref"] != value.service_ref or not ready:
-                        raise Rejected("rollback requires a READY deployment from this service")
-                    lifecycle_ref = target["lifecycle_ref"]
+        try:
+            with self.store.transaction() as conn:
+                existing = self.store.get(conn, "model_deployment", ref)
+                if existing:
+                    if existing["project"] != project or existing["body"]["request"] != request:
+                        raise Conflict("deployment key is already bound to another command")
                 else:
-                    lifecycle_ref = value.lifecycle_ref
-                lifecycle = required(self.store, conn, "model_lifecycle", lifecycle_ref, project)
-                policy = required(
-                    self.store, conn, "model_lifecycle_policy", lifecycle["policy_ref"], project
-                )
-                evaluated = self.store.get(conn, "model_evaluation", lifecycle_ref)
-                if not evaluated or evaluated["project"] != project:
-                    raise Rejected("deployment requires a completed quality evaluation")
-                evaluation = evaluated["body"]
-                if not evaluation["passed"] or evaluation["mse"] > policy["maximum_mse"]:
-                    raise Rejected("quality-rejected models cannot be deployed")
-                registration = required(
-                    self.store, conn, "model_registration", lifecycle_ref, project
-                )
-                if (
-                    not evaluation["passed"]
-                    or evaluation["mse"] > policy["maximum_mse"]
-                    or evaluation["policy_digest"] != signature(policy)
-                    or registration["evaluation_digest"] != signature(evaluation)
-                    or registration["output_checkpoint_digest"]
-                    != evaluation["output_checkpoint_digest"]
-                ):
-                    raise Rejected(
-                        "deployment requires an intact registered quality-passed lifecycle"
+                    rows = history(self.store, conn, project, value.service_ref)
+                    current = rows[0]["ref"] if rows else None
+                    if value.expected_deployment_ref != current:
+                        raise Conflict(
+                            "expected deployment differs from the current desired deployment"
+                        )
+                    if operation == "rollback":
+                        target = required(
+                            self.store,
+                            conn,
+                            "model_deployment",
+                            value.target_deployment_ref,
+                            project,
+                        )
+                        ready = self.store.get(
+                            conn, "model_deployment_ready", value.target_deployment_ref
+                        )
+                        if target["service_ref"] != value.service_ref or not ready:
+                            raise Rejected("rollback requires a READY deployment from this service")
+                        lifecycle_ref = target["lifecycle_ref"]
+                    else:
+                        lifecycle_ref = value.lifecycle_ref
+                    lifecycle = required(
+                        self.store, conn, "model_lifecycle", lifecycle_ref, project
                     )
-                edge = "mde-" + signature([project, value.service_ref, current])[7:47]
-                self.store.put(conn, "model_deployment_edge", edge, project, {"successor": ref})
-                body = {
-                    "request": request,
-                    "operation": operation,
-                    "service_ref": value.service_ref,
-                    "lifecycle_ref": lifecycle_ref,
-                    "revision": rows[0]["body"]["revision"] + 1 if rows else 1,
-                    "registration": registration,
-                }
-                self.store.put(conn, "model_deployment", ref, project, body)
-                self.store.enqueue(
-                    conn,
-                    ref,
-                    "model_deployment",
-                    {"ref": ref, "job_id": registration["training_job_id"]},
-                )
+                    policy = required(
+                        self.store, conn, "model_lifecycle_policy", lifecycle["policy_ref"], project
+                    )
+                    evaluated = self.store.get(conn, "model_evaluation", lifecycle_ref)
+                    if not evaluated or evaluated["project"] != project:
+                        raise Rejected("deployment requires a completed quality evaluation")
+                    evaluation = evaluated["body"]
+                    if not evaluation["passed"] or evaluation["mse"] > policy["maximum_mse"]:
+                        raise Rejected("quality-rejected models cannot be deployed")
+                    registration = required(
+                        self.store, conn, "model_registration", lifecycle_ref, project
+                    )
+                    if (
+                        not evaluation["passed"]
+                        or evaluation["mse"] > policy["maximum_mse"]
+                        or evaluation["policy_digest"] != signature(policy)
+                        or registration["evaluation_digest"] != signature(evaluation)
+                        or registration["output_checkpoint_digest"]
+                        != evaluation["output_checkpoint_digest"]
+                    ):
+                        raise Rejected(
+                            "deployment requires an intact registered quality-passed lifecycle"
+                        )
+                    edge = "mde-" + signature([project, value.service_ref, current])[7:47]
+                    self.store.put(conn, "model_deployment_edge", edge, project, {"successor": ref})
+                    body = {
+                        "request": request,
+                        "operation": operation,
+                        "service_ref": value.service_ref,
+                        "lifecycle_ref": lifecycle_ref,
+                        "revision": rows[0]["body"]["revision"] + 1 if rows else 1,
+                        "registration": registration,
+                    }
+                    self.store.put(conn, "model_deployment", ref, project, body)
+                    self.store.enqueue(
+                        conn,
+                        ref,
+                        "model_deployment",
+                        {"ref": ref, "job_id": registration["training_job_id"]},
+                    )
+        except Conflict:
+            # A concurrent retry may commit after our first absence read. Re-read
+            # in a fresh transaction, including after a unique successor conflict.
+            with self.store.transaction() as conn:
+                existing = self.store.get(conn, "model_deployment", ref)
+                if (
+                    not existing
+                    or existing["project"] != project
+                    or existing["body"]["request"] != request
+                ):
+                    raise
         return self.view(project, ref)
 
     def view(self, project, ref):

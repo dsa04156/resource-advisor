@@ -421,3 +421,123 @@ def test_concurrent_commands_accept_only_one_successor(service, bundle, tmp_path
         "/api/v1/compute/model-services/linear", headers={"Authorization": "Bearer user"}
     ).json()
     assert len(history["history"]) == 1
+
+
+def test_simultaneous_retry_returns_same_deployment(service, bundle, tmp_path, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Event
+
+    from resource_advisor.service import Service
+    from resource_advisor.store import Store
+
+    if service.store.engine.dialect.name == "sqlite":
+        store = Store("sqlite:///" + str(tmp_path / "retry.db"))
+        store.initialize()
+        service = Service(store)
+        spec, _, variant, capability = bundle
+        for kind, model in [("workload", spec), ("variant", variant), ("capability", capability)]:
+            service.register(kind, model, "team-a")
+    client, ref, _, _ = registered_fixture(service, bundle)
+    paused, resume = Event(), Event()
+    original = service.store.get
+
+    def interleaved(conn, kind, entity_ref):
+        result = original(conn, kind, entity_ref)
+        if kind == "model_deployment" and result is None and not paused.is_set():
+            paused.set()
+            assert resume.wait(timeout=10)
+        return result
+
+    monkeypatch.setattr(service.store, "get", interleaved)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        slow = pool.submit(deploy, client, ref)
+        assert paused.wait(timeout=10)
+        fast = deploy(client, ref)
+        resume.set()
+        retry = slow.result(timeout=10)
+    assert fast.status_code == retry.status_code == 200, (fast.text, retry.text)
+    assert fast.json()["ref"] == retry.json()["ref"]
+    assert (
+        len(
+            client.get(
+                "/api/v1/compute/model-services/linear", headers={"Authorization": "Bearer user"}
+            ).json()["history"]
+        )
+        == 1
+    )
+
+
+@pytest.mark.parametrize(
+    "tamper", ["account", "token", "privilege", "command", "mount", "credentials"]
+)
+def test_changed_native_runtime_contract_never_becomes_ready(service, bundle, tamper):
+    client, ref, registry, _ = registered_fixture(service, bundle)
+    view = deploy(client, ref).json()
+    kube = KubeServer()
+    kube.rolled_out = True
+    original = kube.handle
+
+    def altered(request):
+        response = original(request)
+        if (
+            request.method == "GET"
+            and "/deployments/" in request.url.path
+            and response.status_code == 200
+        ):
+            obj = response.json()
+            pod = obj["spec"]["template"]["spec"]
+            container = pod["containers"][0]
+            if tamper == "account":
+                pod["serviceAccountName"] = "ra-worker"
+            elif tamper == "token":
+                pod["automountServiceAccountToken"] = True
+            elif tamper == "privilege":
+                container["securityContext"]["allowPrivilegeEscalation"] = True
+            elif tamper == "command":
+                container["command"] = ["python", "-m", "unexpected.module"]
+            elif tamper == "mount":
+                container["volumeMounts"][0]["readOnly"] = False
+            else:
+                container["env"].append(
+                    {
+                        "name": "CREDENTIAL",
+                        "valueFrom": {"secretKeyRef": {"name": "private", "key": "token"}},
+                    }
+                )
+            return httpx.Response(200, json=obj)
+        return response
+
+    kube.handle = altered
+    assert serving_delivery(service, registry, kube).deliver_one()
+    result = client.get(
+        "/api/v1/compute/model-deployments/" + view["ref"], headers={"Authorization": "Bearer user"}
+    ).json()
+    assert result["state"] == "PENDING"
+    assert result["delivery_error"] == "PREDICTOR_TEMPLATE_MISMATCH"
+
+
+def test_admission_cannot_replace_operator_runtime_contract(service, bundle):
+    client, ref, registry, _ = registered_fixture(service, bundle)
+    view = deploy(client, ref).json()
+    kube = KubeServer()
+    kube.rolled_out = True
+    original = kube.handle
+
+    def changed_admission(request):
+        response = original(request)
+        if request.method == "POST" and "/inferenceservices" in request.url.path:
+            obj = kube.objects[request.url.path + "/" + response.json()["metadata"]["name"]]
+            predictor = obj["spec"]["predictor"]
+            predictor["serviceAccountName"] = "ra-worker"
+            predictor["automountServiceAccountToken"] = True
+            predictor["containers"][0]["image"] = "unexpected/predictor@sha256:" + "b" * 64
+            return httpx.Response(201, json=obj)
+        return response
+
+    kube.handle = changed_admission
+    assert serving_delivery(service, registry, kube).deliver_one()
+    result = client.get(
+        "/api/v1/compute/model-deployments/" + view["ref"], headers={"Authorization": "Bearer user"}
+    ).json()
+    assert result["state"] == "PENDING"
+    assert result["delivery_error"] == "PREDICTOR_TEMPLATE_MISMATCH"

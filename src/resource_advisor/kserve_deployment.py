@@ -88,6 +88,54 @@ class KServeAdapter:
         ):
             raise ServingPending("FOREIGN_SERVING_RESOURCE")
 
+    def predictor_spec(self, cm_name):
+        return {
+            "minReplicas": 1,
+            "maxReplicas": 1,
+            "serviceAccountName": self.config.service_account,
+            "automountServiceAccountToken": False,
+            "nodeSelector": self.config.node_selector,
+            "annotations": {"sidecar.istio.io/inject": "false"},
+            "deploymentStrategy": {
+                "type": "RollingUpdate",
+                "rollingUpdate": {"maxSurge": 1, "maxUnavailable": 0},
+            },
+            "securityContext": {
+                "runAsNonRoot": True,
+                "runAsUser": 10001,
+                "runAsGroup": 10001,
+                "seccompProfile": {"type": "RuntimeDefault"},
+            },
+            "containers": [
+                {
+                    "name": "kserve-container",
+                    "image": self.config.image,
+                    "command": ["python", "-m", "resource_advisor.model_predictor"],
+                    "env": [
+                        {"name": "PYTHONDONTWRITEBYTECODE", "value": "1"},
+                        {"name": "PROTOCOL", "value": "v1"},
+                    ],
+                    "ports": [{"name": "http1", "containerPort": 8080, "protocol": "TCP"}],
+                    "readinessProbe": {
+                        "httpGet": {"path": "/healthz", "port": 8080},
+                        "timeoutSeconds": 2,
+                        "periodSeconds": 5,
+                    },
+                    "securityContext": {
+                        "allowPrivilegeEscalation": False,
+                        "readOnlyRootFilesystem": True,
+                        "capabilities": {"drop": ["ALL"]},
+                    },
+                    "resources": {
+                        "requests": {"cpu": "100m", "memory": "128Mi"},
+                        "limits": {"cpu": "1", "memory": "256Mi"},
+                    },
+                    "volumeMounts": [{"name": "model", "mountPath": "/model", "readOnly": True}],
+                }
+            ],
+            "volumes": [{"name": "model", "configMap": {"name": cm_name}}],
+        }
+
     def apply(self, project, intent, package):
         description, _ = verified_package(package)
         namespace = self.config.project_namespaces[project]
@@ -135,56 +183,7 @@ class KServeAdapter:
                 "labels": {**labels, "networking.kserve.io/visibility": "cluster-local"},
                 "annotations": annotations,
             },
-            "spec": {
-                "predictor": {
-                    "minReplicas": 1,
-                    "maxReplicas": 1,
-                    "serviceAccountName": self.config.service_account,
-                    "automountServiceAccountToken": False,
-                    "nodeSelector": self.config.node_selector,
-                    "annotations": {"sidecar.istio.io/inject": "false"},
-                    "deploymentStrategy": {
-                        "type": "RollingUpdate",
-                        "rollingUpdate": {"maxSurge": 1, "maxUnavailable": 0},
-                    },
-                    "securityContext": {
-                        "runAsNonRoot": True,
-                        "runAsUser": 10001,
-                        "runAsGroup": 10001,
-                        "seccompProfile": {"type": "RuntimeDefault"},
-                    },
-                    "containers": [
-                        {
-                            "name": "kserve-container",
-                            "image": self.config.image,
-                            "command": ["python", "-m", "resource_advisor.model_predictor"],
-                            "env": [
-                                {"name": "PYTHONDONTWRITEBYTECODE", "value": "1"},
-                                {"name": "PROTOCOL", "value": "v1"},
-                            ],
-                            "ports": [{"name": "http1", "containerPort": 8080, "protocol": "TCP"}],
-                            "readinessProbe": {
-                                "httpGet": {"path": "/healthz", "port": 8080},
-                                "timeoutSeconds": 2,
-                                "periodSeconds": 5,
-                            },
-                            "securityContext": {
-                                "allowPrivilegeEscalation": False,
-                                "readOnlyRootFilesystem": True,
-                                "capabilities": {"drop": ["ALL"]},
-                            },
-                            "resources": {
-                                "requests": {"cpu": "100m", "memory": "128Mi"},
-                                "limits": {"cpu": "1", "memory": "256Mi"},
-                            },
-                            "volumeMounts": [
-                                {"name": "model", "mountPath": "/model", "readOnly": True}
-                            ],
-                        }
-                    ],
-                    "volumes": [{"name": "model", "configMap": {"name": cm_name}}],
-                }
-            },
+            "spec": {"predictor": self.predictor_spec(cm_name)},
         }
         if current:
             self.owned(current, project)
@@ -237,11 +236,43 @@ class KServeAdapter:
         ):
             raise ServingPending("ROLLOUT_NOT_COMPLETE")
         template = spec["template"]["spec"]
-        container = next((c for c in template["containers"] if c["name"] == "kserve-container"), {})
-        if container.get("image") != self.config.image or not any(
-            v.get("configMap", {}).get("name") == cm_name for v in template.get("volumes", [])
+        predictor = self.predictor_spec(cm_name)
+        if not contains_requested(isvc["spec"]["predictor"], predictor):
+            raise ServingPending("PREDICTOR_TEMPLATE_MISMATCH")
+        expected = {
+            k: predictor[k]
+            for k in (
+                "serviceAccountName",
+                "automountServiceAccountToken",
+                "nodeSelector",
+                "securityContext",
+                "containers",
+                "volumes",
+            )
+        }
+        if (
+            not contains_requested(template, expected)
+            or template.get("initContainers")
+            or any(template.get(k, False) for k in ("hostNetwork", "hostPID", "hostIPC"))
         ):
-            raise ServingPending("ROLLOUT_NOT_COMPLETE")
+            raise ServingPending("PREDICTOR_TEMPLATE_MISMATCH")
+        container = template["containers"][0]
+        requested = expected["containers"][0]
+        security = container.get("securityContext", {})
+        if (
+            any(container.get(k) != requested.get(k) for k in ("args", "envFrom"))
+            or security.get("privileged", False)
+            or security.get("capabilities", {}).get("add")
+            or any(
+                security.get(k, expected["securityContext"][k]) != expected["securityContext"][k]
+                for k in ("runAsUser", "runAsGroup", "runAsNonRoot")
+            )
+            or any(
+                set(container["resources"][k]) != set(requested["resources"][k])
+                for k in ("requests", "limits")
+            )
+        ):
+            raise ServingPending("PREDICTOR_TEMPLATE_MISMATCH")
         if service["spec"].get("type") != "ClusterIP" or not any(
             p["port"] == 80 and p["targetPort"] == 8080 for p in service["spec"].get("ports", [])
         ):
