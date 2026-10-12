@@ -12,6 +12,7 @@ Kubernetes/Kueue와 Slurm 위에서 실행 가능성 검증과 profile-guided �
 | 무엇을 직접 만들었는가 | [구성요소와 차별점](docs/platform-explained-ko.md) |
 | 어떤 장비에서 실제 실행되는가 | [GPU·NPU 실행 범위](docs/all-accelerators.md) |
 | 기존 방식과 비교하면 어떤가 | [비교 결과와 비용](docs/right-sizing-comparison-results.md) |
+| MLOps 구조와 실제 배포·롤백 범위 | [MLOps 구조](docs/mlops-architecture-ko.md) |
 | 어디까지 기여로 말할 수 있는가 | [연구 기여와 한계](docs/right-sizing-contribution.md) |
 
 구현·장애·복구·실험별 상세 기록은 [문서 목차](docs/README.md)에서 필요한 항목만 펼쳐 보세요.
@@ -35,6 +36,8 @@ NPU는 장치별로 검증한 모델·SDK·입력 계약을 사용합니다. 등
   CUDA smoke, 수치 검증, 모델 품질 검증의 범위는 서로 다릅니다.
 - Slurm Orin의 관측 → 추천 → 승인 → 실행 → 결과 피드백도 실제 GPU 작업으로 확인했습니다.
 - Kubeflow workflow → API → Kueue → GPU → result 경로의 실제 실행 증거가 있습니다.
+- 검증된 선형 모델의 GPU 학습 → 독립 평가 → MLflow 등록 → KServe 서빙 → 버전 1→2→1 롤백을 확인했습니다.
+  [모델 lifecycle의 계약과 한계](docs/mlops-architecture-ko.md)는 별도로 문서화했습니다.
 - Random/BO 비교는 BO의 우위나 profiling 비용 회수를 입증하지 못했습니다.
 - Rockchip 연결은 trusted lab 실험용이고, 일부 NPU firmware identity는 미확인입니다.
   DEEPX, AMD, 다중 GPU 학습과 최초 HAIRP의 Edge 재계획·HAMi 간섭·eBPF 연결에는 미완료 범위가 있습니다.

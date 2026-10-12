@@ -1,0 +1,534 @@
+{
+  "schema_version": "v1",
+  "verified_date": "2026-10-12",
+  "source_commit": "b9a323d929a939bf2b11484fcb400ef5c4b841cd",
+  "scope": "qualified two-feature JSON linear model; one KServe v0.15 RawDeployment CPU replica",
+  "project": "ra-lab",
+  "service_ref": "linear-serving-v1",
+  "training_v2": {
+    "lifecycle_ref": "mlc-1a01f270908afaed881c41e280961563acf08f06",
+    "job_id": "j-f50022a482c7496e9dc7199417aecef1",
+    "attempt_id": "a-a80e12179215453c81ace9f57089fab1",
+    "run_id": "5b36be03aa2043329f7104c55e79bbd6",
+    "model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/2",
+    "policy_ref": "linear-serving-20261012-v2",
+    "frozen_maximum_mse": 1.0,
+    "holdout_mse": 0.4467454401311175,
+    "evaluation": {
+      "lifecycle_ref": "mlc-1a01f270908afaed881c41e280961563acf08f06",
+      "policy_digest": "sha256:f8d8b683772e7f0f9e4b30bcd1c2dceb66bf933ec765990684a801c3ad5a1292",
+      "training_job_id": "j-f50022a482c7496e9dc7199417aecef1",
+      "training_attempt_id": "a-a80e12179215453c81ace9f57089fab1",
+      "code_digest": "sha256:80088871657f1d3da0210f9723db870ad403d5106ddd47e9cabb04b34f5a11bc",
+      "training_input_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+      "initial_checkpoint_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+      "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+      "artifact_ref": "artifact-a-a80e12179215453c81ace9f57089fab1",
+      "artifact_digest": "sha256:f9ba19f22612758b89eb4ebdba2d937ab626eed735480b030efaad1ce5918f92",
+      "holdout_digest": "sha256:762ea6d8483c1cfa42e1288ed1755c8f0c177d953b63a65b82c719c4e2b1b538",
+      "evaluator": "linear-regression-mse-v1",
+      "evaluator_source_digest": "sha256:4c8d7f0b727d090792e2ed597711bccb66e1d9d0e0aa4d3a9e0a70c4cd9b8f7b",
+      "evaluated_at": "2026-10-12T11:01:57.629782+00:00",
+      "sample_count": 64,
+      "predictions": [
+        [
+          0.3504225164651871
+        ],
+        [
+          0.20879073441028595
+        ],
+        [
+          0.06715895235538483
+        ],
+        [
+          -0.0744728296995163
+        ],
+        [
+          -0.21610461175441742
+        ],
+        [
+          -0.35773639380931854
+        ],
+        [
+          -0.49936817586421967
+        ],
+        [
+          -0.6409999579191208
+        ],
+        [
+          0.46234725415706635
+        ],
+        [
+          0.3207154721021652
+        ],
+        [
+          0.1790836900472641
+        ],
+        [
+          0.037451907992362976
+        ],
+        [
+          -0.10417987406253815
+        ],
+        [
+          -0.24581165611743927
+        ],
+        [
+          -0.3874434381723404
+        ],
+        [
+          -0.5290752202272415
+        ],
+        [
+          0.5742719918489456
+        ],
+        [
+          0.4326402097940445
+        ],
+        [
+          0.29100842773914337
+        ],
+        [
+          0.14937664568424225
+        ],
+        [
+          0.0077448636293411255
+        ],
+        [
+          -0.13388691842556
+        ],
+        [
+          -0.2755187004804611
+        ],
+        [
+          -0.41715048253536224
+        ],
+        [
+          0.6861967295408249
+        ],
+        [
+          0.5445649474859238
+        ],
+        [
+          0.40293316543102264
+        ],
+        [
+          0.2613013833761215
+        ],
+        [
+          0.1196696013212204
+        ],
+        [
+          -0.021962180733680725
+        ],
+        [
+          -0.16359396278858185
+        ],
+        [
+          -0.30522574484348297
+        ],
+        [
+          0.7981214672327042
+        ],
+        [
+          0.656489685177803
+        ],
+        [
+          0.5148579031229019
+        ],
+        [
+          0.3732261210680008
+        ],
+        [
+          0.23159433901309967
+        ],
+        [
+          0.08996255695819855
+        ],
+        [
+          -0.051669225096702576
+        ],
+        [
+          -0.1933010071516037
+        ],
+        [
+          0.9100462049245834
+        ],
+        [
+          0.7684144228696823
+        ],
+        [
+          0.6267826408147812
+        ],
+        [
+          0.48515085875988007
+        ],
+        [
+          0.34351907670497894
+        ],
+        [
+          0.20188729465007782
+        ],
+        [
+          0.0602555125951767
+        ],
+        [
+          -0.08137626945972443
+        ],
+        [
+          1.0219709426164627
+        ],
+        [
+          0.8803391605615616
+        ],
+        [
+          0.7387073785066605
+        ],
+        [
+          0.5970755964517593
+        ],
+        [
+          0.4554438143968582
+        ],
+        [
+          0.3138120323419571
+        ],
+        [
+          0.17218025028705597
+        ],
+        [
+          0.030548468232154846
+        ],
+        [
+          1.133895680308342
+        ],
+        [
+          0.9922638982534409
+        ],
+        [
+          0.8506321161985397
+        ],
+        [
+          0.7090003341436386
+        ],
+        [
+          0.5673685520887375
+        ],
+        [
+          0.42573677003383636
+        ],
+        [
+          0.28410498797893524
+        ],
+        [
+          0.14247320592403412
+        ]
+      ],
+      "mse": 0.4467454401311175,
+      "maximum_mse": 1.0,
+      "passed": true
+    },
+    "registration": {
+      "lifecycle_ref": "mlc-1a01f270908afaed881c41e280961563acf08f06",
+      "training_job_id": "j-f50022a482c7496e9dc7199417aecef1",
+      "training_attempt_id": "a-a80e12179215453c81ace9f57089fab1",
+      "run_id": "5b36be03aa2043329f7104c55e79bbd6",
+      "model_name": "ra-ra-lab-linear-lifecycle-v1",
+      "model_version": "2",
+      "model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/2",
+      "evaluation_digest": "sha256:6c612f41638a8644e7485d8fa8fe80e210999422b6b961ae9dbdc1504499f83b",
+      "model_package_digest": "sha256:6ffdc5ab9ade2498ebf3606d7af19f3342b2710caabdb8dd81fe810680b45fdf",
+      "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+      "artifact_path": "resource-advisor-models/mlc-1a01f270908afaed881c41e280961563acf08f06/6ffdc5ab9ade2498ebf3606d7af19f3342b2710caabdb8dd81fe810680b45fdf",
+      "files": {
+        "MLmodel": "sha256:aaf3146e364b9b6a3d3956398a92c31e8ab34765c49bc9f6f9b86fd2639fe66c",
+        "code/ra_linear_model.py": "sha256:6fd318e666964ed6ed0128a62ff05658aee2fca808c2d4e4b2ce23ee3014df13",
+        "data/checkpoint.json": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+        "lineage.json": "sha256:5a036c5673b1925cf183a4beeab5732419be6fca398c057397d040220b2208dd",
+        "requirements.txt": "sha256:30cfa6d838411b556c8aa0457feb189a2fc84a5957fc994bfaceedef7e1ee526",
+        "conda.yaml": "sha256:0e7ca0c508c30428633d6713ba5e3bad9f4e3e87d7ac7846844103e4980cad63",
+        "python_env.yaml": "sha256:9ffabfd991b7cbe9e685fd06f82a4da3b99073ab45578d2b6302a07f5ee43a09"
+      }
+    },
+    "native_job": {
+      "case": "v2",
+      "job_name": "a-a80e12179215453c81ace9f57089fab1",
+      "job_uid": "b0ee8621-8451-4eb1-b39e-21f0461595c9",
+      "succeeded": 1,
+      "start_time": "2026-10-12T11:01:46Z",
+      "completion_time": "2026-10-12T11:01:54Z",
+      "node_selector": {
+        "hairp.io/multi-gpu-poc": "true",
+        "kubernetes.io/arch": "amd64",
+        "kubernetes.io/hostname": "etri-ser0002-cgnmsb"
+      },
+      "images": [
+        "ghcr.io/mlflow/mlflow:v3.16.1@sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984"
+      ],
+      "completed_pods_remaining": 1,
+      "event_reasons": [
+        "Suspended",
+        "CreatedWorkload",
+        "Started",
+        "SuccessfulCreate",
+        "Resumed",
+        "Completed",
+        "FinishedWorkload"
+      ],
+      "logs_sha256": "ddda7f0b7b728011936dbd99c687daad469973f57b39dcf410daf2271944b388"
+    },
+    "s3_bundle_readback_verified": true,
+    "checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+    "explicit_version_reload": {
+      "mlflow_version": "3.16.1",
+      "numpy_version": "2.4.6",
+      "model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/2",
+      "registry_version_count": 2,
+      "rejected_lifecycle_versions": 0,
+      "downloaded_explicit_version": true,
+      "verified_package_file_count": 7,
+      "package_digest": "sha256:6ffdc5ab9ade2498ebf3606d7af19f3342b2710caabdb8dd81fe810680b45fdf",
+      "checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+      "holdout_prediction_count": 64,
+      "maximum_prediction_difference": 0.0,
+      "mse": 0.4467454401311175,
+      "lineage_exact_match": true
+    }
+  },
+  "operations": [
+    {
+      "case": "v1",
+      "deployment_ref": "mdp-21c3c7e7c584eee550442d777c8eac98e2f2e7ca",
+      "revision": 2,
+      "operation": "deploy",
+      "lifecycle_ref": "mlc-5c88f749ef04eba1ffc91efc068a97c2622a3559",
+      "receipt": {
+        "service_name": "ra-93679104fbe82e9e745150a8",
+        "deployment_ref": "mdp-21c3c7e7c584eee550442d777c8eac98e2f2e7ca",
+        "model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/1",
+        "model_package_digest": "sha256:7843521e0643b581cf3bca8dc7355bb4981c68f6a33334467b8ba66af3e7e1bf",
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+        "endpoint": "http://ra-93679104fbe82e9e745150a8-predictor.resource-advisor-lab.svc/v1/models/ra-93679104fbe82e9e745150a8",
+        "isvc_uid": "a9fd3e6b-1beb-40f9-8e60-8dc6579e3ebd",
+        "deployment_uid": "70fa0636-a6cd-4e50-8c77-42eda630d213",
+        "deployment_generation": 1,
+        "service_uid": "0127a61c-c8c5-4d7e-b0cf-3ee066592b1f",
+        "image": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+        "package_configmap": "ra-model-package-b791144c8bebf4dde5ee6404aec8cef2ce82070b",
+        "prediction_count": 64,
+        "prediction_digest": "sha256:d7c891778ed8f8958510f427eb1ef417591a0a7b4a94ca7287414543bb5f9e70",
+        "verified_at": "2026-10-12T11:10:45.054519+00:00"
+      },
+      "native": {
+        "case": "v1",
+        "isvc_uid": "a9fd3e6b-1beb-40f9-8e60-8dc6579e3ebd",
+        "isvc_generation": 1,
+        "deployment_uid": "70fa0636-a6cd-4e50-8c77-42eda630d213",
+        "deployment_generation": 1,
+        "service_uid": "0127a61c-c8c5-4d7e-b0cf-3ee066592b1f",
+        "pod_uid": "fe45f275-874a-4253-ba5f-350bd2e3e29d",
+        "pod_name": "ra-93679104fbe82e9e745150a8-predictor-6bf744d56-2thhk",
+        "node": "etri-ser0001-cg0msb",
+        "image": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+        "image_id": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+        "ready": true,
+        "restarts": 0,
+        "tokenless_no_credentials": true,
+        "nonroot_readonly_seccomp": true,
+        "cpu_only": true,
+        "immutable_package": "ra-model-package-b791144c8bebf4dde5ee6404aec8cef2ce82070b",
+        "external_routes": 0,
+        "logs_sha256": "11be7a3f83169ce30c265309363d064bd9adc4f0b88ef9955a584cb40733463d"
+      },
+      "prediction_count": 64,
+      "maximum_prediction_difference_from_cpu_evaluation": 0.0
+    },
+    {
+      "case": "v2",
+      "deployment_ref": "mdp-1a01f270908afaed881c41e280961563acf08f06",
+      "revision": 3,
+      "operation": "deploy",
+      "lifecycle_ref": "mlc-1a01f270908afaed881c41e280961563acf08f06",
+      "receipt": {
+        "service_name": "ra-93679104fbe82e9e745150a8",
+        "deployment_ref": "mdp-1a01f270908afaed881c41e280961563acf08f06",
+        "model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/2",
+        "model_package_digest": "sha256:6ffdc5ab9ade2498ebf3606d7af19f3342b2710caabdb8dd81fe810680b45fdf",
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+        "endpoint": "http://ra-93679104fbe82e9e745150a8-predictor.resource-advisor-lab.svc/v1/models/ra-93679104fbe82e9e745150a8",
+        "isvc_uid": "a9fd3e6b-1beb-40f9-8e60-8dc6579e3ebd",
+        "deployment_uid": "70fa0636-a6cd-4e50-8c77-42eda630d213",
+        "deployment_generation": 2,
+        "service_uid": "0127a61c-c8c5-4d7e-b0cf-3ee066592b1f",
+        "image": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+        "package_configmap": "ra-model-package-ddf890b8cabb4818ab545cc3e0cf7beb4eb6bb9c",
+        "prediction_count": 64,
+        "prediction_digest": "sha256:d7c891778ed8f8958510f427eb1ef417591a0a7b4a94ca7287414543bb5f9e70",
+        "verified_at": "2026-10-12T11:11:00.755603+00:00"
+      },
+      "native": {
+        "case": "v2",
+        "isvc_uid": "a9fd3e6b-1beb-40f9-8e60-8dc6579e3ebd",
+        "isvc_generation": 2,
+        "deployment_uid": "70fa0636-a6cd-4e50-8c77-42eda630d213",
+        "deployment_generation": 2,
+        "service_uid": "0127a61c-c8c5-4d7e-b0cf-3ee066592b1f",
+        "pod_uid": "d2f314f7-9397-415b-b5e7-924545263755",
+        "pod_name": "ra-93679104fbe82e9e745150a8-predictor-8446f9d747-t87vz",
+        "node": "etri-ser0001-cg0msb",
+        "image": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+        "image_id": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+        "ready": true,
+        "restarts": 0,
+        "tokenless_no_credentials": true,
+        "nonroot_readonly_seccomp": true,
+        "cpu_only": true,
+        "immutable_package": "ra-model-package-ddf890b8cabb4818ab545cc3e0cf7beb4eb6bb9c",
+        "external_routes": 0,
+        "logs_sha256": "850252325b01d7b62f8f3c7344fabef2682700ab1211eee3a7bfc8dcc005317c"
+      },
+      "prediction_count": 64,
+      "maximum_prediction_difference_from_cpu_evaluation": 0.0
+    },
+    {
+      "case": "rollback",
+      "deployment_ref": "mdp-4af7e87cc8f30dab02688d0589fdf84ff92f6f5a",
+      "revision": 4,
+      "operation": "rollback",
+      "lifecycle_ref": "mlc-5c88f749ef04eba1ffc91efc068a97c2622a3559",
+      "receipt": {
+        "service_name": "ra-93679104fbe82e9e745150a8",
+        "deployment_ref": "mdp-4af7e87cc8f30dab02688d0589fdf84ff92f6f5a",
+        "model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/1",
+        "model_package_digest": "sha256:7843521e0643b581cf3bca8dc7355bb4981c68f6a33334467b8ba66af3e7e1bf",
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+        "endpoint": "http://ra-93679104fbe82e9e745150a8-predictor.resource-advisor-lab.svc/v1/models/ra-93679104fbe82e9e745150a8",
+        "isvc_uid": "a9fd3e6b-1beb-40f9-8e60-8dc6579e3ebd",
+        "deployment_uid": "70fa0636-a6cd-4e50-8c77-42eda630d213",
+        "deployment_generation": 3,
+        "service_uid": "0127a61c-c8c5-4d7e-b0cf-3ee066592b1f",
+        "image": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+        "package_configmap": "ra-model-package-92cf26033c04f809f240eaa15a061d9d6e6db9d4",
+        "prediction_count": 64,
+        "prediction_digest": "sha256:d7c891778ed8f8958510f427eb1ef417591a0a7b4a94ca7287414543bb5f9e70",
+        "verified_at": "2026-10-12T11:11:21.527384+00:00"
+      },
+      "native": {
+        "case": "rollback",
+        "isvc_uid": "a9fd3e6b-1beb-40f9-8e60-8dc6579e3ebd",
+        "isvc_generation": 3,
+        "deployment_uid": "70fa0636-a6cd-4e50-8c77-42eda630d213",
+        "deployment_generation": 3,
+        "service_uid": "0127a61c-c8c5-4d7e-b0cf-3ee066592b1f",
+        "pod_uid": "e9af69a1-b537-45a0-bb39-1bf408a1c9c0",
+        "pod_name": "ra-93679104fbe82e9e745150a8-predictor-bd8c5b7db-f5tw7",
+        "node": "etri-ser0001-cg0msb",
+        "image": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+        "image_id": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+        "ready": true,
+        "restarts": 0,
+        "tokenless_no_credentials": true,
+        "nonroot_readonly_seccomp": true,
+        "cpu_only": true,
+        "immutable_package": "ra-model-package-92cf26033c04f809f240eaa15a061d9d6e6db9d4",
+        "external_routes": 0,
+        "logs_sha256": "1bb9d7834ab56072752b464a96b760ad9c89bb875dc32ad97cb7430bb859947a"
+      },
+      "prediction_count": 64,
+      "maximum_prediction_difference_from_cpu_evaluation": 0.0
+    }
+  ],
+  "api_checks": {
+    "versions": [
+      "models:/ra-ra-lab-linear-lifecycle-v1/1",
+      "models:/ra-ra-lab-linear-lifecycle-v1/2",
+      "models:/ra-ra-lab-linear-lifecycle-v1/1"
+    ],
+    "same_isvc_uid": true,
+    "same_service_uid": true,
+    "history_count": 4,
+    "ready_history_count": 3,
+    "all_retries_same_receipt": true,
+    "cross_project_read_404": true,
+    "user_mutation_403": true,
+    "quality_rejected_deployment_422": true,
+    "rejected_request_did_not_change_target": true,
+    "stale_command_409": true
+  },
+  "initial_failure": {
+    "deployment_ref": "mdp-5dff238257c36f694ac10f92223508b2249460ab",
+    "final_state": "SUPERSEDED",
+    "receipt": null,
+    "reason": "KServe default hostname template produced a 72-character DNS label after server dry-run accepted the ISVC",
+    "fix": "shared ra- plus 24 hex service name and namespace maximum 25 characters",
+    "cleanup": {
+      "removed_owned_never_ready_isvc": "ra-model-93679104fbe82e9e745150a809817719",
+      "uid_precondition": "f1cebd6a-9416-4941-8c24-d714f50692d2",
+      "no_deployment_or_service_existed": true,
+      "immutable_failed_intent_preserved": true
+    }
+  },
+  "release": {
+    "source_commit": "b9a323d929a939bf2b11484fcb400ef5c4b841cd",
+    "gitops_synced_healthy": true,
+    "targets": {
+      "ra-api": {
+        "ready": true,
+        "source_hash_match": true
+      },
+      "ra-worker": {
+        "ready": true,
+        "source_hash_match": true
+      }
+    },
+    "existing_records_preserved": {
+      "jobs": 862,
+      "entities": 6321,
+      "usage": 862,
+      "outbox": 3855
+    },
+    "current_job_count": 862,
+    "nonterminal_jobs": 0,
+    "other_specs_uids_secrets_pvc_queues_preserved": true,
+    "existing_configmaps_preserved": 34,
+    "only_worker_serving_config_added": true,
+    "tokenless_predictor_account": true
+  },
+  "preservation": {
+    "initial_job_count": 861,
+    "final_job_count": 862,
+    "initial_job_and_usage_rows_preserved": 861,
+    "original_noninventory_entities_preserved": 6307,
+    "original_outbox_identities_preserved": 3848,
+    "original_configmaps_preserved": 33,
+    "nonterminal_jobs": 0,
+    "new_training_jobs": 1,
+    "deployment_or_rollback_training_jobs": 0,
+    "worker_original_credentials_and_settings_preserved": true,
+    "existing_secrets_pvc_queues_uids_preserved": true,
+    "dirty_user_files_hash_preserved": 36,
+    "completed_pods_remaining": 0
+  },
+  "ci": {
+    "run_id": 38240321553,
+    "url": "https://github.com/dsa04156/resource-advisor/actions/runs/38240321553",
+    "head_sha": "b9a323d929a939bf2b11484fcb400ef5c4b841cd",
+    "conclusion": "success",
+    "python_versions": [
+      "3.11",
+      "3.13"
+    ],
+    "sqlite_passed_each": 1230,
+    "sqlite_skipped_each": 11,
+    "postgresql_passed_each": 1241,
+    "focused_serving_passed": 19,
+    "standards_remaining_findings": 0,
+    "spec_remaining_findings": 0
+  },
+  "limitations": [
+    "Both versions use the same deterministic training fixture; equal checkpoints/predictions establish no accuracy improvement.",
+    "READY receipts describe verification time, not continuous health.",
+    "Native ClusterIP predictor has no application authentication; API authorization is not hostile-tenant network isolation.",
+    "No KFP lifecycle orchestration, console model lineage, generic binary models, canary split, automatic rollback, package garbage collection or production HA."
+  ]
+}

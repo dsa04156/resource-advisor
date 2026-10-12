@@ -14,12 +14,14 @@
 [claim audit](right-sizing-claim-audit.md), 최초 설계와 대조하려면
 [HAIRP 범위](hairp-original-scope-ko.md)를 읽는다.
 
+MLOps 구현 범위와 면접 설명은 [현재 모델 lifecycle 구조](mlops-architecture-ko.md)를 읽는다.
+
 중복 계획과 과거 실패·재시도 보고서를 정리했다. 세부 기술 문서는 `reference/`에 있다.
 실험 문서는 작성 당시의 상태를 담으므로 현재 장비 상태는 위의 현재 장비 문서를 기준으로 본다.
 필요한 세부 항목만 펼치면 된다.
 
 <details>
-<summary>실행·장비·모델 · 16개</summary>
+<summary>실행·장비·모델 · 18개</summary>
 
 - [실제 CPU → GPU 계산 파이프라인 결과](reference/cpu-gpu-pipeline-results.md)
 - [E5 input supply versus CUDA kernel path: measured result](reference/e5-kernel-results.md)
@@ -37,6 +39,8 @@
 - [Right-sizing hardware evidence matrix](reference/right-sizing-hardware-matrix.md)
 - [GPU thermal observations bound to an execution](reference/thermal-evidence.md)
 - [Isolated checkpoint trials on Kubernetes GPUs](reference/training-isolation.md)
+- [Qualified GPU training → CPU gate → MLflow registry](reference/model-lifecycle.md)
+- [Registered model → KServe → verified rollback](reference/model-serving.md)
 
 </details>
 

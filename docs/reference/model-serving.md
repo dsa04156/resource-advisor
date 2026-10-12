@@ -97,7 +97,10 @@ Kubernetes resourceVersion and ordinal annotations fence older writes. A lost cr
 or update response is reconciled by reading the deterministic owned resource.
 
 RawDeployment uses one stable `{isvc}-predictor` Service. Deployment's own observed
-generation, replicas, runtime image and package volume must match. ISVC Ready alone
+generation, replicas and the trusted operator runtime contract must match: image,
+command/env, account/token, node, mounts/resources, non-root/read-only/capabilities
+and container-level seccomp. Both ISVC readback and Deployment are compared to
+the original platform manifest, including admission changes. ISVC Ready alone
 is insufficient: KServe 0.15 copies Deployment observedGeneration into ISVC status.
 GET predictor identity and POST holdout predictions must match before READY is saved.
 
@@ -110,6 +113,57 @@ Failures retain PENDING/error and earlier receipts rather than inventing success
 There is no automatic rollback or continuous drift reconciliation. A resource
 recreated under a different ISVC UID requires investigation. ConfigMaps and historical
 deployment records are retained; automatic package garbage collection is future work.
+
+## Verified lab run: 2026-10-12
+
+[Verification receipt](../evidence/model-serving-20261012-v1.json) records source
+`b9a323d929a939bf2b11484fcb400ef5c4b841cd`, actual registration/deployment
+identities, native UID/generation/image observations and retained history.
+
+A new qualified RTX 5080 GPU Job trained version 2 under a policy frozen before
+submission (`maximum_mse=1.0`). The CPU holdout MSE was 0.4467454401311175.
+Actual S3 bundle readback matched the training receipt. MLflow 3.16.1 downloaded
+explicit version 2, verified all seven files and lineage, then loaded pyfunc and
+matched all 64 holdout predictions with zero difference.
+
+| Accepted operation | Model URI | ISVC / Deployment generation | Predictions vs CPU evaluation |
+| --- | --- | --- | --- |
+| Deploy | `models:/ra-ra-lab-linear-lifecycle-v1/1` | 1 / 1 | 64 exact matches |
+| Deploy | `models:/ra-ra-lab-linear-lifecycle-v1/2` | 2 / 2 | 64 exact matches |
+| Rollback | `models:/ra-ra-lab-linear-lifecycle-v1/1` | 3 / 3 | 64 exact matches |
+
+All three operations retained the same ISVC, Deployment and Service UIDs. Each
+stage ran one Ready CPU predictor on the qualified API node, with zero restarts,
+no mounted API token or credentials, non-root/read-only RuntimeDefault security,
+and no external Ingress/HTTPRoute. The final desired version is 1.
+
+The first attempt exposed the default hostname-length error that admission dry-run
+could not detect. Its never-ready native ISVC was removed with a UID precondition;
+the immutable command remains SUPERSEDED. A new operator command recovered it.
+History therefore contains four commands: one superseded failure and three READY
+receipts. Replaying the three accepted commands returned their original receipts
+without adding history. Cross-project reads returned 404, user mutation 403,
+stale commands 409 and quality-rejected selection 422 without changing the target.
+
+[Exact-source CI](https://github.com/dsa04156/resource-advisor/actions/runs/38240321553)
+passed Python 3.11/3.13: SQLite 1,230 passed / 11 skipped and PostgreSQL 1,241 passed
+in each version. Focused serving tests passed 19. Both independent review axes have
+zero remaining findings, including deterministic same-key concurrency, admission,
+Pod security and hostname regressions.
+
+Both API/worker Argo applications are Synced/Healthy and their deployed source
+hashes match the qualified images. All 861 prior Job/usage rows, 6,307 original
+noninventory entities, 3,848 outbox identities, 33 original ConfigMaps and 36 dirty
+user files were preserved. Original credentials/settings, other resource specs,
+UIDs, queues and PVCs remain intact. The only added compute Job is terminal;
+862 Jobs now exist. Deployment/rollback submitted no training Jobs. No completed
+Pods remain. The new training Pod/logs were captured while available; native
+Jobs/events/S3 bundles and all three predictor Pod/log snapshots were retained.
+
+Both registered versions were trained with the same deterministic fixture, so
+checkpoint bytes and predictions are equal. Their run/policy/package lineage
+is different. This demonstrates version selection and rollback, not improved
+model accuracy or an A/B experiment.
 
 ## Boundaries
 

@@ -125,8 +125,9 @@ route; evaluation ran independently in the CPU worker.
 The exact model URI is `models:/ra-ra-lab-linear-lifecycle-v1/1`. MLflow 3.16.1
 downloaded that version and loaded its pyfunc model. All seven package files,
 checkpoint and lineage matched their saved hashes/receipts; all 64 predictions
-matched the evaluation exactly. This model has one registry version. The rejected
-lifecycle has no version. Authenticated start retries returned the same Job/Attempt,
+matched the evaluation exactly. At this lifecycle milestone the model had one registry version; the subsequent
+[serving milestone](model-serving.md) added version 2. The rejected lifecycle has
+no version. Authenticated start retries returned the same Job/Attempt,
 and the other project's read returned 404.
 
 Local tests passed 1,211 with 11 skips; focused lifecycle tests passed 18.
@@ -156,8 +157,9 @@ This implementation does not promote pilot checkpoints, modify the original sour
 provide arbitrary model/code uploads, transport large binary checkpoints, implement
 distributed/Slurm training or convert GPU models to NPUs. The fixed model's small
 synthetic dataset does not establish useful real-world model accuracy.
-KFP workflow orchestration, KServe deployment/rollback and console model lineage
-remain subsequent integration milestones. Storage is verified on read/write but
+[KServe deployment and verified rollback](model-serving.md) are now connected for
+this fixed model. KFP lifecycle orchestration and console model lineage remain
+subsequent integration milestones. Storage is verified on read/write but
 not WORM; independent administrators can still mutate/delete external files.
 
 References: [MLflow custom pyfunc](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.pyfunc.html),
