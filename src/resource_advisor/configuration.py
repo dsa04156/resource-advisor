@@ -115,6 +115,15 @@ def worker_configuration(config):
         keys.add(key)
         projects.add(route["project"])
     artifact_buckets(config.get("artifacts"), projects)
+    if "serving" in config:
+        from .kserve_deployment import ServingConfig
+
+        try:
+            serving = ServingConfig.model_validate(config["serving"])
+        except (ValueError, TypeError):
+            raise ConfigurationError("INVALID_SERVING_CONFIGURATION") from None
+        require(bool(config.get("mlflow_url")), "SERVING_MLFLOW_REQUIRED")
+        require(set(serving.project_namespaces) <= projects, "SERVING_PROJECT_ROUTE_MISSING")
     if config.get("mlflow_url"):
         require(isinstance(config["mlflow_url"], str), "INVALID_MLFLOW_URL")
         experiments = config.get("mlflow_experiments")

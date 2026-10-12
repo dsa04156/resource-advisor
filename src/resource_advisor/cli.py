@@ -260,6 +260,19 @@ def main():
             if artifacts and delivery
             else None
         )
+        serving = None
+        if config.get("serving"):
+            from .kserve_deployment import KServeAdapter, ServingConfig
+            from .serving_delivery import ServingDelivery
+
+            if delivery is None:
+                parser.error("model serving requires MLflow delivery configuration")
+            serving = ServingDelivery(
+                store,
+                MLflowModelRegistry(store, delivery),
+                KServeAdapter(ServingConfig.model_validate(config["serving"])),
+                job_routes=backends,
+            )
         stopping = Event()
         signal.signal(signal.SIGTERM, lambda *_: stopping.set())
         signal.signal(signal.SIGINT, lambda *_: stopping.set())
@@ -280,6 +293,8 @@ def main():
                     delivery.deliver_artifact_one()
                 if lifecycle:
                     lifecycle.deliver_one()
+                if serving:
+                    serving.deliver_one()
             if args.once:
                 break
             stopping.wait(5)

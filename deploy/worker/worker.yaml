@@ -6,6 +6,14 @@ metadata:
   labels:
     app.kubernetes.io/part-of: resource-advisor
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ra-predictor
+  labels:
+    app.kubernetes.io/part-of: resource-advisor
+automountServiceAccountToken: false
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -13,6 +21,33 @@ metadata:
   labels:
     app.kubernetes.io/part-of: resource-advisor
 rules:
+- apiGroups:
+  - serving.kserve.io
+  resources:
+  - inferenceservices
+  verbs:
+  - create
+  - get
+  - update
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+- apiGroups:
+  - ''
+  resources:
+  - services
+  verbs:
+  - get
 - apiGroups:
   - batch
   resources:

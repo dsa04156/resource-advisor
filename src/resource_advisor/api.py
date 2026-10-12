@@ -47,6 +47,7 @@ def create_app(
     artifact_storage=None,
     anonymous_project=None,
     research_config=None,
+    prediction_client=None,
 ):
     if not credentials:
         raise ValueError("at least one external credential hash is required")
@@ -61,6 +62,15 @@ def create_app(
     from .model_lifecycle import LifecyclePolicy, LifecycleRequest, ModelLifecycles
 
     lifecycles = ModelLifecycles(service)
+    from .model_serving import (
+        DeploymentRequest,
+        ModelDeployments,
+        PredictionInput,
+        RollbackRequest,
+        ServingUnavailable,
+    )
+
+    deployments = ModelDeployments(service.store, prediction_client)
 
     model_qualifications = Qualifications(service.store)
     passive_observations = PassiveObservations(
@@ -96,6 +106,34 @@ def create_app(
     @app.get(PREFIX + "/model-lifecycles/{ref}")
     def model_lifecycle(ref: str, p=Depends(principal)):
         return lifecycles.view(p.project, ref)
+
+    @app.post(PREFIX + "/model-deployments")
+    def deploy_model(
+        value: DeploymentRequest, idempotency_key: str = Header(), p=Depends(operator)
+    ):
+        return deployments.start(p.project, value, idempotency_key)
+
+    @app.post(PREFIX + "/model-rollbacks")
+    def rollback_model(
+        value: RollbackRequest, idempotency_key: str = Header(), p=Depends(operator)
+    ):
+        return deployments.start(p.project, value, idempotency_key)
+
+    @app.get(PREFIX + "/model-deployments/{ref}")
+    def model_deployment(ref: str, p=Depends(principal)):
+        return deployments.view(p.project, ref)
+
+    @app.get(PREFIX + "/model-services/{ref}")
+    def model_service(ref: str, p=Depends(principal)):
+        return deployments.service(p.project, ref)
+
+    @app.post(PREFIX + "/model-services/{ref}:predict")
+    def predict_model(ref: str, value: PredictionInput, p=Depends(principal)):
+        return deployments.predict(p.project, ref, value)
+
+    @app.exception_handler(ServingUnavailable)
+    async def serving_unavailable(_, exc):
+        return JSONResponse({"detail": str(exc)}, status_code=503)
 
     @app.exception_handler(Conflict)
     async def conflict(_, exc):
