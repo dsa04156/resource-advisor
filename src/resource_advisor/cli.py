@@ -8,6 +8,7 @@ from pathlib import Path
 from threading import Event
 
 from .api import create_app
+from .database_recovery import database_cycle
 from .service import Service
 from .store import Store
 from .worker import MLflowDelivery, Worker
@@ -182,22 +183,19 @@ def main():
         if args.heartbeat_path:
             Path(args.heartbeat_path).unlink(missing_ok=True)
         while not stopping.is_set():
-            snapshot = collector.collect()
-            save_inventory(store, config.project_ref, snapshot)
-            if args.heartbeat_path:
-                from .health import write_heartbeat
-
-                write_heartbeat(Path(args.heartbeat_path))
-            print(
-                json.dumps(
-                    {
-                        "ref": snapshot["ref"],
-                        "status": snapshot["status"],
-                        "node_count": len(snapshot["nodes"]),
-                    }
-                ),
-                flush=True,
-            )
+            with database_cycle(store, args.heartbeat_path, once=args.once):
+                snapshot = collector.collect()
+                save_inventory(store, config.project_ref, snapshot)
+                print(
+                    json.dumps(
+                        {
+                            "ref": snapshot["ref"],
+                            "status": snapshot["status"],
+                            "node_count": len(snapshot["nodes"]),
+                        }
+                    ),
+                    flush=True,
+                )
             if args.once:
                 return
             stopping.wait(args.interval_seconds)
@@ -255,21 +253,18 @@ def main():
         if args.heartbeat_path:
             Path(args.heartbeat_path).unlink(missing_ok=True)
         while not stopping.is_set():
-            if config.get("coordinate_studies", True):
-                study_runner.tick_all()
-            runner.submit_one()
-            runner.cancel_one()
-            runner.reconcile_all()
-            runner.release_one()
-            if artifacts:
-                artifacts.deliver_one()
-            if delivery:
-                delivery.deliver_one()
-                delivery.deliver_artifact_one()
-            if args.heartbeat_path:
-                from .health import write_heartbeat
-
-                write_heartbeat(Path(args.heartbeat_path))
+            with database_cycle(store, args.heartbeat_path, once=args.once):
+                if config.get("coordinate_studies", True):
+                    study_runner.tick_all()
+                runner.submit_one()
+                runner.cancel_one()
+                runner.reconcile_all()
+                runner.release_one()
+                if artifacts:
+                    artifacts.deliver_one()
+                if delivery:
+                    delivery.deliver_one()
+                    delivery.deliver_artifact_one()
             if args.once:
                 break
             stopping.wait(5)

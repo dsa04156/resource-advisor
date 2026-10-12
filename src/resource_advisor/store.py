@@ -22,6 +22,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+from sqlalchemy.engine import make_url
 from sqlalchemy.pool import StaticPool
 
 from .contracts import TERMINAL, State, now, signature
@@ -111,6 +112,22 @@ class Store:
             options = {"poolclass": StaticPool, "connect_args": {"check_same_thread": False}}
         elif url.startswith("sqlite:"):
             options = {"connect_args": {"check_same_thread": False, "timeout": 30}}
+        elif make_url(url).get_backend_name() == "postgresql":
+            # Pre-ping handles stale pooled connections. libpq transport limits
+            # also apply when a connection disappears during an active operation.
+            # Neither mechanism replays SQL or an uncertain transaction commit.
+            options = {
+                "pool_pre_ping": True,
+                "pool_timeout": 5,
+                "connect_args": {
+                    "connect_timeout": 5,
+                    "keepalives": 1,
+                    "keepalives_idle": 5,
+                    "keepalives_interval": 2,
+                    "keepalives_count": 3,
+                    "tcp_user_timeout": 15000,
+                },
+            }
         self.engine = create_engine(url, **options)
 
     def initialize(self):

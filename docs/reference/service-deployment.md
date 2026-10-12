@@ -112,10 +112,13 @@ before its first cycle. This indicates loop progress, not that every exporter is
 healthy: source failures remain explicit in the saved snapshot.
 
 SIGTERM/SIGINT request collector shutdown after the current collection/save,
-interrupting the polling wait. There is no dependency-sensitive liveness probe
-that turns a database outage into repeated kills. Kubernetes restarts exited
-containers. A permanently stuck loop is unready but is not automatically killed;
-loop deadlines and operational alerting remain to qualify.
+interrupting the polling wait. [PostgreSQL connection recovery](database-recovery.md)
+validates cached connections, bounds libpq transport waits and resumes polling
+after connection failures without replaying uncertain submissions. A failed
+cycle removes the heartbeat; only a complete subsequent cycle restores it.
+There is no dependency-sensitive liveness probe that turns a database outage
+into repeated kills. Kubernetes restarts exited containers. Arbitrary blocked
+external dependencies and full loop deadlines remain to qualify.
 
 ## Lab access and actual recovery
 
