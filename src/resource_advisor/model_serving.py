@@ -47,6 +47,11 @@ def history(store, conn, project, service):
     )
 
 
+def service_name(project, ref):
+    # Leave room for KServe's "-predictor-<namespace>" DNS label.
+    return "ra-" + signature([project, ref])[7:31]
+
+
 class ModelDeployments:
     def __init__(self, store, prediction_client=None):
         self.store, self.prediction_client = store, prediction_client
@@ -173,7 +178,7 @@ class ModelDeployments:
         if desired["state"] != "READY":
             raise ServingUnavailable("desired model deployment has not been verified")
         receipt = desired["receipt"]
-        name = "ra-model-" + signature([project, ref])[7:39]
+        name = service_name(project, ref)
         endpoint = receipt["endpoint"]
         if not re.fullmatch(
             r"http://" + name + r"-predictor\.[a-z0-9-]{1,63}\.svc/v1/models/" + name, endpoint

@@ -59,6 +59,9 @@ Pending desired deployment, unavailable upstream or stale predictor identity ret
 
 Add optional `serving` to existing worker configuration. Namespace, runtime image,
 node selection and ServiceAccount are operator settings, never client manifest fields.
+Namespaces are limited to 25 characters for the installed default KServe
+`{{ .Name }}-{{ .Namespace }}` hostname label. The stable `ra-` plus 24 hex
+characters reserves room for `-predictor-<namespace>` even when visibility is local.
 
 ```json
 {"serving":{"project_namespaces":{"your-project":"your-model-namespace"},"image":"registry.example/predictor@sha256:REPLACE_WITH_64_HEX_DIGEST","node_selector":{"kubernetes.io/hostname":"your-cpu-node"},"service_account":"ra-predictor"}}

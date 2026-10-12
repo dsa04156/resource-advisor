@@ -9,7 +9,7 @@ import httpx
 from .contracts import signature
 from .kserve_deployment import ServingPending
 from .model_predictor import PACKAGE_FILES, verified_package
-from .model_serving import history
+from .model_serving import history, service_name
 
 
 class ServingDelivery:
@@ -106,7 +106,7 @@ class ServingDelivery:
                 if "sha256:" + hashlib.sha256(data).hexdigest() != digest:
                     raise ServingPending("MODEL_PACKAGE_INTEGRITY_MISMATCH")
                 files[name] = base64.b64encode(data).decode()
-        name = "ra-model-" + signature([project, body["service_ref"]])[7:39]
+        name = service_name(project, body["service_ref"])
         package = {
             "files": files,
             "description": {

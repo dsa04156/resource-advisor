@@ -338,12 +338,12 @@ def test_quality_rejection_cannot_be_selected_for_serving(service, bundle):
 
 
 def test_foreign_native_service_is_never_overwritten(service, bundle):
-    from resource_advisor.contracts import signature
-
     client, ref, registry, _ = registered_fixture(service, bundle)
     view = deploy(client, ref).json()
     kube = KubeServer()
-    name = "ra-model-" + signature(["team-a", "linear"])[7:39]
+    from resource_advisor.model_serving import service_name
+
+    name = service_name("team-a", "linear")
     original = {
         "apiVersion": "serving.kserve.io/v1beta1",
         "kind": "InferenceService",
@@ -543,3 +543,15 @@ def test_admission_cannot_replace_operator_runtime_contract(service, bundle):
     ).json()
     assert result["state"] == "PENDING"
     assert result["delivery_error"] == "PREDICTOR_TEMPLATE_MISMATCH"
+
+
+def test_native_hostname_fits_installed_kserve_domain_template(service, bundle):
+    client, ref, registry, _ = registered_fixture(service, bundle)
+    deploy(client, ref)
+    kube = KubeServer()
+    assert serving_delivery(service, registry, kube).deliver_one()
+    isvc = next(x for x in kube.objects.values() if x["kind"] == "InferenceService")
+    # v0.15 constructs this hostname before creating a Deployment, even when
+    # cluster-local visibility suppresses external ingress.
+    label = isvc["metadata"]["name"] + "-predictor-resource-advisor-lab"
+    assert len(label) <= 63

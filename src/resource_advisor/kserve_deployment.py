@@ -41,6 +41,10 @@ class ServingConfig(Contract):
         names = [*self.project_namespaces.values(), self.service_account]
         if any(not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?", name) for name in names):
             raise ValueError("serving namespaces/accounts must be DNS labels")
+        if any(len(name) > 25 for name in self.project_namespaces.values()):
+            raise ValueError(
+                "serving namespace must fit the default KServe hostname (max 25 characters)"
+            )
         return self
 
 
