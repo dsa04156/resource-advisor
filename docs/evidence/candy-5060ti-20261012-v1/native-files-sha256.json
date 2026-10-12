@@ -1,0 +1,107 @@
+[
+  {
+    "path": "jobs/candy-5060ti-block0-20261012-v1/candy-5060ti-block0-20261012-v1-lf7kn.log",
+    "original_sha256": "1bd1356948b01bfa485b62a09281bc33fd865c47d1020c6a07440f49bdd18532",
+    "public_sha256": "1bd1356948b01bfa485b62a09281bc33fd865c47d1020c6a07440f49bdd18532"
+  },
+  {
+    "path": "jobs/candy-5060ti-block0-20261012-v1/job.json",
+    "original_sha256": "95608b9a8c5210692d08815d70b33d690042f4b12cf0d38823defca49d43262a",
+    "public_sha256": "bd0eec536b2e91b97de7ce6185a50cefd8454315fe37481fe04e4d5933fcd21f"
+  },
+  {
+    "path": "jobs/candy-5060ti-block0-20261012-v1/manifest.json",
+    "original_sha256": "632228dd66d1bf83b3ac47f5af3b28bdc4080e9318f8ea77f86670b640f1ff8b",
+    "public_sha256": "3c9bd60206a5213faae835af606019b003521be8ff6a6115632c556b1101916b"
+  },
+  {
+    "path": "jobs/candy-5060ti-block0-20261012-v1/pods.json",
+    "original_sha256": "3f6f45b9d695709d4624cfbd0a82a2fd0f930ebfbbc218894de9e01c5e62035e",
+    "public_sha256": "7a1362b433a24183aa90a552f300011d0f664551ddad29844f9d1c5aa6d1f94d"
+  },
+  {
+    "path": "jobs/candy-5060ti-block0-20261012-v1/receipt.json",
+    "original_sha256": "60fecc62f2ba9261dbfb8ca5a1ad32ba9f19727aa5df75e7233498378d5f3a79",
+    "public_sha256": "60fecc62f2ba9261dbfb8ca5a1ad32ba9f19727aa5df75e7233498378d5f3a79"
+  },
+  {
+    "path": "jobs/candy-5060ti-block1-20261012-v1/candy-5060ti-block1-20261012-v1-rc56g.log",
+    "original_sha256": "82516e4ebd1b8c513dea5d9be71d08cebe88e2155a9393d6cc0c30215944b51b",
+    "public_sha256": "82516e4ebd1b8c513dea5d9be71d08cebe88e2155a9393d6cc0c30215944b51b"
+  },
+  {
+    "path": "jobs/candy-5060ti-block1-20261012-v1/job.json",
+    "original_sha256": "c5cb44a316ebd78db106ea53229743476b8c55eaa71ff6b23800f5e575d8ae2e",
+    "public_sha256": "7d8c4667532b43c0ac1f2eab38d23e84c25d31b59039880d7da0c474b2e51ed9"
+  },
+  {
+    "path": "jobs/candy-5060ti-block1-20261012-v1/manifest.json",
+    "original_sha256": "a3a8fe16407e138ad5839de55d521a6e718eaa98464de3b75a65e55635d64d54",
+    "public_sha256": "68fe0cd1197c4a779ca1ef1416ee9244189db043a9f285c952487ba7ff26c260"
+  },
+  {
+    "path": "jobs/candy-5060ti-block1-20261012-v1/pods.json",
+    "original_sha256": "397ce240aff6d96e8b604692e37d74ecec2965da47d8b0527cfc9e624262c091",
+    "public_sha256": "57bc75f1d131a00c134e93caeb1c8709eb0688b1a793692d129162cdf1130ecf"
+  },
+  {
+    "path": "jobs/candy-5060ti-block1-20261012-v1/receipt.json",
+    "original_sha256": "eb0a8728f728a832aaa2f71f73038e20207f34eb3dff50c0196a4d0583c5b7c2",
+    "public_sha256": "eb0a8728f728a832aaa2f71f73038e20207f34eb3dff50c0196a4d0583c5b7c2"
+  },
+  {
+    "path": "jobs/candy-5060ti-block2-20261012-v1/candy-5060ti-block2-20261012-v1-5428n.log",
+    "original_sha256": "417fd9041ad2270c67f85935bd28441bef3386419c00e5849929b3adde9a8710",
+    "public_sha256": "417fd9041ad2270c67f85935bd28441bef3386419c00e5849929b3adde9a8710"
+  },
+  {
+    "path": "jobs/candy-5060ti-block2-20261012-v1/job.json",
+    "original_sha256": "a070c810173dd4c9b8094246c725d58e619057f8d1680e91b4b9c34e2bea36a2",
+    "public_sha256": "6f657d61e06010ae86f61d28de9d30e1a8dc1c0cf090759b98da5fe90ac37915"
+  },
+  {
+    "path": "jobs/candy-5060ti-block2-20261012-v1/manifest.json",
+    "original_sha256": "be3c5ae69169f97a2fb355e81a5d5ead78effdcb87e139cc40c1ccd88303a472",
+    "public_sha256": "fcd597c5b8656523c115d96967bbb71f7a711a6f7b6831fbdb35c1807f4d9d79"
+  },
+  {
+    "path": "jobs/candy-5060ti-block2-20261012-v1/pods.json",
+    "original_sha256": "b3c1c4075676c960de163bb9281779bd6d78ebe5f319d5989773712f7fe04f5e",
+    "public_sha256": "9c3df2b17434ec72f619c51609131bd035933a1017bdc9e44a03f8d5b19e3811"
+  },
+  {
+    "path": "jobs/candy-5060ti-block2-20261012-v1/receipt.json",
+    "original_sha256": "639e4fff556fb1d0cc28f58b43136d0d9fff119bbcab4fa512f82fbdf6af8462",
+    "public_sha256": "639e4fff556fb1d0cc28f58b43136d0d9fff119bbcab4fa512f82fbdf6af8462"
+  },
+  {
+    "path": "jobs/candy-5060ti-qual-20261012-v1/candy-5060ti-qual-20261012-v1-bxhzd.log",
+    "original_sha256": "a54aa09f26983fc2326ab020e93ff57f7f1809a90832c8221d483df32924b4e8",
+    "public_sha256": "a54aa09f26983fc2326ab020e93ff57f7f1809a90832c8221d483df32924b4e8"
+  },
+  {
+    "path": "jobs/candy-5060ti-qual-20261012-v1/job.json",
+    "original_sha256": "f0c343750bc3f82009c6812f60cad14ee50c6d7699a5bed263650282111b103d",
+    "public_sha256": "40c6264d55148fd1f516f9081ce4db60d7ea19237bbdf4d9cf3787ae1a8f6b11"
+  },
+  {
+    "path": "jobs/candy-5060ti-qual-20261012-v1/manifest.json",
+    "original_sha256": "6b5d67853873d3260a517101134389bc374b566832e988f20c8434fb8d599d45",
+    "public_sha256": "ddb12bac1add2cfed26aad05d35bf7db7ca00e0064f81cc33fd2a0a36e6c994e"
+  },
+  {
+    "path": "jobs/candy-5060ti-qual-20261012-v1/pods.json",
+    "original_sha256": "5b9b14130f0f7e740741b93ed6f17728e667b0d682e52b400898b858325bbf3a",
+    "public_sha256": "39b0454f956af0f515cfb44799ca818c1f907cc3c6a60537253d320b55727706"
+  },
+  {
+    "path": "jobs/candy-5060ti-qual-20261012-v1/receipt.json",
+    "original_sha256": "a68938a51079bc12b9b988affd0690d088ec725cae3cb6d28cdb8e2ecf61e0ae",
+    "public_sha256": "a68938a51079bc12b9b988affd0690d088ec725cae3cb6d28cdb8e2ecf61e0ae"
+  },
+  {
+    "path": "source-configmap-native-v3.json",
+    "original_sha256": "9076be389b83b8696b6ba21a42e67f08dd835ed2749bbded13a08db67abc9d8a",
+    "public_sha256": "9076be389b83b8696b6ba21a42e67f08dd835ed2749bbded13a08db67abc9d8a"
+  }
+]

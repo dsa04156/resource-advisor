@@ -1,0 +1,69 @@
+{
+  "experiment": "candy-5060ti-20261012-v1",
+  "frozen_utc": "2026-10-12T04:13:24.251264+00:00",
+  "primary_question": "Three fresh RTX5060Ti Job/session observations with unchanged Candy GPU artifact and contiguous-HWC probe; compare descriptively against previously measured RTX5080 and Mobilint.",
+  "model_equivalence": "not-established",
+  "source_onnx_sha256": "9d11a3529d1e547da6ae07201d93484dbab2ec0a3614535752c8f40f0fe2968a",
+  "gpu_model_sha256": "ab607dd30842a4b96b7fbbf7ddf01a18509a308e0584bcfcfc6c6198f3c2ef40",
+  "npu_model_sha256": "aa158a35735a876cc9f9220f9967b711b8e49ce5de49126f0597e994c6b543da",
+  "model_preparation": "input/output metadata 224x344; immutable initializer inputs removed; IR3 to IR4; ORT1.23.2 basic constant-folding; all original initializers byte-identical",
+  "source_sha256": "7aaef774c8d8fe3f921e730170a68290849183fdafad3e6ef29e7a74124c88e9",
+  "input_seed": 20261008,
+  "input_shape": [
+    224,
+    344,
+    3
+  ],
+  "input_range": [
+    -1,
+    1
+  ],
+  "batch_size": 1,
+  "warmups": 5,
+  "samples": 30,
+  "replication_unit": "fresh native Job/session; 30 calls nested within each Job",
+  "schedule": [
+    {
+      "unit_id": 1,
+      "block": 0,
+      "arm": "cuda",
+      "name": "candy-5060ti-block0-20261012-v1"
+    },
+    {
+      "unit_id": 2,
+      "block": 1,
+      "arm": "cuda",
+      "name": "candy-5060ti-block1-20261012-v1"
+    },
+    {
+      "unit_id": 3,
+      "block": 2,
+      "arm": "cuda",
+      "name": "candy-5060ti-block2-20261012-v1"
+    }
+  ],
+  "quality": "finite matching output, within-runtime repeatability; cross-model numerical differences descriptive, not equivalence proof",
+  "no_claims": [
+    "concurrent randomized hardware effect",
+    "hardware-general speedup",
+    "MXQ/ONNX weight equivalence",
+    "accuracy parity",
+    "energy efficiency",
+    "statistical significance"
+  ],
+  "cpu": 1,
+  "boundary": "prepared-host-input-to-contiguous-host-HWC-output; blocking",
+  "qualification_samples": 3,
+  "qualification_warmups": 2,
+  "revision": 1,
+  "amendment": "No change to executed probe, model, FP32/TF32, warmup/sample counts, resource requests/limits or image digest. Only GPU device route and identity assertion change.",
+  "memory_request_mib": 1024,
+  "memory_limit_mib": 4096,
+  "native_suffix": "v2",
+  "expected_gpu": "NVIDIA GeForce RTX 5060 Ti",
+  "reference_protocol": "mobilint-5080-20261012-v1/revision4",
+  "reference_commit": "6b3886fc8db9a2eee008892c0ea8313523e95ac5",
+  "temporal_design": "Additional single-device cohort; three sequential fresh Jobs. Previous RTX5080/Mobilint observations are not concurrent randomized controls.",
+  "reference_summary_sha256": "05a653288628a5d2784992a9d4259c87fe9b513c2b30086ac3829b208fa677ad",
+  "gpu_reference_same_artifact_sha256": true
+}

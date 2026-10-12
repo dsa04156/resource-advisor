@@ -1,0 +1,5 @@
+attempt,state,allocation_seconds
+candy-5060ti-block0-20261012-v1,success,29.0
+candy-5060ti-block1-20261012-v1,success,29.0
+candy-5060ti-block2-20261012-v1,success,6.0
+candy-5060ti-qual-20261012-v1,success,35.0
