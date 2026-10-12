@@ -58,6 +58,10 @@ def create_app(
     from .study import Studies
 
     study_service = Studies(service)
+    from .model_lifecycle import LifecyclePolicy, LifecycleRequest, ModelLifecycles
+
+    lifecycles = ModelLifecycles(service)
+
     model_qualifications = Qualifications(service.store)
     passive_observations = PassiveObservations(
         service.store, accept_synthetic=service.accept_synthetic
@@ -78,6 +82,20 @@ def create_app(
         if not p.operator:
             raise HTTPException(403, "Operator qualification required")
         return p
+
+    @app.post(PREFIX + "/model-lifecycle-policies")
+    def register_lifecycle_policy(value: LifecyclePolicy, p=Depends(operator)):
+        return lifecycles.register(p.project, value)
+
+    @app.post(PREFIX + "/model-lifecycles")
+    def start_model_lifecycle(
+        value: LifecycleRequest, idempotency_key: str = Header(), p=Depends(principal)
+    ):
+        return lifecycles.start(p.project, value, idempotency_key)
+
+    @app.get(PREFIX + "/model-lifecycles/{ref}")
+    def model_lifecycle(ref: str, p=Depends(principal)):
+        return lifecycles.view(p.project, ref)
 
     @app.exception_handler(Conflict)
     async def conflict(_, exc):

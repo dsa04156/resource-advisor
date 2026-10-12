@@ -247,6 +247,19 @@ def main():
             if config.get("mlflow_url")
             else None
         )
+        from .model_lifecycle import LifecycleDelivery
+        from .model_registry import MLflowModelRegistry
+
+        lifecycle = (
+            LifecycleDelivery(
+                service,
+                artifacts.storage,
+                MLflowModelRegistry(store, delivery),
+                job_routes=backends,
+            )
+            if artifacts and delivery
+            else None
+        )
         stopping = Event()
         signal.signal(signal.SIGTERM, lambda *_: stopping.set())
         signal.signal(signal.SIGINT, lambda *_: stopping.set())
@@ -265,6 +278,8 @@ def main():
                 if delivery:
                     delivery.deliver_one()
                     delivery.deliver_artifact_one()
+                if lifecycle:
+                    lifecycle.deliver_one()
             if args.once:
                 break
             stopping.wait(5)
