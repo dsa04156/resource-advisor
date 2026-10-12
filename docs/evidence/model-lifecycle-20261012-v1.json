@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "verified_on": "2026-10-12",
+  "implementation_commit": "6cd778a9eeb89e40d627c55bac1ba0b4939084ae",
+  "code_commits": [
+    "b9e3866bf5b9bb950576a69ff4bccfe25b576794",
+    "6cd778a9eeb89e40d627c55bac1ba0b4939084ae"
+  ],
+  "branch": "feat/model-lifecycle-20261012",
+  "scope": "Qualified two-feature, ten-step linear SGD fixture; functional lifecycle evidence, not production accuracy or complete HAIRP.",
+  "quality_policies_frozen_before_both_training_requests": true,
+  "ci": {
+    "run_id": 38233918253,
+    "url": "https://github.com/dsa04156/resource-advisor/actions/runs/38233918253",
+    "head": "6cd778a9eeb89e40d627c55bac1ba0b4939084ae",
+    "conclusion": "success",
+    "test_summaries": [
+      "2026-10-12T10:05:46.1551774Z 1211 passed, 11 skipped, 3 warnings in 84.31s (0:01:24)",
+      "2026-10-12T10:08:31.3690122Z 1222 passed, 3 warnings in 163.26s (0:02:43)",
+      "2026-10-12T10:05:09.3858789Z 1211 passed, 11 skipped, 3 warnings in 59.53s",
+      "2026-10-12T10:07:09.9468674Z 1222 passed, 3 warnings in 117.92s (0:01:57)"
+    ]
+  },
+  "local_tests": {
+    "full_sqlite": {
+      "passed": 1211,
+      "skipped": 11
+    },
+    "focused_model_lifecycle": {
+      "passed": 18
+    }
+  },
+  "review": {
+    "standards_findings_remaining": 0,
+    "spec_findings_remaining": 0,
+    "concurrent_start_race_fixed_with_public_api_regression": true
+  },
+  "cases": [
+    {
+      "case": "pass",
+      "policy_ref": "linear-lifecycle-20261012-pass",
+      "policy_digest": "sha256:68675ecdeffd0cc85874fee9c34325e51494a4310e2e2099287a65c582d06379",
+      "lifecycle_ref": "mlc-5c88f749ef04eba1ffc91efc068a97c2622a3559",
+      "state": "REGISTERED",
+      "job_id": "j-2cbc4beb10bf4055b25f7ae91c25e3d3",
+      "attempt_id": "a-33b0c55137a24f1c87fc595ef97a59bf",
+      "training_state": "SUCCEEDED",
+      "result_digest": "sha256:1659c6fd87db21fd79a7d8266abab666f726351ea22ec853e72bcdb417fbb1a4",
+      "hardware_execution": {
+        "evidence_kind": "hardware",
+        "measured": true,
+        "work_units": 10,
+        "elapsed_seconds": 0.004761116812005639,
+        "node_selector": {
+          "hairp.io/multi-gpu-poc": "true",
+          "kubernetes.io/arch": "amd64",
+          "kubernetes.io/hostname": "etri-ser0002-cgnmsb"
+        },
+        "native_job_uid": "5ce7db7e-fc9c-409e-8438-d3221aa86deb",
+        "start_time": "2026-10-12T10:11:29Z",
+        "completion_time": "2026-10-12T10:11:36Z",
+        "completed_pods_remaining": 0
+      },
+      "training_receipt": {
+        "initial_checkpoint_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_after_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_after_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_readonly": true,
+        "input_readonly": true,
+        "source_not_mounted": true,
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8"
+      },
+      "evaluation": {
+        "lifecycle_ref": "mlc-5c88f749ef04eba1ffc91efc068a97c2622a3559",
+        "policy_digest": "sha256:68675ecdeffd0cc85874fee9c34325e51494a4310e2e2099287a65c582d06379",
+        "training_job_id": "j-2cbc4beb10bf4055b25f7ae91c25e3d3",
+        "training_attempt_id": "a-33b0c55137a24f1c87fc595ef97a59bf",
+        "code_digest": "sha256:80088871657f1d3da0210f9723db870ad403d5106ddd47e9cabb04b34f5a11bc",
+        "training_input_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "initial_checkpoint_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+        "artifact_ref": "artifact-a-33b0c55137a24f1c87fc595ef97a59bf",
+        "artifact_digest": "sha256:fde4a421b5d972278500be99b160bed780f25e34c4f5dc01e259edb29aaa1ff7",
+        "holdout_digest": "sha256:762ea6d8483c1cfa42e1288ed1755c8f0c177d953b63a65b82c719c4e2b1b538",
+        "evaluator": "linear-regression-mse-v1",
+        "evaluator_source_digest": "sha256:4c8d7f0b727d090792e2ed597711bccb66e1d9d0e0aa4d3a9e0a70c4cd9b8f7b",
+        "evaluated_at": "2026-10-12T10:11:40.850069+00:00",
+        "sample_count": 64,
+        "mse": 0.4467454401311175,
+        "maximum_mse": 1.0,
+        "passed": true
+      },
+      "registration": {
+        "lifecycle_ref": "mlc-5c88f749ef04eba1ffc91efc068a97c2622a3559",
+        "training_job_id": "j-2cbc4beb10bf4055b25f7ae91c25e3d3",
+        "training_attempt_id": "a-33b0c55137a24f1c87fc595ef97a59bf",
+        "run_id": "0453c7309eb24752b2489890298632fa",
+        "model_name": "ra-ra-lab-linear-lifecycle-v1",
+        "model_version": "1",
+        "model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/1",
+        "evaluation_digest": "sha256:942b3cba6fb8fc25810b6941b8373b44284885ad753e124085f0399cf51406d9",
+        "model_package_digest": "sha256:7843521e0643b581cf3bca8dc7355bb4981c68f6a33334467b8ba66af3e7e1bf",
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+        "artifact_path": "resource-advisor-models/mlc-5c88f749ef04eba1ffc91efc068a97c2622a3559/7843521e0643b581cf3bca8dc7355bb4981c68f6a33334467b8ba66af3e7e1bf",
+        "files": {
+          "MLmodel": "sha256:f7799a6fb07911743b7869201c7641ff5bde73bd2704dcebfd1fd18e12acf527",
+          "code/ra_linear_model.py": "sha256:6fd318e666964ed6ed0128a62ff05658aee2fca808c2d4e4b2ce23ee3014df13",
+          "data/checkpoint.json": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+          "lineage.json": "sha256:f0fded2f9814177c933f1e95803b7a7670ae2a04ff88ec2db45b1cb203ec6e2f",
+          "requirements.txt": "sha256:30cfa6d838411b556c8aa0457feb189a2fc84a5957fc994bfaceedef7e1ee526",
+          "conda.yaml": "sha256:0e7ca0c508c30428633d6713ba5e3bad9f4e3e87d7ac7846844103e4980cad63",
+          "python_env.yaml": "sha256:9ffabfd991b7cbe9e685fd06f82a4da3b99073ab45578d2b6302a07f5ee43a09"
+        }
+      },
+      "tracking": {
+        "job_id": "j-2cbc4beb10bf4055b25f7ae91c25e3d3",
+        "experiment_id": "3",
+        "run_id": "0453c7309eb24752b2489890298632fa"
+      },
+      "s3_artifact": {
+        "ref": "artifact-a-33b0c55137a24f1c87fc595ef97a59bf",
+        "digest": "sha256:fde4a421b5d972278500be99b160bed780f25e34c4f5dc01e259edb29aaa1ff7",
+        "size_bytes": 5856,
+        "verified_readback": true
+      }
+    },
+    {
+      "case": "reject",
+      "policy_ref": "linear-lifecycle-20261012-reject",
+      "policy_digest": "sha256:a34952820a0125ab830a878932c1920edc6f985a7a7de2bf2385a21510e926e7",
+      "lifecycle_ref": "mlc-88ba3e16fd6f8bcbb8275cb7807560165df362c5",
+      "state": "QUALITY_REJECTED",
+      "job_id": "j-a87f0a2fbccc4d11b32d6d08625c1963",
+      "attempt_id": "a-d46597d6c91443fea5bb118d98a83b6b",
+      "training_state": "SUCCEEDED",
+      "result_digest": "sha256:abd3b12ae682d87e72cc5ad1ae6fa95e3becf63696d9f71b15f6beb01239ad36",
+      "hardware_execution": {
+        "evidence_kind": "hardware",
+        "measured": true,
+        "work_units": 10,
+        "elapsed_seconds": 0.004099133191630244,
+        "node_selector": {
+          "hairp.io/multi-gpu-poc": "true",
+          "kubernetes.io/arch": "amd64",
+          "kubernetes.io/hostname": "etri-ser0002-cgnmsb"
+        },
+        "native_job_uid": "704f3db2-3059-4796-bb82-390c1189d804",
+        "start_time": "2026-10-12T10:11:38Z",
+        "completion_time": "2026-10-12T10:11:45Z",
+        "completed_pods_remaining": 0
+      },
+      "training_receipt": {
+        "initial_checkpoint_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_after_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "input_after_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "checkpoint_readonly": true,
+        "input_readonly": true,
+        "source_not_mounted": true,
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8"
+      },
+      "evaluation": {
+        "lifecycle_ref": "mlc-88ba3e16fd6f8bcbb8275cb7807560165df362c5",
+        "policy_digest": "sha256:a34952820a0125ab830a878932c1920edc6f985a7a7de2bf2385a21510e926e7",
+        "training_job_id": "j-a87f0a2fbccc4d11b32d6d08625c1963",
+        "training_attempt_id": "a-d46597d6c91443fea5bb118d98a83b6b",
+        "code_digest": "sha256:80088871657f1d3da0210f9723db870ad403d5106ddd47e9cabb04b34f5a11bc",
+        "training_input_digest": "sha256:98d5d806442486e54b1a24706dc62eee91e0eb4bfc08dea1206a3f58288ad077",
+        "initial_checkpoint_digest": "sha256:0f32f7805600dfb7d77f22a7ecf289fe33b584a521ac82dccf4ce3f11d78e0f3",
+        "output_checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+        "artifact_ref": "artifact-a-d46597d6c91443fea5bb118d98a83b6b",
+        "artifact_digest": "sha256:e7303ffbe0d94f891d0652b3c315b680ee397bb720d5b088bb749041f45a7d84",
+        "holdout_digest": "sha256:762ea6d8483c1cfa42e1288ed1755c8f0c177d953b63a65b82c719c4e2b1b538",
+        "evaluator": "linear-regression-mse-v1",
+        "evaluator_source_digest": "sha256:4c8d7f0b727d090792e2ed597711bccb66e1d9d0e0aa4d3a9e0a70c4cd9b8f7b",
+        "evaluated_at": "2026-10-12T10:11:46.921102+00:00",
+        "sample_count": 64,
+        "mse": 0.4467454401311175,
+        "maximum_mse": 0.0,
+        "passed": false
+      },
+      "registration": null,
+      "tracking": {
+        "job_id": "j-a87f0a2fbccc4d11b32d6d08625c1963",
+        "experiment_id": "3",
+        "run_id": "62d36fdbe48048a088d65e179040015e"
+      },
+      "s3_artifact": {
+        "ref": "artifact-a-d46597d6c91443fea5bb118d98a83b6b",
+        "digest": "sha256:e7303ffbe0d94f891d0652b3c315b680ee397bb720d5b088bb749041f45a7d84",
+        "size_bytes": 5856,
+        "verified_readback": true
+      }
+    }
+  ],
+  "model_reload": {
+    "mlflow_version": "3.16.1",
+    "numpy_version": "2.4.6",
+    "model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/1",
+    "registry_version_count": 1,
+    "rejected_lifecycle_versions": 0,
+    "downloaded_explicit_version": true,
+    "verified_package_file_count": 7,
+    "package_digest": "sha256:7843521e0643b581cf3bca8dc7355bb4981c68f6a33334467b8ba66af3e7e1bf",
+    "checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+    "holdout_prediction_count": 64,
+    "maximum_prediction_difference": 0.0,
+    "mse": 0.4467454401311175,
+    "lineage_exact_match": true
+  },
+  "api_checks": {
+    "same_job_attempt_on_replay": true,
+    "cross_project_read_404": true,
+    "original_training_source_unchanged": true,
+    "positive_registered": true,
+    "negative_rejected_without_registration": true
+  },
+  "deployment": {
+    "source_commit": "6cd778a9eeb89e40d627c55bac1ba0b4939084ae",
+    "gitops_synced_healthy": true,
+    "targets": {
+      "ra-api": {
+        "ready": true,
+        "source_hash_match": true
+      },
+      "ra-worker": {
+        "ready": true,
+        "source_hash_match": true
+      }
+    },
+    "existing_records_preserved": {
+      "jobs": 859,
+      "entities": 6285,
+      "usage": 859,
+      "outbox": 3836
+    },
+    "current_job_count": 861,
+    "nonterminal_jobs": 0,
+    "other_specs_uids_secrets_pvc_queues_preserved": true,
+    "expired_api_certificate_renewed": true
+  },
+  "tls_maintenance": {
+    "reason": "existing certificate expired 2026-10-09",
+    "secret_name": "ra-api-tls",
+    "secret_uid_preserved": true,
+    "private_key_preserved": true,
+    "other_secret_data_preserved": true,
+    "old_certificate_sha256": "3102e00089ebe46985186000550ded14ca63e72f50682f1d75547183dfd233db",
+    "new_certificate_sha256": "c35ffee2040861ba495bdd1f327e54cf69d22893e35a0309a4c7775391bfdbd2",
+    "validity": "notBefore=Oct 12 10:10:50 2026 GMT\nnotAfter=Jan 10 10:10:50 2027 GMT\n"
+  },
+  "remaining_work": [
+    "KFP orchestration",
+    "KServe deployment and rollback",
+    "Console model lineage",
+    "General model formats and calibrated production gates"
+  ],
+  "limits": [
+    "Model-version create is a single reserved POST; uncertain responses reconcile by search. Reserved intent with no version requires manual operator investigation.",
+    "JSON checkpoints and fixed platform loader only; model code/data path is bounded.",
+    "Hardware evidence relies on operator-qualified runtime, not cryptographic attestation.",
+    "External artifacts are verified on read/write, not WORM.",
+    "Completed Pods were no longer present at full Pod/log archive time; native Jobs/events and verified S3 result bundles are retained.",
+    "TLS certificate was renewed for 90 days using existing key/SANs; automated certificate renewal remains operational work."
+  ]
+}

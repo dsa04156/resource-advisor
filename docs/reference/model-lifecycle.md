@@ -109,6 +109,41 @@ starting a separate bounded training request. Retain both evaluations and confir
 that the rejected lifecycle added no registry version. Do not lower an existing
 policy's threshold after observing its result.
 
+## Verified lab run: 2026-10-12
+
+[Verification receipt](../evidence/model-lifecycle-20261012-v1.json) records the
+deployed source `6cd778a9eeb89e40d627c55bac1ba0b4939084ae`, Job/Attempt and
+policy/evaluation/checkpoint/package digests. Both policies were registered before
+either training request. Both native GPU Jobs completed on the qualified RTX 5080
+route; evaluation ran independently in the CPU worker.
+
+| Case | Frozen maximum MSE | Actual holdout MSE | Lifecycle result |
+| --- | ---: | ---: | --- |
+| Pass | 1.0 | 0.4467454401311175 | `REGISTERED`, version 1 |
+| Reject | 0.0 | 0.4467454401311175 | `QUALITY_REJECTED`, no model version |
+
+The exact model URI is `models:/ra-ra-lab-linear-lifecycle-v1/1`. MLflow 3.16.1
+downloaded that version and loaded its pyfunc model. All seven package files,
+checkpoint and lineage matched their saved hashes/receipts; all 64 predictions
+matched the evaluation exactly. This model has one registry version. The rejected
+lifecycle has no version. Authenticated start retries returned the same Job/Attempt,
+and the other project's read returned 404.
+
+Local tests passed 1,211 with 11 skips; focused lifecycle tests passed 18.
+[Exact-source CI](https://github.com/dsa04156/resource-advisor/actions/runs/38233918253)
+passed Python 3.11/3.13 checks with SQLite and PostgreSQL. Standards and Spec reviews
+have zero remaining findings; PostgreSQL suites passed all 1,222 tests in each Python
+version. The detected concurrent-start enqueue race has a public API regression test.
+
+Only API/worker image specs changed in the feature release. Both Argo applications
+are Synced/Healthy. All 859 existing Job and usage records, original training source,
+queue/PVC settings and credentials were preserved; the two added Jobs are terminal.
+The existing HTTPS certificate had expired on October 9 and was renewed separately
+for 90 days with the same key, SANs and Secret UID. Automated renewal remains an
+operational task. Completed Pods were no longer present at full Pod/log archival
+time; native Jobs/events and verified S3 result bundles
+are retained. No completed Pods from these two requests remain.
+
 ## Scope and remaining work
 
 Only the already qualified two-feature linear GPU fixture and bounded JSON output
