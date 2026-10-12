@@ -7,6 +7,7 @@ from pathlib import Path
 
 from pydantic import Field, model_validator
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 from .contracts import (
     TERMINAL,
@@ -20,7 +21,7 @@ from .contracts import (
     signature,
 )
 from .service import NotFound, Rejected, required
-from .store import jobs, outbox
+from .store import Conflict, jobs, outbox
 
 
 def evaluator_digest():
@@ -126,8 +127,22 @@ class ModelLifecycles:
             JobRequest(workload_ref=policy["workload_ref"], candidate_ref=policy["candidate_ref"]),
             ref,
         )
+        event_body = {"ref": ref, "job_id": job["job_id"]}
+        try:
+            with self.store.transaction() as conn:
+                self.store.enqueue(conn, ref, "model_lifecycle", event_body)
+        except IntegrityError:
+            # Concurrent replay may win this independent enqueue commit. Read
+            # its durable identity after rollback, rather than replaying SQL.
+            pass
         with self.store.transaction() as conn:
-            self.store.enqueue(conn, ref, "model_lifecycle", {"ref": ref, "job_id": job["job_id"]})
+            saved_event = conn.execute(select(outbox).where(outbox.c.id == ref)).mappings().first()
+            if (
+                not saved_event
+                or saved_event["kind"] != "model_lifecycle"
+                or saved_event["body"] != event_body
+            ):
+                raise Conflict("lifecycle delivery event identity mismatch")
         return self.view(project, ref)
 
     def view(self, project, ref):

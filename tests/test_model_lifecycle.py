@@ -1,11 +1,14 @@
 import hashlib
 import json
+from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from pathlib import Path
+from threading import Barrier
 
 import httpx
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import delete, event
 from test_artifacts import MemoryS3
 from test_worker import SchedulerDouble
 
@@ -504,3 +507,59 @@ def test_same_request_still_reuses_job_after_implementation_update(service, bund
         json={"policy_ref": policy.ref},
     )
     assert fresh.status_code == 422
+
+
+def test_concurrent_partial_start_replays_return_same_job(service, bundle, tmp_path):
+    from resource_advisor.service import Service
+    from resource_advisor.store import Store, outbox
+
+    store = service.store
+    owned_store = store.engine.dialect.name == "sqlite"
+    if owned_store:
+        # A real file provides two independent SQLite connections; StaticPool's
+        # shared in-memory connection cannot reproduce a database uniqueness race.
+        store = Store("sqlite:///" + str(tmp_path / "concurrent.db"))
+        store.initialize()
+        service = Service(store, accept_synthetic=True)
+        spec, _, variant, capability = bundle
+        for kind, value in [("workload", spec), ("variant", variant), ("capability", capability)]:
+            service.register(kind, value, "team-a")
+    client, policy, _ = lifecycle_fixture(service, bundle)
+    assert (
+        client.post(
+            "/api/v1/compute/model-lifecycle-policies",
+            headers={"Authorization": "Bearer operator"},
+            json=policy.model_dump(mode="json"),
+        ).status_code
+        == 200
+    )
+    headers = {"Authorization": "Bearer user", "Idempotency-Key": "concurrent"}
+
+    def start():
+        response = client.post(
+            "/api/v1/compute/model-lifecycles", headers=headers, json={"policy_ref": policy.ref}
+        )
+        assert response.status_code == 200, response.text
+        return response.json()
+
+    first = start()
+    # Simulate a crash after compute acceptance, before lifecycle event enqueue.
+    with store.transaction() as conn:
+        conn.execute(delete(outbox).where(outbox.c.id == first["ref"]))
+    barrier = Barrier(2)
+
+    def synchronize(conn, cursor, statement, parameters, context, executemany):
+        values = parameters.values() if isinstance(parameters, dict) else parameters
+        if statement.startswith("SELECT ra_outbox.id \n") and first["ref"] in values:
+            barrier.wait(timeout=10)
+
+    event.listen(store.engine, "after_cursor_execute", synchronize)
+    try:
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            replayed = list(pool.map(lambda _: start(), range(2)))
+    finally:
+        event.remove(store.engine, "after_cursor_execute", synchronize)
+    assert [x["job_id"] for x in replayed] == [first["job_id"], first["job_id"]]
+    assert len(client.get("/api/v1/compute/jobs", headers=headers).json()) == 1
+    if owned_store:
+        store.engine.dispose()
