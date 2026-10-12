@@ -1,0 +1,94 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "name": "mobilint-5080-qual-npu-20261012-v4",
+    "namespace": "resource-advisor-lab",
+    "labels": {
+      "kueue.x-k8s.io/queue-name": "ra-mobilint",
+      "resource-advisor/experiment": "mobilint-5080-20261012-v1"
+    }
+  },
+  "spec": {
+    "suspend": true,
+    "backoffLimit": 0,
+    "activeDeadlineSeconds": 180,
+    "template": {
+      "metadata": {
+        "labels": {
+          "resource-advisor/experiment": "mobilint-5080-20261012-v1"
+        }
+      },
+      "spec": {
+        "restartPolicy": "Never",
+        "automountServiceAccountToken": false,
+        "nodeSelector": {
+          "kubernetes.io/hostname": "mobilint-npu",
+          "kubernetes.io/arch": "amd64"
+        },
+        "containers": [
+          {
+            "name": "shape",
+            "image": "PRIVATE_REGISTRY/ra-npu-mobilint@sha256:3e1760cdef820206d262488dc60a5047acd551b95e81f914e1f516fda1a496da",
+            "command": [
+              "python3",
+              "-u",
+              "/experiment/probe.py",
+              "--runtime",
+              "mobilint",
+              "--model",
+              "/models/style_candy.mxq",
+              "--model-sha256",
+              "aa158a35735a876cc9f9220f9967b711b8e49ce5de49126f0597e994c6b543da",
+              "--samples",
+              "3",
+              "--warmups",
+              "2"
+            ],
+            "resources": {
+              "requests": {
+                "cpu": "1",
+                "memory": "1Gi",
+                "mobilint.com/npu": "1"
+              },
+              "limits": {
+                "cpu": "1",
+                "memory": "4Gi",
+                "mobilint.com/npu": "1"
+              }
+            },
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              }
+            },
+            "env": [],
+            "volumeMounts": [
+              {
+                "name": "source",
+                "mountPath": "/experiment",
+                "readOnly": true
+              }
+            ]
+          }
+        ],
+        "securityContext": {
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "volumes": [
+          {
+            "name": "source",
+            "configMap": {
+              "name": "mobilint-5080-source-20261012-v3"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

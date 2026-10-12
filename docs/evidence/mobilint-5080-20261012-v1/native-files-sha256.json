@@ -1,0 +1,542 @@
+[
+  {
+    "path": "jobs/mobilint-5080-gpu-block0-20261012-v1/job.json",
+    "original_sha256": "b63cbf60e689c51dc1b475e257311d4315c7bbca6eebbf6a0e09df9a74fd8435",
+    "public_sha256": "51d541666671908b8e5541a771c35edde6c11a76b2c6414bf1848336e64f4211"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block0-20261012-v1/manifest.json",
+    "original_sha256": "fb8c8f2cd39ed433f571f099d15de1eb9b99c83d0256c42f25692c21bc266438",
+    "public_sha256": "842dfbd79a53e611f10ef2b19566cf14609386ff7055c032916307a50026c626"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block0-20261012-v1/mobilint-5080-gpu-block0-20261012-v1-56rlx.log",
+    "original_sha256": "39c850edfdd190529d35fc497d8ae3e21569a22942a90845858e74355d1b6c2b",
+    "public_sha256": "39c850edfdd190529d35fc497d8ae3e21569a22942a90845858e74355d1b6c2b"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block0-20261012-v1/pods.json",
+    "original_sha256": "b555a405821a185106730da2f3607d17b1c49b41086a85b93ef71a7790269877",
+    "public_sha256": "f6c03384f28512c8dc668ceee76760266ee8697b8067fc67bc31d3c53bca58de"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block0-20261012-v1/receipt.json",
+    "original_sha256": "29f8c47442f5193deee4004d97a3f95958eb23ae2a5f73ba95f5a6ee80280b49",
+    "public_sha256": "29f8c47442f5193deee4004d97a3f95958eb23ae2a5f73ba95f5a6ee80280b49"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block0-20261012-v2/job.json",
+    "original_sha256": "e784d6258e9207dd550b51a98c5453dc30720435a81a221c65331cd6975c608e",
+    "public_sha256": "4ceb19565a436f27ee10ae7aff21fc9383399a420c70fb2367daca58baa5e219"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block0-20261012-v2/manifest.json",
+    "original_sha256": "d63af1e1ed50e626ffffa460ed58dd9191ea24a89dc27bfcea1f700f6c4556af",
+    "public_sha256": "ed9443a29947334698a4ac8bd33d4ac71f569bd518d584bb9c5f95080fbd2002"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block0-20261012-v2/mobilint-5080-gpu-block0-20261012-v2-sc677.log",
+    "original_sha256": "f8ae47006ea3512cda85c80961ae43117f430e4e5c9a6b95c4a7109e740ca199",
+    "public_sha256": "f8ae47006ea3512cda85c80961ae43117f430e4e5c9a6b95c4a7109e740ca199"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block0-20261012-v2/pods.json",
+    "original_sha256": "be9d3d46bfc0e1bd0c3b9ab9b369bc688f26685cc8200302d4ac30c4aad57c7e",
+    "public_sha256": "7fde5ab62d640adcf971622e3908103434a08f1e982cfbd674a56508ae4f5ad3"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block0-20261012-v2/receipt.json",
+    "original_sha256": "f0abe9504cf4e58821d97518600823024c84b20478049a3a1828771ccb53b60d",
+    "public_sha256": "f0abe9504cf4e58821d97518600823024c84b20478049a3a1828771ccb53b60d"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block1-20261012-v1/job.json",
+    "original_sha256": "a34b9fda4602cb5ed3649a286177fa07b68a956b01436e43a88cdb58d3aed3da",
+    "public_sha256": "7d3720bae40195cb336846387ec71c30e50b57fc162dce4a815e52740f7925ed"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block1-20261012-v1/manifest.json",
+    "original_sha256": "cb264e01496a9cff406f0938eca9af30fa2e4032cb3c6ee1663706ddf3dbfc1b",
+    "public_sha256": "af7893c7c310f4455e2867338c2ed6bd1ac92f3a940cdc46471d6990f18a13d8"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block1-20261012-v1/mobilint-5080-gpu-block1-20261012-v1-2qrm5.log",
+    "original_sha256": "758b2ee1b3853c92e1e12dca0cec95f716494aa09519b5cae9600b3c5b64fe75",
+    "public_sha256": "758b2ee1b3853c92e1e12dca0cec95f716494aa09519b5cae9600b3c5b64fe75"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block1-20261012-v1/pods.json",
+    "original_sha256": "846442346873cd34585966b0c8a58fd9850a70b7a91f33764309725f8c9dbc27",
+    "public_sha256": "bc5b92f924a1ebe70277da5e6af837fc3143615f171bd6bf86a3f92cf614d760"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block1-20261012-v1/receipt.json",
+    "original_sha256": "177bc5f85b6c4006136cd69f65ff16744f2173a49522721a444f15ea13cdbbff",
+    "public_sha256": "177bc5f85b6c4006136cd69f65ff16744f2173a49522721a444f15ea13cdbbff"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block1-20261012-v2/job.json",
+    "original_sha256": "61a3dbb6f86d040b09fc51deea26d700586ba8c2b5f9c63158096b55d9b190a6",
+    "public_sha256": "ef7dd74c9353a56ff4afcfddd3e6b30060fb5a52da2db49e7197f73011c24ed0"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block1-20261012-v2/manifest.json",
+    "original_sha256": "06de39163ee06e17205393c82cc0c837c479cd81afb1cb39fd9d2bf0a026238a",
+    "public_sha256": "3dab73c85afc58d8871596b313189bd92c9ca799aa72179f1c09dc679fb42808"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block1-20261012-v2/mobilint-5080-gpu-block1-20261012-v2-d9n2f.log",
+    "original_sha256": "aba6f286c54961f817d8d4a46d8ff60a29afe3cbd1b1b06d2803d4727b0850c8",
+    "public_sha256": "aba6f286c54961f817d8d4a46d8ff60a29afe3cbd1b1b06d2803d4727b0850c8"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block1-20261012-v2/pods.json",
+    "original_sha256": "137dfb4244d4bd509f799314a56f4544d9dbb13e9b71dc6f8fb7c23e982eeb2f",
+    "public_sha256": "aa094f4ed8dfd4df4e283329290025e6ba5e8ef3d6f8c484febcbb5ae196529f"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block1-20261012-v2/receipt.json",
+    "original_sha256": "b76ded63dae5b09b7c0a9cb25bf682a5b1a1a6deab384a2fb10ad38a0ab419bf",
+    "public_sha256": "b76ded63dae5b09b7c0a9cb25bf682a5b1a1a6deab384a2fb10ad38a0ab419bf"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block2-20261012-v1/job.json",
+    "original_sha256": "586f2353962e837a964524529e281690f2d577479de11bcb9b6b92f6a050c7bd",
+    "public_sha256": "9ca67639523c31e5439206cd6a575cdf57c99ad9a3b8a50e6c5d24c29355daf6"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block2-20261012-v1/manifest.json",
+    "original_sha256": "0dea67243932fde0ef4d8c5fae24749677db712f5c4a74a061c295c131376caf",
+    "public_sha256": "a6f1fa5c210bb72e7f2381000933a950003ca14f92bcac8093762d0c6fc3a05d"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block2-20261012-v1/mobilint-5080-gpu-block2-20261012-v1-j4k8c.log",
+    "original_sha256": "f91320ebc7dd9f71a273ae89ec23dc2ddcd0ef1e21f5986f5414dec8a1285495",
+    "public_sha256": "f91320ebc7dd9f71a273ae89ec23dc2ddcd0ef1e21f5986f5414dec8a1285495"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block2-20261012-v1/pods.json",
+    "original_sha256": "6e8f7b9d8d2d43df7604228bc27beb2628add7fc043e3e66d7d5f45dcb6d54b6",
+    "public_sha256": "b149ab26cf5bd9d145ba2c6d70d073b30f08931c9d8af4bca9cf35dac874b842"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block2-20261012-v1/receipt.json",
+    "original_sha256": "7b7778b8b4aecd1f2e0d65ff03d119581133a2ef2dcf2d21948c0aa4314b1b98",
+    "public_sha256": "7b7778b8b4aecd1f2e0d65ff03d119581133a2ef2dcf2d21948c0aa4314b1b98"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block2-20261012-v2/job.json",
+    "original_sha256": "d7a96d051f97b7a47d5142aba8b2849255390b54750252f65848e6035378558e",
+    "public_sha256": "363f43c7a3e1c9775a46ef8ebf7cc76e89638b7eb716b07f1d088df34866800a"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block2-20261012-v2/manifest.json",
+    "original_sha256": "3db398651527f50f39526af69195f36d8446b41693cea114493c780f15f82adb",
+    "public_sha256": "ffe712805c52e87ab01dc7667ad1705f348c8e920d39a1b80b14cae8bb1e27df"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block2-20261012-v2/mobilint-5080-gpu-block2-20261012-v2-grfz9.log",
+    "original_sha256": "7f45d9027393b3c0aacc713e62a983b448a6d0403ac8a2485ef10a9512fe5123",
+    "public_sha256": "7f45d9027393b3c0aacc713e62a983b448a6d0403ac8a2485ef10a9512fe5123"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block2-20261012-v2/pods.json",
+    "original_sha256": "2d382b8c08826cfde684ac394a9ca6f7f38d1189b28c6f9d2f49710fde1990c6",
+    "public_sha256": "94296a904c1a489adc2207dd50ede60e5369ae38ab3496301472b19378c8b164"
+  },
+  {
+    "path": "jobs/mobilint-5080-gpu-block2-20261012-v2/receipt.json",
+    "original_sha256": "303fbde286b7c86d0d5843526a3fe847be988ef65f30b31294c37a43f823ed3d",
+    "public_sha256": "303fbde286b7c86d0d5843526a3fe847be988ef65f30b31294c37a43f823ed3d"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block0-20261012-v1/job.json",
+    "original_sha256": "0a8acdfc1cfa6b83e1c8054820d540672819ffdb7dc2d37712cbcae387244618",
+    "public_sha256": "db3017845aee497c75ba0dd44901e82f946e976cf5db3a91686bd5045c619d2e"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block0-20261012-v1/manifest.json",
+    "original_sha256": "a50b246954062d57f104958142ac6fb57403830173c9c11a7e238e35ed907ad0",
+    "public_sha256": "18a8efa40ea4f24cc3a7339e3d6359bba1ea388bb11751799eb825cf39b4abcd"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block0-20261012-v1/mobilint-5080-npu-block0-20261012-v1-kvg4q.log",
+    "original_sha256": "52f9b9f3c166b8ccbf612798312e561109cf70380c874c069ad51186c3ddf41a",
+    "public_sha256": "52f9b9f3c166b8ccbf612798312e561109cf70380c874c069ad51186c3ddf41a"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block0-20261012-v1/pods.json",
+    "original_sha256": "741a01f6594e720df6b839d9df7dd757817cdd3aa070b8a4180a41d058e1a1b8",
+    "public_sha256": "38bc8f8ff5eb03212e4e682b434e641e92054355d6748f80ec8db7cf160dff7c"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block0-20261012-v1/receipt.json",
+    "original_sha256": "d4caa392e82f67c7b9f6527c14a04851c6c10cd2edc9f7b65e610d39baffcbfa",
+    "public_sha256": "d4caa392e82f67c7b9f6527c14a04851c6c10cd2edc9f7b65e610d39baffcbfa"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block0-20261012-v2/job.json",
+    "original_sha256": "b37741bb77c920b6d8d1f2d882e636a8a6c3b6baabaf01be204cc5379f59fbc3",
+    "public_sha256": "6d0ed54d89b022c3eabaf48385ac2ec54cc30454556fda15a92fd04d3d4fad20"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block0-20261012-v2/manifest.json",
+    "original_sha256": "88d9fe9750c57e4c0dcf0a04c66b87a7b21b30515d7bea6a3bc182b994046980",
+    "public_sha256": "aa6e27f62c89d58aada9489702e310c5bbb676f41d5468cb7badafc8ee3dd20d"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block0-20261012-v2/mobilint-5080-npu-block0-20261012-v2-tnnlx.log",
+    "original_sha256": "c188cb97db02b3b6bd6d943af63692b79367d74ddf55839d79704551b4cf665b",
+    "public_sha256": "c188cb97db02b3b6bd6d943af63692b79367d74ddf55839d79704551b4cf665b"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block0-20261012-v2/pods.json",
+    "original_sha256": "1798894807a137f8db86d3d7692a1fb922d94cd6086c2341eb91eaddfe087c12",
+    "public_sha256": "e3b462815b898d063556c2b222f7f815e5291b093d29082fa8ef84c5e1a3031b"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block0-20261012-v2/receipt.json",
+    "original_sha256": "9aff4bd2bf674359899c992c12361540ba45a547b021f6130adf25e5266a22a2",
+    "public_sha256": "9aff4bd2bf674359899c992c12361540ba45a547b021f6130adf25e5266a22a2"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block1-20261012-v1/job.json",
+    "original_sha256": "1bd6c80b513b8df5888e154d43a60d3255dbf5c15bf56290d8dd4cd53a1aecbe",
+    "public_sha256": "491e19ccc4d478207ffdde5b2b22f1c008689dea5029aca2d9f318aec7107fb0"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block1-20261012-v1/manifest.json",
+    "original_sha256": "bb96e1eb0f7604cd06b5011b7bdfa54aee37649a478cfeb6a1b1dae998a0a048",
+    "public_sha256": "bb6446f17afd67c546755d5864962216890d907fda8ffd01786ad464cffda4c0"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block1-20261012-v1/mobilint-5080-npu-block1-20261012-v1-q8jth.log",
+    "original_sha256": "66a5cc9790c27bd7d0faffe8e0b194f6caa920d0a03fd9777c3a7da4b5917f63",
+    "public_sha256": "66a5cc9790c27bd7d0faffe8e0b194f6caa920d0a03fd9777c3a7da4b5917f63"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block1-20261012-v1/pods.json",
+    "original_sha256": "6556d4f653d064aaffc97dbf5e0619390515b98718ad28aa319cbb7c94383863",
+    "public_sha256": "0dd3bcf5812fd240ef193a5b1945519ed72286f9e4d1dea303475d2c7ecd1e21"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block1-20261012-v1/receipt.json",
+    "original_sha256": "a3af95cd33e349501d49a77e10234bb30296dd102273ebdb48f38fbaa60da6a9",
+    "public_sha256": "a3af95cd33e349501d49a77e10234bb30296dd102273ebdb48f38fbaa60da6a9"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block1-20261012-v2/job.json",
+    "original_sha256": "d01376aac1e01c85112246f0de2fc19d5c75c0c524798cd4d4d1f45ca3bd4e30",
+    "public_sha256": "1121cf9454b9c010c5e8eb8bf172ec96cfaa5297683ede452514b331c7dc10a8"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block1-20261012-v2/manifest.json",
+    "original_sha256": "7c61b1b8146261aefa77bed0ec634fb4f2dd4ce95fc0ab886b4e44463877c582",
+    "public_sha256": "7104299a5982b0284bbfa18d6b26e001fdb4392a82be895bf8b51d237bd49b22"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block1-20261012-v2/mobilint-5080-npu-block1-20261012-v2-hg7c8.log",
+    "original_sha256": "39a1eb96794ba091fb1502e7e6a480cd1f5bc20048ca52c91b193702b9d71ae1",
+    "public_sha256": "39a1eb96794ba091fb1502e7e6a480cd1f5bc20048ca52c91b193702b9d71ae1"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block1-20261012-v2/pods.json",
+    "original_sha256": "776df5eb2630a7bca462000ae353e0cc49a054e75066bbabcb48248ce09b4395",
+    "public_sha256": "336f7522c40d89d9229641172cf69ff4163e8f58be9f9ec48cdf56e86312f6d8"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block1-20261012-v2/receipt.json",
+    "original_sha256": "260f74e3c0bf9476682d9ee6e15297c8f7465501686df7e49f22fc3693e42b37",
+    "public_sha256": "260f74e3c0bf9476682d9ee6e15297c8f7465501686df7e49f22fc3693e42b37"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block2-20261012-v1/job.json",
+    "original_sha256": "b574e33753637d4ce77db6ce1b6257cacfb3d8878d038b9f3b0bdfae33ba3ec9",
+    "public_sha256": "88a89f97f85a38db831746ee4a8b796ca06a4c9b7a7fbf8e495563b966cd23c5"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block2-20261012-v1/manifest.json",
+    "original_sha256": "d74f2c56419ae4577cb98863a672e6baee800e5808f948a5b48ca04c3da484fc",
+    "public_sha256": "b95dc01df193b4638ba1c2710a632cd7f4ab69ae3854e1a794889b2a8dfff94c"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block2-20261012-v1/mobilint-5080-npu-block2-20261012-v1-z2w7h.log",
+    "original_sha256": "32decb16d2459e3dbc6e18ce0ec35970ebcbbbf73c2226ddeaff566e983cfe49",
+    "public_sha256": "32decb16d2459e3dbc6e18ce0ec35970ebcbbbf73c2226ddeaff566e983cfe49"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block2-20261012-v1/pods.json",
+    "original_sha256": "3891dabecc6a3c24d25e2c95c32f6f02f915db840ec40666e2e36ebda250fd4f",
+    "public_sha256": "5c78688ef9293d0bfbf266ff18772479e9b056199fe699e337fb5bf1ae9b7f34"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block2-20261012-v1/receipt.json",
+    "original_sha256": "51d2db07733272e87d6b2997d83563155f4ab447c3496461016c0f0ab5beb39c",
+    "public_sha256": "51d2db07733272e87d6b2997d83563155f4ab447c3496461016c0f0ab5beb39c"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block2-20261012-v2/job.json",
+    "original_sha256": "b24997ecc15c04e3236fc9e22829e32c3abee22b40478223ea2cc18f1b0e913f",
+    "public_sha256": "de4bf3012edd5b38d02faccad5da0e23edf1ebc8fcea6e22523655e1aa0e9f10"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block2-20261012-v2/manifest.json",
+    "original_sha256": "da66d8178dfc46a5f46b9e19672c451b7b9aea7f1f6afbecb9ccda42f112a8fa",
+    "public_sha256": "61844d60beb16083e2476245e870e27773d26fabe85e6a0cd914e25cd132043f"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block2-20261012-v2/mobilint-5080-npu-block2-20261012-v2-2lwdg.log",
+    "original_sha256": "71c807fa470439a21567a1209052f1e23973c6867a8045d06832db0d6f82766b",
+    "public_sha256": "71c807fa470439a21567a1209052f1e23973c6867a8045d06832db0d6f82766b"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block2-20261012-v2/pods.json",
+    "original_sha256": "1e7d46d0ecf91bbab3a3139fb08aeddc85ae4d543fac874034119f3e77e3cf38",
+    "public_sha256": "2712b32fd3a091a969cea18388a0c8a23c288b5f0243b55b51f9a9a4f69d372c"
+  },
+  {
+    "path": "jobs/mobilint-5080-npu-block2-20261012-v2/receipt.json",
+    "original_sha256": "fade638166e0b0376ca2369dd5d4f0de5040917ea0ff29ed2676bfba12884559",
+    "public_sha256": "fade638166e0b0376ca2369dd5d4f0de5040917ea0ff29ed2676bfba12884559"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v1/job.json",
+    "original_sha256": "b5b845968fef40f6b420f8fe36d88a93d4013312afee9f3bc7debb014c35fbcb",
+    "public_sha256": "d3ccf39255417f400947931415b5a4d0675c1231dc3900b52b68543dc949f0ea"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v1/mobilint-5080-qual-gpu-20261012-v1-86sn6.log",
+    "original_sha256": "ed0b93be2c05910d5f9a8292a26cb40e3fac3b636fdcaea698d8ea15d3c1ff39",
+    "public_sha256": "ed0b93be2c05910d5f9a8292a26cb40e3fac3b636fdcaea698d8ea15d3c1ff39"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v1/pods.json",
+    "original_sha256": "b9504606eb4856e5aa6c03208a3f7265a3af7c9e3aeecf5c66bcac62ce2b2893",
+    "public_sha256": "8685eb155afcbb5f96474c18f6a37e2a019d21539c695b7478ced06f8b21f491"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v1/receipt.json",
+    "original_sha256": "eb9ead8cc92df72378cf3850b45cb0cc650c5a82ad1a3588edffc3c33e3aa6d1",
+    "public_sha256": "eb9ead8cc92df72378cf3850b45cb0cc650c5a82ad1a3588edffc3c33e3aa6d1"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v2/job.json",
+    "original_sha256": "20bca8d5697323f3f8d29f85638a2bbd2cdbe0466e5f94f1e87fc4947beabc9a",
+    "public_sha256": "f153f9e087616f600d6e6d48f4b7245f4813a0e7e3f8954fc5aac13979c47577"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v2/mobilint-5080-qual-gpu-20261012-v2-msd5h.log",
+    "original_sha256": "0b47a2cbc43a50d59241b25cdcf954dc0c39062dbcdb9f4ec98ff6a5010090fe",
+    "public_sha256": "0b47a2cbc43a50d59241b25cdcf954dc0c39062dbcdb9f4ec98ff6a5010090fe"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v2/pods.json",
+    "original_sha256": "019f0ddac70e9e376e4342f5cf5d3b8568f6c75b8b834f0f32bbdb5198832102",
+    "public_sha256": "8228b3ed22eebec7fc4ed3656aed6138dfe7a58ef2ad726e8c8b6634daeee989"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v2/receipt.json",
+    "original_sha256": "b6fc6f1551b494bc53fc0ddc4dcb4ab966a306a646ec1cffd06cdc1ff973638f",
+    "public_sha256": "b6fc6f1551b494bc53fc0ddc4dcb4ab966a306a646ec1cffd06cdc1ff973638f"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v3/job.json",
+    "original_sha256": "7e2f7606382a705a8b81375ad99fce93ed837df7a927c8c2f2f7332d9274659d",
+    "public_sha256": "977cf7aa860a64a99ca8a4626faeec7d15d04b344489ba37c77155f1c3a439d1"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v3/mobilint-5080-qual-gpu-20261012-v3-9qfcs.log",
+    "original_sha256": "1c9c05de8909fefccb3ce028800969835abb6e3035cadca8b7d08264061ef47b",
+    "public_sha256": "1c9c05de8909fefccb3ce028800969835abb6e3035cadca8b7d08264061ef47b"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v3/pods.json",
+    "original_sha256": "a8e9bb292ce5319b106332f5d2b12fb11c9fb7a60e0f1477eeddb3d66f4bf9c8",
+    "public_sha256": "d0976abb91708baba9fea1ec567b179fd6ac2e5101d62449fb3c8a370503b5d6"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v3/receipt.json",
+    "original_sha256": "fe442235adc21456b761c350a092ecf0a2bdf246dc46da8ea72af817c4c5ab33",
+    "public_sha256": "fe442235adc21456b761c350a092ecf0a2bdf246dc46da8ea72af817c4c5ab33"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v4/job.json",
+    "original_sha256": "e596d06e81d7afbb2fe83d78395f261f5b26ab137ed14eeded8173ca22b67447",
+    "public_sha256": "a83fd34fbd492dca0b9bcd7fc804b4f686df1020013b99b492cf354fee21742e"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v4/mobilint-5080-qual-gpu-20261012-v4-zjgmc.log",
+    "original_sha256": "a0bfd4ab7b4c88f81be29586d7241c07a59b81c88837d63f9b9eb2abb4ba0394",
+    "public_sha256": "a0bfd4ab7b4c88f81be29586d7241c07a59b81c88837d63f9b9eb2abb4ba0394"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v4/pods.json",
+    "original_sha256": "7bcdc6a45e8c95808dd2fdd82d431302d10bbf015c6c1886429d209c8647c3f2",
+    "public_sha256": "ca3fa6e62e6b8de6f012b703224e94c90576fa3761a3ec23d51c8237755fdd20"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v4/receipt.json",
+    "original_sha256": "20ea4c6ae763d154514dcbfaebe538ec1eca30397d78b090617a8e3ac494f246",
+    "public_sha256": "20ea4c6ae763d154514dcbfaebe538ec1eca30397d78b090617a8e3ac494f246"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v5/job.json",
+    "original_sha256": "3dff0569ba8bf3459636e004c9d4379509df778a88748e321608b56be8eaecb9",
+    "public_sha256": "8ec3591f8a4799e21edb4a591aea3f5c9389602a1e7686e46b796d1655813944"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v5/mobilint-5080-qual-gpu-20261012-v5-l8tx6.log",
+    "original_sha256": "f970b75d55896a1507bef2512d34e57803384550122529e20504d6e55bc0391e",
+    "public_sha256": "f970b75d55896a1507bef2512d34e57803384550122529e20504d6e55bc0391e"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v5/pods.json",
+    "original_sha256": "2dcaed4b4f3045bf064db904307ad409bc77d852334109f16e406f93497c96fe",
+    "public_sha256": "93cdb7e2c17a8eb5110b0a578b300020095787ef9f993cb59aff7760ef01bb79"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-gpu-20261012-v5/receipt.json",
+    "original_sha256": "91bb2a774a17c74cc5886d19ad418721b91af7e6f9794cc60577a26bd3cf4a85",
+    "public_sha256": "91bb2a774a17c74cc5886d19ad418721b91af7e6f9794cc60577a26bd3cf4a85"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v1/job.json",
+    "original_sha256": "29a7de6b1fef431de0801acfec700250b75c0983c9f43261dcd411a01f00bc96",
+    "public_sha256": "05d2b730f2dfd1285f1ecf189579796050d6c70065c9b588760ee3898eddc22d"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v1/mobilint-5080-qual-npu-20261012-v1-skbql.log",
+    "original_sha256": "e738d65c38a1eea7c86eb17c9812c78a6521afe73d9a6982cc46c7400818f278",
+    "public_sha256": "e738d65c38a1eea7c86eb17c9812c78a6521afe73d9a6982cc46c7400818f278"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v1/pods.json",
+    "original_sha256": "acf0e11321b6f0d9a0babf1859e929d131bf320ae1fc4d607a00cbcf785d3b17",
+    "public_sha256": "aac5947dd4242c727d30bd4edd77753a31f6186b089f1dd5ee39565b6ae2fe26"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v1/receipt.json",
+    "original_sha256": "d4ffa70a1b14ed391f45e9df3b6255be4da11544d8ef8a6fc6f8f3707a3814c2",
+    "public_sha256": "d4ffa70a1b14ed391f45e9df3b6255be4da11544d8ef8a6fc6f8f3707a3814c2"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v2/job.json",
+    "original_sha256": "c650bc48f20d159ac0542b6296e86fbb1d15b759d6413519d863cf5d0d161051",
+    "public_sha256": "bff69f1809e2ad1ba2ce8a1b834c3f1c16fab9580cbf860512dc9ec9d3dcabe9"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v2/mobilint-5080-qual-npu-20261012-v2-qxr49.log",
+    "original_sha256": "0c4c1908f10e2e69fa96f083dd5ad201e901c3495545f814df0fe768a3ad32a1",
+    "public_sha256": "0c4c1908f10e2e69fa96f083dd5ad201e901c3495545f814df0fe768a3ad32a1"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v2/pods.json",
+    "original_sha256": "364008cb2b8c0722f0c4f91135300d7f80649f54c7fb5c82a175fb1ea7a8d457",
+    "public_sha256": "95411fe95690cd078b64df1d528e8594d0194b5bcbb4f7732a0ae07a1d8dc356"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v2/receipt.json",
+    "original_sha256": "b6bad0ac433de5d10a1d9e44cd906bf94d2adb2423710422aa7404705287f8a4",
+    "public_sha256": "b6bad0ac433de5d10a1d9e44cd906bf94d2adb2423710422aa7404705287f8a4"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v3/job.json",
+    "original_sha256": "43f4f0a3d5a2739a1cbf9e3120c6b1587939a3b8fef9885a3dd1d3e04a6f1929",
+    "public_sha256": "afbed3d784113118315ed038b3536a48e663da80bcfa4b932500a5ecdcf66ed4"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v3/mobilint-5080-qual-npu-20261012-v3-kkn4z.log",
+    "original_sha256": "cc18134d8c2cb04c57810ec09b50fe43f370c9cc8d933f6a6bd39856dde08bf1",
+    "public_sha256": "cc18134d8c2cb04c57810ec09b50fe43f370c9cc8d933f6a6bd39856dde08bf1"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v3/pods.json",
+    "original_sha256": "2af662010913f19119be2afc2a09c9b763af80274e28c254235b7fc48cd6df85",
+    "public_sha256": "708f9b4e97f511894733b20c0ee90dbeeea47ddf27840fac721215b96f6521a9"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v3/receipt.json",
+    "original_sha256": "dee334bc17931c9659b7435cb3d03037bbcdd7efa0f5316ea06344118cb59ba1",
+    "public_sha256": "dee334bc17931c9659b7435cb3d03037bbcdd7efa0f5316ea06344118cb59ba1"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v4/job.json",
+    "original_sha256": "3de57d81b10fdfdc9de5ff5b4533e370edfaafac96ed3020f54b30a9bfa479ee",
+    "public_sha256": "92e15516c2f217ffb3015c50d70a959dc30cb6eed10f1a1c11706a1ca48ebe5d"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v4/mobilint-5080-qual-npu-20261012-v4-zjds4.log",
+    "original_sha256": "c366f8d71a7a131fc32f6b8ce2dcc259e3e0cd8963b081075bc8a82fb62a2cf6",
+    "public_sha256": "c366f8d71a7a131fc32f6b8ce2dcc259e3e0cd8963b081075bc8a82fb62a2cf6"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v4/pods.json",
+    "original_sha256": "0d44a67fc0a80923f308c1d56bf75d763e3185adf54437ca3ff1a065f91b9525",
+    "public_sha256": "189cd73a009c549d7626f41edd0ccad034683e388fcc4b8568a3149b52986553"
+  },
+  {
+    "path": "jobs/mobilint-5080-qual-npu-20261012-v4/receipt.json",
+    "original_sha256": "db6c2461e085871f3d3885af9bf502cfcab82aade9027dba6d7b410eb3763acd",
+    "public_sha256": "db6c2461e085871f3d3885af9bf502cfcab82aade9027dba6d7b410eb3763acd"
+  },
+  {
+    "path": "jobs/mobilint-5080-source-inspect-20261012-v1/job.json",
+    "original_sha256": "196136caaa2942a16b3425e28051c15fc2f96d32641ce0a0d18534a2ba6be8f1",
+    "public_sha256": "8be1fc9ceab77237ad2efdd6cd1e89fa211f7125c4bcfb9ab0e767484c3e6611"
+  },
+  {
+    "path": "jobs/mobilint-5080-source-inspect-20261012-v1/pods.json",
+    "original_sha256": "7a779468a2dde976a9b896541df1e4ef805e813093bd5edb40ef1a6eea588edf",
+    "public_sha256": "7a779468a2dde976a9b896541df1e4ef805e813093bd5edb40ef1a6eea588edf"
+  },
+  {
+    "path": "jobs/mobilint-5080-source-inspect-20261012-v2/job.json",
+    "original_sha256": "82390d3b413a7d9a4b5bb57eb8da6ef8ecce06aa057ee8ac16aa2bef2650feaf",
+    "public_sha256": "dfcbe59b5457da24c0a585fb96920781733c125f4955d396f9cf27fefbfe18b4"
+  },
+  {
+    "path": "jobs/mobilint-5080-source-inspect-20261012-v2/mobilint-5080-source-inspect-20261012-v2-vzt9n.log",
+    "original_sha256": "7ada3722b62b347a4f644c6ff7e6d775e4e26350fc68a2a199e7de45a3a2a820",
+    "public_sha256": "7ada3722b62b347a4f644c6ff7e6d775e4e26350fc68a2a199e7de45a3a2a820"
+  },
+  {
+    "path": "jobs/mobilint-5080-source-inspect-20261012-v2/pods.json",
+    "original_sha256": "045c1374948d4ef7467d6ed27659b8b6657baa49d1988c49438f42c13d9d23c3",
+    "public_sha256": "b82556faeeb9f87c83f8abd8e73a504de8d16457c505c84416c494b307c389b6"
+  },
+  {
+    "path": "jobs/mobilint-5080-source-inspect-20261012-v3/job.json",
+    "original_sha256": "d379665ec9b3bd5e61ada3add5b2524db06509f4702d6f51b12c2a88e86e0ec3",
+    "public_sha256": "1c8f1b1f5114c691780e56edf5882843ae53dd5ea05e96044594e334327e992e"
+  },
+  {
+    "path": "jobs/mobilint-5080-source-inspect-20261012-v3/mobilint-5080-source-inspect-20261012-v3-8kqnq.log",
+    "original_sha256": "f7627318f4c5f4913acf25ee721355d672d0d41c434e6d2e8f99fb2d1a4a5c8f",
+    "public_sha256": "f7627318f4c5f4913acf25ee721355d672d0d41c434e6d2e8f99fb2d1a4a5c8f"
+  },
+  {
+    "path": "jobs/mobilint-5080-source-inspect-20261012-v3/pods.json",
+    "original_sha256": "d51abb6db75f4c2ae09ed1a5a4f7d5059d81dc2fae79c0e59ce1e311f0cd4780",
+    "public_sha256": "a68bf018317ca2d405edee7f39e1c05abdfaae7b6dc80b226b56bd69cbe4078e"
+  },
+  {
+    "path": "source-configmap-native-v1.json",
+    "original_sha256": "ca74520e47159019a923be6798abff1d094a48fec7f6eca249a261820c54e8c0",
+    "public_sha256": "ca74520e47159019a923be6798abff1d094a48fec7f6eca249a261820c54e8c0"
+  },
+  {
+    "path": "source-configmap-native-v2.json",
+    "original_sha256": "be5e6cb84e470034f76b853c4597d49d6613503aebbf37badf5945923937ed69",
+    "public_sha256": "be5e6cb84e470034f76b853c4597d49d6613503aebbf37badf5945923937ed69"
+  },
+  {
+    "path": "source-configmap-native-v3.json",
+    "original_sha256": "9076be389b83b8696b6ba21a42e67f08dd835ed2749bbded13a08db67abc9d8a",
+    "public_sha256": "9076be389b83b8696b6ba21a42e67f08dd835ed2749bbded13a08db67abc9d8a"
+  },
+  {
+    "path": "source-inspect-events.json",
+    "original_sha256": "58f77f45a743bc5ef3c465089d653bc7806c8117bec690af901d5f74add9f7e3",
+    "public_sha256": "4553b1b4f3cb517220c3c3c864f1954cb0503f710f2cadbd038d6094398b4b05"
+  }
+]

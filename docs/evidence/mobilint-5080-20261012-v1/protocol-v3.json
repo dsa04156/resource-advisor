@@ -1,0 +1,73 @@
+{
+  "experiment": "mobilint-5080-20261012-v1",
+  "frozen_utc": "2026-10-12T01:50:11.961221+00:00",
+  "primary_question": "deployment latency under matched input; same-model hardware speed comparison blocked by missing MXQ provenance",
+  "model_equivalence": "not-established",
+  "source_onnx_sha256": "9d11a3529d1e547da6ae07201d93484dbab2ec0a3614535752c8f40f0fe2968a",
+  "gpu_model_sha256": "ab607dd30842a4b96b7fbbf7ddf01a18509a308e0584bcfcfc6c6198f3c2ef40",
+  "npu_model_sha256": "aa158a35735a876cc9f9220f9967b711b8e49ce5de49126f0597e994c6b543da",
+  "model_preparation": "input/output metadata 224x344; immutable initializer inputs removed; IR3 to IR4; ORT1.23.2 basic constant-folding; all original initializers byte-identical",
+  "source_sha256": "7b092733af24caeeafb9d94bc7bdf03498817d155e74c5e0af2040f90647b3c9",
+  "input_seed": 20261008,
+  "input_shape": [
+    224,
+    344,
+    3
+  ],
+  "input_range": [
+    -1,
+    1
+  ],
+  "batch_size": 1,
+  "warmups": 5,
+  "samples": 30,
+  "replication_unit": "fresh native Job/session; 30 calls nested within each Job",
+  "schedule": [
+    {
+      "unit_id": 1,
+      "block": 0,
+      "arm": "mobilint"
+    },
+    {
+      "unit_id": 2,
+      "block": 0,
+      "arm": "cuda"
+    },
+    {
+      "unit_id": 3,
+      "block": 1,
+      "arm": "mobilint"
+    },
+    {
+      "unit_id": 4,
+      "block": 1,
+      "arm": "cuda"
+    },
+    {
+      "unit_id": 5,
+      "block": 2,
+      "arm": "cuda"
+    },
+    {
+      "unit_id": 6,
+      "block": 2,
+      "arm": "mobilint"
+    }
+  ],
+  "quality": "finite matching output, within-runtime repeatability; cross-model numerical differences descriptive, not equivalence proof",
+  "no_claims": [
+    "hardware-general speedup",
+    "energy efficiency",
+    "accuracy parity",
+    "same original weights",
+    "statistical significance"
+  ],
+  "cpu": 1,
+  "boundary": "prepared-host-input-to-contiguous-host-HWC-output; blocking",
+  "qualification_samples": 3,
+  "qualification_warmups": 2,
+  "revision": 3,
+  "amendment": "Before main runs: both memory requests 1Gi and limits 4Gi; native GPU qual v3 was OOMKilled with 1Gi limit. Existing queue quotas remain unchanged.",
+  "memory_request_mib": 1024,
+  "memory_limit_mib": 4096
+}

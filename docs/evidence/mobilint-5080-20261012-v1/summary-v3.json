@@ -1,0 +1,81 @@
+{
+  "scope": "synthetic Candy deployment microbenchmark; model equivalence not established",
+  "hardware_speedup": null,
+  "accuracy_parity": null,
+  "energy_efficiency": null,
+  "production_integration": false,
+  "independent_jobs_per_runtime": 3,
+  "timed_calls_per_job": 30,
+  "groups": {
+    "mobilint": {
+      "mean_ms": 24.790106747402913,
+      "p95_ms": 26.303925560205244,
+      "timed_loop_calls_per_second": 40.33867260796539,
+      "mean_setup_ms": 72.0865889840449,
+      "mean_first_warmup_ms": 27.068175666499883,
+      "mean_native_job_jct_seconds": 2.0,
+      "main_device_allocation_seconds": 5.0,
+      "per_job": [
+        {
+          "block": 0,
+          "mean_ms": 24.46686424082145,
+          "setup_ms": 63.64343600580469,
+          "first_warmup_ms": 26.062275050207973,
+          "native_job_jct_seconds": 2.0,
+          "device_allocation_seconds": 2.0
+        },
+        {
+          "block": 1,
+          "mean_ms": 24.305823833371203,
+          "setup_ms": 63.612115976866335,
+          "first_warmup_ms": 26.82704495964572,
+          "native_job_jct_seconds": 2.0,
+          "device_allocation_seconds": 1.0
+        },
+        {
+          "block": 2,
+          "mean_ms": 25.597632168016087,
+          "setup_ms": 89.00421496946365,
+          "first_warmup_ms": 28.315206989645958,
+          "native_job_jct_seconds": 2.0,
+          "device_allocation_seconds": 2.0
+        }
+      ]
+    },
+    "cuda": {
+      "mean_ms": 2.6884711399260497,
+      "p95_ms": 2.7133365045301616,
+      "timed_loop_calls_per_second": 371.95861437720566,
+      "mean_setup_ms": 151.59735029252866,
+      "mean_first_warmup_ms": 20119.95148099959,
+      "mean_native_job_jct_seconds": 23.0,
+      "main_device_allocation_seconds": 66.0,
+      "per_job": [
+        {
+          "block": 0,
+          "mean_ms": 2.6754113069425025,
+          "setup_ms": 144.9625811073929,
+          "first_warmup_ms": 20136.119389906526,
+          "native_job_jct_seconds": 23.0,
+          "device_allocation_seconds": 22.0
+        },
+        {
+          "block": 1,
+          "mean_ms": 2.6995428527394933,
+          "setup_ms": 148.88564287684858,
+          "first_warmup_ms": 20132.104218006134,
+          "native_job_jct_seconds": 23.0,
+          "device_allocation_seconds": 22.0
+        },
+        {
+          "block": 2,
+          "mean_ms": 2.6904592600961528,
+          "setup_ms": 160.94382689334452,
+          "first_warmup_ms": 20091.630835086107,
+          "native_job_jct_seconds": 23.0,
+          "device_allocation_seconds": 22.0
+        }
+      ]
+    }
+  }
+}

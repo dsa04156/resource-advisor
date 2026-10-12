@@ -1,0 +1,92 @@
+{
+  "apiVersion": "batch/v1",
+  "kind": "Job",
+  "metadata": {
+    "name": "mobilint-5080-qual-gpu-20261012-v5",
+    "namespace": "resource-advisor-lab",
+    "labels": {
+      "kueue.x-k8s.io/queue-name": "ra-f0-gpu",
+      "resource-advisor/experiment": "mobilint-5080-20261012-v1"
+    }
+  },
+  "spec": {
+    "suspend": true,
+    "backoffLimit": 0,
+    "activeDeadlineSeconds": 180,
+    "template": {
+      "metadata": {
+        "labels": {
+          "resource-advisor/experiment": "mobilint-5080-20261012-v1"
+        }
+      },
+      "spec": {
+        "restartPolicy": "Never",
+        "nodeSelector": {
+          "kubernetes.io/hostname": "gpu-5080",
+          "kubernetes.io/arch": "amd64"
+        },
+        "containers": [
+          {
+            "name": "inference",
+            "image": "PRIVATE_REGISTRY/ra-candy-cuda@sha256:29012d0aea4548c27852090fe5a38db22374e0b3298f840fd3177f23d5b638ea",
+            "command": [
+              "python3",
+              "-u",
+              "-c",
+              "import ctypes,json,sys,runpy\ncuda=ctypes.CDLL('libcuda.so.1');assert cuda.cuInit(0)==0\nname=ctypes.create_string_buffer(256);assert cuda.cuDeviceGetName(name,256,0)==0\nversion=ctypes.c_int();assert cuda.cuDriverGetVersion(ctypes.byref(version))==0\nproduct=name.value.decode();assert 'RTX 5080' in product,product\nprint('GPU_IDENTITY '+json.dumps({'name':product,'cuda_driver_version':version.value}),flush=True)\nsys.argv=['/experiment/probe.py']+sys.argv[1:];runpy.run_path('/experiment/probe.py',run_name='__main__')\n",
+              "--runtime",
+              "cuda",
+              "--model",
+              "/models/candy.onnx",
+              "--model-sha256",
+              "ab607dd30842a4b96b7fbbf7ddf01a18509a308e0584bcfcfc6c6198f3c2ef40",
+              "--samples",
+              "3",
+              "--warmups",
+              "2"
+            ],
+            "resources": {
+              "requests": {
+                "cpu": "1",
+                "memory": "1Gi",
+                "nvidia.com/gpu": "1"
+              },
+              "limits": {
+                "cpu": "1",
+                "memory": "4Gi",
+                "nvidia.com/gpu": "1"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "source",
+                "mountPath": "/experiment",
+                "readOnly": true
+              }
+            ],
+            "env": [
+              {
+                "name": "PYTHONPATH",
+                "value": "/opt/candy/deps"
+              },
+              {
+                "name": "LD_LIBRARY_PATH",
+                "value": "/opt/candy/deps/nvidia/cuda_nvrtc/lib:/opt/candy/deps/nvidia/cublas/lib:/opt/candy/deps/nvidia/cuda_runtime/lib:/opt/candy/deps/nvidia/cudnn/lib:/opt/candy/deps/nvidia/cufft/lib:/opt/candy/deps/nvidia/curand/lib:/opt/candy/deps/nvidia/nvjitlink/lib:/usr/local/nvidia/lib64:/usr/local/nvidia/lib"
+              }
+            ]
+          }
+        ],
+        "volumes": [
+          {
+            "name": "source",
+            "configMap": {
+              "name": "mobilint-5080-source-20261012-v3"
+            }
+          }
+        ],
+        "automountServiceAccountToken": false,
+        "terminationGracePeriodSeconds": 5
+      }
+    }
+  }
+}
