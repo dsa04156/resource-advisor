@@ -190,7 +190,7 @@ def test_unresponsive_postgres_connection_returns_within_connect_deadline(postgr
     import socket
     from threading import Event, Thread
 
-    stopping = Event()
+    stopping, accepted = Event(), Event()
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))
         listener.listen()
@@ -203,12 +203,15 @@ def test_unresponsive_postgres_connection_returns_within_connect_deadline(postgr
                 except TimeoutError:
                     continue
                 with conn:
+                    accepted.set()
                     stopping.wait(10)
 
         thread = Thread(target=accept_without_responding)
         thread.start()
-        url = postgres_store.engine.url.set(port=listener.getsockname()[1]).update_query_dict(
-            {"sslmode": "disable", "gssencmode": "disable"}
+        url = (
+            postgres_store.engine.url.set(host="127.0.0.1", port=listener.getsockname()[1])
+            .difference_update_query(["host", "hostaddr", "port", "service"])
+            .update_query_dict({"sslmode": "disable", "gssencmode": "disable"})
         )
         script = """
 import os
@@ -236,4 +239,17 @@ except OperationalError:
             stopping.set()
             thread.join(timeout=2)
         assert result.returncode == 0, result.stderr
+        assert accepted.is_set(), "the deadline must exercise the unresponsive TCP endpoint"
         assert result.stdout.strip() == "connection deadline enforced"
+
+
+def test_fatal_cycle_error_propagates_and_clears_previous_heartbeat(database_store, tmp_path):
+    from resource_advisor.database_recovery import database_cycle
+    from resource_advisor.health import write_heartbeat
+
+    heartbeat = tmp_path / "heartbeat"
+    write_heartbeat(heartbeat)
+    with pytest.raises(ValueError, match="invalid cycle"):
+        with database_cycle(database_store, heartbeat):
+            raise ValueError("invalid cycle")
+    assert not heartbeat_fresh(heartbeat)

@@ -12,6 +12,7 @@ from .health import write_heartbeat
 @contextmanager
 def database_cycle(store, heartbeat_path=None, *, once=False):
     path = Path(heartbeat_path) if heartbeat_path else None
+    completed = False
     try:
         yield
     except DBAPIError as exc:
@@ -26,10 +27,12 @@ def database_cycle(store, heartbeat_path=None, *, once=False):
         # polling cycle reads durable intent/leases and reconciles uncertain
         # submissions instead of immediately retrying the failed remote action.
         store.engine.dispose()
-        if path:
-            path.unlink(missing_ok=True)
         # Exception text can contain SQL parameters, endpoints or credentials.
         print(json.dumps({"status": "database_unavailable"}), flush=True)
     else:
         if path:
             write_heartbeat(path)
+        completed = True
+    finally:
+        if path and not completed:
+            path.unlink(missing_ok=True)
