@@ -40,6 +40,8 @@ def main(argv=None):
     token = os.environ.get("RA_API_TOKEN", "")
     if not token:
         parser.error("RA_API_TOKEN is required")
+    if args.heartbeat_path:
+        Path(args.heartbeat_path).unlink(missing_ok=True)
     stop = threading.Event()
     for sig in (signal.SIGINT, signal.SIGTERM):
         signal.signal(sig, lambda *_: stop.set())

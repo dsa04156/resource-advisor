@@ -69,13 +69,11 @@ spec:
             exec:
               command:
                 - python
-                - -m
-                - resource_advisor.cli
-                - check-heartbeat
-                - --path
-                - /tmp/heartbeat
-                - --max-age
-                - '120'
+                - -c
+                - >-
+                  import time; from pathlib import Path;
+                  p = Path('/tmp/heartbeat');
+                  raise SystemExit(0 if p.exists() and 0 <= time.time() - p.stat().st_mtime < 120 else 1)
             periodSeconds: 10
             timeoutSeconds: 5
       volumes:

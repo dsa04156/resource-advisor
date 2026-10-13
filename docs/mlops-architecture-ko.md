@@ -90,14 +90,21 @@ Python 3.11/3.13 CI에서 각각 SQLite 1,252개와 PostgreSQL 1,263개 테스�
 학습을 중복 생성하지 않습니다. 실제 Pod 계약·모델 identity·예측 결과로 배포를
 확인하고, 기존 READY 버전으로 롤백하는 경로도 실환경에서 검증했습니다.”
 
+서빙 관측은 API 요청 수·지연·오류와 30초 실제 예측 probe로 연결했다.
+입력 PSI는 고정 학습 데이터와 최근 사용자 요청의 분포를 비교하며,
+가용성·오류율·p95·입력 변화에 대한 Prometheus 알림 규칙을 제공한다.
+[서빙 모니터링의 동작과 한계](serving-observability.md)를 참고한다.
+전체 회귀·장애·알림 전달 검증은 사용자 요청에 따라 후속 작업으로 남겼다.
+
 ## 남은 단계
 
 - Console의 모델 lineage·승인·릴리스 화면.
-- 지속적인 서빙 상태·latency·error·drift 관측과 기준에 따른 재학습/자동 복구.
+- 서빙 관측의 SLO·drift 기준 보정, 장애·알림 검증 및 기준에 따른 재학습/자동 복구.
 - 일반 binary 모델과 큰 checkpoint, GPU inference, canary traffic 전환.
 - 운영용 HA, 자동 인증서 갱신, package 보존·삭제 정책, 강한 tenant 격리.
 
 Staging과 기존 서비스는 같은 lab namespace를 사용한다. 이번 KFP 실행은 실제
 cluster API로 연결하는 임시 TLS bridge를 사용하고 종료 후 제거했다. 상시 자동 실행에는
 Service DNS에 맞는 TLS endpoint와 인증서 관리가 필요하다. 세 probe는 smoke 검증이며
-운영 SLO·부하 시험·지속적인 장애 탐지를 대신하지 않는다.
+운영 SLO·부하 시험을 대신하지 않는다. 지속적인 서빙 탐지는 별도 monitor가 수행하며,
+현재 내부 Service DNS 연결에는 기존 CA와 IP SAN 검증을 유지하는 TLS 이름 설정을 사용한다.
