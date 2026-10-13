@@ -820,7 +820,7 @@ async function refreshModels() {
   } catch (error) {
     if (session === generation && error.name !== "AbortError") {
       modelsData = null;
-      modelsError = error.message;
+      modelsError = "모델 상태를 가져오지 못했어요. 상태 새로고침으로 다시 확인해 주세요.";
     }
   } finally {
     if (session === generation) {
