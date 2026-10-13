@@ -34,7 +34,7 @@ server-side across project records; node filtering remains local.
 Palette follows the reference: neutral #f5f5f7 canvas, #1d1d1f text, #0071e3 actions,
 #0b1716 rack, #102321 instrument and #58ddb2 signals. Cards use 22px radii, the
 fleet hero 28px, a 4px spacing grid, subtle borders and a minimal panel shadow.
-At mobile widths the six primary routes move to a scrollable bottom navigation bar; analysis
+At mobile widths the primary routes move to a scrollable bottom navigation bar; analysis
 links remain accessible above the topbar, tables expose extra facts in details.
 Compatibility and recommendation evidence remain secondary sidebar links.
 An operator-selected submission catalog is the default; historical experimental
@@ -251,3 +251,21 @@ Show before-arrival offset, requested GPU group size, attempt count and failed
 node exclusion. Previous native failures and priority change evidence remain in
 the existing collapsed inspector. Preserve fleet_batch as the heterogeneous
 registered-workload option, with its own GPU/NPU/Slurm routes and limitations.
+
+Model health: the primary “모델 상태” route and Operations shortcut open a read-only,
+project-scoped service list. Lead with “지금 답할 수 있나요?” and a 30px/650 status
+headline, current model version and explicit probe/query timestamps. Separate
+historical READY from a fresh matching-deployment probe (120-second freshness).
+Waiting, unavailable and stale states use text with amber/red badges. No probe
+must never become healthy merely because the deployment receipt is READY.
+Two 24px-padded fact panels explain response time and failed user requests. Probe
+latency is explicitly labelled when no user latency exists. Drift is a full-width
+22px-radius panel with a native progress bar before 128 user input rows; say inputs
+“개” in plain-language copy. Exclude probes from user counts and drift. PSI signals
+input change, never prediction accuracy or automatic replacement. Technical IDs
+and process-reset scope live in persistent native details; a second disclosure
+explains model/deployment/probe/drift in plain Korean. Reuse workspace colors,
+system Korean font and 4px spacing; 44px controls. Two columns collapse to one at
+650px; primary mobile navigation scrolls horizontally. Preserve selection, focus
+and disclosures on polling. Shared-lab reads reuse its server-selected project;
+no credential is embedded and existing probe/operator authentication is retained.

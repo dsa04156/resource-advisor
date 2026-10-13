@@ -19,6 +19,9 @@ const labReplaySeen=new Set();
 let labResource="",labResourceFilter="all";
 let jobsDisplay="graph", graphJobId=null, graphSelection="compute";
 let resourceBackend = "all", resourceSearch = "", searchTimer = null, filterRevision = 0;
+let modelsData = null, modelsPending = false, modelsUpdated = 0, modelsReceivedAt = 0;
+let modelsError = "", modelSelected = "", modelPage = 0, modelsShowStaging = false;
+const modelDisclosures = new Set();
 const submissionDraft = { workload: "", candidate: "" };
 let schedulingProfile = "", schedulingPreview = null, schedulingPreviewKey = "";
 let schedulingPendingKey = "", trackedJobId = null;
@@ -170,6 +173,7 @@ function approvalControls(recommendation) {
   return add(el("div"), button, el("small", "승인 시 현재 근거를 다시 검사합니다. 승인은 자원 예약이 아닙니다."));
 }
 const views = {
+  models: ["MODEL HEALTH", "모델 상태", "모델이 지금 답할 수 있는지, 느려졌는지, 새로운 입력이 달라졌는지 쉽게 확인하세요."],
   "scheduler-lab": ["NATIVE SCHEDULING", "스케줄링 실험실", "백필 · 갱 입장 · 토폴로지 배치를 실제 GPU에서 실행하고 관측합니다."],
   scenario: ["REQUEST → QUEUE → RUN", "자원 요청 시나리오", "두 연구 요청이 같은 실행 자원을 사용합니다. 실제 큐의 대기와 실행을 따라가고 기록을 다시 재생하세요."],
   experiments: ["EXPERIMENT WORKSPACE", "실험 · 비교", "MLflow 실행 기록, 파라미터, 지표와 아티팩트를 함께 확인합니다."],
@@ -754,7 +758,7 @@ function operationsView() {
   if(!op)return empty("운영 집계를 불러오지 못했습니다.");
   root.append(add(el("section",null,"operations-intro"),
     add(el("div"),el("p","SHARED COMPUTE · "+data.project_ref,"eyebrow"),el("h2","공동 자원 운영"),el("p","지금 기다리는 작업과 확인할 문제부터 살펴보세요.")),
-    add(el("div",null,"hero-actions"),actionLink("자원 요청 시나리오 →","#scenario"),actionLink("작업 제출 →","#submit"),actionLink("장비 사용량 보기","#execution"))));
+    add(el("div",null,"hero-actions"),actionLink("모델 상태 보기 →","#models"),actionLink("자원 요청 시나리오 →","#scenario"),actionLink("작업 제출 →","#submit"),actionLink("장비 사용량 보기","#execution"))));
   const kpis=dashboardStats([["실행 중",op.running_total,"현재 프로젝트"],["접수 · 대기",op.waiting_total,"백엔드 대기 사유 확인"],["취소 확인 중",op.cancel_pending_total,"자원 반환 확인 전"],["최근 실패",op.failed_24h_total,"최근 24시간"],["장비 확인 필요",op.node_issues.length,"오래된 관측 포함"]]);
   kpis.classList.add("ops-kpis");root.append(kpis,queueCards());
   const activeRows=op.active_jobs.map(j=>[
@@ -795,6 +799,183 @@ function usageView() {
   root.append(panel("백엔드·장치별 집계", "실제로 관측된 예약 시간입니다. GPU·NPU·공유 슬롯을 서로 합산하거나 실제 사용률로 해석하지 않습니다.",
     add(el("div"),add(el("div",null,"panel-head"),exportButton),groups.length?table(["프로젝트","백엔드 · 장비","할당 단위","작업 수","확인된 할당 시간","미확인 작업","종료 상태"],rows):empty("집계할 종료 기록이 없습니다."))));
   root.append(ledgerView());return root;
+}
+
+async function refreshModels() {
+  if (modelsPending || !data || (!token && !anonymousConnected)) return;
+  modelsPending = true;
+  const session = generation;
+  $("refresh").disabled = true;
+  try {
+    const response = await fetch(API + "/model-services?page=" + modelPage, {
+      headers: authHeaders(), signal: controller.signal, cache: "no-store",
+    });
+    if (session !== generation) return;
+    if (response.status === 401) { reset("프로젝트 연결을 다시 확인해 주세요."); return; }
+    if (!response.ok) throw new Error("모델 상태를 가져오지 못했어요. 상태 새로고침으로 다시 확인해 주세요.");
+    const result = await response.json();
+    if (session !== generation) return;
+    if (result.project_ref !== data.project_ref) throw new Error("프로젝트 연결을 다시 확인해 주세요.");
+    modelsData = result; modelsReceivedAt = performance.now(); modelsError = "";
+  } catch (error) {
+    if (session === generation && error.name !== "AbortError") {
+      modelsData = null;
+      modelsError = error.message;
+    }
+  } finally {
+    if (session === generation) {
+      modelsPending = false; modelsUpdated = Date.now();
+      $("refresh").disabled = false;
+      if (active === "models") render();
+    }
+  }
+}
+function modelStamp(seconds) { return seconds ? stamp(new Date(seconds * 1000).toISOString()) : "아직 확인하지 않음"; }
+function modelProbeStatus(model) {
+  if (model.desired_state !== "READY") return {
+    tone: "warn", title: "모델을 연결하는 중이에요", label: "연결 확인 중",
+    explanation: "배포 요청은 접수됐어요. 모델 연결과 예측 확인이 끝나면 사용할 수 있어요.",
+  };
+  const probe = model.probe;
+  if (!probe || probe.deployment_ref !== model.deployment_ref) return {
+    tone: "warn", title: "아직 현재 상태를 확인하지 못했어요", label: "자동 점검 대기",
+    explanation: "모델은 배포됐지만 최근 자동 점검 결과가 없어요. 배포 완료만으로 지금 정상이라고 판단하지 않아요.",
+  };
+  const now = modelsData.generated_at_seconds + (performance.now() - modelsReceivedAt) / 1000;
+  const age = now - probe.timestamp_seconds;
+  if (!Number.isFinite(age) || age < -5 || age > 120) return {
+    tone: "warn", title: "최근 상태를 다시 확인해야 해요", label: "점검 기록이 오래됨",
+    explanation: "자동 점검 기록이 2분 넘게 갱신되지 않았어요. 새 결과가 나오기 전에는 정상 동작 여부를 알 수 없어요.",
+  };
+  if (!probe.success) return {
+    tone: "bad", title: "자동 점검에서 답을 확인하지 못했어요", label: "확인 필요",
+    explanation: probe.reason === "PREDICTION_MISMATCH"
+      ? "샘플 질문의 답이 저장된 확인 결과와 달라요. 모델 연결과 입력 처리를 확인해 주세요."
+      : probe.reason === "DEPLOYMENT_CHANGED"
+        ? "점검 도중 모델이 바뀌었어요. 다음 자동 점검 결과를 확인해 주세요."
+        : "샘플 질문에 정상 응답하지 못했어요. 서비스 연결 상태를 확인해 주세요.",
+  };
+  return {
+    tone: "good", title: "최근 점검에서는 잘 답했어요", label: "응답 확인됨",
+    explanation: "샘플 질문을 보내 모델과 답을 확인했어요. 모든 질문의 정답률을 보장하는 점검은 아니에요.",
+  };
+}
+function modelDisclosure(key, title, ...children) {
+  const summary = el("summary", title);
+  summary.id = key === "guide" ? "model-guide-summary" : "model-technical-summary";
+  const node = add(el("details", null, "model-disclosure"), summary, ...children);
+  node.open = modelDisclosures.has(key);
+  node.ontoggle = () => { if (node.open) modelDisclosures.add(key); else modelDisclosures.delete(key); };
+  return node;
+}
+function modelFact(title, value, explanation, tone = "") {
+  return add(el("article", null, "model-fact " + tone), el("h3", title),
+    el("strong", value, "model-fact-value"), el("p", explanation));
+}
+function modelStatusView() {
+  const root = el("div", null, "models-page");
+  const reload = el("button", modelsPending ? "상태 확인 중…" : "상태 새로고침");
+  reload.id = "models-refresh"; reload.disabled = modelsPending; reload.onclick = () => refreshModels();
+  if (modelsError) {
+    const failure = add(el("section", null, "panel model-empty"),
+      badge("현재 상태 미확인", "warn"), el("h2", "지금은 모델 상태를 볼 수 없어요"),
+      el("p", modelsError), el("p", "연결이 끊겼다고 모델이 고장 났다는 뜻은 아니에요. 이전 정상 표시를 숨기고 다시 확인해요."), reload);
+    failure.setAttribute("role", "status"); root.append(failure); return root;
+  }
+  if (!modelsData) {
+    const loading = el("p", "모델 목록과 최근 점검 결과를 불러오는 중…", "model-empty");
+    loading.setAttribute("role", "status"); root.append(loading); return root;
+  }
+  const roles = { production: "운영용", staging: "테스트용", service: "서비스" };
+  const all = modelsData.items;
+  const visible = all.filter(m => modelsShowStaging || m.role !== "staging")
+    .sort((a,b) => Number(b.role === "production") - Number(a.role === "production"));
+  const selected = visible.find(m => m.service_ref === modelSelected) || visible[0];
+  modelSelected = selected?.service_ref || "";
+  const controls = el("div", null, "models-controls");
+  if (visible.length) {
+    const select = el("select"); select.id = "model-service";
+    for (const model of visible) {
+      const version = model.model_uri.split("/").at(-1);
+      const option = el("option", `${roles[model.role]} · ${model.service_ref} · 버전 ${version}`);
+      option.value = model.service_ref; select.append(option);
+    }
+    select.value = modelSelected;
+    select.onchange = () => { modelSelected = select.value; render(); };
+    controls.append(add(el("div", null, "model-picker"), el("label", "확인할 모델 서비스"), select));
+    controls.querySelector("label").htmlFor = select.id;
+  }
+  const show = el("input"); show.type = "checkbox"; show.id = "model-show-staging"; show.checked = modelsShowStaging;
+  show.onchange = () => { modelsShowStaging = show.checked; render(); };
+  if (all.some(m => m.role === "staging")) controls.append(add(el("label", null, "model-show-staging"), show, el("span", "테스트용도 보기")));
+  controls.append(reload); root.append(controls);
+  if (modelsData.total > modelsData.page_size) {
+    const previous = el("button", "이전 서비스"); previous.id = "models-previous"; previous.disabled = !modelPage || modelsPending;
+    const next = el("button", "다음 서비스"); next.id = "models-next"; next.disabled = !modelsData.has_next || modelsPending;
+    const change = direction => { modelPage += direction; modelsUpdated = 0; modelsData = null; refreshModels(); render(); };
+    previous.onclick = () => change(-1); next.onclick = () => change(1);
+    root.append(add(el("div", null, "models-controls"), el("small", `전체 ${modelsData.total}개 서비스 · ${modelPage+1}페이지`), previous, next));
+  }
+  if (!selected) {
+    root.append(add(el("section", null, "panel model-empty"), el("h2", all.length ? "운영용 모델은 아직 없어요" : "아직 연결된 모델이 없어요"),
+      el("p", all.length ? "테스트용도 보기를 켜면 배포 전 연습 중인 모델을 볼 수 있어요." : "학습한 모델을 서비스로 연결하면 여기에 자동으로 나타나요."),
+      actionLink("학습 파이프라인 보기 →", "#pipelines")));
+    return root;
+  }
+  const m = selected, health = modelProbeStatus(m), user = m.user_requests;
+  const version = m.model_uri.split("/").at(-1), probe = m.probe;
+  const hero = add(el("section", null, "model-health panel " + health.tone),
+    add(el("div", null, "model-health-heading"), badge(roles[m.role]), badge(health.label, health.tone)),
+    el("p", "지금 답할 수 있나요?", "model-question"), el("h2", health.title), el("p", health.explanation),
+    add(el("div", null, "model-health-meta"), el("strong", "현재 모델 · 버전 " + version),
+      el("span", "마지막 자동 점검 " + modelStamp(probe?.timestamp_seconds)), el("span", "화면 조회 " + modelStamp(modelsData.generated_at_seconds))));
+  hero.setAttribute("aria-label", "현재 모델 응답 상태"); root.append(hero);
+  const facts = el("div", null, "model-facts");
+  const userLatency = user.mean_duration_seconds;
+  const probeLatency = health.tone === "good" ? probe.duration_seconds : null;
+  const latency = userLatency ?? probeLatency;
+  facts.append(modelFact("얼마나 빨리 답했나요?", latency == null ? "아직 모름" : fmt(latency, 3) + "초",
+    userLatency != null ? `기록된 사용자 요청 ${fmt(user.attempts,0)}건의 평균 응답 시간이에요. 자동 점검 요청은 제외했어요.`
+      : probeLatency != null ? "최근 자동 점검의 응답 시간이에요. 사용자 요청의 평균 속도는 아직 알 수 없어요."
+        : "최근 응답 기록이 없어요. 사용자가 요청하거나 자동 점검이 완료되면 표시해요."));
+  const failed = user.error + user.conflict;
+  facts.append(modelFact("실패한 요청이 있나요?", user.attempts ? `${fmt(failed,0)} / ${fmt(user.attempts,0)}건` : "아직 요청 없음",
+    user.attempts ? `집계 시작 이후 사용자 요청 중 응답하지 못했거나 재시도가 필요한 건수예요. 실패 비율 ${fmt(failed / user.attempts * 100,1)}%.`
+      : "사용자 요청이 들어오면 확인할 수 있어요. 자동 점검 성공을 사용자 요청 성공률로 계산하지 않아요.", failed ? "warn" : ""));
+  root.append(facts);
+  const drift = m.input_drift, hasDrift = drift.state === "AVAILABLE" && Array.isArray(drift.psi);
+  const changed = hasDrift && Math.max(...drift.psi) > 0.2;
+  const driftBox = add(el("section", null, "panel model-drift"),
+    add(el("div", null, "model-health-heading"), el("h3", "새로운 입력이 예전과 비슷한가요?"),
+      badge(!hasDrift ? "데이터를 모으는 중" : changed ? "입력 변화 감지" : "비슷한 입력", changed ? "warn" : "")),
+    el("h2", !hasDrift ? "아직 비교할 입력이 부족해요" : changed ? "평소와 다른 입력이 늘었어요" : "학습할 때와 비슷한 입력이 들어와요"),
+    el("p", !hasDrift ? `사용자 입력 ${drift.minimum_samples}개가 모이면 비교해요. 지금 ${fmt(drift.samples,0)} / ${drift.minimum_samples}개예요.`
+      : "모델을 학습시킨 입력과 최근 사용자 입력을 비교한 결과예요. 입력이 달라졌다고 답이 틀렸다는 뜻은 아니에요."));
+  if (!hasDrift) {
+    const progress = el("progress"); progress.max = drift.minimum_samples; progress.value = drift.samples;
+    progress.setAttribute("aria-label", "입력 비교에 필요한 데이터 수집 진행"); driftBox.append(progress);
+  } else {
+    const distribution = el("div", null, "model-distribution");
+    drift.psi.forEach((value,feature) => distribution.append(add(el("div"), el("span", `입력 ${feature+1}`),
+      el("strong", fmt(value,3)), badge(value > 0.2 ? "변화 확인 필요" : "큰 변화 없음", value > 0.2 ? "warn" : ""))));
+    driftBox.append(distribution, el("small", `최근 입력 ${fmt(drift.samples,0)}개 · 최대 ${fmt(drift.window_rows,0)}개를 비교해요. 변화 지수(PSI)가 0.2를 넘으면 확인이 필요해요.`));
+  }
+  driftBox.append(el("small", "자동 점검용 입력은 제외해요. 입력 변화만으로 모델을 자동 교체하거나 다시 학습시키지 않아요.")); root.append(driftBox);
+  root.append(add(el("p", null, "model-note"), el("strong", "배포 완료와 현재 정상 동작은 달라요. "),
+    el("span", "자동 모니터가 설정된 서비스는 보통 30초마다 실제로 답을 확인해요. 이 화면은 새 작업이나 모델 배포를 시작하지 않아요.")));
+  root.append(modelDisclosure("guide", "이 화면을 쉽게 읽는 법",
+    add(el("div", null, "model-guide"),
+      modelFact("모델", "예측하는 도구", "학습한 패턴으로 입력에 대한 답을 만드는 도구예요."),
+      modelFact("배포", "사람들이 쓰도록 연결", "준비된 모델을 서비스에 연결하는 단계예요. 연결 후에도 점검이 필요해요."),
+      modelFact("자동 점검", "샘플로 답해 보기", "정해진 작은 입력을 보내 모델과 응답이 맞는지 확인해요."),
+      modelFact("입력 변화", "평소와 다른 입력 찾기", "새 입력이 학습할 때와 얼마나 다른지 봐요. 정답률을 측정하는 기능은 아니에요."))));
+  const technical = el("dl", null, "model-technical");
+  for (const [name,value] of [["서비스",m.service_ref],["모델 버전",m.model_uri],["배포 기록",m.deployment_ref],
+    ["학습 기록",m.lifecycle_ref],["배포 기록 상태",m.desired_state],["자동 점검 결과",probe?.reason || "아직 없음"],
+    ["집계 시작",modelStamp(m.observed_since_seconds)]]) technical.append(el("dt", name), add(el("dd"), code(value)));
+  root.append(modelDisclosure("technical:" + m.service_ref, "기술 정보와 집계 범위 보기", technical,
+    el("p", "현재 모델에서 집계한 요청이에요. 서버 재시작이나 모델 변경 시 집계와 입력 비교 데이터가 다시 시작돼요. 인증 실패·잘못된 입력 형식·없는 서비스 요청은 이 요청 집계에서 제외해요.")));
+  return root;
 }
 function execution() {
   const root = el("div");
@@ -1788,12 +1969,13 @@ function recommendationsView() {
 }
 function render() {
   if (!data) return;
+  if (active === "models" && !modelsPending && (!modelsUpdated || ($("auto").checked && Date.now() - modelsUpdated > 15000))) refreshModels();
   if (active === "scheduler-lab" && !labPending && Date.now()-labUpdated > 3000) refreshLab();
   if (active === "scenario" && !scenarioPending && Date.now()-scenarioUpdated > 3000) refreshScenario();
   if (["operations","experiments","pipelines","notebooks","jobs"].includes(active) && !researchPending && Date.now()-researchUpdated>30000) refreshResearch();
   const motionBefore = active === "scheduler-lab" ? captureLabMotion() : null;
   const focused = document.activeElement;
-  const keepFocus = ["job-search", "resource-search", "poc-gpu-count", "lab-scenario", "lab-resource-mode", "lab-history", "lab-replay-speed", "lab-replay-toggle", "lab-replay-seek", "lab-resource-filter"].includes(focused?.id)
+  const keepFocus = ["model-guide-summary", "model-technical-summary", "model-service", "model-show-staging", "models-refresh", "models-previous", "models-next", "job-search", "resource-search", "poc-gpu-count", "lab-scenario", "lab-resource-mode", "lab-history", "lab-replay-speed", "lab-replay-toggle", "lab-replay-seek", "lab-resource-filter"].includes(focused?.id)
     ? { id: focused.id, start: focused.selectionStart, end: focused.selectionEnd } : null;
   const [label, title, description] = views[active];
   $("section-label").textContent = label;
@@ -1801,10 +1983,12 @@ function render() {
   $("view-description").textContent = description;
   $("identity").textContent = data.project_ref;
   $("nav-job-count").textContent = Object.values(data.job_counts).reduce((a,b)=>a+b,0);
-  $("updated").textContent = "조회 " + stamp(data.generated_at);
+  $("updated").textContent = active === "models" && modelsData
+    ? "모델 조회 " + modelStamp(modelsData.generated_at_seconds) : "조회 " + stamp(data.generated_at);
   $("content").replaceChildren(
     {
       operations: operationsView,
+      models: modelStatusView,
       scenario: scenarioView,
       "scheduler-lab": schedulerLabView,
       experiments: experimentsView,
@@ -1848,6 +2032,7 @@ function render() {
 }
 function reset(message = "") {
   generation++;
+  modelsData=null;modelsPending=false;modelsUpdated=0;modelsError="";modelSelected="";modelPage=0;modelsShowStaging=false;modelDisclosures.clear();
   graphJobId=null;graphSelection="compute";
   stopLabReplay();labReplaySeen.clear();labResource="";labResourceFilter="all";
   labData=null; labRef=""; labUpdated=0; labCursor=null; labKey=null;
@@ -1938,7 +2123,7 @@ $("login").onsubmit = (e) => {
 $("content").addEventListener(
   "toggle",
   (e) => {
-    if (e.target.tagName === "DETAILS" && e.target.open && active !== "scheduler-lab")
+    if (e.target.tagName === "DETAILS" && e.target.open && !["scheduler-lab", "models"].includes(active))
       $("auto").checked = false;
   },
   true,
@@ -1951,7 +2136,7 @@ $("logout").onclick = () => {
   reset("연결을 해제했습니다.");
   $("token").focus();
 };
-$("refresh").onclick = () => load();
+$("refresh").onclick = () => active === "models" ? refreshModels() : load();
 function navigate(event) {
   const view = new URL(event?.newURL || location.href).hash.slice(1);
   if (view === "main") return; // The skip link must not change the selected view.
@@ -1966,7 +2151,9 @@ function navigate(event) {
 window.addEventListener("hashchange", navigate);
 navigate();
 setInterval(() => {
-  if ($("auto").checked && (token || anonymousConnected)) load();
+  if ($("auto").checked && (token || anonymousConnected)) {
+    if (active === "models") refreshModels(); else load();
+  } else if (active === "models" && data) render();
 }, 15000);
 window.addEventListener("pagehide", () => reset());
 

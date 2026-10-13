@@ -25,6 +25,9 @@ class Observation:
     requests: Counts = field(default_factory=Counts)
     latency_seconds: float | None = None
     probe: dict | None = None
+    started_at_seconds: float = field(default_factory=time.time)
+    user_latency_seconds: float | None = None
+    user_duration_seconds: float = 0
 
 
 class ProjectMetrics:
@@ -145,6 +148,8 @@ class ServingTelemetry:
             observation.latency_seconds = seconds
             if source != "request":
                 return
+            observation.user_latency_seconds = seconds
+            observation.user_duration_seconds += seconds
             observation.rows.extend(
                 tuple(bisect.bisect_right(observation.edges[i], row[i]) for i in range(2))
                 for row in rows
@@ -191,6 +196,11 @@ class ServingTelemetry:
     def snapshot(self, project, service):
         with self.lock:
             observation = self.projects[project].services[service]
+            user_counts = {
+                outcome: observation.requests[("request", outcome)]
+                for outcome in ("success", "error", "conflict")
+            }
+            attempts = sum(user_counts.values())
             return {
                 "deployment_ref": observation.deployment_ref,
                 "model_uri": observation.model_uri,
@@ -200,6 +210,15 @@ class ServingTelemetry:
                 ],
                 "last_attempt_duration_seconds": observation.latency_seconds,
                 "probe": observation.probe,
+                "observed_since_seconds": observation.started_at_seconds,
+                "user_requests": {
+                    "attempts": attempts,
+                    **user_counts,
+                    "mean_duration_seconds": (
+                        observation.user_duration_seconds / attempts if attempts else None
+                    ),
+                    "last_duration_seconds": observation.user_latency_seconds,
+                },
                 "input_drift": self._drift(observation),
                 "storage": "API_PROCESS_MEMORY",
             }

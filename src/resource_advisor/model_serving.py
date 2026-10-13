@@ -7,7 +7,7 @@ import time
 
 import httpx
 from pydantic import Field
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 
 from .contracts import Contract, Ref, signature
 from .service import NotFound, Rejected, required
@@ -228,6 +228,57 @@ class ModelDeployments:
             "service_ref": ref,
             "desired_state": desired["state"],
             **self.telemetry.snapshot(project, ref),
+        }
+
+    def listing(self, project, page=0):
+        from .model_release import target_ref
+
+        page_size = 25
+        with self.store.transaction() as conn:
+            services = (
+                select(entities.c.body["service_ref"].as_string().label("service_ref"))
+                .where(entities.c.kind == "model_deployment", entities.c.project == project)
+                .distinct()
+            )
+            total = conn.execute(select(func.count()).select_from(services.subquery())).scalar_one()
+            refs = (
+                conn.execute(
+                    services.order_by("service_ref").offset(page * page_size).limit(page_size)
+                )
+                .scalars()
+                .all()
+            )
+            protected = {
+                ref: bool(self.store.get(conn, "model_release_target", target_ref(project, ref)))
+                for ref in refs
+            }
+        items = []
+        for ref in refs:
+            desired = self.observe(project, ref)
+            items.append(
+                {
+                    "service_ref": ref,
+                    "desired_state": desired["state"],
+                    "role": (
+                        "staging"
+                        if desired["request"].get("staging")
+                        else "production"
+                        if protected[ref]
+                        else "service"
+                    ),
+                    "lifecycle_ref": desired["lifecycle_ref"],
+                    "revision": desired["revision"],
+                    **self.telemetry.snapshot(project, ref),
+                }
+            )
+        return {
+            "project_ref": project,
+            "generated_at_seconds": time.time(),
+            "items": items,
+            "total": total,
+            "page": page,
+            "page_size": page_size,
+            "has_next": (page + 1) * page_size < total,
         }
 
     def observe_project(self, project):

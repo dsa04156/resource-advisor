@@ -1,5 +1,11 @@
 # Research resource console
 
+The **모델 상태** navigation entry opens `/console#models`. It explains live model
+response, latency, failed user requests and input drift in plain Korean, with
+technical IDs in a disclosure. Shared-lab users can read the project-scoped model
+list without re-entering a token. Missing or stale probes and insufficient input
+data stay unknown. See [serving observability](../serving-observability.md).
+
 Open `/console` on the Resource Advisor API origin. This is a new interface over
 this project's own API and database; it does not embed or copy another platform's
 application. The console ships as static assets inside the Python package and

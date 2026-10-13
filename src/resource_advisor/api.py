@@ -166,6 +166,10 @@ def create_app(
     def model_deployment(ref: str, p=Depends(principal)):
         return deployments.view(p.project, ref)
 
+    @app.get(PREFIX + "/model-services")
+    def model_services(page: int = Query(default=0, ge=0), p=Depends(principal)):
+        return deployments.listing(p.project, page)
+
     @app.get(PREFIX + "/model-services/{ref}")
     def model_service(ref: str, p=Depends(principal)):
         return deployments.service(p.project, ref)

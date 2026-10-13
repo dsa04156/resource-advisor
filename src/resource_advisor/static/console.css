@@ -28,6 +28,8 @@
   font-size: 14px;
   line-height: 1.55;
 }
+
+
 * {
   box-sizing: border-box;
 }
@@ -1118,3 +1120,63 @@ main:has(.lab-page){padding-top:12px}.lab-resource .measure meter{margin:2px 0}.
 @media(min-width:1101px){.lab-node-table td{padding-top:2px;padding-bottom:2px}.lab-node-table .lab-node-pick{min-height:24px}.lab-bottom>details{padding:6px 10px}.lab-flow-matrix .lab-flow-job strong{font-size:9px}.lab-node-table .lab-fleet-head{min-height:24px}}
 
 .lab-pool-coverage{grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:11px;line-height:16px;color:#d7e5ff}.lab-pool-coverage span{white-space:nowrap}.lab-pool-coverage strong{font-size:10px;font-weight:500;color:#ffe0a1}@media(max-width:760px){.lab-pool-coverage{gap:4px 12px;font-size:10px}}
+
+/* Model health follows the existing workspace tokens and native controls. */
+.models-page { display: grid; gap: 20px; max-width: 1080px; }
+.models-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 16px; }
+.models-controls button { min-height: 44px; }
+.models-controls > button:last-child { margin-left: auto; }
+.model-picker { flex: 1 1 320px; min-width: 0; }
+.model-picker label { display: block; margin-bottom: 8px; color: var(--secondary); }
+.model-picker select { width: 100%; max-width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); }
+.model-show-staging { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 13px; }
+.models-page .panel { margin: 0; }
+.model-health { padding: 28px 32px; border-left: 4px solid var(--accent); }
+.model-health.warn { border-left-color: var(--warning); }
+.model-health.bad { border-left-color: var(--danger); }
+.model-health-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.model-question { margin: 24px 0 8px; font-size: 14px; font-weight: 600; color: var(--secondary); }
+.model-health h2 { margin: 0 0 12px; font-size: 30px; line-height: 1.3; letter-spacing: -.8px; text-wrap: balance; }
+.model-health > p:not(.model-question) { max-width: 720px; color: var(--secondary); line-height: 1.7; margin: 0; }
+.model-health-meta { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 24px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.model-health-meta strong { color: var(--ink); }
+.model-facts { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+.model-fact { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--panel-radius); padding: 24px; }
+.model-fact h3 { font-size: 14px; font-weight: 550; color: var(--secondary); margin: 0 0 16px; }
+.model-fact-value { display: block; font-size: 28px; line-height: 1.3; font-weight: 650; font-variant-numeric: tabular-nums; letter-spacing: -.5px; }
+.model-fact.warn .model-fact-value { color: var(--warning); }
+.model-fact p { margin: 12px 0 0; font-size: 13px; color: var(--secondary); line-height: 1.7; }
+.model-drift { padding: 24px 28px; }
+.model-drift h3 { margin: 0; font-size: 15px; }
+.model-drift h2 { font-size: 22px; letter-spacing: -.5px; margin: 20px 0 12px; text-wrap: balance; }
+.model-drift p { margin: 0 0 16px; color: var(--secondary); line-height: 1.7; }
+.model-drift progress { display: block; width: 100%; height: 12px; margin: 20px 0; accent-color: var(--accent); }
+.model-drift small { display: block; margin-top: 12px; color: var(--muted); line-height: 1.6; }
+.model-distribution { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.model-distribution > div { padding: 16px; border-radius: 12px; background: var(--canvas); display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.model-distribution strong { font-variant-numeric: tabular-nums; }
+.model-note { margin: 0; color: var(--secondary); font-size: 13px; line-height: 1.7; }
+.model-disclosure { border-top: 1px solid var(--line); padding-top: 8px; }
+.model-disclosure > summary { min-height: 44px; padding: 12px 0; font-weight: 600; cursor: pointer; }
+.model-disclosure > p { font-size: 13px; line-height: 1.7; color: var(--secondary); }
+.model-guide { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; padding: 8px 0; }
+.model-guide .model-fact { padding: 20px; }
+.model-guide .model-fact h3 { margin-bottom: 8px; }
+.model-guide .model-fact-value { font-size: 18px; letter-spacing: -.2px; }
+.model-technical { display: grid; grid-template-columns: 120px minmax(0,1fr); gap: 12px 16px; padding: 16px 0; font-size: 12px; }
+.model-technical dt { color: var(--secondary); }
+.model-technical dd { margin: 0; min-width: 0; }
+.model-technical code { overflow-wrap: anywhere; }
+.model-empty { padding: 28px; }
+.model-empty h2 { font-size: 24px; text-wrap: balance; }
+.model-empty p { color: var(--secondary); line-height: 1.7; }
+@media (max-width: 650px) {
+  .model-health { padding: 24px 20px; }
+  .model-health h2 { font-size: 26px; }
+  .model-health-meta { display: grid; gap: 8px; }
+  .model-facts, .model-guide, .model-distribution { grid-template-columns: minmax(0,1fr); gap: 12px; }
+  .model-fact, .model-drift { padding: 20px; }
+  .model-technical { grid-template-columns: minmax(0,1fr); gap: 4px; }
+  .model-technical dd { margin-bottom: 12px; }
+  .models-controls { gap: 8px; }
+}
