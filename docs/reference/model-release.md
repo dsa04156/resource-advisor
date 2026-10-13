@@ -126,6 +126,31 @@ inherit the ordinary launcher's ownership lease. SDK 2.13.0 is locked; the lab
 backend is 2.5.0. Direct run polling must handle `CANCELED` as terminal and accept
 only `SUCCEEDED`; the SDK completion helper omits cancellation.
 
+## Real lab verification
+
+On 2026-10-13, two uncached native KFP runs succeeded with the same training and
+release keys. Exactly one new GPU Job registered explicit MLflow version 3.
+The first run completed at PENDING_APPROVAL after separate staging READY and
+three 64-row probes with zero prediction error. Production stayed on version 1
+through staging and approval; only the later operator deployment changed it to
+version 3. The existing ISVC/Deployment/Service UIDs and old history were retained.
+Replaying the completed workflow reused the candidate and verification without
+a second GPU job or production command.
+
+Missing approval/direct bypass returned 422, user approval/promotion 403,
+cross-project read 404, and wrong evidence digest, changed decision and stale
+rollback/policy baseline 409. Exact-source CI passed SQLite **1,252** tests
+(11 PostgreSQL-only skips) and PostgreSQL **1,263** tests for both Python 3.11
+and 3.13. Both independent review axes have zero remaining findings.
+
+[The verification receipt](../evidence/model-release-20261013-v1.json) contains
+run IDs, observed uncached task inputs/outputs, frozen policy/approval digests,
+native identities, explicit-version reload, preserved records and cleanup.
+The lab run used a temporary TLS-verified host bridge to the real cluster API
+because its existing certificate has IP SANs. The bridge was removed afterward.
+Unattended operation needs a reachable TLS endpoint with appropriate Service DNS
+SANs and certificate management; the example accepts that endpoint as `api_url`.
+
 ## Boundaries
 
 The initial staging/production services share the existing lab namespace and

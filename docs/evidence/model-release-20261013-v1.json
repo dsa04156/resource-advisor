@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-13T02:28:18.149086+00:00",
+  "scope": "Qualified two-feature linear model; approval-based API/CLI and KFP release milestone",
+  "source_commit": "02b3b81380d56fb7c6906c218c33ee1138728ea1",
+  "source_ci": {
+    "conclusion": "success",
+    "headSha": "02b3b81380d56fb7c6906c218c33ee1138728ea1",
+    "status": "completed",
+    "url": "https://github.com/dsa04156/resource-advisor/actions/runs/38335639326",
+    "python_versions": [
+      "3.11",
+      "3.13"
+    ],
+    "sqlite_per_python": {
+      "passed": 1252,
+      "skipped": 11
+    },
+    "postgresql_per_python": {
+      "passed": 1263,
+      "skipped": 0
+    },
+    "ruff_and_wheel_checks": true,
+    "ansible_syntax": true
+  },
+  "review": {
+    "standards_findings_remaining": 0,
+    "spec_findings_remaining": 0,
+    "protection_registration_race_fixed": true,
+    "policy_before_training_enforced": true
+  },
+  "runtime": {
+    "kfp_backend_image": "ghcr.io/kubeflow/kfp-api-server:2.5.0",
+    "kfp_sdk": "2.13.0",
+    "api_image": "192.168.0.56:5000/resource-advisor/services@sha256:ca83639819391497af7436dfd4b8b5acac12996a21106c9f8f30fdc493c7d0b0",
+    "api_source_sha256": "b31b4e350dce50df3c1edf2e049e256b3780fc71792aaf472a593a77b1838366",
+    "gitops": {
+      "source_commit": "02b3b81380d56fb7c6906c218c33ee1138728ea1",
+      "gitops_synced_healthy": true,
+      "source_hash_match": true,
+      "existing_records_preserved": {
+        "jobs": 862,
+        "entities": 6331,
+        "usage": 862,
+        "outbox": 3858
+      },
+      "other_specs_uids_secret_values_pvc_queues_preserved": true,
+      "only_existing_operator_subject_added": true
+    },
+    "worker_and_predictor_images_unchanged": true,
+    "temporary_tls_bridge_removed": true,
+    "candidate_api_connection": "Temporary TLS-verified bridge to the real cluster API; removed after verification"
+  },
+  "policy": {
+    "ref": "linear-release-policy-20261013-v3",
+    "project_ref": "ra-lab",
+    "lifecycle_policy_ref": "linear-release-20261013-v3",
+    "production_service_ref": "linear-serving-v1",
+    "expected_production_deployment_ref": "mdp-4af7e87cc8f30dab02688d0589fdf84ff92f6f5a",
+    "maximum_mse_regression": 0.0,
+    "maximum_probe_latency_ms": 10000,
+    "verification_ttl_seconds": 3600,
+    "policy_digest": "sha256:f9a59f27fcdc8b1f77b97dfe4bdc17871fdfae7d95dd0445d87c8c4dba0bca74",
+    "policy_created_at": "2026-10-13T02:17:04.807997+00:00",
+    "lifecycle_created_at": "2026-10-13T02:18:17.345676+00:00"
+  },
+  "kfp_runs": [
+    {
+      "run_id": "4dd5b676-617a-4ac8-80b5-3cdd7cff4553",
+      "state": "SUCCEEDED",
+      "workflow_name": "resource-advisor-model-candidate-w27wf",
+      "workflow_uid": "ccb7d0a1-29a7-4efe-aad7-7831e75341aa",
+      "tasks": {
+        "train": {
+          "cached": false,
+          "cpu_only": true,
+          "user_secret_only": true,
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "256Mi"
+            },
+            "requests": {
+              "cpu": "100m",
+              "memory": "128Mi"
+            }
+          },
+          "raw_reference_output": "mlc-de4d6162834be2c308cee6d09d98973e4424b0c4",
+          "logs_sha256": "ab70f72675c66fc36e8317056223fbe030d91fd9c625501923306fde02e003b1"
+        },
+        "stage": {
+          "cached": false,
+          "cpu_only": true,
+          "user_secret_only": true,
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "256Mi"
+            },
+            "requests": {
+              "cpu": "100m",
+              "memory": "128Mi"
+            }
+          },
+          "raw_reference_output": "mrl-4db2f37d185a8a96d3effa750ece50283e93cb2a",
+          "logs_sha256": "839ed101ce931bf0c3769d3cb830e263dddbaefa2e79ff31386e63435c2141d1"
+        }
+      }
+    },
+    {
+      "run_id": "31157cbd-eff0-4803-be4d-102699086e83",
+      "state": "SUCCEEDED",
+      "workflow_name": "resource-advisor-model-candidate-j94c2",
+      "workflow_uid": "623b43a4-b92e-4612-9c5e-f82c05fece7e",
+      "tasks": {
+        "train": {
+          "cached": false,
+          "cpu_only": true,
+          "user_secret_only": true,
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "256Mi"
+            },
+            "requests": {
+              "cpu": "100m",
+              "memory": "128Mi"
+            }
+          },
+          "raw_reference_output": "mlc-de4d6162834be2c308cee6d09d98973e4424b0c4",
+          "logs_sha256": "61e7d7f67c004c0310774c853c5b7f3db27d6557467537029baa75216d0d02d4"
+        },
+        "stage": {
+          "cached": false,
+          "cpu_only": true,
+          "user_secret_only": true,
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "256Mi"
+            },
+            "requests": {
+              "cpu": "100m",
+              "memory": "128Mi"
+            }
+          },
+          "raw_reference_output": "mrl-4db2f37d185a8a96d3effa750ece50283e93cb2a",
+          "logs_sha256": "7ab6d61a44808a432b7f95e815c5d77f406fa93839aad9e3a8f2bf2683efc0f4"
+        }
+      }
+    }
+  ],
+  "lineage": {
+    "lifecycle_ref": "mlc-de4d6162834be2c308cee6d09d98973e4424b0c4",
+    "release_ref": "mrl-4db2f37d185a8a96d3effa750ece50283e93cb2a",
+    "job_id": "j-7f585a395c324d899aab790f6564a3d9",
+    "attempt_id": "a-c9a1bb841fef4d26a24dab3c99bb10af",
+    "model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/3",
+    "run_id": "84b77db562c24d7390e87461c957facc",
+    "evaluation_digest": "sha256:70939f4e4600f5896f6728f8483560341ec6227b9532e199a62dcb0a6ccbc9b5",
+    "model_package_digest": "sha256:08ea4f354ff71d24dc7a7c86f52d70470faa19a797a952c30d4f91e3771cae15"
+  },
+  "pending_approval": {
+    "state": "PENDING_APPROVAL",
+    "production_unchanged_before_approval": true,
+    "user_cannot_approve_or_promote_403": true,
+    "cross_project_release_read_404": true,
+    "missing_approval_and_direct_bypass_422": true,
+    "wrong_verification_digest_409": true,
+    "training_release_staging_verification_replays_same": true,
+    "candidate_model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/3",
+    "comparison": {
+      "candidate_mse": 0.4467454401311175,
+      "baseline_mse": 0.4467454401311175
+    },
+    "staging_probes": [
+      {
+        "latency_ms": 87.9989960230887,
+        "prediction_count": 64,
+        "maximum_abs_error": 0.0
+      },
+      {
+        "latency_ms": 40.4098539147526,
+        "prediction_count": 64,
+        "maximum_abs_error": 0.0
+      },
+      {
+        "latency_ms": 42.788448045030236,
+        "prediction_count": 64,
+        "maximum_abs_error": 0.0
+      }
+    ]
+  },
+  "staging": {
+    "service_ref": "release-stage-4db2f37d185a8a96d3effa750ece50283e93cb2a",
+    "receipt_digest": "sha256:21bbc4a1465a43743497e7c2b3445ee21d59326e1715c1c8c4b73f729030832a",
+    "verification": {
+      "release_ref": "mrl-4db2f37d185a8a96d3effa750ece50283e93cb2a",
+      "staging_deployment_ref": "mdp-ab3b64fdd939c09a2ec7f79de3b476f540662207",
+      "staging_receipt_digest": "sha256:21bbc4a1465a43743497e7c2b3445ee21d59326e1715c1c8c4b73f729030832a",
+      "model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/3",
+      "model_package_digest": "sha256:08ea4f354ff71d24dc7a7c86f52d70470faa19a797a952c30d4f91e3771cae15",
+      "evaluation_digest": "sha256:70939f4e4600f5896f6728f8483560341ec6227b9532e199a62dcb0a6ccbc9b5",
+      "verified_at": "2026-10-13T02:19:15.031471+00:00",
+      "probes": [
+        {
+          "latency_ms": 87.9989960230887,
+          "prediction_count": 64,
+          "maximum_abs_error": 0.0
+        },
+        {
+          "latency_ms": 40.4098539147526,
+          "prediction_count": 64,
+          "maximum_abs_error": 0.0
+        },
+        {
+          "latency_ms": 42.788448045030236,
+          "prediction_count": 64,
+          "maximum_abs_error": 0.0
+        }
+      ]
+    },
+    "native": {
+      "case": "staging",
+      "isvc_uid": "203cdb02-c60b-498d-834b-b4be1e453c2b",
+      "isvc_generation": 1,
+      "deployment_uid": "76375d29-d179-45c7-9f41-6322ce165d53",
+      "deployment_generation": 1,
+      "service_uid": "5d564d31-8fd6-49e2-af20-f51c33c35bc2",
+      "pod_uid": "3e1fba9c-4613-418e-bf57-f2f4c41b422d",
+      "pod_name": "ra-bca365c73c68c08ec550148e-predictor-65df7dfb7c-8jpzp",
+      "node": "etri-ser0001-cg0msb",
+      "image": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+      "image_id": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+      "ready": true,
+      "restarts": 0,
+      "tokenless_no_credentials": true,
+      "nonroot_readonly_seccomp": true,
+      "cpu_only": true,
+      "immutable_package": "ra-model-package-1510951f40a92fac2e07fa3aa05bf1fb20483ec7",
+      "external_routes": 0,
+      "logs_sha256": "dd501d4be186b9cae0c8fd3336bd04b1705d6b878d92791425e97f6935e6542d"
+    }
+  },
+  "approval": {
+    "request": {
+      "decision": "approve",
+      "verification_digest": "sha256:0ad58f554e7f3af51b1e06938e32cf0ec7c8160d6e3950ec3caa80221a84a268",
+      "reason": "Reviewed frozen baseline comparison and three live staging probes for the bounded linear fixture"
+    },
+    "actor": "ra-lab-operator",
+    "decided_at": "2026-10-13T02:19:40.600099+00:00"
+  },
+  "production": {
+    "state": "DEPLOYED",
+    "model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/3",
+    "history_count": 5,
+    "old_ready_history_retained": true,
+    "same_production_isvc_and_service_uid": true,
+    "production_release_and_approval_bound": true,
+    "prediction_count": 64,
+    "exact_cpu_evaluation_match": true,
+    "decision_and_promotion_replays_same": true,
+    "decision_change_409": true,
+    "stale_rollback_and_policy_baseline_409": true,
+    "stale_requests_preserved_current_target": true,
+    "deployment_ref": "mdp-3d4c3fc70f1d53cfcc8456de280cc4f0d25e5c1e",
+    "decision_digest": "sha256:18dea973a2ea7f664bd3930ca0d5f188ba4450ac07299e1473aa47ed8665941c",
+    "native": {
+      "case": "v3",
+      "isvc_uid": "a9fd3e6b-1beb-40f9-8e60-8dc6579e3ebd",
+      "isvc_generation": 4,
+      "deployment_uid": "70fa0636-a6cd-4e50-8c77-42eda630d213",
+      "deployment_generation": 4,
+      "service_uid": "0127a61c-c8c5-4d7e-b0cf-3ee066592b1f",
+      "pod_uid": "78875aa6-c1c5-45ee-8b1b-d4c98df48ceb",
+      "pod_name": "ra-93679104fbe82e9e745150a8-predictor-59b8b9f65b-47tzh",
+      "node": "etri-ser0001-cg0msb",
+      "image": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+      "image_id": "192.168.0.56:5000/resource-advisor/services@sha256:1f18f257b792ddf7fbb4cdd332544308985b59144022bee17d94a0783b810183",
+      "ready": true,
+      "restarts": 0,
+      "tokenless_no_credentials": true,
+      "nonroot_readonly_seccomp": true,
+      "cpu_only": true,
+      "immutable_package": "ra-model-package-72460b3693e9be1e2d6c54f09322d28ee46ef7a5",
+      "external_routes": 0,
+      "logs_sha256": "c2b52e4627d2aeda23665023908bfbf26747587b2c5e5d3d8e9b2902d39035fc"
+    }
+  },
+  "gpu_execution": {
+    "case": "v3",
+    "job_name": "a-c9a1bb841fef4d26a24dab3c99bb10af",
+    "job_uid": "ee957290-5776-479f-ac4a-9a8278a108f4",
+    "succeeded": 1,
+    "start_time": "2026-10-13T02:18:21Z",
+    "completion_time": "2026-10-13T02:18:29Z",
+    "node_selector": {
+      "hairp.io/multi-gpu-poc": "true",
+      "kubernetes.io/arch": "amd64",
+      "kubernetes.io/hostname": "etri-ser0002-cgnmsb"
+    },
+    "images": [
+      "ghcr.io/mlflow/mlflow:v3.16.1@sha256:06058cc872276873e9759c635e773342aca4731e240f6d20d88ea43774083984"
+    ],
+    "completed_pods_remaining": 1,
+    "event_reasons": [
+      "Suspended",
+      "CreatedWorkload",
+      "Started",
+      "SuccessfulCreate",
+      "Resumed",
+      "Completed",
+      "FinishedWorkload"
+    ],
+    "logs_sha256": "4d76c37d20a9d131d053887037b153d4d7aa23efcd485eee41750c3cff70f6e2"
+  },
+  "explicit_version_reload": {
+    "mlflow_version": "3.16.1",
+    "numpy_version": "2.4.6",
+    "model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/3",
+    "registry_version_count": 3,
+    "rejected_lifecycle_versions": 0,
+    "downloaded_explicit_version": true,
+    "verified_package_file_count": 7,
+    "package_digest": "sha256:08ea4f354ff71d24dc7a7c86f52d70470faa19a797a952c30d4f91e3771cae15",
+    "checkpoint_digest": "sha256:37b8d783b1b0888457d531376e34cb5766ffaa4e3ebfa536f53eb776ce1a14a8",
+    "holdout_prediction_count": 64,
+    "maximum_prediction_difference": 0.0,
+    "mse": 0.4467454401311175,
+    "lineage_exact_match": true
+  },
+  "verified_s3_readback_bundles": 1,
+  "preservation": {
+    "existing_jobs_and_usage_preserved": 862,
+    "current_jobs_and_usage": 863,
+    "new_gpu_training_jobs": 1,
+    "all_jobs_terminal": true,
+    "existing_entity_and_outbox_records_preserved": true,
+    "existing_native_uids_other_specs_pvc_queues_configmaps_preserved": true,
+    "existing_secret_values_preserved_except_operator_subject": true,
+    "only_existing_predictor_revision_and_package_changed": true,
+    "existing_kfp_secrets_preserved": true,
+    "user_file_hashes_preserved": 36
+  },
+  "cleanup": {
+    "owned_completed_pods_removed": 10,
+    "logs_archived_first": true,
+    "gpu_training_pod_already_absent": true,
+    "gpu_training_jobs_deleted": 0,
+    "kfp_workflows_deleted": 0,
+    "other_pods_untouched": true
+  },
+  "limits": [
+    "The deterministic fixture shows equal MSE, not accuracy improvement.",
+    "Three probes are smoke evidence, not a production SLO or load test.",
+    "Staging and production share the lab namespace; no infrastructure/tenant isolation claim.",
+    "KFP cancellation does not cancel independent accepted training or serving commands.",
+    "Configured operator subject is an audit principal, not independent human identity verification.",
+    "Console controls, continuous monitoring/drift, retraining, canary, HA and certificate automation remain later work."
+  ]
+}

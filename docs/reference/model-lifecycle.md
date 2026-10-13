@@ -158,8 +158,9 @@ provide arbitrary model/code uploads, transport large binary checkpoints, implem
 distributed/Slurm training or convert GPU models to NPUs. The fixed model's small
 synthetic dataset does not establish useful real-world model accuracy.
 [KServe deployment and verified rollback](model-serving.md) are now connected for
-this fixed model. KFP lifecycle orchestration and console model lineage remain
-subsequent integration milestones. Storage is verified on read/write but
+this fixed model. [KFP candidate staging and operator approval](model-release.md)
+now orchestrate this lifecycle. Console model lineage remains a subsequent
+integration milestone. Storage is verified on read/write but
 not WORM; independent administrators can still mutate/delete external files.
 
 References: [MLflow custom pyfunc](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.pyfunc.html),

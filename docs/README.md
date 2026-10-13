@@ -41,6 +41,7 @@ MLOps 구현 범위와 면접 설명은 [현재 모델 lifecycle 구조](mlops-a
 - [Isolated checkpoint trials on Kubernetes GPUs](reference/training-isolation.md)
 - [Qualified GPU training → CPU gate → MLflow registry](reference/model-lifecycle.md)
 - [Registered model → KServe → verified rollback](reference/model-serving.md)
+- [KFP candidate → staging → operator-approved model release](reference/model-release.md)
 
 </details>
 

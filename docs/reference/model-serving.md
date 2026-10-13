@@ -172,8 +172,10 @@ installed RawDeployment path. The native predictor has no application authentica
 API project authorization does not isolate arbitrary callers already inside the cluster.
 Namespace-scoped create RBAC plus ownership checks is not a hostile-tenant sandbox.
 Predictor images are digest-pinned but rely on operator qualification. JSON ConfigMaps
-are appropriate for this tiny model only. KFP orchestration, console lineage, generic
-binary models, GPU inference, canary experiments and production HA remain separate.
+are appropriate for this tiny model only. [KFP staging and approved release](model-release.md)
+now orchestrate qualified candidates and protect registered production targets
+against direct deployment bypass. Console lineage, generic binary models, GPU
+inference, canary experiments and production HA remain separate.
 
 References: [KServe v0.15 custom predictor](https://github.com/kserve/kserve/blob/v0.15.0/docs/samples/v1beta1/custom/custom_model/custom.yaml),
 [Raw status propagation](https://github.com/kserve/kserve/blob/v0.15.0/pkg/apis/serving/v1beta1/inference_service_status.go),
