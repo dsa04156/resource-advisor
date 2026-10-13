@@ -1,0 +1,77 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ra-model-serving
+  namespace: kube-system
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: resource-advisor.model-serving
+      rules:
+        - alert: ResourceAdvisorServingMetricsUnavailable
+          expr: up{job="resource-advisor-model-serving"} == 0
+          for: 2m
+          labels: {severity: warning}
+          annotations:
+            summary: Resource Advisor serving metrics are unreachable
+            description: Check ra-api, the metrics credential and TLS CA before judging model availability.
+        - alert: ResourceAdvisorModelProbeFailed
+          expr: >-
+            (resource_advisor_model_probe_success == 0)
+            and on (project_ref, service_ref)
+            (resource_advisor_model_probe_timestamp_seconds > 0)
+          for: 2m
+          labels: {severity: warning}
+          annotations:
+            summary: 'Model live probe failed: {{ $labels.service_ref }}'
+            description: Check the observability endpoint and predictor. READY is a historical deployment receipt.
+        - alert: ResourceAdvisorModelProbeStale
+          expr: >-
+            (time() - resource_advisor_model_probe_timestamp_seconds > 120)
+            and on (project_ref, service_ref)
+            (resource_advisor_model_probe_timestamp_seconds > 0)
+          for: 1m
+          labels: {severity: warning}
+          annotations:
+            summary: 'Model probe stopped updating: {{ $labels.service_ref }}'
+            description: Check ra-serving-monitor and its API credential before judging model availability.
+        - alert: ResourceAdvisorServingMonitorUnavailable
+          expr: kube_deployment_status_replicas_available{deployment="ra-serving-monitor"} < 1
+          for: 2m
+          labels: {severity: warning}
+          annotations:
+            summary: Model serving monitor cannot reach the API
+            description: Check the monitor pod, project user credential and TLS CA. Its heartbeat requires an authenticated API response.
+        - alert: ResourceAdvisorModelErrorRateHigh
+          expr: >-
+            (sum by (project_ref, service_ref) (rate(resource_advisor_model_requests_total{source="request",outcome!="success"}[5m]))
+            / sum by (project_ref, service_ref) (rate(resource_advisor_model_requests_total{source="request"}[5m])) > 0.05)
+            and on (project_ref, service_ref)
+            (sum by (project_ref, service_ref) (increase(resource_advisor_model_requests_total{source="request"}[5m])) >= 20)
+          for: 2m
+          labels: {severity: warning}
+          annotations:
+            summary: 'Model request error rate exceeds 5%: {{ $labels.service_ref }}'
+            description: Requires at least 20 user requests in 5 minutes. Inspect API and predictor errors.
+        - alert: ResourceAdvisorModelLatencyHigh
+          expr: >-
+            (histogram_quantile(0.95, sum by (le, project_ref, service_ref)
+            (rate(resource_advisor_model_request_duration_seconds_bucket{source="request"}[5m]))) > 1)
+            and on (project_ref, service_ref)
+            (sum by (project_ref, service_ref) (increase(resource_advisor_model_requests_total{source="request"}[5m])) >= 20)
+          for: 5m
+          labels: {severity: warning}
+          annotations:
+            summary: 'Model p95 latency exceeds 1 second: {{ $labels.service_ref }}'
+            description: Initial lab threshold; adjust to the service latency budget.
+        - alert: ResourceAdvisorModelInputDrift
+          expr: >-
+            (resource_advisor_model_input_psi > 0.2)
+            and on (project_ref, service_ref)
+            (resource_advisor_model_input_samples >= 128)
+          for: 5m
+          labels: {severity: warning}
+          annotations:
+            summary: 'Model input distribution changed: {{ $labels.service_ref }}, feature {{ $labels.feature }}'
+            description: PSI compares recent user input bins with the frozen training input. Investigate data quality and labels before retraining.

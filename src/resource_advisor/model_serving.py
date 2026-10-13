@@ -3,6 +3,7 @@
 import hashlib
 import math
 import re
+import time
 
 import httpx
 from pydantic import Field
@@ -66,8 +67,9 @@ def lock_service(store, conn, project, service):
 
 
 class ModelDeployments:
-    def __init__(self, store, prediction_client=None):
+    def __init__(self, store, prediction_client=None, telemetry=None):
         self.store, self.prediction_client = store, prediction_client
+        self.telemetry = telemetry
 
     def start(self, project, value, key, *, release_ref=None, staging=False):
         if not key or len(key) > 128:
@@ -207,10 +209,112 @@ class ModelDeployments:
         views = [self.view(project, row["ref"]) for row in rows]
         return {"service_ref": ref, "desired": views[0], "history": views}
 
-    def predict(self, project, ref, value):
+    def observe(self, project, ref):
+        desired = self.service(project, ref)["desired"]
+        if self.telemetry is not None:
+            with self.store.transaction() as conn:
+                lifecycle = required(
+                    self.store, conn, "model_lifecycle", desired["lifecycle_ref"], project
+                )
+                policy = required(
+                    self.store, conn, "model_lifecycle_policy", lifecycle["policy_ref"], project
+                )
+            self.telemetry.configure(project, ref, desired, policy["training_input"]["x"])
+        return desired
+
+    def observability(self, project, ref):
+        desired = self.observe(project, ref)
+        return {
+            "service_ref": ref,
+            "desired_state": desired["state"],
+            **self.telemetry.snapshot(project, ref),
+        }
+
+    def observe_project(self, project):
+        with self.store.transaction() as conn:
+            refs = (
+                conn.execute(
+                    select(entities.c.body["service_ref"].as_string())
+                    .where(entities.c.kind == "model_deployment", entities.c.project == project)
+                    .distinct()
+                )
+                .scalars()
+                .all()
+            )
+        for ref in refs:
+            self.observe(project, ref)
+
+    def probe(self, project, ref):
+        desired = self.observe(project, ref)
+        started = time.perf_counter()
+        success, reason = False, "SERVING_UNAVAILABLE"
+        try:
+            with self.store.transaction() as conn:
+                lifecycle = required(
+                    self.store, conn, "model_lifecycle", desired["lifecycle_ref"], project
+                )
+                policy = required(
+                    self.store, conn, "model_lifecycle_policy", lifecycle["policy_ref"], project
+                )
+                evaluation = required(
+                    self.store, conn, "model_evaluation", desired["lifecycle_ref"], project
+                )
+            output = self.predict(
+                project,
+                ref,
+                PredictionInput(instances=(policy["holdout"]["x"][0],)),
+                source="probe",
+            )
+            if (
+                output["model"]["deployment_ref"] != desired["ref"]
+                or self.service(project, ref)["desired"]["ref"] != desired["ref"]
+            ):
+                raise Conflict("desired deployment changed while probing; retry")
+            if not math.isclose(
+                output["predictions"][0][0],
+                evaluation["predictions"][0][0],
+                rel_tol=0,
+                abs_tol=1e-12,
+            ):
+                reason = "PREDICTION_MISMATCH"
+            else:
+                success, reason = True, "OK"
+        except ServingUnavailable:
+            pass
+        except Conflict:
+            reason = "DEPLOYMENT_CHANGED"
+        finally:
+            self.telemetry.record_probe(
+                project, ref, desired["ref"], success, time.perf_counter() - started, reason
+            )
+        return self.observability(project, ref)
+
+    def predict(self, project, ref, value, *, source="request"):
+        started = time.perf_counter()
+        desired = self.observe(project, ref)
+        outcome = "error"
+        try:
+            result = self._predict(project, ref, value, desired)
+            outcome = "success"
+            return result
+        except Conflict:
+            outcome = "conflict"
+            raise
+        finally:
+            if self.telemetry is not None:
+                self.telemetry.record(
+                    project,
+                    ref,
+                    desired["ref"],
+                    source,
+                    outcome,
+                    time.perf_counter() - started,
+                    value.instances,
+                )
+
+    def _predict(self, project, ref, value, desired):
         from .model_predictor import ModelDescription
 
-        desired = self.service(project, ref)["desired"]
         if desired["state"] != "READY":
             raise ServingUnavailable("desired model deployment has not been verified")
         receipt = desired["receipt"]

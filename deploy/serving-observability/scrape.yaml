@@ -1,0 +1,33 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: ra-model-serving
+  namespace: kube-system
+  labels:
+    release: prometheus
+spec:
+  jobName: resource-advisor-model-serving
+  scheme: HTTPS
+  metricsPath: /metrics
+  scrapeInterval: 15s
+  scrapeTimeout: 10s
+  sampleLimit: 10000
+  honorLabels: false
+  honorTimestamps: false
+  staticConfigs:
+    - targets: ['ra-api.resource-advisor-lab.svc:8443']
+      labels:
+        project_ref: ra-lab
+  authorization:
+    type: Bearer
+    credentials:
+      name: ra-serving-metrics-client
+      key: token
+  tlsConfig:
+    minVersion: TLS12
+    insecureSkipVerify: false
+    serverName: example.invalid
+    ca:
+      secret:
+        name: ra-serving-metrics-client
+        key: ca.crt

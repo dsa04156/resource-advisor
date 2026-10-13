@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ra-serving-monitor
+  namespace: resource-advisor-lab
+  labels:
+    app.kubernetes.io/name: ra-serving-monitor
+    app.kubernetes.io/part-of: resource-advisor
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ra-serving-monitor
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ra-serving-monitor
+    spec:
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        resource-advisor.io/services: 'true'
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: monitor
+          image: example.invalid/resource-advisor/services:site-must-pin-digest
+          command: [python, -m, resource_advisor.serving_monitor]
+          args:
+            - --api-url
+            - https://ra-api.resource-advisor-lab.svc:8443
+            - --service-ref
+            - linear-serving-v1
+            - --interval-seconds
+            - '30'
+            - --tls-server-name
+            - example.invalid
+            - --heartbeat-path
+            - /tmp/heartbeat
+          env:
+            - name: RA_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: ra-serving-probe-client
+                  key: token
+            - name: SSL_CERT_FILE
+              value: /tls/ca.crt
+            - name: PYTHONDONTWRITEBYTECODE
+              value: '1'
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 250m, memory: 256Mi}
+          volumeMounts:
+            - {name: tls, mountPath: /tls, readOnly: true}
+            - {name: tmp, mountPath: /tmp}
+          readinessProbe:
+            exec:
+              command:
+                - python
+                - -m
+                - resource_advisor.cli
+                - check-heartbeat
+                - --path
+                - /tmp/heartbeat
+                - --max-age
+                - '120'
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: tls
+          secret:
+            secretName: ra-serving-probe-client
+            defaultMode: 288
+            items: [{key: ca.crt, path: ca.crt}]
+        - name: tmp
+          emptyDir: {sizeLimit: 16Mi}

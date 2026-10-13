@@ -70,8 +70,10 @@ def create_app(
         RollbackRequest,
         ServingUnavailable,
     )
+    from .serving_observability import ServingTelemetry
 
-    deployments = ModelDeployments(service.store, prediction_client)
+    serving_telemetry = ServingTelemetry({identity.project for identity in credentials.values()})
+    deployments = ModelDeployments(service.store, prediction_client, serving_telemetry)
     from .model_release import ModelReleases, ReleaseDecision, ReleasePolicy, ReleaseRequest
 
     releases = ModelReleases(service.store, deployments)
@@ -96,6 +98,11 @@ def create_app(
         if not p.operator:
             raise HTTPException(403, "Operator qualification required")
         return p
+
+    def authenticated_principal(authorization: str = Header(default="")):
+        if not authorization.startswith("Bearer "):
+            raise HTTPException(401, "Bearer token required")
+        return principal(authorization)
 
     @app.post(PREFIX + "/model-release-policies")
     def register_release_policy(value: ReleasePolicy, p=Depends(operator)):
@@ -162,6 +169,14 @@ def create_app(
     @app.get(PREFIX + "/model-services/{ref}")
     def model_service(ref: str, p=Depends(principal)):
         return deployments.service(p.project, ref)
+
+    @app.get(PREFIX + "/model-services/{ref}/observability")
+    def model_observability(ref: str, p=Depends(authenticated_principal)):
+        return deployments.observability(p.project, ref)
+
+    @app.post(PREFIX + "/model-services/{ref}/probe")
+    def probe_model(ref: str, p=Depends(authenticated_principal)):
+        return deployments.probe(p.project, ref)
 
     @app.post(PREFIX + "/model-services/{ref}:predict")
     def predict_model(ref: str, value: PredictionInput, p=Depends(principal)):
@@ -769,6 +784,7 @@ def create_app(
 
     @app.get("/metrics")
     def metrics(p=Depends(operator)):
+        deployments.observe_project(p.project)
         registry = CollectorRegistry()
         gauge = Gauge(
             "resource_advisor_jobs", "Jobs by project and state", ["state"], registry=registry
@@ -792,6 +808,9 @@ def create_app(
                 .group_by(outbox.c.kind)
             ):
                 pending.labels(kind).set(count)
-        return Response(generate_latest(registry), media_type="text/plain; version=0.0.4")
+        return Response(
+            generate_latest(registry) + serving_telemetry.exposition(p.project),
+            media_type="text/plain; version=0.0.4",
+        )
 
     return app
