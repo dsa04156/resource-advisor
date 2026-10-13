@@ -34,6 +34,8 @@ rtk proxy python -m resource_advisor.serving_monitor \
 ## Prometheus
 
 기존 operator 전용 `/metrics`에 해당 프로젝트의 서빙 지표를 추가한다. 기존 작업 지표와 operator 전역 outbox 지표의 범위는 그대로다.
+요청 지표는 프로젝트 소속 서비스에 유효한 입력으로 실행된 서빙 시도에 적용한다.
+인증 실패, 입력 형식 검증 실패와 존재하지 않는 서비스의 HTTP 요청은 이 지표에 포함하지 않는다.
 
 | 지표 | 용도 |
 | --- | --- |
@@ -70,3 +72,11 @@ PSI는 입력 분포 변화 신호다. 정답 label이나 운영 품질 점수�
 현재 배포는 API 단일 프로세스다. API 재시작 시 관측 window와 JSON 집계가 초기화되며 Prometheus가 수집한 시계열은 기존 보존 정책에 따른다. 여러 API replica/process를 사용하려면 metric aggregation과 drift window 공유를 먼저 구현해야 한다. 라벨 집합은 DB에 존재하는 서비스와 현재 모델로 제한하지만 서비스 수에 대한 별도 운영 상한은 아직 없다.
 
 사용자 요청에 따라 기본 기능 smoke와 실제 연결 확인만 수행한다. 전체 회귀 테스트, 독립 코드 리뷰, 장애 주입, 알림 발화·복구 및 통지 전달, 장시간 운영 검증은 후속 검증으로 남긴다.
+
+2026-10-13 lab 적용에서 API와 monitor가 Running/Ready이고 두 Argo Application이
+Synced/Healthy인 것을 확인했다. 모델 버전 3의 실제 probe가 성공하고 Prometheus target은
+up이며 7개 알림 규칙이 로드됐다. Native 수집 리소스는 기존 selector가 모든 namespace를
+허용하므로 `resource-advisor-lab`에 두었다. 새 Argo project는 해당 namespace의 Deployment,
+ScrapeConfig, PrometheusRule만 허용하고 Secret은 별도 제공한다.
+[기본 기능 및 실제 연결 기록](evidence/serving-observability-20261013-v1.json)에 결과와
+유예한 검증을 구분했다. Native 입력 window는 실제 사용자 트래픽 0행으로 아직 PSI를 계산하지 않는다.

@@ -1,0 +1,37 @@
+{
+  "feature": "serving-observability",
+  "source_commit": "746426cb23ded18f7d5db47bc188237475543626",
+  "image": "192.168.0.56:5000/resource-advisor/services@sha256:29aa3cfc7e5f936d2b47974e44b8b7990133b494ba9d5893543127363c5cf726",
+  "functional_smoke": {
+    "request_metrics": true,
+    "probe_success_and_failure": true,
+    "stable_and_shifted_input_psi": true,
+    "project_isolation": true
+  },
+  "native_connection": {
+    "api_and_monitor_ready": true,
+    "gitops_apps_synced_healthy": true,
+    "production_model_uri": "models:/ra-ra-lab-linear-lifecycle-v1/3",
+    "production_deployment_ref": "mdp-3d4c3fc70f1d53cfcc8456de280cc4f0d25e5c1e",
+    "live_probe_success": true,
+    "probe_latency_seconds": 0.16494451090693474,
+    "prometheus_target_up": true,
+    "prometheus_probe_success": true,
+    "loaded_alert_rules": 7,
+    "input_drift": {
+      "state": "INSUFFICIENT_DATA",
+      "samples": 0,
+      "minimum_samples": 128,
+      "window_rows": 1024,
+      "psi": null
+    }
+  },
+  "deferred_validation": [
+    "full regression suite",
+    "independent code review",
+    "native failure injection",
+    "alert firing recovery and external notification delivery",
+    "long-running stability",
+    "SLO and drift threshold calibration"
+  ]
+}
