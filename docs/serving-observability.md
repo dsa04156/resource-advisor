@@ -95,3 +95,9 @@ up이며 7개 알림 규칙이 로드됐다. Native 수집 리소스는 기존 s
 ScrapeConfig, PrometheusRule만 허용하고 Secret은 별도 제공한다.
 [기본 기능 및 실제 연결 기록](evidence/serving-observability-20261013-v1.json)에 결과와
 유예한 검증을 구분했다. Native 입력 window는 실제 사용자 트래픽 0행으로 아직 PSI를 계산하지 않는다.
+
+웹 화면도 기존 Console 주소에 배포했다. [웹 기본 기능 기록](evidence/serving-console-20261013-v1.json)은
+공유 프로젝트 조회, 프로젝트 범위, 사용자/probe 집계 분리, 실제 웹의 JS/CSS 일치와
+1440px/390px 기본 표시 확인을 담는다. 운영용 버전 3이 자동 선택되고 안내를 펼쳐볼 수 있다.
+시각 확인용 브라우저에서는 기존 self-signed 인증서 예외를 사용했으며, 별도 HTTP 확인은
+기존 CA로 인증서를 검증했다. 서버 TLS 설정은 변경하지 않았다. 전체 웹 회귀 및 접근성 감사는 유예했다.

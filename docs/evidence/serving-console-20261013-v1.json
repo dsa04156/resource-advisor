@@ -1,0 +1,40 @@
+{
+  "feature": "plain-language model status web",
+  "source_commit": "d5b1d573d4b7b997e3b0a7642a7f2daa01d6c923",
+  "image": "192.168.0.56:5000/resource-advisor/services@sha256:cd8b5b86228079760e7a3c859436ad5189d7a77832f6155b96fd9779ab44a1fa",
+  "route": "/console#models",
+  "functional_checks": {
+    "project_scoped_paginated_listing": true,
+    "shared_project_read_without_token": true,
+    "explicit_invalid_token_rejected": true,
+    "probe_and_operator_auth_unchanged": true,
+    "user_latency_and_counts_separate_from_probes": true
+  },
+  "native_web": {
+    "served_js_css_match_source": true,
+    "tls_verified_with_existing_ca": true,
+    "gitops_synced_healthy": true,
+    "production_model_version": "3",
+    "selected_service": "linear-serving-v1",
+    "staging_services": 1
+  },
+  "browser_basic_visual_check": {
+    "source_commit": "0adfd672057b62bfd9c7e9da803d8383181192be",
+    "desktop_width": 1440,
+    "mobile_viewport_width": 390,
+    "mobile_page_width": 390,
+    "response_observed": true,
+    "insufficient_input_explicit": true,
+    "plain_language_guide_opens": true,
+    "page_errors": 0,
+    "self_signed_certificate_exception_used_for_visual_browser_only": true,
+    "final_change": "connection failure copy only"
+  },
+  "deferred_validation": [
+    "full regression suite",
+    "independent code review",
+    "full accessibility audit",
+    "native failure injection and alert delivery",
+    "long-running stability"
+  ]
+}
