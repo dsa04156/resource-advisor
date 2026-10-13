@@ -47,9 +47,10 @@ def principals(credentials):
         )
         require(
             isinstance(identity, dict)
-            and set(identity) <= {"project", "operator"}
+            and set(identity) <= {"project", "operator", "subject"}
             and valid_ref(identity.get("project"))
-            and isinstance(identity.get("operator", False), bool),
+            and isinstance(identity.get("operator", False), bool)
+            and ("subject" not in identity or valid_ref(identity["subject"])),
             "INVALID_PRINCIPAL",
         )
         result[digest] = Principal(**identity)

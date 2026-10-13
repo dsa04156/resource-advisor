@@ -69,3 +69,33 @@ def test_cpu_gpu_workflow_has_uncached_execution_dependency(tmp_path, monkeypatc
     } == {"cpu_run_key", "gpu_run_key"}
     for executor in pipeline["deploymentSpec"]["executors"].values():
         assert "accelerator" not in executor["container"]["resources"]
+
+
+def test_candidate_workflow_passes_lifecycle_output_and_has_no_operator_task(tmp_path):
+    pytest.importorskip("kfp.kubernetes")
+    import yaml
+    from kfp import compiler
+
+    path = Path(__file__).parents[1] / "examples" / "model_release_pipeline.py"
+    spec = importlib.util.spec_from_file_location("release_pipeline", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    output = tmp_path / "candidate.yaml"
+    compiler.Compiler().compile(module.candidate, str(output))
+    pipeline = list(yaml.safe_load_all(output.read_text()))[0]
+    tasks = pipeline["root"]["dag"]["tasks"]
+    assert set(tasks) == {"train", "stage"}
+    source = tasks["stage"]["inputs"]["parameters"]["lifecycle_ref"]["taskOutputParameter"]
+    assert source == {"producerTask": "train", "outputParameterKey": "lifecycle_ref"}
+    assert all(
+        not task.get("cachingOptions", {}).get("enableCache", False) for task in tasks.values()
+    )
+    assert all(task["retryPolicy"]["maxRetryCount"] == 2 for task in tasks.values())
+    parameters = pipeline["root"]["inputDefinitions"]["parameters"]
+    assert "user_secret" in parameters
+    assert not any("operator" in name for name in parameters)
+    for executor in pipeline["deploymentSpec"]["executors"].values():
+        container = executor["container"]
+        assert container["command"] == ["python", "-m", "resource_advisor.release_launcher"]
+        assert container["args"][0] in {"train", "stage"}
+        assert "accelerator" not in container["resources"]

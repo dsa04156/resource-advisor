@@ -56,12 +56,14 @@ class ModelDeployments:
     def __init__(self, store, prediction_client=None):
         self.store, self.prediction_client = store, prediction_client
 
-    def start(self, project, value, key):
+    def start(self, project, value, key, *, release_ref=None, staging=False):
         if not key or len(key) > 128:
             raise Rejected("Idempotency-Key must contain 1–128 characters")
         ref = "mdp-" + hashlib.sha256(f"{project}:{key}".encode()).hexdigest()[:40]
         operation = "rollback" if isinstance(value, RollbackRequest) else "deploy"
         request = {"operation": operation, **value.model_dump(mode="json")}
+        if release_ref is not None:
+            request.update(release_ref=release_ref, staging=staging)
         try:
             with self.store.transaction() as conn:
                 existing = self.store.get(conn, "model_deployment", ref)
@@ -69,6 +71,24 @@ class ModelDeployments:
                     if existing["project"] != project or existing["body"]["request"] != request:
                         raise Conflict("deployment key is already bound to another command")
                 else:
+                    from .model_release import authorize_production, target_ref
+
+                    decision_digest = None
+                    if value.service_ref.startswith("release-stage-") and operation == "deploy":
+                        if not release_ref or not staging:
+                            raise Rejected("release staging services are reserved")
+                        release = required(self.store, conn, "model_release", release_ref, project)
+                        if (
+                            value.service_ref != release["staging_service_ref"]
+                            or value.lifecycle_ref != release["request"]["lifecycle_ref"]
+                        ):
+                            raise Conflict("staging command differs from frozen release")
+                    elif operation == "deploy" and self.store.get(
+                        conn, "model_release_target", target_ref(project, value.service_ref)
+                    ):
+                        decision_digest = authorize_production(
+                            self.store, conn, project, release_ref, value
+                        )
                     rows = history(self.store, conn, project, value.service_ref)
                     current = rows[0]["ref"] if rows else None
                     if value.expected_deployment_ref != current:
@@ -127,6 +147,8 @@ class ModelDeployments:
                         "revision": rows[0]["body"]["revision"] + 1 if rows else 1,
                         "registration": registration,
                     }
+                    if release_ref is not None:
+                        body.update(release_ref=release_ref, decision_digest=decision_digest)
                     self.store.put(conn, "model_deployment", ref, project, body)
                     self.store.enqueue(
                         conn,

@@ -38,6 +38,7 @@ PREFIX = "/api/v1/compute"
 class Principal:
     project: str
     operator: bool = False
+    subject: str | None = None
 
 
 def create_app(
@@ -71,6 +72,9 @@ def create_app(
     )
 
     deployments = ModelDeployments(service.store, prediction_client)
+    from .model_release import ModelReleases, ReleaseDecision, ReleasePolicy, ReleaseRequest
+
+    releases = ModelReleases(service.store, deployments)
 
     model_qualifications = Qualifications(service.store)
     passive_observations = PassiveObservations(
@@ -92,6 +96,38 @@ def create_app(
         if not p.operator:
             raise HTTPException(403, "Operator qualification required")
         return p
+
+    @app.post(PREFIX + "/model-release-policies")
+    def register_release_policy(value: ReleasePolicy, p=Depends(operator)):
+        return releases.register(p.project, value)
+
+    @app.post(PREFIX + "/model-releases")
+    def start_release(value: ReleaseRequest, idempotency_key: str = Header(), p=Depends(principal)):
+        return releases.start(p.project, value, idempotency_key)
+
+    @app.get(PREFIX + "/model-releases")
+    def list_releases(p=Depends(principal)):
+        return releases.listing(p.project)
+
+    @app.get(PREFIX + "/model-releases/{ref}")
+    def release(ref: str, p=Depends(principal)):
+        return releases.view(p.project, ref)
+
+    @app.post(PREFIX + "/model-releases/{ref}/staging")
+    def stage_release(ref: str, p=Depends(principal)):
+        return releases.stage(p.project, ref)
+
+    @app.post(PREFIX + "/model-releases/{ref}/verification")
+    def verify_release(ref: str, p=Depends(principal)):
+        return releases.verify(p.project, ref)
+
+    @app.post(PREFIX + "/model-releases/{ref}/decisions")
+    def decide_release(ref: str, value: ReleaseDecision, p=Depends(operator)):
+        return releases.decide(p.project, ref, value, p.subject)
+
+    @app.post(PREFIX + "/model-releases/{ref}/deployment")
+    def deploy_release(ref: str, p=Depends(operator)):
+        return releases.deploy(p.project, ref)
 
     @app.post(PREFIX + "/model-lifecycle-policies")
     def register_lifecycle_policy(value: LifecyclePolicy, p=Depends(operator)):
