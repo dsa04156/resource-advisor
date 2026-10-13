@@ -6,7 +6,7 @@ import re
 
 import httpx
 from pydantic import Field
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from .contracts import Contract, Ref, signature
 from .service import NotFound, Rejected, required
@@ -52,6 +52,19 @@ def service_name(project, ref):
     return "ra-" + signature([project, ref])[7:31]
 
 
+def lock_service(store, conn, project, service):
+    ref = "msg-" + signature([project, service])[7:47]
+    store.put(conn, "model_service_guard", ref, project, {"service_ref": service})
+    # A no-op write locks this service row in PostgreSQL and acquires SQLite's
+    # writer lock. Immutable body/digest/time stay unchanged. Policy registration
+    # and deployment decisions read their fences only after this lock.
+    conn.execute(
+        update(entities)
+        .where(entities.c.kind == "model_service_guard", entities.c.ref == ref)
+        .values(ref=entities.c.ref)
+    )
+
+
 class ModelDeployments:
     def __init__(self, store, prediction_client=None):
         self.store, self.prediction_client = store, prediction_client
@@ -73,6 +86,7 @@ class ModelDeployments:
                 else:
                     from .model_release import authorize_production, target_ref
 
+                    lock_service(self.store, conn, project, value.service_ref)
                     decision_digest = None
                     if value.service_ref.startswith("release-stage-") and operation == "deploy":
                         if not release_ref or not staging:

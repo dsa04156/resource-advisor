@@ -42,12 +42,17 @@ production deployment. Explicit null bootstraps an empty service. The platform
 freezes its receipt/evaluation and compares candidate MSE on identical holdout
 data and evaluator versions. Equality passes a zero-regression policy; this
 does not establish model improvement. Incompatible evaluations fail closed.
+Candidate training intent must be created after its release policy; attaching
+an already trained lifecycle to a later policy is rejected.
 
 Registration protects that production service against generic direct deploys.
 New deployment commands require an approved release; accepted old commands can
 still be replayed. Operator rollback to an earlier READY model remains available.
 Protection is durable, including across policy versions; removal would require
 a separately designed migration. Existing unprotected services retain their APIs.
+Policy registration and new deployment acceptance lock the same per-service
+database guard before reading the baseline or protection marker. A concurrent
+direct deploy cannot slip past newly registered protection.
 
 ## Candidate and staging APIs
 

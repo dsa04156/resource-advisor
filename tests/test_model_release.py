@@ -1,8 +1,15 @@
 import hashlib
+import json
 
 import httpx
 import pytest
 from fastapi.testclient import TestClient
+from test_model_lifecycle import (
+    RegistryServer,
+    finish_training,
+    lifecycle_fixture,
+    registry_delivery,
+)
 from test_model_serving import KubeServer, registered_fixture, serving_delivery
 
 from resource_advisor.api import Principal, create_app
@@ -46,9 +53,27 @@ def policy_request(lifecycle, *, baseline=None):
     }
 
 
+def test_release_policy_cannot_be_frozen_after_candidate_training(service, bundle):
+    client, lifecycle_ref, _, _ = registered_fixture(service, bundle)
+    lifecycle = api(client, "GET", "/model-lifecycles/" + lifecycle_ref).json()
+    policy = policy_request(lifecycle)
+    assert (
+        api(client, "POST", "/model-release-policies", who="operator", json=policy).status_code
+        == 200
+    )
+    response = api(
+        client,
+        "POST",
+        "/model-releases",
+        key="retroactive-policy",
+        json={"policy_ref": policy["ref"], "lifecycle_ref": lifecycle_ref},
+    )
+    assert response.status_code == 422, response.text
+
+
 def test_candidate_is_frozen_project_owned_and_does_not_deploy(service, bundle):
-    _, lifecycle_ref, _, _ = registered_fixture(service, bundle)
-    client = release_client(service)
+    client, view, _, _ = staged_fixture(service, bundle)
+    lifecycle_ref = view["request"]["lifecycle_ref"]
     lifecycle = api(client, "GET", "/model-lifecycles/" + lifecycle_ref).json()
     policy = policy_request(lifecycle)
     registered = api(client, "POST", "/model-release-policies", who="operator", json=policy)
@@ -72,15 +97,73 @@ def test_candidate_is_frozen_project_owned_and_does_not_deploy(service, bundle):
     )
 
 
-def staged_fixture(service, bundle):
-    _, lifecycle_ref, registry, _ = registered_fixture(service, bundle)
+class ReleaseRegistryServer(RegistryServer):
+    """MLflow boundary double with distinct runs for repeated training."""
+
+    def __init__(self):
+        super().__init__()
+        self.runs = {}
+
+    def handle(self, request):
+        path = request.url.path
+        body = json.loads(request.content) if request.method == "POST" else {}
+        if path.endswith("runs/search"):
+            attempt = body["filter"].split("'")[1]
+            found = [
+                run
+                for run in self.runs.values()
+                if any(
+                    tag["key"] == "resource_advisor.attempt_id" and tag["value"] == attempt
+                    for tag in run["data"]["tags"]
+                )
+            ]
+            return httpx.Response(200, json={"runs": found})
+        if path.endswith("runs/create"):
+            response = super().handle(request)
+            run = response.json()["run"]
+            run_id = f"{len(self.runs) + 1:032x}"
+            run["info"].update(
+                run_id=run_id, artifact_uri="mlflow-artifacts:/123/" + run_id + "/artifacts"
+            )
+            self.runs[run_id] = run
+            self.run = run
+            return httpx.Response(200, json={"run": run})
+        if path.endswith("runs/get"):
+            return httpx.Response(200, json={"run": self.runs[request.url.params["run_id"]]})
+        return super().handle(request)
+
+
+def train_candidate(service, bundle, client, key, *, server=None, bias=0.75):
+    _, training, binding = lifecycle_fixture(service, bundle)
+    started, storage = finish_training(service, client, training, binding, key=key, bias=bias)
+    server = server or ReleaseRegistryServer()
+    delivery = registry_delivery(service, storage, server)
+    assert delivery.deliver_one()
+    return started["ref"], delivery.registry, server
+
+
+def staged_fixture(service, bundle, *, maximum_probe_latency_ms=10000):
+    _, training, _ = lifecycle_fixture(service, bundle)
     kube = KubeServer()
     kube.rolled_out = True
     client = release_client(service, httpx.Client(transport=httpx.MockTransport(kube.predict)))
-    lifecycle = api(client, "GET", "/model-lifecycles/" + lifecycle_ref).json()
-    policy = policy_request(lifecycle)
+    assert (
+        api(
+            client,
+            "POST",
+            "/model-lifecycle-policies",
+            who="operator",
+            json=training.model_dump(mode="json"),
+        ).status_code
+        == 200
+    )
+    policy = {
+        **policy_request({"policy_ref": training.ref}),
+        "maximum_probe_latency_ms": maximum_probe_latency_ms,
+    }
     response = api(client, "POST", "/model-release-policies", who="operator", json=policy)
     assert response.status_code == 200, response.text
+    lifecycle_ref, registry, _ = train_candidate(service, bundle, client, "release-training")
     response = api(
         client,
         "POST",
@@ -167,6 +250,83 @@ def test_only_operator_decides_and_production_requires_exact_approval(service, b
     assert len(api(client, "GET", "/model-services/linear").json()["history"]) == 1
 
 
+def test_policy_registration_and_generic_deploy_share_one_transaction_fence(
+    service, bundle, tmp_path
+):
+    from concurrent.futures import ThreadPoolExecutor, TimeoutError
+    from threading import Event, get_ident
+
+    from sqlalchemy import event
+
+    from resource_advisor.service import Service
+    from resource_advisor.store import Store
+
+    if service.store.engine.dialect.name == "sqlite":
+        store = Store("sqlite:///" + str(tmp_path / "protect.db"))
+        store.initialize()
+        service = Service(store)
+        spec, _, variant, capability = bundle
+        for kind, model in [("workload", spec), ("variant", variant), ("capability", capability)]:
+            service.register(kind, model, "team-a")
+    client, lifecycle, _, _ = registered_fixture(service, bundle)
+    value = api(client, "GET", "/model-lifecycles/" + lifecycle).json()
+    paused, resume = Event(), Event()
+    owner = {}
+
+    def after_query(conn, cursor, statement, parameters, context, executemany):
+        values = list(parameters.values()) if isinstance(parameters, dict) else parameters
+        if statement.lstrip().startswith("SELECT") and "model_deployment" in values and not owner:
+            owner["thread"] = get_ident()
+        if (
+            get_ident() == owner.get("thread")
+            and statement.lstrip().startswith("SELECT")
+            and "model_release_target" in values
+            and not paused.is_set()
+        ):
+            paused.set()
+            assert resume.wait(timeout=10)
+
+    # Coordinate at the real SQL system boundary; API/store collaborators run
+    # unchanged. A read completed before another transaction tries to protect it.
+    event.listen(service.store.engine, "after_cursor_execute", after_query)
+
+    def direct():
+        return api(
+            client,
+            "POST",
+            "/model-deployments",
+            who="operator",
+            key="racing-direct",
+            json={"service_ref": "linear", "lifecycle_ref": lifecycle},
+        )
+
+    try:
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            deployment = pool.submit(direct)
+            assert paused.wait(timeout=10)
+            protection = pool.submit(
+                api,
+                client,
+                "POST",
+                "/model-release-policies",
+                who="operator",
+                json=policy_request(value),
+            )
+            try:
+                # Without the shared fence protection could commit here while
+                # the old direct request still relied on its absent marker.
+                protection.result(timeout=0.3)
+            except TimeoutError:
+                pass
+            finally:
+                resume.set()
+            results = [deployment.result(timeout=10), protection.result(timeout=10)]
+        assert sorted(r.status_code for r in results) == [200, 409]
+    finally:
+        resume.set()
+        event.remove(service.store.engine, "after_cursor_execute", after_query)
+
+
 def verified_fixture(service, bundle):
     client, release, runner, kube = staged_fixture(service, bundle)
     path = "/model-releases/" + release["ref"]
@@ -232,7 +392,9 @@ def test_expired_verification_cannot_be_approved_or_promoted(service, bundle, mo
 
 @pytest.mark.parametrize("failure", ["prediction", "latency", "identity"])
 def test_bad_live_probes_never_create_approval_evidence(service, bundle, failure):
-    client, release, runner, kube = staged_fixture(service, bundle)
+    client, release, runner, kube = staged_fixture(
+        service, bundle, maximum_probe_latency_ms=1 if failure == "latency" else 10000
+    )
     path = "/model-releases/" + release["ref"]
     assert api(client, "POST", path + "/staging").status_code == 200
     assert runner.deliver_one()
@@ -251,34 +413,6 @@ def test_bad_live_probes_never_create_approval_evidence(service, bundle, failure
         return httpx.Response(200, json=output)
 
     altered = release_client(service, httpx.Client(transport=httpx.MockTransport(bad_prediction)))
-    if failure == "latency":
-        # New policy frozen before its candidate and probes, with an intentionally
-        # strict ceiling; the accepted policy is never edited after observations.
-        lifecycle = api(
-            client, "GET", "/model-lifecycles/" + release["request"]["lifecycle_ref"]
-        ).json()
-        policy = {
-            **policy_request(lifecycle),
-            "ref": "strict-latency",
-            "maximum_probe_latency_ms": 1,
-        }
-        assert (
-            api(client, "POST", "/model-release-policies", who="operator", json=policy).status_code
-            == 200
-        )
-        release = api(
-            client,
-            "POST",
-            "/model-releases",
-            key="strict-latency-candidate",
-            json={**release["request"], "policy_ref": policy["ref"]},
-        ).json()
-        path = "/model-releases/" + release["ref"]
-        stage_kube = KubeServer()
-        stage_kube.rolled_out = True
-        assert api(client, "POST", path + "/staging").status_code == 200
-        assert serving_delivery(service, runner.registry, stage_kube).deliver_one()
-        kube = stage_kube
     failed = api(altered, "POST", path + "/verification")
     assert failed.status_code == (503 if failure == "identity" else 422), failed.text
     assert api(client, "GET", path).json()["verification"] is None
@@ -335,7 +469,7 @@ def test_emergency_staging_rollback_invalidates_existing_approval(service, bundl
 def test_baseline_comparison_is_frozen_and_production_rollback_invalidates_promotion(
     service, bundle
 ):
-    old_client, lifecycle_ref, registry, _ = registered_fixture(service, bundle)
+    old_client, lifecycle_ref, registry, old_server = registered_fixture(service, bundle)
     kube = KubeServer()
     kube.rolled_out = True
     runner = serving_delivery(service, registry, kube)
@@ -351,6 +485,12 @@ def test_baseline_comparison_is_frozen_and_production_rollback_invalidates_promo
     assert (
         api(client, "POST", "/model-release-policies", who="operator", json=policy).status_code
         == 200
+    )
+    server = ReleaseRegistryServer()
+    server.__dict__.update(old_server.__dict__)
+    server.runs = {old_server.run["info"]["run_id"]: old_server.run}
+    lifecycle_ref, registry, _ = train_candidate(
+        service, bundle, client, "new-baseline-candidate", server=server
     )
     release = api(
         client,

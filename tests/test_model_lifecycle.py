@@ -162,7 +162,7 @@ class TrainingScheduler(SchedulerDouble):
         return {"result": result, "digest": signature(result), "training_receipt": receipt}
 
 
-def finish_training(service, client, policy, binding, **scheduler_options):
+def finish_training(service, client, policy, binding, *, key="pipeline", **scheduler_options):
     assert (
         client.post(
             "/api/v1/compute/model-lifecycle-policies",
@@ -173,7 +173,7 @@ def finish_training(service, client, policy, binding, **scheduler_options):
     )
     started = client.post(
         "/api/v1/compute/model-lifecycles",
-        headers={"Authorization": "Bearer user", "Idempotency-Key": "pipeline"},
+        headers={"Authorization": "Bearer user", "Idempotency-Key": key},
         json={"policy_ref": policy.ref},
     ).json()
     backend = TrainingScheduler(binding, **scheduler_options)

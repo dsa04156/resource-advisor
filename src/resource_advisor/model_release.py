@@ -9,7 +9,13 @@ from typing import Literal
 from pydantic import Field
 
 from .contracts import Contract, Digest, Ref, now, signature
-from .model_serving import DeploymentRequest, PredictionInput, ServingUnavailable, history
+from .model_serving import (
+    DeploymentRequest,
+    PredictionInput,
+    ServingUnavailable,
+    history,
+    lock_service,
+)
 from .service import NotFound, Rejected, required
 from .store import Conflict
 
@@ -104,9 +110,13 @@ class ModelReleases:
             required(
                 self.store, conn, "model_lifecycle_policy", policy.lifecycle_policy_ref, project
             )
-            baseline = self.baseline(conn, project, policy.production_service_ref)
-            if policy.expected_production_deployment_ref != (baseline["ref"] if baseline else None):
-                raise Conflict("release policy baseline differs from current desired deployment")
+            lock_service(self.store, conn, project, policy.production_service_ref)
+            baseline = self.baseline(
+                conn,
+                project,
+                policy.production_service_ref,
+                policy.expected_production_deployment_ref,
+            )
             body = {"request": request, "baseline": baseline}
             self.store.put(conn, "model_release_policy", policy.ref, project, body)
             self.store.put(
@@ -118,8 +128,10 @@ class ModelReleases:
             )
             return body
 
-    def baseline(self, conn, project, service):
+    def baseline(self, conn, project, service, expected):
         rows = history(self.store, conn, project, service)
+        if (rows[0]["ref"] if rows else None) != expected:
+            raise Conflict("release policy baseline differs from current desired deployment")
         if not rows:
             return None
         row = rows[0]
@@ -146,6 +158,12 @@ class ModelReleases:
                 lifecycle = required(
                     self.store, conn, "model_lifecycle", request.lifecycle_ref, project
                 )
+                policy_record = self.store.get(conn, "model_release_policy", request.policy_ref)
+                lifecycle_record = self.store.get(conn, "model_lifecycle", request.lifecycle_ref)
+                if datetime.fromisoformat(lifecycle_record["created_at"]) <= datetime.fromisoformat(
+                    policy_record["created_at"]
+                ):
+                    raise Rejected("release policy must be frozen before candidate training starts")
                 if lifecycle["policy_ref"] != policy["request"]["lifecycle_policy_ref"]:
                     raise Rejected("candidate does not use the frozen lifecycle policy")
                 evaluation = required(
