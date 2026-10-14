@@ -12,7 +12,7 @@ from uuid import uuid4
 
 import httpx
 from pydantic import Field, model_validator
-from sqlalchemy import func, select
+from sqlalchemy import select
 
 from .backends import BackendError, run
 from .contracts import Contract, Ref, now
@@ -497,22 +497,33 @@ def latest_inventory(store, project, cluster):
 
 def latest_inventory_views(conn, project, *, at=None):
     """Latest authorized cluster observations, evaluated at the requested time."""
-    ranked = (
-        select(
-            entities.c.ref,
-            func.row_number()
-            .over(
-                partition_by=entities.c.body["cluster_ref"].as_string(),
-                order_by=(entities.c.created_at.desc(), entities.c.ref.desc()),
-            )
-            .label("rank"),
-        )
-        .where(entities.c.kind == "inventory", entities.c.project == project)
-        .subquery()
+    cluster = entities.c.body["cluster_ref"].as_string()
+    scope = (entities.c.kind == "inventory", entities.c.project == project)
+    # Seek between distinct cluster keys instead of decompressing every historical
+    # snapshot. The matching partial index bounds each lookup to one row.
+    first = select(cluster).where(*scope).order_by(cluster).limit(1).scalar_subquery()
+    clusters = select(first.label("cluster_ref")).cte("inventory_clusters", recursive=True)
+    following = (
+        select(cluster)
+        .where(*scope, cluster > clusters.c.cluster_ref)
+        .order_by(cluster)
+        .limit(1)
+        .correlate(clusters)
+        .scalar_subquery()
+    )
+    clusters = clusters.union_all(select(following).where(clusters.c.cluster_ref.is_not(None)))
+    latest = (
+        select(entities.c.ref)
+        .where(*scope, cluster == clusters.c.cluster_ref)
+        .order_by(entities.c.created_at.desc(), entities.c.ref.desc())
+        .limit(1)
+        .correlate(clusters)
+        .scalar_subquery()
     )
     snapshots = conn.execute(
-        select(entities.c.body)
-        .join(ranked, entities.c.ref == ranked.c.ref)
-        .where(entities.c.kind == "inventory", entities.c.project == project, ranked.c.rank == 1)
+        select(entities.c.body).where(
+            *scope,
+            entities.c.ref.in_(select(latest).where(clusters.c.cluster_ref.is_not(None))),
+        )
     ).scalars()
     return sorted((fresh_view(s, at=at) for s in snapshots), key=lambda s: s["cluster_ref"])

@@ -8,6 +8,7 @@ from sqlalchemy import (
     JSON,
     Column,
     Float,
+    Index,
     Integer,
     MetaData,
     String,
@@ -24,6 +25,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.engine import make_url
 from sqlalchemy.pool import StaticPool
+from sqlalchemy.schema import CreateIndex
 
 from .contracts import TERMINAL, State, now, signature
 
@@ -37,6 +39,15 @@ entities = Table(
     Column("digest", String(80), nullable=False),
     Column("body", JSON, nullable=False),
     Column("created_at", String(40), nullable=False),
+)
+inventory_latest_index = Index(
+    "ix_ra_inventory_project_cluster_latest",
+    entities.c.project,
+    entities.c.body["cluster_ref"].as_string(),
+    entities.c.created_at.desc(),
+    entities.c.ref.desc(),
+    postgresql_where=entities.c.kind == "inventory",
+    sqlite_where=entities.c.kind == "inventory",
 )
 jobs = Table(
     "ra_jobs",
@@ -134,6 +145,9 @@ class Store:
         from . import scheduler_lab  # noqa: F401
 
         metadata.create_all(self.engine)
+        # create_all skips indexes for tables that already exist.
+        with self.engine.begin() as conn:
+            conn.execute(CreateIndex(inventory_latest_index, if_not_exists=True))
 
     @contextmanager
     def transaction(self):
