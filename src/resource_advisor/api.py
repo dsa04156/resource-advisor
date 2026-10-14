@@ -1,7 +1,10 @@
 """API credentials are supplied externally; project identity is server-derived."""
 
+import asyncio
 import hashlib
 import hmac
+import threading
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
@@ -49,6 +52,8 @@ def create_app(
     anonymous_project=None,
     research_config=None,
     prediction_client=None,
+    inference_config=None,
+    inference_client=None,
 ):
     if not credentials:
         raise ValueError("at least one external credential hash is required")
@@ -56,7 +61,15 @@ def create_app(
         identity.project for identity in credentials.values()
     }:
         raise ValueError("anonymous project must be an existing configured project")
-    app = FastAPI(title="Resource Advisor", version="0.1.0")
+
+    @asynccontextmanager
+    async def lifespan(_):
+        try:
+            yield
+        finally:
+            inference.close()
+
+    app = FastAPI(title="Resource Advisor", version="0.1.0", lifespan=lifespan)
     from .study import Studies
 
     study_service = Studies(service)
@@ -77,6 +90,11 @@ def create_app(
     from .model_release import ModelReleases, ReleaseDecision, ReleasePolicy, ReleaseRequest
 
     releases = ModelReleases(service.store, deployments)
+
+    from .inference_routing import InferenceInput, InferencePool, InferenceRouter
+
+    inference = InferenceRouter(service.store, inference_config, inference_client)
+    inference_ingress = threading.BoundedSemaphore(4)
 
     model_qualifications = Qualifications(service.store)
     passive_observations = PassiveObservations(
@@ -107,6 +125,18 @@ def create_app(
     @app.post(PREFIX + "/model-release-policies")
     def register_release_policy(value: ReleasePolicy, p=Depends(operator)):
         return releases.register(p.project, value)
+
+    @app.post(PREFIX + "/inference-pools")
+    def register_inference_pool(value: InferencePool, p=Depends(operator)):
+        return inference.register(p.project, value)
+
+    @app.get(PREFIX + "/inference-pools/{ref}")
+    def inference_pool(ref: str, p=Depends(principal)):
+        return inference.view(p.project, ref)
+
+    @app.post(PREFIX + "/inference-pools/{ref}:predict")
+    def route_inference(ref: str, value: InferenceInput, p=Depends(principal)):
+        return inference.predict(p.project, ref, value)
 
     @app.post(PREFIX + "/model-releases")
     def start_release(value: ReleaseRequest, idempotency_key: str = Header(), p=Depends(principal)):
@@ -204,7 +234,35 @@ def create_app(
 
     @app.middleware("http")
     async def private_responses(request, call_next):
-        response = await call_next(request)
+        reserved = False
+        if request.url.path.startswith(PREFIX + "/inference-pools/") and request.url.path.endswith(
+            ":predict"
+        ):
+            try:
+                size = int(request.headers.get("content-length", "0"))
+            except ValueError:
+                size = 0
+            if not 0 < size <= 12 * 1024**2:
+                return JSONResponse(
+                    {"detail": "bounded Content-Length required for image input"}, status_code=413
+                )
+            if not inference_ingress.acquire(blocking=False):
+                return JSONResponse(
+                    {"detail": "inference ingress busy; retry later"}, status_code=429
+                )
+            reserved = True
+        try:
+            if reserved:
+                try:
+                    body = await asyncio.wait_for(request.body(), timeout=5)
+                except TimeoutError:
+                    return JSONResponse({"detail": "image upload timed out"}, status_code=408)
+                if len(body) != size:
+                    return JSONResponse({"detail": "image body length mismatch"}, status_code=413)
+            response = await call_next(request)
+        finally:
+            if reserved:
+                inference_ingress.release()
         if request.url.path.startswith((PREFIX, "/console")):
             response.headers["Cache-Control"] = "no-store"
             response.headers["X-Content-Type-Options"] = "nosniff"

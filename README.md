@@ -61,6 +61,16 @@ NPU는 장치별로 검증한 모델·SDK·입력 계약을 사용합니다. 등
 
 ## 책임 경계
 
+### 이기종 추론 분산
+
+검증된 ResNet50의 **GPU·Hailo NPU 상시 워커**를 하나의 추론 풀로 묶는 API를 추가했습니다.
+준비 상태, 현재 요청 수와 최근 처리시간으로 경로를 선택하고 장애 시 다른 검증 경로로
+전환합니다. 응답에서 실제 선택한 장비와 fallback 여부를 확인할 수 있습니다.
+기존 선형 모델의 승인 기반 배포·롤백과는 별도 lab 기능입니다.
+[지원 입력·API·운영 범위](docs/reference/heterogeneous-inference.md)를 참고하세요.
+
+### 네이티브 스케줄러
+
 플랫폼은 workload/runtime 계약, 비교 가능한 이력, profiling 예산, 추천·승인과
 실행 결과를 연결합니다. Kueue의 admission·quota, Kubernetes의 node binding과
 Slurm의 native scheduling은 기존 도구가 담당합니다. 기존 Edge runtime 동작은 유지합니다.
