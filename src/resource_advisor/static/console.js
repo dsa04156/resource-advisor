@@ -3,6 +3,10 @@ const $ = (id) => document.getElementById(id);
 const API = "/api/v1/compute";
 let anonymousConnected = false;
 function authHeaders() { return token ? { Authorization: "Bearer " + token } : {}; }
+// getRandomValues also works at explicitly configured HTTP LAN origins.
+function randomRequestId() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, "0")).join("");
+}
 let token = "",
   generation = 0,
   controller = null,
@@ -1323,7 +1327,7 @@ function templateEditor(sources) {
   form.onsubmit=async e=>{
     e.preventDefault();if(savingTemplate || !w || !form.reportValidity()) return;
     const session=generation; savingTemplate=true;save.disabled=true;save.textContent="저장 중…";
-    templateDraft.ref ||= "tpl-" + crypto.randomUUID();
+    templateDraft.ref ||= "tpl-" + randomRequestId();
     const payload={ref:templateDraft.ref,name:name.value.trim(),workload_ref:w.workload_ref,candidate_ref:selected?.candidate_ref || null,priority:priority.value,max_run_seconds:Number(run.value),max_queue_seconds:Number(queue.value)};
     try {
       const response=await fetch(API+"/job-templates",{method:"POST",headers:{...authHeaders(),"Content-Type":"application/json"},body:JSON.stringify(payload)});
@@ -2283,7 +2287,7 @@ function pipelinesView() {
   for(const [key,input] of [["template",template],["workload",workload],["profile",profile]]){pipelineDraft[key]=input.value;input.onchange=()=>{pipelineDraft[key]=input.value;pipelineRequestKey=null;};}
   form.append(el("label","파이프라인"),template,el("label","실행할 작업"),workload,el("label","자동 배치 정책"),profile);
   const submit=researchButton("Kubeflow 파이프라인 실행",async()=>{
-    pipelineRequestKey ||= "pipeline-console-"+crypto.randomUUID();
+    pipelineRequestKey ||= "pipeline-console-"+randomRequestId();
     const run=await researchRequest("/pipelines",{template_ref:template.value,workload_ref:workload.value,profile_ref:profile.value},pipelineRequestKey);
     pipelineRequestKey=null;researchUpdated=0;await refreshResearch();$("notice").textContent="Kubeflow에 실행을 요청했습니다: "+run.run_id;
   },true);submit.disabled=!(info.templates?.length && workload.value && profile.value);
@@ -2334,7 +2338,7 @@ function notebooksView() {
 
 function retryJobButton(job) {
   let key=null;
-  return researchButton("같은 작업 다시 제출",async()=>{key ||= "retry-console-"+crypto.randomUUID();
+  return researchButton("같은 작업 다시 제출",async()=>{key ||= "retry-console-"+randomRequestId();
     const response=await fetch(API+"/jobs/"+encodeURIComponent(job.job_id)+"/retry",{method:"POST",headers:{...authHeaders(),"Idempotency-Key":key}});
     const value=await response.json();if(!response.ok)throw new Error(value.detail||"재제출하지 못했습니다.");trackedJobId=value.job_id;$("job-dialog").close();$("auto").checked=true;await load();$("notice").textContent="새 실행으로 재제출했습니다: "+value.job_id;
   });
@@ -2381,7 +2385,7 @@ async function startScenario(workload,profile) {
   if(saved && JSON.stringify(saved.request)!==JSON.stringify(request)) {
     scenarioError="미확인 제출이 있습니다. 이전 작업·정책으로 같은 요청을 다시 확인해 주세요.";scenarioStarting=false;render();return;
   }
-  saved ||= {request,key:"scenario-"+crypto.randomUUID()};scenarioSubmission=saved;
+  saved ||= {request,key:"scenario-"+randomRequestId()};scenarioSubmission=saved;
   try{sessionStorage.setItem(storageKey,JSON.stringify(saved));}catch(_){}
   render();
   try {
@@ -2624,7 +2628,7 @@ async function refreshLab(){
   finally{if(session===generation){labPending=false;labUpdated=Date.now();if(active==="scheduler-lab"){autoReplayLab();render();}}}
 }
 async function startLab(){
-  if(labBusy)return;stopLabReplay();labBusy=true;labError="";labKey ||= "native-lab-"+crypto.randomUUID();render();
+  if(labBusy)return;stopLabReplay();labBusy=true;labError="";labKey ||= "native-lab-"+randomRequestId();render();
   try{const r=await fetch(API+"/scheduler-labs",{method:"POST",headers:{...authHeaders(),"Content-Type":"application/json","Idempotency-Key":labKey},body:JSON.stringify({scenario:labKind,...(labKind==="multi_gpu"?{gpu_count:labGpuCount}:{})})});const v=await r.json();if(!r.ok)throw new Error(v.detail||"실험 접수 실패");labRef=v.ref;labReplaySeen.add(v.ref);labCursor=null;labSelected="";labWorker="";labKey=null;$("auto").checked=true;await refreshLab();}
   catch(e){labError=e.message;}finally{labBusy=false;render();}
 }
