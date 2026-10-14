@@ -103,3 +103,20 @@ release API checks cover compatibility. Native acceptance and selected routes ar
 recorded separately from these software checks.
 
 Deployment: [dedicated worker renderer](../../deploy/inference-pool/README.md).
+
+## Live acceptance — 2026-10-14
+
+The lab registered `resnet50-lab-v1` through the operator API, then sent one single
+request and twelve requests with three concurrent clients. All 13 returned 200:
+CUDA served eight and Hailo served five. Both endpoint failure counters and local
+reservations were zero afterward. This checks actual routing and response contracts
+on one fixed fixture image; it is not a throughput, latency or new-data quality study.
+
+All three Deployments were READY with zero Pod restarts. The API's three replaced
+source files matched the image build hashes, and its existing Argo Application was
+Synced/Healthy at `dda9dd1dc0937d5fc93ade34a072af3021aa5530`. Existing 1,464 Job
+UIDs/specs, the two native queue specs, and existing InferenceService UIDs/specs
+were preserved; both existing InferenceServices remained Ready. The focused router
+API checks (5) and existing serving/release checks (34) passed.
+
+[Sanitized functionality evidence](../evidence/heterogeneous-inference-20261014-v1.json).

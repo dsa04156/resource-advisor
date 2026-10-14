@@ -68,6 +68,8 @@ NPU는 장치별로 검증한 모델·SDK·입력 계약을 사용합니다. 등
 전환합니다. 응답에서 실제 선택한 장비와 fallback 여부를 확인할 수 있습니다.
 기존 선형 모델의 승인 기반 배포·롤백과는 별도 lab 기능입니다.
 [지원 입력·API·운영 범위](docs/reference/heterogeneous-inference.md)를 참고하세요.
+실제 기본 동작 확인에서 13개 요청이 모두 성공했고 GPU 8개·NPU 5개로 분산됐습니다.
+[실행 근거](docs/evidence/heterogeneous-inference-20261014-v1.json)는 성능 비교 결과와 구분합니다.
 
 ### 네이티브 스케줄러
 

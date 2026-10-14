@@ -1,0 +1,87 @@
+{
+  "scope": "basic functionality only; not a performance benchmark",
+  "date": "2026-10-14",
+  "pool_ref": "resnet50-lab-v1",
+  "requests": 13,
+  "successful": 13,
+  "selected_runtimes": {
+    "cuda": 8,
+    "hailo": 5
+  },
+  "native_startup_qualification": {
+    "cuda": {
+      "ready": true,
+      "identity": {
+        "model_ref": "resnet50-lab-v1",
+        "source_model_sha256": "2625772f5e1324c1e2781856926a445b4fe6494b9e0bb0161a7d86df7f095d38",
+        "runtime": "cuda",
+        "artifact_sha256": "1737a0c64aff1a923bd73b426fe40700bb7bf2e7c1449bad2c90eda03d93249d",
+        "qualification_digest": "sha256:7740c3420918e1264024dd41dbe6c0db18a2f1d283789afc89ef3d0db522d30f",
+        "runtime_image_digest": "sha256:0e0498c82b7442e9b69c54785ebf099e853d76af927780817d7bcedd35c94adf",
+        "input_contract": "rgb-f32-nhwc-224x224x3-v1",
+        "output_contract": "imagenet-scores-f32-1000-v1"
+      },
+      "qualification": {
+        "accuracy": 0.79,
+        "reference_agreement": 1.0,
+        "distinct_images": 100,
+        "manifest_digest": "sha256:7740c3420918e1264024dd41dbe6c0db18a2f1d283789afc89ef3d0db522d30f"
+      }
+    },
+    "hailo": {
+      "ready": true,
+      "identity": {
+        "model_ref": "resnet50-lab-v1",
+        "source_model_sha256": "2625772f5e1324c1e2781856926a445b4fe6494b9e0bb0161a7d86df7f095d38",
+        "runtime": "hailo",
+        "artifact_sha256": "a1d82e9121c66e772257490cb3af904d1e90fb4387ad5f683fbc5efe1a05f9f7",
+        "qualification_digest": "sha256:7740c3420918e1264024dd41dbe6c0db18a2f1d283789afc89ef3d0db522d30f",
+        "runtime_image_digest": "sha256:43a4271c8d3440d71458b97881742f440fc7540a26800ff8e383245c2508d641",
+        "input_contract": "rgb-f32-nhwc-224x224x3-v1",
+        "output_contract": "imagenet-scores-f32-1000-v1"
+      },
+      "qualification": {
+        "accuracy": 0.8,
+        "reference_agreement": 0.97,
+        "distinct_images": 100,
+        "manifest_digest": "sha256:7740c3420918e1264024dd41dbe6c0db18a2f1d283789afc89ef3d0db522d30f"
+      }
+    }
+  },
+  "deployment_images": {
+    "ra-api": "192.168.0.56:5000/resource-advisor/inference-api@sha256:50961409ae53573e128a39a8776a5c9b6c83decf97288ea5f12df3a23ede0c6d",
+    "ra-infer-cuda-v1": "192.168.0.56:5000/resource-advisor/inference-cuda@sha256:0e0498c82b7442e9b69c54785ebf099e853d76af927780817d7bcedd35c94adf",
+    "ra-infer-hailo-v1": "192.168.0.56:5000/resource-advisor/inference-hailo@sha256:43a4271c8d3440d71458b97881742f440fc7540a26800ff8e383245c2508d641"
+  },
+  "all_three_deployments_ready": true,
+  "api_source_hashes_match_image": true,
+  "gitops": {
+    "revision": "dda9dd1dc0937d5fc93ade34a072af3021aa5530",
+    "sync": "Synced",
+    "health": "Healthy",
+    "operation": "Succeeded"
+  },
+  "preservation": {
+    "existing_jobs_before": 1464,
+    "existing_jobs_after": 1464,
+    "existing_job_specs_and_uids_preserved": true,
+    "queue_specs_preserved": true,
+    "existing_serving_specs_and_uids_preserved": true,
+    "existing_serving_ready": true
+  },
+  "software_checks": {
+    "new_router_api": 5,
+    "existing_serving_and_release": 34,
+    "ruff": "passed",
+    "review": "spec and standards review passed"
+  },
+  "deferred": [
+    "full regression",
+    "load and long-duration tests",
+    "native fault injection",
+    "statistical performance comparison",
+    "shared multi-replica reservations",
+    "Console image upload",
+    "standing worker Argo adoption"
+  ]
+}
