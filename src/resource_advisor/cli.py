@@ -220,6 +220,7 @@ def main():
                 artifact_storage=artifact_storage,
                 anonymous_project=os.getenv("RA_ANONYMOUS_PROJECT") or None,
                 research_config=json.loads(os.getenv("RA_RESEARCH_CONFIG_JSON", "{}")),
+                inference_config=json.loads(os.getenv("RA_INFERENCE_CONFIG_JSON", "{}")),
             ),
             host=args.host,
             port=args.port,
