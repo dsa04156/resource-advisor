@@ -1,0 +1,112 @@
+{
+  "date": "2026-10-14",
+  "scope": "Functional UI redesign check; not performance/accuracy/HA certification",
+  "release_commit": "665704562f024be1ef21b5da5f9fce09cfcc88f5",
+  "image": "192.168.0.56:5000/resource-advisor/console-api@sha256:92449b5a313d3e125ba5d919d6f064c13f1069ec281b747ab526ce543ef19e46",
+  "checks": {
+    "api_tests": 34,
+    "image_header_tests": 3,
+    "ruff": "passed",
+    "javascript_syntax": "passed",
+    "git_diff_check": "passed",
+    "project_scoped_live_listing": {
+      "a": {
+        "status": 200,
+        "refs": [
+          "resnet50-lab-v1"
+        ],
+        "configured": [
+          true
+        ]
+      },
+      "b": {
+        "status": 200,
+        "refs": [],
+        "configured": []
+      },
+      "assets_match": true,
+      "asset_count": 27,
+      "license_file_served": false,
+      "notes": "26 public assets plus /console index match; icons/LICENSE is intentionally a package source license, not an API asset."
+    },
+    "desktop_viewport": [
+      1440,
+      900
+    ],
+    "mobile_viewport": [
+      390,
+      844
+    ],
+    "home_and_submit_horizontal_overflow": false,
+    "mobile_primary_navigation_items": 5,
+    "mobile_primary_navigation_height_css_px": 55,
+    "mobile_submit_button_height_css_px": 44,
+    "catalog_cards": 9,
+    "job_filter_search_pagination": {
+      "completed_only": true,
+      "search_matches": true,
+      "next_page_changed": true
+    },
+    "job_detail_tabs": 4,
+    "job_detail_arrow_navigation": true,
+    "observed_lifecycle_rows": 6,
+    "form_refresh": {
+      "disclosure_retained": true,
+      "draft_retained": true,
+      "focus_retained": true,
+      "caret_retained": true
+    },
+    "oversized_header_fixture": {
+      "pixels": 100000000,
+      "bitmap_decodes": 0,
+      "rejected": true
+    },
+    "submit_fixture": {
+      "intercepted": true,
+      "post_count_for_two_handler_invocations": 1,
+      "native_jobs_created": 0,
+      "automatic_candidate": true,
+      "mode": "observe"
+    },
+    "live_inference": {
+      "status": 200,
+      "runtime": "hailo",
+      "output_scores": 1000,
+      "top_class": "web site",
+      "router_duration_ms": 104.97051299898885,
+      "timing_is_single_functional_request_not_benchmark": true
+    },
+    "previous_live_gpu_request": {
+      "status": 200,
+      "runtime": "cuda",
+      "top_class": "web site"
+    },
+    "image_and_result_retained_on_refresh": true,
+    "deployed_app_console_errors": 0,
+    "legacy_routes_rendered": 11,
+    "standards_review": "passed after fixes",
+    "spec_review": "passed after fixes"
+  },
+  "preservation": {
+    "existing_jobs_before": 1464,
+    "existing_jobs_after": 1464,
+    "existing_job_specs_and_uids_preserved": true,
+    "queue_specs_preserved": true,
+    "existing_serving_specs_and_uids_preserved": true,
+    "existing_serving_ready": true,
+    "api_source_hashes_match_image": true,
+    "standing_worker_specs_preserved": true,
+    "gitops": {
+      "revision": "665704562f024be1ef21b5da5f9fce09cfcc88f5",
+      "sync": "Synced",
+      "health": "Healthy",
+      "operation": "Succeeded"
+    }
+  },
+  "limitations": [
+    "Full regression, load, long-running tests and native fault injection deferred by user preference.",
+    "Existing legacy routes checked for rendering, not all actions end-to-end.",
+    "User-uploaded inference is qualified ResNet50 lab only; no new arbitrary-model or generic NPU support.",
+    "No new native job was submitted for UI duplicate guard; its POST was intercepted."
+  ]
+}

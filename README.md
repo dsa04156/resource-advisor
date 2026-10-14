@@ -21,6 +21,10 @@ Kubernetes/Kueue와 Slurm 위에서 실행 가능성 검증과 profile-guided �
 
 설정된 API 주소의 `/console`에서 사용합니다.
 
+[![첫 사용자를 위한 작업 중심 Console](docs/images/console-workspace.png)](docs/images/console-workspace.png)
+
+*시작하기 → 작업 선택 → 실행·결과 흐름으로 구성했습니다. [모바일 화면](docs/images/console-workspace-mobile.png)도 지원합니다.*
+
 1. **시작하기**에서 검증된 예제를 고릅니다.
 2. **새 작업**에서 실행 조건을 확인하고 실행합니다. 호환되는 장치를 자동 선택할 수 있습니다.
 3. **작업**에서 대기 이유·진행 상태를 확인하고, 상세의 요약·결과·실행 기록을 살펴봅니다.

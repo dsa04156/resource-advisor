@@ -12,7 +12,7 @@
 
 GET /api/v1/compute/inference-pools?page=0은 principal.project에 등록된 풀을12개씩 나눠 반환합니다. 내부 Service URL이나 자격증명은 반환하지 않습니다. 변경된 endpoint binding은 configured=false로 표시해 재등록이 필요한 풀의 실행을 막습니다. 목록은 readiness를 주장하지 않으며 선택한 풀의 health/identity를 기존 GET으로 별도 확인합니다.
 
-현재 lab 풀은 ResNet50/CUDA ONNX/Hailo HEF의 검증된 입력/출력 계약을 따릅니다. 브라우저는 JPG/PNG/WebP 한 장≤8MiB·25MP을 RGB224×224로 stretch resize하며 투명 배경은 흰색입니다. 입력은 canvas pixels 0–255이고 서버가 네이티브 전처리를 적용합니다. 원본 이미지와 결과를 DB/스토리지에 저장하지 않습니다. 클라이언트에서 파일 선택과 결과를 유지하되 연결 해제/pagehide는 메모리·blob을 지우고 진행 요청을 abort합니다.
+현재 lab 풀은 ResNet50/CUDA ONNX/Hailo HEF의 검증된 입력/출력 계약을 따릅니다. 브라우저는 JPG/PNG/WebP의 최대512KiB 헤더에서 치수를 먼저 검사한 뒤 한 장≤8MiB·25MP을 RGB224×224로 stretch resize하며 투명 배경은 흰색입니다. WebP 애니메이션과 제한된 헤더에서 치수를 확인할 수 없는 파일은 거절합니다. 입력은 canvas pixels 0–255이고 서버가 네이티브 전처리를 적용합니다. 원본 이미지와 결과를 DB/스토리지에 저장하지 않습니다. 클라이언트에서 파일 선택과 결과를 유지하되 연결 해제/pagehide는 메모리·blob을 지우고 진행 요청을 abort합니다.
 
 결과는 ImageNet 상위5개 분류/원시 모델 점수/실제 GPU 또는 Hailo 경로/라우터 구간 시간/fallback을 보여줍니다. 점수를 정확도나 정답 확률로 해석하지 않습니다. 분류명은 TensorFlow가 배포한 imagenet_class_index.json의 영어 라벨입니다. 선택한 이미지의 렌더링 예시는 새 품질 보장의 근거가 아닙니다.
 
@@ -27,4 +27,4 @@ GET /api/v1/compute/inference-pools?page=0은 principal.project에 등록된 풀
 
 코드와 브랜드/서버는 우리 구현을 유지하며 참조 제품 코드를 이식하지 않았습니다. library icons는 lucide-static1.57.0에서 복사했고 static/icons/LICENSE에 MIT 고지를 포함합니다. 기본 스타일 토큰과 의도된 참조 차이는 .interface-design/system.md에 기록합니다.
 
-전체 회귀·부하·장기·native 장애 주입은 사용자의 요청대로 후속입니다. 기본 API/브라우저/실제 추론·현재 배포 상태 확인 결과는 완료 시 evidence에 기록합니다.
+기본 동작·프로젝트 경계·실제 GPU/Hailo 추론·배포 보존 확인은 [완료 근거](../evidence/console-workspace-20261014.json)에 기록했습니다. 전체 회귀·부하·장기·native 장애 주입은 사용자의 요청대로 후속입니다. 시각 비교와 의도된 변형은 [design-qa.md](../../design-qa.md)를 참고하세요.
