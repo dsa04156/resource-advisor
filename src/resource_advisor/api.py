@@ -253,11 +253,22 @@ def create_app(
             reserved = True
         try:
             if reserved:
+
+                async def bounded_body():
+                    body = bytearray()
+                    async for chunk in request.stream():
+                        if len(body) + len(chunk) > size:
+                            raise ValueError("image body exceeds declared length")
+                        body.extend(chunk)
+                    if len(body) != size:
+                        raise ValueError("image body length mismatch")
+                    request._body = bytes(body)
+
                 try:
-                    body = await asyncio.wait_for(request.body(), timeout=5)
+                    await asyncio.wait_for(bounded_body(), timeout=5)
                 except TimeoutError:
                     return JSONResponse({"detail": "image upload timed out"}, status_code=408)
-                if len(body) != size:
+                except ValueError:
                     return JSONResponse({"detail": "image body length mismatch"}, status_code=413)
             response = await call_next(request)
         finally:
