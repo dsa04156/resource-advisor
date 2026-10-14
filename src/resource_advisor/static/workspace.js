@@ -1,3 +1,5 @@
+import { imageDimensions } from "./image-header.js";
+
 /** Task-first workspace. Existing scheduler and release contracts remain authoritative. */
 export function createWorkflowWorkspace(c) {
   const { el, add, badge, stateBadge, table, stamp, duration, actionLink } = c;
@@ -92,7 +94,7 @@ export function createWorkflowWorkspace(c) {
     return w.workload_ref;
   }
   const catalog = () =>
-    c.data?.submission_catalog?.length
+    Array.isArray(c.data?.submission_catalog)
       ? c.data.submission_catalog
       : c.data?.templates?.items || [];
   function focusSetup() {
@@ -542,6 +544,15 @@ export function createWorkflowWorkspace(c) {
     c.render();
     let bitmap;
     try {
+      const dimensions = imageDimensions(
+        await file.slice(0, 512 * 1024).arrayBuffer(),
+        file.type,
+      );
+      if (dimensions.width * dimensions.height > 25_000_000)
+        throw new Error(
+          "이미지 크기가 너무 커요. 2,500만 화소 이하로 줄여 주세요.",
+        );
+      if (session !== c.generation() || serial !== imageRequest) return;
       bitmap = await createImageBitmap(file);
       if (bitmap.width * bitmap.height > 25_000_000)
         throw new Error(

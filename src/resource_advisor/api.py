@@ -483,6 +483,7 @@ def create_app(
             "mark.svg",
             "imagenet-labels.json",
             "workspace.js",
+            "image-header.js",
             "workspace.css",
         }:
             raise HTTPException(404, "Asset not found")

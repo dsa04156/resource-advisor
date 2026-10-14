@@ -14,11 +14,11 @@ MODEL = "resnet50-lab-v1"
 SOURCE = "a" * 64
 
 
-def router_client(service, gpu_artifact="b"):
+def router_client(service, gpu_artifact="b", gpu_project="team-a"):
     bindings = {}
     for ref, runtime, artifact in [("gpu", "cuda", gpu_artifact), ("npu", "hailo", "c")]:
         bindings[ref] = {
-            "project_ref": "team-a",
+            "project_ref": gpu_project if ref == "gpu" else "team-a",
             "url": f"http://{ref}.models.svc:8080",
             "model_ref": MODEL,
             "source_model_sha256": SOURCE,
@@ -262,3 +262,7 @@ def test_pool_catalog_is_project_scoped_and_marks_changed_bindings(service):
         ]
         is False
     )
+    reassigned, _, _ = router_client(service, gpu_project="team-b")
+    item = reassigned.get(PREFIX, headers={"Authorization": "Bearer user"}).json()["items"][0]
+    assert item["configured"] is False
+    assert item["runtimes"] == ["hailo"]

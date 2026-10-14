@@ -1978,8 +1978,16 @@ function render() {
   if (active === "scenario" && !scenarioPending && Date.now()-scenarioUpdated > 3000) refreshScenario();
   if (["operations","experiments","pipelines","notebooks","jobs"].includes(active) && !researchPending && Date.now()-researchUpdated>30000) refreshResearch();
   const motionBefore = active === "scheduler-lab" ? captureLabMotion() : null;
+  const disclosureKey = (node) => {
+    const path = [];
+    for (let parent = node; parent && parent !== $("content"); parent = parent.parentElement)
+      if (parent.tagName === "DETAILS") path.unshift(parent.querySelector(":scope > summary")?.textContent || "");
+    return JSON.stringify(path);
+  };
+  const openSubmissionPanels = active === "submit"
+    ? new Set([...$("content").querySelectorAll("details[open]")].map(disclosureKey)) : null;
   const focused = document.activeElement;
-  const keepFocus = ["model-guide-summary", "model-technical-summary", "model-service", "model-show-staging", "models-refresh", "models-previous", "models-next", "job-search", "resource-search", "workload-search", "submit-workload", "submit-candidate", "scheduling-profile", "inference-pool", "poc-gpu-count", "lab-scenario", "lab-resource-mode", "lab-history", "lab-replay-speed", "lab-replay-toggle", "lab-replay-seek", "lab-resource-filter"].includes(focused?.id)
+  const keepFocus = ["model-guide-summary", "model-technical-summary", "model-service", "model-show-staging", "models-refresh", "models-previous", "models-next", "job-search", "resource-search", "workload-search", "template-name", "template-source", "template-device", "template-priority", "template-run", "template-queue", "submit-workload", "submit-candidate", "scheduling-profile", "inference-pool", "poc-gpu-count", "lab-scenario", "lab-resource-mode", "lab-history", "lab-replay-speed", "lab-replay-toggle", "lab-replay-seek", "lab-resource-filter"].includes(focused?.id)
     ? { id: focused.id, start: focused.selectionStart, end: focused.selectionEnd } : null;
   const [label, title, description] = views[active];
   workspaceUI.navigation(active);
@@ -2010,6 +2018,9 @@ function render() {
       recommendations: recommendationsView,
     }[active](),
   );
+  if (openSubmissionPanels)
+    for (const node of $("content").querySelectorAll("details"))
+      node.open = openSubmissionPanels.has(disclosureKey(node));
   if (motionBefore) animateLabMotion(motionBefore);
   if (keepFocus && $(keepFocus.id)) {
     $(keepFocus.id).focus();
