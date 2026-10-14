@@ -14,9 +14,9 @@ MODEL = "resnet50-lab-v1"
 SOURCE = "a" * 64
 
 
-def router_client(service):
+def router_client(service, gpu_artifact="b"):
     bindings = {}
-    for ref, runtime, artifact in [("gpu", "cuda", "b"), ("npu", "hailo", "c")]:
+    for ref, runtime, artifact in [("gpu", "cuda", gpu_artifact), ("npu", "hailo", "c")]:
         bindings[ref] = {
             "project_ref": "team-a",
             "url": f"http://{ref}.models.svc:8080",
@@ -228,3 +228,37 @@ def test_wrong_model_response_is_not_returned_and_pool_binding_is_immutable(serv
     assert response.status_code == 200
     assert response.json()["routing"]["attempts"][0]["outcome"] == "IDENTITY_OR_OUTPUT_MISMATCH"
     assert calls == ["gpu", "npu"]
+
+
+def test_pool_catalog_is_project_scoped_and_marks_changed_bindings(service):
+    client, _, _ = router_client(service)
+    value = {
+        "ref": "images",
+        "model_ref": MODEL,
+        "source_model_sha256": SOURCE,
+        "endpoint_refs": ["gpu", "npu"],
+    }
+    assert (
+        client.post(PREFIX, headers={"Authorization": "Bearer operator"}, json=value).status_code
+        == 200
+    )
+    user = client.get(PREFIX, headers={"Authorization": "Bearer user"})
+    assert user.status_code == 200
+    body = user.json()
+    assert body["items"][0]["ref"] == "images"
+    assert body["items"][0]["configured"] is True
+    assert body["items"][0]["runtimes"] == ["cuda", "hailo"]
+    assert "url" not in json.dumps(body)
+    assert client.get(PREFIX, headers={"Authorization": "Bearer other"}).json()["items"] == []
+    assert client.get(PREFIX).status_code == 401
+    assert (
+        client.get(PREFIX + "?page=1", headers={"Authorization": "Bearer user"}).json()["items"]
+        == []
+    )
+    changed, _, _ = router_client(service, gpu_artifact="f")
+    assert (
+        changed.get(PREFIX, headers={"Authorization": "Bearer user"}).json()["items"][0][
+            "configured"
+        ]
+        is False
+    )

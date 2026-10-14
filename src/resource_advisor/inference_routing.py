@@ -183,6 +183,40 @@ class InferenceRouter:
             self.store.put(conn, "inference_pool", self.pool_key(project, value.ref), project, body)
         return self.view(project, value.ref)
 
+    def listing(self, project, page=0):
+        with self.store.transaction() as conn:
+            records = self.store.list(conn, "inference_pool", project)
+        records = sorted(records, key=lambda row: row["body"]["pool"]["ref"])
+        items = []
+        for row in records[page * 12 : (page + 1) * 12]:
+            body = row["body"]
+            configured = all(
+                ref in self.bindings
+                and self.bindings[ref].project_ref == project
+                and signature(self.bindings[ref]) == digest
+                for ref, digest in body["bindings"].items()
+            )
+            items.append(
+                {
+                    **body["pool"],
+                    "configured": configured,
+                    "runtimes": sorted(
+                        {
+                            self.bindings[ref].runtime
+                            for ref in body["bindings"]
+                            if ref in self.bindings
+                        }
+                    ),
+                }
+            )
+        return {
+            "items": items,
+            "page": page,
+            "size": 12,
+            "total": len(records),
+            "has_next": (page + 1) * 12 < len(records),
+        }
+
     def _pool(self, project, ref):
         with self.store.transaction() as conn:
             record = self.store.get(conn, "inference_pool", self.pool_key(project, ref))

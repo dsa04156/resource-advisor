@@ -130,6 +130,10 @@ def create_app(
     def register_inference_pool(value: InferencePool, p=Depends(operator)):
         return inference.register(p.project, value)
 
+    @app.get(PREFIX + "/inference-pools")
+    def list_inference_pools(page: int = Query(default=0, ge=0, le=100000), p=Depends(principal)):
+        return inference.listing(p.project, page)
+
     @app.get(PREFIX + "/inference-pools/{ref}")
     def inference_pool(ref: str, p=Depends(principal)):
         return inference.view(p.project, ref)
@@ -445,9 +449,42 @@ def create_app(
             "project_ref": anonymous_project,
         }
 
+    @app.get("/console/icons/{name}.svg", include_in_schema=False)
+    def console_icon(name: str):
+        if name not in {
+            "house",
+            "list-checks",
+            "cpu",
+            "boxes",
+            "flask-conical",
+            "play",
+            "arrow-right",
+            "refresh-cw",
+            "circle-check",
+            "circle-alert",
+            "upload",
+            "image",
+            "chevron-right",
+            "settings-2",
+            "book-open",
+            "layers",
+            "clock",
+            "check",
+            "x",
+        }:
+            raise HTTPException(404, "Icon not found")
+        return FileResponse(Path(__file__).parent / "static" / "icons" / (name + ".svg"))
+
     @app.get("/console/{asset}", include_in_schema=False)
     def console_asset(asset: str):
-        if asset not in {"console.js", "console.css", "mark.svg"}:
+        if asset not in {
+            "console.js",
+            "console.css",
+            "mark.svg",
+            "imagenet-labels.json",
+            "workspace.js",
+            "workspace.css",
+        }:
             raise HTTPException(404, "Asset not found")
         return FileResponse(Path(__file__).parent / "static" / asset)
 
