@@ -28,3 +28,17 @@ GET /api/v1/compute/inference-pools?page=0은 principal.project에 등록된 풀
 코드와 브랜드/서버는 우리 구현을 유지하며 참조 제품 코드를 이식하지 않았습니다. library icons는 lucide-static1.57.0에서 복사했고 static/icons/LICENSE에 MIT 고지를 포함합니다. 기본 스타일 토큰과 의도된 참조 차이는 .interface-design/system.md에 기록합니다.
 
 기본 동작·프로젝트 경계·실제 GPU/Hailo 추론·배포 보존 확인은 [완료 근거](../evidence/console-workspace-20261014.json)에 기록했습니다. 전체 회귀·부하·장기·native 장애 주입은 사용자의 요청대로 후속입니다. 시각 비교와 의도된 변형은 [design-qa.md](../../design-qa.md)를 참고하세요.
+
+## LAN 로딩 수정 (2026-10-14)
+
+접속 서버는0.0.0.0:18420을 유지하고 API Service로 직접 연결합니다. 기존 CA와 인증서 identity를 검증하며 포트포워딩에 의존하지 않습니다. HTTP LAN 주소에서도 템플릿·파이프라인·재시도·시나리오·실험 버튼이128bit 요청 키를 생성할 수 있습니다. 기존 요청 키 재사용과 중복 제출 보호는 유지합니다.
+
+최신 inventory 조회는 프로젝트·클러스터별 인덱스 탐색을 사용합니다. 과거 JSON 관측 전체를 읽거나 응답을 캐싱하지 않으며 기존 created_at/ref 최신순과 신선도 재평가를 유지합니다. 새 DB와 기존 DB의 init-db는 보조 index를 생성합니다. 큰 운영 DB에서 최초 적용은 다음 index를 별도 autocommit 연결로 생성한 뒤 코드를 배포합니다(현재 lab 적용 완료).
+
+```sql
+CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_ra_inventory_project_cluster_latest
+ON ra_entities (project, (CAST(body->>'cluster_ref' AS VARCHAR)), created_at DESC, ref DESC)
+WHERE kind = 'inventory';
+```
+
+초기 화면 데이터 조회는 기존6~13초에서 집중 확인 시0.5~0.8초로 줄었고, 동일 PostgreSQL snapshot에서 반환 장비 기록이 완전히 같은지 확인했습니다. [수정 및 배포 근거](../evidence/console-loading-fix-20261014.json)를 참고하세요.

@@ -1,0 +1,110 @@
+{
+  "date": "2026-10-14",
+  "release": "435bc267983fcfcd7c5982d431cd0c78cd4e06e9",
+  "image": "192.168.0.56:5000/resource-advisor/console-api@sha256:97cd7faf4ab0a47f11e802b034a0a727c5ba5b54e357e417124e4f90e1a8b86d",
+  "scope": "Focused correction of LAN loading and UI request-ID failures; not a load benchmark",
+  "before": {
+    "overview_seconds": [
+      13.29,
+      6.023,
+      9.037
+    ],
+    "asset_failures": {
+      "status": 502,
+      "timeout_ms": 25000,
+      "affected": [
+        "console.js",
+        "play.svg",
+        "mark.svg"
+      ]
+    },
+    "http_lan_template_fixture": {
+      "native_posts": 0,
+      "error": "crypto.randomUUID is not a function",
+      "save_button_stuck": true
+    },
+    "inventory_history_rows_approx": 58000
+  },
+  "fixes": [
+    "Access proxy stays0.0.0.0:18420 and connects directly to stable API Service over CA-verified TLS with the existing127.0.0.1 certificate identity; no kubectl port-forward dependency.",
+    "Partial project/cluster/latest index plus recursive key seeks avoid historical JSON decompression and sorting. No response cache or inventory deletion.",
+    "Five UI operations use cryptographically random128-bit request IDs supported at HTTP LAN origins. Retry-key reuse is unchanged."
+  ],
+  "after": {
+    "inventory_same_repeatable_read_snapshot_comparison": {
+      "old_ms": 5370.3,
+      "new_ms": 8.54,
+      "clusters": 2,
+      "exact_snapshot_match": true,
+      "other_project_empty": true
+    },
+    "live_overview_samples": [
+      {
+        "status": 200,
+        "ms": 711,
+        "clusters": 2,
+        "jobs": 855
+      },
+      {
+        "status": 200,
+        "ms": 724,
+        "clusters": 2,
+        "jobs": 855
+      },
+      {
+        "status": 200,
+        "ms": 740,
+        "clusters": 2,
+        "jobs": 855
+      }
+    ],
+    "browser_initial_ready_ms": 628,
+    "browser_overview_ms": 550,
+    "final_missing_images": [],
+    "final_console_errors": 0,
+    "mobile": {
+      "viewport": [
+        390,
+        844
+      ],
+      "page_width": 390,
+      "primary_navigation_items": 5
+    },
+    "http_lan_template_fixture": {
+      "intercepted_posts": 1,
+      "valid128bit_hex_ref": true,
+      "uncaught_errors": [],
+      "button_unlocked": true,
+      "templates_persisted": 0
+    },
+    "tests": {
+      "api_inventory_router_passed": 34,
+      "repeated_schema_initialization": "passed",
+      "ruff": "passed",
+      "javascript_syntax": "passed",
+      "standards_review": "passed",
+      "spec_review": "passed"
+    }
+  },
+  "preservation": {
+    "existing_jobs_before": 1464,
+    "existing_jobs_after": 1464,
+    "existing_job_specs_and_uids_preserved": true,
+    "queue_specs_preserved": true,
+    "existing_serving_specs_and_uids_preserved": true,
+    "existing_serving_ready": true,
+    "api_source_hashes_match_image": true,
+    "standing_worker_specs_preserved": true,
+    "gitops": {
+      "revision": "435bc267983fcfcd7c5982d431cd0c78cd4e06e9",
+      "sync": "Synced",
+      "health": "Healthy",
+      "operation": "Succeeded"
+    }
+  },
+  "limits": [
+    "Full regression, load/long-running/native fault checks remain deferred by user preference.",
+    "Focused timings were collected on the live lab; they are not percentile/SLO guarantees.",
+    "Additional subjective layout direction was asked asynchronously; no new visual direction was assumed."
+  ]
+}
