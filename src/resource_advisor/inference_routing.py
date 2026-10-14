@@ -204,7 +204,7 @@ class InferenceRouter:
                         {
                             self.bindings[ref].runtime
                             for ref in body["bindings"]
-                            if ref in self.bindings
+                            if ref in self.bindings and self.bindings[ref].project_ref == project
                         }
                     ),
                 }
