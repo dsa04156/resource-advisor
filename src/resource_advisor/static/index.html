@@ -3,76 +3,128 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>HAIRP · AI 연구 운영 플랫폼</title>
+    <title>HAIRP · AI 작업 공간</title>
     <link rel="icon" type="image/svg+xml" href="/console/mark.svg" />
     <link rel="stylesheet" href="/console/console.css" />
+    <link rel="stylesheet" href="/console/workspace.css" />
     <script type="module" src="/console/console.js"></script>
   </head>
   <body>
     <a href="#main" class="skip">본문으로 이동</a>
     <div class="layout">
       <aside class="sidebar">
-        <a href="#operations" class="brand"><span class="brand-mark" aria-hidden="true">▥</span><span>HAIRP<small>AI 연구 · 자원 운영</small></span></a>
-        <nav aria-label="작업과 자원 관리">
-          <a href="#operations" data-view="operations" aria-current="page"><span>▦</span>운영 현황</a>
-          <a href="#execution" data-view="execution"><span>◫</span>자원 현황</a>
-          <a href="#jobs" data-view="jobs"><span>≡</span>작업 현황 <b id="nav-job-count" class="nav-count">—</b></a>
-          <a href="#models" data-view="models"><span aria-hidden="true">◎</span>모델 상태</a>
-          <a href="#history" data-view="history"><span>⌘</span>큐 · 쿼터</a>
-          <a href="#usage" data-view="usage"><span>◷</span>프로젝트 사용량</a>
-          <a href="#submit" data-view="submit"><span>＋</span>작업 제출</a>
-        </nav>
-        <nav class="related-nav" aria-label="분석과 검증">
-          <p class="eyebrow">RESEARCH</p>
-          <a href="#scheduler-lab" data-view="scheduler-lab"><span>◈</span>스케줄링 실험실</a>
-          <a href="#scenario" data-view="scenario"><span>▷</span>자원 요청 시나리오</a>
-          <a href="#experiments" data-view="experiments"><span>◈</span>실험 · 비교</a>
-          <a href="#pipelines" data-view="pipelines"><span>⇢</span>파이프라인</a>
-          <a href="#notebooks" data-view="notebooks"><span>▤</span>노트북</a>
-          <a href="#compatibility" data-view="compatibility"><span>◇</span>가속기 호환성</a>
-          <a href="#recommendations" data-view="recommendations"><span>⌁</span>추천 근거 · 결과</a>
+        <a href="#home" class="brand"
+          ><img src="/console/mark.svg" width="32" height="32" alt="" /><span
+            >HAIRP<small>AI 작업 공간</small></span
+          ></a
+        >
+        <a class="sidebar-create" href="#submit"
+          ><img src="/console/icons/play.svg" alt="" />새 작업 실행</a
+        >
+        <nav aria-label="주 메뉴">
+          <a href="#home" data-view="home" aria-current="page"
+            ><img src="/console/icons/house.svg" alt="" />시작하기</a
+          >
+          <a href="#jobs" data-view="jobs"
+            ><img src="/console/icons/list-checks.svg" alt="" />작업
+            <b id="nav-job-count" class="nav-count">—</b></a
+          >
+          <a href="#models" data-view="models"
+            ><img src="/console/icons/boxes.svg" alt="" />모델 서비스</a
+          >
+          <a href="#execution" data-view="execution"
+            ><img src="/console/icons/cpu.svg" alt="" />자원</a
+          >
+          <a href="#experiments" data-view="experiments"
+            ><img src="/console/icons/flask-conical.svg" alt="" />실험</a
+          >
         </nav>
         <div class="sidebar-spacer"></div>
-        <section class="tenant-card"><span class="connection-dot" aria-hidden="true"></span><div><small>워크스페이스</small><strong id="identity">연결 전</strong></div></section>
-        <button id="logout" hidden>연결 해제</button>
+        <details class="sidebar-tools">
+          <summary>
+            <img src="/console/icons/settings-2.svg" alt="" />운영·고급 도구
+          </summary>
+          <nav aria-label="운영 도구">
+            <a href="#operations" data-view="operations">운영 현황</a>
+            <a href="#history" data-view="history">큐·할당량</a>
+            <a href="#usage" data-view="usage">프로젝트 사용량</a>
+            <a href="#compatibility" data-view="compatibility">장치 호환성</a>
+            <a href="#recommendations" data-view="recommendations">추천 근거</a>
+            <a href="#scheduler-lab" data-view="scheduler-lab"
+              >스케줄링 실험실</a
+            >
+            <a href="#scenario" data-view="scenario">자원 요청 시나리오</a>
+            <a href="#pipelines" data-view="pipelines">파이프라인</a>
+            <a href="#notebooks" data-view="notebooks">노트북</a>
+          </nav>
+        </details>
+        <section class="tenant-card">
+          <span class="connection-dot" aria-hidden="true"></span>
+          <div>
+            <small>연결된 프로젝트</small><strong id="identity">연결 전</strong>
+          </div>
+        </section>
+        <button id="logout" hidden>프로젝트 연결 해제</button>
       </aside>
       <div class="content-shell">
         <header class="topbar">
-          <div><p class="eyebrow" id="section-label">WORKSPACE</p><h1 id="view-title">자원 현황</h1></div>
-          <div class="refresh"><small id="updated"></small><label><input id="auto" type="checkbox" checked />15초 자동 갱신</label><button id="refresh" aria-label="지금 갱신" title="지금 갱신">↻</button><a class="action-link" href="#submit">새 작업</a></div>
+          <div>
+            <p class="eyebrow" id="section-label">나의 작업 공간</p>
+            <h1 id="view-title">시작하기</h1>
+          </div>
+          <div class="refresh">
+            <small id="updated"></small
+            ><label><input id="auto" type="checkbox" checked />자동 갱신</label
+            ><button id="refresh" aria-label="지금 갱신" title="지금 갱신">
+              <img src="/console/icons/refresh-cw.svg" alt="" /></button
+            ><a class="action-link" href="#submit">새 작업</a>
+          </div>
         </header>
-      <main id="main" tabindex="-1">
-        <section id="connect" class="connect panel">
-          <p class="eyebrow">PROJECT ACCESS</p>
-          <h1>연구 자원에 연결</h1>
-          <p>프로젝트 토큰으로 자원 현황과 실행 근거를 조회합니다.</p>
-          <form id="login" method="post">
-            <label for="token">프로젝트 API 토큰</label>
-            <div class="form-line">
-              <input
-                id="token"
-                type="password"
-                autocomplete="off"
-                required
-                spellcheck="false"
-              /><button type="submit" class="primary">연결</button>
-            </div>
-          </form>
-          <p class="muted">
-            토큰은 현재 탭의 메모리에만 유지됩니다. 연결 해제나 새로고침 시 다시
-            입력합니다.
-          </p>
-        </section>
-        <div id="notice" role="status" aria-live="polite"></div>
-        <div id="workspace" hidden>
-          <p id="view-description" class="view-description"></p>
-          <div id="content"></div>
-        </div>
-      </main>
+        <nav
+          id="section-tabs"
+          class="section-tabs"
+          aria-label="관련 화면"
+        ></nav>
+        <main id="main" tabindex="-1">
+          <section id="connect" class="connect panel">
+            <p class="eyebrow">시작하기</p>
+            <h1>AI 작업 공간에 연결하세요</h1>
+            <p>
+              프로젝트에 연결하면 실행 가능한 예제와 프로젝트 작업을 볼 수
+              있어요.
+            </p>
+            <form id="login" method="post">
+              <label for="token">프로젝트 API 토큰</label>
+              <div class="form-line">
+                <input
+                  id="token"
+                  type="password"
+                  autocomplete="off"
+                  required
+                  spellcheck="false"
+                /><button type="submit" class="primary">연결하기</button>
+              </div>
+            </form>
+            <p class="muted">
+              토큰은 현재 탭에서만 사용하며 새로고침이나 연결 해제 시
+              지워집니다.
+            </p>
+          </section>
+          <div id="notice" role="status" aria-live="polite"></div>
+          <div id="workspace" hidden>
+            <p id="view-description" class="view-description"></p>
+            <div id="content"></div>
+          </div>
+        </main>
       </div>
     </div>
     <dialog id="job-dialog" aria-labelledby="job-dialog-title">
-      <div class="panel-head"><h2 id="job-dialog-title">작업 상세</h2><button id="close-job-dialog" aria-label="상세 닫기">닫기 ×</button></div>
+      <div class="panel-head">
+        <h2 id="job-dialog-title">작업 상세</h2>
+        <button id="close-job-dialog" aria-label="상세 닫기">
+          <img src="/console/icons/x.svg" alt="" />닫기
+        </button>
+      </div>
       <div id="job-dialog-body"></div>
     </dialog>
   </body>

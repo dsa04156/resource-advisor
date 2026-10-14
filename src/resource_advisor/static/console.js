@@ -1,3 +1,4 @@
+import {createWorkflowWorkspace} from "./workspace.js";
 const $ = (id) => document.getElementById(id);
 const API = "/api/v1/compute";
 let anonymousConnected = false;
@@ -9,7 +10,7 @@ let token = "",
   data = null;
 let receivedAt = 0,
   expiryTimer = null,
-  active = "operations";
+  active = "home";
 const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, qualifications: 0, observations: 0, templates: 0 };
 const submitting = new Set();
 const requestKeys = new Map();
@@ -17,7 +18,7 @@ const jobFilters = { status: "all", backend: "all", search: "" };
 let labReplay=null,labReplaySpeed=1,labReceivedAt=0;
 const labReplaySeen=new Set();
 let labResource="",labResourceFilter="all";
-let jobsDisplay="graph", graphJobId=null, graphSelection="compute";
+let jobsDisplay="table", graphJobId=null, graphSelection="compute";
 let resourceBackend = "all", resourceSearch = "", searchTimer = null, filterRevision = 0;
 let modelsData = null, modelsPending = false, modelsUpdated = 0, modelsReceivedAt = 0;
 let modelsError = "", modelSelected = "", modelPage = 0, modelsShowStaging = false;
@@ -41,7 +42,7 @@ function reasonText(reason) {
 
 function submitButton(workload, candidate, approval = null, scheduling = null) {
   const automatic = candidate.candidate_ref === "auto";
-  const label = approval ? "승인한 구성 실행" : automatic ? "스케줄러에 제출" : "작업 제출";
+  const label = approval ? "승인한 구성 실행" : automatic ? "작업 실행하기" : "작업 제출";
   const key = `ra-submit:${data.project_ref}:${workload.workload_ref}:${candidate.candidate_ref}${approval ? ":" + approval.ref : ""}${workload.template_ref ? ":template:" + workload.template_ref : ""}${scheduling ? ":policy:" + scheduling.digest : ""}`;
   let saved = requestKeys.get(key);
   try { saved ||= sessionStorage.getItem(key); } catch (_) { /* Memory fallback. */ }
@@ -173,25 +174,27 @@ function approvalControls(recommendation) {
   return add(el("div"), button, el("small", "승인 시 현재 근거를 다시 검사합니다. 승인은 자원 예약이 아닙니다."));
 }
 const views = {
-  models: ["MODEL HEALTH", "모델 상태", "모델이 지금 답할 수 있는지, 느려졌는지, 새로운 입력이 달라졌는지 쉽게 확인하세요."],
+  home: ["나의 작업 공간", "시작하기", "예제 작업을 실행하고, 진행 상태와 결과를 확인하세요."],
+  inference: ["모델 서비스", "이미지 체험", "이미지 한 장으로 GPU·NPU 추론 서비스를 사용해보세요."],
+  models: ["모델 서비스", "서비스 상태", "모델이 지금 답할 수 있는지, 느려졌는지, 새로운 입력이 달라졌는지 쉽게 확인하세요."],
   "scheduler-lab": ["NATIVE SCHEDULING", "스케줄링 실험실", "백필 · 갱 입장 · 토폴로지 배치를 실제 GPU에서 실행하고 관측합니다."],
   scenario: ["REQUEST → QUEUE → RUN", "자원 요청 시나리오", "두 연구 요청이 같은 실행 자원을 사용합니다. 실제 큐의 대기와 실행을 따라가고 기록을 다시 재생하세요."],
-  experiments: ["EXPERIMENT WORKSPACE", "실험 · 비교", "MLflow 실행 기록, 파라미터, 지표와 아티팩트를 함께 확인합니다."],
+  experiments: ["연구 기록", "실험 · 비교", "MLflow 실행 기록, 파라미터, 지표와 아티팩트를 함께 확인합니다."],
   pipelines: ["WORKFLOW OPERATIONS", "파이프라인", "Kubeflow 단계 상태와 연결된 작업을 추적하고 실행·중지를 요청합니다."],
   notebooks: ["RESEARCH WORKSPACES", "노트북", "개발 환경의 상태와 자원을 확인하고 시작·중지·접속합니다."],
   operations: ["COMPUTE OPERATIONS", "운영 현황", "자원 배분, 대기 사유, 장애와 사용량을 확인합니다."],
   usage: ["PROJECT ACCOUNTING", "프로젝트 사용량", "물리 장치와 공유 슬롯을 구분한 할당 원장입니다."],
   submit: [
-    "SUBMIT JOB",
-    "작업 제출",
+    "프로젝트 작업",
+    "새 작업",
     "작업 요구사항을 보고 플랫폼이 호환 자원을 선택해 Kubernetes 또는 Slurm 큐에 제출합니다.",
   ],
   execution: [
-    "OBSERVATION",
+    "프로젝트 자원",
     "자원 현황",
     "실측 사용량과 스케줄러 예약량을 나란히 확인합니다.",
   ],
-  jobs: ["EXECUTIONS", "작업 현황", "프로젝트의 전체 작업을 검색하고 실행 상태·결과를 확인합니다."],
+  jobs: ["프로젝트 작업", "작업 목록", "프로젝트의 전체 작업을 검색하고 실행 상태·결과를 확인합니다."],
   compatibility: [
     "QUALIFICATION",
     "가속기 호환성",
@@ -1079,7 +1082,7 @@ function showJob(job) {
     details("전체 기록 · 결과 · MLflow", job));
   const cancel = cancelButton(job);
   if (cancel) { const handler = cancel.onclick; cancel.onclick = async () => { await handler(); $("job-dialog").close(); }; content.append(cancel); }
-  $("job-dialog-body").replaceChildren(content); $("job-dialog").showModal();
+  $("job-dialog-body").replaceChildren(workspaceUI.jobDetail(job,content)); $("job-dialog").showModal();
 }
 function jobsView() {
   const root = el("div"), counts = data.job_counts;
@@ -1088,7 +1091,7 @@ function jobsView() {
   root.classList.add("jobs-page");
   const tracked=data.jobs.items.find(j=>j.job_id===trackedJobId) || data.jobs.items.find(j=>j.scheduling_plan && !["SUCCEEDED","FAILED","CANCELED","RESULT_INVALID"].includes(j.state));
   if(tracked && jobsDisplay==="table")root.append(schedulingProgress(tracked));
-  root.append(add(el("div",null,"section-heading"),el("p","ML EXECUTION MAP","eyebrow"),el("h2","ML 작업 흐름"),el("p",`전체 ${total}개 · 실행 ${counts.RUNNING||0}개 · 대기 ${waiting}개 · 완료 ${counts.SUCCEEDED||0}개`)));
+  root.append(add(el("div",null,"section-heading"),el("p","내 작업","eyebrow"),el("h2","실행 기록"),el("p",`전체 ${total}개 · 실행 ${counts.RUNNING||0}개 · 대기 ${waiting}개 · 완료 ${counts.SUCCEEDED||0}개`)));
   const toolbar = el("div",null,"jobs-toolbar"), search = el("input");
   search.id = "job-search"; search.type = "search"; search.maxLength = 128; search.placeholder = "작업 이름 · ID · 노드 검색"; search.setAttribute("aria-label","작업 검색"); search.value = jobFilters.search;
   const refreshFilters = () => { pages.jobs = 0; filterRevision++; load(); };
@@ -1969,15 +1972,17 @@ function recommendationsView() {
 }
 function render() {
   if (!data) return;
+  if (active === "inference") workspaceUI.navigation(active);
   if (active === "models" && !modelsPending && (!modelsUpdated || ($("auto").checked && Date.now() - modelsUpdated > 15000))) refreshModels();
   if (active === "scheduler-lab" && !labPending && Date.now()-labUpdated > 3000) refreshLab();
   if (active === "scenario" && !scenarioPending && Date.now()-scenarioUpdated > 3000) refreshScenario();
   if (["operations","experiments","pipelines","notebooks","jobs"].includes(active) && !researchPending && Date.now()-researchUpdated>30000) refreshResearch();
   const motionBefore = active === "scheduler-lab" ? captureLabMotion() : null;
   const focused = document.activeElement;
-  const keepFocus = ["model-guide-summary", "model-technical-summary", "model-service", "model-show-staging", "models-refresh", "models-previous", "models-next", "job-search", "resource-search", "poc-gpu-count", "lab-scenario", "lab-resource-mode", "lab-history", "lab-replay-speed", "lab-replay-toggle", "lab-replay-seek", "lab-resource-filter"].includes(focused?.id)
+  const keepFocus = ["model-guide-summary", "model-technical-summary", "model-service", "model-show-staging", "models-refresh", "models-previous", "models-next", "job-search", "resource-search", "workload-search", "submit-workload", "submit-candidate", "scheduling-profile", "inference-pool", "poc-gpu-count", "lab-scenario", "lab-resource-mode", "lab-history", "lab-replay-speed", "lab-replay-toggle", "lab-replay-seek", "lab-resource-filter"].includes(focused?.id)
     ? { id: focused.id, start: focused.selectionStart, end: focused.selectionEnd } : null;
   const [label, title, description] = views[active];
+  workspaceUI.navigation(active);
   $("section-label").textContent = label;
   $("view-title").textContent = title;
   $("view-description").textContent = description;
@@ -1987,6 +1992,8 @@ function render() {
     ? "모델 조회 " + modelStamp(modelsData.generated_at_seconds) : "조회 " + stamp(data.generated_at);
   $("content").replaceChildren(
     {
+      home: () => workspaceUI.home(),
+      inference: () => workspaceUI.inference(),
       operations: operationsView,
       models: modelStatusView,
       scenario: scenarioView,
@@ -1997,7 +2004,7 @@ function render() {
       usage: usageView,
       execution,
       jobs: jobsView,
-      submit: submissionView,
+      submit: () => workspaceUI.submission(submissionView),
       compatibility: compatibilityView,
       history: historyView,
       recommendations: recommendationsView,
@@ -2032,6 +2039,7 @@ function render() {
 }
 function reset(message = "") {
   generation++;
+  workspaceUI.reset();
   modelsData=null;modelsPending=false;modelsUpdated=0;modelsError="";modelSelected="";modelPage=0;modelsShowStaging=false;modelDisclosures.clear();
   graphJobId=null;graphSelection="compute";
   stopLabReplay();labReplaySeen.clear();labResource="";labResourceFilter="all";
@@ -2110,6 +2118,15 @@ async function load() {
     }
   }
 }
+const workspaceUI = createWorkflowWorkspace({
+  el, add, badge, stateBadge, table, stamp, duration, actionLink, empty, details,
+  API, authHeaders, selectionKey, canSubmit, workloadPurpose, reasonText,
+  schedulingProgress, dashboardStats, cancelButton, retryJobButton, researchButton, openExperiment,
+  get data() { return data; }, get draft() { return submissionDraft; },
+  generation: () => generation, render, preview: refreshSchedulingPreview, openJob: showJob,
+  selectWorkload: ref => { showAllTemplates=false; submissionDraft.workload=ref; submissionDraft.candidate=""; schedulingPreview=null; },
+  navigate: view => { if (location.hash === "#"+view) render(); else location.hash=view; },
+});
 $("login").onsubmit = (e) => {
   e.preventDefault();
   const entered = $("token").value.trim();
@@ -2140,7 +2157,7 @@ $("refresh").onclick = () => active === "models" ? refreshModels() : load();
 function navigate(event) {
   const view = new URL(event?.newURL || location.href).hash.slice(1);
   if (view === "main") return; // The skip link must not change the selected view.
-  active = views[view] ? view : "operations";
+  active = views[view] ? view : "home";
   if(active!=="scheduler-lab")stopLabReplay();
   document.querySelectorAll("nav a").forEach((a) => {
     if (a.dataset.view === active) a.setAttribute("aria-current", "page");

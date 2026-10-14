@@ -269,3 +269,15 @@ system Korean font and 4px spacing; 44px controls. Two columns collapse to one a
 650px; primary mobile navigation scrolls horizontally. Preserve selection, focus
 and disclosures on polling. Shared-lab reads reuse its server-selected project;
 no credential is embedded and existing probe/operator authentication is retained.
+
+## 작업 중심 Console — 2026-10-14
+
+이 절은 새 shell/home/submit/jobs/detail/inference를 우선 정의하며 과거 fixed sidebar/bottom4nav·green control room shell을 대체한다. 실험실 상태·관측/예약 구분·실측만 재생하는 규칙은 유지한다.
+
+기준: SkyPilot 목록·dstack 상세·ZenML 첫 안내. 한국어/프로젝트 범위/승인 계약에 맞춰 의도적으로 적응했다. 첫 focal action은 검증된 예제 작업 선택. signature는 예제→호환 자원 자동→실제큐/단계→결과이며 이미지체험은 실제선택GPU/NPU를곁에표시한다.
+
+palette: foreground #17243b / secondary #47566b / muted #6c788a; canvas #f7f8fb, surface#fff,inset#f1f4f9,border#e4e8ef; primary#2563eb,soft#edf3ff; measuredsuccessgreen/waitamber/errorred. borders-only exceptmodal. 4px spacing grid. Korean system font reuse; main23px650,home28px650,panel17px650,body14px,line1.6,table12px/meta10–11px.
+
+Desktop sidebar224px, content32px pad, topbar92px plus44px subnav. panel22px/card20px pad, radius12px/panel·10px/card·8px/control. primary44px, regular40px. mobile390px: top5nav with52px targets, single-column input/result/cards, table-only local scrolling. Primarynavgroups five, advanced in relevant tabs. SVG assets use originalLucide source; no glyph icons added.
+
+Polling preserves drafts/focus, selected image/blob and completed result. Upload/analysis disabled while pending. Data missing/old is explicitly marked; no artificialpercent-completion/accuracy/health is introduced. Job detail keyboard tabs share native dialog focus management.
