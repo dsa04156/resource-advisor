@@ -1,0 +1,7 @@
+# source: resource-advisor/docs/evidence/right-sizing-slurm-attempts-v1.csv (columns job_id/attempt_id removed)
+experiment_id,role,native_job_id,forward_compute_seconds,gpu_reservation_seconds,cpu_core_reservation_seconds,queue_seconds,quality
+right-sizing-slurm-20261008-v1,qualification,77,0.014932958991266787,89.0,89.0,1.0,1.0
+right-sizing-slurm-20261008-v1,observe,78,0.01330578385386616,85.0,85.0,1.0,1.0
+right-sizing-slurm-20261008-v1,observe,79,0.011263818014413118,83.0,83.0,0.0,1.0
+right-sizing-slurm-20261008-v1,observe,80,0.011639217962510884,84.0,84.0,1.0,1.0
+right-sizing-slurm-20261008-v1,approved_main,81,0.011986714089289308,80.0,80.0,1.0,1.0

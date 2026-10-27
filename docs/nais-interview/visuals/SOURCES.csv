@@ -1,0 +1,8 @@
+figure,repository_path,sha256
+04-slurm-loop,docs/evidence/right-sizing-slurm-attempts-v1.csv,948c9db78f259160c02af0bc33828d1ead798701cf38d477329406117eb9bfb4
+05-k8s-tradeoff,docs/evidence/profile-pool-20261008-v2-results/summary.json,2f86748a782d9dd73f650d6986e3da2399e7cbee9fc76ff0d0252ad2bc24e623
+06-jct-recorded,docs/evidence/jct-profile-queue-20261008-short-v1-recorded/recorded-results.json,0ff8dd12e6f5f8aed62eccc4d1e66e5fdf6911a1dd67a6d45d6cc95b48c7aaef
+07-operations,docs/evidence/persistent-postgres.json,69e6068ff3e4e033b8de082b3054501b465ce31b43d1c218833341f74edfa2ed
+07-operations,docs/evidence/service-deployment.json,72923c905ff9ec351c399745eebbf11cabd601f247b374260fb14f6841483614
+07-operations,docs/evidence/slurm-policy.json,156cb64e45b24cdc8df218549e2cf37a419659b363fac76c5e203f6284f0f4e5
+08-hailo,docs/reference/hailo-resnet50.md,289655e314ad112f8f2be3d61a81888b54e4924b92db2cbe6c78a51b92ee0c3e
