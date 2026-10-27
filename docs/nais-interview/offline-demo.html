@@ -105,6 +105,9 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
 #mobilint-success p{margin:4px 0}
 #mobilint-success a{color:var(--native)}
 #mobilint-success .facts{margin:8px 0}
+#mobilint-row[hidden]{display:none}
+#mobilint-row .separate-date{padding:8px 14px;background:var(--native-wash);color:var(--native);font-size:12px;border-top:1px solid var(--rule)}
+#mobilint-row .row{cursor:default}
 .summary .card{padding:16px 18px}
 .summary p{margin:4px 0;color:var(--muted)}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
@@ -191,13 +194,25 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
 </section>
 
 <div class="layout">
-  <section class="board" aria-label="논리 요청 10개의 관측 상태">
+  <section class="board" aria-label="통합 실행 10건 및 별도 Mobilint 실행 기록">
     <div class="board-head" aria-hidden="true">
       <span>요청</span><span>네이티브 경로</span><span>장치 모델 · 작업</span>
       <span class="stage-head"><span>접수</span><span>대기</span><span>할당</span><span>실행</span><span>수집</span><span>종료</span></span>
       <span>관측 상태</span><span>노드 alias</span><span id="extra-head">결과 · 기록</span>
     </div>
     <div id="rows"></div>
+    <div id="mobilint-row" hidden>
+      <div class="separate-date">별도 성공 기록 · 2026-10-08 · 위 통합 실행 10건과 다른 실행</div>
+      <div class="row" aria-label="별도 Mobilint ARIES2 Candy Kubernetes 실행 성공, 2026-10-08">
+        <span class="rid">별도</span>
+        <span class="lane kubernetes">K8s · Kueue</span>
+        <span class="what"><b>Mobilint ARIES2</b><small>Candy 모델 추론</small><br><small>NPU · 가속기 1</small></span>
+        <span class="track" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span class="on done"></span></span>
+        <span class="state">SUCCEEDED</span>
+        <span class="where">노드 비공개</span>
+        <span class="extra">반복 출력 일치 · 결과 수집 · MLflow 기록</span>
+      </div>
+    </div>
   </section>
   <aside>
     <section class="card" id="detail" aria-live="polite"></section>
@@ -366,6 +381,7 @@ function render() {
   const frames = sc().frames, f = frame(), prev = state.index > 0 ? frames[state.index - 1] : null, last = state.index === frames.length - 1;
   $('scope').textContent = sc().name + ' · ' + sc().scope;
   $('mobilint-success').hidden = state.scenario !== 'fleet' || !last;
+  $('mobilint-row').hidden = state.scenario !== 'fleet' || !last;
   $('seek').max = frames.length - 1; $('seek').value = state.index;
   $('seek').setAttribute('aria-valuetext', `관측 ${state.index + 1} / ${frames.length}, ${hhmmss(f.observed_at)}`);
   $('idx').textContent = `관측 ${state.index + 1} / ${frames.length}`;
