@@ -164,7 +164,7 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
   </details>
 </section>
 
-<section class="transport" aria-label="재생 제어">
+<section class="transport" aria-label="2026-10-07 요청 10건 재생 제어">
   <div class="buttons">
     <button id="reset" type="button" title="처음 관측으로 (Home)" aria-label="처음 관측으로">⏮</button>
     <button id="prev" type="button" title="이전 관측 (←)" aria-label="이전 관측">◀</button>
@@ -215,7 +215,7 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
   </section>
   <aside>
     <section class="card" id="detail" aria-live="polite"></section>
-    <section class="card"><h2>이 관측의 노드 (alias)</h2><div class="nodes" id="nodes"></div></section>
+    <section class="card"><h2>실행 노드 (alias)</h2><div class="nodes" id="nodes"></div></section>
   </aside>
 </div>
 
@@ -350,7 +350,7 @@ function renderNodes(f) {
     txt.append(on[alias] ? el('span', null, on[alias].join('  ')) : unknown('이 관측에 표시된 요청 없음'));
     d.append(txt); box.append(d);
   });
-  if (state.scenario === 'fleet' && state.index === sc().frames.length - 1) {
+  if (state.scenario === 'fleet') {
     const d = el('div'), txt = el('span');
     txt.append(el('strong', null, 'Mobilint ARIES2'), el('br'), el('small', null, 'Kubernetes · NPU · 2026-10-08'), el('br'), el('span', null, '요청 11 · SUCCEEDED'));
     d.append(el('span', 'node', 'NPU-B'), txt); box.append(d);
@@ -385,9 +385,9 @@ function renderSummary(f, last) {
 
 function render() {
   const frames = sc().frames, f = frame(), prev = state.index > 0 ? frames[state.index - 1] : null, last = state.index === frames.length - 1;
-  $('scope').textContent = state.scenario === 'fleet' && last ? 'Kubernetes · Slurm · CUDA · Hailo · Mobilint | 2026-10-07~08 실행 완료 기록' : sc().name + ' · ' + sc().scope;
+  $('scope').textContent = state.scenario === 'fleet' && last ? 'Kubernetes · Slurm · CUDA · Hailo · Mobilint | 2026-10-07~08 실행 완료 기록' : state.scenario === 'fleet' ? '2026-10-07 요청 10건 재생 · Mobilint는 2026-10-08 완료 기록을 계속 표시합니다.' : sc().name + ' · ' + sc().scope;
   $('mobilint-success').hidden = true;
-  $('mobilint-row').hidden = state.scenario !== 'fleet' || !last;
+  $('mobilint-row').hidden = state.scenario !== 'fleet';
   $('seek').max = frames.length - 1; $('seek').value = state.index;
   $('seek').setAttribute('aria-valuetext', `관측 ${state.index + 1} / ${frames.length}, ${hhmmss(f.observed_at)}`);
   $('idx').textContent = `관측 ${state.index + 1} / ${frames.length}`;
