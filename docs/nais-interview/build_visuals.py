@@ -309,5 +309,5 @@ with zipfile.ZipFile(BASE/'NAIS-visual-assets.zip','w',zipfile.ZIP_DEFLATED) as 
         if p.is_file():z.write(p,'visuals/'+p.name)
     z.write(__file__,'build_visuals.py')
     z.write(BASE/'offline-demo.html','offline-demo.html')
-    for name in ['observations.json','PROVENANCE.json','export_replay.py','test_replay.py','browser_check.py','offline-demo.template.html']:z.write(REPLAY/name,'replay/'+name)
+    for name in ['observations.json','PROVENANCE.json','export_replay.py','test_replay.py','browser_check.py','offline-demo.template.html','DEVICE-MODELS.md']:z.write(REPLAY/name,'replay/'+name)
 print(f'Rendered {len(assets)} figures to {OUT}')

@@ -66,7 +66,7 @@ fieldset.scenario legend{position:absolute;width:1px;height:1px;overflow:hidden;
 .lane.kubernetes{background:var(--native-wash);color:var(--native)}
 .lane.slurm{background:var(--slurm-wash);color:var(--slurm);box-shadow:inset 0 0 0 1px var(--slurm)}
 .what{min-width:0}
-.what b{display:block;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.what b{display:block;font-weight:600;font-size:13px;white-space:normal;overflow-wrap:anywhere}
 .what small{color:var(--muted);font-size:12px}
 .track{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
 .track span{height:8px;border-radius:2px;background:var(--rule-soft)}
@@ -193,7 +193,7 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
 <div class="layout">
   <section class="board" aria-label="논리 요청 10개의 관측 상태">
     <div class="board-head" aria-hidden="true">
-      <span>요청</span><span>네이티브 경로</span><span>장치 · workload</span>
+      <span>요청</span><span>네이티브 경로</span><span>장치 모델 · 작업</span>
       <span class="stage-head"><span>접수</span><span>대기</span><span>할당</span><span>실행</span><span>수집</span><span>종료</span></span>
       <span>관측 상태</span><span>노드 alias</span><span id="extra-head">결과 · 기록</span>
     </div>
@@ -216,6 +216,10 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
 'use strict';
 const DATA = JSON.parse(document.getElementById('observations').textContent);
 const STAGES = {REQUESTED:0, VALIDATED:0, SUBMITTING:0, QUEUED:1, PENDING:1, REQUEUED:1, ADMITTED:2, RUNNING:3, COLLECTING:4, FINALIZING:4, SUCCEEDED:5, FAILED:5};
+// Recorded node alias to model mapping: replay/DEVICE-MODELS.md
+const DEVICE_MODELS = {"GPU-A": "NVIDIA RTX 5060 Ti", "GPU-B": "NVIDIA RTX 5080", "GPU-C": "NVIDIA GB10", "JET-A": "Jetson Orin Nano", "JET-B": "Jetson AGX Orin", "NPU-A": "Hailo-8", "SLURM-A": "Jetson Orin (Slurm)"};
+const requestNodes = req => req.pods ? req.pods.map(p => p.node).filter(Boolean) : [req.node].filter(Boolean);
+const requestModels = req => [...new Set(requestNodes(req).map(n => DEVICE_MODELS[n] || n))].join(" + ");
 const BACKEND = {kubernetes:'K8s · Kueue', slurm:'Slurm'};
 const $ = id => document.getElementById(id);
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
@@ -246,7 +250,8 @@ function renderRow(row, req, prev) {
     return b;
   }
   b.append(el('span', 'lane ' + req.backend, BACKEND[req.backend] || req.backend));
-  const what = el('span', 'what'); what.append(el('b', null, req.workload));
+  const what = el('span', 'what'); what.append(el('b', null, requestModels(req) || '장치 배치 미관측'));
+  what.append(el('small', null, req.workload), el('br'));
   what.append(el('small', null, req.device_class.toUpperCase() + (req.gpu != null ? ` · ${req.gpu} GPU` : req.accelerator_count != null ? ` · 가속기 ${req.accelerator_count}` : '')));
   b.append(what);
   const track = el('span', 'track'); track.setAttribute('aria-hidden', 'true');
@@ -259,7 +264,7 @@ function renderRow(row, req, prev) {
   if (req.reason) { st.append(el('br')); st.append(el('small', 'unknown', req.reason)); }
   b.append(st);
   const where = el('span', 'where');
-  const nodes = req.pods ? req.pods.map(p => p.node).filter(Boolean) : [req.node].filter(Boolean);
+  const nodes = requestNodes(req);
   if (nodes.length) nodes.forEach(n => where.append(el('span', 'node', n))); else where.append(unknown(req.state === 'NOT_SUBMITTED' ? '—' : '노드 미관측'));
   b.append(where);
   const extra = el('span', 'extra');
@@ -287,6 +292,8 @@ function renderDetail(f) {
   const dl = el('dl');
   const add = (k, v) => { dl.append(el('dt', null, k)); const d = el('dd'); d.append(v == null || v === '' ? unknown() : v); dl.append(d); };
   add('네이티브 경로', BACKEND[req.backend]);
+  add('장치 모델', requestModels(req));
+  add('실행 작업', req.workload);
   add('관측 상태', req.state);
   add('사유', req.reason);
   if (state.scenario === 'fleet') {
@@ -324,7 +331,7 @@ function renderNodes(f) {
   });
   Object.entries(DATA.nodes).forEach(([alias, meta]) => {
     const d = el('div'); d.append(el('span', 'node', alias));
-    const txt = el('span'); txt.append(el('small', null, `${BACKEND[meta.backend]} · ${meta.accelerator} · ${meta.architecture || '아키텍처 미기록'}`), el('br'));
+    const txt = el('span'); txt.append(el('strong', null, DEVICE_MODELS[alias] || alias), el('br')); txt.append(el('small', null, `${BACKEND[meta.backend]} · ${meta.accelerator} · ${meta.architecture || '아키텍처 미기록'}`), el('br'));
     txt.append(on[alias] ? el('span', null, on[alias].join('  ')) : unknown('이 관측에 표시된 요청 없음'));
     d.append(txt); box.append(d);
   });
