@@ -99,6 +99,12 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
 .nodes .node{font:600 12px var(--mono)}
 .nodes small{color:var(--muted)}
 .summary{margin-top:16px}
+#mobilint-success{margin-top:14px}
+#mobilint-success[hidden]{display:none}
+#mobilint-success h2{color:var(--ink);font-size:18px;margin-bottom:4px}
+#mobilint-success p{margin:4px 0}
+#mobilint-success a{color:var(--native)}
+#mobilint-success .facts{margin:8px 0}
 .summary .card{padding:16px 18px}
 .summary p{margin:4px 0;color:var(--muted)}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
@@ -127,7 +133,7 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
 </style>
 </head>
 <body>
-<div class="banner" role="note"><span class="dot" aria-hidden="true"></span><span><b>저장된 관측 재생 · live 아님.</b> 2026-10-07 실험 기록의 스냅샷만 순서대로 보여 줍니다. 관측 사이의 상태는 기록되지 않았습니다.</span></div>
+<div class="banner" role="note"><span class="dot" aria-hidden="true"></span><span><b>저장된 관측 재생 · live 아님.</b> 2026-10-07 통합 실행 기록 · Mobilint는 2026-10-08 별도 성공 기록입니다.</span></div>
 <main>
 <header>
   <div>
@@ -135,10 +141,25 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
     <p class="sub" id="scope"></p>
   </div>
   <fieldset class="scenario"><legend>시나리오</legend>
-    <label><input type="radio" name="scenario" value="fleet" checked> 전체 연결 자원</label>
+    <label><input type="radio" name="scenario" value="fleet" checked> 통합 실행 · K8s + Slurm</label>
     <label><input type="radio" name="scenario" value="adaptive"> 변동 도착·우선순위·재시도</label>
   </fieldset>
 </header>
+
+<section class="card" id="mobilint-success" aria-label="모빌린트 별도 실행 성공 기록" hidden data-source-sha256="64ebe1c9d4e585f59e0e7d7b55665d3758d031a0924c2426fb4de6c6ff44bd09">
+  <h2>Mobilint ARIES2 · Candy 실행 성공 <span class="lane kubernetes">Kubernetes</span></h2>
+  <p class="sub">2026-10-08 별도 실행 기록 · 아래 10월 7일 통합 실행 10건에 합산하지 않습니다.</p>
+  <div class="facts">
+    <div><b>SUCCEEDED</b><span>실제 NPU 작업 완료</span></div>
+    <div><b>일치 검증 통과</b><span>고정 입력의 반복 출력 일치</span></div>
+    <div><b>결과 수집 완료</b><span>프로파일 · MLflow 기록 확인</span></div>
+  </div>
+  <details><summary>실행 근거와 검증 범위</summary>
+    <p>Candy 컴파일 모델 · NPU 1개 · CPU 1개 · 메모리 1 GiB. 접수 07:22:15 UTC → 완료 07:22:50 UTC.</p>
+    <p>실제 하드웨어 실행과 반복 출력 일치를 확인한 기록입니다. 스타일 품질 평가나 현재 장비 상태를 뜻하지 않습니다. Firmware identity 미완료로 성능 추천 재사용은 보류돼 있습니다.</p>
+    <p><a href="https://github.com/dsa04156/resource-advisor/blob/a5d1dde87b56ba2794dc6a93559342eb85f1940f/docs/evidence/all-accelerators-20261008-v1.json">원본 성공 기록 · jobs[0]</a> · workload: mobilint-candy-20261008-v1</p>
+  </details>
+</section>
 
 <section class="transport" aria-label="재생 제어">
   <div class="buttons">
@@ -337,6 +358,7 @@ function renderSummary(f, last) {
 function render() {
   const frames = sc().frames, f = frame(), prev = state.index > 0 ? frames[state.index - 1] : null, last = state.index === frames.length - 1;
   $('scope').textContent = sc().name + ' · ' + sc().scope;
+  $('mobilint-success').hidden = state.scenario !== 'fleet' || !last;
   $('seek').max = frames.length - 1; $('seek').value = state.index;
   $('seek').setAttribute('aria-valuetext', `관측 ${state.index + 1} / ${frames.length}, ${hhmmss(f.observed_at)}`);
   $('idx').textContent = `관측 ${state.index + 1} / ${frames.length}`;
@@ -387,6 +409,7 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'Home') { e.preventDefault(); go(0); }
 });
 window.__replay = {state, go, data: DATA};
+if (location.hash === '#success') state.index = DATA.scenarios.fleet.frames.length - 1;
 renderRuler(); render();
 })();
 </script>
