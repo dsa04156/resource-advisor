@@ -136,7 +136,7 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
 </style>
 </head>
 <body>
-<div class="banner" role="note"><span class="dot" aria-hidden="true"></span><span><b>저장된 관측 재생 · live 아님.</b> 2026-10-07 통합 실행 기록 · Mobilint는 2026-10-08 별도 성공 기록입니다.</span></div>
+<div class="banner" role="note"><span class="dot" aria-hidden="true"></span><span><b>저장된 관측 재생 · live 아님.</b> 2026-10-07~08 실행 기록 · 각 행의 실행일을 함께 표시합니다.</span></div>
 <main>
 <header>
   <div>
@@ -149,9 +149,9 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
   </fieldset>
 </header>
 
-<section class="card" id="mobilint-success" aria-label="모빌린트 별도 실행 성공 기록" hidden data-source-sha256="64ebe1c9d4e585f59e0e7d7b55665d3758d031a0924c2426fb4de6c6ff44bd09">
+<section class="card" id="mobilint-success" aria-label="모빌린트 실행 성공 기록" hidden data-source-sha256="64ebe1c9d4e585f59e0e7d7b55665d3758d031a0924c2426fb4de6c6ff44bd09">
   <h2>Mobilint ARIES2 · Candy 실행 성공 <span class="lane kubernetes">Kubernetes</span></h2>
-  <p class="sub">2026-10-08 별도 실행 기록 · 아래 10월 7일 통합 실행 10건에 합산하지 않습니다.</p>
+  <p class="sub">실행일 2026-10-08 · 검증된 Candy 모델 실행 결과</p>
   <div class="facts">
     <div><b>SUCCEEDED</b><span>실제 NPU 작업 완료</span></div>
     <div><b>일치 검증 통과</b><span>고정 입력의 반복 출력 일치</span></div>
@@ -194,22 +194,21 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
 </section>
 
 <div class="layout">
-  <section class="board" aria-label="통합 실행 10건 및 별도 Mobilint 실행 기록">
+  <section class="board" aria-label="Kubernetes와 Slurm 실행 기록">
     <div class="board-head" aria-hidden="true">
       <span>요청</span><span>네이티브 경로</span><span>장치 모델 · 작업</span>
       <span class="stage-head"><span>접수</span><span>대기</span><span>할당</span><span>실행</span><span>수집</span><span>종료</span></span>
-      <span>관측 상태</span><span>노드 alias</span><span id="extra-head">결과 · 기록</span>
+      <span>관측 상태</span><span>노드 · 실행일</span><span id="extra-head">결과 · 기록</span>
     </div>
     <div id="rows"></div>
     <div id="mobilint-row" hidden>
-      <div class="separate-date">별도 성공 기록 · 2026-10-08 · 위 통합 실행 10건과 다른 실행</div>
-      <div class="row" aria-label="별도 Mobilint ARIES2 Candy Kubernetes 실행 성공, 2026-10-08">
-        <span class="rid">별도</span>
+      <div class="row" aria-label="요청 11 Mobilint ARIES2 Candy Kubernetes 실행 성공, 2026-10-08">
+        <span class="rid">요청 11</span>
         <span class="lane kubernetes">K8s · Kueue</span>
         <span class="what"><b>Mobilint ARIES2</b><small>Candy 모델 추론</small><br><small>NPU · 가속기 1</small></span>
         <span class="track" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span class="on done"></span></span>
         <span class="state">SUCCEEDED</span>
-        <span class="where">노드 비공개</span>
+        <span class="where"><span class="node">NPU-B</span><br><small>2026-10-08</small></span>
         <span class="extra">반복 출력 일치 · 결과 수집 · MLflow 기록</span>
       </div>
     </div>
@@ -281,6 +280,7 @@ function renderRow(row, req, prev) {
   const where = el('span', 'where');
   const nodes = requestNodes(req);
   if (nodes.length) nodes.forEach(n => where.append(el('span', 'node', n))); else where.append(unknown(req.state === 'NOT_SUBMITTED' ? '—' : '노드 미관측'));
+  where.append(el('br'), el('small', null, frame().observed_at.slice(0, 10)));
   b.append(where);
   const extra = el('span', 'extra');
   if (state.scenario === 'adaptive') {
@@ -350,6 +350,11 @@ function renderNodes(f) {
     txt.append(on[alias] ? el('span', null, on[alias].join('  ')) : unknown('이 관측에 표시된 요청 없음'));
     d.append(txt); box.append(d);
   });
+  if (state.scenario === 'fleet' && state.index === sc().frames.length - 1) {
+    const d = el('div'), txt = el('span');
+    txt.append(el('strong', null, 'Mobilint ARIES2'), el('br'), el('small', null, 'Kubernetes · NPU · 2026-10-08'), el('br'), el('span', null, '요청 11 · SUCCEEDED'));
+    d.append(el('span', 'node', 'NPU-B'), txt); box.append(d);
+  }
   if (f.queue_observation) box.append(el('p', 'sub', `Kueue 관측: admitted ${f.queue_observation.admitted ?? '—'} · pending ${f.queue_observation.pending ?? '—'}`));
 }
 
@@ -360,18 +365,19 @@ function renderSummary(f, last) {
   const card = el('div', 'card'); card.append(el('h2', null, '기록 종료 요약 · 마지막 관측에서만 표시'));
   const reqs = Object.values(f.requests), facts = el('div', 'facts');
   const fact = (v, k) => { const d = el('div'); d.append(el('b', null, String(v)), el('span', null, k)); facts.append(d); };
-  fact(`${reqs.filter(r => r.state === 'SUCCEEDED').length}/${reqs.length}`, '논리 요청 SUCCEEDED');
+  const additional = state.scenario === 'fleet' ? 1 : 0;
+  fact(`${reqs.filter(r => r.state === 'SUCCEEDED').length + additional}/${reqs.length + additional}`, '표시된 실행 기록 SUCCEEDED');
   fact(new Set(reqs.map(r => r.backend)).size === 2 ? 'K8s + Slurm' : BACKEND[reqs[0].backend], '네이티브 경로');
   if (state.scenario === 'fleet') {
-    fact(`${f.execution_coverage.gpu.length} + ${f.execution_coverage.npu.length}`, '실행 노드 GPU + NPU (누적)');
-    fact(reqs.filter(r => r.mlflow_receipt).length, 'MLflow 수신 기록');
+    fact(`${f.execution_coverage.gpu.length} + ${f.execution_coverage.npu.length + 1}`, '실행 노드 GPU + NPU (누적)');
+    fact(reqs.filter(r => r.mlflow_receipt).length + 1, 'MLflow 수신 기록');
   } else {
     fact(f.native_attempts.length, '네이티브 시도 (논리 요청 10)');
     fact(f.priority_changes.length, '대기 우선순위 승격 10→100');
     fact(f.native_attempts.filter(a => a.state === 'FAILED').length, '주입 실패 exit 42 → 다른 노드 재시도');
     fact(secs(f.elapsed_seconds), '기록된 경과 시간');
   }
-  card.append(facts, el('p', null, sc().scope));
+  card.append(facts, el('p', null, state.scenario === 'fleet' ? '2026-10-07 K8s·Slurm 실행 10건과 2026-10-08 Mobilint 실행 1건의 완료 기록입니다. 노드 수는 누적이며 동시 할당 수가 아닙니다.' : sc().scope));
   const span = (t(f.observed_at) - t(sc().frames[0].observed_at)) / 1000;
   card.append(el('p', null, `관측 ${sc().frames.length}개, 첫 관측부터 ${secs(span)}. 요청별 정확한 실행 시간이 아니라 스냅샷 시각이다.`));
   box.append(card);
@@ -379,8 +385,8 @@ function renderSummary(f, last) {
 
 function render() {
   const frames = sc().frames, f = frame(), prev = state.index > 0 ? frames[state.index - 1] : null, last = state.index === frames.length - 1;
-  $('scope').textContent = sc().name + ' · ' + sc().scope;
-  $('mobilint-success').hidden = state.scenario !== 'fleet' || !last;
+  $('scope').textContent = state.scenario === 'fleet' && last ? 'Kubernetes · Slurm · CUDA · Hailo · Mobilint | 2026-10-07~08 실행 완료 기록' : sc().name + ' · ' + sc().scope;
+  $('mobilint-success').hidden = true;
   $('mobilint-row').hidden = state.scenario !== 'fleet' || !last;
   $('seek').max = frames.length - 1; $('seek').value = state.index;
   $('seek').setAttribute('aria-valuetext', `관측 ${state.index + 1} / ${frames.length}, ${hhmmss(f.observed_at)}`);
@@ -399,7 +405,7 @@ function render() {
   $('next').disabled = last;
   $('play').setAttribute('aria-pressed', String(state.playing));
   $('play').textContent = state.playing ? '❚❚ 일시정지' : '▶ 재생';
-  $('caveat').replaceChildren(`${DATA.notice} 노드·요청·시도 이름은 공개용 alias다. 출처: `, Object.assign(el('a', null, sc().public_summary), {href: sc().public_summary}), ' · replay/PROVENANCE.json');
+  $('caveat').replaceChildren(`${DATA.notice} 노드·요청·시도 이름은 공개용 alias다. 출처: `, Object.assign(el('a', null, sc().public_summary), {href: sc().public_summary}), ' · replay/PROVENANCE.json', ' · ', Object.assign(el('a', null, 'Mobilint 실행 근거'), {href: document.querySelector('#mobilint-success a').href}));
 }
 
 function stop() { clearTimeout(state.timer); state.timer = null; state.playing = false; }

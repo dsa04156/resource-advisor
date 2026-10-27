@@ -10,6 +10,7 @@
 | JET-A | Jetson Orin Nano |
 | JET-B | Jetson AGX Orin |
 | NPU-A | Hailo-8 |
+| NPU-B | Mobilint ARIES2 |
 | SLURM-A | Jetson Orin (Slurm) |
 
 Mobilint ARIES2는 별도의 2026-10-08 성공 카드이며 기존 10건에 합산하지 않는다.
@@ -24,3 +25,5 @@ Mobilint ARIES2는 별도의 2026-10-08 성공 카드이며 기존 10건에 합�
 | latest.json | `cdd8e56d22d3dcbfdd25beea7f0daa4fda84c66f3ed15dedacf4feb35d19d91f` |
 | cuda-smoke-auto-v1.json | `6817e98b49c75c1fdf0381f9e8040de6e48bf5695208fc1a82990a40f58a435d` |
 | gpu-source-job.json | `cbbcb9894e3926dcd9101b0bf8102cc1e04e6f449a3961af55de68eb5dd5d710` |
+
+NPU-B는 2026-10-08 Mobilint 성공 기록의 node_alias npu-1에 부여한 공개용 표시 별칭이다. 요청 11은 이 합본 표의 표시 번호이며 10월 7일 재생 원본의 요청 번호가 아니다. 완료 표의 합계는 두 날짜의 11건을 집계한다.
