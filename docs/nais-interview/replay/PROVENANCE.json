@@ -1,0 +1,99 @@
+{
+ "schema": "nais-offline-replay-provenance/v1",
+ "exporter": "replay/export_replay.py",
+ "exporter_version": "1.0.0",
+ "output": {
+  "path_from_materials": "replay/observations.json",
+  "schema": "nais-offline-replay/v1",
+  "sha256": "eb0b39d3494146521fc74ae621ead4265d3e75fb02643b0a2f53631c995cf218"
+ },
+ "raw_inputs": [
+  {
+   "scenario": "fleet_batch",
+   "role": "fleet",
+   "location": "private run-state store (not published)",
+   "sha256": "2449294738f393ca1c435a8931eed6ce209e57b2c26c2f881096326f60db9927",
+   "bytes": 3182877,
+   "record_version": 39,
+   "recorded_state": "SUCCEEDED",
+   "events": 24,
+   "event_schema": [
+    "title",
+    "observed_at",
+    "snapshot"
+   ]
+  },
+  {
+   "scenario": "adaptive_batch",
+   "role": "adaptive",
+   "location": "private run-state store (not published)",
+   "sha256": "cdd8e56d22d3dcbfdd25beea7f0daa4fda84c66f3ed15dedacf4feb35d19d91f",
+   "bytes": 9281975,
+   "record_version": 52,
+   "recorded_state": "SUCCEEDED",
+   "events": 52,
+   "event_schema": [
+    "title",
+    "observed_at",
+    "snapshot"
+   ]
+  }
+ ],
+ "extraction_scope": {
+  "per_frame": "one output frame per recorded body.events item, same order and observed_at; no interpolation",
+  "request_fields": "state, allowlisted reason or reason category, device_class, backend, node alias, requested accelerator count, recorded lifecycle/attempt/pod state, exit codes, priority, result outcome/quality, MLflow receipt presence",
+  "aliases": "nodes → GPU/JET/NPU/SLURM-A.. ordered within accelerator type; requests → R01..R10; attempts → Rnn·aN; run/project → run-<scenario>/project-A",
+  "replaced": "event titles mapped to fixed templates; final verdict replaced by a structured summary; Kueue admission messages mapped to categories",
+  "excluded": [
+   "credentials",
+   "endpoints and URLs",
+   "image references and registries",
+   "shell commands and logs",
+   "local absolute paths",
+   "raw job/attempt/native/workload/MLflow identifiers",
+   "cluster queue and flavor names",
+   "node inventory metrics",
+   "raw free-text explanation/verdict/policy",
+   "pod names and UIDs"
+  ]
+ },
+ "public_summary_references": [
+  {
+   "path_from_materials": "../evidence/full-fleet-ten-request.json",
+   "sha256": "a8a14c6e703115229a7616cc072d2001eed7a6a6d8cc588c332476a238fc2012"
+  },
+  {
+   "path_from_materials": "../evidence/adaptive-gpu-arrivals.json",
+   "sha256": "5e0bdb8b79bf76831d01ec45074f1a7ce81ea2235dfcd830b3e5976752c78887"
+  },
+  {
+   "path_from_materials": "../evidence/common-gpu-pool-ten-request.json",
+   "sha256": "1687e2e57a3867d1ac52f553afda684fad4d98c42695a9b6a35330f3455c5f3b"
+  },
+  {
+   "path_from_materials": "../reference/native-scheduler-lab.md",
+   "sha256": "dad656b99091a03921e40709ba863fd688389ca03c54572c6a7a6cb350b69df5"
+  }
+ ],
+ "extracted_counts": {
+  "fleet": {
+   "frames": 24,
+   "rows": 10,
+   "final_succeeded": 10,
+   "mlflow_receipts": 10,
+   "execution_nodes": {
+    "gpu": 6,
+    "npu": 1
+   }
+  },
+  "adaptive": {
+   "frames": 52,
+   "rows": 10,
+   "final_succeeded": 10,
+   "native_attempts": 11,
+   "priority_changes": 6,
+   "succeeded_worker_pods": 13
+  }
+ },
+ "command": "rtk proxy python3 docs/nais-interview/replay/export_replay.py --fleet <RAW_FLEET_BATCH_JSON> --adaptive <RAW_ADAPTIVE_BATCH_JSON>"
+}

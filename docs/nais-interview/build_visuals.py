@@ -1,8 +1,10 @@
 """Render interview assets from archived evidence; does not contact the cluster.
+10–11 and offline-demo.html read replay/observations.json (sanitized; refresh it with replay/export_replay.py).
 Run: rtk proxy uv run --isolated --with matplotlib==3.11.2 --with cairosvg --with pillow python docs/nais-interview/build_visuals.py
 """
 from pathlib import Path
 import csv, json, html, hashlib, zipfile
+from datetime import datetime
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -193,6 +195,78 @@ diagram('09-runai-scope','비교의 중심은 “어느 운영 계층을 맡는�
         'Run:ai의 NodeSet 지원은 Slurm job/account/partition 전체 관리와 다름  ·  세부 공식 링크는 README',
         'Run:ai 공식 제품·scheduler·supported workload·Slurm tutorial 기준. 라이선스·비용·성능의 우열 비교 아님.')
 
+# 10–11 and the offline demo read only the sanitized replay derivative, never the private raw records.
+REPLAY=BASE/'replay'
+p=source('10-fleet-integration','docs/nais-interview/replay/observations.json')
+source('10-fleet-integration','docs/evidence/full-fleet-ten-request.json')
+source('11-adaptive-timeline','docs/nais-interview/replay/observations.json')
+source('11-adaptive-timeline','docs/evidence/adaptive-gpu-arrivals.json')
+obs=json.loads(p.read_text());NODES=obs['nodes']
+def ts(x):return datetime.fromisoformat(x).timestamp()
+def offset(sc,x):return ts(x)-ts(sc['frames'][0]['observed_at'])
+
+# 10: final recorded snapshot of fleet_batch; first SUCCEEDED observation per row from the recorded frames.
+fl=obs['scenarios']['fleet'];final=fl['frames'][-1]['requests']
+first_ok={r:next(offset(fl,f['observed_at']) for f in fl['frames'] if f['requests'].get(r,{}).get('state')=='SUCCEEDED') for r in fl['rows']}
+assert all(final[r]['state']=='SUCCEEDED' for r in fl['rows']) and len({final[r]['node'] for r in fl['rows']})==7
+k8s=[a for a in NODES if NODES[a]['backend']=='kubernetes'];slurm=[a for a in NODES if NODES[a]['backend']=='slurm']
+ny={a:248+i*68 for i,a in enumerate(k8s)}|{a:712 for a in slurm}
+b=f'<rect x="960" y="212" width="592" height="452" rx="10" fill="#e8eef8"/>'+svg_text(980,240,'Kubernetes · Kueue  (K8s adapter → suspended Job)',18,BLUE,'bold')
+b+=f'<rect x="960" y="676" width="592" height="114" rx="10" fill="#e9ebee" stroke="{INK}" stroke-width="1.5"/>'+svg_text(980,702,'Slurm  (별도 SSH adapter → sbatch)',18,INK,'bold')
+for i,r in enumerate(fl['rows']):
+    q=final[r];y=228+i*54;col=BLUE if q['backend']=='kubernetes' else INK;n=q['node']
+    b+=f'<path d="M620,{y+22} C790,{y+22} 830,{ny[n]+29} 1000,{ny[n]+29}" fill="none" stroke="{col}" stroke-width="{2.5 if col==INK else 1.8}" opacity=".75"'+(' stroke-dasharray="7 5"' if q['device_class']=='npu' else '')+'/>'
+    b+=f'<rect x="64" y="{y}" width="556" height="44" rx="6" fill="#ffffff" stroke="#d9dce1"/>'
+    b+=svg_text(80,y+29,r.replace('R','요청 '),18,INK,'bold')+svg_text(170,y+29,f"{q['device_class'].upper()} · {q['workload']}",17,MUTED)
+    b+=svg_text(604,y+29,f"SUCCEEDED +{first_ok[r]:.0f}초",16,col,'bold','end')
+for a in NODES:
+    m=NODES[a];y=ny[a];used=[r for r in fl['rows'] if final[r]['node']==a]
+    b+=f'<rect x="1000" y="{y}" width="520" height="58" rx="6" fill="#ffffff" stroke="{MUTED}" stroke-width="1.5"/>'
+    b+=svg_text(1016,y+26,a,20,INK,'bold')+svg_text(1120,y+26,f"{m['accelerator']} · {m['architecture']}",17,MUTED)
+    b+=svg_text(1016,y+48,'요청 '+', '.join(r[1:] for r in used),15,MUTED)
+b+=svg_text(700,218,'선: 요청 → 실행 노드 (최종 관측)',16,MUTED)+svg_text(700,800-16,'점선: NPU 요청',16,MUTED)
+diagram('10-fleet-integration','요청 10개를 K8s GPU·NPU와 별도 Slurm에 나누어 실행','2026-10-07 · fleet_batch 동시 제출 · 저장된 관측 24개 중 마지막 스냅샷 · 노드는 공개 alias',b,
+        '실행 노드 7개(GPU 6 + NPU 1)는 누적 관측, 동시 할당 아님  ·  +초는 첫 관측 기준 SUCCEEDED가 처음 보인 스냅샷 시각이며 실행 시간 아님',
+        '정제 replay/observations.json의 fleet 마지막 프레임. 결과·MLflow 수신 10/10은 full-fleet-ten-request.json과 일치. 두 scheduler의 공동 GPU 소유가 아니다.')
+
+# 11: dot per recorded snapshot; no line between dots because intermediate states were not recorded.
+ad=obs['scenarios']['adaptive'];rows=ad['rows'];frames=ad['frames'][1:]
+STYLE={'NOT_SUBMITTED':dict(marker='.',s=14,c='#c8ccd4'),'PENDING':dict(marker='o',s=40,facecolors='none',edgecolors=MUTED),
+       'REQUEUED':dict(marker='o',s=40,facecolors='none',edgecolors=ACCENT),'ADMITTED':dict(marker='o',s=40,facecolors='none',edgecolors=BLUE,linewidths=1.6),
+       'RUNNING':dict(marker='o',s=40,c=BLUE),'FINALIZING':dict(marker='o',s=40,c='#7c9bd1'),'SUCCEEDED':dict(marker='s',s=22,c=INK)}
+NAMES={'NOT_SUBMITTED':'도착 전','PENDING':'대기','REQUEUED':'재접수','ADMITTED':'입장 승인','RUNNING':'실행','FINALIZING':'마무리','SUCCEEDED':'성공'}
+fig=chart('11-adaptive-timeline','변동 도착 10건: 대기 승격과 주입 실패 재시도를 관측 시각으로','2026-10-07 · adaptive_batch · Kueue 공통 GPU 풀 3장 · 저장된 관측 52개 · 점 1개 = 스냅샷 1개, 점 사이 상태는 미기록',
+          '2-GPU 요청(01·03·06)은 시작 barrier가 있는 독립 worker 2개이며 DDP 학습이 아니다. exit 42는 주입한 실패이며 하드웨어 장애가 아니다.\n가로축은 첫 관측 기준 스냅샷 시각이며 요청별 실행 시간이 아니다. 승격 규칙: 대기 20초 이상 aging, 10→100. 기록 경과 218.1초.')
+ax=fig.add_axes([.075,.25,.76,.56]);ax.set_facecolor(PAPER)
+seen=set();cells=[]
+for f in frames:
+    x=offset(ad,f['observed_at'])
+    for i,r in enumerate(rows):
+        st=f['requests'][r]['state'];assert st in STYLE,st
+        ax.scatter([x],[i],zorder=3,label=NAMES[st] if st not in seen else None,**STYLE[st]);seen.add(st)
+        cells.append((r,x,st))
+last=ad['frames'][-1]
+for c in last['priority_changes']:
+    i=rows.index(c['row']);x=offset(ad,c['observed_at'])
+    ax.scatter([x],[i-.32],marker='v',s=70,c=ACCENT,zorder=4,label='우선순위 승격 기록' if c is last['priority_changes'][0] else None)
+fail=next(f for f in ad['frames'] if any(a['state']=='FAILED' for a in f['requests'].get('R02',{}).get('previous_attempts',[])))
+r2=last['requests']['R02'];old=r2['previous_attempts'][0]
+fx=offset(ad,fail['observed_at']);ax.scatter([fx],[1],marker='X',s=150,c=ACCENT,zorder=5,label='실패 기록 (a1)')
+ax.annotate(f"a1 exit 42 · {old['pods'][0]['node']} 제외 → a2 {r2['pods'][0]['node']} 성공",(fx,1),xytext=(fx+8,1.45),fontsize=12,color=ACCENT,arrowprops=dict(arrowstyle='-',color=ACCENT,lw=1))
+for i,r in enumerate(rows):
+    q=last['requests'][r];ax.text(1.005,i,f"{q['gpu']} GPU · "+'+'.join(p['node'] for p in q['pods']),transform=ax.get_yaxis_transform(),va='center',fontsize=12,color=MUTED)
+ax.set_yticks(range(10),[r.replace('R','요청 ') for r in rows]);ax.invert_yaxis();ax.set_ylim(9.7,-.7)
+ax.set_xlim(0,offset(ad,last['observed_at'])+3);ax.set_xlabel('첫 관측 기준 스냅샷 시각 (초)',color=MUTED)
+ax.spines[['top','right','left']].set_visible(False);ax.tick_params(axis='y',length=0)
+for f in ad['frames']:ax.axvline(offset(ad,f['observed_at']),ymin=0,ymax=.025,color=MUTED,lw=.8)
+h,l=ax.get_legend_handles_labels();order=[*NAMES.values(),'우선순위 승격 기록','실패 기록 (a1)'];hl=sorted(zip(h,l),key=lambda x:order.index(x[1]))
+ax.legend(*zip(*hl),loc='lower left',bbox_to_anchor=(0,1.01),ncol=10,frameon=False,fontsize=11.5,handletextpad=.3,columnspacing=1.1)
+save(fig,'11-adaptive-timeline','변동 도착·승격·재시도 관측','정제 replay/observations.json의 adaptive 52개 프레임. 상태는 스냅샷 값 그대로이고 점 사이를 잇지 않는다. 시도 11·승격 6·worker 13은 adaptive-gpu-arrivals.json과 일치.')
+
+# Offline demo: template + sanitized JSON in one self-contained file (no network, opens from file://).
+payload=json.dumps(obs,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
+(BASE/'offline-demo.html').write_text((REPLAY/'offline-demo.template.html').read_text().replace('__OBSERVATIONS_JSON__',payload))
+
 # Self-contained SVG gallery, image index, source manifest, chart table and contact sheet.
 with (OUT/'SOURCES.csv').open('w',newline='') as f:
     w=csv.writer(f);w.writerow(['figure','repository_path','sha256']);w.writerows(source_rows)
@@ -205,17 +279,25 @@ with (OUT/'CHART-DATA.csv').open('w',newline='') as f:
     for k in policies:
         for metric in ['mean_jct_seconds','p95_jct_seconds','native_throughput_jobs_per_second']:w.writerow(['06',k,metric,d['overall'][k][metric],'jobs_per_second' if 'throughput' in metric else 'seconds'])
     for i,v in enumerate(vals):w.writerow(['08',f'api_run_{i+1}','100_call_sum',v,'seconds'])
-gallery=['<!doctype html><meta charset="utf-8"><title>NAIS 발표 이미지 자료</title><style>body{margin:32px;background:#e9ebee;font-family:sans-serif}section{max-width:1400px;margin:32px auto}svg{width:100%;height:auto}p{line-height:1.6}a{color:#2e5aa8}</style><h1>NAIS 발표 이미지 자료</h1><p>코드 기반 구조도와 기록 기반 데이터 차트. 실제 서비스 화면 캡처가 아닙니다.</p>']
-readme=['# 발표용 이미지 자료','', 'PNG는 3200×1800(16:9)이며 바로 PPT에 삽입할 수 있다. SVG는 벡터 도형·텍스트를 편집할 수 있다. SVG의 한글 글꼴은 Noto Sans CJK 계열이 필요하며 폰트가 없으면 PNG를 사용한다.', '', '구조도는 코드 기반 재구성, 차트는 과거 기록의 시각화다. 실제 화면 캡처나 현재 가동 상태가 아니다. 중요한 표본·조건·한계는 그림 자체에도 표시했다.', '', '| 번호 | 내용 | PNG | SVG |', '|---|---|---|---|']
+    for r in fl['rows']:
+        w.writerow(['10',r,'final_backend',final[r]['backend'],'label']);w.writerow(['10',r,'final_node_alias',final[r]['node'],'alias'])
+        w.writerow(['10',r,'first_succeeded_snapshot_offset',round(first_ok[r],3),'seconds'])
+    for r in rows:
+        q=last['requests'][r];w.writerow(['11',r,'requested_gpu',q['gpu'],'count'])
+        w.writerow(['11',r,'first_native_creation_offset',int(ts((q['previous_attempts'] or [q])[0]['submitted_at'])-ts(last['requests']['R01']['submitted_at'])),'seconds'])
+    for c in last['priority_changes']:w.writerow(['11',c['row'],'priority_change_observed_offset',round(offset(ad,c['observed_at']),3),'seconds'])
+    w.writerow(['11','R02','failure_first_recorded_snapshot_offset',round(fx,3),'seconds'])
+gallery=['<!doctype html><meta charset="utf-8"><title>NAIS 발표 이미지 자료</title><style>body{margin:32px;background:#e9ebee;font-family:sans-serif}section{max-width:1400px;margin:32px auto}svg{width:100%;height:auto}p{line-height:1.6}a{color:#2e5aa8}</style><h1>NAIS 발표 이미지 자료</h1><p>코드 기반 구조도와 기록 기반 데이터 차트. 실제 서비스 화면 캡처가 아닙니다. 저장된 관측을 재생하는 <a href="../offline-demo.html">오프라인 데모</a>도 함께 제공합니다.</p>']
+readme=['# 발표용 이미지 자료','', 'PNG는 3200×1800(16:9)이며 바로 PPT에 삽입할 수 있다. SVG는 벡터 도형·텍스트를 편집할 수 있다. SVG의 한글 글꼴은 Noto Sans CJK 계열이 필요하며 폰트가 없으면 PNG를 사용한다.', '', '구조도는 코드 기반 재구성, 차트는 과거 기록의 시각화다. 실제 화면 캡처나 현재 가동 상태가 아니다. 중요한 표본·조건·한계는 그림 자체에도 표시했다.', '', '10·11과 [오프라인 재생 데모](../offline-demo.html)는 비공개 실행 기록에서 허용 필드만 추출한 [정제 파생 데이터](../replay/observations.json)를 사용한다. 원본은 공개하지 않으며 해시·추출 범위는 [PROVENANCE.json](../replay/PROVENANCE.json)에 있다.', '', '| 번호 | 내용 | PNG | SVG |', '|---|---|---|---|']
 for name,title,caption in assets:
     svg=(OUT/f'{name}.svg').read_text();svg=svg[svg.index('<svg'):]
     gallery.append(f'<section><h2>{html.escape(title)}</h2>{svg}<p>{html.escape(caption)}</p></section>')
     readme.append(f'| {name[:2]} | {title} | [PNG]({name}.png) | [SVG]({name}.svg) |')
 readme += ['', '## 그림별 설명', '']+[f'- **{n}**: {c}' for n,t,c in assets]
-readme += ['', '## 데이터와 출처','', '- [CHART-DATA.csv](CHART-DATA.csv): 그림에 표시한 주요 수치와 단위.', '- [SOURCES.csv](SOURCES.csv): 데이터 원본 경로와 SHA-256. 경로는 레포 루트 기준.', '- [전체 원자료](../SOURCE-MATERIAL.md), [증거 색인](../EVIDENCE-INDEX.md).', '- 01·02 코드: src/resource_advisor/{configuration,backends,worker,service,contracts}.py', '- 03 공식: https://www.nst.re.kr/www/contents.do?key=358', '- 09 공식: https://www.nvidia.com/en-us/software/run-ai/', '- 09 scheduler: https://docs.nvidia.com/run-ai/self-hosted/v3.0/documentation/platform-management/runai-scheduler/scheduling/how-the-scheduler-works', '- 09 NodeSet 범위: https://docs.nvidia.com/run-ai/self-hosted/documentation/workloads-in-nvidia-run-ai/workload-types/supported-workload-types', '- 09 Slurm: https://docs.nvidia.com/run-ai/self-hosted/v3.0/documentation/tutorials/training-tutorials/deploying-slurm', '', '## 제작·재생성', '', 'build_visuals.py를 이용한 로컬 문서 산출 작업이며 시스템 구현을 변경하지 않는다. 그래프: Matplotlib, 도식: SVG/CairoSVG. 원본에서 수치 재독해, 표본·단위 확인, 이미지 육안 검수. 별도 실험 또는 독립 감사는 수행하지 않음.', '', '한글 적용: Noto Sans CJK, 제목·본문 모두 한글 가독성 우선. paper #f5f5f5 / ink #2d3142 / accent #eb6c36 / muted #4f5d75. 데이터 축은 0에서 시작. 허용되지 않은 오차막대나 유의성 표시를 추가하지 않음.', '', '시각화 절차 참고: Kassis, T., Agarwal, V., He, Y., Patel, D., & Brueckner, A. M. (2026). Scientific Agent Skills: A Library of Procedural Knowledge for Research Agents. https://doi.org/10.48550/arXiv.2609.00065 (확인된 최신 레코드 v2, 2026-09-02). 프로젝트의 실험 근거와는 별개인 제작 도구 참고문헌.']
+readme += ['', '## 데이터와 출처','', '- [CHART-DATA.csv](CHART-DATA.csv): 그림에 표시한 주요 수치와 단위.', '- [SOURCES.csv](SOURCES.csv): 데이터 원본 경로와 SHA-256. 경로는 레포 루트 기준.', '- 10·11 정제 데이터 재생성(비공개 원본 필요): `rtk proxy python3 docs/nais-interview/replay/export_replay.py --fleet <RAW_FLEET_BATCH_JSON> --adaptive <RAW_ADAPTIVE_BATCH_JSON>`', '- [전체 원자료](../SOURCE-MATERIAL.md), [증거 색인](../EVIDENCE-INDEX.md).', '- 01·02 코드: src/resource_advisor/{configuration,backends,worker,service,contracts}.py', '- 03 공식: https://www.nst.re.kr/www/contents.do?key=358', '- 09 공식: https://www.nvidia.com/en-us/software/run-ai/', '- 09 scheduler: https://docs.nvidia.com/run-ai/self-hosted/v3.0/documentation/platform-management/runai-scheduler/scheduling/how-the-scheduler-works', '- 09 NodeSet 범위: https://docs.nvidia.com/run-ai/self-hosted/documentation/workloads-in-nvidia-run-ai/workload-types/supported-workload-types', '- 09 Slurm: https://docs.nvidia.com/run-ai/self-hosted/v3.0/documentation/tutorials/training-tutorials/deploying-slurm', '', '## 제작·재생성', '', 'build_visuals.py를 이용한 로컬 문서 산출 작업이며 시스템 구현을 변경하지 않는다. 그래프: Matplotlib, 도식: SVG/CairoSVG. 원본에서 수치 재독해, 표본·단위 확인, 이미지 육안 검수. 별도 실험 또는 독립 감사는 수행하지 않음.', '', '한글 적용: Noto Sans CJK, 제목·본문 모두 한글 가독성 우선. paper #f5f5f5 / ink #2d3142 / accent #eb6c36 / muted #4f5d75. 데이터 축은 0에서 시작. 허용되지 않은 오차막대나 유의성 표시를 추가하지 않음.', '', '시각화 절차 참고: Kassis, T., Agarwal, V., He, Y., Patel, D., & Brueckner, A. M. (2026). Scientific Agent Skills: A Library of Procedural Knowledge for Research Agents. https://doi.org/10.48550/arXiv.2609.00065 (확인된 최신 레코드 v2, 2026-09-02). 프로젝트의 실험 근거와는 별개인 제작 도구 참고문헌.']
 (OUT/'gallery.html').write_text('\n'.join(gallery))
 (OUT/'README.md').write_text('\n'.join(readme)+'\n')
-thumb=Image.new('RGB',(1600,972),'#e9ebee')
+thumb=Image.new('RGB',(1600,12+-(-len(assets)//3)*320),'#e9ebee')
 for i,(n,_,_) in enumerate(assets):
     im=Image.open(OUT/f'{n}.png');im.thumbnail((512,288));x=16+(i%3)*528;y=16+(i//3)*320;thumb.paste(im,(x,y));ImageDraw.Draw(thumb).text((x,y+292),n,fill=INK)
 thumb.save(OUT/'CONTACT-SHEET.png')
@@ -226,4 +308,6 @@ with zipfile.ZipFile(BASE/'NAIS-visual-assets.zip','w',zipfile.ZIP_DEFLATED) as 
     for p in sorted(OUT.iterdir()):
         if p.is_file():z.write(p,'visuals/'+p.name)
     z.write(__file__,'build_visuals.py')
+    z.write(BASE/'offline-demo.html','offline-demo.html')
+    for name in ['observations.json','PROVENANCE.json','export_replay.py','test_replay.py','browser_check.py','offline-demo.template.html']:z.write(REPLAY/name,'replay/'+name)
 print(f'Rendered {len(assets)} figures to {OUT}')

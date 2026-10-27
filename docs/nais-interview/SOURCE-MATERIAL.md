@@ -357,6 +357,29 @@ AMD GPU나 국산 NPU 전체로 일반화할 수 없다. NPU 메모리·전력·
 
 ---
 
+### 5.10 통합 실행·우선순위·재시도 기록과 오프라인 재생 (2026-10-07 lab 기록)
+
+[그림 10](visuals/10-fleet-integration.png) · [그림 11](visuals/11-adaptive-timeline.png) ·
+[오프라인 재생 데모](offline-demo.html) · [정제 데이터](replay/observations.json) · [출처 manifest](replay/PROVENANCE.json).
+공개 요약: [full-fleet-ten-request.json](../evidence/full-fleet-ten-request.json),
+[adaptive-gpu-arrivals.json](../evidence/adaptive-gpu-arrivals.json),
+[common-gpu-pool-ten-request.json](../evidence/common-gpu-pool-ten-request.json), 의미 설명 [native-scheduler-lab.md](../reference/native-scheduler-lab.md).
+
+| 시나리오 | 저장된 관측 | 기록된 결과 |
+|---|---|---|
+| fleet_batch | 스냅샷 24개 | 요청 10개(GPU 8 / NPU 2), K8s 8 + Slurm 2, 결과·MLflow 수신 10/10, 실행 노드 GPU 6 + NPU 1 (누적) |
+| adaptive_batch | 스냅샷 52개 · 기록 경과 218.1초 | 논리 요청 10, 네이티브 시도 11, CUDA worker 결과 13, 대기 승격 6건 10→100, 주입 실패 exit 42 1건 후 다른 노드 재시도 성공 |
+
+- 실행 노드 7개는 누적 관측이며 동시 할당이 아니다. 2-GPU 요청은 barrier가 있는 독립 worker 2개이며 DDP 학습이 아니다.
+- exit 42는 시나리오가 주입한 실패이며 하드웨어 장애가 아니다. checkpoint 복원·Slurm/NPU failover는 이 기록의 범위가 아니다.
+- 재생은 저장된 스냅샷을 순서대로 보여 줄 뿐이며 live 상태가 아니다. 관측 사이 상태는 보간하지 않고, 기록 없는 값은 “미관측”으로 표시한다.
+- 그림·데모의 “+초”는 첫 관측 기준 스냅샷 시각이며 요청별 정확한 실행 시간이 아니다.
+- **비공개 원본 vs 공개 파생**: 원본 실행 기록(내부 노드명·job id·엔드포인트 등 포함)은 공개하지 않는다.
+  [export_replay.py](replay/export_replay.py)가 허용 필드만 추출하고 노드·요청·시도를 alias(GPU-A, SLURM-A, R02·a1 등)로 바꾼다.
+  원본 SHA-256·추출 범위·제외 항목·추출 수는 PROVENANCE.json에 있다.
+- 재생성: `rtk proxy python3 docs/nais-interview/replay/export_replay.py --fleet <RAW_FLEET_BATCH_JSON> --adaptive <RAW_ADAPTIVE_BATCH_JSON>` 후
+  `build_visuals.py` 실행. 검사: `replay/test_replay.py`(원본 경로를 환경변수로 주면 원본 대조 포함), `replay/browser_check.py`(file:// 브라우저 검사).
+
 ## 6. 범위: 구현된 lab 경로 vs 미구현
 
 | [실습 구현] lab 경로 | [미구현] 기관 규모에 필요한 것 |
@@ -424,6 +447,7 @@ Run:ai보다 기관 전체에 적합하다고 결론 내릴 근거는 없다. �
 9. 범위와 한계 — 6장
 10. 직무 연결 — 6.1
 11. 부록 — 5.3 162작업, 7장 Run:ai
+12. (선택) 통합 실행·재시도 — 5.10, 그림 10·11, 오프라인 재생 데모
 
 ---
 

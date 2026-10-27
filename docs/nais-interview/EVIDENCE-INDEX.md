@@ -14,6 +14,8 @@
 | BO 선택 이점 없음 | 동일 예산 S0/S1/S2 | [policy-comparison-v2.md](../reference/policy-comparison-v2.md) |
 | Slurm high 우선순위 경로 | QOS ra-high, GPU 예약 72초, 1 Job | [slurm-priority-gateway.md](../reference/slurm-priority-gateway.md) |
 | Slurm container 미지원, native runtime만 | container variant preflight 거절 | [slurm-runtime.md](../reference/slurm-runtime.md), [backends.py](../../src/resource_advisor/backends.py) |
+| 10요청 통합 실행: K8s 8 + Slurm 2, GPU 8 / NPU 2, 결과·MLflow 10/10 | 2026-10-07 fleet_batch, 스냅샷 24개, 실행 노드 7개 누적 | [공개 요약](../evidence/full-fleet-ten-request.json), [정제 재생 데이터](replay/observations.json), [출처 manifest](replay/PROVENANCE.json) |
+| 변동 도착: 시도 11, 승격 6건 10→100, exit 42 주입 1건 후 다른 노드 재시도 | 2026-10-07 adaptive_batch, 스냅샷 52개, 218.1초, worker 결과 13 | [공개 요약](../evidence/adaptive-gpu-arrivals.json), [lab 설명](../reference/native-scheduler-lab.md), [정제 재생 데이터](replay/observations.json) |
 | 운영 한계·미검증 복구 | E0–E7 전체, Slurm 복구 등 | [architecture.md](../architecture.md), [claim audit](../right-sizing-claim-audit.md) |
 
 ## 구현 코드 (아키텍처 근거)
@@ -54,6 +56,6 @@
 
 ## 발표용 이미지
 
-[그림 9종 목록](visuals/README.md) · [한눈에 보기](visuals/CONTACT-SHEET.png) · [전체 ZIP](NAIS-visual-assets.zip)
+[그림 11종 목록](visuals/README.md) · [오프라인 재생 데모](offline-demo.html) · [한눈에 보기](visuals/CONTACT-SHEET.png) · [전체 ZIP](NAIS-visual-assets.zip)
 
 고해상도 PNG와 편집용 SVG, 차트 수치 CSV, 출처 목록을 제공한다.

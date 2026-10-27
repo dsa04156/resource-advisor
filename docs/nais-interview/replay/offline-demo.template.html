@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:">
+<title>스케줄러 기록 재생</title>
+<style>
+:root{
+  --paper:#f5f5f5; --sheet:#ffffff; --ink:#2d3142; --muted:#4f5d75; --faint:#8a93a6; --rule:rgba(45,49,66,.14); --rule-soft:rgba(45,49,66,.08);
+  --accent:#eb6c36; --accent-wash:#fcece4; --native:#2e5aa8; --native-wash:#e8eef8; --slurm:#2d3142; --slurm-wash:#e9ebee;
+  --focus:#2e5aa8; --font:"Noto Sans CJK KR","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular","Noto Sans Mono CJK KR",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 var(--font);overflow-x:hidden}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.banner{position:sticky;top:0;z-index:5;display:flex;gap:10px;align-items:center;padding:8px 20px;background:var(--ink);color:#fff;font-size:13px}
+.banner b{color:#ffd9c7;font-weight:600}
+.banner .dot{width:8px;height:8px;border-radius:50%;border:2px solid #ffd9c7;flex:none}
+main{max-width:1320px;margin:0 auto;padding:16px 20px 40px}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+h1{font-size:22px;letter-spacing:-.01em;margin:0;line-height:1.25}
+.sub{margin:2px 0 0;color:var(--muted);font-size:13px}
+fieldset.scenario{border:0;margin:0;padding:0;display:flex;gap:0;border:1px solid var(--rule);border-radius:8px;background:var(--sheet);overflow:hidden}
+fieldset.scenario legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.scenario label{display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;font-size:13px;color:var(--muted)}
+.scenario label+label{border-left:1px solid var(--rule)}
+.scenario input{accent-color:var(--accent);margin:0}
+.scenario label:has(input:checked){background:var(--accent-wash);color:var(--ink);font-weight:600}
+.transport{margin-top:14px;display:grid;grid-template-columns:auto 1fr auto;gap:10px 16px;align-items:center;background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:10px 14px}
+.buttons{display:flex;gap:6px}
+.buttons button{min-width:40px;height:34px;padding:0 10px;border:1px solid var(--rule);border-radius:7px;background:var(--paper);cursor:pointer}
+.buttons button:hover{background:#ebecef}
+.buttons button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.buttons button:disabled{opacity:.4;cursor:default}
+.seek{display:flex;flex-direction:column;gap:2px;min-width:0}
+.seek input{width:100%;accent-color:var(--accent);margin:0}
+.ruler{position:relative;height:16px}
+.ruler i{position:absolute;top:3px;width:2px;height:10px;margin-left:-1px;background:var(--rule);border-radius:1px}
+.ruler i.past{background:var(--muted)}
+.ruler i.now{background:var(--accent);top:0;height:16px;width:3px}
+.speed{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.speed select{height:34px;border:1px solid var(--rule);border-radius:7px;background:var(--paper);padding:0 6px}
+.clock{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 18px;align-items:baseline;border-top:1px solid var(--rule-soft);padding-top:8px}
+.clock .idx{font:600 15px var(--mono)}
+.clock time{font:600 15px var(--mono)}
+.clock .rel,.clock .gap{color:var(--muted);font-size:13px}
+.clock .title{font-weight:600}
+.gap.long{color:var(--accent)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;margin-top:14px;align-items:start}
+.board{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.board-head,.row{display:grid;grid-template-columns:58px 92px minmax(120px,1.1fr) 120px 112px minmax(96px,.8fr) minmax(140px,1.2fr);gap:10px;align-items:center;padding:0 14px}
+.board-head{height:34px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--rule);background:#fafafa}
+.stage-head{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;text-align:center;font-size:10px;letter-spacing:-.04em;white-space:nowrap}
+.row{min-height:46px;border-bottom:1px solid var(--rule-soft);cursor:pointer;width:100%;text-align:left;background:none;border-left:0;border-right:0;border-top:0}
+.row:last-child{border-bottom:0}
+.row:hover{background:#fafbfc}
+.row[aria-pressed="true"]{background:var(--accent-wash)}
+.row.changed{animation:flash 900ms ease-out}
+@keyframes flash{from{box-shadow:inset 4px 0 0 var(--accent)}to{box-shadow:inset 4px 0 0 transparent}}
+.rid{font:600 13px var(--mono)}
+.lane{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap}
+.lane.kubernetes{background:var(--native-wash);color:var(--native)}
+.lane.slurm{background:var(--slurm-wash);color:var(--slurm);box-shadow:inset 0 0 0 1px var(--slurm)}
+.what{min-width:0}
+.what b{display:block;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.what small{color:var(--muted);font-size:12px}
+.track{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
+.track span{height:8px;border-radius:2px;background:var(--rule-soft)}
+.track span.on{background:var(--native)}
+.track span.on.done{background:var(--ink)}
+.track span.on.fail{background:var(--accent)}
+.state{font:600 12px var(--mono);letter-spacing:.02em}
+.state.fail{color:var(--accent)}
+.unknown{color:var(--faint);font-style:italic;font-weight:400;font-family:var(--font)}
+.where{min-width:0;font-size:13px}
+.where .node{font:600 12px var(--mono);background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:1px 5px;margin-right:3px;white-space:nowrap}
+.attempts{display:flex;flex-wrap:wrap;gap:4px;font-size:12px}
+.att{font:600 11px var(--mono);padding:1px 6px;border-radius:4px;border:1px solid var(--rule);white-space:nowrap}
+.att.failed{border-color:var(--accent);color:var(--accent);text-decoration:line-through;text-decoration-thickness:1px}
+.att.current{border-color:var(--ink)}
+.prio{font:600 12px var(--mono)}
+.prio.up{color:var(--accent)}
+aside{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px 14px}
+.card h2{font-size:13px;margin:0 0 8px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.card h3{font-size:16px;margin:0 0 6px}
+dl{display:grid;grid-template-columns:96px 1fr;gap:4px 10px;margin:0;font-size:13px}
+dt{color:var(--muted)}
+dd{margin:0;min-width:0;overflow-wrap:anywhere}
+ol.log{list-style:none;margin:8px 0 0;padding:0;font-size:12px;max-height:220px;overflow:auto}
+ol.log li{display:grid;grid-template-columns:86px 1fr;gap:8px;padding:3px 0;border-top:1px solid var(--rule-soft)}
+ol.log time{font-family:var(--mono);color:var(--muted)}
+.nodes{display:grid;gap:6px;font-size:12px}
+.nodes div{display:grid;grid-template-columns:70px 1fr;gap:8px;align-items:start}
+.nodes .node{font:600 12px var(--mono)}
+.nodes small{color:var(--muted)}
+.summary{margin-top:16px}
+.summary .card{padding:16px 18px}
+.summary p{margin:4px 0;color:var(--muted)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
+.facts div{border-left:3px solid var(--rule);padding:2px 10px}
+.facts b{display:block;font:600 20px var(--mono)}
+.facts span{font-size:12px;color:var(--muted)}
+.caveat{font-size:12px;color:var(--muted);margin-top:16px;border-top:1px solid var(--rule);padding-top:10px}
+.caveat a{color:var(--native)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:1100px){
+  .layout{grid-template-columns:1fr}
+  aside{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+}
+@media (max-width:720px){
+  main{padding:12px 12px 32px}
+  .banner{padding:8px 12px;font-size:12px}
+  .transport{grid-template-columns:1fr;padding:10px}
+  .buttons{justify-content:space-between}
+  .buttons button{flex:1}
+  .board-head{display:none}
+  .row{grid-template-columns:52px minmax(0,1fr) auto;grid-template-areas:"id what lane" "track track state" "where where where" "extra extra extra";gap:6px 10px;padding:10px 12px}
+  .row .rid{grid-area:id}.row .what{grid-area:what}.row .lane{grid-area:lane}.row .track{grid-area:track}.row .state{grid-area:state}.row .where{grid-area:where}.row .extra{grid-area:extra}
+  aside{display:flex}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="banner" role="note"><span class="dot" aria-hidden="true"></span><span><b>저장된 관측 재생 · live 아님.</b> 2026-10-07 실험 기록의 스냅샷만 순서대로 보여 줍니다. 관측 사이의 상태는 기록되지 않았습니다.</span></div>
+<main>
+<header>
+  <div>
+    <h1>K8s · Slurm · GPU/NPU 요청 상태 기록 재생</h1>
+    <p class="sub" id="scope"></p>
+  </div>
+  <fieldset class="scenario"><legend>시나리오</legend>
+    <label><input type="radio" name="scenario" value="fleet" checked> 전체 연결 자원</label>
+    <label><input type="radio" name="scenario" value="adaptive"> 변동 도착·우선순위·재시도</label>
+  </fieldset>
+</header>
+
+<section class="transport" aria-label="재생 제어">
+  <div class="buttons">
+    <button id="reset" type="button" title="처음 관측으로 (Home)" aria-label="처음 관측으로">⏮</button>
+    <button id="prev" type="button" title="이전 관측 (←)" aria-label="이전 관측">◀</button>
+    <button id="play" type="button" aria-pressed="false" title="재생 / 일시정지 (Space)">▶ 재생</button>
+    <button id="next" type="button" title="다음 관측 (→)" aria-label="다음 관측">▶︎|</button>
+  </div>
+  <div class="seek">
+    <label class="sr" for="seek">관측 시점 선택</label>
+    <input id="seek" type="range" min="0" value="0" step="1">
+    <div class="ruler" id="ruler" aria-hidden="true"></div>
+  </div>
+  <label class="speed">재생 속도
+    <select id="speed">
+      <option value="1">기록 시간 1×</option>
+      <option value="5">5×</option>
+      <option value="10" selected>10×</option>
+      <option value="30">30×</option>
+    </select>
+  </label>
+  <div class="clock" aria-live="polite">
+    <span class="idx" id="idx"></span>
+    <time id="time"></time>
+    <span class="rel" id="rel"></span>
+    <span class="title" id="title"></span>
+    <span class="gap" id="gap"></span>
+  </div>
+</section>
+
+<div class="layout">
+  <section class="board" aria-label="논리 요청 10개의 관측 상태">
+    <div class="board-head" aria-hidden="true">
+      <span>요청</span><span>네이티브 경로</span><span>장치 · workload</span>
+      <span class="stage-head"><span>접수</span><span>대기</span><span>할당</span><span>실행</span><span>수집</span><span>종료</span></span>
+      <span>관측 상태</span><span>노드 alias</span><span id="extra-head">결과 · 기록</span>
+    </div>
+    <div id="rows"></div>
+  </section>
+  <aside>
+    <section class="card" id="detail" aria-live="polite"></section>
+    <section class="card"><h2>이 관측의 노드 (alias)</h2><div class="nodes" id="nodes"></div></section>
+  </aside>
+</div>
+
+<section class="summary" id="summary" aria-live="polite"></section>
+
+<p class="caveat" id="caveat"></p>
+</main>
+
+<script type="application/json" id="observations">__OBSERVATIONS_JSON__</script>
+<script>
+(() => {
+'use strict';
+const DATA = JSON.parse(document.getElementById('observations').textContent);
+const STAGES = {REQUESTED:0, VALIDATED:0, SUBMITTING:0, QUEUED:1, PENDING:1, REQUEUED:1, ADMITTED:2, RUNNING:3, COLLECTING:4, FINALIZING:4, SUCCEEDED:5, FAILED:5};
+const BACKEND = {kubernetes:'K8s · Kueue', slurm:'Slurm'};
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+const unknown = text => el('span', 'unknown', text || '미관측');
+const state = {scenario: 'fleet', index: 0, playing: false, timer: null, selected: 'R01'};
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+const sc = () => DATA.scenarios[state.scenario];
+const frame = (i = state.index) => sc().frames[i];
+const t = iso => new Date(iso).getTime();
+const hhmmss = iso => iso.slice(11, 21).replace(/(\.\d)\d*$/, '$1') + ' UTC';
+const secs = s => (s >= 10 ? s.toFixed(0) : s.toFixed(1)) + '초';
+
+function renderRuler() {
+  const frames = sc().frames, t0 = t(frames[0].observed_at), span = t(frames.at(-1).observed_at) - t0 || 1;
+  const ruler = $('ruler'); ruler.replaceChildren();
+  frames.forEach((f, i) => { const tick = el('i'); tick.style.left = ((t(f.observed_at) - t0) / span * 100) + '%'; tick.dataset.i = i; ruler.append(tick); });
+}
+
+function renderRow(row, req, prev) {
+  const b = el('button', 'row'); b.type = 'button'; b.dataset.row = row;
+  b.setAttribute('aria-pressed', String(state.selected === row));
+  b.onclick = () => { state.selected = row; render(); };
+  b.append(el('span', 'rid', row.replace('R', '요청 ')));
+  if (!req) {
+    b.append(unknown('기록 없음'), unknown(''), el('span', 'track'), unknown('이 관측에 요청 기록 없음'), el('span', 'where'), el('span', 'extra'));
+    b.setAttribute('aria-label', `${row} 이 관측에는 요청 기록이 없음`);
+    return b;
+  }
+  b.append(el('span', 'lane ' + req.backend, BACKEND[req.backend] || req.backend));
+  const what = el('span', 'what'); what.append(el('b', null, req.workload));
+  what.append(el('small', null, req.device_class.toUpperCase() + (req.gpu != null ? ` · ${req.gpu} GPU` : req.accelerator_count != null ? ` · 가속기 ${req.accelerator_count}` : '')));
+  b.append(what);
+  const track = el('span', 'track'); track.setAttribute('aria-hidden', 'true');
+  const stage = STAGES[req.state];
+  for (let i = 0; i < 6; i++) { const s = el('span'); if (i === stage) s.className = 'on' + (req.state === 'SUCCEEDED' ? ' done' : req.state === 'FAILED' ? ' fail' : ''); track.append(s); }
+  b.append(track);
+  const st = el('span', 'state' + (req.state === 'FAILED' ? ' fail' : ''));
+  st.append(req.state === 'NOT_SUBMITTED' ? '도착 전' : req.state);
+  if (req.state === 'NOT_SUBMITTED') { st.append(el('br')); st.append(el('small', 'unknown', `계획 도착 +${req.planned_arrival_seconds}초`)); }
+  if (req.reason) { st.append(el('br')); st.append(el('small', 'unknown', req.reason)); }
+  b.append(st);
+  const where = el('span', 'where');
+  const nodes = req.pods ? req.pods.map(p => p.node).filter(Boolean) : [req.node].filter(Boolean);
+  if (nodes.length) nodes.forEach(n => where.append(el('span', 'node', n))); else where.append(unknown(req.state === 'NOT_SUBMITTED' ? '—' : '노드 미관측'));
+  b.append(where);
+  const extra = el('span', 'extra');
+  if (state.scenario === 'adaptive') {
+    const box = el('span', 'attempts');
+    const change = (frame().priority_changes || []).find(c => c.row === row);
+    box.append(el('span', 'prio' + (change ? ' up' : ''), `P${req.priority ?? '?'}` + (change ? ` ↑${change.before}→${change.after}` : '')));
+    req.previous_attempts.forEach(a => box.append(el('span', 'att' + (a.state === 'FAILED' ? ' failed' : ''), `${a.attempt.split('·')[1]} ${a.state === 'FAILED' ? '✕' : a.state}${a.pods[0]?.exit_codes?.length ? ' exit ' + a.pods[0].exit_codes.join(',') : ''}`)));
+    if (req.attempt) box.append(el('span', 'att current', req.attempt.split('·')[1]));
+    extra.append(box);
+  } else if (req.result) {
+    extra.append(el('span', null, `결과 ${req.result.outcome} · 품질 ${req.result.quality_value}` + (req.mlflow_receipt ? ' · MLflow 기록' : '')));
+  } else extra.append(unknown('결과 미기록'));
+  b.append(extra);
+  b.setAttribute('aria-label', `${row} ${BACKEND[req.backend]} ${req.workload} 상태 ${req.state} 노드 ${nodes.join(', ') || '미관측'}`);
+  if (prev && prev.state !== req.state && !reduceMotion.matches) b.classList.add('changed');
+  return b;
+}
+
+function renderDetail(f) {
+  const box = $('detail'); box.replaceChildren(el('h2', null, '선택한 요청 상세 · 이 관측 시점 기준'));
+  const req = f.requests[state.selected];
+  box.append(el('h3', null, state.selected.replace('R', '요청 ')));
+  if (!req) { box.append(unknown('이 관측에는 이 요청의 기록이 없습니다.')); return; }
+  const dl = el('dl');
+  const add = (k, v) => { dl.append(el('dt', null, k)); const d = el('dd'); d.append(v == null || v === '' ? unknown() : v); dl.append(d); };
+  add('네이티브 경로', BACKEND[req.backend]);
+  add('관측 상태', req.state);
+  add('사유', req.reason);
+  if (state.scenario === 'fleet') {
+    add('노드 alias', req.node);
+    add('결과', req.result ? `${req.result.outcome} · 측정 ${req.result.measured ? '예' : '아니오'} · 품질 ${req.result.quality_value}` : null);
+    add('MLflow 수신', req.mlflow_receipt ? '기록 있음' : null);
+    box.append(dl);
+    if (req.lifecycle.length) {
+      box.append(el('p', 'sub', '이 스냅샷에 저장된 상태 이벤트'));
+      const ol = el('ol', 'log');
+      req.lifecycle.forEach(e => { const li = el('li'); li.append(el('time', null, hhmmss(e.observed_at)), el('span', null, e.state + (e.reason ? ' · ' + e.reason : ''))); ol.append(li); });
+      box.append(ol);
+    }
+  } else {
+    add('현재 시도', req.attempt);
+    add('우선순위', req.priority != null ? String(req.priority) : null);
+    add('요청 GPU', req.gpu != null ? `${req.gpu}개${req.gpu === 2 ? ' · 독립 worker 2개 (DDP 아님)' : ''}` : null);
+    add('제외 노드', req.excluded_nodes.length ? req.excluded_nodes.join(', ') : null);
+    box.append(dl);
+    const ol = el('ol', 'log');
+    const line = (when, text) => { const li = el('li'); li.append(el('time', null, when ? hhmmss(when) : '시각 미기록'), el('span', null, text)); ol.append(li); };
+    req.previous_attempts.forEach(a => line(a.submitted_at, `${a.attempt} ${a.state} · P${a.priority} · ` + a.pods.map(p => `${p.node} rank${p.rank} ${p.state} exit ${p.exit_codes.join(',') || '—'} ${p.phases.includes('EXPECTED_FAILURE') ? '(주입 실패)' : ''}`).join('; ')));
+    if (req.attempt) line(req.submitted_at, `${req.attempt} ${req.state} · ` + (req.pods.length ? req.pods.map(p => `${p.node} rank${p.rank} ${p.state}`).join('; ') : 'Pod 미관측'));
+    (f.priority_changes || []).filter(c => c.row === state.selected).forEach(c => line(c.observed_at, `${c.attempt} 우선순위 ${c.before}→${c.after} · ${c.reason}`));
+    if (ol.children.length) { box.append(el('p', 'sub', '시도·승격 기록 (같은 논리 요청)')); box.append(ol); }
+  }
+}
+
+function renderNodes(f) {
+  const box = $('nodes'); box.replaceChildren();
+  const on = {};
+  Object.entries(f.requests).forEach(([row, r]) => {
+    const nodes = r.pods ? r.pods.map(p => p.node) : [r.node];
+    nodes.filter(Boolean).forEach(n => (on[n] = on[n] || []).push(`${row}·${r.state}`));
+  });
+  Object.entries(DATA.nodes).forEach(([alias, meta]) => {
+    const d = el('div'); d.append(el('span', 'node', alias));
+    const txt = el('span'); txt.append(el('small', null, `${BACKEND[meta.backend]} · ${meta.accelerator} · ${meta.architecture || '아키텍처 미기록'}`), el('br'));
+    txt.append(on[alias] ? el('span', null, on[alias].join('  ')) : unknown('이 관측에 표시된 요청 없음'));
+    d.append(txt); box.append(d);
+  });
+  if (f.queue_observation) box.append(el('p', 'sub', `Kueue 관측: admitted ${f.queue_observation.admitted ?? '—'} · pending ${f.queue_observation.pending ?? '—'}`));
+}
+
+function renderSummary(f, last) {
+  const box = $('summary'); box.replaceChildren();
+  if (!last) { box.hidden = true; return; }
+  box.hidden = false;
+  const card = el('div', 'card'); card.append(el('h2', null, '기록 종료 요약 · 마지막 관측에서만 표시'));
+  const reqs = Object.values(f.requests), facts = el('div', 'facts');
+  const fact = (v, k) => { const d = el('div'); d.append(el('b', null, String(v)), el('span', null, k)); facts.append(d); };
+  fact(`${reqs.filter(r => r.state === 'SUCCEEDED').length}/${reqs.length}`, '논리 요청 SUCCEEDED');
+  fact(new Set(reqs.map(r => r.backend)).size === 2 ? 'K8s + Slurm' : BACKEND[reqs[0].backend], '네이티브 경로');
+  if (state.scenario === 'fleet') {
+    fact(`${f.execution_coverage.gpu.length} + ${f.execution_coverage.npu.length}`, '실행 노드 GPU + NPU (누적)');
+    fact(reqs.filter(r => r.mlflow_receipt).length, 'MLflow 수신 기록');
+  } else {
+    fact(f.native_attempts.length, '네이티브 시도 (논리 요청 10)');
+    fact(f.priority_changes.length, '대기 우선순위 승격 10→100');
+    fact(f.native_attempts.filter(a => a.state === 'FAILED').length, '주입 실패 exit 42 → 다른 노드 재시도');
+    fact(secs(f.elapsed_seconds), '기록된 경과 시간');
+  }
+  card.append(facts, el('p', null, sc().scope));
+  const span = (t(f.observed_at) - t(sc().frames[0].observed_at)) / 1000;
+  card.append(el('p', null, `관측 ${sc().frames.length}개, 첫 관측부터 ${secs(span)}. 요청별 정확한 실행 시간이 아니라 스냅샷 시각이다.`));
+  box.append(card);
+}
+
+function render() {
+  const frames = sc().frames, f = frame(), prev = state.index > 0 ? frames[state.index - 1] : null, last = state.index === frames.length - 1;
+  $('scope').textContent = sc().name + ' · ' + sc().scope;
+  $('seek').max = frames.length - 1; $('seek').value = state.index;
+  $('seek').setAttribute('aria-valuetext', `관측 ${state.index + 1} / ${frames.length}, ${hhmmss(f.observed_at)}`);
+  $('idx').textContent = `관측 ${state.index + 1} / ${frames.length}`;
+  $('time').dateTime = f.observed_at; $('time').textContent = hhmmss(f.observed_at);
+  $('rel').textContent = `첫 관측 +${secs((t(f.observed_at) - t(frames[0].observed_at)) / 1000)}`;
+  $('title').textContent = f.title;
+  const gap = prev ? (t(f.observed_at) - t(prev.observed_at)) / 1000 : null;
+  $('gap').textContent = gap == null ? '첫 스냅샷' : `직전 관측과 ${secs(gap)} 간격 · 그 사이 상태 미기록`;
+  $('gap').className = 'gap' + (gap > 15 ? ' long' : '');
+  [...$('ruler').children].forEach((tick, i) => tick.className = i === state.index ? 'now' : i < state.index ? 'past' : '');
+  $('extra-head').textContent = state.scenario === 'adaptive' ? '우선순위 · 시도' : '결과 · 기록';
+  const rows = $('rows'); rows.replaceChildren(...sc().rows.map(r => renderRow(r, f.requests[r], prev && prev.requests[r])));
+  renderDetail(f); renderNodes(f); renderSummary(f, last);
+  $('prev').disabled = $('reset').disabled = state.index === 0;
+  $('next').disabled = last;
+  $('play').setAttribute('aria-pressed', String(state.playing));
+  $('play').textContent = state.playing ? '❚❚ 일시정지' : '▶ 재생';
+  $('caveat').replaceChildren(`${DATA.notice} 노드·요청·시도 이름은 공개용 alias다. 출처: `, Object.assign(el('a', null, sc().public_summary), {href: sc().public_summary}), ' · replay/PROVENANCE.json');
+}
+
+function stop() { clearTimeout(state.timer); state.timer = null; state.playing = false; }
+function go(i) { stop(); state.index = Math.max(0, Math.min(sc().frames.length - 1, i)); render(); }
+function schedule() {
+  const frames = sc().frames;
+  if (state.index >= frames.length - 1) { stop(); render(); return; }
+  const wait = (t(frames[state.index + 1].observed_at) - t(frames[state.index].observed_at)) / Number($('speed').value);
+  state.timer = setTimeout(() => { state.index += 1; render(); schedule(); }, Math.max(150, wait));
+}
+function togglePlay() {
+  if (state.playing) { stop(); render(); return; }
+  if (state.index >= sc().frames.length - 1) state.index = 0;
+  state.playing = true; render(); schedule();
+}
+
+document.querySelectorAll('input[name=scenario]').forEach(r => r.onchange = () => { stop(); state.scenario = r.value; state.index = 0; state.selected = 'R01'; renderRuler(); render(); });
+$('play').onclick = togglePlay;
+$('reset').onclick = () => go(0);
+$('prev').onclick = () => go(state.index - 1);
+$('next').onclick = () => go(state.index + 1);
+$('seek').oninput = e => go(Number(e.target.value));
+$('speed').onchange = () => { if (state.playing) { clearTimeout(state.timer); schedule(); } };
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,select,textarea') || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key === ' ' && e.target.tagName === 'BUTTON') return;
+  if (e.key === ' ' || e.key === 'k') { e.preventDefault(); togglePlay(); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); go(state.index + 1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); go(state.index - 1); }
+  else if (e.key === 'Home') { e.preventDefault(); go(0); }
+});
+window.__replay = {state, go, data: DATA};
+renderRuler(); render();
+})();
+</script>
+</body>
+</html>

@@ -1,8 +1,12 @@
 # 발표용 이미지 자료
 
+**최신 발표용 이미지:** [이미지 생성 도구로 만든 PNG 2종](imagegen/README.md). 아래 11종은 코드 기반 원본 도표다.
+
 PNG는 3200×1800(16:9)이며 바로 PPT에 삽입할 수 있다. SVG는 벡터 도형·텍스트를 편집할 수 있다. SVG의 한글 글꼴은 Noto Sans CJK 계열이 필요하며 폰트가 없으면 PNG를 사용한다.
 
 구조도는 코드 기반 재구성, 차트는 과거 기록의 시각화다. 실제 화면 캡처나 현재 가동 상태가 아니다. 중요한 표본·조건·한계는 그림 자체에도 표시했다.
+
+10·11과 [오프라인 재생 데모](../offline-demo.html)는 비공개 실행 기록에서 허용 필드만 추출한 [정제 파생 데이터](../replay/observations.json)를 사용한다. 원본은 공개하지 않으며 해시·추출 범위는 [PROVENANCE.json](../replay/PROVENANCE.json)에 있다.
 
 | 번호 | 내용 | PNG | SVG |
 |---|---|---|---|
@@ -15,6 +19,8 @@ PNG는 3200×1800(16:9)이며 바로 PPT에 삽입할 수 있다. SVG는 벡터 
 | 07 | 운영 역량은 정책 집행과 복구 기록으로 설명 | [PNG](07-operations.png) | [SVG](07-operations.svg) |
 | 08 | NPU 품질 계약과 반복 실행 | [PNG](08-hailo.png) | [SVG](08-hailo.svg) |
 | 09 | 비교의 중심은 “어느 운영 계층을 맡는가” | [PNG](09-runai-scope.png) | [SVG](09-runai-scope.svg) |
+| 10 | 요청 10개를 K8s GPU·NPU와 별도 Slurm에 나누어 실행 | [PNG](10-fleet-integration.png) | [SVG](10-fleet-integration.svg) |
+| 11 | 변동 도착·승격·재시도 관측 | [PNG](11-adaptive-timeline.png) | [SVG](11-adaptive-timeline.svg) |
 
 ## 그림별 설명
 
@@ -27,11 +33,14 @@ PNG는 3200×1800(16:9)이며 바로 PPT에 삽입할 수 있다. SVG는 벡터 
 - **07-operations**: slurm-policy.json, persistent-postgres.json, service-deployment.json. 사전 DB 행 수 655/52/201/8/52, 상세는 원자료.
 - **08-hailo**: hailo-resnet50.md 표를 그대로 사용. 속도 개선·임의 NPU 호환성 주장 없음.
 - **09-runai-scope**: Run:ai 공식 제품·scheduler·supported workload·Slurm tutorial 기준. 라이선스·비용·성능의 우열 비교 아님.
+- **10-fleet-integration**: 정제 replay/observations.json의 fleet 마지막 프레임. 결과·MLflow 수신 10/10은 full-fleet-ten-request.json과 일치. 두 scheduler의 공동 GPU 소유가 아니다.
+- **11-adaptive-timeline**: 정제 replay/observations.json의 adaptive 52개 프레임. 상태는 스냅샷 값 그대로이고 점 사이를 잇지 않는다. 시도 11·승격 6·worker 13은 adaptive-gpu-arrivals.json과 일치.
 
 ## 데이터와 출처
 
 - [CHART-DATA.csv](CHART-DATA.csv): 그림에 표시한 주요 수치와 단위.
 - [SOURCES.csv](SOURCES.csv): 데이터 원본 경로와 SHA-256. 경로는 레포 루트 기준.
+- 10·11 정제 데이터 재생성(비공개 원본 필요): `rtk proxy python3 docs/nais-interview/replay/export_replay.py --fleet <RAW_FLEET_BATCH_JSON> --adaptive <RAW_ADAPTIVE_BATCH_JSON>`
 - [전체 원자료](../SOURCE-MATERIAL.md), [증거 색인](../EVIDENCE-INDEX.md).
 - 01·02 코드: src/resource_advisor/{configuration,backends,worker,service,contracts}.py
 - 03 공식: https://www.nst.re.kr/www/contents.do?key=358
@@ -47,5 +56,3 @@ build_visuals.py를 이용한 로컬 문서 산출 작업이며 시스템 구현
 한글 적용: Noto Sans CJK, 제목·본문 모두 한글 가독성 우선. paper #f5f5f5 / ink #2d3142 / accent #eb6c36 / muted #4f5d75. 데이터 축은 0에서 시작. 허용되지 않은 오차막대나 유의성 표시를 추가하지 않음.
 
 시각화 절차 참고: Kassis, T., Agarwal, V., He, Y., Patel, D., & Brueckner, A. M. (2026). Scientific Agent Skills: A Library of Procedural Knowledge for Research Agents. https://doi.org/10.48550/arXiv.2609.00065 (확인된 최신 레코드 v2, 2026-09-02). 프로젝트의 실험 근거와는 별개인 제작 도구 참고문헌.
-
-공개 저장소에서 재생성: 레포 루트에서 `rtk proxy uv run --isolated --with matplotlib==3.11.2 --with cairosvg --with pillow python docs/nais-interview/build_visuals.py`.
