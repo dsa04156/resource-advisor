@@ -97,6 +97,7 @@ native scheduler 정책이 여전히 최종 권한을 가진다.
 |---|---|---|
 | 요청 | — | REST API: project 범위 인증, 멱등 키(request digest), 불변 workload/variant 참조 ([service.py][service]) |
 | 상태 원장 | PostgreSQL | Job 상태기계·제출 intent·usage ledger 스키마와 전이 규칙 ([contracts.py][contracts] `State`, [worker.py][worker]) |
+| 상위 정책·후보 선택 | — | `SchedulingProfile` + `compile_plan`: 호환성·관측 여유·backend 선호·접수 이력으로 실행 후보 선택 ([scheduling.py](../../src/resource_advisor/scheduling.py)). 상세는 3.4절 |
 | 라우팅 | — | `routes: [{project, cluster, backend, options}]` → backend 인스턴스, (project, cluster) 중복 금지 ([configuration.py][config]) |
 | Kubernetes 경로 | Kubernetes Job, **Kueue** admission, kube-scheduler 배치 | `KubernetesBackend`: `suspend: true` Job + `kueue.x-k8s.io/queue-name`/`priority-class` 라벨 생성, 상태 관측 ([backends.py][backends]); container 이미지는 `@sha256:` digest 고정 필수 ([contracts.py][contracts] `RuntimeVariant`) |
 | Slurm 경로 | Slurm `sbatch`/`squeue`/`sacct`/`scancel`, 제한된 SSH gateway | `SlurmBackend`: 안전 식별자 검증(partition/account/QOS), SSH alias 실행(비밀번호 없음), `sbatch --parsable` ID 확인, `sacct` 실패를 “없음”이 아닌 UNKNOWN으로 처리, **container variant 거절** ([backends.py][backends]) |
@@ -112,6 +113,9 @@ native scheduler 정책이 여전히 최종 권한을 가진다.
    ▼
 [구현] REST API ── 검증: project 범위, 불변 workload·variant, capability snapshot TTL
    │
+   ▼
+[구현] 상위 정책 계층: 후보 필터 → 관측 여유·정책·접수 이력 순서로 선택
+   │ 실행 계획·선택 근거 저장 (자동 선택과 접수는 project별 DB lock)
    ▼
 [기존] PostgreSQL  ◀──▶  [구현] Worker (project × cluster route)
    │                          │
@@ -131,7 +135,7 @@ native scheduler 정책이 여전히 최종 권한을 가진다.
 ```
 
 **도식에 반드시 넣을 경계:** 두 backend는 **서로 다른 장비 풀**이다. 같은 장비를 K8s와 Slurm이
-공동 스케줄링하지 않는다. 배치 결정은 각 native scheduler가 한다.
+공동 스케줄링하지 않는다. 상위 계층이 실행 후보와 경로를 선택하고, 실제 admission·자원 할당·노드 바인딩은 각 native scheduler가 수행한다.
 
 ### 3.3 Job 상태기계 (contracts.py `State`)
 
@@ -148,6 +152,51 @@ native scheduler 정책이 여전히 최종 권한을 가진다.
 | RUNNING | native scheduler가 배치. Slurm은 guard가 runtime hash 확인 후 실행 | [backends.py][backends], [runtime_guard.py][guard] |
 | COLLECTING | backend 완료 ≠ 성공. 결과 envelope 검증, 수집 기한 초과 시 `RESULT_INVALID(RESULT_COLLECTION_DEADLINE)` | [worker.py][worker], [service.py][service] |
 | 종료 | 종료 상태와 ledger 기록 원자적. 실패·취소·사전 거절도 ledger에 남김 | [architecture.md][arch] |
+
+---
+
+### 3.4 상위 스케줄링 계층: 무엇을 보고 어디까지 결정하는가
+
+**면접용 핵심 문장:** “검증된 실행 후보 중 정책과 관측 상태에 맞는 실행 경로를 고르는 상위 계층을 구현했습니다. 실제 자원 할당과 큐 집행은 Kubernetes·Kueue와 Slurm에 맡겼습니다.”
+
+#### 입력 → 선택 → 제출
+
+1. 연구자가 등록된 workload와 `SchedulingProfile`을 보낸다. 자동 선택 요청에서는 `candidate_ref`를 생략한다. 프로파일에는 허용 작업·할당 방식, CPU/메모리/가속기 상한, backend 선호 순서, normal/high 우선순위와 대기·실행 시간 제한이 있다.
+2. `compile_plan`이 workload에 등록된 후보를 평가한다. 실행 계약·런타임 호환성, 프로파일 제한, backend binding과 우선순위 지원 등을 확인하고 부적격 후보를 이유와 함께 제외한다. down/draining/fail로 관측된 노드도 제외한다.
+3. 남은 후보를 아래 순서로 정렬해 첫 후보를 선택한다. 모든 조건을 합친 가중 점수나 ML 실행시간 예측이 아니라 **앞선 기준이 같을 때 다음 기준으로 비교하는 결정적 규칙**이다.
+4. 선택한 candidate/backend/cluster/node, 자원 요구량, 우선순위·시간 제한, queue/QOS 매핑, 후보별 제외·선택 근거를 실행 계획에 저장한다.
+5. Worker가 `(project, cluster)`에 연결된 adapter로 제출한다. Kubernetes 경로는 suspended Job과 Kueue queue/priority로, Slurm 경로는 관리자가 지정한 Account/QOS/Partition으로 변환된다.
+6. Kueue·Kubernetes 또는 Slurm이 실제 admission·할당·실행을 결정한다. 상위 Worker는 상태를 조정하고 결과·사용량·MLflow 기록을 연결한다.
+
+| 순서 | 후보 선택 기준 | 의미 |
+|---|---|---|
+| 1 | `available → busy → unknown` | CPU·메모리·해당 가속기의 관측된 request headroom이 요구량을 충족하는지 판단 |
+| 2 | 프로파일의 `backend_order` | 같은 가용성 등급이면 운영자가 지정한 backend 선호 적용 |
+| 3 | `accepted_active_jobs`가 적은 후보 | 같은 프로젝트에서 접수됐고 아직 종료되지 않은 요청 수 |
+| 4 | `accepted_recent_jobs`가 적은 후보 | 최근 5분의 접수 건수. 이미 끝난 짧은 작업도 포함해 한 후보로 반복 집중되는 것을 줄임 |
+| 5 | candidate reference 순서 | 나머지 조건이 같으면 결정적인 결과를 유지 |
+
+**관측 여유의 뜻:** GPU 사용률이 아니다. scheduler 요청량 기준의 여유다. 부족하면 busy로 남겨 native queue에서 기다릴 수 있도록 하며, 관측이 없거나 오래됐으면 unknown이다. 큰 GPU나 가장 빠른 장치를 고르는 규칙이 아니다.
+
+**동시 접수 처리:** PostgreSQL에서는 자동 선택과 Job 접수를 같은 transaction에서 수행하고 project별 advisory transaction lock을 건다. 다음 요청이 앞서 접수된 요청 수를 보고 선택하게 한다. 이 lock은 물리 GPU 예약이나 프로젝트 간 전역 쿼터가 아니다. 같은 idempotency key 재요청은 기존 Job을 반환한다.
+
+**계획 검증:** 고정 후보·미리보기 digest 방식은 제출 시 계획을 재검증한다. 자동 선택 방식은 접수 시 다시 평가해 실제 선택을 저장한다. adapter는 저장된 계획과 실제 route binding의 차이를 검사한다. 미리보기 자체가 자원 예약은 아니다.
+
+#### 계층별 역할을 설명하는 예
+
+같은 CUDA workload에 호환 후보 A/B가 있고 두 후보의 관측 가용성·backend 선호가 같다고 가정한다. A에는 접수된 진행 중 요청이 2개, B에는 0개라면 상위 계층은 B를 우선 선택한다. 이후에도 native quota가 부족하면 B의 작업은 Kueue/Slurm에서 대기한다. **이 예는 코드 규칙을 설명하기 위한 가정이며 새로운 실측 결과가 아니다.**
+
+Mobilint Candy는 해당 모델·런타임에 등록된 후보 안에서 선택된다. CUDA·Hailo·Mobilint를 표시한 화면이 동일 모델의 장치 간 자동 변환이나 성능 비교를 증명하지는 않는다.
+
+#### 구현 범위와 발표 증거
+
+- 명칭: **정책 기반 실행 대상 선택 + 공통 실행 관리 계층**. 제한된 의미에서 상위 스케줄링 계층이라고 설명할 수 있다.
+- 구현하지 않은 것: K8s·Slurm을 가로지르는 원자적 GPU 예약·전역 쿼터, 전역 최적 배치 보장, 실행 중 작업 이동, native preemption override.
+- 데모의 완료 표는 실제 실행 대상과 결과를 보여준다. 후보를 왜 선택했는지는 저장된 scheduling plan의 `evaluation`, `selected`, `reason`으로 확인해야 한다. 완료 표만으로 정책 효과를 입증했다고 주장하지 않는다.
+- 실험실의 20초 대기 후 우선순위 승격과 주입 실패 재시도는 시나리오 제어 기능이다. 일반 `compile_plan`의 후보 선택 규칙과 구분한다.
+
+코드: [scheduling.py](../../src/resource_advisor/scheduling.py) `availability`, `compile_plan` / [service.py](../../src/resource_advisor/service.py) `submit` / [configuration.py](../../src/resource_advisor/configuration.py) route 구성 / [worker.py](../../src/resource_advisor/worker.py) 제출·상태 조정 / [backends.py](../../src/resource_advisor/backends.py) native 변환.
+설계 문서: [공통 스케줄링 프로파일](../reference/scheduling-profiles.md), [공통 GPU 풀](../reference/common-gpu-pool.md).
 
 ---
 

@@ -33,6 +33,10 @@
 PNG 3200×1800, 벡터 SVG, 차트 데이터와 출처를 포함한다.
 `gallery.html`은 내려받아 브라우저에서 열면 된다. GitHub에서는 HTML이 페이지로 렌더링되지 않을 수 있다.
 
+## 상위 스케줄링 설명 위치
+
+[SOURCE-MATERIAL.md 3.4절](SOURCE-MATERIAL.md#34-상위-스케줄링-계층-무엇을-보고-어디까지-결정하는가)을 먼저 읽는다. 후보 필터 → 관측 여유 → backend 선호 → 진행 중 접수 수 → 최근 5분 접수 수 → candidate ref 순의 선택 규칙, project별 동시 접수 lock, 계획 검증, adapter와 native scheduler의 책임 경계를 정리했다. 완료 화면은 실행 증거이며 선택 이유의 증거는 저장된 scheduling plan이다.
+
 ## 먼저 이해할 핵심
 
 - 공통 계약·API·project×cluster route → K8s/Kueue adapter 또는 별도 Slurm SSH adapter.
