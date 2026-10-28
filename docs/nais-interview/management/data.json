@@ -1,0 +1,3219 @@
+{
+ "schema": "nais-recorded-management/v1",
+ "notice": "실증 기록 · 2026-10-07~08. 저장된 실행 기록을 새로 렌더링한 읽기 전용 관리 화면이며 현재 live 상태나 과거 운영 UI 캡처가 아니다.",
+ "period": "2026-10-07~08",
+ "time_zone": "UTC",
+ "default_snapshot": 12,
+ "summary": {
+  "completed": 11,
+  "backend": {
+   "kubernetes": 9,
+   "slurm": 2
+  },
+  "nodes_cumulative": 8,
+  "node_classes": {
+   "gpu": 6,
+   "npu": 2
+  },
+  "result_receipts": 11,
+  "mlflow_receipts": 11,
+  "dates": {
+   "2026-10-07": 10,
+   "2026-10-08": 1
+  }
+ },
+ "devices": [
+  {
+   "alias": "GPU-A",
+   "model": "NVIDIA RTX 5060 Ti",
+   "backend": "kubernetes",
+   "path": "kueue",
+   "device_class": "gpu",
+   "architecture": "amd64",
+   "resource": "nvidia.com/gpu",
+   "boundary": "물리 GPU 1장 단위",
+   "workloads": 1,
+   "request_ids": [
+    "R03"
+   ],
+   "dates": [
+    "2026-10-07"
+   ],
+   "source": "replay/observations.json nodes"
+  },
+  {
+   "alias": "GPU-B",
+   "model": "NVIDIA RTX 5080",
+   "backend": "kubernetes",
+   "path": "kueue",
+   "device_class": "gpu",
+   "architecture": "amd64",
+   "resource": "nvidia.com/gpu",
+   "boundary": "물리 GPU 1장 단위",
+   "workloads": 1,
+   "request_ids": [
+    "R06"
+   ],
+   "dates": [
+    "2026-10-07"
+   ],
+   "source": "replay/observations.json nodes"
+  },
+  {
+   "alias": "GPU-C",
+   "model": "NVIDIA GB10",
+   "backend": "kubernetes",
+   "path": "kueue",
+   "device_class": "gpu",
+   "architecture": "arm64",
+   "resource": "nvidia.com/gpu",
+   "boundary": "물리 GPU 1장 단위",
+   "workloads": 2,
+   "request_ids": [
+    "R02",
+    "R05"
+   ],
+   "dates": [
+    "2026-10-07"
+   ],
+   "source": "replay/observations.json nodes"
+  },
+  {
+   "alias": "JET-A",
+   "model": "Jetson Orin Nano",
+   "backend": "kubernetes",
+   "path": "kueue",
+   "device_class": "gpu",
+   "architecture": "arm64",
+   "resource": "nvidia.com/gpu.shared",
+   "boundary": "공유 GPU 슬롯 단위 (물리 GPU 아님)",
+   "workloads": 1,
+   "request_ids": [
+    "R04"
+   ],
+   "dates": [
+    "2026-10-07"
+   ],
+   "source": "replay/observations.json nodes"
+  },
+  {
+   "alias": "JET-B",
+   "model": "Jetson AGX Orin",
+   "backend": "kubernetes",
+   "path": "kueue",
+   "device_class": "gpu",
+   "architecture": "arm64",
+   "resource": "nvidia.com/gpu.shared",
+   "boundary": "공유 GPU 슬롯 단위 (물리 GPU 아님)",
+   "workloads": 1,
+   "request_ids": [
+    "R01"
+   ],
+   "dates": [
+    "2026-10-07"
+   ],
+   "source": "replay/observations.json nodes"
+  },
+  {
+   "alias": "NPU-A",
+   "model": "Hailo-8",
+   "backend": "kubernetes",
+   "path": "kueue",
+   "device_class": "npu",
+   "architecture": "arm64",
+   "resource": "hailo.ai/h8",
+   "boundary": "물리 NPU 장치 단위",
+   "workloads": 2,
+   "request_ids": [
+    "R07",
+    "R08"
+   ],
+   "dates": [
+    "2026-10-07"
+   ],
+   "source": "replay/observations.json nodes"
+  },
+  {
+   "alias": "NPU-B",
+   "model": "Mobilint ARIES2",
+   "backend": "kubernetes",
+   "path": "kubernetes",
+   "device_class": "npu",
+   "architecture": "amd64",
+   "resource": null,
+   "boundary": "물리 NPU 장치 단위 (allocation_mode physical_device)",
+   "workloads": 1,
+   "request_ids": [
+    "R11"
+   ],
+   "dates": [
+    "2026-10-08"
+   ],
+   "source": "Mobilint jobs[0] · qualifications[0]"
+  },
+  {
+   "alias": "SLURM-A",
+   "model": "Jetson Orin (Slurm)",
+   "backend": "slurm",
+   "path": "slurm",
+   "device_class": "gpu",
+   "architecture": "aarch64",
+   "resource": "gres/gpu",
+   "boundary": "Slurm GRES GPU 단위",
+   "workloads": 2,
+   "request_ids": [
+    "R09",
+    "R10"
+   ],
+   "dates": [
+    "2026-10-07"
+   ],
+   "source": "replay/observations.json nodes"
+  }
+ ],
+ "requests": [
+  {
+   "id": "R01",
+   "workload": "CUDA 검증 커널 · 자동 배치",
+   "device_class": "gpu",
+   "backend": "kubernetes",
+   "state": "SUCCEEDED",
+   "reason": null,
+   "node": "JET-B",
+   "accelerator_count": 1,
+   "native_job_recorded": true,
+   "started_at": "2026-10-07T04:29:34+00:00",
+   "finished_at": "2026-10-07T04:29:40.039265+00:00",
+   "path": "kueue",
+   "date": "2026-10-07",
+   "lifecycle": [
+    {
+     "state": "SUBMITTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:33.809626+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:33.867198+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": "SchedulingGated",
+     "observed_at": "2026-10-07T04:29:34.148247+00:00"
+    },
+    {
+     "state": "COLLECTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:39.952799+00:00"
+    },
+    {
+     "state": "SUCCEEDED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:40.043528+00:00"
+    }
+   ],
+   "result": {
+    "outcome": "COMPLETED",
+    "measured": true,
+    "quality_value": 1.0
+   },
+   "mlflow_receipt": true
+  },
+  {
+   "id": "R02",
+   "workload": "CUDA 검증 커널 · 자동 배치",
+   "device_class": "gpu",
+   "backend": "kubernetes",
+   "state": "SUCCEEDED",
+   "reason": null,
+   "node": "GPU-C",
+   "accelerator_count": 1,
+   "native_job_recorded": true,
+   "started_at": "2026-10-07T04:30:04+00:00",
+   "finished_at": "2026-10-07T04:30:08.886339+00:00",
+   "path": "kueue",
+   "date": "2026-10-07",
+   "lifecycle": [
+    {
+     "state": "SUBMITTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:30:02.903982+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:30:02.973081+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": "SchedulingGated",
+     "observed_at": "2026-10-07T04:30:03.319796+00:00"
+    },
+    {
+     "state": "COLLECTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:30:08.827497+00:00"
+    },
+    {
+     "state": "SUCCEEDED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:30:08.889513+00:00"
+    }
+   ],
+   "result": {
+    "outcome": "COMPLETED",
+    "measured": true,
+    "quality_value": 1.0
+   },
+   "mlflow_receipt": true
+  },
+  {
+   "id": "R03",
+   "workload": "CUDA 검증 커널 · 자동 배치",
+   "device_class": "gpu",
+   "backend": "kubernetes",
+   "state": "SUCCEEDED",
+   "reason": null,
+   "node": "GPU-A",
+   "accelerator_count": 1,
+   "native_job_recorded": true,
+   "started_at": "2026-10-07T04:29:40+00:00",
+   "finished_at": "2026-10-07T04:29:45.849006+00:00",
+   "path": "kueue",
+   "date": "2026-10-07",
+   "lifecycle": [
+    {
+     "state": "SUBMITTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:39.680844+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:39.768494+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": "SchedulingGated",
+     "observed_at": "2026-10-07T04:29:40.195722+00:00"
+    },
+    {
+     "state": "COLLECTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:45.803797+00:00"
+    },
+    {
+     "state": "SUCCEEDED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:45.853811+00:00"
+    }
+   ],
+   "result": {
+    "outcome": "COMPLETED",
+    "measured": true,
+    "quality_value": 1.0
+   },
+   "mlflow_receipt": true
+  },
+  {
+   "id": "R04",
+   "workload": "CUDA 검증 커널 · 자동 배치",
+   "device_class": "gpu",
+   "backend": "kubernetes",
+   "state": "SUCCEEDED",
+   "reason": null,
+   "node": "JET-A",
+   "accelerator_count": 1,
+   "native_job_recorded": true,
+   "started_at": "2026-10-07T04:29:29+00:00",
+   "finished_at": "2026-10-07T04:29:34.027523+00:00",
+   "path": "kueue",
+   "date": "2026-10-07",
+   "lifecycle": [
+    {
+     "state": "SUBMITTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:27.896085+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:27.995477+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": "SchedulingGated",
+     "observed_at": "2026-10-07T04:29:28.303049+00:00"
+    },
+    {
+     "state": "COLLECTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:33.965166+00:00"
+    },
+    {
+     "state": "SUCCEEDED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:34.058751+00:00"
+    }
+   ],
+   "result": {
+    "outcome": "COMPLETED",
+    "measured": true,
+    "quality_value": 1.0
+   },
+   "mlflow_receipt": true
+  },
+  {
+   "id": "R05",
+   "workload": "CUDA 검증 커널 · 자동 배치",
+   "device_class": "gpu",
+   "backend": "kubernetes",
+   "state": "SUCCEEDED",
+   "reason": null,
+   "node": "GPU-C",
+   "accelerator_count": 1,
+   "native_job_recorded": true,
+   "started_at": "2026-10-07T04:29:23+00:00",
+   "finished_at": "2026-10-07T04:29:28.210902+00:00",
+   "path": "kueue",
+   "date": "2026-10-07",
+   "lifecycle": [
+    {
+     "state": "SUBMITTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:22.332659+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:22.432736+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": "SchedulingGated",
+     "observed_at": "2026-10-07T04:29:22.604937+00:00"
+    },
+    {
+     "state": "COLLECTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:28.104286+00:00"
+    },
+    {
+     "state": "SUCCEEDED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:28.216323+00:00"
+    }
+   ],
+   "result": {
+    "outcome": "COMPLETED",
+    "measured": true,
+    "quality_value": 1.0
+   },
+   "mlflow_receipt": true
+  },
+  {
+   "id": "R06",
+   "workload": "등록 CNN 추론",
+   "device_class": "gpu",
+   "backend": "kubernetes",
+   "state": "SUCCEEDED",
+   "reason": null,
+   "node": "GPU-B",
+   "accelerator_count": 1,
+   "native_job_recorded": true,
+   "started_at": "2026-10-07T04:29:46+00:00",
+   "finished_at": "2026-10-07T04:29:57.130462+00:00",
+   "path": "kueue",
+   "date": "2026-10-07",
+   "lifecycle": [
+    {
+     "state": "SUBMITTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:45.637419+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:45.714227+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": "SchedulingGated",
+     "observed_at": "2026-10-07T04:29:45.949162+00:00"
+    },
+    {
+     "state": "RUNNING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:51.534575+00:00"
+    },
+    {
+     "state": "COLLECTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:57.062701+00:00"
+    },
+    {
+     "state": "SUCCEEDED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:57.137785+00:00"
+    }
+   ],
+   "result": {
+    "outcome": "COMPLETED",
+    "measured": true,
+    "quality_value": 1.0
+   },
+   "mlflow_receipt": true
+  },
+  {
+   "id": "R07",
+   "workload": "Hailo-8 ResNet-50 추론",
+   "device_class": "npu",
+   "backend": "kubernetes",
+   "state": "SUCCEEDED",
+   "reason": null,
+   "node": "NPU-A",
+   "accelerator_count": 1,
+   "native_job_recorded": true,
+   "started_at": "2026-10-07T04:29:51+00:00",
+   "finished_at": "2026-10-07T04:29:57.345388+00:00",
+   "path": "kueue",
+   "date": "2026-10-07",
+   "lifecycle": [
+    {
+     "state": "SUBMITTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:51.357021+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:51.421787+00:00"
+    },
+    {
+     "state": "COLLECTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:57.268727+00:00"
+    },
+    {
+     "state": "SUCCEEDED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:57.350164+00:00"
+    }
+   ],
+   "result": {
+    "outcome": "COMPLETED",
+    "measured": true,
+    "quality_value": 0.8
+   },
+   "mlflow_receipt": true
+  },
+  {
+   "id": "R08",
+   "workload": "Hailo-8 ResNet-50 추론",
+   "device_class": "npu",
+   "backend": "kubernetes",
+   "state": "SUCCEEDED",
+   "reason": null,
+   "node": "NPU-A",
+   "accelerator_count": 1,
+   "native_job_recorded": true,
+   "started_at": "2026-10-07T04:29:57+00:00",
+   "finished_at": "2026-10-07T04:30:03.216487+00:00",
+   "path": "kueue",
+   "date": "2026-10-07",
+   "lifecycle": [
+    {
+     "state": "SUBMITTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:56.884489+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:56.967609+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": "ContainerCreating",
+     "observed_at": "2026-10-07T04:29:57.461431+00:00"
+    },
+    {
+     "state": "COLLECTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:30:03.134180+00:00"
+    },
+    {
+     "state": "SUCCEEDED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:30:03.222061+00:00"
+    }
+   ],
+   "result": {
+    "outcome": "COMPLETED",
+    "measured": true,
+    "quality_value": 0.8
+   },
+   "mlflow_receipt": true
+  },
+  {
+   "id": "R09",
+   "workload": "Orin CNN 추론",
+   "device_class": "gpu",
+   "backend": "slurm",
+   "state": "SUCCEEDED",
+   "reason": null,
+   "node": "SLURM-A",
+   "accelerator_count": 1,
+   "native_job_recorded": true,
+   "started_at": "2026-10-07T04:29:42+00:00",
+   "finished_at": "2026-10-07T04:31:01.041828+00:00",
+   "path": "slurm",
+   "date": "2026-10-07",
+   "lifecycle": [
+    {
+     "state": "SUBMITTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:42.214641+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:42.856464+00:00"
+    },
+    {
+     "state": "RUNNING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:43.299288+00:00"
+    },
+    {
+     "state": "COLLECTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:30:59.898834+00:00"
+    },
+    {
+     "state": "SUCCEEDED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:31:01.045660+00:00"
+    }
+   ],
+   "result": {
+    "outcome": "COMPLETED",
+    "measured": true,
+    "quality_value": 1.0
+   },
+   "mlflow_receipt": true
+  },
+  {
+   "id": "R10",
+   "workload": "Orin CNN 추론",
+   "device_class": "gpu",
+   "backend": "slurm",
+   "state": "SUCCEEDED",
+   "reason": null,
+   "node": "SLURM-A",
+   "accelerator_count": 1,
+   "native_job_recorded": true,
+   "started_at": "2026-10-07T04:30:55+00:00",
+   "finished_at": "2026-10-07T04:32:14.043607+00:00",
+   "path": "slurm",
+   "date": "2026-10-07",
+   "lifecycle": [
+    {
+     "state": "SUBMITTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:48.370823+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:29:48.708817+00:00"
+    },
+    {
+     "state": "QUEUED",
+     "reason": "AssocGrpCpuLimit",
+     "observed_at": "2026-10-07T04:29:49.510290+00:00"
+    },
+    {
+     "state": "RUNNING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:30:59.155084+00:00"
+    },
+    {
+     "state": "COLLECTING",
+     "reason": null,
+     "observed_at": "2026-10-07T04:32:11.836964+00:00"
+    },
+    {
+     "state": "SUCCEEDED",
+     "reason": null,
+     "observed_at": "2026-10-07T04:32:14.047755+00:00"
+    }
+   ],
+   "result": {
+    "outcome": "COMPLETED",
+    "measured": true,
+    "quality_value": 1.0
+   },
+   "mlflow_receipt": true
+  },
+  {
+   "id": "R11",
+   "workload": "Mobilint Candy 추론",
+   "workload_ref": "mobilint-candy-20261008-v1",
+   "device_class": "npu",
+   "backend": "kubernetes",
+   "path": "kubernetes",
+   "state": "SUCCEEDED",
+   "reason": null,
+   "node": "NPU-B",
+   "accelerator_count": 1,
+   "native_job_recorded": true,
+   "date": "2026-10-08",
+   "started_at": "2026-10-08T07:22:45Z",
+   "finished_at": "2026-10-08T07:22:50.778902+00:00",
+   "times": [
+    {
+     "label": "접수 (created_at)",
+     "at": "2026-10-08T07:22:15.316126+00:00"
+    },
+    {
+     "label": "네이티브 제출 (usage.submitted_at)",
+     "at": "2026-10-08T07:22:45Z"
+    },
+    {
+     "label": "실행 시작 (usage.started_at)",
+     "at": "2026-10-08T07:22:45Z"
+    },
+    {
+     "label": "백엔드 종료 (usage.backend_finished_at)",
+     "at": "2026-10-08T07:22:46Z"
+    },
+    {
+     "label": "결과 확정 (finished_at)",
+     "at": "2026-10-08T07:22:50.778902+00:00"
+    }
+   ],
+   "lifecycle": [],
+   "result": {
+    "outcome": "COMPLETED",
+    "measured": true,
+    "evidence_kind": "hardware",
+    "quality_passed": true
+   },
+   "mlflow_receipt": true,
+   "profile_recorded": true,
+   "requested": {
+    "npu": 1,
+    "cpu": 1.0,
+    "memory_mib": 1024
+   },
+   "allocation": {
+    "mode": "physical_device",
+    "source": "kubernetes:scheduled workload container requests",
+    "interval_seconds": 1.0,
+    "uncertainty": [
+     "QUEUE_WHOLE_SECOND_RESOLUTION"
+    ],
+    "semantics": "allocated reservations, not utilization; unknowns are null"
+   },
+   "measurements": {
+    "measured_compute_seconds": 0.26127630400878843,
+    "elapsed_seconds": 0.26127630400878843,
+    "latency_p50_ms": 26.048539504699875,
+    "latency_p95_ms": 26.31216699955985,
+    "latency_p99_ms": 26.31216699955985,
+    "throughput": 38.27365837073244,
+    "throughput_unit": "work units/s",
+    "sample_count": 10,
+    "work_units": 10,
+    "peak_memory_mib": 66.33203125,
+    "quality_value": 1.0,
+    "gpu_utilization": null,
+    "power_watts": null,
+    "temperature_celsius": null
+   },
+   "quality_contract": {
+    "metric": "finite_output_repeat_element_agreement",
+    "minimum": 1.0,
+    "minimum_repeats": 3,
+    "maximum_peak_memory_mib": 1024.0
+   },
+   "runtime": {
+    "arch": "amd64",
+    "precision": "mxq-float32-io",
+    "input_shape": [
+     224,
+     344,
+     3
+    ],
+    "profile_reuse": "blocked-unobserved-host-firmware"
+   },
+   "source": {
+    "url": "https://github.com/dsa04156/resource-advisor/blob/a5d1dde87b56ba2794dc6a93559342eb85f1940f/docs/evidence/all-accelerators-20261008-v1.json",
+    "pointer": "jobs[0]",
+    "qualification_pointer": "qualifications[0].report"
+   }
+  }
+ ],
+ "snapshots": [
+  {
+   "index": 0,
+   "observed_at": "2026-10-07T04:29:12.393914+00:00",
+   "title": "실험 시작 · 요청 없음",
+   "phase": null,
+   "queue_observation": null,
+   "requests": {},
+   "counts": {}
+  },
+  {
+   "index": 1,
+   "observed_at": "2026-10-07T04:29:14.505385+00:00",
+   "title": "독립 요청 10개 · 플랫폼 접수 시작",
+   "phase": "SUBMIT",
+   "queue_observation": null,
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    }
+   },
+   "counts": {
+    "REQUESTED": 10
+   }
+  },
+  {
+   "index": 2,
+   "observed_at": "2026-10-07T04:29:17.889105+00:00",
+   "title": "등록된 GPU 작업 접수",
+   "phase": "SUBMIT",
+   "queue_observation": null,
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    }
+   },
+   "counts": {
+    "REQUESTED": 9,
+    "VALIDATED": 1
+   }
+  },
+  {
+   "index": 3,
+   "observed_at": "2026-10-07T04:29:21.375233+00:00",
+   "title": "등록된 GPU 작업 접수",
+   "phase": "SUBMIT",
+   "queue_observation": null,
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    }
+   },
+   "counts": {
+    "REQUESTED": 8,
+    "VALIDATED": 2
+   }
+  },
+  {
+   "index": 4,
+   "observed_at": "2026-10-07T04:29:26.575525+00:00",
+   "title": "등록된 GPU 작업 접수",
+   "phase": "SUBMIT",
+   "queue_observation": null,
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    }
+   },
+   "counts": {
+    "REQUESTED": 7,
+    "VALIDATED": 3
+   }
+  },
+  {
+   "index": 5,
+   "observed_at": "2026-10-07T04:29:30.735268+00:00",
+   "title": "등록된 GPU 작업 접수",
+   "phase": "SUBMIT",
+   "queue_observation": null,
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    }
+   },
+   "counts": {
+    "REQUESTED": 6,
+    "VALIDATED": 4
+   }
+  },
+  {
+   "index": 6,
+   "observed_at": "2026-10-07T04:29:33.873340+00:00",
+   "title": "등록된 GPU 작업 접수",
+   "phase": "SUBMIT",
+   "queue_observation": null,
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    }
+   },
+   "counts": {
+    "VALIDATED": 5,
+    "REQUESTED": 5
+   }
+  },
+  {
+   "index": 7,
+   "observed_at": "2026-10-07T04:29:37.714944+00:00",
+   "title": "등록된 GPU 작업 접수",
+   "phase": "SUBMIT",
+   "queue_observation": null,
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    }
+   },
+   "counts": {
+    "VALIDATED": 6,
+    "REQUESTED": 4
+   }
+  },
+  {
+   "index": 8,
+   "observed_at": "2026-10-07T04:29:42.084420+00:00",
+   "title": "등록된 GPU 작업 접수",
+   "phase": "SUBMIT",
+   "queue_observation": null,
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    }
+   },
+   "counts": {
+    "VALIDATED": 7,
+    "REQUESTED": 3
+   }
+  },
+  {
+   "index": 9,
+   "observed_at": "2026-10-07T04:29:45.091742+00:00",
+   "title": "등록된 GPU 작업 접수",
+   "phase": "SUBMIT",
+   "queue_observation": null,
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    }
+   },
+   "counts": {
+    "VALIDATED": 8,
+    "REQUESTED": 2
+   }
+  },
+  {
+   "index": 10,
+   "observed_at": "2026-10-07T04:29:48.190500+00:00",
+   "title": "등록된 NPU 작업 접수",
+   "phase": "SUBMIT",
+   "queue_observation": null,
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "REQUESTED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    }
+   },
+   "counts": {
+    "VALIDATED": 9,
+    "REQUESTED": 1
+   }
+  },
+  {
+   "index": 11,
+   "observed_at": "2026-10-07T04:29:50.089471+00:00",
+   "title": "등록된 NPU 작업 접수",
+   "phase": "SUBMIT",
+   "queue_observation": null,
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": null,
+     "state": "VALIDATED",
+     "reason": null,
+     "node": null,
+     "native_job_recorded": false
+    }
+   },
+   "counts": {
+    "VALIDATED": 10
+   }
+  },
+  {
+   "index": 12,
+   "observed_at": "2026-10-07T04:29:54.303176+00:00",
+   "title": "GPU·NPU 네이티브 작업 상태와 결과 관측",
+   "phase": "EXECUTION",
+   "queue_observation": {
+    "admitted": 0,
+    "pending": 0
+   },
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-B",
+     "native_job_recorded": true
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "VALIDATED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-A",
+     "native_job_recorded": true
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-A",
+     "native_job_recorded": true
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "RUNNING",
+     "reason": null,
+     "node": "GPU-B",
+     "native_job_recorded": true
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "QUEUED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "VALIDATED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": false
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "RUNNING",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "QUEUED",
+     "reason": "AssocGrpCpuLimit",
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    }
+   },
+   "counts": {
+    "SUCCEEDED": 4,
+    "VALIDATED": 2,
+    "RUNNING": 2,
+    "QUEUED": 2
+   }
+  },
+  {
+   "index": 13,
+   "observed_at": "2026-10-07T04:30:00.244454+00:00",
+   "title": "GPU·NPU 네이티브 작업 상태와 결과 관측",
+   "phase": "EXECUTION",
+   "queue_observation": {
+    "admitted": 0,
+    "pending": 0
+   },
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-B",
+     "native_job_recorded": true
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "VALIDATED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": false
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-A",
+     "native_job_recorded": true
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-A",
+     "native_job_recorded": true
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-B",
+     "native_job_recorded": true
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "QUEUED",
+     "reason": "ContainerCreating",
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "RUNNING",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "QUEUED",
+     "reason": "AssocGrpCpuLimit",
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    }
+   },
+   "counts": {
+    "SUCCEEDED": 6,
+    "VALIDATED": 1,
+    "QUEUED": 2,
+    "RUNNING": 1
+   }
+  },
+  {
+   "index": 14,
+   "observed_at": "2026-10-07T04:30:05.008057+00:00",
+   "title": "GPU·NPU 네이티브 작업 상태와 결과 관측",
+   "phase": "EXECUTION",
+   "queue_observation": {
+    "admitted": 1,
+    "pending": 0
+   },
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-B",
+     "native_job_recorded": true
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "QUEUED",
+     "reason": "SchedulingGated",
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-A",
+     "native_job_recorded": true
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-A",
+     "native_job_recorded": true
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-B",
+     "native_job_recorded": true
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "RUNNING",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "QUEUED",
+     "reason": "AssocGrpCpuLimit",
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    }
+   },
+   "counts": {
+    "SUCCEEDED": 7,
+    "QUEUED": 2,
+    "RUNNING": 1
+   }
+  },
+  {
+   "index": 15,
+   "observed_at": "2026-10-07T04:30:11.260226+00:00",
+   "title": "GPU·NPU 네이티브 작업 상태와 결과 관측",
+   "phase": "EXECUTION",
+   "queue_observation": {
+    "admitted": 0,
+    "pending": 0
+   },
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-B",
+     "native_job_recorded": true
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-A",
+     "native_job_recorded": true
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-A",
+     "native_job_recorded": true
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-B",
+     "native_job_recorded": true
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "RUNNING",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "QUEUED",
+     "reason": "AssocGrpCpuLimit",
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    }
+   },
+   "counts": {
+    "SUCCEEDED": 8,
+    "RUNNING": 1,
+    "QUEUED": 1
+   }
+  },
+  {
+   "index": 16,
+   "observed_at": "2026-10-07T04:30:16.103485+00:00",
+   "title": "GPU·NPU 네이티브 작업 상태와 결과 관측",
+   "phase": "EXECUTION",
+   "queue_observation": {
+    "admitted": 0,
+    "pending": 0
+   },
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-B",
+     "native_job_recorded": true
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-A",
+     "native_job_recorded": true
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-A",
+     "native_job_recorded": true
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-B",
+     "native_job_recorded": true
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "RUNNING",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "QUEUED",
+     "reason": "AssocGrpCpuLimit",
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    }
+   },
+   "counts": {
+    "SUCCEEDED": 8,
+    "RUNNING": 1,
+    "QUEUED": 1
+   }
+  },
+  {
+   "index": 17,
+   "observed_at": "2026-10-07T04:30:47.121178+00:00",
+   "title": "노드 자원 관측 갱신",
+   "phase": "EXECUTION",
+   "queue_observation": {
+    "admitted": 0,
+    "pending": 0
+   },
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-B",
+     "native_job_recorded": true
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-A",
+     "native_job_recorded": true
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-A",
+     "native_job_recorded": true
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-B",
+     "native_job_recorded": true
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "RUNNING",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "QUEUED",
+     "reason": "AssocGrpCpuLimit",
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    }
+   },
+   "counts": {
+    "SUCCEEDED": 8,
+    "RUNNING": 1,
+    "QUEUED": 1
+   }
+  },
+  {
+   "index": 18,
+   "observed_at": "2026-10-07T04:31:04.164517+00:00",
+   "title": "GPU·NPU 네이티브 작업 상태와 결과 관측",
+   "phase": "EXECUTION",
+   "queue_observation": {
+    "admitted": 0,
+    "pending": 0
+   },
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-B",
+     "native_job_recorded": true
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-A",
+     "native_job_recorded": true
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-A",
+     "native_job_recorded": true
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-B",
+     "native_job_recorded": true
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "RUNNING",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    }
+   },
+   "counts": {
+    "SUCCEEDED": 9,
+    "RUNNING": 1
+   }
+  },
+  {
+   "index": 19,
+   "observed_at": "2026-10-07T04:31:10.364469+00:00",
+   "title": "GPU·NPU 네이티브 작업 상태와 결과 관측",
+   "phase": "EXECUTION",
+   "queue_observation": {
+    "admitted": 0,
+    "pending": 0
+   },
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-B",
+     "native_job_recorded": true
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-A",
+     "native_job_recorded": true
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-A",
+     "native_job_recorded": true
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-B",
+     "native_job_recorded": true
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "RUNNING",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    }
+   },
+   "counts": {
+    "SUCCEEDED": 9,
+    "RUNNING": 1
+   }
+  },
+  {
+   "index": 20,
+   "observed_at": "2026-10-07T04:31:48.877616+00:00",
+   "title": "노드 자원 관측 갱신",
+   "phase": "EXECUTION",
+   "queue_observation": {
+    "admitted": 0,
+    "pending": 0
+   },
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-B",
+     "native_job_recorded": true
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-A",
+     "native_job_recorded": true
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-A",
+     "native_job_recorded": true
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-B",
+     "native_job_recorded": true
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "RUNNING",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    }
+   },
+   "counts": {
+    "SUCCEEDED": 9,
+    "RUNNING": 1
+   }
+  },
+  {
+   "index": 21,
+   "observed_at": "2026-10-07T04:32:13.123010+00:00",
+   "title": "GPU·NPU 네이티브 작업 상태와 결과 관측",
+   "phase": "EXECUTION",
+   "queue_observation": {
+    "admitted": 0,
+    "pending": 0
+   },
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-B",
+     "native_job_recorded": true
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-A",
+     "native_job_recorded": true
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-A",
+     "native_job_recorded": true
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-B",
+     "native_job_recorded": true
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "COLLECTING",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    }
+   },
+   "counts": {
+    "SUCCEEDED": 9,
+    "COLLECTING": 1
+   }
+  },
+  {
+   "index": 22,
+   "observed_at": "2026-10-07T04:32:18.791447+00:00",
+   "title": "GPU·NPU 네이티브 작업 상태와 결과 관측",
+   "phase": "EXECUTION",
+   "queue_observation": {
+    "admitted": 0,
+    "pending": 0
+   },
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-B",
+     "native_job_recorded": true
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-A",
+     "native_job_recorded": true
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-A",
+     "native_job_recorded": true
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-B",
+     "native_job_recorded": true
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    }
+   },
+   "counts": {
+    "SUCCEEDED": 10
+   }
+  },
+  {
+   "index": 23,
+   "observed_at": "2026-10-07T04:32:24.232167+00:00",
+   "title": "최종 관측 · 실험 종료 기록",
+   "phase": "FINISHED",
+   "queue_observation": {
+    "admitted": 0,
+    "pending": 0
+   },
+   "requests": {
+    "R01": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-B",
+     "native_job_recorded": true
+    },
+    "R02": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R03": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-A",
+     "native_job_recorded": true
+    },
+    "R04": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "JET-A",
+     "native_job_recorded": true
+    },
+    "R05": {
+     "workload": "CUDA 검증 커널 · 자동 배치",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-C",
+     "native_job_recorded": true
+    },
+    "R06": {
+     "workload": "등록 CNN 추론",
+     "device_class": "gpu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "GPU-B",
+     "native_job_recorded": true
+    },
+    "R07": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R08": {
+     "workload": "Hailo-8 ResNet-50 추론",
+     "device_class": "npu",
+     "backend": "kubernetes",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "NPU-A",
+     "native_job_recorded": true
+    },
+    "R09": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    },
+    "R10": {
+     "workload": "Orin CNN 추론",
+     "device_class": "gpu",
+     "backend": "slurm",
+     "state": "SUCCEEDED",
+     "reason": null,
+     "node": "SLURM-A",
+     "native_job_recorded": true
+    }
+   },
+   "counts": {
+    "SUCCEEDED": 10
+   }
+  }
+ ],
+ "fleet": {
+  "run_alias": "run-fleet",
+  "project_alias": "project-A",
+  "scope": "K8s GPU·NPU와 별도 Slurm에 동시 제출한 독립 요청 10개. 실행 노드 수는 누적 관측이며 동시 할당이 아니다."
+ },
+ "provenance": {
+  "builder": "management/build_data.py",
+  "sources": [
+   {
+    "role": "2026-10-07 fleet_batch 관측 24개 · 요청 R01–R10",
+    "path": "../replay/observations.json",
+    "sha256": "eb0b39d3494146521fc74ae621ead4265d3e75fb02643b0a2f53631c995cf218",
+    "manifest": "../replay/PROVENANCE.json"
+   },
+   {
+    "role": "2026-10-08 Mobilint ARIES2 실행 기록 jobs[0] (표시 번호 R11)",
+    "path": "docs/evidence/all-accelerators-20261008-v1.json",
+    "commit": "a5d1dde87b56ba2794dc6a93559342eb85f1940f",
+    "url": "https://github.com/dsa04156/resource-advisor/blob/a5d1dde87b56ba2794dc6a93559342eb85f1940f/docs/evidence/all-accelerators-20261008-v1.json",
+    "sha256": "64ebe1c9d4e585f59e0e7d7b55665d3758d031a0924c2426fb4de6c6ff44bd09"
+   },
+   {
+    "role": "장치 모델 매핑",
+    "path": "../replay/DEVICE-MODELS.md"
+   },
+   {
+    "role": "아키텍처 책임 경계",
+    "path": "../SOURCE-MATERIAL.md#34-상위-스케줄링-계층-무엇을-보고-어디까지-결정하는가"
+   }
+  ],
+  "excluded": [
+   "job/attempt/native/MLflow identifiers",
+   "digests and signatures",
+   "endpoints, URLs of services, credentials",
+   "host names",
+   "node inventory metrics (capacity, utilization)"
+  ],
+  "paths": "K8s · Kueue = 2026-10-07 fleet_batch Kubernetes 요청(실행 단위로 Kueue admitted/pending 관측 기록 있음). Kubernetes = Mobilint jobs[0](backend kubernetes만 기록, Kueue 기록 없음).",
+  "aliases": "NPU-B = Mobilint 기록의 node_alias npu-1. R11 = 합본 표 표시 번호이며 2026-10-07 원본의 요청 번호가 아니다."
+ }
+}

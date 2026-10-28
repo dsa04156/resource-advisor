@@ -7,7 +7,22 @@
 사용자가 PPT를 직접 구성할 수 있도록 설명 원자료·원본 데이터 링크·이미지를 제공한 상태다.
 이 자료는 완성된 발표 덱이 아니다. 아래 자료를 먼저 읽고 사용자가 요청하는 후속 편집을 수행한다.
 
-## 최신 이미지: 이미지 생성 도구로 만든 버전
+## 실증 기록 기반 관리 화면 — 발표 우선 자료
+
+- [관리 화면](management/index.html), [캡처 갤러리](management/captures/gallery.html), [PNG 8장 ZIP](NAIS-management-captures.zip).
+- [관리 화면 설명·발표 문장·원본 출처](management/README.md)를 먼저 읽는다.
+- Run:ai처럼 **개요 → 자원 → 워크로드 → 대기열·실행 → 결과**를 이어서 설명한다. 모빌인트를 포함한 장치 모델, Kubernetes·Slurm 경로, 요청별 상태, Slurm 대기 사유, 결과·MLflow 수신을 볼 수 있다.
+- 2026-10-07~08 실제 하드웨어 기록을 새 관리 화면으로 렌더링했다. 완료 요청 11건(K8s 9·Slurm 2), 누적 실행 노드 8개(GPU 6·NPU 2)이며, 현재 가동 상태나 과거 운영 UI 자체의 캡처는 아니다.
+- 관리 흐름을 설명하는 발표에는 이 자료를 우선한다. 아래 작업 제출 화면은 화면 기능 설명에 사용한다.
+
+## 작업 제출 화면 캡처 (2026-10-28)
+
+- [캡처 ZIP](NAIS-interview-captures-20261028.zip): 고해상도 PNG 13장, 발표 문장, 출처·해시.
+- [캡처별 용도와 발표 문장](captures/2026-10-28/README.md), [이미지 미리보기](captures/2026-10-28/gallery.html).
+- 새 Console의 작업 선택·자동 배치 검토·Mobilint 선택·Slurm 검토·통합 접수 목록을 촬영했다. `01`~`07a`는 격리된 **TEST DATA UI 검증**이며 실제 장비 실행은 없다.
+- `08`은 기존 2026-10-07~08 실제 실행 기록 재생 캡처다. 새 UI의 접수 예시와 실제 실행 기록을 구분해 설명한다.
+
+## 아키텍처 이미지: 이미지 생성 도구로 만든 버전
 
 사용자는 이미지 생성 기능으로 만든 발표용 그림을 요청했다. **아래 두 PNG를 발표 편집의 우선 시각 자료로 사용한다.**
 
@@ -34,6 +49,8 @@ PNG 3200×1800, 벡터 SVG, 차트 데이터와 출처를 포함한다.
 `gallery.html`은 내려받아 브라우저에서 열면 된다. GitHub에서는 HTML이 페이지로 렌더링되지 않을 수 있다.
 
 ## 상위 스케줄링 설명 위치
+
+[SCHEDULER-SLIDE-NOTES.md](SCHEDULER-SLIDE-NOTES.md)는 **Kubernetes·Slurm 연결과 하위 스케줄러의 작업 처리**를 쉽게 설명하는 5장 분량 원고다. 슬라이드별 본문·그림 배치·발표 멘트·코드 근거가 있다. Kubeflow는 요청 진입점으로 짧게 다루고, 공통 계층 → 어댑터 → Kueue/kube-scheduler 또는 Slurm → 상태·결과 회수를 중심으로 구성한다.
 
 [SOURCE-MATERIAL.md 3.4절](SOURCE-MATERIAL.md#34-상위-스케줄링-계층-무엇을-보고-어디까지-결정하는가)을 먼저 읽는다. 후보 필터 → 관측 여유 → backend 선호 → 진행 중 접수 수 → 최근 5분 접수 수 → candidate ref 순의 선택 규칙, project별 동시 접수 lock, 계획 검증, adapter와 native scheduler의 책임 경계를 정리했다. 완료 화면은 실행 증거이며 선택 이유의 증거는 저장된 scheduling plan이다.
 

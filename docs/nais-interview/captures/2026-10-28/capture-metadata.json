@@ -1,0 +1,206 @@
+{
+  "capture_date": "2026-10-28",
+  "scope": "Isolated TEST DATA fixture; real Console and public API; no worker/native execution; no production services changed",
+  "viewport": {
+    "width": 1920,
+    "height": 1080,
+    "device_scale_factor": 2
+  },
+  "candidate_focus_viewport": {
+    "width": 1100,
+    "height": 1000,
+    "device_scale_factor": 2
+  },
+  "page_errors": [],
+  "submitted_fixture_jobs": [
+    {
+      "job_id": "j-57007f0301bb4ee3a05937d451c90683",
+      "project_ref": "TEST-DATA-fixture",
+      "state": "VALIDATED",
+      "attempt_id": "a-ecc8db50ed3c4b6ea0af96da188c72e5",
+      "epoch": 1,
+      "created_at": "2026-10-28T02:37:43.453778+00:00",
+      "external_id": null,
+      "workload_signature": "sha256:15167834a1c0968435bb15bb4006cc69f5de8ced0eb366fc2d542070f89357bd",
+      "context_signature": "sha256:7791312e813f61569eb45081b317bcb93d0b336f35e79d765b2984262db1872e",
+      "error": null,
+      "result_digest": null,
+      "last_observation_error": null,
+      "last_observation_error_at": null,
+      "cancel_requested_at": null,
+      "cancel_dispatch_started_at": null,
+      "cancel_acknowledged_at": null,
+      "owner_lease_expires_at": null,
+      "owner_last_heartbeat_at": null,
+      "operational_submission": true,
+      "submission_warnings": []
+    },
+    {
+      "job_id": "j-38233cdaacda418ba622b0b545fcd221",
+      "project_ref": "TEST-DATA-fixture",
+      "state": "VALIDATED",
+      "attempt_id": "a-07e78bcf177b430abb5be0afbcd923ee",
+      "epoch": 1,
+      "created_at": "2026-10-28T02:37:43.755379+00:00",
+      "external_id": null,
+      "workload_signature": "sha256:15167834a1c0968435bb15bb4006cc69f5de8ced0eb366fc2d542070f89357bd",
+      "context_signature": "sha256:81aeebd7925f2dac4a654a1ae1149ac27ace7da7a596d92540f5d8d1526d4bfa",
+      "error": null,
+      "result_digest": null,
+      "last_observation_error": null,
+      "last_observation_error_at": null,
+      "cancel_requested_at": null,
+      "cancel_dispatch_started_at": null,
+      "cancel_acknowledged_at": null,
+      "owner_lease_expires_at": null,
+      "owner_last_heartbeat_at": null,
+      "operational_submission": true,
+      "submission_warnings": []
+    },
+    {
+      "job_id": "j-d2fc8ec699d54238957098d4d92781ca",
+      "project_ref": "TEST-DATA-fixture",
+      "state": "VALIDATED",
+      "attempt_id": "a-c8b5e811f00c456d81efb34ef93fc7a7",
+      "epoch": 1,
+      "created_at": "2026-10-28T02:37:44.008886+00:00",
+      "external_id": null,
+      "workload_signature": "sha256:15167834a1c0968435bb15bb4006cc69f5de8ced0eb366fc2d542070f89357bd",
+      "context_signature": "sha256:a8237955175cf026509a7f5e7a26819572c5f4ad0d5578d7d4876129f006dbcb",
+      "error": null,
+      "result_digest": null,
+      "last_observation_error": null,
+      "last_observation_error_at": null,
+      "cancel_requested_at": null,
+      "cancel_dispatch_started_at": null,
+      "cancel_acknowledged_at": null,
+      "owner_lease_expires_at": null,
+      "owner_last_heartbeat_at": null,
+      "operational_submission": true,
+      "submission_warnings": []
+    },
+    {
+      "job_id": "j-505a6b5b1b2646f4b0f063225ee7a67a",
+      "project_ref": "TEST-DATA-fixture",
+      "state": "VALIDATED",
+      "attempt_id": "a-cd11941e6fea4e03b7acbc806a5b9853",
+      "epoch": 1,
+      "created_at": "2026-10-28T02:37:44.272748+00:00",
+      "external_id": null,
+      "workload_signature": "sha256:32c2af1fb43324d7383792c5f53ef56b6f0e75e357f05c115886be0489ea8569",
+      "context_signature": "sha256:3af43d567532e2ce2ad8609e4ac6d127b52f082e40442128aba6f783ea1dd938",
+      "error": null,
+      "result_digest": null,
+      "last_observation_error": null,
+      "last_observation_error_at": null,
+      "cancel_requested_at": null,
+      "cancel_dispatch_started_at": null,
+      "cancel_acknowledged_at": null,
+      "owner_lease_expires_at": null,
+      "owner_last_heartbeat_at": null,
+      "operational_submission": true,
+      "submission_warnings": []
+    }
+  ],
+  "files": [
+    {
+      "file": "01-workload-catalog.png",
+      "sha256": "43ae66830e275a78a91e03d82a950864b5953e7ba1fe3d94383f0d57c535b5b7",
+      "scope": "TEST DATA UI capture, no native execution",
+      "width": 3840,
+      "height": 2160
+    },
+    {
+      "file": "02-auto-placement.png",
+      "sha256": "9600e30f578aef414bccc5aea8196043669f4f2160737d79530179af761b8c40",
+      "scope": "TEST DATA UI capture, no native execution",
+      "width": 3840,
+      "height": 2632
+    },
+    {
+      "file": "03-mobilint-placement.png",
+      "sha256": "5131e75e2da9e8b8057738058b242143e47ab62596f7313f260a7a25b63675cd",
+      "scope": "TEST DATA UI capture, no native execution",
+      "width": 3840,
+      "height": 2632
+    },
+    {
+      "file": "03a-device-selection-focus.png",
+      "sha256": "fe8ee12c857e967092e04ee668e708e8d91315e153aff7b0a3ea5131afdc4116",
+      "scope": "TEST DATA UI capture, no native execution",
+      "width": 2128,
+      "height": 1076
+    },
+    {
+      "file": "03b-mobilint-review-focus.png",
+      "sha256": "67fe213440990ec8d30edc2651a5852aaf636d1635a8f449a160085618486fb7",
+      "scope": "TEST DATA UI capture, no native execution",
+      "width": 680,
+      "height": 1226
+    },
+    {
+      "file": "04-candidate-reasons-focus.png",
+      "sha256": "c9ee5ac0e6c1927a379fbb9b563a787f2c556923a9550abfc1d9e25e0ee939fa",
+      "scope": "TEST DATA UI capture, no native execution",
+      "width": 1540,
+      "height": 554
+    },
+    {
+      "file": "05-slurm-placement.png",
+      "sha256": "fab78a6a9329a7b391c7bc4fcd138fd57700f51977dd49db4f8b3d009b6546b4",
+      "scope": "TEST DATA UI capture, no native execution",
+      "width": 3840,
+      "height": 2350
+    },
+    {
+      "file": "05a-slurm-review-focus.png",
+      "sha256": "4bc12a729a8fdb35868350e8f5f8e1d16cbf78902a87c4350a0542b5a32fed7a",
+      "scope": "TEST DATA UI capture, no native execution",
+      "width": 680,
+      "height": 1264
+    },
+    {
+      "file": "06-workload-submission-list.png",
+      "sha256": "ec0dd6e253fcf1c9e03932ade052ce84d28b8fbde578b07346d8b25b7523d591",
+      "scope": "TEST DATA UI capture, no native execution",
+      "width": 3840,
+      "height": 2160
+    },
+    {
+      "file": "06a-workload-table-focus.png",
+      "sha256": "a979a94836671135f2c6f6b1b6d7703a82ef392b29004cfa0732e5a3c845cb7f",
+      "scope": "TEST DATA UI capture, no native execution",
+      "width": 2040,
+      "height": 926
+    },
+    {
+      "file": "07-mobilint-submission-detail.png",
+      "sha256": "353c3bed0a7ef0e4cbbfb3b66ec67fadb964a101aa101a5019e001605e1c1719",
+      "scope": "TEST DATA UI capture, no native execution",
+      "width": 3840,
+      "height": 2160
+    },
+    {
+      "file": "07a-submission-progress-focus.png",
+      "sha256": "38f14e8a1dfe0cec20df3d33ebe62611441b920be43432f85e2ecc5803022f04",
+      "scope": "TEST DATA UI capture, no native execution",
+      "width": 760,
+      "height": 1914
+    },
+    {
+      "file": "08-recorded-execution-results.png",
+      "sha256": "168cd336a845e6a26b03e2587f99ae051397332f83faaa786bf0035abcbc0838",
+      "scope": "Existing recorded-execution replay screenshot; not live",
+      "source": "docs/nais-interview/visuals/mobilint-success-dashboard.png",
+      "dates": "2026-10-07 Kubernetes 8 + Slurm 2; 2026-10-08 Mobilint ARIES2 1",
+      "width": 1440,
+      "height": 1505
+    }
+  ],
+  "source_sha256": {
+    "src/resource_advisor/static/console.js": "0ce9573326cfe36057dc8920043012766d7341a22833b1bdc8e169759fa59320",
+    "src/resource_advisor/static/workspace.js": "ae515578b01e00a632ce4daaf2d0cebb3ad9b981515c81aca17ca9ed7e8786d7",
+    "src/resource_advisor/static/workspace.css": "4330fba5b841fb25301a520713bc1f977b5586bbdac011a0add5191e22e03b73",
+    "examples/workload_console_fixture.py": "545783e822b413e2d23e9191afbd3f98bed54a7792a147b0065b0f35ae105294"
+  }
+}

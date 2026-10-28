@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HAIRP 실행 관리 · 실증 기록</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" aria-label="주 메뉴">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">H</span>
+      <span><b>HAIRP</b><small>이기종 실행 관리</small></span>
+    </div>
+    <nav class="nav">
+      <a href="#/overview" data-route="overview"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>개요</a>
+      <a href="#/resources" data-route="resources"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/></svg>자원</a>
+      <a href="#/workloads" data-route="workloads"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>워크로드</a>
+      <a href="#/queue" data-route="queue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h4v14H3zM10 5h4v9h-4zM17 5h4v5h-4z"/></svg>대기열 · 실행</a>
+      <a href="#/results" data-route="results"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>결과</a>
+    </nav>
+    <div class="scope">
+      <span class="scope-label">기록 범위</span>
+      <b>이기종 실증 기록</b>
+      <span>fleet_batch · 2026-10-07</span>
+      <span>Mobilint · 2026-10-08</span>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="heading">
+        <h1 id="page-title">개요</h1>
+        <p id="page-sub"></p>
+      </div>
+      <div class="stamp" aria-label="기록 기준 표시">
+        <span class="stamp-tag">실증 기록 · 2026-10-07~08</span>
+        <span class="stamp-basis">관측 기록 기준</span>
+      </div>
+    </header>
+
+    <main id="view" tabindex="-1" aria-live="polite"></main>
+
+    <footer class="caption">
+      <p id="caption-text"></p>
+      <p class="sources" id="caption-sources"></p>
+    </footer>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

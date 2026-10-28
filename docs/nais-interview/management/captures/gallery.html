@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>실증 기록 관리 캡처</title>
+<link rel="icon" href="data:,">
+<style>
+:root { --ink: #17243b; --ink-2: #47566b; --ink-3: #6c788a; --canvas: #f7f8fb; --sheet: #fff; --rule: #e4e8ef; --record: #0f2a4f; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--canvas); color: var(--ink); font: 15px/1.55 "Noto Sans CJK KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+main { max-width: 1280px; margin: 0 auto; padding: 32px 16px 48px; }
+h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.01em; }
+.lead { color: var(--ink-2); margin: 0 0 8px; }
+.tag { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--record); color: #fff; font-size: 13px; font-weight: 600; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 560px), 1fr)); gap: 20px; margin-top: 24px; }
+figure { margin: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+figure a { display: block; background: var(--canvas); }
+img { display: block; width: 100%; height: auto; outline: 1px solid rgba(0,0,0,.08); outline-offset: -1px; }
+figcaption { padding: 12px 16px 14px; font-size: 14px; }
+figcaption b { display: block; font-size: 15px; }
+figcaption span { color: var(--ink-3); font-size: 13px; }
+footer { margin-top: 28px; color: var(--ink-3); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+<span class="tag">실증 기록 · 2026-10-07~08</span>
+<h1>실증 기록 관리 화면 캡처</h1>
+<p class="lead">저장된 실제 하드웨어 실행 기록을 2026-10-28에 새로 렌더링한 읽기 전용 화면입니다. 과거 운영 UI의 스크린샷이나 현재 live 상태가 아닙니다.</p>
+<div class="grid">
+<figure><a href="01-overview.png"><img src="01-overview.png" alt="개요 화면" loading="lazy"></a><figcaption><b>이기종 실행 완료 기록 개요</b>완료 기록 11건 · 백엔드별 K8s 9건 / Slurm 2건 · 실행 노드(누적) 8 · 결과·MLflow 11/11<br><span>두 날짜 누적 · 동시 실행 아님</span></figcaption></figure>
+<figure><a href="02-resources.png"><img src="02-resources.png" alt="자원 화면" loading="lazy"></a><figcaption><b>실행된 자원과 할당 단위 경계</b>장치 8개의 모델·백엔드·할당 단위·완료 수<br><span>현재 inventory·용량·사용률 아님</span></figcaption></figure>
+<figure><a href="03-workloads.png"><img src="03-workloads.png" alt="워크로드 화면" loading="lazy"></a><figcaption><b>요청 단위의 공통 작업 관리</b>11건 · 백엔드/장치 필터 · 행 상세<br><span>R11은 2026-10-08 단독 기록</span></figcaption></figure>
+<figure><a href="03a-workload-detail-R10.png"><img src="03a-workload-detail-R10.png" alt="R10 상세" loading="lazy"></a><figcaption><b>Slurm 대기 사유와 단계 기록</b>R10 · AssocGrpCpuLimit 대기 → 실행 → 결과 수집 → 완료</figcaption></figure>
+<figure><a href="03b-workload-detail-R11.png"><img src="03b-workload-detail-R11.png" alt="R11 상세" loading="lazy"></a><figcaption><b>Mobilint NPU 실행 기록</b>Kubernetes · NPU 1 · CPU 1 · 1024 MiB 요청 · MLflow 수신<br><span>기록된 시각 필드이며 상태 이력 아님</span></figcaption></figure>
+<figure><a href="04-queue-snapshot-12.png"><img src="04-queue-snapshot-12.png" alt="대기열 실행 화면" loading="lazy"></a><figcaption><b>한 시점의 대기·실행 상태</b>2026-10-07 04:29:54.303 UTC · 완료 4 · 검증 2 · 실행 2 · 대기 2<br><span>Kueue admitted 0 · pending 0은 별도 계층 · 보간 없음</span></figcaption></figure>
+<figure><a href="04a-queue-board-12.png"><img src="04a-queue-board-12.png" alt="스냅샷 상태 보드" loading="lazy"></a><figcaption><b>스냅샷 12 상태 보드</b>같은 화면의 crop</figcaption></figure>
+<figure><a href="05-results.png"><img src="05-results.png" alt="결과 화면" loading="lazy"></a><figcaption><b>결과 수신과 하드웨어 측정 경계</b>Mobilint p50 26.05 ms · p95 26.31 ms · 38.27 work units/s<br><span>반복 출력 일치는 정확도 아님 · 장치 간 비교 아님</span></figcaption></figure>
+</div>
+<footer>출처와 해시: <a href="capture-metadata.json">capture-metadata.json</a> · <a href="../README.md">README.md</a> · <a href="../data.json">data.json</a></footer>
+</main>
+</body>
+</html>
