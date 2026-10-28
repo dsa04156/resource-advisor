@@ -459,3 +459,275 @@ def test_default_route_keeps_pod_network_and_dedicated_transport_rejects_legacy(
         KubernetesBackend(
             **options, host_network_variants={"different-variant": "sha256:" + "0" * 64}
         ).manifest(job)
+
+
+def kueue_workload(job_uid, queue="batch", *, admitted):
+    conditions = [
+        {
+            "type": "QuotaReserved",
+            "status": "True" if admitted else "False",
+            "reason": "QuotaReserved" if admitted else "Pending",
+            "message": "couldn't assign flavors to pod set main: insufficient unused quota"
+            if not admitted
+            else "Quota reserved in ClusterQueue ra-live",
+            "lastTransitionTime": "2026-10-28T01:00:00Z",
+        }
+    ]
+    if admitted:
+        conditions.append(
+            {
+                "type": "Admitted",
+                "status": "True",
+                "reason": "Admitted",
+                "message": "The workload is admitted",
+                "lastTransitionTime": "2026-10-28T01:00:01Z",
+            }
+        )
+    return {
+        "metadata": {
+            "name": "job-attempt-1a2b3",
+            "uid": "wl-uid",
+            "labels": {"kueue.x-k8s.io/job-uid": job_uid},
+            "ownerReferences": [{"kind": "Job", "uid": job_uid, "controller": True}],
+        },
+        "spec": {"queueName": queue},
+        "status": {
+            "conditions": conditions,
+            **(
+                {
+                    "admission": {
+                        "clusterQueue": "ra-live",
+                        "podSetAssignments": [
+                            {
+                                "name": "main",
+                                "flavors": {"cpu": "ra-live-cpu"},
+                                "resourceUsage": {"cpu": "2", "memory": "1Gi"},
+                            }
+                        ],
+                    }
+                }
+                if admitted
+                else {}
+            ),
+        },
+    }
+
+
+@pytest.mark.parametrize("admitted", [False, True])
+def test_kubernetes_observation_records_owned_pod_node_and_kueue_admission(service, admitted):
+    from test_kubernetes_retention import Scheduler
+
+    job = row(service)
+    job["body"]["external_id"] = job["body"]["attempt_id"]
+    scheduler = Scheduler(job)
+    scheduler.pod["spec"]["nodeName"] = "etri-node-1"
+    if not admitted:
+        scheduler.obj["spec"] = {"suspend": True}
+        scheduler.pod = None
+    foreign = kueue_workload("other-job-uid", admitted=True)
+    calls = []
+
+    def execute(args, **kwargs):
+        calls.append(args)
+        if "workloads.kueue.x-k8s.io" in args:
+            return json.dumps({"items": [kueue_workload("job-uid", admitted=admitted), foreign]})
+        if "pods" in args:
+            return json.dumps({"items": [scheduler.pod] if scheduler.pod else []})
+        return json.dumps(scheduler.obj)
+
+    backend = KubernetesBackend(
+        namespace="research-a",
+        local_queue="batch",
+        node_selector={"pool": "lab"},
+        observe_admission=True,
+        execute=execute,
+    )
+    observation = backend.status(job)
+    query = next(a for a in calls if "workloads.kueue.x-k8s.io" in a)
+    assert "kueue.x-k8s.io/job-uid=job-uid" in query and "--namespace" in query
+    admission = observation.admission
+    assert admission["source"] == "kueue:Workload" and admission["uid"] == "wl-uid"
+    assert admission["local_queue"] == "batch"
+    reserved = next(c for c in admission["conditions"] if c["type"] == "QuotaReserved")
+    if admitted:
+        assert observation.state == "RUNNING"
+        assert admission["cluster_queue"] == "ra-live"
+        assert admission["resource_usage"] == {"cpu": "2", "memory": "1Gi"}
+        assert observation.placement == {
+            "source": "kubernetes:Pod",
+            "job_uid": "job-uid",
+            "pod_name": "attempt-pod",
+            "pod_uid": "pod-uid",
+            "node_name": "etri-node-1",
+            "phase": "Running",
+        }
+    else:
+        assert observation.state == "QUEUED" and observation.placement is None
+        assert observation.scheduler_reason == "AdmissionPending"
+        assert reserved["status"] == "False" and "insufficient" in reserved["message"]
+
+
+def test_kubernetes_admission_read_failure_keeps_scheduler_state(service):
+    from test_kubernetes_retention import Scheduler
+
+    job = row(service)
+    job["body"]["external_id"] = job["body"]["attempt_id"]
+    scheduler = Scheduler(job)
+
+    def execute(args, **kwargs):
+        if "workloads.kueue.x-k8s.io" in args:
+            raise BackendError("kubectl exited with code 1")
+        if "pods" in args:
+            return json.dumps({"items": [scheduler.pod]})
+        return json.dumps(scheduler.obj)
+
+    backend = KubernetesBackend(
+        namespace="research-a",
+        local_queue="batch",
+        node_selector={"pool": "lab"},
+        observe_admission=True,
+        execute=execute,
+    )
+    observation = backend.status(job)
+    assert observation.state == "RUNNING"
+    assert observation.admission == {"source": "kueue:Workload", "error": "UNAVAILABLE"}
+
+
+def test_progress_parser_keeps_owned_bounded_records_only():
+    from resource_advisor.backends import progress_from_log
+
+    def record(attempt, epoch, loss=0.5):
+        return "RA_PROGRESS " + json.dumps(
+            {
+                "schema": "ra-progress-v1",
+                "job_id": "j-1",
+                "attempt_id": attempt,
+                "epoch": epoch,
+                "total_epochs": 50,
+                "optimizer_steps": epoch * 4,
+                "loss": loss,
+                "elapsed_seconds": epoch * 1.5,
+                "observed_at": "2026-10-28T01:00:00+00:00",
+                "injected": "<script>",
+            }
+        )
+
+    log = "\n".join(
+        [record("a-1", n) for n in range(30)]
+        + [record("a-other", 99), "x" * 5000, "RESOURCE_ADVISOR_RESULT {" + "1" * 9000 + "}"]
+    )
+    view = progress_from_log(log, {"id": "j-1", "body": {"attempt_id": "a-1"}}, "fixture")
+    assert view["attempt_id"] == "a-1" and view["source"] == "fixture"
+    assert view["latest"]["epoch"] == 29 and "injected" not in view["latest"]
+    assert [r["epoch"] for r in view["records"]] == list(range(10, 30))
+    assert len(view["log_tail"]) <= 40 and all(len(line) <= 300 for line in view["log_tail"])
+    assert view["log_tail"][-1] == "[result envelope]"
+    assert view["observed_at"]
+    nan = record("a-1", 31).replace('"loss": 0.5', '"loss": NaN')
+    assert progress_from_log(nan, {"id": "j-1", "body": {"attempt_id": "a-1"}}, "x")["latest"] is None
+
+
+def test_kubernetes_progress_reads_bounded_workload_log(service):
+    job = row(service)
+    job["body"]["external_id"] = job["body"]["attempt_id"]
+    calls = []
+
+    def execute(args, **kwargs):
+        calls.append(args)
+        return "starting\n"
+
+    backend = KubernetesBackend(
+        namespace="research-a",
+        local_queue="batch",
+        node_selector={"pool": "lab"},
+        observe_progress=True,
+        execute=execute,
+    )
+    view = backend.progress(job, None)
+    assert calls[-1][-4:] == ["job/" + job["body"]["attempt_id"], "--container", "workload", "--tail=60"]
+    assert view["log_tail"] == ["starting"] and view["latest"] is None
+
+
+def test_slurm_progress_reads_owned_output_through_node_transport(service):
+    from resource_advisor.backends import Observation
+
+    job = row(service)
+    job["body"]["external_id"] = "77"
+    calls = []
+
+    def execute(args, **kwargs):
+        calls.append(args)
+        return "epoch log\n"
+
+    backend = SlurmBackend(
+        partition="compute",
+        account="ra-project",
+        qos="ra-normal",
+        output_dir="/srv/ra/results",
+        ssh_target="controller",
+        result_ssh_targets={"vm-node": "vm-results"},
+        observe_progress=True,
+        execute=execute,
+    )
+    running = Observation("RUNNING", placement={"source": "slurm:squeue", "node_name": "vm-node"})
+    assert backend.progress(job, running)["log_tail"] == ["epoch log"]
+    assert calls[-1][-2:] == [
+        "vm-results",
+        "tail -c 16384 -- /srv/ra/results/" + job["body"]["attempt_id"] + ".log",
+    ]
+    with pytest.raises(BackendError):
+        backend.progress(job, Observation("RUNNING", placement={"node_name": "other-node"}))
+
+
+@pytest.mark.parametrize("state", ["PENDING", "RUNNING"])
+def test_slurm_live_observation_reports_reason_node_and_running_allocation(service, state):
+    job = row(service)
+    job["body"]["external_id"] = "81"
+    attempt = job["body"]["attempt_id"]
+    calls = []
+
+    def execute(args, **_):
+        calls.append(args)
+        if args[0] == "squeue":
+            assert args[-1] == "--format=%i|%j|%a|%P|%T|%r|%N"
+            node = "(Resources)" if state == "PENDING" else "vm-node"
+            reason = "Resources" if state == "PENDING" else "None"
+            return (
+                f"80|other|ra-project|compute|RUNNING|None|vm-node\n"
+                f"81|{attempt}|ra-project|compute|{state}|{reason}|{node}\n"
+            )
+        assert args[3] == "sacct" and "--jobs" in args and args[-2] == "81"
+        return (
+            f"81|{attempt}|ra-project|compute|RUNNING|0:0|2026-10-28T01:00:05+0000|Unknown|"
+            "billing=2,cpu=2,mem=1024M,node=1|2026-10-28T01:00:00+0000\n"
+        )
+
+    backend = SlurmBackend(
+        partition="compute",
+        account="ra-project",
+        qos="ra-normal",
+        output_dir="/srv/ra/results",
+        observe_allocation=True,
+        execute=execute,
+    )
+    observation = backend.status(job)
+    if state == "PENDING":
+        assert observation.state == "QUEUED" and observation.scheduler_reason == "Resources"
+        assert observation.placement is None and observation.allocation is None
+        assert len(calls) == 1
+    else:
+        assert observation.state == "RUNNING" and observation.scheduler_reason is None
+        assert observation.started_at == "2026-10-28T01:00:05+0000"
+        assert observation.submitted_at == "2026-10-28T01:00:00+0000"
+        assert observation.allocation == {
+            "source": "slurm:sacct AllocTRES",
+            "accelerator_count": None,
+            "cpu": 2.0,
+            "memory_mib": 1024.0,
+        }
+        assert observation.placement == {
+            "source": "slurm:squeue",
+            "job_id": "81",
+            "node_name": "vm-node",
+            "state": "RUNNING",
+        }

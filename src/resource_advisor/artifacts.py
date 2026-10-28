@@ -105,8 +105,10 @@ class S3Artifacts:
 
 
 class ArtifactDelivery:
-    def __init__(self, store, storage):
+    def __init__(self, store, storage, *, job_routes=None):
         self.store, self.storage = store, storage
+        # None keeps the original global claim; a mapping limits work to owned routes.
+        self.job_routes = job_routes
 
     def enqueue_existing(self):
         """Explicit backfill when enabling storage for already validated results."""
@@ -130,7 +132,7 @@ class ArtifactDelivery:
     def deliver_one(self):
         from botocore.exceptions import BotoCoreError, ClientError
 
-        event = self.store.claim("artifact")
+        event = self.store.claim("artifact", job_routes=self.job_routes)
         if not event:
             return False
         try:
@@ -180,7 +182,7 @@ class ArtifactDelivery:
                     conn,
                     "mlflow-artifact-" + body["attempt_id"],
                     "mlflow_artifact",
-                    {"artifact_ref": record["ref"]},
+                    {"artifact_ref": record["ref"], "job_id": row["id"]},
                 )
             self.store.finish(event)
         except (BotoCoreError, ClientError, ArtifactError, Conflict, KeyError, TypeError) as exc:

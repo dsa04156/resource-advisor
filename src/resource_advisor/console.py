@@ -45,6 +45,8 @@ def job_view(service, conn, row):
     result = owned(service.store, conn, row["project"], "result", body["attempt_id"])
     tracking = owned(service.store, conn, row["project"], "tracking", body["attempt_id"])
     phases = owned(service.store, conn, row["project"], "phase_profile", body["attempt_id"])
+    # Kubeflow launches use their durable pipeline ref as the compute idempotency key.
+    receipt = owned(service.store, conn, row["project"], "pipeline_receipt", row["idempotency_key"])
     view = {
         **service.public_job(row),
         "workload_ref": body["request"]["workload_ref"],
@@ -65,6 +67,8 @@ def job_view(service, conn, row):
         "backend": body["candidate"]["backend"],
         "cluster_ref": body["backend_cluster_id"],
         "node_ref": body["capability"]["node_ref"],
+        "device_class": body["capability"].get("device_class"),
+        "accelerator_model": body["capability"].get("accelerator_model"),
         "mode": body["request"]["mode"],
         "scheduler_reason": body.get("scheduler_reason"),
         "lifecycle_events": body.get("lifecycle_events", []),
@@ -76,6 +80,14 @@ def job_view(service, conn, row):
         "requested_resources": body["candidate"]["context"]["resources"],
         "allocation_mode": body["candidate"]["context"]["allocation_mode"],
         "observed_allocation": body.get("allocation"),
+        "observed_placement": body.get("placement"),
+        "admission": body.get("admission"),
+        "live_progress": body.get("live_progress"),
+        "pipeline": {"ref": row["idempotency_key"], "run_id": receipt.get("run_id")}
+        if receipt
+        else None,
+        "progress_error": body.get("progress_error"),
+        "progress_error_at": body.get("progress_error_at"),
         "quality_passed": body.get("quality_passed"),
         "result": result,
         "tracking": tracking,
@@ -121,6 +133,7 @@ def overview(
     templates_page=0,
     jobs_status="all",
     jobs_backend="all",
+    jobs_device="all",
     jobs_search="",
 ):
     store = service.store
@@ -143,6 +156,10 @@ def overview(
         if jobs_backend in {"kubernetes", "slurm"}:
             job_query = job_query.where(
                 jobs.c.body["candidate"]["backend"].as_string() == jobs_backend
+            )
+        if jobs_device in {"gpu", "npu", "cpu"}:
+            job_query = job_query.where(
+                jobs.c.body["capability"]["device_class"].as_string() == jobs_device
             )
         if jobs_search.strip():
             term = jobs_search.strip().lower()

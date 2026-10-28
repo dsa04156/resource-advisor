@@ -200,3 +200,32 @@ def test_mlflow_artifact_proxy_upload_verifies_ownership_and_bytes(service, faul
         )
         assert event["status"] == ("PENDING" if fault else "DONE")
     assert writes == (0 if fault else 1)
+
+
+def test_route_scoped_deliveries_leave_foreign_route_events_untouched(service):
+    backend, worker, job = setup(service)
+    worker.submit_one()
+    backend.observation = Observation(State.COLLECTING)
+    worker.reconcile_all()
+    s3 = MemoryS3()
+    storage = S3Artifacts(buckets={"team-a": "test-results"}, client=s3)
+    ArtifactDelivery(service.store, storage).enqueue_existing()
+    other = {("team-a", "other-cluster"): backend}
+    assert not ArtifactDelivery(service.store, storage, job_routes=other).deliver_one()
+    mlflow = MLflowDelivery(
+        service.store, "http://mlflow.invalid", experiments={"team-a": "1"},
+        client=httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(500))),
+        artifact_storage=storage, job_routes=other,
+    )
+    assert not mlflow.deliver_one()
+    with service.store.transaction() as conn:
+        assert {e["status"] for e in conn.execute(select(outbox)).mappings()} >= {"PENDING"}
+        assert all(e["tries"] == 0 for e in conn.execute(
+            select(outbox).where(outbox.c.kind.in_(["artifact", "mlflow"]))).mappings())
+    owned = ArtifactDelivery(service.store, storage, job_routes={("team-a", "lab"): backend})
+    assert owned.deliver_one() and s3.writes == 1
+    with service.store.transaction() as conn:
+        event = conn.execute(
+            select(outbox).where(outbox.c.kind == "mlflow_artifact")).mappings().one()
+    assert event["body"]["job_id"] == job["job_id"]
+    assert not mlflow.deliver_artifact_one()

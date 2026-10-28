@@ -272,8 +272,11 @@ def compile_plan(service, conn, project, request):
             for k in ["host_cpu", "host_memory_mib", "accelerator_count"]
         ):
             errors.append("PROFILE_RESOURCE_LIMIT")
+        # bundle() has validated the binding; only the CPU host-copy class runs on Slurm.
         if candidate.backend == "slurm" and spec.identity.task_type == "training":
-            errors.append("SLURM_TRAINING_ISOLATION_UNSUPPORTED")
+            binding = required(service.store, conn, "training_isolation", spec.ref, project)
+            if binding.get("backend") != "slurm" or binding.get("device_class") != "cpu":
+                errors.append("SLURM_TRAINING_ISOLATION_UNSUPPORTED")
         binding = next(
             (
                 b

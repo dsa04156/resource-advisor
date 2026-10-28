@@ -57,6 +57,23 @@ def test_job_filters_apply_before_pagination(service):
             assert client.get(url + "?" + query, headers=headers).json()["jobs"]["total"] == 0
 
 
+def test_job_device_filter_uses_recorded_capability(service):
+    service.submit("team-a", JobRequest(workload_ref="workload-1", candidate_ref="base"), "dev")
+    with client_for(service) as client:
+        headers = {"Authorization": "Bearer a"}
+        url = "/api/v1/compute/overview"
+        gpu = client.get(url + "?jobs_device=gpu", headers=headers).json()["jobs"]
+        assert gpu["total"] == 1
+        assert gpu["items"][0]["device_class"] == "gpu"
+        assert gpu["items"][0]["accelerator_model"] == "fixture-gpu"
+        for device in ("npu", "cpu"):
+            page = client.get(url, params={"jobs_device": device}, headers=headers).json()
+            assert page["jobs"]["total"] == 0
+        assert client.get(url + "?jobs_device=tpu", headers=headers).status_code == 422
+        other = client.get(url + "?jobs_device=gpu", headers={"Authorization": "Bearer b"})
+        assert other.json()["jobs"]["total"] == 0
+
+
 def test_console_auth_and_project_isolation_without_side_effects(service):
     complete(service)
     rec = service.recommend("team-a", "workload-1")

@@ -502,6 +502,7 @@ def create_app(
             "all", "running", "pending", "succeeded", "failed", "canceled"
         ] = "all",
         jobs_backend: Literal["all", "kubernetes", "slurm"] = "all",
+        jobs_device: Literal["all", "gpu", "npu", "cpu"] = "all",
         jobs_search: str = Query(default="", max_length=128),
         p=Depends(principal),
     ):
@@ -519,6 +520,7 @@ def create_app(
             templates_page=templates_page,
             jobs_status=jobs_status,
             jobs_backend=jobs_backend,
+            jobs_device=jobs_device,
             jobs_search=jobs_search,
         )
 
@@ -568,6 +570,40 @@ def create_app(
         with service.store.transaction() as conn:
             try:
                 return compile_plan(service, conn, p.project, value)
+            except (NotFound, Rejected):
+                raise
+            except ValueError as exc:
+                raise Rejected(str(exc)) from exc
+
+    from .placement import PlacementRequest, TopologySnapshot, import_snapshot
+    from .placement import evaluate as evaluate_placement
+
+    @app.post(PREFIX + "/topology-snapshots")
+    def register_topology_snapshot(value: TopologySnapshot, p=Depends(operator)):
+        return import_snapshot(service, p.project, value)
+
+    @app.get(PREFIX + "/topology-snapshots")
+    def topology_snapshots(p=Depends(principal)):
+        with service.store.transaction() as conn:
+            return {
+                "items": [
+                    row["body"] for row in service.store.list(conn, "topology_snapshot", p.project)
+                ]
+            }
+
+    @app.get(PREFIX + "/topology-snapshots/{ref}")
+    def topology_snapshot(ref: str, p=Depends(principal)):
+        from .service import required
+
+        with service.store.transaction() as conn:
+            return required(service.store, conn, "topology_snapshot", ref, p.project)
+
+    @app.post(PREFIX + "/placement-plans")
+    def placement_plan(value: PlacementRequest, p=Depends(principal)):
+        # Read-only preview: nothing is reserved, persisted or submitted.
+        with service.store.transaction() as conn:
+            try:
+                return evaluate_placement(service, conn, p.project, value)
             except (NotFound, Rejected):
                 raise
             except ValueError as exc:

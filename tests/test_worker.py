@@ -396,3 +396,65 @@ def test_failed_event_backoff_does_not_block_next_submission(service):
     )
     claimed = service.store.claim("submit")
     assert claimed["body"]["job_id"] == second["job_id"]
+
+
+def test_worker_persists_observed_placement_admission_and_live_progress(service):
+    from resource_advisor.console import job_view
+
+    backend = SchedulerDouble()
+    backend.observe_progress = True
+    reads = []
+
+    def progress(job, observation):
+        reads.append(observation.state)
+        return {"source": "fixture", "attempt_id": job["body"]["attempt_id"], "latest": {"epoch": 2}}
+
+    backend.progress = progress
+    worker = Worker(service, {("team-a", "lab"): backend})
+    job = service.submit(
+        "team-a", JobRequest(workload_ref="workload-1", candidate_ref="base"), "live"
+    )
+    worker.submit_one()
+    worker.reconcile_all()
+    assert reads == []  # Waiting for admission: no workload output to read yet.
+    backend.observation = Observation(
+        State.RUNNING,
+        placement={"source": "fixture", "node_name": "node-a"},
+        admission={"source": "kueue:Workload", "cluster_queue": "cq"},
+    )
+    worker.reconcile_all()
+    with service.store.transaction() as conn:
+        row = service.store.job(conn, job["job_id"])
+        view = job_view(service, conn, row)
+    assert view["state"] == "RUNNING"
+    assert view["observed_placement"]["node_name"] == "node-a"
+    assert view["admission"]["cluster_queue"] == "cq"
+    assert view["live_progress"]["latest"] == {"epoch": 2}
+
+    def broken(job, observation):
+        raise BackendError("log transport unavailable")
+
+    backend.progress = broken
+    worker.reconcile_all()
+    current = service.get_job("team-a", job["job_id"])
+    assert current["state"] == "RUNNING"
+    with service.store.transaction() as conn:
+        body = service.store.job(conn, job["job_id"])["body"]
+    assert body["progress_error"] == "BackendError" and body["progress_error_at"]
+    assert body["live_progress"]["latest"] == {"epoch": 2}  # Last observation stays dated.
+
+
+def test_job_view_links_the_kubeflow_run_that_submitted_it(service):
+    from resource_advisor.console import job_view
+
+    request = JobRequest(workload_ref="workload-1", candidate_ref="base")
+    own = service.submit("team-a", request, "kfp-own")
+    foreign = service.submit("team-a", request, "kfp-foreign")
+    with service.store.transaction() as conn:
+        service.store.put(conn, "pipeline_receipt", "kfp-own", "team-a", {"run_id": "run-1"})
+        service.store.put(conn, "pipeline_receipt", "kfp-foreign", "team-b", {"run_id": "x"})
+    with service.store.transaction() as conn:
+        view = job_view(service, conn, service.store.job(conn, own["job_id"]))
+        other = job_view(service, conn, service.store.job(conn, foreign["job_id"]))
+    assert view["pipeline"] == {"ref": "kfp-own", "run_id": "run-1"}
+    assert other["pipeline"] is None

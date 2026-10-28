@@ -9,7 +9,7 @@ import stat
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, model_serializer, model_validator
 
 from .contracts import Contract, Digest, Ref, signature
 
@@ -24,9 +24,25 @@ class TrainingIsolation(Contract):
     checkpoint_size_bytes: int = Field(gt=0, le=1048576)
     input_size_bytes: int = Field(gt=0, le=1048576)
     validation_refs: tuple[Ref, ...] = Field(min_length=1)
-    backend: Literal["kubernetes"] = "kubernetes"
+    backend: Literal["kubernetes", "slurm"] = "kubernetes"
     output_format: Literal["bounded-json-v1"] = "bounded-json-v1"
     auto_promote: Literal[False] = False
+    # CPU training is a separately qualified class; GPU remains the legacy default.
+    device_class: Literal["gpu", "cpu"] = "gpu"
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_signature(self, handler):
+        value = handler(self)
+        if self.device_class == "gpu":
+            value.pop("device_class", None)
+        return value
+
+    @model_validator(mode="after")
+    def qualified_combination(self):
+        # Native Slurm has no container sandbox: only the host-copy CPU runner is qualified.
+        if self.backend == "slurm" and self.device_class != "cpu":
+            raise ValueError("Slurm training is qualified only for CPU host-copy execution")
+        return self
 
 
 def validate_binding(binding, spec, candidate, variant):
@@ -40,8 +56,15 @@ def validate_binding(binding, spec, candidate, variant):
         or binding.checkpoint_digest != spec.identity.model_digest
         or binding.input_digest != spec.identity.dataset_version
         or variant.verification != "TRAINING_VERIFIED"
-        or variant.device_class != "gpu"
+        or variant.device_class != binding.device_class
         or candidate.backend != binding.backend
+        or (
+            binding.device_class == "cpu"
+            and (
+                candidate.context.allocation_mode != "cpu_only"
+                or candidate.context.resources.accelerator_count != 0
+            )
+        )
         or spec.identity.task_type != "training"
     ):
         raise ValueError("training isolation does not match qualified workload/checkpoint/input")
@@ -62,9 +85,26 @@ class TrainingReceipt(Contract):
     input_after_digest: Digest
     checkpoint_readonly: Literal[True]
     input_readonly: Literal[True]
-    source_not_mounted: Literal[True]
+    # Containers prove the original is absent; native hosts can only prove it is
+    # operator-owned and read-only while a private per-attempt copy is trained.
+    source_not_mounted: Literal[True] | None = None
+    source_protection: Literal["operator-owned-readonly-host-copy"] | None = None
     output_checkpoint_digest: Digest
     output_checkpoint: dict
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_signature(self, handler):
+        value = handler(self)
+        for key in ("source_not_mounted", "source_protection"):
+            if value.get(key) is None:
+                value.pop(key, None)
+        return value
+
+    @model_validator(mode="after")
+    def one_protection_claim(self):
+        if (self.source_not_mounted is None) == (self.source_protection is None):
+            raise ValueError("exactly one source protection claim is required")
+        return self
 
 
 def validate_receipt(receipt, result, binding):
@@ -89,6 +129,12 @@ def validate_receipt(receipt, result, binding):
         or receipt.input_after_digest != binding.input_digest
         or receipt.output_checkpoint_digest != signature(receipt.output_checkpoint)
         or result.outcome != "COMPLETED"
+        or (binding.backend == "slurm") != (receipt.source_protection is not None)
+        # Live CPU training must evidence a genuine parameter update.
+        or (
+            binding.device_class == "cpu"
+            and receipt.output_checkpoint_digest == binding.checkpoint_digest
+        )
     ):
         raise ValueError("training receipt mismatch or input mutation")
     return receipt

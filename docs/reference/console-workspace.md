@@ -42,3 +42,28 @@ WHERE kind = 'inventory';
 ```
 
 초기 화면 데이터 조회는 기존6~13초에서 집중 확인 시0.5~0.8초로 줄었고, 동일 PostgreSQL snapshot에서 반환 장비 기록이 완전히 같은지 확인했습니다. [수정 및 배포 근거](../evidence/console-loading-fix-20261014.json)를 참고하세요.
+
+## 워크로드 목록과 새 워크로드 흐름 (2026-10-28)
+
+Run:ai v3.0.19 워크로드 관리자의 구조(목록 표·검색/필터·NEW WORKLOAD·맥락→설정→검토)를 참고해 `#jobs`와 `#submit`을 다시 구성했습니다. 참조 제품 코드·브랜드·인프라 정보는 사용하지 않았고, 기존 14개 hash route·인증·프로젝트 경계를 유지합니다.
+
+- **워크로드(`#jobs`)**: 표(이름·유형·상태·장치/실행 위치·요청 자원·생성 시각), 상태·백엔드·장치(GPU/NPU/CPU 전용) 필터, 선택한 작업의 상세(요약/결과/실행 기록/자원·전체 기록, 취소·재시도·MLflow)를 1280px 이상에서는 오른쪽에, 그보다 좁으면 표 아래에 표시합니다. 선택과 상세 탭은 polling 후에도 유지되고, 목록 밖 작업은 `GET /jobs/{id}/view`로 다시 읽습니다.
+- **새 워크로드 메뉴**: 서버 catalog에 등록된 작업 유형(추론·학습·성능 측정·전처리·저장한 템플릿)만 개수와 함께 보여줍니다. 임의 이미지·YAML 제출은 지원하지 않는다고 명시합니다.
+- **새 워크로드(`#submit`)**: (1) 등록된 작업 카드, 각 카드에 실제 등록 후보 장치 모델·백엔드 표시 → (2) 실행 정책과 자동/고정 대상(호환되지 않는 후보는 이유와 함께 비활성) → (3) `POST /scheduling-plans` 검토: 프로젝트, 정책, 백엔드·큐, 예상 대상, 등록된 자원 요청(읽기 전용), 실행/대기 제한, 후보별 판단 이유 → (4) 기존 `POST /jobs`로 제출합니다. 검토가 수락되지 않으면 제출 버튼이 비활성이고 초안은 유지됩니다.
+- **오류 처리**: 응답을 잃은 제출은 같은 Idempotency-Key로 "제출 확인 재시도"를 제공해 중복 접수되지 않습니다. overview API 연결이 끊기면 제출 UI 대신 연결 끊김 패널(보존된 초안 요약·다시 연결)을 표시하고 성공을 가장하지 않습니다. catalog가 비었거나 설정되지 않은 경우 그 사실을 문구로 설명합니다.
+
+API 변경은 장치 필터에 필요한 최소 범위입니다: overview의 `jobs_device=all|gpu|npu|cpu`(기록된 capability `device_class` 기준, 페이지 전에 적용)와 job view의 읽기 전용 `device_class`·`accelerator_model` 필드입니다.
+
+검증: `tests/test_console.py::test_job_device_filter_uses_recorded_capability`와 `examples/workload_console_check.py`입니다. 후자는 `examples/workload_console_fixture.py`의 **TEST DATA 등록**(CUDA/Hailo/Mobilint/Slurm 이름에 `TEST … (fixture)` 표기, worker 없음)으로 실제 FastAPI 앱을 띄우고 Chrome에서 PC 1366×768과 모바일 390×844를 확인합니다. 응답 유실·API 장애는 브라우저 안에서 응답을 끊는 방식으로만 재현합니다. fixture 결과는 실제 실행 근거가 아닙니다.
+
+```sh
+rtk proxy uv run --with playwright python examples/workload_console_check.py output/playwright/workload-console
+```
+
+화면만 살펴볼 때는 같은 TEST DATA로 격리 미리보기를 띄웁니다. 프로젝트 이름이 `TEST-DATA-fixture`로 표시되고 토큰 없이 그 프로젝트에만 연결됩니다. 임시 SQLite만 사용하며 worker·native backend·운영 API/DB에는 연결하지 않으므로 제출한 작업은 VALIDATED 상태에 머뭅니다. 토큰 로그인을 확인하려면 fixture 전용 값 `fixture-console-token`을 사용합니다(운영 자격 증명 아님).
+
+```sh
+rtk proxy uv run python examples/workload_console_fixture.py --host 0.0.0.0 --port 18432
+```
+
+데스크톱에서 검토 패널과 선택한 작업 상세는 92px 고정 상단바 아래(`top: 108px`)에 붙습니다. 이전에는 `top: 16px`이어서 스크롤하면 패널 상단이 상단바에 가려졌습니다. 1100px 이하에서는 검토 패널이 고정되지 않습니다.

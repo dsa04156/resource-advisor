@@ -92,6 +92,7 @@ def worker_configuration(config):
     optimizer_required = config.get("optimizer_required", False)
     require(type(optimizer_required) is bool, "INVALID_OPTIMIZER_REQUIREMENT")
     require(type(config.get("coordinate_studies", True)) is bool, "INVALID_STUDY_COORDINATION")
+    require(type(config.get("scope_deliveries", False)) is bool, "INVALID_DELIVERY_SCOPE")
     if optimizer_required:
         try:
             importlib.import_module("torch")

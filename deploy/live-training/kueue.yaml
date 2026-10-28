@@ -1,0 +1,38 @@
+# Isolated acceptance quota for live CPU training. No preemption of other queues;
+# 2 CPU / 2Gi nominal quota admits one 2-CPU training at a time so the next waits
+# with a real Kueue QuotaReserved=False reason.
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ResourceFlavor
+metadata:
+  name: ra-live-cpu
+  labels: {app.kubernetes.io/part-of: resource-advisor}
+spec:
+  nodeLabels:
+    kubernetes.io/hostname: etri-ser0001-cg0msb
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: ra-live-training-cpu
+  labels: {app.kubernetes.io/part-of: resource-advisor}
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: resource-advisor-lab
+  queueingStrategy: BestEffortFIFO
+  resourceGroups:
+  - coveredResources: [cpu, memory]
+    flavors:
+    - name: ra-live-cpu
+      resources:
+      - {name: cpu, nominalQuota: '2'}
+      - {name: memory, nominalQuota: 2Gi}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata:
+  name: ra-live-cpu
+  namespace: resource-advisor-lab
+  labels: {app.kubernetes.io/part-of: resource-advisor}
+spec:
+  clusterQueue: ra-live-training-cpu

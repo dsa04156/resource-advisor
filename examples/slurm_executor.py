@@ -6,6 +6,7 @@ remain responsible for execution isolation. No shell evaluates request text.
 """
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -35,6 +36,17 @@ ENV_KEYS = {
 }
 
 
+TRAINING_KEY = "RA_TRAINING_BINDING"
+LEGACY_RESOURCES = {"host_cpu": 1, "host_memory_mib": 1024}
+
+
+def canonical_digest(value):
+    encoded = json.dumps(
+        value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+    ).encode()
+    return "sha256:" + hashlib.sha256(encoded).hexdigest()
+
+
 def batch(config, script):
     if len(script.encode()) > 65536 or not script.startswith("#!/bin/bash\n"):
         raise ValueError("bounded batch script required")
@@ -55,12 +67,22 @@ def batch(config, script):
         if len(tokens) != 2 or tokens[0] != "export":
             raise ValueError("one literal export required")
         key, value = tokens[1].split("=", 1)
-        if key not in ENV_KEYS or key in exports or "\x00" in value:
+        if key not in ENV_KEYS | {TRAINING_KEY} or key in exports or "\x00" in value:
             raise ValueError("unqualified environment")
         exports[key] = value
         index += 1
-    if set(exports) != ENV_KEYS:
+    if set(exports) - {TRAINING_KEY} != ENV_KEYS:
         raise ValueError("complete job identity required")
+    if TRAINING_KEY in exports:
+        # Only operator-enabled CPU host-copy training bindings may run natively.
+        binding = json.loads(exports[TRAINING_KEY])
+        if (
+            not isinstance(binding, dict)
+            or canonical_digest(binding) not in config.get("training_bindings", [])
+            or binding.get("backend") != "slurm"
+            or binding.get("device_class") != "cpu"
+        ):
+            raise ValueError("training binding is not enabled")
     for key in ["RA_JOB_ID", "RA_ATTEMPT_ID"]:
         if not re.fullmatch(REF, exports[key]):
             raise ValueError("invalid identity")
@@ -79,9 +101,22 @@ def batch(config, script):
         or context.get("memory_model") != "host"
     ):
         raise ValueError("CPU-only scope cannot request accelerator resources")
-    resources = {"host_cpu": 1, "host_memory_mib": 1024, "accelerator_count": 0 if cpu_only else 1}
-    if context["resources"] != resources:
+    allowed = config.get("resources", [dict(LEGACY_RESOURCES, accelerator_count=0 if cpu_only else 1)])
+    if not isinstance(allowed, list) or any(
+        not isinstance(r, dict)
+        or set(r) != {"host_cpu", "host_memory_mib", "accelerator_count"}
+        or type(r["host_cpu"]) is not int
+        or type(r["host_memory_mib"]) is not int
+        or r["accelerator_count"] != (0 if cpu_only else 1)
+        for r in allowed
+    ):
+        raise ValueError("invalid configured resource scope")
+    if context["resources"] not in allowed:
         raise ValueError("unqualified resource request")
+    resources = context["resources"]
+    max_minutes = config.get("max_minutes", 2)
+    if type(max_minutes) is not int or not 1 <= max_minutes <= 60:
+        raise ValueError("invalid configured time scope")
     priority_qos = config.get("qos_by_priority", {})
     if (
         not isinstance(priority_qos, dict)
@@ -106,15 +141,17 @@ def batch(config, script):
         "--nodes": "1",
         "--ntasks": "1",
         "--chdir": "/",
-        "--cpus-per-task": "1",
-        "--mem": "1024M",
+        "--cpus-per-task": str(int(resources["host_cpu"])),
+        "--mem": f"{resources['host_memory_mib']}M",
         "--time": directives.get("--time"),
         "--output": config["output_dir"] + "/" + exports["RA_ATTEMPT_ID"] + ".log",
         "--export": "NONE",
     }
     if not cpu_only:
         expected["--gres"] = config["gres"] + ":1"
-    if directives != expected or directives["--time"] not in {"1", "2"}:
+    if directives != expected or directives["--time"] not in {
+        str(n) for n in range(1, max_minutes + 1)
+    }:
         raise ValueError("batch escaped configured scope")
     tail = "\n".join(lines[index:]) + "\n"
     bindings = config.get("native_bindings", [])
@@ -140,19 +177,27 @@ def plan(config, original, script=""):
         raise ValueError("bounded command required")
     argv = shlex.split(original)
     if config["mode"] == "results":
-        if len(argv) != 5 or argv[:4] != ["tail", "-c", "65537", "--"]:
+        # 65537: terminal result envelope; 16384: bounded live progress tail.
+        if len(argv) != 5 or argv[:2] != ["tail", "-c"] or argv[2:4] not in (
+            ["65537", "--"],
+            ["16384", "--"],
+        ):
             raise ValueError("result read only")
         path = Path(argv[4])
         if str(path.parent) != config["output_dir"] or not re.fullmatch(REF + r"\.log", path.name):
             raise ValueError("result path escaped scope")
-        return "read", str(path)
+        return ("read" if argv[2] == "65537" else "read-progress"), str(path)
     if config["mode"] != "controller":
         raise ValueError("unknown gateway mode")
     if argv == ["sbatch", "--parsable"]:
         return ["/usr/bin/sbatch", "--parsable"], batch(config, script)
     account, partition, user = (config[k] for k in ["account", "partition", "user"])
     queue = ["squeue", "--noheader", "--account", account, "--partition", partition]
-    if argv in (queue + ["--format=%i|%j|%a|%P|%T"], queue + ["--format=%i|%j|%a|%P|%T|%r"]) or (
+    if argv in (
+        queue + ["--format=%i|%j|%a|%P|%T"],
+        queue + ["--format=%i|%j|%a|%P|%T|%r"],
+        queue + ["--format=%i|%j|%a|%P|%T|%r|%N"],
+    ) or (
         len(argv) == len(queue) + 3
         and argv[: len(queue)] == queue
         and argv[-3] == "--name"
@@ -210,14 +255,15 @@ def main():
         original = os.environ.get("SSH_ORIGINAL_COMMAND", "")
         script = sys.stdin.read(65537) if original == "sbatch --parsable" else ""
         command, data = plan(config, original, script)
-        if command == "read":
+        if isinstance(command, str):  # Bounded file reads; scheduler commands are argv lists.
+            size = 65537 if command == "read" else 16384
             fd = os.open(data, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
             with os.fdopen(fd, "rb") as handle:
                 info = os.fstat(handle.fileno())
                 if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid():
                     raise ValueError("result must be an owned regular file")
-                handle.seek(max(0, info.st_size - 65537))
-                sys.stdout.buffer.write(handle.read(65537))
+                handle.seek(max(0, info.st_size - size))
+                sys.stdout.buffer.write(handle.read(size))
             return 0
         result = subprocess.run(
             command,

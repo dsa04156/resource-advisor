@@ -232,11 +232,15 @@ def main():
         from .study import Studies
 
         study_runner = Studies(service)
+        # Opt-in: an isolated acceptance worker must not drain historical deliveries.
+        delivery_routes = backends if config.get("scope_deliveries", False) is True else None
         artifacts = None
         if config.get("artifacts"):
             from .artifacts import ArtifactDelivery, S3Artifacts
 
-            artifacts = ArtifactDelivery(store, S3Artifacts(**config["artifacts"]))
+            artifacts = ArtifactDelivery(
+                store, S3Artifacts(**config["artifacts"]), job_routes=delivery_routes
+            )
         delivery = (
             MLflowDelivery(
                 store,
@@ -244,6 +248,7 @@ def main():
                 experiments=config["mlflow_experiments"],
                 token=os.getenv("RA_MLFLOW_TOKEN"),
                 artifact_storage=artifacts.storage if artifacts else None,
+                job_routes=delivery_routes,
             )
             if config.get("mlflow_url")
             else None

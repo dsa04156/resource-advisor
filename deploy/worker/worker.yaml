@@ -72,6 +72,14 @@ rules:
   - pods/log
   verbs:
   - get
+# Read-only admission observation; owner UID is matched in the adapter.
+- apiGroups:
+  - kueue.x-k8s.io
+  resources:
+  - workloads
+  verbs:
+  - get
+  - list
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

@@ -1,0 +1,1534 @@
+{
+ "kind": "live-multi-request-training-acceptance",
+ "date": "2026-10-28",
+ "scope": "Real CPU-only training (synthetic regression data, tanh MLP SGD) through Resource Advisor on Kubernetes/Kueue (isolated ClusterQueue ra-live-training-cpu, 2 CPU quota) and a QEMU TCG Slurm 24.11.5 VM (2 vCPU). No GPU used; reservation is not utilization; VM timings are not hardware performance.",
+ "images": {
+  "api": "console-api@sha256:376440bd36a5922355151c588ac9fd7eae67d342ab58660a84ce1a0ca7bdc488",
+  "kubernetes_worker": "services@sha256:671755834f17f2568e341bce6c17115f37f52f993edeeb7fd6f2ab6db852b446",
+  "slurm_worker": "slurm-worker@sha256:19035231239b2ac7a20142c824ee9a6eaf264ff2d73e85399995c6825711e495",
+  "kubernetes_training_pod": "services@sha256:49764f1dd6809f480738bca93e87b59d84d3fb8b82b73ed9735a05fb700ff286"
+ },
+ "vm_runtime": {
+  "environment_digest": "sha256:5c5c45cc5b23d4f5e887ffc0541ca476f10af0e5aca1d51ab8d3890910462f49",
+  "manifest_path": "/opt/ra/runtime/runtime.json",
+  "manifest_digest": "sha256:258f22a73f2d7b45deb2e1bd927a7847a244fd2940e8a9431f942a483b98f7fb",
+  "guard_path": "/opt/ra/runtime/runtime_guard.py",
+  "guard_digest": "sha256:fefdf27cfd5e5570b0495f435fb14f710f5730930467ddbff7e3849b41e39ce2",
+  "runner_digest": "sha256:324064f6337acb14bc91095037023291b07bd9bb63eca14578c1926c9338775c",
+  "python_digest": "sha256:889c603f0d17cb54060951bcf4c4f9b8c9ebd9e52b392c70209bbb9755d797d9",
+  "python_version": "3.13.5",
+  "commands": "see registered variants"
+ },
+ "same_key_retry": {
+  "key": "live-vm-b-final-20261028",
+  "returned_job": "j-1122dca243744b70a10139ce064e99cc",
+  "native_id": "7",
+  "db_rows_for_key": 1
+ },
+ "slurm_cancel_accounting": "Slurm 9: CANCELLED by job owner uid, step 9.0 CANCELLED 0:15, AllocTRES cpu=2,mem=1G; log tail retained in job record",
+ "kubernetes_cancel": "j-2866577b: Job/Pod deleted, ClusterQueue usage returned to 0",
+ "preservation": {
+  "historical_jobs": {
+   "count": 863,
+   "digest_before": "f6a716fc435eae7d996ed2f2a95897c01a84da255e066194958810b7faf98d5d",
+   "digest_after": "f6a716fc435eae7d996ed2f2a95897c01a84da255e066194958810b7faf98d5d"
+  },
+  "historical_outbox": {
+   "count": 3866,
+   "digest_before": "5661c8a004f9e0d7c7a6a7991ddfbfe47d239addcdddb2a2d98565ba9e60c431",
+   "digest_after": "5661c8a004f9e0d7c7a6a7991ddfbfe47d239addcdddb2a2d98565ba9e60c431"
+  }
+ },
+ "kubeflow_setup_failures": [
+  "77133991-067c-47e4-b016-7c649f5708cd (admission webhook had 0 endpoints)",
+  "7dd95c91-03ee-4406-9a38-ec2e974ff3eb (katib pod webhook had 0 endpoints)"
+ ],
+ "jobs": [
+  {
+   "job_id": "j-580dd6b67c8144a480533b4a59f4db93",
+   "attempt_id": "a-6bb7501534aa4745b5df0ec9610d6c8e",
+   "submission_channel": "api",
+   "note": "k8s pair 1",
+   "workload": "live-train-k8s-a",
+   "backend": "kubernetes",
+   "cluster_ref": "live-k8s-cpu",
+   "device": "CPU only (no GPU)",
+   "native_id": "a-6bb7501534aa4745b5df0ec9610d6c8e",
+   "state": "SUCCEEDED",
+   "error": null,
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:13:32.704177+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:13:32.790103+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:13:33.067850+00:00",
+     "state": "QUEUED",
+     "reason": "AdmissionPending"
+    },
+    {
+     "at": "2026-10-28T11:13:38.488406+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:14:58.983085+00:00",
+     "state": "COLLECTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:14:59.039320+00:00",
+     "state": "SUCCEEDED",
+     "reason": null
+    }
+   ],
+   "kueue": {
+    "cluster_queue": "ra-live-training-cpu",
+    "local_queue": "ra-live-cpu",
+    "conditions": [
+     {
+      "type": "QuotaReserved",
+      "status": "True",
+      "reason": "QuotaReserved",
+      "last_transition_time": "2026-10-28T11:13:33Z"
+     },
+     {
+      "type": "Admitted",
+      "status": "True",
+      "reason": "Admitted",
+      "last_transition_time": "2026-10-28T11:13:33Z"
+     },
+     {
+      "type": "Finished",
+      "status": "True",
+      "reason": "Succeeded",
+      "last_transition_time": "2026-10-28T11:14:53Z"
+     },
+     {
+      "type": "PodsReady",
+      "status": "True",
+      "reason": "Recovered",
+      "last_transition_time": "2026-10-28T11:14:53Z"
+     }
+    ]
+   },
+   "observed_node": "etri-ser0001-cg0msb",
+   "reserved_allocation": {
+    "source": "kubernetes:scheduled workload container requests",
+    "accelerator_count": 0.0,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 14,
+   "final_progress": {
+    "epoch": 500,
+    "total_epochs": 500,
+    "optimizer_steps": 32000,
+    "loss": 0.0012648562656793461,
+    "elapsed_seconds": 74.97616153199851,
+    "observed_at": "2026-10-28T11:14:50.304918+00:00"
+   },
+   "result": {
+    "elapsed_seconds": 74.97620956399987,
+    "work_units": 500,
+    "quality_value": 0.9973480053375562,
+    "throughput": 13657.665624265936,
+    "peak_memory_mib": 18.85546875,
+    "gpu_utilization": null
+   },
+   "quality_passed": true,
+   "training_receipt": {
+    "initial_checkpoint_digest": "sha256:39f937abdfcfc6ad4a6e2f42a443052ccad5200293cbf89dfb67ee1f13193bb3",
+    "output_checkpoint_digest": "sha256:f46886271563dc968eb7962b09b552e87f5202c569122a1cf493046bf6bfd6d4",
+    "input_digest": "sha256:f24ab450b8d16e80b66678d268cd225e6176c694c9b11220052e4f97b1247c13",
+    "source_not_mounted": true,
+    "source_protection": null,
+    "checkpoint_readonly": true,
+    "input_readonly": true,
+    "optimizer_steps": 32000
+   },
+   "mlflow_run_id": "c7492808d14d4d1983a96d7a2e5ec8bc",
+   "artifact_digests": [
+    "sha256:1b0fa34eecbf0f964fe82c1c86cacd897073d589574a7d65b43cf2686281e324"
+   ],
+   "started_at": "2026-10-28T11:13:33Z",
+   "finished_at": "2026-10-28T11:14:59.037465+00:00"
+  },
+  {
+   "job_id": "j-fd974c7a1a2349dc88337bb67688515e",
+   "attempt_id": "a-979658e96ab544f886e4a216a7d4cbb4",
+   "submission_channel": "api",
+   "note": "k8s pair 1",
+   "workload": "live-train-k8s-b",
+   "backend": "kubernetes",
+   "cluster_ref": "live-k8s-cpu",
+   "device": "CPU only (no GPU)",
+   "native_id": "a-979658e96ab544f886e4a216a7d4cbb4",
+   "state": "SUCCEEDED",
+   "error": null,
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:13:38.150202+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:13:38.200578+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:13:38.717681+00:00",
+     "state": "QUEUED",
+     "reason": "AdmissionPending"
+    },
+    {
+     "at": "2026-10-28T11:14:58.682970+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:16:10.087063+00:00",
+     "state": "COLLECTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:16:10.144216+00:00",
+     "state": "SUCCEEDED",
+     "reason": null
+    }
+   ],
+   "kueue": {
+    "cluster_queue": "ra-live-training-cpu",
+    "local_queue": "ra-live-cpu",
+    "conditions": [
+     {
+      "type": "QuotaReserved",
+      "status": "True",
+      "reason": "QuotaReserved",
+      "last_transition_time": "2026-10-28T11:14:54Z"
+     },
+     {
+      "type": "Admitted",
+      "status": "True",
+      "reason": "Admitted",
+      "last_transition_time": "2026-10-28T11:14:54Z"
+     },
+     {
+      "type": "Finished",
+      "status": "True",
+      "reason": "Succeeded",
+      "last_transition_time": "2026-10-28T11:16:08Z"
+     },
+     {
+      "type": "PodsReady",
+      "status": "True",
+      "reason": "Recovered",
+      "last_transition_time": "2026-10-28T11:16:08Z"
+     }
+    ]
+   },
+   "observed_node": "etri-ser0001-cg0msb",
+   "reserved_allocation": {
+    "source": "kubernetes:scheduled workload container requests",
+    "accelerator_count": 0.0,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 13,
+   "final_progress": {
+    "epoch": 600,
+    "total_epochs": 600,
+    "optimizer_steps": 38400,
+    "loss": 0.0016648729950450288,
+    "elapsed_seconds": 67.98134753900013,
+    "observed_at": "2026-10-28T11:16:04.510853+00:00"
+   },
+   "result": {
+    "elapsed_seconds": 67.98139307300153,
+    "work_units": 600,
+    "quality_value": 0.9964917185951554,
+    "throughput": 18075.534266861203,
+    "peak_memory_mib": 18.86328125,
+    "gpu_utilization": null
+   },
+   "quality_passed": true,
+   "training_receipt": {
+    "initial_checkpoint_digest": "sha256:cf1055eaa603d9684bfda38843a56d0f0afd464abca458b96282798aaef22e78",
+    "output_checkpoint_digest": "sha256:3abc1c6274ca500b46581e5fdecde0d5b9ab356986d9daf7bbfd9704b8c473b0",
+    "input_digest": "sha256:2648f2d31975165b9060f302d167a93e3fd1006d40f248a0f1cda073749fe474",
+    "source_not_mounted": true,
+    "source_protection": null,
+    "checkpoint_readonly": true,
+    "input_readonly": true,
+    "optimizer_steps": 38400
+   },
+   "mlflow_run_id": "e85b389cfdf5473291e8edbdb51d5c60",
+   "artifact_digests": [
+    "sha256:e86ee66bb81de75e6076b3ca4d00a9bcd0efbe1afdbac69d2948ba83739acf6b"
+   ],
+   "started_at": "2026-10-28T11:14:54Z",
+   "finished_at": "2026-10-28T11:16:10.142392+00:00"
+  },
+  {
+   "job_id": "j-2866577b4b6e43389820a6a5a5deef82",
+   "attempt_id": "a-53b6712997f5454e82d6e777001518d4",
+   "submission_channel": "api",
+   "note": "k8s controlled cancel",
+   "workload": "live-train-k8s-b",
+   "backend": "kubernetes",
+   "cluster_ref": "live-k8s-cpu",
+   "device": "CPU only (no GPU)",
+   "native_id": "a-53b6712997f5454e82d6e777001518d4",
+   "state": "CANCELED",
+   "error": null,
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:16:50.994806+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:16:51.051404+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:16:51.286646+00:00",
+     "state": "QUEUED",
+     "reason": "AdmissionPending"
+    },
+    {
+     "at": "2026-10-28T11:16:56.782689+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:17:00.362758+00:00",
+     "state": "CANCEL_REQUESTED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:17:07.512488+00:00",
+     "state": "CANCELED",
+     "reason": null
+    }
+   ],
+   "kueue": {
+    "cluster_queue": "ra-live-training-cpu",
+    "local_queue": "ra-live-cpu",
+    "conditions": [
+     {
+      "type": "PodsReady",
+      "status": "True",
+      "reason": "Started",
+      "last_transition_time": "2026-10-28T11:16:54Z"
+     },
+     {
+      "type": "QuotaReserved",
+      "status": "True",
+      "reason": "QuotaReserved",
+      "last_transition_time": "2026-10-28T11:16:51Z"
+     },
+     {
+      "type": "Admitted",
+      "status": "True",
+      "reason": "Admitted",
+      "last_transition_time": "2026-10-28T11:16:51Z"
+     }
+    ]
+   },
+   "observed_node": "etri-ser0001-cg0msb",
+   "reserved_allocation": {
+    "source": "kubernetes:scheduled workload container requests",
+    "accelerator_count": 0.0,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 1,
+   "final_progress": {
+    "epoch": 34,
+    "total_epochs": 600,
+    "optimizer_steps": 2176,
+    "loss": 0.01211591947262356,
+    "elapsed_seconds": 3.8775091230018006,
+    "observed_at": "2026-10-28T11:16:56.737277+00:00"
+   },
+   "result": null,
+   "quality_passed": null,
+   "training_receipt": null,
+   "mlflow_run_id": "cd088eb14f764af4a6226eb6add35208",
+   "artifact_digests": [],
+   "started_at": "2026-10-28T11:16:51Z",
+   "finished_at": "2026-10-28T11:17:07.512490+00:00"
+  },
+  {
+   "job_id": "j-3c537cc2ee864f7bbfe6e2af128e5a3a",
+   "attempt_id": "a-8c210acb8aab4d5baace9818c5f96e86",
+   "submission_channel": "kubeflow api launch",
+   "note": "kfp run 1f4bde5b-13a4-4736-b1d8-08d1b2c9c3be",
+   "workload": "live-train-k8s-a",
+   "backend": "kubernetes",
+   "cluster_ref": "live-k8s-cpu",
+   "device": "CPU only (no GPU)",
+   "native_id": "a-8c210acb8aab4d5baace9818c5f96e86",
+   "state": "SUCCEEDED",
+   "error": null,
+   "pipeline": {
+    "ref": "kfp-8b7a4d494f9dca19ac5a631df4e1a7adf003f696",
+    "run_id": "1f4bde5b-13a4-4736-b1d8-08d1b2c9c3be"
+   },
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:25:41.675095+00:00",
+     "state": "VALIDATED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:25:46.389890+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:25:46.453732+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:25:52.057048+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:27:12.624033+00:00",
+     "state": "COLLECTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:27:12.732999+00:00",
+     "state": "SUCCEEDED",
+     "reason": null
+    }
+   ],
+   "kueue": {
+    "cluster_queue": "ra-live-training-cpu",
+    "local_queue": "ra-live-cpu",
+    "conditions": [
+     {
+      "type": "QuotaReserved",
+      "status": "True",
+      "reason": "QuotaReserved",
+      "last_transition_time": "2026-10-28T11:25:46Z"
+     },
+     {
+      "type": "Admitted",
+      "status": "True",
+      "reason": "Admitted",
+      "last_transition_time": "2026-10-28T11:25:46Z"
+     },
+     {
+      "type": "Finished",
+      "status": "True",
+      "reason": "Succeeded",
+      "last_transition_time": "2026-10-28T11:27:04Z"
+     },
+     {
+      "type": "PodsReady",
+      "status": "True",
+      "reason": "Recovered",
+      "last_transition_time": "2026-10-28T11:27:04Z"
+     }
+    ]
+   },
+   "observed_node": "etri-ser0001-cg0msb",
+   "reserved_allocation": {
+    "source": "kubernetes:scheduled workload container requests",
+    "accelerator_count": 0.0,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 0,
+   "final_progress": {
+    "epoch": 500,
+    "total_epochs": 500,
+    "optimizer_steps": 32000,
+    "loss": 0.0012648562656793461,
+    "elapsed_seconds": 73.7552163649998,
+    "observed_at": "2026-10-28T11:27:01.778434+00:00"
+   },
+   "result": {
+    "elapsed_seconds": 73.755261418999,
+    "work_units": 500,
+    "quality_value": 0.9973480053375562,
+    "throughput": 13883.75527791462,
+    "peak_memory_mib": 18.9609375,
+    "gpu_utilization": null
+   },
+   "quality_passed": true,
+   "training_receipt": {
+    "initial_checkpoint_digest": "sha256:39f937abdfcfc6ad4a6e2f42a443052ccad5200293cbf89dfb67ee1f13193bb3",
+    "output_checkpoint_digest": "sha256:f46886271563dc968eb7962b09b552e87f5202c569122a1cf493046bf6bfd6d4",
+    "input_digest": "sha256:f24ab450b8d16e80b66678d268cd225e6176c694c9b11220052e4f97b1247c13",
+    "source_not_mounted": true,
+    "source_protection": null,
+    "checkpoint_readonly": true,
+    "input_readonly": true,
+    "optimizer_steps": 32000
+   },
+   "mlflow_run_id": "0c3f2b720d65438ea132d15cdd24a25b",
+   "artifact_digests": [
+    "sha256:8fa383879ce31adb4534372c5861000a001cdb2bd76e750231a4110b31585e06"
+   ],
+   "started_at": "2026-10-28T11:25:46Z",
+   "finished_at": "2026-10-28T11:27:12.731332+00:00"
+  },
+  {
+   "job_id": "j-0331292f4ef54b5ab77d4832164dd35e",
+   "attempt_id": "a-e674f704b6794d728f9eb7c567368c89",
+   "submission_channel": "console wizard",
+   "note": "final round 1",
+   "workload": "live-train-k8s-a",
+   "backend": "kubernetes",
+   "cluster_ref": "live-k8s-cpu",
+   "device": "CPU only (no GPU)",
+   "native_id": "a-e674f704b6794d728f9eb7c567368c89",
+   "state": "SUCCEEDED",
+   "error": null,
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:52:54.562045+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:52:54.626388+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:52:55.098281+00:00",
+     "state": "QUEUED",
+     "reason": "PodInitializing"
+    },
+    {
+     "at": "2026-10-28T11:53:00.611347+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:54:17.096620+00:00",
+     "state": "COLLECTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:54:17.213108+00:00",
+     "state": "SUCCEEDED",
+     "reason": null
+    }
+   ],
+   "kueue": {
+    "cluster_queue": "ra-live-training-cpu",
+    "local_queue": "ra-live-cpu",
+    "conditions": [
+     {
+      "type": "QuotaReserved",
+      "status": "True",
+      "reason": "QuotaReserved",
+      "last_transition_time": "2026-10-28T11:52:55Z"
+     },
+     {
+      "type": "Admitted",
+      "status": "True",
+      "reason": "Admitted",
+      "last_transition_time": "2026-10-28T11:52:55Z"
+     },
+     {
+      "type": "Finished",
+      "status": "True",
+      "reason": "Succeeded",
+      "last_transition_time": "2026-10-28T11:54:14Z"
+     },
+     {
+      "type": "PodsReady",
+      "status": "True",
+      "reason": "Recovered",
+      "last_transition_time": "2026-10-28T11:54:14Z"
+     }
+    ]
+   },
+   "observed_node": "etri-ser0001-cg0msb",
+   "reserved_allocation": {
+    "source": "kubernetes:scheduled workload container requests",
+    "accelerator_count": 0.0,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 0,
+   "final_progress": {
+    "epoch": 500,
+    "total_epochs": 500,
+    "optimizer_steps": 32000,
+    "loss": 0.0012648562656793461,
+    "elapsed_seconds": 74.41920306099928,
+    "observed_at": "2026-10-28T11:54:11.447259+00:00"
+   },
+   "result": {
+    "elapsed_seconds": 74.41924823799854,
+    "work_units": 500,
+    "quality_value": 0.9973480053375562,
+    "throughput": 13759.881001823189,
+    "peak_memory_mib": 19.2265625,
+    "gpu_utilization": null
+   },
+   "quality_passed": true,
+   "training_receipt": {
+    "initial_checkpoint_digest": "sha256:39f937abdfcfc6ad4a6e2f42a443052ccad5200293cbf89dfb67ee1f13193bb3",
+    "output_checkpoint_digest": "sha256:f46886271563dc968eb7962b09b552e87f5202c569122a1cf493046bf6bfd6d4",
+    "input_digest": "sha256:f24ab450b8d16e80b66678d268cd225e6176c694c9b11220052e4f97b1247c13",
+    "source_not_mounted": true,
+    "source_protection": null,
+    "checkpoint_readonly": true,
+    "input_readonly": true,
+    "optimizer_steps": 32000
+   },
+   "mlflow_run_id": "48a0beef32c34ef0afd3feda8fff762d",
+   "artifact_digests": [
+    "sha256:93d6b3abb04b0228a58dc3f24d5bfa89ad39b67a1f969f69a3a102e0ad5d486f"
+   ],
+   "started_at": "2026-10-28T11:52:54Z",
+   "finished_at": "2026-10-28T11:54:17.210480+00:00"
+  },
+  {
+   "job_id": "j-a2ab0f2359d64fbeb8929b2582abe04a",
+   "attempt_id": "a-b914dbf2448147c788d485b31a792863",
+   "submission_channel": "console wizard",
+   "note": "final round 1",
+   "workload": "live-train-vm-a",
+   "backend": "slurm",
+   "cluster_ref": "live-vm-slurm",
+   "device": "CPU only (no GPU)",
+   "native_id": "6",
+   "state": "SUCCEEDED",
+   "error": null,
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:53:31.029581+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:53:33.588813+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:53:38.200965+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:56:28.932204+00:00",
+     "state": "COLLECTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:56:31.239109+00:00",
+     "state": "SUCCEEDED",
+     "reason": null
+    }
+   ],
+   "kueue": null,
+   "observed_node": "ra-slurm-vm",
+   "reserved_allocation": {
+    "source": "slurm:sacct AllocTRES",
+    "accelerator_count": 0.0,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 2,
+   "final_progress": {
+    "epoch": 500,
+    "total_epochs": 500,
+    "optimizer_steps": 16000,
+    "loss": 0.00032592479410943246,
+    "elapsed_seconds": 158.48432606099993,
+    "observed_at": "2026-10-28T11:56:15.808489+00:00"
+   },
+   "result": {
+    "elapsed_seconds": 158.48580983499994,
+    "work_units": 500,
+    "quality_value": 0.9990080387920184,
+    "throughput": 1615.2865689775153,
+    "peak_memory_mib": 18.36328125,
+    "gpu_utilization": null
+   },
+   "quality_passed": true,
+   "training_receipt": {
+    "initial_checkpoint_digest": "sha256:92a48214c46bb4c933c37a9463342d0b9310f3f73efc57cc2a268a0e897736bd",
+    "output_checkpoint_digest": "sha256:a26e92c2946831df5cbb07997d2ea7134d97525d9ce27fd0f686c048e29a9be4",
+    "input_digest": "sha256:341ce2ae4e868530b914f55baec4a6579dc51a988e8133af30a6232317c60a63",
+    "source_not_mounted": null,
+    "source_protection": "operator-owned-readonly-host-copy",
+    "checkpoint_readonly": true,
+    "input_readonly": true,
+    "optimizer_steps": 16000
+   },
+   "mlflow_run_id": "57f29615f2144885bf4470c516e0031b",
+   "artifact_digests": [
+    "sha256:2fff1492c425e4128d2f68169ff2614c581e1fff524df4c6a2e2e2d02e207061"
+   ],
+   "started_at": "2026-10-28T11:53:33+0000",
+   "finished_at": "2026-10-28T11:56:31.237284+00:00"
+  },
+  {
+   "job_id": "j-d7400df186f54b08aea78777964f4dbc",
+   "attempt_id": "a-9db002d697fe45b1b9d39acfa58e4864",
+   "submission_channel": "console wizard -> kubeflow",
+   "note": "kfp run ede4244c-6741-448b-b9ee-0f06f44eca83",
+   "workload": "live-train-k8s-b",
+   "backend": "kubernetes",
+   "cluster_ref": "live-k8s-cpu",
+   "device": "CPU only (no GPU)",
+   "native_id": "a-9db002d697fe45b1b9d39acfa58e4864",
+   "state": "SUCCEEDED",
+   "error": null,
+   "pipeline": {
+    "ref": "kfp-f86c643c6db7c7a866312def53788f8fb670fb7f",
+    "run_id": "ede4244c-6741-448b-b9ee-0f06f44eca83"
+   },
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:54:36.473855+00:00",
+     "state": "VALIDATED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:54:43.345031+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:54:43.405315+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:54:43.612283+00:00",
+     "state": "QUEUED",
+     "reason": "PodInitializing"
+    },
+    {
+     "at": "2026-10-28T11:54:49.005114+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:55:58.993836+00:00",
+     "state": "COLLECTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:55:59.047232+00:00",
+     "state": "SUCCEEDED",
+     "reason": null
+    }
+   ],
+   "kueue": {
+    "cluster_queue": "ra-live-training-cpu",
+    "local_queue": "ra-live-cpu",
+    "conditions": [
+     {
+      "type": "QuotaReserved",
+      "status": "True",
+      "reason": "QuotaReserved",
+      "last_transition_time": "2026-10-28T11:54:43Z"
+     },
+     {
+      "type": "Admitted",
+      "status": "True",
+      "reason": "Admitted",
+      "last_transition_time": "2026-10-28T11:54:43Z"
+     },
+     {
+      "type": "Finished",
+      "status": "True",
+      "reason": "Succeeded",
+      "last_transition_time": "2026-10-28T11:55:55Z"
+     },
+     {
+      "type": "PodsReady",
+      "status": "True",
+      "reason": "Recovered",
+      "last_transition_time": "2026-10-28T11:55:55Z"
+     }
+    ]
+   },
+   "observed_node": "etri-ser0001-cg0msb",
+   "reserved_allocation": {
+    "source": "kubernetes:scheduled workload container requests",
+    "accelerator_count": 0.0,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 0,
+   "final_progress": {
+    "epoch": 600,
+    "total_epochs": 600,
+    "optimizer_steps": 38400,
+    "loss": 0.0016648729950450288,
+    "elapsed_seconds": 67.53408078600114,
+    "observed_at": "2026-10-28T11:55:52.870315+00:00"
+   },
+   "result": {
+    "elapsed_seconds": 67.53413170800195,
+    "work_units": 600,
+    "quality_value": 0.9964917185951554,
+    "throughput": 18195.24392958772,
+    "peak_memory_mib": 18.4453125,
+    "gpu_utilization": null
+   },
+   "quality_passed": true,
+   "training_receipt": {
+    "initial_checkpoint_digest": "sha256:cf1055eaa603d9684bfda38843a56d0f0afd464abca458b96282798aaef22e78",
+    "output_checkpoint_digest": "sha256:3abc1c6274ca500b46581e5fdecde0d5b9ab356986d9daf7bbfd9704b8c473b0",
+    "input_digest": "sha256:2648f2d31975165b9060f302d167a93e3fd1006d40f248a0f1cda073749fe474",
+    "source_not_mounted": true,
+    "source_protection": null,
+    "checkpoint_readonly": true,
+    "input_readonly": true,
+    "optimizer_steps": 38400
+   },
+   "mlflow_run_id": "5a7c782e78724ae391da599331d6e647",
+   "artifact_digests": [
+    "sha256:168c9dc443e2c1cae27fd051a45916b0760240f87b96b5baca4527648c5c0b06"
+   ],
+   "started_at": "2026-10-28T11:54:43Z",
+   "finished_at": "2026-10-28T11:55:59.045442+00:00"
+  },
+  {
+   "job_id": "j-1122dca243744b70a10139ce064e99cc",
+   "attempt_id": "a-a6609805027c4ffea5057204069e0c09",
+   "submission_channel": "api",
+   "note": "final round 1; same-key retry target",
+   "workload": "live-train-vm-b",
+   "backend": "slurm",
+   "cluster_ref": "live-vm-slurm",
+   "device": "CPU only (no GPU)",
+   "native_id": "7",
+   "state": "SUCCEEDED",
+   "error": null,
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:54:28.374801+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:54:29.633321+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:54:34.693736+00:00",
+     "state": "QUEUED",
+     "reason": "Resources"
+    },
+    {
+     "at": "2026-10-28T11:56:25.293032+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:58:58.820876+00:00",
+     "state": "COLLECTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:59:01.182992+00:00",
+     "state": "SUCCEEDED",
+     "reason": null
+    }
+   ],
+   "kueue": null,
+   "observed_node": "ra-slurm-vm",
+   "reserved_allocation": {
+    "source": "slurm:sacct AllocTRES",
+    "accelerator_count": 0.0,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 14,
+   "final_progress": {
+    "epoch": 600,
+    "total_epochs": 600,
+    "optimizer_steps": 19200,
+    "loss": 0.00266041472843328,
+    "elapsed_seconds": 144.5732883249999,
+    "observed_at": "2026-10-28T11:58:43.752433+00:00"
+   },
+   "result": {
+    "elapsed_seconds": 144.57500876899996,
+    "work_units": 600,
+    "quality_value": 0.9945111379429139,
+    "throughput": 2124.8485655694485,
+    "peak_memory_mib": 18.48828125,
+    "gpu_utilization": null
+   },
+   "quality_passed": true,
+   "training_receipt": {
+    "initial_checkpoint_digest": "sha256:671c01a8dde101a9382a4c05bc667e4a1e966f436cdeb587c0ee60243af91105",
+    "output_checkpoint_digest": "sha256:f714fdae1873e6a215dfdba8cd2d2866a5941ebb7fd40829de2cac11faff9c46",
+    "input_digest": "sha256:2040d366f633d6f9b911a0fe0415dddc4fe8bf166358629c13173dac80c7ac4a",
+    "source_not_mounted": null,
+    "source_protection": "operator-owned-readonly-host-copy",
+    "checkpoint_readonly": true,
+    "input_readonly": true,
+    "optimizer_steps": 19200
+   },
+   "mlflow_run_id": "afe293a0584d46e9a38db27381067781",
+   "artifact_digests": [
+    "sha256:ddb20d4914f8323633f07fad64740fbb493c20eb40ab680618cc73535dc8d468"
+   ],
+   "started_at": "2026-10-28T11:56:16+0000",
+   "finished_at": "2026-10-28T11:59:01.181605+00:00"
+  },
+  {
+   "job_id": "j-342c58fcb5e74b838ad70a288438c4d4",
+   "attempt_id": "a-0fd5d027debc45b6ab7b80b3ddebea82",
+   "submission_channel": "api",
+   "note": "final round 2",
+   "workload": "live-train-vm-a",
+   "backend": "slurm",
+   "cluster_ref": "live-vm-slurm",
+   "device": "CPU only (no GPU)",
+   "native_id": "8",
+   "state": "SUCCEEDED",
+   "error": null,
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:57:29.499788+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:57:30.778956+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:57:35.588982+00:00",
+     "state": "QUEUED",
+     "reason": "Resources"
+    },
+    {
+     "at": "2026-10-28T11:58:47.149879+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T12:01:35.632599+00:00",
+     "state": "COLLECTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T12:01:37.966280+00:00",
+     "state": "SUCCEEDED",
+     "reason": null
+    }
+   ],
+   "kueue": null,
+   "observed_node": "ra-slurm-vm",
+   "reserved_allocation": {
+    "source": "slurm:sacct AllocTRES",
+    "accelerator_count": 0.0,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 14,
+   "final_progress": {
+    "epoch": 500,
+    "total_epochs": 500,
+    "optimizer_steps": 16000,
+    "loss": 0.00032592479410943246,
+    "elapsed_seconds": 162.19366875900005,
+    "observed_at": "2026-10-28T12:01:29.344692+00:00"
+   },
+   "result": {
+    "elapsed_seconds": 162.19477383499998,
+    "work_units": 500,
+    "quality_value": 0.9990080387920184,
+    "throughput": 1578.3492522417994,
+    "peak_memory_mib": 18.4765625,
+    "gpu_utilization": null
+   },
+   "quality_passed": true,
+   "training_receipt": {
+    "initial_checkpoint_digest": "sha256:92a48214c46bb4c933c37a9463342d0b9310f3f73efc57cc2a268a0e897736bd",
+    "output_checkpoint_digest": "sha256:a26e92c2946831df5cbb07997d2ea7134d97525d9ce27fd0f686c048e29a9be4",
+    "input_digest": "sha256:341ce2ae4e868530b914f55baec4a6579dc51a988e8133af30a6232317c60a63",
+    "source_not_mounted": null,
+    "source_protection": "operator-owned-readonly-host-copy",
+    "checkpoint_readonly": true,
+    "input_readonly": true,
+    "optimizer_steps": 16000
+   },
+   "mlflow_run_id": "9b850719706f469eb99857a51e003a14",
+   "artifact_digests": [
+    "sha256:5e785d981b275f35538d44f94f6a20d1cb428fd08e0c6ed1d12a756325730d45"
+   ],
+   "started_at": "2026-10-28T11:58:44+0000",
+   "finished_at": "2026-10-28T12:01:37.964859+00:00"
+  },
+  {
+   "job_id": "j-fab0b967863640e4a820d717bb91f3ea",
+   "attempt_id": "a-240f9bac08704d75bbd66988b7c7ac61",
+   "submission_channel": "api",
+   "note": "final round 2 controlled cancel",
+   "workload": "live-train-vm-b",
+   "backend": "slurm",
+   "cluster_ref": "live-vm-slurm",
+   "device": "CPU only (no GPU)",
+   "native_id": "9",
+   "state": "CANCELED",
+   "error": null,
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:57:40.677857+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:57:41.947159+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:58:50.079510+00:00",
+     "state": "QUEUED",
+     "reason": "Resources"
+    },
+    {
+     "at": "2026-10-28T12:01:41.507308+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T12:01:53.707103+00:00",
+     "state": "CANCEL_REQUESTED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T12:02:04.384686+00:00",
+     "state": "CANCELED",
+     "reason": null
+    }
+   ],
+   "kueue": null,
+   "observed_node": "ra-slurm-vm",
+   "reserved_allocation": {
+    "source": "slurm:sacct AllocTRES",
+    "accelerator_count": 0.0,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 2,
+   "final_progress": {
+    "epoch": 110,
+    "total_epochs": 600,
+    "optimizer_steps": 3520,
+    "loss": 0.009770939541267861,
+    "elapsed_seconds": 28.339782411999977,
+    "observed_at": "2026-10-28T12:02:00.611899+00:00"
+   },
+   "result": null,
+   "quality_passed": null,
+   "training_receipt": null,
+   "mlflow_run_id": "44e3fa6941374e188074e12e14ac5100",
+   "artifact_digests": [],
+   "started_at": "2026-10-28T12:01:29+0000",
+   "finished_at": "2026-10-28T12:02:04.384689+00:00"
+  },
+  {
+   "job_id": "j-59c965fa6aa04a909b7109bbce3571e4",
+   "attempt_id": "a-76c4a15aa5cc4418b44ac464c5519299",
+   "submission_channel": "api",
+   "note": "final round 2",
+   "workload": "live-train-k8s-a",
+   "backend": "kubernetes",
+   "cluster_ref": "live-k8s-cpu",
+   "device": "CPU only (no GPU)",
+   "native_id": "a-76c4a15aa5cc4418b44ac464c5519299",
+   "state": "SUCCEEDED",
+   "error": null,
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:57:45.534983+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:57:45.598692+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:57:51.213262+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:59:09.626284+00:00",
+     "state": "COLLECTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:59:09.712932+00:00",
+     "state": "SUCCEEDED",
+     "reason": null
+    }
+   ],
+   "kueue": {
+    "cluster_queue": "ra-live-training-cpu",
+    "local_queue": "ra-live-cpu",
+    "conditions": [
+     {
+      "type": "QuotaReserved",
+      "status": "True",
+      "reason": "QuotaReserved",
+      "last_transition_time": "2026-10-28T11:57:46Z"
+     },
+     {
+      "type": "Admitted",
+      "status": "True",
+      "reason": "Admitted",
+      "last_transition_time": "2026-10-28T11:57:46Z"
+     },
+     {
+      "type": "Finished",
+      "status": "True",
+      "reason": "Succeeded",
+      "last_transition_time": "2026-10-28T11:59:06Z"
+     },
+     {
+      "type": "PodsReady",
+      "status": "True",
+      "reason": "Recovered",
+      "last_transition_time": "2026-10-28T11:59:06Z"
+     }
+    ]
+   },
+   "observed_node": "etri-ser0001-cg0msb",
+   "reserved_allocation": {
+    "source": "kubernetes:scheduled workload container requests",
+    "accelerator_count": 0.0,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 14,
+   "final_progress": {
+    "epoch": 500,
+    "total_epochs": 500,
+    "optimizer_steps": 32000,
+    "loss": 0.0012648562656793461,
+    "elapsed_seconds": 75.42566273899865,
+    "observed_at": "2026-10-28T11:59:03.254468+00:00"
+   },
+   "result": {
+    "elapsed_seconds": 75.42569808899862,
+    "work_units": 500,
+    "quality_value": 0.9973480053375562,
+    "throughput": 13576.274743811193,
+    "peak_memory_mib": 18.9296875,
+    "gpu_utilization": null
+   },
+   "quality_passed": true,
+   "training_receipt": {
+    "initial_checkpoint_digest": "sha256:39f937abdfcfc6ad4a6e2f42a443052ccad5200293cbf89dfb67ee1f13193bb3",
+    "output_checkpoint_digest": "sha256:f46886271563dc968eb7962b09b552e87f5202c569122a1cf493046bf6bfd6d4",
+    "input_digest": "sha256:f24ab450b8d16e80b66678d268cd225e6176c694c9b11220052e4f97b1247c13",
+    "source_not_mounted": true,
+    "source_protection": null,
+    "checkpoint_readonly": true,
+    "input_readonly": true,
+    "optimizer_steps": 32000
+   },
+   "mlflow_run_id": "353701764e5c4a66a46af4728316f280",
+   "artifact_digests": [
+    "sha256:127c2a8f99cd1c001bc0b075cfb528656088200d2216f9392a50d30c5a3028a4"
+   ],
+   "started_at": "2026-10-28T11:57:45Z",
+   "finished_at": "2026-10-28T11:59:09.710808+00:00"
+  },
+  {
+   "job_id": "j-d4a5b35a77a24ac0830cef427f484da7",
+   "attempt_id": "a-4d76d3bdb2234d54b3677533ee2b3ced",
+   "submission_channel": "console wizard",
+   "note": "final round 2",
+   "workload": "live-train-k8s-b",
+   "backend": "kubernetes",
+   "cluster_ref": "live-k8s-cpu",
+   "device": "CPU only (no GPU)",
+   "native_id": "a-4d76d3bdb2234d54b3677533ee2b3ced",
+   "state": "SUCCEEDED",
+   "error": null,
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:58:18.164252+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:58:18.217975+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:58:18.467440+00:00",
+     "state": "QUEUED",
+     "reason": "AdmissionPending"
+    },
+    {
+     "at": "2026-10-28T11:59:09.310263+00:00",
+     "state": "QUEUED",
+     "reason": "PodInitializing"
+    },
+    {
+     "at": "2026-10-28T11:59:15.278592+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T12:00:23.297619+00:00",
+     "state": "COLLECTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T12:00:23.432105+00:00",
+     "state": "SUCCEEDED",
+     "reason": null
+    }
+   ],
+   "kueue": {
+    "cluster_queue": "ra-live-training-cpu",
+    "local_queue": "ra-live-cpu",
+    "conditions": [
+     {
+      "type": "QuotaReserved",
+      "status": "True",
+      "reason": "QuotaReserved",
+      "last_transition_time": "2026-10-28T11:59:07Z"
+     },
+     {
+      "type": "Admitted",
+      "status": "True",
+      "reason": "Admitted",
+      "last_transition_time": "2026-10-28T11:59:07Z"
+     },
+     {
+      "type": "Finished",
+      "status": "True",
+      "reason": "Succeeded",
+      "last_transition_time": "2026-10-28T12:00:19Z"
+     },
+     {
+      "type": "PodsReady",
+      "status": "True",
+      "reason": "Recovered",
+      "last_transition_time": "2026-10-28T12:00:19Z"
+     }
+    ]
+   },
+   "observed_node": "etri-ser0001-cg0msb",
+   "reserved_allocation": {
+    "source": "kubernetes:scheduled workload container requests",
+    "accelerator_count": 0.0,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 12,
+   "final_progress": {
+    "epoch": 600,
+    "total_epochs": 600,
+    "optimizer_steps": 38400,
+    "loss": 0.0016648729950450288,
+    "elapsed_seconds": 67.65506771500077,
+    "observed_at": "2026-10-28T12:00:16.731097+00:00"
+   },
+   "result": {
+    "elapsed_seconds": 67.65509390200168,
+    "work_units": 600,
+    "quality_value": 0.9964917185951554,
+    "throughput": 18162.71220877936,
+    "peak_memory_mib": 18.83984375,
+    "gpu_utilization": null
+   },
+   "quality_passed": true,
+   "training_receipt": {
+    "initial_checkpoint_digest": "sha256:cf1055eaa603d9684bfda38843a56d0f0afd464abca458b96282798aaef22e78",
+    "output_checkpoint_digest": "sha256:3abc1c6274ca500b46581e5fdecde0d5b9ab356986d9daf7bbfd9704b8c473b0",
+    "input_digest": "sha256:2648f2d31975165b9060f302d167a93e3fd1006d40f248a0f1cda073749fe474",
+    "source_not_mounted": true,
+    "source_protection": null,
+    "checkpoint_readonly": true,
+    "input_readonly": true,
+    "optimizer_steps": 38400
+   },
+   "mlflow_run_id": "3f43eb5b7e9542b8bf69400c50cca8e6",
+   "artifact_digests": [
+    "sha256:6346b0aae1afa57a827abcd211ac37b206f07b7c8bc7ece4ea79333bf24bc4f3"
+   ],
+   "started_at": "2026-10-28T11:59:07Z",
+   "finished_at": "2026-10-28T12:00:23.430490+00:00"
+  },
+  {
+   "job_id": "j-56728b5676264de8b96822be50529a56",
+   "attempt_id": "a-35e930ad7278411484fd6821d34f45d3",
+   "submission_channel": "api",
+   "note": "slurm smoke",
+   "workload": "live-train-vm-a",
+   "backend": "slurm",
+   "cluster_ref": "live-vm-slurm",
+   "device": "CPU only (no GPU)",
+   "native_id": "5",
+   "state": "SUCCEEDED",
+   "error": null,
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:44:58.490490+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:45:01.367561+00:00",
+     "state": "QUEUED",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:45:05.638067+00:00",
+     "state": "RUNNING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:47:45.786490+00:00",
+     "state": "COLLECTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:47:48.035278+00:00",
+     "state": "SUCCEEDED",
+     "reason": null
+    }
+   ],
+   "kueue": null,
+   "observed_node": "ra-slurm-vm",
+   "reserved_allocation": {
+    "source": "slurm:sacct AllocTRES",
+    "accelerator_count": null,
+    "cpu": 2.0,
+    "memory_mib": 1024.0
+   },
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 18,
+   "final_progress": {
+    "epoch": 499,
+    "total_epochs": 500,
+    "optimizer_steps": 15968,
+    "loss": 0.0003235174746273375,
+    "elapsed_seconds": 153.51158322700002,
+    "observed_at": "2026-10-28T11:47:38.024113+00:00"
+   },
+   "result": {
+    "elapsed_seconds": 153.84513239199998,
+    "work_units": 500,
+    "quality_value": 0.9990080387920184,
+    "throughput": 1664.0110481214817,
+    "peak_memory_mib": 18.37890625,
+    "gpu_utilization": null
+   },
+   "quality_passed": true,
+   "training_receipt": {
+    "initial_checkpoint_digest": "sha256:92a48214c46bb4c933c37a9463342d0b9310f3f73efc57cc2a268a0e897736bd",
+    "output_checkpoint_digest": "sha256:a26e92c2946831df5cbb07997d2ea7134d97525d9ce27fd0f686c048e29a9be4",
+    "input_digest": "sha256:341ce2ae4e868530b914f55baec4a6579dc51a988e8133af30a6232317c60a63",
+    "source_not_mounted": null,
+    "source_protection": "operator-owned-readonly-host-copy",
+    "checkpoint_readonly": true,
+    "input_readonly": true,
+    "optimizer_steps": 16000
+   },
+   "mlflow_run_id": "8e86d73e361948b495632d1f5d667df5",
+   "artifact_digests": [
+    "sha256:ceedb5c05c95c1d02a271d82229bea0947df9a81cda8b0d0bff95034c69131ae"
+   ],
+   "started_at": "2026-10-28T11:45:01+0000",
+   "finished_at": "2026-10-28T11:47:48.033046+00:00"
+  },
+  {
+   "job_id": "j-684f5a7dac8a4541bf4d36c5a4e40fc8",
+   "attempt_id": "a-27b816e29186404eaeae2d3c3b4cdb65",
+   "submission_channel": "api",
+   "note": "setup failure: worker had no API credentials",
+   "workload": "live-train-k8s-a",
+   "backend": "kubernetes",
+   "cluster_ref": "live-k8s-cpu",
+   "device": "CPU only (no GPU)",
+   "native_id": null,
+   "state": "SUBMISSION_UNKNOWN",
+   "error": "SUBMISSION_RESPONSE_UNCERTAIN",
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:11:05.002025+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:11:05.102320+00:00",
+     "state": "SUBMISSION_UNKNOWN",
+     "reason": null
+    }
+   ],
+   "kueue": null,
+   "observed_node": null,
+   "reserved_allocation": null,
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 0,
+   "final_progress": null,
+   "result": null,
+   "quality_passed": null,
+   "training_receipt": null,
+   "mlflow_run_id": null,
+   "artifact_digests": [],
+   "started_at": null,
+   "finished_at": null
+  },
+  {
+   "job_id": "j-5e1ec033742343fa8e1320d81ec75939",
+   "attempt_id": "a-9d424482a8af4b8ba914ededc65aa6a5",
+   "submission_channel": "api",
+   "note": "setup failure: worker had no API credentials",
+   "workload": "live-train-k8s-b",
+   "backend": "kubernetes",
+   "cluster_ref": "live-k8s-cpu",
+   "device": "CPU only (no GPU)",
+   "native_id": null,
+   "state": "SUBMISSION_UNKNOWN",
+   "error": "SUBMISSION_RESPONSE_UNCERTAIN",
+   "pipeline": null,
+   "lifecycle": [
+    {
+     "at": "2026-10-28T11:11:20.610978+00:00",
+     "state": "SUBMITTING",
+     "reason": null
+    },
+    {
+     "at": "2026-10-28T11:11:20.674013+00:00",
+     "state": "SUBMISSION_UNKNOWN",
+     "reason": null
+    }
+   ],
+   "kueue": null,
+   "observed_node": null,
+   "reserved_allocation": null,
+   "requested": {
+    "host_cpu": 2.0,
+    "host_memory_mib": 1024,
+    "accelerator_count": 0
+   },
+   "distinct_running_progress_observations": 0,
+   "final_progress": null,
+   "result": null,
+   "quality_passed": null,
+   "training_receipt": null,
+   "mlflow_run_id": null,
+   "artifact_digests": [],
+   "started_at": null,
+   "finished_at": null
+  }
+ ]
+}

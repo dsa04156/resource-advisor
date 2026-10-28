@@ -1,4 +1,4 @@
-import {createWorkflowWorkspace} from "./workspace.js";
+import {createWorkflowWorkspace, createPlacementConsole} from "./workspace.js";
 const $ = (id) => document.getElementById(id);
 const API = "/api/v1/compute";
 let anonymousConnected = false;
@@ -18,7 +18,7 @@ let receivedAt = 0,
 const pages = { jobs: 0, compatibility: 0, history: 0, recommendations: 0, qualifications: 0, observations: 0, templates: 0 };
 const submitting = new Set();
 const requestKeys = new Map();
-const jobFilters = { status: "all", backend: "all", search: "" };
+const jobFilters = { status: "all", backend: "all", device: "all", search: "" };
 let labReplay=null,labReplaySpeed=1,labReceivedAt=0;
 const labReplaySeen=new Set();
 let labResource="",labResourceFilter="all";
@@ -29,7 +29,8 @@ let modelsError = "", modelSelected = "", modelPage = 0, modelsShowStaging = fal
 const modelDisclosures = new Set();
 const submissionDraft = { workload: "", candidate: "" };
 let schedulingProfile = "", schedulingPreview = null, schedulingPreviewKey = "";
-let schedulingPendingKey = "", trackedJobId = null;
+let schedulingPendingKey = "", schedulingPreviewError = null, submitIssue = null;
+let selectedJobId = null, selectedJob = null, selectedJobRequest = 0, connectionLost = "";
 let templateEditorOpen = false, savingTemplate = false;
 let templateDraft = {};
 const selectionKey = w => w.template_ref ? "template:" + w.template_ref : w.workload_ref;
@@ -41,7 +42,12 @@ function reasonText(reason) {
     ARCH_MISMATCH: "CPU 아키텍처가 실행 환경과 다름", RUNTIME_MISMATCH: "런타임 버전이 다름",
     LOGICAL_WORKLOAD_MISMATCH: "모델·입력 조건이 등록된 실행 환경과 다름",
     PRECISION_MISMATCH: "모델 정밀도 설정이 다름", INPUT_SHAPE_UNVERIFIED: "입력 크기가 실행 환경과 다름",
-    ENVIRONMENT_MISMATCH: "등록된 실행 환경이 다름" })[reason] || reason;
+    ENVIRONMENT_MISMATCH: "등록된 실행 환경이 다름", REGISTRY_ENTRY_MISSING: "실행 환경 등록 정보 없음",
+    QUALIFICATION_REJECTED: "실행 검증 조건 미충족", NO_ELIGIBLE_CANDIDATE: "정책에 맞는 실행 후보 없음",
+    ALLOCATION_MODE_DENIED: "정책이 허용하지 않는 자원 단위", BACKEND_DENIED: "정책이 허용하지 않는 백엔드",
+    PROFILE_RESOURCE_LIMIT: "정책의 최대 자원 초과", WORKLOAD_TYPE_DENIED: "정책이 허용하지 않는 작업 유형",
+    SCHEDULER_BINDING_MISSING: "정책에 연결된 큐 없음", OBSERVED_NODE_UNAVAILABLE: "노드 사용 불가 관측",
+    SLURM_TRAINING_ISOLATION_UNSUPPORTED: "Slurm 학습 격리 미지원" })[reason] || reason;
 }
 
 function submitButton(workload, candidate, approval = null, scheduling = null) {
@@ -63,6 +69,7 @@ function submitButton(workload, candidate, approval = null, scheduling = null) {
       try { sessionStorage.setItem(key, requestKeys.get(key)); } catch (_) { /* Memory fallback. */ }
     }
     submitting.add(key);
+    submitIssue = null;
     button.disabled = true;
     button.textContent = "제출 중…";
     try {
@@ -83,24 +90,30 @@ function submitButton(workload, candidate, approval = null, scheduling = null) {
       requestKeys.delete(key);
       try { sessionStorage.removeItem(key); } catch (_) { /* No credential is stored. */ }
       if (session !== generation) return;
-      trackedJobId = job.job_id;
+      selectedJobId = job.job_id; selectedJob = null;
       $("auto").checked = true;
       pages.jobs = 0;
-      jobFilters.status = "all"; jobFilters.backend = "all"; jobFilters.search = "";
+      jobFilters.status = "all"; jobFilters.backend = "all"; jobFilters.device = "all"; jobFilters.search = "";
       active = "jobs";
       location.hash = "jobs";
       await load();
       $("notice").textContent = "작업을 접수했습니다: " + job.job_id;
     } catch (error) {
-      if (session === generation)
-        $("notice").textContent = error.message + " 같은 버튼으로 재시도하면 동일 요청을 확인합니다.";
+      if (session === generation) {
+        // A lost response may still have created the job; only the same key can confirm it.
+        const message = error instanceof TypeError
+          ? "제출 결과를 확인하지 못했습니다. 서버에 접수됐을 수 있습니다."
+          : error.message;
+        submitIssue = { key, message: message + " 같은 요청 키로 다시 확인하므로 중복 접수되지 않습니다." };
+        $("notice").textContent = submitIssue.message;
+      }
     } finally {
       submitting.delete(key);
       if (session === generation) render();
     }
   };
   const resources = candidate.resources;
-  return add(el("div"), button, automatic ? el("small", "접수 시점에 호환 자원을 다시 확인해 선택하고 해당 큐에 제출합니다.") : resources ? el("small",
+  return add(el("div"), button, submitIssue?.key === key ? el("p", submitIssue.message, "error-message") : null, automatic ? el("small", "접수 시점에 호환 자원을 다시 확인해 선택하고 해당 큐에 제출합니다.") : resources ? el("small",
     `가속기 ${resources.accelerator_count} · CPU ${resources.host_cpu} · ${resources.host_memory_mib} MiB · 최대 ${workload.max_run_seconds}초`) : null);
 }
 const recommending = new Set(), approving = new Set(), approvals = new Map();
@@ -190,15 +203,20 @@ const views = {
   usage: ["PROJECT ACCOUNTING", "프로젝트 사용량", "물리 장치와 공유 슬롯을 구분한 할당 원장입니다."],
   submit: [
     "프로젝트 작업",
-    "새 작업",
-    "작업 요구사항을 보고 플랫폼이 호환 자원을 선택해 Kubernetes 또는 Slurm 큐에 제출합니다.",
+    "새 워크로드",
+    "등록된 작업을 고르고 정책·실행 대상을 검토한 뒤 Kubernetes 또는 Slurm 큐에 제출합니다.",
+  ],
+  placement: [
+    "프로젝트 작업",
+    "이기종 자원 조합 검토",
+    "단계별 등록 작업의 GPU·NPU 후보와 측정된 토폴로지로 자원 조합을 미리 검토합니다. 작업을 실행하거나 자원을 예약하지 않습니다.",
   ],
   execution: [
     "프로젝트 자원",
     "자원 현황",
     "실측 사용량과 스케줄러 예약량을 나란히 확인합니다.",
   ],
-  jobs: ["프로젝트 작업", "작업 목록", "프로젝트의 전체 작업을 검색하고 실행 상태·결과를 확인합니다."],
+  jobs: ["프로젝트 작업", "워크로드", "프로젝트의 워크로드를 찾고 상태·장치·결과를 확인합니다."],
   compatibility: [
     "QUALIFICATION",
     "가속기 호환성",
@@ -721,7 +739,7 @@ function selectTargetButton(w,c) {
     showAllTemplates=false;submissionDraft.workload=w.workload_ref;submissionDraft.candidate=c.candidate_ref;
     $("auto").checked=false;
     if(location.hash==="#submit")render();else location.hash="submit";
-    $("submit-candidate")?.focus();
+    $("target-"+c.candidate_ref)?.focus();
   };
   return button;
 }
@@ -1060,6 +1078,9 @@ function execution() {
 function showJob(job) {
   passiveRequestSerial++;
   $("job-dialog-title").textContent="작업 상세";
+  $("job-dialog-body").replaceChildren(jobDetailView(job, true)); $("job-dialog").showModal();
+}
+function jobDetailView(job, inDialog = false) {
   const m = job.result?.measurements;
   const content = add(el("div", null, "job-detail-content"),
     el("p", job.template?.name || job.workload_ref, "detail-workload"),
@@ -1085,25 +1106,100 @@ function showJob(job) {
     job.scheduling_plan ? schedulingProgress(job) : null,
     details("전체 기록 · 결과 · MLflow", job));
   const cancel = cancelButton(job);
-  if (cancel) { const handler = cancel.onclick; cancel.onclick = async () => { await handler(); $("job-dialog").close(); }; content.append(cancel); }
-  $("job-dialog-body").replaceChildren(workspaceUI.jobDetail(job,content)); $("job-dialog").showModal();
+  if (cancel && inDialog) { const handler = cancel.onclick; cancel.onclick = async () => { await handler(); $("job-dialog").close(); }; }
+  if (cancel) content.append(cancel);
+  return workspaceUI.jobDetail(job, content, inDialog ? "dialog" : "inline");
+}
+// Native identity, admission, observed placement and workload-reported progress.
+// Every value is a backend observation with its own timestamp; nothing is estimated.
+function liveExecution(job) {
+  const admission = job.admission, place = job.observed_placement, alloc = job.observed_allocation;
+  const progress = job.live_progress, latest = progress?.latest;
+  if (!job.external_id && !admission && !progress && !job.pipeline) return null;
+  const root = el("div", null, "evidence");
+  const age = progress?.observed_at ? Math.round((effectiveNow() - Date.parse(progress.observed_at)) / 1000) : null;
+  if (job.device_class === "cpu") root.append(badge("CPU 학습 · GPU 사용 안 함"));
+  const ids = [["백엔드 작업 ID", job.external_id || "—"], ["시도 ID", job.attempt_id || "—"]];
+  if (job.pipeline) ids.unshift(["Kubeflow 실행", job.pipeline.run_id || job.pipeline.ref]);
+  if (admission?.uid) ids.push(["Kueue Workload", admission.name + " · " + (admission.cluster_queue || admission.local_queue)]);
+  if (place?.pod_name) ids.push(["Pod", place.pod_name]);
+  root.append(table(["식별자", "값"], ids.map(([k, v]) => [el("span", k), code(v)])));
+  if (admission?.error) root.append(el("p", "Kueue 승인 정보 확인 불가: " + admission.error, "error-message"));
+  if (admission?.conditions?.length)
+    root.append(table(["Kueue 조건", "상태", "이유", "관측 시각"], admission.conditions.map(c =>
+      [el("span", c.type), badge(c.status, c.status === "True" ? "good" : ""), el("small", [c.reason, c.message].filter(Boolean).join(" · ")), el("span", stamp(c.last_transition_time))])));
+  root.append(table(["관측 항목", "값"], [
+    ["실행 노드", place?.node_name ? place.node_name + " · " + place.source : "미배치 (스케줄러가 아직 배치하지 않음)"],
+    ["할당 (예약)", alloc ? `CPU ${alloc.cpu ?? "—"} · ${alloc.memory_mib == null ? "—" : Math.round(alloc.memory_mib) + " MiB"} · 가속기 ${alloc.accelerator_count ?? "미확인"} · ${alloc.source} (사용률 아님)` : "미관측"],
+    ["학습 진행", latest ? `epoch ${latest.epoch}/${latest.total_epochs} · loss ${fmt(latest.loss, 5)} · step ${latest.optimizer_steps}` : "작업 로그에서 아직 읽지 못함"],
+  ].map(([k, v]) => [el("span", k), el("strong", v)])));
+  if (progress) {
+    root.append(el("small", `진행 관측 ${stamp(progress.observed_at)}${age != null && age > 45 && !["SUCCEEDED","FAILED","RESULT_INVALID","CANCELED"].includes(job.state) ? " · " + age + "초 전 (갱신 지연)" : ""} · ${progress.source}`));
+    if (progress.records?.length)
+      root.append(table(["epoch", "loss", "optimizer step", "경과", "작업 기록 시각"], progress.records.slice(-6).reverse().map(r =>
+        [el("span", String(r.epoch)), el("strong", fmt(r.loss, 5)), el("span", String(r.optimizer_steps)), el("span", duration(r.elapsed_seconds)), el("span", stamp(r.observed_at))])));
+    if (progress.log_tail?.length) root.append(add(el("details"), el("summary", `작업 로그 마지막 ${progress.log_tail.length}줄`), el("pre", progress.log_tail.join("\n"))));
+  }
+  if (job.progress_error) root.append(el("p", `진행 로그 확인 실패 (${job.progress_error}) · ${stamp(job.progress_error_at)} · 스케줄러 상태는 그대로 유지`, "error-message"));
+  return panel("실행 관측", "스케줄러와 작업 로그에서 읽은 값입니다. 예약 자원은 실제 사용률이 아닙니다.", root);
+}
+// Wizard → Kubeflow: reuse the research launch. A reviewed fixed target or saved
+// template cannot be carried by the profile-based pipeline, so it is not offered then.
+let wizardPipelineKey = null, wizardPipelineSubmitting = false;
+function kubeflowSubmitOption(m) {
+  const info = researchData?.kubeflow;
+  if (!researchData && !researchPending) refreshResearch();
+  if (info?.status !== "connected" || !info.templates?.length) return el("small", "Kubeflow 연결을 확인하는 중이거나 등록된 파이프라인이 없어요.", "wizard-note");
+  if (m.workload.template_ref || (m.candidate && m.workload.candidates.length > 1))
+    return el("small", "저장한 템플릿이나 직접 고른 대상은 Kubeflow 경로로 보낼 수 없어요. 직접 제출을 사용하세요.", "wizard-note");
+  const button = researchButton(wizardPipelineSubmitting ? "Kubeflow 요청 중…" : wizardPipelineKey ? "Kubeflow 요청 확인 재시도" : "Kubeflow 파이프라인으로 실행", async () => {
+    wizardPipelineKey ||= "pipeline-wizard-" + randomRequestId();
+    wizardPipelineSubmitting = true;
+    try {
+      const run = await researchRequest("/pipelines", { template_ref: info.templates[0].ref, workload_ref: m.workload.workload_ref, profile_ref: m.profile.ref }, wizardPipelineKey);
+      wizardPipelineKey = null; researchUpdated = 0;
+      $("notice").textContent = "Kubeflow 실행을 요청했습니다: " + run.run_id + " · 연결된 작업은 워크로드 목록에 나타납니다.";
+      active = "jobs"; location.hash = "jobs"; await load();
+    } finally { wizardPipelineSubmitting = false; }
+  });
+  return add(el("div"), button, el("small", `${info.templates[0].name} · 정책 ${m.profile.name} · 같은 요청은 같은 키로만 다시 확인해요.`, "wizard-note"));
+}
+const deviceNames = { gpu: "GPU", npu: "NPU", cpu: "CPU" };
+function selectJob(job) {
+  selectedJobId = job.job_id; selectedJob = job; render();
+  if (matchMedia("(max-width: 1100px)").matches) $("selected-job")?.scrollIntoView({ block: "start" });
+}
+// The selected job may fall outside the current filter or page; read it through the scoped job view.
+async function refreshSelectedJob() {
+  if (!selectedJobId || data?.jobs.items.some(j => j.job_id === selectedJobId)) return;
+  const session = generation, serial = ++selectedJobRequest, id = selectedJobId;
+  try {
+    const response = await fetch(API + "/jobs/" + encodeURIComponent(id) + "/view", { headers: authHeaders(), cache: "no-store" });
+    if (!response.ok) return;
+    const job = await response.json();
+    if (session === generation && serial === selectedJobRequest && id === selectedJobId) { selectedJob = job; render(); }
+  } catch (_) { /* The list keeps the last observed detail and the connection notice explains failures. */ }
 }
 function jobsView() {
-  const root = el("div"), counts = data.job_counts;
+  const root = el("div", null, "jobs-page workloads-page"), counts = data.job_counts;
   const total = Object.values(counts).reduce((a,b) => a+b,0);
   const waiting = ["RECEIVED","VALIDATED","SUBMITTING","SUBMISSION_UNKNOWN","QUEUED"].reduce((sum,k) => sum+(counts[k]||0),0);
-  root.classList.add("jobs-page");
-  const tracked=data.jobs.items.find(j=>j.job_id===trackedJobId) || data.jobs.items.find(j=>j.scheduling_plan && !["SUCCEEDED","FAILED","CANCELED","RESULT_INVALID"].includes(j.state));
-  if(tracked && jobsDisplay==="table")root.append(schedulingProgress(tracked));
-  root.append(add(el("div",null,"section-heading"),el("p","내 작업","eyebrow"),el("h2","실행 기록"),el("p",`전체 ${total}개 · 실행 ${counts.RUNNING||0}개 · 대기 ${waiting}개 · 완료 ${counts.SUCCEEDED||0}개`)));
+  const current = data.jobs.items.find(j => j.job_id === selectedJobId);
+  if (current) selectedJob = current;
+  root.append(add(el("div",null,"workloads-head"),
+    add(el("div"),el("h2","워크로드"),el("p",`${data.project_ref} · 전체 ${total}개 · 실행 ${counts.RUNNING||0}개 · 대기 ${waiting}개 · 완료 ${counts.SUCCEEDED||0}개`)),
+    workspaceUI.newWorkloadMenu()));
   const toolbar = el("div",null,"jobs-toolbar"), search = el("input");
-  search.id = "job-search"; search.type = "search"; search.maxLength = 128; search.placeholder = "작업 이름 · ID · 노드 검색"; search.setAttribute("aria-label","작업 검색"); search.value = jobFilters.search;
+  search.id = "job-search"; search.type = "search"; search.maxLength = 128; search.placeholder = "이름 · ID · 노드 검색"; search.setAttribute("aria-label","워크로드 검색"); search.value = jobFilters.search;
   const refreshFilters = () => { pages.jobs = 0; filterRevision++; load(); };
   search.oninput = () => { jobFilters.search = search.value; clearTimeout(searchTimer); searchTimer = setTimeout(refreshFilters,300); };
-  const backend = el("select"); backend.setAttribute("aria-label","작업 백엔드");
+  const backend = el("select"); backend.id = "job-backend"; backend.setAttribute("aria-label","백엔드");
   for (const [key,label] of [["all","모든 백엔드"],["kubernetes","Kubernetes"],["slurm","Slurm"]]) backend.append(new Option(label,key));
   backend.value = jobFilters.backend; backend.onchange = () => { jobFilters.backend = backend.value; refreshFilters(); };
-  toolbar.append(search,backend);
+  const device = el("select"); device.id = "job-device"; device.setAttribute("aria-label","장치 종류");
+  for (const [key,label] of [["all","모든 장치"],["gpu","GPU"],["npu","NPU"],["cpu","CPU 전용"]]) device.append(new Option(label,key));
+  device.value = jobFilters.device; device.onchange = () => { jobFilters.device = device.value; refreshFilters(); };
+  toolbar.append(search,backend,device);
   const filters = el("div",null,"status-filters");
   for (const [key,label] of [["all","전체"],["running","실행"],["pending","대기"],["succeeded","완료"],["failed","실패"],["canceled","취소"]]) {
     const b = el("button",label,jobFilters.status===key ? "selected" : ""); b.setAttribute("aria-pressed",String(jobFilters.status===key));
@@ -1111,19 +1207,31 @@ function jobsView() {
   }
   toolbar.append(filters);
   const display=el("div",null,"status-filters");
-  for(const [key,label] of [["graph","그래프 보기"],["table","표 보기"]]) {
+  for(const [key,label] of [["table","표"],["graph","그래프"]]) {
     const b=el("button",label,jobsDisplay===key?"selected":"");b.setAttribute("aria-pressed",String(jobsDisplay===key));
     b.onclick=()=>{jobsDisplay=key;render();};display.append(b);
   }
   toolbar.append(display);
+  const types = {inference:"추론",training:"학습",benchmark:"성능 측정",preprocessing:"전처리"};
   const rows = data.jobs.items.map(j => {
-    const open = el("button", "상세 보기", "details-action"); open.setAttribute("aria-label", `상세 보기 · ${j.job_id}`); open.onclick = () => showJob(j);
-    return [add(el("div",null,"job-name"),el("strong",j.template?.name || j.workload_ref),code(j.job_id)),add(el("div"),stateBadge(j.state),j.scheduler_reason?el("small",j.attention?.title||j.scheduler_reason):null),
-      add(el("div"),badge(j.backend),el("small",j.node_ref)),
-      el("span",`CPU ${j.requested_resources?.host_cpu ?? "—"} · GPU/NPU ${j.requested_resources?.accelerator_count ?? "—"}`),
-      stamp(j.created_at),add(el("div",null,"job-actions"),open,cancelButton(j))];
+    const pick = el("button", null, "job-select"); pick.id = "job-select-" + j.job_id; pick.dataset.keepFocus = "true";
+    pick.setAttribute("aria-pressed", String(j.job_id === selectedJobId));
+    const id = code(j.job_id.length > 16 ? j.job_id.slice(0, 15) + "…" : j.job_id); id.title = j.job_id;
+    pick.append(el("strong", j.template?.name || j.workload_ref), id); pick.onclick = () => selectJob(j);
+    const r = j.requested_resources || {};
+    return [pick, types[j.workload_summary?.task_type] || j.workload_summary?.task_type || "—",
+      add(el("div"),stateBadge(j.state),j.scheduler_reason?el("small",j.attention?.title||j.scheduler_reason):null),
+      add(el("div"),el("span",j.accelerator_model || "장치 미기록"),el("small",[deviceNames[j.device_class] || "종류 미기록", j.backend === "slurm" ? "Slurm" : "Kubernetes", j.node_ref].filter(Boolean).join(" · "))),
+      el("span",`${r.accelerator_count ? (deviceNames[j.device_class] || "가속기") + " " + r.accelerator_count + " · " : ""}CPU ${r.host_cpu ?? "—"} · ${r.host_memory_mib ?? "—"} MiB`),
+      stamp(j.created_at)];
   });
-  root.append(add(el("section",null,"panel jobs-panel"), toolbar, rows.length ? (jobsDisplay==="graph"?mlJobsGraph():table(["작업","상태","실행 대상","요청 자원","생성 시각","관리"],rows)) : empty("조건에 맞는 작업이 없습니다."),pager("jobs",data.jobs)));
+  const list = rows.length ? (jobsDisplay==="graph" ? mlJobsGraph() : table(["워크로드","유형","상태","장치 · 실행 위치","요청 자원","생성 시각"],rows)) : empty("조건에 맞는 워크로드가 없습니다.");
+  list.querySelectorAll("tbody tr").forEach((tr,i) => { if (data.jobs.items[i]?.job_id === selectedJobId) tr.classList.add("selected"); });
+  const listPanel = add(el("section",null,"panel jobs-panel"), toolbar, list, pager("jobs",data.jobs));
+  const detail = el("section",null,"panel selected-job"); detail.id = "selected-job"; detail.setAttribute("aria-label","선택한 워크로드 상세");
+  if (selectedJob) add(detail, current ? null : el("small","현재 목록 밖의 작업 · 서버 기록을 표시합니다."), jobDetailView(selectedJob));
+  else detail.append(add(el("div",null,"selected-empty"),el("strong","워크로드를 선택하세요"),el("p","목록에서 이름을 누르면 상태·결과·실행 기록과 취소·재시도 동작을 여기서 확인할 수 있어요.")));
+  root.append(add(el("div",null,"workloads-split"+(selectedJob?" has-selection":"")), listPanel, detail));
   root.append(passiveObservationsView());
   return root;
 }
@@ -1233,62 +1341,57 @@ async function refreshSchedulingPreview(workload) {
     const result=await response.json();
     if(!response.ok)throw new Error(typeof result.detail==="string"?result.detail:"후보를 확인하지 못했습니다.");
     if(session!==generation || key!==schedulingKey(workload))return;
-    schedulingPreview=result;schedulingPreviewKey=key;
-  } catch(error) {if(session===generation) $("notice").textContent=error.message;}
+    schedulingPreview=result;schedulingPreviewKey=key;schedulingPreviewError=null;
+  } catch(error) {
+    if(session===generation && key===schedulingKey(workload)) {
+      const message=error instanceof TypeError?"정책 검토 API에 연결하지 못했습니다.":error.message;
+      schedulingPreviewError={key,message};$("notice").textContent=message;
+    }
+  }
   finally {if(schedulingPendingKey===key)schedulingPendingKey="";if(session===generation)render();}
 }
-function submissionView() {
-  const root=el("div");
+function submissionModel() {
   const catalogMode=!showAllTemplates && data.submission_catalog != null;
   const sources=catalogMode?data.submission_catalog:data.compatibility.items;
   const items=[...sources,...(data.templates?.items || [])];
   const profiles=data.scheduling_profiles || [];
   if(!schedulingProfile && profiles.length) schedulingProfile=(profiles.find(p=>p.policy.priority==="normal" && p.policy.backend_order[0]==="kubernetes") || profiles[0]).ref;
-  root.append(add(el("div",null,"section-heading"),el("p","WORKLOAD → SCHEDULER → QUEUE → EXECUTION","eyebrow"),el("h2","작업을 정의하면 실행 자원은 플랫폼이 선택합니다"),el("p","등록된 실행 환경과 요구 자원을 확인한 뒤, 선택한 백엔드 큐에서 자원 할당을 기다립니다.")));
-  const form=el("div",null,"job-form");
+  const workload=items.find(w=>selectionKey(w)===submissionDraft.workload) || null;
+  const key=workload?schedulingKey(workload):"";
+  return {catalogMode,catalogConfigured:data.submission_catalog != null,showAll:showAllTemplates,items,profiles,
+    profile:profiles.find(p=>p.ref===schedulingProfile) || null,workload,candidate:submissionDraft.candidate,
+    preview:workload && schedulingPreviewKey===key?schedulingPreview:null,pending:Boolean(workload) && schedulingPendingKey===key,
+    error:workload && schedulingPreviewError?.key===key?schedulingPreviewError.message:""};
+}
+function updateDraft(change) {
+  Object.assign(submissionDraft,change.draft || {});
+  if(change.profile !== undefined) schedulingProfile=change.profile;
+  schedulingPreview=null;schedulingPreviewError=null;render();
+  const {workload}=submissionModel();if(workload)refreshSchedulingPreview(workload);
+}
+// Existing POST /jobs keys: automatic choice is re-planned at receipt, a fixed target sends the reviewed digest.
+function draftSubmitButton({workload,preview}) {
+  if(!submissionDraft.candidate)
+    return submitButton(workload,{candidate_ref:"auto",submittable_now:workload.candidates.some(canSubmit)},null,{plan:{profile_ref:schedulingProfile},digest:schedulingProfile});
+  const candidate=workload.candidates.find(c=>c.candidate_ref===submissionDraft.candidate);
+  return submitButton({...workload,...preview.plan.execution},candidate,null,preview);
+}
+function submissionTools() {
+  const root=el("div",null,"submission-tools"),{items,catalogMode}=submissionModel();
   const workloadSelect=el("select");workloadSelect.id="submit-workload";
   workloadSelect.append(new Option("실행할 작업을 선택하세요",""));
   const types={inference:"추론",training:"학습",benchmark:"벤치마크",preprocessing:"전처리"};
   for(const w of items)workloadSelect.append(new Option(`${w.name || (w.candidates.length>1 && w.measurement_boundary?.startsWith("cuda-squares")?"GPU 연산 점검 · 자동 자원 선택":w.workload_ref)} · ${types[w.task_type] || w.task_type}${w.template_ref?" · 저장한 템플릿":""}`,selectionKey(w)));
   workloadSelect.value=submissionDraft.workload;
-  workloadSelect.onchange=()=>{submissionDraft.workload=workloadSelect.value;submissionDraft.candidate="";schedulingPreview=null;render();const w=items.find(x=>selectionKey(x)===submissionDraft.workload);if(w)refreshSchedulingPreview(w);};
-  const label=el("label","1. 실행할 작업");label.htmlFor=workloadSelect.id;form.append(label,workloadSelect);
-  const workload=items.find(w=>selectionKey(w)===submissionDraft.workload);
-  if(workload){
-    form.append(el("p",`${types[workload.task_type] || workload.task_type} · ${workload.precision} · 배치 ${workload.batch_size ?? "—"} · 입력 ${(workload.input_shape || []).join(" × ")} · 등록된 실행 후보 ${workload.candidates.length}개`));
-    const policy=el("select");policy.id="scheduling-profile";
-    for(const p of profiles)policy.append(new Option(p.name,p.ref));policy.value=schedulingProfile;
-    const policyLabel=el("label","2. 실행 정책");policyLabel.htmlFor=policy.id;
-    policy.onchange=()=>{schedulingProfile=policy.value;schedulingPreview=null;render();refreshSchedulingPreview(workload);};
-    form.append(policyLabel,policy,el("small","GPU를 지정할 필요가 없습니다. 같은 작업을 실행할 수 있는 후보 중 관측된 예약 여유와 정책을 보고 선택합니다."));
-    const advanced=el("details");const candidates=el("select");candidates.id="submit-candidate";candidates.append(new Option("자동 선택 (기본)",""));
-    for(const c of workload.candidates)candidates.append(new Option(`${c.backend} · ${c.model || c.candidate_ref} · ${c.candidate_ref}`,c.candidate_ref));
-    candidates.value=submissionDraft.candidate;candidates.onchange=()=>{submissionDraft.candidate=candidates.value;schedulingPreview=null;render();refreshSchedulingPreview(workload);};
-    const targetLabel=el("label","실행 후보 고정");targetLabel.htmlFor=candidates.id;
-    advanced.append(el("summary","고급: 특정 실행 자원으로 고정"),targetLabel,candidates);advanced.open=Boolean(submissionDraft.candidate);form.append(advanced);
-    const preview=schedulingPreviewKey===schedulingKey(workload)?schedulingPreview:null;
-    form.append(schedulingFlow(null,preview));
-    const inspect=el("button",schedulingPendingKey===schedulingKey(workload)?"후보 확인 중…":"후보·선택 이유 새로 확인");inspect.type="button";inspect.disabled=Boolean(schedulingPendingKey);inspect.onclick=()=>refreshSchedulingPreview(workload);form.append(inspect);
-    if(preview){
-      form.append(candidateEvaluation(preview.plan || {evaluation:preview.evaluation}));
-      if(!preview.accepted)form.append(el("p","조건에 맞는 실행 후보가 없습니다: "+preview.reasons.map(reasonText).join(" · "),"error-message"));
-      else form.append(el("p",`현재 예상 선택: ${preview.plan.node_ref} · ${preview.plan.backend} · 실행 제한 ${preview.plan.execution.max_run_seconds}초`),el("small","여유 관측은 예약 보장이 아닙니다. 자동 제출 시 다시 판단하고, 자원이 사용 중이면 큐에서 기다립니다."));
-    }
-    if(!profiles.length)form.append(empty("운영자가 공통 스케줄링 프로필을 등록해야 자동 제출할 수 있습니다."));
-    else if(!submissionDraft.candidate){
-      form.append(submitButton(workload,{candidate_ref:"auto",submittable_now:workload.candidates.some(canSubmit)},null,{plan:{profile_ref:schedulingProfile},digest:schedulingProfile}));
-    }else if(preview?.accepted){
-      const candidate=workload.candidates.find(c=>c.candidate_ref===submissionDraft.candidate);
-      form.append(submitButton({...workload,...preview.plan.execution},candidate,null,preview));
-    }
-  }else form.append(schedulingFlow());
-  root.append(panel("새 작업 제출","작업 → 요구사항 확인 → 자동 배치 → 큐 → 실행",form));
-  const create=el("button",templateEditorOpen?"등록 폼 닫기":"＋ 새 템플릿 등록");create.onclick=()=>{templateEditorOpen=!templateEditorOpen;render();};root.append(create);
-  if(templateEditorOpen)root.append(templateEditor(sources));
+  workloadSelect.onchange=()=>updateDraft({draft:{workload:workloadSelect.value,candidate:""}});
+  const label=el("label","전체 목록에서 직접 선택");label.htmlFor=workloadSelect.id;
+  root.append(label,workloadSelect);
   const showAll=el("input");showAll.type="checkbox";showAll.checked=showAllTemplates;showAll.onchange=()=>{showAllTemplates=showAll.checked;render();};
-  root.append(add(el("label",null,"template-filter"),showAll,document.createTextNode(" 고급: 전체 실험·테스트 템플릿 보기")));
-  root.append(add(el("details",null,"panel"),el("summary","연결된 장비별 실행 작업 보기"),executionTargets()));
+  root.append(add(el("label",null,"template-filter"),showAll,document.createTextNode(" 전체 실험·테스트 템플릿 보기")));
   if(!catalogMode)root.append(pager("compatibility",data.compatibility));
+  const create=el("button",templateEditorOpen?"등록 폼 닫기":"＋ 새 템플릿 등록");create.onclick=()=>{templateEditorOpen=!templateEditorOpen;render();};root.append(create);
+  if(templateEditorOpen)root.append(templateEditor(catalogMode?data.submission_catalog:data.compatibility.items));
+  root.append(add(el("details",null,"panel"),el("summary","연결된 장비별 실행 작업 보기"),executionTargets()));
   root.append(workloadImport());return root;
 }
 function templateEditor(sources) {
@@ -1988,10 +2091,10 @@ function render() {
       if (parent.tagName === "DETAILS") path.unshift(parent.querySelector(":scope > summary")?.textContent || "");
     return JSON.stringify(path);
   };
-  const openSubmissionPanels = active === "submit"
+  const openSubmissionPanels = ["submit", "placement"].includes(active)
     ? new Set([...$("content").querySelectorAll("details[open]")].map(disclosureKey)) : null;
   const focused = document.activeElement;
-  const keepFocus = ["model-guide-summary", "model-technical-summary", "model-service", "model-show-staging", "models-refresh", "models-previous", "models-next", "job-search", "resource-search", "workload-search", "template-name", "template-source", "template-device", "template-priority", "template-run", "template-queue", "submit-workload", "submit-candidate", "scheduling-profile", "inference-pool", "poc-gpu-count", "lab-scenario", "lab-resource-mode", "lab-history", "lab-replay-speed", "lab-replay-toggle", "lab-replay-seek", "lab-resource-filter"].includes(focused?.id)
+  const keepFocus = ["model-guide-summary", "model-technical-summary", "model-service", "model-show-staging", "models-refresh", "models-previous", "models-next", "job-search", "resource-search", "workload-search", "template-name", "template-source", "template-device", "template-priority", "template-run", "template-queue", "submit-workload", "submit-candidate", "scheduling-profile", "inference-pool", "poc-gpu-count", "lab-scenario", "lab-resource-mode", "lab-history", "lab-replay-speed", "lab-replay-toggle", "lab-replay-seek", "lab-resource-filter", "job-backend", "job-device", "wizard-type"].includes(focused?.id) || focused?.dataset?.keepFocus
     ? { id: focused.id, start: focused.selectionStart, end: focused.selectionEnd } : null;
   const [label, title, description] = views[active];
   workspaceUI.navigation(active);
@@ -2016,7 +2119,8 @@ function render() {
       usage: usageView,
       execution,
       jobs: jobsView,
-      submit: () => workspaceUI.submission(submissionView),
+      submit: () => workspaceUI.submission(),
+      placement: () => placementUI.view(),
       compatibility: compatibilityView,
       history: historyView,
       recommendations: recommendationsView,
@@ -2055,6 +2159,7 @@ function render() {
 function reset(message = "") {
   generation++;
   workspaceUI.reset();
+  placementUI.reset();
   modelsData=null;modelsPending=false;modelsUpdated=0;modelsError="";modelSelected="";modelPage=0;modelsShowStaging=false;modelDisclosures.clear();
   graphJobId=null;graphSelection="compute";
   stopLabReplay();labReplaySeen.clear();labResource="";labResourceFilter="all";
@@ -2067,7 +2172,8 @@ function reset(message = "") {
   token = "";
   importedWorkload = null;
   templateDraft = {}; templateEditorOpen = false;
-  schedulingProfile = ""; schedulingPreview = null; schedulingPreviewKey = ""; schedulingPendingKey = ""; trackedJobId = null;
+  schedulingProfile = ""; schedulingPreview = null; schedulingPreviewKey = ""; schedulingPendingKey = ""; schedulingPreviewError = null; submitIssue = null;
+  selectedJobId = null; selectedJob = null; selectedJobRequest++; connectionLost = "";
   submissionDraft.workload = "";
   submissionDraft.candidate = "";
   anonymousConnected = false;
@@ -2113,15 +2219,17 @@ async function load() {
     if (session !== generation) return;
     data = result;
     receivedAt = performance.now();
-    $("notice").textContent = "";
+    connectionLost = "";
+    $("notice").textContent = submitIssue?.message || "";
     render();
+    refreshSelectedJob();
   } catch (e) {
     if (session === generation && e.name !== "AbortError") {
+      // Describe the retained draft before dropping stale data; submission stays unavailable until reconnect.
+      if (data) connectionLost = workspaceUI.draftSummary() || connectionLost;
       data = null;
       clearTimeout(expiryTimer);
-      $("content").replaceChildren(
-        empty("새 상태를 확인할 수 없어 이전 자원 막대를 숨겼습니다."),
-      );
+      $("content").replaceChildren(disconnectedView());
       $("notice").textContent =
         "자원 API에 연결할 수 없습니다. 다시 갱신해 주세요.";
     }
@@ -2133,14 +2241,29 @@ async function load() {
     }
   }
 }
+function disconnectedView() {
+  const retry = el("button", "다시 연결", "primary"); retry.type = "button"; retry.onclick = () => load();
+  const box = add(el("section", null, "panel connection-lost"), el("h2", "API 연결이 끊겼어요"),
+    el("p", "새 상태를 확인할 수 없어 이전 자원 막대를 숨겼습니다. 연결이 돌아올 때까지 작업 제출은 막혀 있어요."),
+    connectionLost ? add(el("div", null, "draft-summary"), el("small", "이 탭에 보존된 초안"), el("strong", connectionLost)) : null,
+    [...requestKeys.keys()].some(k => k.startsWith("ra-submit:")) ? el("p", "결과를 확인하지 못한 제출 요청이 있어요. 다시 연결한 뒤 같은 버튼으로 확인하세요.", "error-message") : null,
+    retry);
+  return box;
+}
 const workspaceUI = createWorkflowWorkspace({
-  el, add, badge, stateBadge, table, stamp, duration, actionLink, empty, details,
+  el, add, badge, stateBadge, table, stamp, duration, actionLink, empty, details, fmt,
   API, authHeaders, selectionKey, canSubmit, workloadPurpose, reasonText,
   schedulingProgress, dashboardStats, cancelButton, retryJobButton, researchButton, openExperiment,
+  submissionModel, updateDraft, draftSubmitButton, kubeflowSubmitOption, liveExecution, submissionTools, candidateEvaluation, schedulingFlow, modes,
   get data() { return data; }, get draft() { return submissionDraft; },
   generation: () => generation, render, preview: refreshSchedulingPreview, openJob: showJob,
   selectWorkload: ref => { showAllTemplates=false; submissionDraft.workload=ref; submissionDraft.candidate=""; schedulingPreview=null; },
   navigate: view => { if (location.hash === "#"+view) render(); else location.hash=view; },
+});
+const placementUI = createPlacementConsole({
+  el, add, badge, table, stamp, empty, details, code, fmt, modes, actionLink, reasonText,
+  API, authHeaders, randomId: randomRequestId, now: effectiveNow,
+  get data() { return data; }, generation: () => generation, render,
 });
 $("login").onsubmit = (e) => {
   e.preventDefault();
@@ -2161,14 +2284,14 @@ $("content").addEventListener(
   true,
 );
 $("content").addEventListener("focusin", (e) => {
-  if (e.target.closest(".job-form, .jobs-toolbar, .view-toolbar")) $("auto").checked = false;
+  if (e.target.closest(".job-form, .jobs-toolbar, .view-toolbar, .placement-form")) $("auto").checked = false;
 });
 $("close-job-dialog").onclick = () => $("job-dialog").close();
 $("logout").onclick = () => {
   reset("연결을 해제했습니다.");
   $("token").focus();
 };
-$("refresh").onclick = () => active === "models" ? refreshModels() : load();
+$("refresh").onclick = () => { if (active === "placement") placementUI.refresh(); return active === "models" ? refreshModels() : load(); };
 function navigate(event) {
   const view = new URL(event?.newURL || location.href).hash.slice(1);
   if (view === "main") return; // The skip link must not change the selected view.
@@ -2340,7 +2463,7 @@ function retryJobButton(job) {
   let key=null;
   return researchButton("같은 작업 다시 제출",async()=>{key ||= "retry-console-"+randomRequestId();
     const response=await fetch(API+"/jobs/"+encodeURIComponent(job.job_id)+"/retry",{method:"POST",headers:{...authHeaders(),"Idempotency-Key":key}});
-    const value=await response.json();if(!response.ok)throw new Error(value.detail||"재제출하지 못했습니다.");trackedJobId=value.job_id;$("job-dialog").close();$("auto").checked=true;await load();$("notice").textContent="새 실행으로 재제출했습니다: "+value.job_id;
+    const value=await response.json();if(!response.ok)throw new Error(value.detail||"재제출하지 못했습니다.");selectedJobId=value.job_id;selectedJob=null;$("job-dialog").close();$("auto").checked=true;await load();$("notice").textContent="새 실행으로 재제출했습니다: "+value.job_id;
   });
 }
 
@@ -2536,7 +2659,7 @@ function workflowCanvas(nodes,edges,onSelect,{width=1230,height=370,label="작�
 }
 function mlJobsGraph() {
   const items=data.jobs.items, root=el("div",null,"ml-workbench");
-  let job=items.find(j=>j.job_id===graphJobId) || items.find(j=>j.job_id===trackedJobId) || items.find(j=>!scenarioTerminal(j.state)) || items[0];
+  let job=items.find(j=>j.job_id===graphJobId) || items.find(j=>j.job_id===selectedJobId) || items.find(j=>!scenarioTerminal(j.state)) || items[0];
   graphJobId=job.job_id;
   const picker=el("div",null,"ml-job-picker");picker.setAttribute("aria-label","그래프로 볼 작업 선택");
   for(const j of items){const b=el("button",null,j.job_id===job.job_id?"selected":"");b.setAttribute("aria-label",`작업 그래프 · ${j.job_id}`);b.setAttribute("aria-pressed",String(j.job_id===job.job_id));

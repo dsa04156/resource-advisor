@@ -1,6 +1,7 @@
 """Separate adapters. Kubernetes admission and Slurm scheduling stay independent."""
 
 import json
+import math
 import re
 import shlex
 import subprocess
@@ -9,7 +10,7 @@ from datetime import datetime
 from typing import Protocol
 
 from .accounting import number
-from .contracts import State
+from .contracts import State, now
 
 
 class BackendError(RuntimeError):
@@ -32,6 +33,9 @@ class Observation:
     backend_uid: str | None = None
     termination: dict | None = None
     scheduler_reason: str | None = None
+    # Observed native identity/placement and admission, not planned capability.
+    placement: dict | None = None
+    admission: dict | None = None
 
 
 def memory_mib(value, *, slurm=False):
@@ -101,6 +105,49 @@ def result_from_log(log: str) -> dict:
     return json.loads(lines[0])
 
 
+PROGRESS_FIELDS = {
+    "epoch": int,
+    "total_epochs": int,
+    "optimizer_steps": int,
+    "loss": float,
+    "elapsed_seconds": float,
+    "observed_at": str,
+}
+
+
+def progress_from_log(log, job, source):
+    """Bounded tail plus validated progress records of this attempt only."""
+    records = []
+    for line in log.splitlines():
+        if not line.startswith("RA_PROGRESS ") or len(line) > 2048:
+            continue
+        try:
+            value = json.loads(line[len("RA_PROGRESS ") :])
+            record = {key: kind(value[key]) for key, kind in PROGRESS_FIELDS.items()}
+        except (ValueError, KeyError, TypeError):
+            continue
+        if (
+            value.get("schema") == "ra-progress-v1"
+            and value.get("attempt_id") == job["body"]["attempt_id"]
+            and value.get("job_id") == job["id"]
+            and all(math.isfinite(record[k]) for k in ("loss", "elapsed_seconds"))
+            and len(record["observed_at"]) <= 64
+        ):
+            records.append(record)
+    tail = [
+        "[result envelope]" if line.startswith("RESOURCE_ADVISOR_RESULT ") else line[:300]
+        for line in log.splitlines()[-40:]
+    ]
+    return {
+        "source": source,
+        "attempt_id": job["body"]["attempt_id"],
+        "observed_at": now().isoformat(),
+        "latest": records[-1] if records else None,
+        "records": records[-20:],
+        "log_tail": tail,
+    }
+
+
 def identity_environment(job):
     b = job["body"]
     values = {
@@ -168,6 +215,8 @@ class KubernetesBackend:
         retain_termination_evidence=False,
         runtime_class_name=None,
         host_network_variants=None,
+        observe_admission=False,
+        observe_progress=False,
         execute=run,
     ):
         if not namespace or not local_queue or not node_selector:
@@ -190,6 +239,13 @@ class KubernetesBackend:
         ):
             raise ValueError("invalid Kubernetes runtime class")
         self.runtime_class_name = runtime_class_name
+        if not isinstance(observe_admission, bool):
+            raise ValueError("Kueue admission observation must be an explicit boolean")
+        # Opt-in: reading Workloads needs a namespaced get/list grant in the worker Role.
+        self.observe_admission = observe_admission
+        if not isinstance(observe_progress, bool):
+            raise ValueError("progress observation must be an explicit boolean")
+        self.observe_progress = observe_progress
         self.host_network_variants = dict(host_network_variants or {})
         if any(
             not isinstance(ref, str)
@@ -482,6 +538,19 @@ class KubernetesBackend:
         execution_started = container.get("terminated", container.get("running", {})).get(
             "startedAt"
         )
+        observed = {
+            "placement": {
+                "source": "kubernetes:Pod",
+                "job_uid": obj["metadata"].get("uid"),
+                "pod_name": pods[0]["metadata"].get("name"),
+                "pod_uid": pods[0]["metadata"].get("uid"),
+                "node_name": pods[0].get("spec", {}).get("nodeName"),
+                "phase": pod_status.get("phase"),
+            }
+            if pods and pods[0].get("spec", {}).get("nodeName")
+            else None,
+            "admission": self.admission(obj) if self.observe_admission else None,
+        }
         for condition in status.get("conditions", []):
             if condition["type"] == "Complete" and condition["status"] == "True":
                 return Observation(
@@ -491,6 +560,7 @@ class KubernetesBackend:
                     allocation=allocation,
                     execution_started_at=execution_started,
                     submitted_at=submitted,
+                    **observed,
                     **retained,
                 )
             if condition["type"] == "Failed" and condition["status"] == "True":
@@ -502,6 +572,7 @@ class KubernetesBackend:
                     allocation=allocation,
                     execution_started_at=execution_started,
                     submitted_at=submitted,
+                    **observed,
                     **retained,
                 )
         scheduler_reason = None
@@ -530,8 +601,63 @@ class KubernetesBackend:
             allocation=allocation,
             execution_started_at=execution_started,
             submitted_at=submitted,
+            **observed,
             **retained,
         )
+
+    def admission(self, obj):
+        """Kueue Workload owned by this exact Job UID; never matched by name alone."""
+        uid = obj["metadata"].get("uid")
+        try:
+            items = json.loads(
+                self.execute(
+                    self.prefix
+                    + [
+                        "get",
+                        "workloads.kueue.x-k8s.io",
+                        "-l",
+                        "kueue.x-k8s.io/job-uid=" + str(uid),
+                        "-o",
+                        "json",
+                    ]
+                )
+            )["items"]
+        except (BackendError, ValueError, KeyError, TypeError):
+            return {"source": "kueue:Workload", "error": "UNAVAILABLE"}
+        owned = [
+            w
+            for w in items
+            if any(
+                o.get("kind") == "Job" and o.get("uid") == uid and o.get("controller")
+                for o in w.get("metadata", {}).get("ownerReferences", [])
+            )
+            and w.get("spec", {}).get("queueName") == self.local_queue
+        ]
+        if len(owned) != 1:
+            return {"source": "kueue:Workload", "error": "NOT_FOUND" if not owned else "AMBIGUOUS"}
+        workload, status = owned[0], owned[0].get("status", {})
+        assignment = (status.get("admission", {}).get("podSetAssignments") or [{}])[0]
+        return {
+            "source": "kueue:Workload",
+            "name": workload["metadata"].get("name"),
+            "uid": workload["metadata"].get("uid"),
+            "local_queue": self.local_queue,
+            "cluster_queue": status.get("admission", {}).get("clusterQueue"),
+            "flavors": assignment.get("flavors"),
+            "resource_usage": assignment.get("resourceUsage"),
+            "conditions": [
+                {
+                    "type": c.get("type"),
+                    "status": c.get("status"),
+                    "reason": c.get("reason"),
+                    "message": str(c.get("message", ""))[:512],
+                    "last_transition_time": c.get("lastTransitionTime"),
+                }
+                for c in status.get("conditions", [])
+                if c.get("type")
+                in {"QuotaReserved", "Admitted", "PodsReady", "Evicted", "Preempted", "Finished"}
+            ],
+        }
 
     def cancel(self, job):
         self.execute(
@@ -539,6 +665,15 @@ class KubernetesBackend:
             + ["delete", "job", job["body"]["external_id"], "--ignore-not-found", "--wait=false"]
             + (["--cascade=foreground"] if self.retain_termination_evidence else [])
         )
+
+    def progress(self, job, observation):
+        target = (
+            "pod/" + job["body"]["termination"]["pod_name"]
+            if job["body"].get("termination")
+            else "job/" + job["body"]["external_id"]
+        )
+        log = self.execute(self.prefix + ["logs", target, "--container", "workload", "--tail=60"])
+        return progress_from_log(log, job, "kubernetes:pod log tail")
 
     def release_termination(self, receipt):
         from .kubernetes_retention import release
@@ -576,6 +711,9 @@ class SlurmBackend:
         qos_by_priority=None,
         native_runtimes=None,
         result_ssh_targets=None,
+        training_sources=None,
+        observe_progress=False,
+        observe_allocation=False,
         execute=run,
     ):
         for value in [partition, account, qos]:
@@ -597,6 +735,14 @@ class SlurmBackend:
                 r"[A-Za-z0-9_][A-Za-z0-9_@.-]*", target
             ):
                 raise ValueError("invalid result node/SSH alias")
+        if not isinstance(observe_progress, bool):
+            raise ValueError("progress observation must be an explicit boolean")
+        self.observe_progress = observe_progress
+        if not isinstance(observe_allocation, bool):
+            raise ValueError("allocation observation must be an explicit boolean")
+        # Opt-in: older forced-command gateways pin the five/six-column squeue format.
+        self.observe_allocation = observe_allocation
+        self.training_sources = dict(training_sources or {})
 
     def call(self, argv, *, target=None, **kwargs):
         if argv[0] == "sacct":
@@ -662,8 +808,9 @@ class SlurmBackend:
 
     def script(self, job):
         b = job["body"]
+        training = None
         if b["spec"]["identity"]["task_type"] == "training":
-            raise BackendError("Slurm checkpoint isolation is not qualified")
+            training = self.training_binding(job)
         qos = policy_priority(job, self.qos_by_priority, self.qos)
         from .scheduling import verify_adapter_plan
 
@@ -703,6 +850,10 @@ class SlurmBackend:
                 raise BackendError("verified Slurm GRES is required")
             directives.append(f"--gres={gres}:{r['accelerator_count']}")
         env = identity_environment(job)
+        if training:
+            if r["accelerator_count"]:
+                raise BackendError("Slurm training is qualified only without accelerators")
+            env["RA_TRAINING_BINDING"] = json.dumps(training, separators=(",", ":"))
         return (
             "#!/bin/bash\n"
             + "\n".join("#SBATCH " + d for d in directives)
@@ -714,6 +865,37 @@ class SlurmBackend:
             + shlex.join(["srun", "--export=ALL", *command])
             + "\n"
         )
+
+    def training_binding(self, job):
+        """Operator route for the CPU host-copy runner; every other training fails closed."""
+        from .contracts import signature
+        from .training import TrainingIsolation
+
+        b = job["body"]
+        route = self.training_sources.get((b.get("training_isolation") or {}).get("ref"))
+        if not route:
+            raise BackendError("Slurm checkpoint isolation is not qualified")
+        try:
+            binding = TrainingIsolation.model_validate(b["training_isolation"])
+        except ValueError as exc:
+            raise BackendError("invalid Slurm training binding") from exc
+        safe = r"/[A-Za-z0-9_/.-]+"
+        command = list(b.get("effective_command", b["variant"]["command"]))
+        if (
+            binding.backend != "slurm"
+            or binding.device_class != "cpu"
+            or set(route) != {"binding_digest", "source_dir", "work_dir"}
+            or route["binding_digest"] != signature(binding)
+            or not all(
+                isinstance(route[k], str)
+                and re.fullmatch(safe, route[k])
+                and ".." not in route[k].split("/")
+                for k in ("source_dir", "work_dir")
+            )
+            or command[-4:] != ["--host-source", route["source_dir"], "--host-work", route["work_dir"]]
+        ):
+            raise BackendError("invalid Slurm training source binding")
+        return binding.model_dump(mode="json")
 
     def submit(self, job):
         script = self.script(job)
@@ -828,7 +1010,7 @@ class SlurmBackend:
                 self.account,
                 "--partition",
                 self.partition,
-                "--format=%i|%j|%a|%P|%T|%r",
+                "--format=%i|%j|%a|%P|%T|%r" + ("|%N" if self.observe_allocation else ""),
             ]
         )
         # Older command wrappers may still emit five columns; reason remains unknown.
@@ -836,39 +1018,42 @@ class SlurmBackend:
             5
             if queued.strip()
             and all(len(line.split("|")) == 5 for line in queued.splitlines() if line.strip())
+            else 7
+            if self.observe_allocation
             else 6
         )
         record = self.owned_record(queued, job, width=width, required=False)
         if record:
-            return Observation(
-                State.RUNNING if record[4] in {"RUNNING", "COMPLETING"} else State.QUEUED,
+            running = record[4] in {"RUNNING", "COMPLETING"}
+            observation = Observation(
+                State.RUNNING if running else State.QUEUED,
                 scheduler_reason=record[5]
-                if width == 6
+                if width >= 6
                 and record[4] == "PENDING"
                 and re.fullmatch(r"[A-Za-z0-9_.-]{1,128}", record[5])
                 else None,
             )
-        output = self.call(
-            [
-                "sacct",
-                "--noheader",
-                "--parsable2",
-                "--duplicates",
-                "--accounts",
-                self.account,
-                "--partition",
-                self.partition,
-                "--jobs",
-                jid,
-                "--format=JobIDRaw,JobName%100,Account%100,Partition%100,State%64,ExitCode,Start,End,AllocTRES%200,Submit",
-            ]
-        )
+            if running and width == 7 and re.fullmatch(r"[A-Za-z0-9_.-]+", record[6]):
+                observation.placement = {
+                    "source": "slurm:squeue",
+                    "job_id": jid,
+                    "node_name": record[6],
+                    "state": record[4],
+                }
+                # Accounting of the same owned ID gives the actual running allocation.
+                active = self.owned_record(self.accounting(jid), job, width=10)
+                start, tres, submitted = active[6], active[8], active[9]
+                observation.started_at = start if _aware(start) else None
+                observation.submitted_at = submitted if _aware(submitted) else None
+                observation.allocation = self.allocation(job, tres)
+            return observation
+        output = self.accounting(jid)
         parts = self.owned_record(output, job, width=10)
         state, exitcode, start, end, tres, submitted = parts[4:]
         # The command requests UTC offsets. Unsupported/missing values stay unknown.
         start = start if _aware(start) else None
         end = end if _aware(end) else None
-        allocation = slurm_allocation(tres, job["body"]["capability"].get("resource_key"))
+        allocation = self.allocation(job, tres)
         submitted = submitted if _aware(submitted) else None
         if state == "COMPLETED" and exitcode == "0:0":
             return Observation(
@@ -896,6 +1081,39 @@ class SlurmBackend:
             )
         raise BackendError("accounting has not confirmed a terminal state")
 
+    @staticmethod
+    def allocation(job, tres):
+        allocation = slurm_allocation(tres, job["body"]["capability"].get("resource_key"))
+        capability, context = job["body"]["capability"], job["body"]["candidate"]["context"]
+        if (
+            allocation
+            and allocation["accelerator_count"] is None
+            and capability["device_class"] == "cpu"
+            and capability["resource_key"] is None
+            and context["allocation_mode"] == "cpu_only"
+            and context["resources"]["accelerator_count"] == 0
+        ):
+            # Zero is evidenced by this CPU-only job's AllocTRES listing no GRES.
+            allocation["accelerator_count"] = 0.0
+        return allocation
+
+    def accounting(self, jid):
+        return self.call(
+            [
+                "sacct",
+                "--noheader",
+                "--parsable2",
+                "--duplicates",
+                "--accounts",
+                self.account,
+                "--partition",
+                self.partition,
+                "--jobs",
+                jid,
+                "--format=JobIDRaw,JobName%100,Account%100,Partition%100,State%64,ExitCode,Start,End,AllocTRES%200,Submit",
+            ]
+        )
+
     def cancel(self, job):
         jid = self.external_id(job)
         # Ask the controller to apply all filters at cancellation, rather than
@@ -913,6 +1131,27 @@ class SlurmBackend:
                 jid,
             ]
         )
+
+    def output_target(self, node):
+        if not self.result_ssh_targets:
+            return None
+        target = self.result_ssh_targets.get(node)
+        if not target:
+            raise BackendError("result node has no authorized transport")
+        return target
+
+    def progress(self, job, observation):
+        # status() has just matched the attempt owner; the output read is bounded,
+        # path-fixed and still checked again by the forced-command gateway.
+        # After the job leaves squeue, the node comes from the saved running placement.
+        node = (
+            (observation.placement if observation else None) or job["body"].get("placement") or {}
+        ).get("node_name")
+        if node is None and self.result_ssh_targets:
+            raise BackendError("running node is unknown")
+        path = f"{self.output_dir}/{job['body']['attempt_id']}.log"
+        log = self.call(["tail", "-c", "16384", "--", path], target=self.output_target(node))
+        return progress_from_log(log, job, "slurm:output tail")
 
     def result(self, job):
         # Check ownership even when the controller can read a shared filesystem.
@@ -939,13 +1178,10 @@ class SlurmBackend:
             or exitcode != "0:0"
         ):
             raise BackendError("result allocation does not match the completed attempt")
-        target = None
-        if self.result_ssh_targets:
-            target = self.result_ssh_targets.get(node)
-            if not target:
-                raise BackendError("result node has no authorized transport")
         path = f"{self.output_dir}/{job['body']['attempt_id']}.log"
-        return result_from_log(self.call(["tail", "-c", "65537", "--", path], target=target))
+        return result_from_log(
+            self.call(["tail", "-c", "65537", "--", path], target=self.output_target(node))
+        )
 
 
 def _aware(value):

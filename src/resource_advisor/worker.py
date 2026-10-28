@@ -263,7 +263,8 @@ class Worker:
                     continue
                 backend = self.backend(row)
                 observation = backend.status(row)
-                self._reconcile_observation(row, backend, observation)
+                progress = self.read_progress(row, backend, observation)
+                self._reconcile_observation(row, backend, observation, progress)
             except (BackendError, Conflict, Rejected, ValueError, KeyError) as exc:
                 # Transport errors are observable without falsely failing a running workload.
                 try:
@@ -284,6 +285,22 @@ class Worker:
                     pass  # Another worker already changed this version.
 
     @staticmethod
+    def read_progress(row, backend, observation):
+        """Bounded workload output for an owned, started attempt. Never changes state."""
+        if not getattr(backend, "observe_progress", False) or observation.state not in {
+            State.RUNNING,
+            State.COLLECTING,
+            State.FAILED,
+            State.CANCEL_REQUESTED,
+            State.CANCELED,
+        }:
+            return None
+        try:
+            return {"live_progress": backend.progress(row, observation)}
+        except (BackendError, ValueError, KeyError, TypeError) as exc:
+            return {"progress_error": type(exc).__name__, "progress_error_at": now().isoformat()}
+
+    @staticmethod
     def observed_body(latest, observation):
         body = dict(latest["body"])
         body["backend_observed_at"] = now().isoformat()
@@ -297,6 +314,8 @@ class Worker:
             ("execution_started_at", observation.execution_started_at),
             ("backend_uid", observation.backend_uid),
             ("termination", observation.termination),
+            ("placement", observation.placement),
+            ("admission", observation.admission),
         ]:
             if value:
                 body[key] = value
@@ -320,7 +339,7 @@ class Worker:
             self.store.finish(event, type(exc).__name__)
         return True
 
-    def _reconcile_observation(self, row, backend, observation):
+    def _reconcile_observation(self, row, backend, observation, progress=None):
         with self.store.transaction() as conn:
             latest = self.store.job(conn, row["id"])
             if latest["state"] in TERMINAL:
@@ -328,6 +347,10 @@ class Worker:
             if latest["version"] != row["version"]:
                 raise Conflict("job changed while backend observation was in flight; reobserve")
             body = self.observed_body(latest, observation)
+            if progress and progress.get("live_progress"):
+                body.pop("progress_error", None)
+                body.pop("progress_error_at", None)
+            body.update(progress or {})
             state = observation.state
             limits = body.get("execution_limits", body["spec"]["execution"])
             if state == State.COLLECTING:
@@ -383,10 +406,21 @@ class Worker:
 
 
 class MLflowDelivery:
-    def __init__(self, store, url, *, experiments, token=None, client=None, artifact_storage=None):
+    def __init__(
+        self,
+        store,
+        url,
+        *,
+        experiments,
+        token=None,
+        client=None,
+        artifact_storage=None,
+        job_routes=None,
+    ):
         import httpx
 
         self.store = store
+        self.job_routes = job_routes
         if not experiments or any(
             not isinstance(v, str) or not v.strip() for v in experiments.values()
         ):
@@ -405,7 +439,7 @@ class MLflowDelivery:
         return response.json()
 
     def deliver_one(self):
-        event = self.store.claim("mlflow")
+        event = self.store.claim("mlflow", job_routes=self.job_routes)
         if not event:
             return False
         try:
@@ -639,7 +673,7 @@ class MLflowDelivery:
 
         from .artifacts import MAX_RESULT_BYTES, ArtifactError
 
-        event = self.store.claim("mlflow_artifact")
+        event = self.store.claim("mlflow_artifact", job_routes=self.job_routes)
         if not event:
             return False
         try:

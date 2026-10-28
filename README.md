@@ -1,5 +1,9 @@
 # Resource Advisor
 
+2026-10-28: [다중 CPU 학습 관리 구현·실험](docs/reference/live-training.md) · [발표 이미지와 실제 실행 캡처](docs/presentation/live-training-20261028/README.md).
+
+**후속 작업 전에 [우리의 목적 — NAIS 연구기술직-3 실증](docs/PROJECT-PURPOSE.md)을 먼저 읽습니다.** 연구자의 학습 요청부터 GPU·NPU 선택, Kubernetes·Slurm 실행, 상태·사용량·결과 관리까지 연결하고 실제 학습과 발표 캡처로 입증하는 것이 현재 작업의 목적입니다.
+
 **GPU·NPU 자원을 확인하고, 검증된 AI 작업을 큐에 제출하며, 결과·실험 기록·사용량을 연결하는 연구 플랫폼입니다.**
 Kubernetes/Kueue와 Slurm 위에서 실행 가능성 검증과 profile-guided 자원 추천을 담당합니다.
 전체 HAIRP 설계와 모든 장비의 자동 right-sizing은 아직 완료되지 않았습니다.
