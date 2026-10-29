@@ -1,0 +1,78 @@
+{
+  "scope": "Documentation and diagrams; no performance measurements generated",
+  "render_dependencies": {
+    "cairosvg": "2.9.1",
+    "markdown": "3.11.2",
+    "weasyprint": "70.0"
+  },
+  "files": {
+    "ARCHITECTURE-KO.md": {
+      "bytes": 48259,
+      "sha256": "eab572a61dc370d35b5cc595a38028cc63fdfc21b9ed69d258b80354a4e35674"
+    },
+    "PRESENTATION-NOTES-KO.md": {
+      "bytes": 6878,
+      "sha256": "254208fdac5be4b17dbdfe1696b45966484088eaaaaeb82e231e770dab036fe8"
+    },
+    "README.md": {
+      "bytes": 3097,
+      "sha256": "d61cc07f4ea3b1e0f44ae6faf59d49fb588d612562df3b65639522a79b54165e"
+    },
+    "SOURCES.md": {
+      "bytes": 7703,
+      "sha256": "06466e1b5b2b38adba7e13a662b346970eb1f382348d16c959e48b7584341426"
+    },
+    "architecture.html": {
+      "bytes": 112886,
+      "sha256": "07f5f87b83696a13f7d9ac7f1778c9ff707c68edd3ab8a49da4f73a5b0f23f44"
+    },
+    "architecture.pdf": {
+      "bytes": 920092,
+      "sha256": "5a0b0e8aad1ab89c2a3a7a0cf8f8b72aa38f6db71abdca494676d2f202102ebe"
+    },
+    "build_assets.py": {
+      "bytes": 13677,
+      "sha256": "ec3717b2a3e59af63928b8d02a5f6f626acd5a9054cd0a5885538196d3aa2443"
+    },
+    "evidence-snapshot.json": {
+      "bytes": 6934,
+      "sha256": "447ab2ac3b4667ef87c0f3626667d1487cc3e93ce54b78b691d51336dacc78cd"
+    },
+    "figures/01-overview.mmd": {
+      "bytes": 348,
+      "sha256": "13e55fa91049ddb11da3601def69a8b85cc60f82936dd2aaf9b9025c1a48e5b2"
+    },
+    "figures/01-overview.png": {
+      "bytes": 172537,
+      "sha256": "5cbf1fc1eae8d6a0b2db77840acb9315494c97c89dc32e0e9f6faa01cac8480b"
+    },
+    "figures/01-overview.svg": {
+      "bytes": 6164,
+      "sha256": "a5f01cbc45cdeab75ba109bbdb6fe8c006023a7da9c32860b97885e10c8ec127"
+    },
+    "figures/02-kubernetes.mmd": {
+      "bytes": 403,
+      "sha256": "5d83d1891ca04f07e5be4058861cdfd83905dab9668ad599afdede731d5b5724"
+    },
+    "figures/02-kubernetes.png": {
+      "bytes": 214755,
+      "sha256": "49ad31fcb5149910d904fe8924d23e61df3c31486d56b23f1a7501de6dd23d8e"
+    },
+    "figures/02-kubernetes.svg": {
+      "bytes": 5884,
+      "sha256": "882e9ef50d5369c1e9b5e5e892024751350b55b094de3b1f43c45c088cdeadb8"
+    },
+    "figures/03-slurm.mmd": {
+      "bytes": 332,
+      "sha256": "f1d402f7a229d06b90766e39587c925736e4f171739f7ffcdba2c8bd789fdfb3"
+    },
+    "figures/03-slurm.png": {
+      "bytes": 200602,
+      "sha256": "1d66dd7727409d1c8f8be8c18dc24029a0b0474b76d64874671282409b3ad728"
+    },
+    "figures/03-slurm.svg": {
+      "bytes": 5922,
+      "sha256": "fbb02d8a49fd8299dc7255f463b3714366a69048245691947429b87c58a1890c"
+    }
+  }
+}

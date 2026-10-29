@@ -1,0 +1,1406 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><title>Resource Advisor 통합 아키텍처</title><style>@font-face{font-family:Noto;src:url(file:///usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc)}
+body{font-family:Noto,sans-serif;color:#2d3142;background:#f5f5f5;margin:0;line-height:1.7}main{max-width:1240px;margin:auto;padding:48px;background:white}h1{font-size:30px;line-height:1.4}h2{margin-top:40px;color:#2e5aa8}h3{margin-top:28px}a{color:#2e5aa8;overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid #ccd2dc;padding:9px;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#e9ebee}pre{padding:16px;background:#f5f5f5;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}code{font-size:.88em;overflow-wrap:anywhere}blockquote{border-left:4px solid #eb6c36;margin:24px 0;padding:8px 20px;background:#fff5ed}figure{margin:32px 0}figure svg{width:100%;height:auto}article+article{border-top:4px solid #2e5aa8;margin-top:64px;padding-top:32px}
+@page{size:A4;margin:18mm 15mm;@bottom-right{content:counter(page);font-size:9pt;color:#4f5d75}}
+@page diagram{size:A4 landscape;margin:12mm}
+@media print{body{background:white;font-size:9pt;line-height:1.55}main{padding:0;max-width:none}h1{font-size:20pt}h2{font-size:15pt;margin-top:20pt}h3{font-size:11pt}table{font-size:7.5pt;table-layout:fixed}td,th{padding:5px}thead{display:table-header-group}tr{break-inside:avoid}h1,h2,h3{break-after:avoid}pre{font-size:7.5pt}figure{page:diagram;break-before:page;break-after:page;margin:0}figure svg{width:100%;height:auto}article+article{break-before:page;border:0;margin:0;padding:0}a{color:#2e5aa8;text-decoration:none}}
+</style><body><main><article id="part-0"><h1 id="resource-advisor-kubernetes-docker-slurm">Resource Advisor × Kubernetes × 가상 Docker Slurm 통합 아키텍처</h1>
+<ul>
+<li><strong>기준 시각:</strong> 2026-10-29. 현재 상태는 08:09 UTC 읽기 전용 스냅샷(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a>), 상세 evidence는 06:10–07:43 UTC 기록</li>
+<li><strong>대상 브랜치:</strong> <code>docs/integration-architecture-20261029</code> (base <code>0b89d6e</code>)</li>
+<li><strong>용도:</strong> NAIS 연구기술직 면접 데모용 설명 문서. 시연 범위는 "관측 + 공통 계약 + 실행 경로 설계"이며 새 실행 실험은 포함하지 않는다.</li>
+<li><strong>같이 보는 자료:</strong> <a href="#part-1">발표 노트</a> · <a href="#part-2">출처 색인</a> · <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/README.md">README</a></li>
+</ul>
+<blockquote>
+<p>이 문서의 모든 수치는 아래 링크한 코드·고정 evidence에서 가져왔다. 링크가 없는 문장은 설계 설명이다.
+공개 문서이므로 실제 사설 IP·토큰·비밀번호·SSH fingerprint는 <code>&lt;K8S_API&gt;</code>, <code>&lt;SLURM_HOST&gt;</code>, <code>&lt;ADVISOR_EGRESS_IP&gt;</code>, <code>&lt;RA_API&gt;</code> 같은 자리표시자로 바꿨다.</p>
+</blockquote>
+<hr />
+<h2 id="1">1. 한 페이지 요약</h2>
+<p><strong>Resource Advisor(RA)는 Kubernetes와 Slurm 위에 놓인 상위 control plane이다.</strong> 스케줄러를 새로 만들지 않고, 여러 클러스터의 GPU를 하나의 물리 풀로 합치지도 않는다.</p>
+<table>
+<thead>
+<tr>
+<th>질문</th>
+<th>답</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RA가 하는 일</td>
+<td>공통 Job 계약, 프로젝트×클러스터 route, 제출 intent의 내구 기록(PostgreSQL outbox), 불확실 제출의 reconcile, 종료 상태와 usage 장부, 클러스터 인벤토리 관측</td>
+</tr>
+<tr>
+<td>RA가 하지 않는 일</td>
+<td>노드 bind와 admission(K8s는 Kueue가 admission, kube-scheduler가 bind, Slurm은 slurmctld가 결정. 단 <strong>현재 K8s 경로는 RA가 검증한 후보 노드를 <code>kubernetes.io/hostname</code> nodeSelector로 고정</strong>하므로 kube-scheduler가 노드를 자유롭게 고르지 않는다 — 5.2절), 전역 쿼터·공정성, 두 스케줄러의 같은 GPU 공동 소유, Slurm REST 연동</td>
+</tr>
+<tr>
+<td>지금 실제로 돌고 있는 것</td>
+<td>네임스페이스 <code>resource-advisor-lab</code>의 API, worker, Kubernetes 인벤토리 수집기, 가상 Slurm 인벤토리 수집기(모두 1/1, 08:09 UTC <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a>)</td>
+</tr>
+<tr>
+<td>연결된 클러스터</td>
+<td><code>lab-kubernetes</code> 12 노드(Ready 10, 스냅샷 status <code>partial</code>) · <code>virtual-slurm-140</code> 6 노드, 가상 GPU 슬롯 8개(4/2/1/1) · <code>lab-slurm</code> 2 노드(2026-10-22 이후 stale, 이력만 보존)</td>
+</tr>
+<tr>
+<td>가상 Slurm으로 가는 길</td>
+<td>HTTP·REST가 아니라 <strong>SSH(22) forced-command → <code>docker exec --user slurm slurmctld</code> → <code>scontrol</code>/<code>squeue</code> JSON(v0.0.42)</strong></td>
+</tr>
+<tr>
+<td>가상 Slurm 실행</td>
+<td><strong>미검증.</strong> 실행 route는 예시 설정뿐이고 API에 등록되지 않았으며 worker manifest는 <code>replicas: 0</code>이다. sbatch는 한 번도 보내지 않았다</td>
+</tr>
+<tr>
+<td>왜 이 구조인가</td>
+<td>연구기관 GPU 운영에서는 K8s(서빙·컨테이너)와 Slurm(HPC 배치)이 공존한다. 각 스케줄러의 정책은 그대로 두고, 요청·상태·사용량을 한 장부로 설명할 수 있게 한다</td>
+</tr>
+</tbody>
+</table>
+<p>면접에서 한 문장으로 말하면 다음과 같다. "기존 스케줄러가 배치를 결정하고, RA는 누가 무엇을 요청했고 어디서 어떻게 끝났는지를 잃어버리지 않게 기록하는 계층입니다. 가상 Slurm은 현재 관측까지 연결했고, 실행은 일부러 막아 두었습니다."</p>
+<hr />
+<h2 id="2">2. 범위와 표기(범례)</h2>
+<p>이 문서는 상태를 네 단계로 구분한다. 면접 답변에서도 이 단어를 그대로 쓴다.</p>
+<table>
+<thead>
+<tr>
+<th>표기</th>
+<th>의미</th>
+<th>예</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>[배포·관측]</strong></td>
+<td>현재 lab에 배포되어 있고 live readback 또는 API 응답으로 확인함</td>
+<td>가상 Slurm 인벤토리 수집기, SlurmDBD accounting</td>
+</tr>
+<tr>
+<td><strong>[구현·미검증]</strong></td>
+<td>코드와 관련 자동 테스트는 있음. 실제 클러스터에서 그 경로로 작업이 돈 적은 없음</td>
+<td>가상 Slurm 실행 route, 결과 파일 positive read</td>
+</tr>
+<tr>
+<td><strong>[오픈소스]</strong></td>
+<td>우리가 만들지 않은 기존 구성요소. 설정·연결만 함</td>
+<td>Kubernetes, Kueue, Slurm 24.11.5, SlurmDBD, MariaDB, Prometheus, PostgreSQL, MLflow</td>
+</tr>
+<tr>
+<td><strong>[계획·범위 외]</strong></td>
+<td>설계상 다음 단계이거나 의도적으로 하지 않음</td>
+<td>전용 job UID, 적격 runtime 바인딩, KAI Scheduler, slurmrestd</td>
+</tr>
+</tbody>
+</table>
+<p>별도로 <strong>[과거 기록]</strong> 은 2026-10-07~08 등 이전 실장비 실행 기록(예: 실제 Orin Slurm 실행)이다. 이번 가상 Slurm 데모와 섞어 말하지 않는다.</p>
+<hr />
+<h2 id="3">3. 전체 구조</h2>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc"><title id="title">Kubernetes·Slurm을 연결하는 상위 운영 계층</title><desc id="desc">공통 요청·상태·사용량을 관리하고, 최종 자원 할당은 각 Native Scheduler가 수행한다.</desc><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#2e5aa8"/></marker></defs><rect width="1920" height="1080" fill="#f5f5f5"/><g font-family="Noto Sans CJK KR, sans-serif"><text x="64" y="76" font-size="20" fill="#4f5d75" font-weight="400">RESOURCE ADVISOR / 01</text><text x="64" y="140" font-size="44" fill="#2d3142" font-weight="700">Kubernetes·Slurm을 연결하는 상위 운영 계층</text><text x="64" y="188" font-size="24" fill="#4f5d75" font-weight="400">공통 요청·상태·사용량을 관리하고, 최종 자원 할당은 각 Native Scheduler가 수행한다.</text><polyline points="384,292 512,292" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="512,292 492.0,302.0 492.0,282.0" fill="#2e5aa8"/><rect x="400" y="248" width="80" height="32" fill="#f5f5f5"/><text x="408" y="272" font-size="20" fill="#2e5aa8" font-weight="400">HTTPS</text><polyline points="912,292 1088,292" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="1088,292 1068.0,302.0 1068.0,282.0" fill="#2e5aa8"/><rect x="932" y="248" width="80" height="32" fill="#f5f5f5"/><text x="940" y="272" font-size="20" fill="#2e5aa8" font-weight="400">읽기·기록</text><polyline points="912,560 992,560 992,392 1200,392 1200,360" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="1200,360 1210.0,380.0 1190.0,380.0" fill="#2e5aa8"/><polyline points="1256,488 1256,360" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="1256,360 1266.0,380.0 1246.0,380.0" fill="#2e5aa8"/><polyline points="1688,488 1688,360" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="1688,360 1698.0,380.0 1678.0,380.0" fill="#2e5aa8"/><polyline points="712,664 712,784" fill="none" stroke="#2e5aa8" stroke-width="3" stroke-dasharray="10 8"/><polygon points="712,784 702.0,764.0 722.0,764.0" fill="#2e5aa8"/><polyline points="1256,664 1256,728 872,728 872,784" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="872,784 862.0,764.0 882.0,764.0" fill="#2e5aa8"/><polyline points="1688,664 1688,784" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="1688,784 1678.0,764.0 1698.0,764.0" fill="#2e5aa8"/><rect x="1704" y="704" width="72" height="32" fill="#f5f5f5"/><text x="1712" y="728" font-size="20" fill="#2e5aa8" font-weight="400">SSH</text><rect x="64" y="224" width="320" height="136" rx="8" fill="#ffffff" stroke="#4f5d75" stroke-width="2"/><text x="88" y="272" font-size="32" fill="#2d3142" font-weight="700">연구자·운영자</text><text x="88" y="312" font-size="24" fill="#4f5d75" font-weight="400">Console / 공통 API</text><rect x="512" y="224" width="400" height="136" rx="8" fill="#fcece4" stroke="#eb6c36" stroke-width="2"/><text x="536" y="272" font-size="32" fill="#2d3142" font-weight="700">Resource Advisor</text><text x="536" y="312" font-size="24" fill="#4f5d75" font-weight="400">요청 계약 · 권한 · 라우팅</text><rect x="1088" y="224" width="768" height="136" rx="8" fill="#e9ebee" stroke="#4f5d75" stroke-width="2"/><text x="1112" y="272" font-size="32" fill="#2d3142" font-weight="700">PostgreSQL</text><text x="1112" y="312" font-size="24" fill="#4f5d75" font-weight="400">인벤토리 · Job / Attempt · Outbox · Usage</text><rect x="512" y="488" width="400" height="176" rx="8" fill="#ffffff" stroke="#4f5d75" stroke-width="2"/><text x="536" y="536" font-size="32" fill="#2d3142" font-weight="700">Lifecycle Worker</text><text x="536" y="576" font-size="24" fill="#4f5d75" font-weight="400">Kubernetes worker 활성</text><text x="536" y="612" font-size="24" fill="#4f5d75" font-weight="400">가상 Slurm worker 미배포</text><rect x="1088" y="488" width="336" height="176" rx="8" fill="#ffffff" stroke="#4f5d75" stroke-width="2"/><text x="1112" y="536" font-size="32" fill="#2d3142" font-weight="700">K8s 수집기</text><text x="1112" y="576" font-size="24" fill="#4f5d75" font-weight="400">API · Prometheus</text><text x="1112" y="612" font-size="24" fill="#4f5d75" font-weight="400">30초 주기</text><rect x="1520" y="488" width="336" height="176" rx="8" fill="#ffffff" stroke="#4f5d75" stroke-width="2"/><text x="1544" y="536" font-size="32" fill="#2d3142" font-weight="700">Slurm 수집기</text><text x="1544" y="576" font-size="24" fill="#4f5d75" font-weight="400">SSH 제한 명령</text><text x="1544" y="612" font-size="24" fill="#4f5d75" font-weight="400">30초 주기</text><rect x="64" y="784" width="848" height="160" rx="8" fill="#e9ebee" stroke="#4f5d75" stroke-width="2"/><text x="88" y="832" font-size="32" fill="#2d3142" font-weight="700">Kubernetes · Kueue</text><text x="88" y="872" font-size="24" fill="#4f5d75" font-weight="400">실제 클러스터 12노드 · GPU / NPU / Jetson</text><text x="88" y="908" font-size="24" fill="#4f5d75" font-weight="400">상태 partial: 일부 관측 누락</text><rect x="1088" y="784" width="768" height="160" rx="8" fill="#e9ebee" stroke="#4f5d75" stroke-width="2"/><text x="1112" y="832" font-size="32" fill="#2d3142" font-weight="700">Docker Slurm · SlurmDBD</text><text x="1112" y="872" font-size="24" fill="#4f5d75" font-weight="400">가상 6노드 · GPU 슬롯 8개 · 성능 의미 없음</text><text x="1112" y="908" font-size="24" fill="#4f5d75" font-weight="400">관측 연결 / 새 작업 제출 0건</text><path d="M64 988 H1856" stroke="#cbd0d8"/><text x="64" y="1024" font-size="20" fill="#4f5d75" font-weight="400">흰색: 자체 구현 · 회색: 기존 오픈소스 · 실선: 연결된 관측/저장 경로 · 점선: 구현된 실행 경로</text><text x="64" y="1056" font-size="20" fill="#4f5d75" font-weight="400">출처: 소스 코드 · 2026-10-29 관측 스냅샷 · Slurm 배포 증거 / 성능 측정 결과가 아님</text></g></svg></figure>
+<p>벡터 버전: <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/figures/01-overview.svg">figures/01-overview.svg</a></p>
+<h3 id="31">3.1 계층별 존재 이유</h3>
+<table>
+<thead>
+<tr>
+<th>계층</th>
+<th>구성요소</th>
+<th>왜 필요한가</th>
+<th>만든 것 / 기존 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>진입</td>
+<td>Console(<code>/console</code>), REST API(<code>/api/v1/compute/...</code>)</td>
+<td>연구자·운영자가 같은 계약으로 요청·조회</td>
+<td><strong>우리 구현</strong> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/api.py">api.py</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/console.py">console.py</a>) — FastAPI는 오픈소스</td>
+</tr>
+<tr>
+<td>계약</td>
+<td><code>JobRequest</code>, <code>State</code>, 결과 envelope</td>
+<td>백엔드가 달라도 요청·상태·결과 형식이 같아야 장부가 하나가 됨</td>
+<td><strong>우리 구현</strong> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/contracts.py">contracts.py</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/service.py">service.py</a>)</td>
+</tr>
+<tr>
+<td>내구 기록</td>
+<td>PostgreSQL <code>ra_jobs</code>, <code>ra_outbox</code>, <code>ra_usage</code>, <code>ra_entities</code></td>
+<td>API 응답과 원격 제출 사이 장애 때 요청을 잃거나 두 번 내지 않기 위함</td>
+<td>스키마·전이 규칙은 <strong>우리 구현</strong> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/store.py">store.py</a>), DB는 <strong>오픈소스</strong></td>
+</tr>
+<tr>
+<td>route</td>
+<td>프로젝트×클러스터 → 백엔드 옵션</td>
+<td>한 프로젝트가 어느 큐/계정/파티션으로 가는지 설정으로 고정</td>
+<td><strong>우리 구현</strong> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/configuration.py">configuration.py</a> <code>worker_configuration</code>)</td>
+</tr>
+<tr>
+<td>어댑터</td>
+<td><code>KubernetesBackend</code>, <code>SlurmBackend</code></td>
+<td>공통 계약을 각 스케줄러의 native 명령으로 번역</td>
+<td><strong>우리 구현</strong> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/backends.py">backends.py</a>)</td>
+</tr>
+<tr>
+<td>관측</td>
+<td><code>InventoryCollector</code>, <code>SlurmInventoryCollector</code></td>
+<td>배치 판단 전에 "지금 무엇이 있고 얼마나 비었는지"를 시각과 함께 기록</td>
+<td><strong>우리 구현</strong> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/inventory.py">inventory.py</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/slurm_inventory.py">slurm_inventory.py</a>)</td>
+</tr>
+<tr>
+<td>원격 경계</td>
+<td>forced-command gateway</td>
+<td>원격 호스트에서 허용된 명령만 실행</td>
+<td><strong>우리 구현</strong> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/examples/slurm_observer.py">slurm_observer.py</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/examples/slurm_executor.py">slurm_executor.py</a>)</td>
+</tr>
+<tr>
+<td>배치·실행</td>
+<td>kube-scheduler, Kueue, slurmctld/slurmd, SlurmDBD</td>
+<td>자원 배정·큐·우선순위·회계</td>
+<td><strong>오픈소스</strong> — 우리는 설정·조회만</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-2026-10-29">4. 실제 배포 매핑 (2026-10-29)</h2>
+<p>현재 replica 값은 08:09 UTC 스냅샷(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a>)이다. revision·이미지 digest는 06:10 UTC 배포 readback(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/evidence/deployment-20261029.json">deployment-20261029.json</a>)의 <strong>과거 기록</strong>이며, 08:09 스냅샷이 그 값을 다시 확인한 것은 아니다.</p>
+<table>
+<thead>
+<tr>
+<th>단위</th>
+<th>위치</th>
+<th>상태</th>
+<th>근거</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ra-api</code> (HTTPS 8443)</td>
+<td>K8s ns <code>resource-advisor-lab</code></td>
+<td><strong>[배포·관측]</strong> 1/1 (08:09Z). 과거 기록: revision 96, <code>/healthz</code> 200 (06:10Z)</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/evidence/deployment-20261029.json">deployment-20261029.json</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/services/services.yaml">services.yaml</a></td>
+</tr>
+<tr>
+<td><code>ra-worker</code></td>
+<td>같은 ns</td>
+<td><strong>[배포·관측]</strong> 1/1 (08:09Z)</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a></td>
+</tr>
+<tr>
+<td><code>ra-inventory</code> (K8s 수집기, 30 s)</td>
+<td>같은 ns, ServiceAccount <code>ra-inventory</code></td>
+<td><strong>[배포·관측]</strong> 1/1 (08:09Z)</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/services/services.yaml">services.yaml</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/inventory-rbac.yaml">inventory-rbac.yaml</a></td>
+</tr>
+<tr>
+<td><code>ra-virtual-slurm-140-inventory</code> (30 s)</td>
+<td>같은 ns, SA 토큰 미마운트</td>
+<td><strong>[배포·관측]</strong> 1/1 (08:09Z)</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-inventory-virtual-140/deployment.yaml">deployment.yaml</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/evidence/virtual-slurm-140-inventory-20261029.md">inventory evidence</a></td>
+</tr>
+<tr>
+<td><code>ra-virtual-slurm-140-worker</code></td>
+<td>manifest만 존재</td>
+<td><strong>[구현·미검증]</strong> <code>replicas: 0</code>, <strong>배포 안 됨</strong> (<code>worker_deployed: false</code>, <code>api_route_registered: false</code>)</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-execution-virtual-140/worker.yaml">worker.yaml</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a></td>
+</tr>
+<tr>
+<td><code>ra-slurm-worker</code>, <code>ra-slurm-inventory</code> (구 <code>lab-slurm</code>)</td>
+<td>같은 ns</td>
+<td>0 replicas (<code>ra-slurm-worker</code> 0/0 at 08:09Z; <code>lab-slurm</code> 인벤토리는 stale 이력만)</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/evidence/slurm-execution-140-20261029.md">slurm-execution-140 evidence</a></td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td>Secret <code>ra-service-db</code>로 접속</td>
+<td><strong>[배포·관측]</strong> jobs 878 / outbox 3918 / usage 876 (07:43Z)</td>
+<td>같은 evidence</td>
+</tr>
+<tr>
+<td>Docker Slurm <code>sim</code> (가상 140)</td>
+<td><code>&lt;SLURM_HOST&gt;</code>의 Docker 네트워크 <code>slurmnet</code></td>
+<td><strong>[배포·관측]</strong> <code>slurmctld</code> + 노드 컨테이너 6개, 모두 IDLE</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/evidence/virtual-slurm-140-inventory-20261029.md">inventory evidence</a></td>
+</tr>
+<tr>
+<td><code>slurmdbd</code> + <code>slurmdbd-mariadb</code></td>
+<td>같은 <code>slurmnet</code>, 호스트 포트 publish 없음</td>
+<td><strong>[배포·관측]</strong> 24.11.5 / MariaDB 11.8.9, named volume <code>ra-slurmdbd-mariadb</code></td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-accounting-virtual-140/README.md">accounting README</a></td>
+</tr>
+<tr>
+<td>호스트 native Slurm <code>etri-slurm</code></td>
+<td><code>&lt;SLURM_HOST&gt;</code> 호스트 자체</td>
+<td><strong>사용하지 않음</strong> (다른 클러스터, 건드리지 않음)</td>
+<td>같은 README</td>
+</tr>
+</tbody>
+</table>
+<p><strong>롤아웃 방식(과거 기록, 06:10Z):</strong> <code>ra-api</code>는 Argo Application이 없어 이미지 직접 갱신, worker는 last-applied manifest를 image-only diff로 apply(<code>Recreate</code>). 이미지 소스는 리뷰된 커밋 <code>53cd73b</code> + 기존 미추적 모듈 5개를 바이트 그대로 보존한 것으로, <strong>커밋과 완전히 같은 이미지는 아니다</strong> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/evidence/deployment-20261029.json">deployment-20261029.json</a> <code>image_source</code>).</p>
+<hr />
+<h2 id="5-kubernetes">5. Kubernetes 쪽 구조</h2>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc"><title id="title">Kubernetes: 관측 경로와 실행 경로</title><desc id="desc">API·메트릭을 공통 상태로 정규화한다. Kueue는 Admission, kube-scheduler는 Pod 배치를 담당한다.</desc><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#2e5aa8"/></marker></defs><rect width="1920" height="1080" fill="#f5f5f5"/><g font-family="Noto Sans CJK KR, sans-serif"><text x="64" y="76" font-size="20" fill="#4f5d75" font-weight="400">RESOURCE ADVISOR / 02</text><text x="64" y="140" font-size="44" fill="#2d3142" font-weight="700">Kubernetes: 관측 경로와 실행 경로</text><text x="64" y="188" font-size="24" fill="#4f5d75" font-weight="400">API·메트릭을 공통 상태로 정규화한다. Kueue는 Admission, kube-scheduler는 Pod 배치를 담당한다.</text><text x="64" y="252" font-size="24" fill="#2e5aa8" font-weight="700">현재 연결된 관측 경로</text><polyline points="624,376 744,376" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="744,376 724.0,386.0 724.0,366.0" fill="#2e5aa8"/><polyline points="1160,376 1280,376" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="1280,376 1260.0,386.0 1260.0,366.0" fill="#2e5aa8"/><rect x="64" y="288" width="560" height="176" rx="8" fill="#e9ebee" stroke="#4f5d75" stroke-width="2"/><text x="88" y="336" font-size="32" fill="#2d3142" font-weight="700">Kubernetes API · Prometheus</text><text x="88" y="376" font-size="24" fill="#4f5d75" font-weight="400">Node / Pod / Queue 상태</text><text x="88" y="412" font-size="24" fill="#4f5d75" font-weight="400">GPU·NPU·Jetson exporter 메트릭</text><rect x="744" y="288" width="416" height="176" rx="8" fill="#ffffff" stroke="#4f5d75" stroke-width="2"/><text x="768" y="336" font-size="32" fill="#2d3142" font-weight="700">Inventory Collector</text><text x="768" y="376" font-size="24" fill="#4f5d75" font-weight="400">자원 단위 · 출처 · 관측 시각</text><text x="768" y="412" font-size="24" fill="#4f5d75" font-weight="400">미측정 unknown / 오래되면 stale</text><rect x="1280" y="288" width="576" height="176" rx="8" fill="#fcece4" stroke="#eb6c36" stroke-width="2"/><text x="1304" y="336" font-size="32" fill="#2d3142" font-weight="700">공통 DB · 자원 화면</text><text x="1304" y="376" font-size="24" fill="#4f5d75" font-weight="400">물리 GPU / 논리 슬롯 구분</text><text x="1304" y="412" font-size="24" fill="#4f5d75" font-weight="400">할당량과 실제 사용률을 분리</text><text x="64" y="592" font-size="24" fill="#2e5aa8" font-weight="700">코드로 구현된 실행 경로 — 이번 문서 작업에서 새 Job 실행·복구 실증은 하지 않음</text><polyline points="480,736 600,736" fill="none" stroke="#2e5aa8" stroke-width="3" stroke-dasharray="10 8"/><polygon points="600,736 580.0,746.0 580.0,726.0" fill="#2e5aa8"/><polyline points="936,736 1056,736" fill="none" stroke="#2e5aa8" stroke-width="3" stroke-dasharray="10 8"/><polygon points="1056,736 1036.0,746.0 1036.0,726.0" fill="#2e5aa8"/><polyline points="1392,736 1512,736" fill="none" stroke="#2e5aa8" stroke-width="3" stroke-dasharray="10 8"/><polygon points="1512,736 1492.0,746.0 1492.0,726.0" fill="#2e5aa8"/><rect x="64" y="648" width="416" height="176" rx="8" fill="#ffffff" stroke="#4f5d75" stroke-width="2"/><text x="88" y="696" font-size="32" fill="#2d3142" font-weight="700">Worker · K8s Adapter</text><text x="88" y="736" font-size="24" fill="#4f5d75" font-weight="400">Job 생성 · hostname 제약</text><text x="88" y="772" font-size="24" fill="#4f5d75" font-weight="400">후보 노드를 nodeSelector로 고정</text><rect x="600" y="648" width="336" height="176" rx="8" fill="#e9ebee" stroke="#4f5d75" stroke-width="2"/><text x="624" y="696" font-size="32" fill="#2d3142" font-weight="700">Kueue</text><text x="624" y="736" font-size="24" fill="#4f5d75" font-weight="400">Quota / Admission</text><text x="624" y="772" font-size="24" fill="#4f5d75" font-weight="400">승인 전 suspend</text><rect x="1056" y="648" width="336" height="176" rx="8" fill="#e9ebee" stroke="#4f5d75" stroke-width="2"/><text x="1080" y="696" font-size="32" fill="#2d3142" font-weight="700">kube-scheduler</text><text x="1080" y="736" font-size="24" fill="#4f5d75" font-weight="400">nodeSelector 제약 확인</text><text x="1080" y="772" font-size="24" fill="#4f5d75" font-weight="400">제약 안에서 최종 bind</text><rect x="1512" y="648" width="344" height="176" rx="8" fill="#e9ebee" stroke="#4f5d75" stroke-width="2"/><text x="1536" y="696" font-size="32" fill="#2d3142" font-weight="700">kubelet · 실행</text><text x="1536" y="736" font-size="24" fill="#4f5d75" font-weight="400">GPU / NPU Job</text><text x="1536" y="772" font-size="24" fill="#4f5d75" font-weight="400">상태 · 결과 수집</text><text x="64" y="888" font-size="24" fill="#4f5d75" font-weight="400">현재 RA는 후보 노드를 hostname으로 고정한다. 자원풀만 지정하고 노드를 위임하는 방식은 향후 개선 항목이다.</text><text x="64" y="932" font-size="24" fill="#4f5d75" font-weight="400">Kueue Admission과 kube-scheduler 최종 bind는 유지한다. KAI 연계·전역 GPU 예약은 검증 범위 밖이다.</text><path d="M64 988 H1856" stroke="#cbd0d8"/><text x="64" y="1024" font-size="20" fill="#4f5d75" font-weight="400">흰색: 자체 구현 · 회색: 기존 오픈소스 · 실선: 현재 관측 · 점선: 구현된 실행 흐름(이번 신규 실증 없음)</text><text x="64" y="1056" font-size="20" fill="#4f5d75" font-weight="400">출처: 소스 코드 · 2026-10-29 관측 스냅샷 · Slurm 배포 증거 / 성능 측정 결과가 아님</text></g></svg></figure>
+<p>벡터 버전: <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/figures/02-kubernetes.svg">figures/02-kubernetes.svg</a></p>
+<h3 id="51">5.1 관측</h3>
+<p><code>InventoryCollector.collect</code> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/inventory.py">inventory.py</a>)는 30초마다 <code>kubectl</code>로 세 가지를 읽는다.</p>
+<ol>
+<li><code>kubectl get nodes -o json</code> — capacity/allocatable, Ready, nodeInfo</li>
+<li><code>kubectl get pods --all-namespaces -o json</code> — 노드별 <strong>요청량(requests) 합</strong> (사용률 아님, <code>pod_request</code>)</li>
+<li><code>kubectl get --raw /apis/metrics.k8s.io/v1beta1/nodes</code> — metrics API</li>
+</ol>
+<p>추가로 Kueue <code>Workload</code>/<code>LocalQueue</code>/<code>ClusterQueue</code>를 읽는다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/queue_inventory.py">queue_inventory.py</a>). 권한은 <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/inventory-rbac.yaml">inventory-rbac.yaml</a>의 <code>get</code>/<code>list</code>뿐이다: <code>nodes</code>, <code>pods</code>, metrics <code>nodes</code>, <code>clusterqueues</code>(get), 네임스페이스 Role로 <code>workloads</code>, <code>localqueues</code>. <strong>쓰기 권한은 없다.</strong></p>
+<p>장치 텔레메트리는 Prometheus 바인딩(<code>MetricBinding</code>: <code>query</code> + <code>timestamp_query</code>)으로 붙는다. 과거 live trial에서 DCGM GPU, Jetson GPU 사용률, Mobilint 사용률·메모리·온도를 읽은 기록이 있다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/inventory.md">inventory.md</a> "Actual lab evidence", <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/evidence/inventory-live.json">inventory-live.json</a>). 모든 값은 <code>signal()</code> 형식(<code>value</code>, <code>observed_at</code>, <code>source</code>, <code>status</code>, <code>unit</code>)으로 저장되고, 읽을 때 <code>fresh_view</code>가 시각을 다시 평가해 오래된 값은 <code>null</code> + <code>stale</code>로 바꾼다. <strong>미측정은 0이 아니라 unknown이다.</strong></p>
+<p>장치 수 해석 주의:
+- 공유·time-slicing 단위(HAMi 공유 단위, <code>nvidia.com/gpu.shared</code> Jetson 슬롯)는 <strong>논리 슬롯이지 물리 장치 수가 아니다</strong> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/common-gpu-pool.md">common-gpu-pool.md</a>).
+- Jetson은 GPU와 CPU가 메모리를 공유(integrated memory)하므로 GPU 메모리를 독립 용량으로 더하지 않는다.
+- NPU(Mobilint, Hailo 등)는 별도 장치 클래스다. CUDA GPU 용량에 합치지 않는다.</p>
+<h3 id="52-kueue-admission-kube-scheduler-placement">5.2 Kueue admission과 kube-scheduler placement는 다른 단계다</h3>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>누가</th>
+<th>무엇을 결정</th>
+<th>RA가 보는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>제출</td>
+<td>RA worker</td>
+<td><code>kubectl create -f -</code>로 Job 생성. 라벨 <code>kueue.x-k8s.io/queue-name</code>(LocalQueue), 선택적 <code>kueue.x-k8s.io/priority-class</code></td>
+<td><code>KubernetesBackend.manifest</code>/<code>submit</code> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/backends.py">backends.py</a>)</td>
+</tr>
+<tr>
+<td>admission</td>
+<td><strong>Kueue</strong> [오픈소스]</td>
+<td>이 Workload를 지금 들여보낼지만 결정. ClusterQueue 쿼터 안이면 쿼터를 예약하고 ResourceFlavor를 할당한 뒤 Job suspend 해제. 초과면 <code>QuotaReserved=False</code>로 <strong>대기</strong>(거절 아님). <strong>Pod를 어느 노드에 둘지는 정하지 않는다</strong></td>
+<td><code>KubernetesBackend.admission</code>이 <code>kueue.x-k8s.io/job-uid=&lt;UID&gt;</code>로 Workload를 찾아 조건 기록</td>
+</tr>
+<tr>
+<td>placement</td>
+<td><strong>kube-scheduler</strong> [오픈소스]</td>
+<td>admission 이후 생성된 Pod를 제약(RA가 넣은 <code>kubernetes.io/hostname</code>·<code>kubernetes.io/arch</code> nodeSelector, flavor의 노드 조건, 요청량, taint 등) 안에서 bind. hostname이 고정돼 있으므로 사실상 <strong>그 한 노드에 bind할 수 있는지만</strong> 판단한다</td>
+<td><code>KubernetesBackend.manifest</code>가 검증된 후보의 <code>node_ref</code>를 hostname nodeSelector로 설정(<code>spec.nodeName</code>은 쓰지 않음). Pod의 노드·시각은 status로 관측</td>
+</tr>
+<tr>
+<td>실행·종료</td>
+<td>kubelet/컨테이너 런타임</td>
+<td>실제 실행</td>
+<td><code>status</code>/<code>result</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>현재 구현 vs 향후 설계:</strong> 지금 RA는 후보 노드를 직접 검증하고 hostname nodeSelector로 고정한다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/backends.py">backends.py</a> <code>KubernetesBackend.manifest</code>). kube-scheduler는 그 제약 안에서 bind만 한다. "풀(pool) 조건만 주고 노드 선택은 kube-scheduler에 위임"하는 방식은 <strong>향후 설계이며 현재 구현이 아니다.</strong></p>
+</blockquote>
+<p>실제 Kueue 거동 기록: 1 GPU 쿼터에 2 GPU 요청 → Job 생성은 성공, <code>QuotaReserved=False</code>로 suspend 유지, Pod 없음(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/kueue-policy.md">kueue-policy.md</a>, 2026-10-02 [과거 기록]). Slurm도 한도 초과가 늘 거절은 아니다. 과거 별도 lab 기록에서 <code>DenyOnLimit</code> QOS 플래그와 <code>AccountingStorageEnforce=associations,limits,qos</code>를 켰을 때 <strong>job별 한도 초과</strong>(CPU·메모리·시간)와 미할당 QOS는 제출 거절됐지만, account 집계 한도(<code>AssocGrpCpuLimit</code>)는 <strong>대기</strong>였다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/slurm-policy.md">slurm-policy.md</a> [과거 기록]; 현재 <code>virtual-slurm-140</code>은 <code>AccountingStorageEnforce=none</code>). RA는 native 사유로 대기(<code>QUOTA_OR_LIMIT_PENDING</code>: Kueue <code>QuotaReserved=False</code>, Slurm <code>AssocGrp*/QOSGrp*/QOSMax*</code>)와 거절(<code>NATIVE_REJECTED</code>)을 따로 분류한다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/ARCHITECTURE.md">ARCHITECTURE.md</a> Policy contract).</p>
+<p><strong>KAI Scheduler는 미검증이다.</strong> 이 저장소에 KAI 연동 코드나 실행 기록은 없다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/CURRENT-STATE-AUDIT.md">CURRENT-STATE-AUDIT.md</a> 4절 마지막 줄: "No scheduler algorithm, global quota, SlurmREST, OIDC, KAI…").</p>
+<h3 id="53">5.3 소유권 확인 (이름 재사용 대비)</h3>
+<p>Kubernetes Job 이름은 attempt ID다. 같은 이름이 삭제 후 재생성될 수 있으므로 <code>KubernetesBackend.owns</code>는 annotation <code>resource-advisor/job-id</code>, <code>resource-advisor/context-signature</code>가 일치하고, <code>backend_uid</code>가 이미 묶여 있으면 <strong>UID</strong>까지 일치해야 자기 Job으로 인정한다. UID는 제출 응답, 응답 손실 뒤 adopt, 또는 첫 관측(reconcile) 때 <code>backend_uid</code>로 저장되며, 그 전에는 annotation 일치로만 확인한 뒤 그 시점에 UID를 묶는다(<code>KubernetesBackend.owns</code>/<code>reconcile</code>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/worker.py">worker.py</a> <code>adopted_body</code>). 취소도 <code>DeleteOptions.preconditions.uid</code>로 같은 UID만 지운다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/RESULTS.md">RESULTS.md</a> Review round 2).</p>
+<hr />
+<h2 id="6-docker-slurm">6. 가상 Docker Slurm 쪽 구조</h2>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc"><title id="title">가상 Slurm: SSH 관측·회계 연결</title><desc id="desc">SSH 22 → forced-command → docker exec. 공개 포트 16817 → 6817은 어댑터 연결에 사용하지 않는다.</desc><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#2e5aa8"/></marker></defs><rect width="1920" height="1080" fill="#f5f5f5"/><g font-family="Noto Sans CJK KR, sans-serif"><text x="64" y="76" font-size="20" fill="#4f5d75" font-weight="400">RESOURCE ADVISOR / 03</text><text x="64" y="140" font-size="44" fill="#2d3142" font-weight="700">가상 Slurm: SSH 관측·회계 연결</text><text x="64" y="188" font-size="24" fill="#4f5d75" font-weight="400">SSH 22 → forced-command → docker exec. 공개 포트 16817 → 6817은 어댑터 연결에 사용하지 않는다.</text><polyline points="480,336 592,336" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="592,336 572.0,346.0 572.0,326.0" fill="#2e5aa8"/><polyline points="1056,336 1200,336" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="1200,336 1180.0,346.0 1180.0,326.0" fill="#2e5aa8"/><polyline points="480,624 536,624 536,400 592,400" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="592,400 572.0,410.0 572.0,390.0" fill="#2e5aa8"/><polyline points="1528,424 1528,536" fill="none" stroke="#2e5aa8" stroke-width="3" stroke-dasharray="10 8"/><polygon points="1528,536 1518.0,516.0 1538.0,516.0" fill="#2e5aa8"/><polyline points="1200,392 1120,392 1120,624 1056,624" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="1056,624 1076.0,614.0 1076.0,634.0" fill="#2e5aa8"/><rect x="1128" y="480" width="72" height="32" fill="#f5f5f5"/><text x="1136" y="504" font-size="20" fill="#2e5aa8" font-weight="400">6819</text><polyline points="824,712 824,804" fill="none" stroke="#2e5aa8" stroke-width="3"/><polygon points="824,804 814.0,784.0 834.0,784.0" fill="#2e5aa8"/><rect x="840" y="744" width="72" height="32" fill="#f5f5f5"/><text x="848" y="768" font-size="20" fill="#2e5aa8" font-weight="400">3306</text><rect x="64" y="248" width="416" height="176" rx="8" fill="#ffffff" stroke="#4f5d75" stroke-width="2"/><text x="88" y="296" font-size="32" fill="#2d3142" font-weight="700">관측 전용 수집기</text><text x="88" y="336" font-size="24" fill="#4f5d75" font-weight="400">scontrol / squeue JSON</text><text x="88" y="372" font-size="24" fill="#4f5d75" font-weight="400">ra-lab 계정 범위 조회</text><rect x="592" y="248" width="464" height="176" rx="8" fill="#fcece4" stroke="#eb6c36" stroke-width="2"/><text x="616" y="296" font-size="32" fill="#2d3142" font-weight="700">SSH Forced-command</text><text x="616" y="336" font-size="24" fill="#4f5d75" font-weight="400">키 분리 · 명령 허용 목록</text><text x="616" y="372" font-size="24" fill="#4f5d75" font-weight="400">고정 host key · 출발지 제한</text><rect x="1200" y="248" width="656" height="176" rx="8" fill="#e9ebee" stroke="#4f5d75" stroke-width="2"/><text x="1224" y="296" font-size="32" fill="#2d3142" font-weight="700">slurmctld 24.11.5</text><text x="1224" y="336" font-size="24" fill="#4f5d75" font-weight="400">Docker 컨테이너의 sim 클러스터</text><text x="1224" y="372" font-size="24" fill="#4f5d75" font-weight="400">호스트 native Slurm과 분리</text><rect x="64" y="536" width="416" height="176" rx="8" fill="#ffffff" stroke="#4f5d75" stroke-width="2"/><text x="88" y="584" font-size="32" fill="#2d3142" font-weight="700">실행 어댑터·전용 키</text><text x="88" y="624" font-size="24" fill="#4f5d75" font-weight="400">squeue / sacct 조회 검증</text><text x="88" y="660" font-size="24" fill="#4f5d75" font-weight="400">제출 route 미등록·worker 미배포</text><rect x="592" y="536" width="464" height="176" rx="8" fill="#e9ebee" stroke="#4f5d75" stroke-width="2"/><text x="616" y="584" font-size="32" fill="#2d3142" font-weight="700">SlurmDBD 24.11.5</text><text x="616" y="624" font-size="24" fill="#4f5d75" font-weight="400">회계 조회 · 계정 association</text><text x="616" y="660" font-size="24" fill="#4f5d75" font-weight="400">sacct 가능 / 신규 Job 행 0</text><rect x="1200" y="536" width="656" height="176" rx="8" fill="#e9ebee" stroke="#4f5d75" stroke-width="2"/><text x="1224" y="584" font-size="32" fill="#2d3142" font-weight="700">slurmd 컨테이너 6개</text><text x="1224" y="624" font-size="24" fill="#4f5d75" font-weight="400">가상 GPU 슬롯 8개 (4 / 2 / 1 / 1)</text><text x="1224" y="660" font-size="24" fill="#4f5d75" font-weight="400">실제 GPU 연산·성능 검증 없음</text><rect x="592" y="804" width="464" height="136" rx="8" fill="#e9ebee" stroke="#4f5d75" stroke-width="2"/><text x="616" y="852" font-size="32" fill="#2d3142" font-weight="700">MariaDB 11.8.9</text><text x="616" y="892" font-size="24" fill="#4f5d75" font-weight="400">내부 Docker망 · 영속 볼륨</text><text x="1200" y="852" font-size="24" fill="#4f5d75" font-weight="400">회계 DB는 호스트 포트를 공개하지 않음</text><text x="1200" y="892" font-size="24" fill="#4f5d75" font-weight="400">신뢰된 Docker 운영 계정의 명령 경계</text><text x="1200" y="932" font-size="24" fill="#4f5d75" font-weight="400">멀티테넌트·root 격리를 입증한 것은 아님</text><path d="M64 988 H1856" stroke="#cbd0d8"/><text x="64" y="1024" font-size="20" fill="#4f5d75" font-weight="400">실선: 연결/조회 확인 · 점선: Slurm 고유 실행 관계(이번 작업 제출 0건) · 가상 슬롯 ≠ 물리 GPU</text><text x="64" y="1056" font-size="20" fill="#4f5d75" font-weight="400">출처: 소스 코드 · 2026-10-29 관측 스냅샷 · Slurm 배포 증거 / 성능 측정 결과가 아님</text></g></svg></figure>
+<p>벡터 버전: <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/figures/03-slurm.svg">figures/03-slurm.svg</a></p>
+<h3 id="61-slurm">6.1 Slurm 구성요소 역할 [오픈소스]</h3>
+<table>
+<thead>
+<tr>
+<th>구성요소</th>
+<th>역할</th>
+<th>가상 140에서의 실체</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>slurmctld</code></td>
+<td>컨트롤러. 큐·우선순위·노드 배정 결정, RPC 6817</td>
+<td>컨테이너 <code>slurmctld</code>, Slurm 24.11.5</td>
+</tr>
+<tr>
+<td><code>slurmd</code></td>
+<td>각 노드에서 job step 실행</td>
+<td>컨테이너 <code>cpu-1</code>, <code>cpu-2</code>, <code>gpu-big</code>, <code>gpu-mid</code>, <code>gpu-s1</code>, <code>gpu-s2</code></td>
+</tr>
+<tr>
+<td><code>slurmdbd</code></td>
+<td>accounting 데몬, 6819. <code>sacct</code>·association·QOS의 원천</td>
+<td>컨테이너 <code>slurmdbd</code> (2026-10-29 추가)</td>
+</tr>
+<tr>
+<td>MariaDB</td>
+<td>slurmdbd 저장소, 3306</td>
+<td>컨테이너 <code>slurmdbd-mariadb</code>, DB <code>slurm_acct_db</code></td>
+</tr>
+<tr>
+<td>munge</td>
+<td>노드 간 인증</td>
+<td>클러스터 기존 키 재사용</td>
+</tr>
+</tbody>
+</table>
+<p>내부 경로: <code>slurmctld → slurmdbd:6819 → slurmdbd-mariadb:3306</code>, 모두 Docker 네트워크 <code>slurmnet</code> 내부이며 <strong>DB 계열 포트는 호스트에 publish하지 않았다</strong>(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-accounting-virtual-140/README.md">accounting README</a>).</p>
+<p>호스트에는 <code>16817 → 컨테이너 6817</code> publish가 이미 존재하지만, <strong>RA 어댑터는 이 포트를 쓰지 않는다.</strong> HTTP도, Slurm RPC 직접 연결도 하지 않는다. <code>slurmrestd</code>는 설치·사용되지 않았다. RA가 가상 Slurm에 닿는 유일한 경로는 SSH 22번의 forced-command다.</p>
+<h3 id="62">6.2 관측 경로 [배포·관측]</h3>
+<ol>
+<li><code>ra-virtual-slurm-140-inventory</code> Pod가 30초마다 <code>SlurmInventoryCollector.collect</code> 실행 (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/slurm_inventory.py">slurm_inventory.py</a>).</li>
+<li><code>read()</code>가 <code>ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=5 ra-virtual-slurm-140-observer '&lt;명령&gt;'</code> 실행. 호스트 키는 Secret의 <code>known_hosts</code>에 고정.</li>
+<li><code>&lt;SLURM_HOST&gt;</code>의 <code>authorized_keys</code>가 이 키를 <code>restrict,from="&lt;ADVISOR_EGRESS_IP&gt;"</code>와 forced command <code>slurm_observer.py --config …</code>로 묶는다. 클라이언트가 보낸 명령은 <code>SSH_ORIGINAL_COMMAND</code>로만 전달된다.</li>
+<li><code>observe()</code> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/examples/slurm_observer.py">slurm_observer.py</a>)가 <strong>정확히 두 가지 명령</strong>만 허용한다.</li>
+<li><code>scontrol --json=v0.0.42 show nodes</code></li>
+<li><code>squeue --json=v0.0.42 --account=ra-lab --partition=all</code></li>
+<li>허용되면 <code>/usr/bin/docker exec --user slurm slurmctld /usr/bin/&lt;cmd&gt; …</code>로 실행(환경 <code>PATH=/usr/bin:/bin</code>, 15 s timeout).</li>
+<li>응답 검증: <code>data_parser/v0.0.42</code>, release <code>24.11.5</code>, 8 MiB·10,000행 상한, 허가된 노드 6개가 정확히 있는지, 큐 행이 <code>ra-lab</code>/<code>all</code> 밖으로 새지 않는지. 허용 필드만 남겨(<code>NODE_FIELDS</code>, <code>JOB_FIELDS</code>) 반환.</li>
+<li>수집기가 다시 같은 검증을 하고 <code>node_view</code>/<code>queue_view</code>로 스냅샷을 만들어 <code>save_inventory</code> → <code>ra_entities</code>(kind <code>inventory</code>)에 저장.</li>
+<li>Console·API는 <code>latest_inventory_views</code>/<code>latest_inventory</code>로 최신 스냅샷을 읽고 <code>fresh_view</code>로 신선도를 재평가한다.</li>
+</ol>
+<p><code>scontrol</code> 노드 TRES에 <code>gres/gpu</code>가 없어서 GPU 슬롯 수는 노드의 <code>gres</code> 등록값에서 읽는다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-inventory-virtual-140/README.md">inventory README</a>).</p>
+<h3 id="63-accounting">6.3 Accounting [배포·관측]</h3>
+<ul>
+<li><code>slurm.conf</code>에 네 줄 추가: <code>AccountingStorageType=accounting_storage/slurmdbd</code>, <code>AccountingStorageHost=slurmdbd</code>, <code>AccountingStoragePort=6819</code>, <code>AccountingStorageTRES=gres/gpu</code>.</li>
+<li>association: cluster <code>sim</code>, account <code>ra-lab</code>, user <code>slurm</code>, 기본 QOS <code>normal</code>. <strong><code>AccountingStorageEnforce</code>는 <code>none</code> 그대로</strong> — 즉 회계 기록만 켰고 쿼터 강제는 바꾸지 않았다.</li>
+<li>확인: <code>sacctmgr show cluster</code> 등록, <code>sacct -X</code> exit 0 / 0행, MariaDB·slurmdbd 재시작 후 association 유지, <code>sdiag</code> DBD agent queue 0 (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/evidence/slurm-execution-140-20261029.md">slurm-execution-140 evidence</a>).</li>
+</ul>
+<p>ClusterID 전환 사건(요약): 첫 전환에서 컨트롤러 state의 ID 623과 DBD가 새로 부여한 ID 927이 맞지 않아 약 90초 crash-loop → <code>slurm.conf</code> 복원으로 롤백. 이후 승인을 받아 identity 파일 <code>clustername</code>만 옆으로 옮기고(삭제 아님) 다시 적용, ID 927 채택. 백업 보존, <code>NEXT_JOB_ID=3</code> 유지, 큐는 처음부터 끝까지 비어 있었다. 상세는 같은 evidence의 "Incident during the switch". 발표 본론은 아니며 질문이 오면 설명한다.</p>
+<h3 id="64">6.4 실행 경로 [구현·미검증 — 실행 불가 상태로 고정]</h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>worker route <code>ra-lab</code>/<code>virtual-slurm-140</code></td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-execution-virtual-140/worker-route.example.json">worker-route.example.json</a> <strong>예시 파일</strong>. 실제 worker 설정·API에 등록되지 않음</td>
+</tr>
+<tr>
+<td>worker Deployment</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-execution-virtual-140/worker.yaml">worker.yaml</a> <code>replicas: 0</code>, 배포 안 됨</td>
+</tr>
+<tr>
+<td><code>native_runtimes</code> (worker)</td>
+<td><code>{}</code> → <code>SlurmBackend.validate</code>가 SSH 이전에 거부</td>
+</tr>
+<tr>
+<td><code>native_bindings</code>/<code>training_bindings</code> (gateway)</td>
+<td><code>[]</code> → <code>batch()</code>가 <code>native runtime is not enabled</code>로 Docker 호출 전에 거부</td>
+</tr>
+<tr>
+<td>job UID</td>
+<td>전용 비특권 UID 없음. 실행된다면 <code>SlurmUser</code>인 <code>slurm</code>으로 돈다</td>
+</tr>
+<tr>
+<td>제출 이력</td>
+<td>sbatch 0건, <code>NEXT_JOB_ID</code> 3 유지, RA DB의 <code>virtual-slurm-140</code> 관련 jobs/outbox/usage 0</td>
+</tr>
+<tr>
+<td>executor/results 키</td>
+<td>설치됨, <strong>읽기 전용 확인만</strong>: <code>squeue</code>/<code>sacct</code> 허용 형식 exit 0·0행, 그 외 명령은 거부</td>
+</tr>
+<tr>
+<td>결과 파일 positive read</td>
+<td><strong>미검증</strong> (읽을 job 출력이 없음)</td>
+</tr>
+</tbody>
+</table>
+<p>두 거부 지점은 <code>tests/test_slurm_executor.py::test_committed_virtual_140_route_and_gateway_cannot_submit</code>가 테스트한다. 거부를 증명하려고 live sbatch를 보낸 적도 없다.</p>
+<p><strong>기존 Slurm backend와의 구분:</strong> <code>SlurmBackend</code> 코드 자체와 과거 실제 Orin/VM Slurm 실행 기록(예: <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/slurm-jetson-runtime-results.md">slurm-jetson-runtime-results.md</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/slurm-vm.md">slurm-vm.md</a>)은 [과거 기록]이며 다른 클러스터다. "가상 140에서 실행이 된다"는 근거로 쓰지 않는다.</p>
+<hr />
+<h2 id="7-payload">7. 프로토콜·인증·방향·payload</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>출발 → 도착</th>
+<th>프로토콜/포트</th>
+<th>인증</th>
+<th>방향</th>
+<th>payload</th>
+<th>상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td>Client/Console → <code>ra-api</code></td>
+<td>HTTPS 8443</td>
+<td><code>Authorization: Bearer</code> (설정된 credential 해시와 비교, <code>principal</code>). 단 <code>RA_ANONYMOUS_PROJECT</code>(<code>anonymous_project</code>)가 설정되면 <strong>Authorization 헤더 없는 요청을 그 Project의 비운영자 Principal로 허용</strong>한다. 현재 데모는 anonymous <code>ra-lab</code> 모드이며, 운영자 전용 변경 API는 여전히 운영자 credential이 필요하다</td>
+<td>요청/응답</td>
+<td>JSON (<code>JobRequest</code>, 조회 결과)</td>
+<td>배포</td>
+</tr>
+<tr>
+<td>P2</td>
+<td><code>ra-api</code>·worker·수집기 → PostgreSQL</td>
+<td>PostgreSQL 프로토콜</td>
+<td>Secret <code>ra-service-db</code>의 URL</td>
+<td>양방향</td>
+<td>SQL, JSON body</td>
+<td>배포</td>
+</tr>
+<tr>
+<td>P3</td>
+<td><code>ra-inventory</code> → <code>&lt;K8S_API&gt;</code></td>
+<td>HTTPS (kubectl)</td>
+<td>ServiceAccount <code>ra-inventory</code> 토큰, ClusterRole get/list</td>
+<td>읽기</td>
+<td>Node/Pod/metrics/Kueue JSON</td>
+<td>배포</td>
+</tr>
+<tr>
+<td>P4</td>
+<td><code>ra-inventory</code> → Prometheus</td>
+<td>HTTP(S)</td>
+<td>선택적 토큰 env(<code>prometheus_token_env</code>), URL에 자격증명 금지</td>
+<td>읽기</td>
+<td>PromQL 결과 + timestamp</td>
+<td>바인딩 시</td>
+</tr>
+<tr>
+<td>P5</td>
+<td><code>ra-worker</code> → <code>&lt;K8S_API&gt;</code></td>
+<td>HTTPS (kubectl)</td>
+<td>worker 전용 권한</td>
+<td>쓰기(create/delete Job)·읽기</td>
+<td>Job manifest JSON</td>
+<td>배포 (이번 업데이트 중 새 GPU job 없음)</td>
+</tr>
+<tr>
+<td>P6</td>
+<td>가상 Slurm 수집기 → <code>&lt;SLURM_HOST&gt;</code></td>
+<td>SSH 22</td>
+<td>ed25519 키, <code>restrict</code>, <code>from="&lt;ADVISOR_EGRESS_IP&gt;"</code>, 고정 host key</td>
+<td>읽기</td>
+<td>2개 명령 문자열 → 필터된 JSON</td>
+<td>배포</td>
+</tr>
+<tr>
+<td>P7</td>
+<td>forced command → <code>slurmctld</code> 컨테이너</td>
+<td>로컬 <code>docker exec</code> (Docker socket)</td>
+<td>호스트 운영 계정 <code>etri</code>(docker 그룹)</td>
+<td>로컬</td>
+<td>argv</td>
+<td>배포</td>
+</tr>
+<tr>
+<td>P8</td>
+<td><code>slurmctld</code> → <code>slurmdbd</code> → MariaDB</td>
+<td>Slurm RPC 6819 / MySQL 3306</td>
+<td>munge / DB 비밀번호(호스트 0700 디렉터리)</td>
+<td>내부</td>
+<td>accounting 레코드</td>
+<td>배포</td>
+</tr>
+<tr>
+<td>P9</td>
+<td>(예정) worker → <code>&lt;SLURM_HOST&gt;</code> executor 키</td>
+<td>SSH 22</td>
+<td>별도 키 <code>ra-virtual-slurm-140-executor</code>, <code>restrict,from=</code></td>
+<td>쓰기 후보</td>
+<td><code>sbatch --parsable</code> + stdin 스크립트, <code>squeue</code>/<code>sacct</code>/<code>scancel</code> 고정 형식</td>
+<td><strong>구현·미검증</strong>, 현재 sbatch는 거부</td>
+</tr>
+<tr>
+<td>P10</td>
+<td>(예정) worker → results 키</td>
+<td>SSH 22</td>
+<td>별도 키 <code>ra-virtual-slurm-140-results</code></td>
+<td>읽기</td>
+<td><code>tail -c 65537|16384 -- /jobs/ra-lab/&lt;attempt&gt;.log</code></td>
+<td>설치·거부 확인만</td>
+</tr>
+<tr>
+<td>P11</td>
+<td>worker → 객체 저장소·MLflow</td>
+<td>HTTPS</td>
+<td>설정된 자격증명</td>
+<td>쓰기</td>
+<td>결과 아티팩트, run 기록</td>
+<td>코드 경로 존재. 현재 실행마다 검증된 것으로 가정하지 않음</td>
+</tr>
+<tr>
+<td>—</td>
+<td>호스트 <code>16817 → 6817</code></td>
+<td>TCP</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><strong>존재하지만 RA는 사용 안 함</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-slurm-30">8. 관측 시퀀스 (가상 Slurm, 30초 주기)</h2>
+<pre><code class="language-text">t0  ra-virtual-slurm-140-inventory: collect()
+t0  ├─ ssh … ra-virtual-slurm-140-observer 'scontrol --json=v0.0.42 show nodes'
+    │    └─ &lt;SLURM_HOST&gt; sshd → slurm_observer.py → docker exec --user slurm slurmctld scontrol …
+    │       └─ 6개 노드만 남기고 NODE_FIELDS 필터 → JSON
+t0  ├─ ssh … 'squeue --json=v0.0.42 --account=ra-lab --partition=all'
+    │    └─ ra-lab/all 행만, JOB_FIELDS 필터 (&quot;Zero jobs to dump&quot; 경고는 정상 빈 결과로 인정)
+t0  ├─ snapshot.sources = {slurm_nodes, slurm_queue, prometheus}
+    ├─ 어느 하나라도 ok가 아니면 status = partial
+    └─ save_inventory → ra_entities(kind=inventory, project=ra-lab, cluster_ref=virtual-slurm-140)
+t0+ heartbeat 파일 갱신 → readinessProbe(check-heartbeat --max-age 120)
+읽기 Console/API → latest_inventory_views → fresh_view(stale_after_seconds 기본 120)
+</code></pre>
+<p>2026-10-29 07:06:50Z 스냅샷 결과: <code>slurm_nodes: ok</code>, <code>slurm_queue: ok</code>(ra-lab/all 범위 0행 — <strong>전체 클러스터 큐가 아님</strong>), <code>prometheus: not_configured</code> → <strong>status <code>partial</code></strong>. "partial"은 장애가 아니라 <strong>메트릭 관측이 연결되지 않았다</strong>는 뜻이다. 노드 전부가 offline이라는 의미도 아니다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/evidence/virtual-slurm-140-inventory-20261029.md">inventory evidence</a>). 08:08:42Z 스냅샷에서도 status는 <code>partial</code>이었다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a>).</p>
+<hr />
+<h2 id="9-job-slurm">9. 공통 Job 흐름 (개념도 — 가상 Slurm 제출은 비활성)</h2>
+<p>아래는 RA가 <strong>Kubernetes route와 기존 Slurm route에서 쓰는</strong> 흐름이다. 가상 140 route에서는 6단계의 원격 호출 전에 <code>validate</code>에서 막힌다.</p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>일어나는 일</th>
+<th>코드</th>
+<th>장애 시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. 접수</td>
+<td><code>POST /api/v1/compute/jobs</code> + <code>Idempotency-Key</code> 헤더</td>
+<td><code>api.submit</code> → <code>Service.submit</code> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/service.py">service.py</a>)</td>
+<td>같은 키+같은 body는 같은 job 재반환, 다른 body는 Conflict</td>
+</tr>
+<tr>
+<td>2. intent 기록</td>
+<td>한 트랜잭션에 <code>VALIDATED</code> job, <code>attempt_id</code>(<code>a-…</code>), outbox <code>submit-&lt;attempt&gt;</code></td>
+<td><code>store.enqueue</code></td>
+<td>커밋 전 실패면 아무것도 없음</td>
+</tr>
+<tr>
+<td>3. lease</td>
+<td>route가 맞는 worker만 이벤트를 가져감 (<code>FOR UPDATE SKIP LOCKED</code>, lease token)</td>
+<td><code>store.claim(job_routes=…)</code>, <code>store.job_route_filter</code></td>
+<td>lease 만료 시 다른 시도가 이어받음, stale finish는 token으로 차단</td>
+</tr>
+<tr>
+<td>4. 사전 검증</td>
+<td>호환성·승인·deadline·<code>backend.validate</code></td>
+<td><code>Worker.submit_one</code></td>
+<td>원격 호출 전 실패는 <code>FAILED</code>(<code>PRE_SUBMISSION_*</code>) — <strong>가상 140은 여기서 멈춤</strong></td>
+</tr>
+<tr>
+<td>5. 제출 의도 커밋</td>
+<td><code>SUBMITTING</code>을 먼저 커밋</td>
+<td><code>Worker.submit_one</code></td>
+<td>이후 crash는 재제출이 아니라 reconcile 대상</td>
+</tr>
+<tr>
+<td>6. native 호출</td>
+<td>K8s: <code>kubectl create</code>; Slurm: <code>sbatch --parsable</code>(SSH forced-command)</td>
+<td><code>KubernetesBackend.submit</code>, <code>SlurmBackend.submit</code></td>
+<td>응답 손실·timeout → <code>SUBMISSION_UNKNOWN</code>; 허용 목록에 있는 거절 문구만 <code>FAILED</code>(<code>native_rejection</code>)</td>
+</tr>
+<tr>
+<td>7. native ID</td>
+<td><code>QUEUED</code> + <code>external_id</code>(K8s Job 이름, Slurm job ID). K8s UID는 <code>backend_uid</code>에 따로 저장</td>
+<td><code>native_name</code>, <code>SlurmBackend.external_id</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>8. reconcile</td>
+<td>불확실하면 attempt 이름으로 찾음. K8s: <code>get job &lt;attempt&gt;</code> + 소유권; Slurm: <code>squeue --name</code>/<code>sacct --name … --duplicates</code></td>
+<td><code>Worker.reconcile_submission</code>, <code>*.reconcile</code></td>
+<td><code>MATCHED</code> 채택 / <code>NO_MATCH</code>·<code>AMBIGUOUS</code>·<code>QUERY_FAILED</code>는 열린 상태 유지</td>
+</tr>
+<tr>
+<td>9. 상태 추적</td>
+<td><code>RUNNING</code>, Kueue 조건, Slurm <code>%r</code> 대기 사유</td>
+<td><code>Worker.reconcile_all</code>, <code>status</code>, <code>admission</code></td>
+<td>조회 실패는 unknown이지 부재가 아님</td>
+</tr>
+<tr>
+<td>10. 결과</td>
+<td>결과 envelope 수집(K8s 로그, Slurm results 키의 bounded tail) → 검증</td>
+<td><code>result</code>, <code>result_from_log</code></td>
+<td>형식 불일치 → <code>RESULT_INVALID</code></td>
+</tr>
+<tr>
+<td>11. 종료+usage</td>
+<td>종료 상태와 <code>ra_usage</code> 1행을 <strong>같은 트랜잭션</strong>에 기록, attempt가 PK</td>
+<td><code>store.change_job</code> → <code>record_usage</code>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/accounting.py">accounting.py</a> <code>ledger_record</code></td>
+<td>재실행·backfill은 새 행을 만들지 않음</td>
+</tr>
+<tr>
+<td>12. 게시</td>
+<td>아티팩트·MLflow 전달(outbox)</td>
+<td><code>MLflowDelivery</code> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/worker.py">worker.py</a>), <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/artifacts.py">artifacts.py</a></td>
+<td>전달 실패는 재시도, 결과 상태와 분리</td>
+</tr>
+</tbody>
+</table>
+<p>조회: <code>GET /jobs/{id}</code>, <code>GET /jobs/{id}/lifecycle</code>(reconcile 이력 최근 10개, 연속 no-match 수), <code>GET /usage/report?month=YYYY-MM</code>. 운영자는 <code>POST /jobs/{id}/submission-resolution</code>(<code>ACKNOWLEDGE_UNRESOLVED</code>)로 <strong>감사 기록만</strong> 남긴다. 이 조치는 job을 종료시키거나 usage를 쓰지 않고, 늦게 나타난 native job은 여전히 채택된다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/ARCHITECTURE.md">ARCHITECTURE.md</a> Lifecycle contract).</p>
+<p><strong>현재 미해결:</strong> 2026-10-28 <code>live-k8s-cpu</code>의 <code>SUBMISSION_UNKNOWN</code> 2건이 열려 있다. acknowledge하지 않았고 테스트 job으로 재사용하지도 않았다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/evidence/deployment-20261029.json">deployment-20261029.json</a> <code>pre_existing_unresolved</code>). 따라서 <strong>"zero-loss가 증명됐다"고 말하지 않는다.</strong> 말할 수 있는 것은 "불확실한 제출을 성공이나 실패로 둔갑시키지 않고 열어 둔다"는 설계다.</p>
+<hr />
+<h2 id="10">10. 공통 엔티티 키와 상태 의미</h2>
+<table>
+<thead>
+<tr>
+<th>키</th>
+<th>의미</th>
+<th>출처</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>project</code></td>
+<td>권한·쿼터 매핑 단위. Bearer credential이 프로젝트 하나에 묶임. anonymous 모드에서는 헤더 없는 요청이 설정된 Project 하나로 매핑됨</td>
+<td><code>Principal</code>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/configuration.py">configuration.py</a> <code>principals</code></td>
+</tr>
+<tr>
+<td><code>cluster</code> / <code>cluster_ref</code></td>
+<td>route와 인벤토리의 클러스터 이름 (<code>lab-kubernetes</code>, <code>virtual-slurm-140</code>, <code>lab-slurm</code>)</td>
+<td>worker route, <code>TelemetryConfig.cluster_ref</code></td>
+</tr>
+<tr>
+<td><code>node_ref</code></td>
+<td>RA 쪽 노드 별칭. 가상 140은 <code>virtual-slurm-140-</code> 접두사 + <code>node_names</code>로 Slurm 이름 매핑</td>
+<td><code>SlurmInventoryConfig.slurm_scope</code></td>
+</tr>
+<tr>
+<td><code>job_id</code> (<code>j-…</code>)</td>
+<td>논리 job. 재시도해도 같음</td>
+<td><code>service.submit</code></td>
+</tr>
+<tr>
+<td><code>attempt_id</code> (<code>a-…</code>)</td>
+<td>실제 제출 1회. <strong>K8s Job 이름 = Slurm job 이름 = usage PK</strong></td>
+<td>같은 곳</td>
+</tr>
+<tr>
+<td><code>external_id</code></td>
+<td>native ID (K8s Job 이름, Slurm job ID). K8s UID는 별도 필드 <code>backend_uid</code></td>
+<td><code>native_name</code>, <code>adopted_body</code></td>
+</tr>
+<tr>
+<td><code>idempotency_key</code></td>
+<td><code>(project, key)</code> 유일</td>
+<td><code>ra_jobs</code></td>
+</tr>
+</tbody>
+</table>
+<p>상태: <code>RECEIVED → VALIDATED → SUBMITTING → (SUBMISSION_UNKNOWN) → QUEUED → RUNNING → COLLECTING → SUCCEEDED | FAILED | RESULT_INVALID | CANCELED</code>, 취소 경로 <code>CANCEL_REQUESTED</code> (<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/contracts.py">contracts.py</a> <code>State</code>). 모든 전이는 version CAS로 늦은 응답이 최신 상태를 되돌리지 못하게 한다(<code>store.change_job</code>).</p>
+<p>unknown 원칙:
+- 관측: <code>status ∈ {ok, unavailable, stale, invalid_time, not_configured}</code>. ok가 아니면 <code>value=null</code>.
+- 큐: 조회 실패는 "큐가 비었다"가 아니다.
+- reconcile: <code>NO_MATCH</code>도 부재 증명이 아니다(SlurmDBD 지연·조회 범위).
+- usage: 구간을 모르면 0이 아니라 "unknown"으로 별도 집계.</p>
+<hr />
+<h2 id="11">11. 쿼터·사용량 매핑</h2>
+<h3 id="111-native">11.1 쿼터는 native가 소유한다</h3>
+<table>
+<thead>
+<tr>
+<th>RA route 값</th>
+<th>Kubernetes</th>
+<th>Slurm(가상 140)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>큐</td>
+<td><code>local_queue</code> → Kueue LocalQueue → ClusterQueue 쿼터</td>
+<td><code>partition: all</code></td>
+</tr>
+<tr>
+<td>회계 단위</td>
+<td>(네임스페이스/큐)</td>
+<td><code>account: ra-lab</code></td>
+</tr>
+<tr>
+<td>우선순위</td>
+<td><code>kueue.x-k8s.io/priority-class</code> (WorkloadPriorityClass)</td>
+<td><code>qos: normal</code></td>
+</tr>
+<tr>
+<td>강제</td>
+<td>Kueue admission</td>
+<td><code>AccountingStorageEnforce=none</code> (현재 강제 없음)</td>
+</tr>
+</tbody>
+</table>
+<p>route drift 방지: 계획(<code>scheduling_plan</code>)이 저장된 job은 실제 어댑터 값이 다르면 <code>verify_adapter_plan</code>이 <code>SCHEDULING_BINDING_DRIFT</code>로 제출 전에 거부한다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/scheduling.py">scheduling.py</a>). RA는 <strong>전역 쿼터를 추가하지 않는다.</strong></p>
+<h3 id="112-usage">11.2 usage 단위</h3>
+<ul>
+<li>기록 대상은 <strong>native evidence로 관측된 예약량</strong>이다: K8s는 스케줄된 컨테이너 requests + Pod 시각, Slurm은 <code>sacct</code> <code>AllocTRES</code> + 시작/종료 시각. 요청량도 사용률도 아니다.</li>
+<li><code>allocation_mode</code>(<code>physical_device</code>, <code>virtual_slot</code>, <code>cpu_only</code>), 장치 클래스, 모델, 클러스터, 자원 키는 <strong>합치지 않는다.</strong> 환율을 만들지 않는다.</li>
+<li>가상 140의 <code>gres/gpu</code> 시간은 <strong>virtual-slot 시간</strong>이다. <code>gres/gpumem</code>, <code>gres/gpuutil</code>은 Slurm이 자동 등록했지만 <code>JobAcctGatherType</code>이 없어 측정되지 않는다 → unknown.</li>
+<li><code>/usage/report</code>는 <code>[start, end)</code> UTC로 구간을 자르고, 끝나지 않은 attempt는 <code>not_finalized</code>로 따로 나열한다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/accounting.py">accounting.py</a> <code>period_report</code>).</li>
+</ul>
+<h3 id="113-toctou">11.3 비트랜잭션 외부 작업, TOCTOU, 멱등성</h3>
+<ul>
+<li><strong>외부 작업은 트랜잭션 밖이다.</strong> DB 커밋과 <code>sbatch</code>/<code>kubectl create</code>를 원자적으로 묶을 수 없다. 그래서 "의도 먼저 커밋 → 호출 → 결과 기록" 순서와 reconcile로 보완한다.</li>
+<li><strong>TOCTOU:</strong> 인벤토리에서 "비어 있다"고 본 순간과 native 스케줄러가 배정하는 순간 사이에 상태가 바뀐다. 인벤토리는 <strong>배치 권한이 아니다</strong>(<code>execution_qualification: "inventory never grants runtime qualification or admission"</code>). 최종 판단은 Kueue/slurmctld가 한다.</li>
+<li><strong>멱등성:</strong> API는 <code>(project, Idempotency-Key)</code>, 제출은 attempt 이름, usage는 attempt PK. 단, Slurm 쪽 이름 검색은 SlurmDBD가 있어야 응답 손실을 안전하게 복구할 수 있다(<code>SlurmBackend.reconcile</code> 주석). 가상 140에 SlurmDBD를 붙인 이유 중 하나다.</li>
+<li><strong>동시성:</strong> CAS·lease·<code>SKIP LOCKED</code>는 테스트로 확인했지만 운영 자격은 <strong>route당 worker 1 replica</strong>(<code>Recreate</code>)다. HA 주장이 아니다.</li>
+</ul>
+<hr />
+<h2 id="12">12. 보안 경계</h2>
+<table>
+<thead>
+<tr>
+<th>경계</th>
+<th>무엇으로</th>
+<th>무엇을 막는가</th>
+<th>막지 못하는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API</td>
+<td>Bearer credential(해시 비교), 프로젝트 범위, 운영자 플래그+subject. anonymous 모드(현재 데모 <code>ra-lab</code>)에서는 헤더 없는 요청이 그 Project의 비운영자 Principal이 됨</td>
+<td>다른 프로젝트 조회·제출, 비운영자의 resolution</td>
+<td>credential 유출. anonymous 모드에서는 API에 닿는 누구나 <code>ra-lab</code> 범위 조회·제출 가능</td>
+</tr>
+<tr>
+<td>수집기 Pod</td>
+<td><code>runAsNonRoot</code> 10001, <code>readOnlyRootFilesystem</code>, <code>capabilities: drop ALL</code>, seccomp <code>RuntimeDefault</code>; 가상 Slurm 수집기는 SA 토큰 미마운트</td>
+<td>Pod 내 권한 상승, K8s API 접근(가상 Slurm 수집기)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>K8s 수집기 RBAC</td>
+<td>get/list만</td>
+<td>쓰기</td>
+<td>클러스터 전체 Pod 목록 읽기는 가능(요청량 계산용)</td>
+</tr>
+<tr>
+<td>SSH 키</td>
+<td><code>restrict</code>(포워딩·pty 금지), <code>from="&lt;ADVISOR_EGRESS_IP&gt;"</code>, 고정 <code>known_hosts</code>, <code>BatchMode</code></td>
+<td>다른 출발지, 셸, 포트 포워딩(실측: administratively prohibited)</td>
+<td>출발 IP를 공유하는 다른 Pod</td>
+</tr>
+<tr>
+<td>forced command</td>
+<td>명령 화이트리스트, 계정/파티션 고정 인자, 출력 필드 필터</td>
+<td><code>id</code>, <code>bash -i</code>, <code>sinfo</code>, <code>docker ps</code>, <code>sbatch</code>(observer), <code>; id</code> 연결, 타 계정 조회 (모두 실측 거부)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>키 분리</td>
+<td>observer / executor / results 3개 키</td>
+<td>관측 키로 제출, 결과 키로 스케줄러 명령</td>
+<td>—</td>
+</tr>
+<tr>
+<td>결과 파일</td>
+<td>경로 <code>/jobs/ra-lab/&lt;REF&gt;.log</code>만, <code>O_NOFOLLOW</code>, 정규 파일, 소유자 UID 64030(<code>slurm</code>), 64 KiB/16 KiB tail</td>
+<td>symlink 탈출, 범위 밖 파일, 대용량 읽기</td>
+<td>positive read는 미검증</td>
+</tr>
+<tr>
+<td>운영 계정</td>
+<td>gateway 파일 소유 <code>etri</code>, 0700/0600</td>
+<td>—</td>
+<td><strong><code>etri</code>는 docker 그룹 = 그 호스트에서 root와 동등.</strong> root 소유 격리 경계가 아니라 "신뢰된 계정 하나의 명령 경계"다</td>
+</tr>
+<tr>
+<td>job 실행 UID</td>
+<td>(없음)</td>
+<td>—</td>
+<td>실행 시 <code>slurm</code>으로 돎. 전용 비특권 UID가 생기기 전에는 실행 금지</td>
+</tr>
+</tbody>
+</table>
+<p>참고: <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/examples/slurm_observer.py">slurm_observer.py</a> docstring은 "Root-owned forced-SSH command"라고 쓰지만, 가상 140 배포에서는 <code>etri</code> 소유로 설치했다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-inventory-virtual-140/README.md">inventory README</a> Transport). 발표에서 root 소유·격리라고 말하지 않는다. 기존 상태 그대로인 <code>shared/munge.key</code> 0644도 한계로 기록돼 있다.</p>
+<hr />
+<h2 id="13-evidence-live">13. 노드·장치 인벤토리 (evidence 시점 값, live 메트릭 아님)</h2>
+<table>
+<thead>
+<tr>
+<th>클러스터</th>
+<th>노드</th>
+<th>장치/슬롯</th>
+<th>상태</th>
+<th>시점·근거</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lab-kubernetes</code></td>
+<td>12 (Ready 10)</td>
+<td>물리 GPU <code>nvidia.com/gpu</code> 3 · Jetson 공유 슬롯 <code>nvidia.com/gpu.shared</code> 6(노드 3개×2, 그중 1노드 NotReady) · NPU 5(<code>hailo.ai/h8</code> 2, <code>rockchip.com/rk3399pro</code> 1(NotReady 노드), <code>npu.intel.com/accel</code> 1, <code>mobilint.com/npu</code> 1) · 가속기 없는 노드 2</td>
+<td>partial</td>
+<td>08:08:40Z, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a></td>
+</tr>
+<tr>
+<td><code>virtual-slurm-140</code></td>
+<td>6 (IDLE, 07:06Z)</td>
+<td><code>cpu-1</code>,<code>cpu-2</code>: 4 CPU/2000 MiB · <code>gpu-big</code> 4 CPU, 슬롯 4 · <code>gpu-mid</code> 4 CPU, 슬롯 2 · <code>gpu-s1</code>,<code>gpu-s2</code> 2 CPU/1000 MiB, 슬롯 1씩 → <strong>가상 GPU 슬롯 8, 예약 0</strong></td>
+<td>partial (메트릭 미연결)</td>
+<td>08:08:42Z <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a> (슬롯 수 동일); CPU·메모리·IDLE은 07:06:50Z <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/evidence/virtual-slurm-140-inventory-20261029.md">inventory evidence</a></td>
+</tr>
+<tr>
+<td><code>lab-slurm</code></td>
+<td>2</td>
+<td>—</td>
+<td><strong>stale</strong> (마지막 수집 2026-10-22T07:55Z), 이력만</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a></td>
+</tr>
+</tbody>
+</table>
+<p>위 값은 스냅샷 시점의 <strong>등록 용량</strong>이며 사용률이 아니다. 공유 슬롯 6은 물리 GPU 6이 아니고, AGX 노드는 실행 대상에서 제외돼 있다. 스냅샷의 Slurm 노드 <code>ready</code>는 null인데, Slurm 노드에는 Kubernetes Ready 조건이 없기 때문이다(노드 상태는 Slurm <code>state</code>로 따로 기록).</p>
+<p>가상 GPU는 컨테이너 안에서 <code>/dev/null</code>을 <code>/dev/nvidiaN</code>으로 매핑한 것이다. Slurm은 <code>gpu:a100</code>이라고 보고하지만 <strong>물리 GPU가 아니며 A100 성능 주장은 없다.</strong> RA는 이를 <code>device_class: gpu</code>, <code>allocation_mode: virtual_slot</code>으로 분류하고 Console에 "공유 슬롯"으로 표시한다. Console 헤더의 "GPU 등록 노드"는 가상 슬롯 노드 4개를 등록 수로 센다(프론트엔드 미변경, 한계로 기록).</p>
+<hr />
+<h2 id="14">14. 한계 매트릭스</h2>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th>현재</th>
+<th>말해도 되는 것</th>
+<th>말하면 안 되는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>가상 Slurm 관측</td>
+<td>배포·관측</td>
+<td>6노드·8슬롯을 30초마다 수집, partial</td>
+<td>실시간 사용률, 전체 클러스터 큐</td>
+</tr>
+<tr>
+<td>가상 Slurm accounting</td>
+<td>배포·관측</td>
+<td>SlurmDBD로 <code>sacct</code> 가능, association 존재</td>
+<td>쿼터 강제 중, job 회계 검증 완료</td>
+</tr>
+<tr>
+<td>가상 Slurm 실행</td>
+<td>구현·미검증</td>
+<td>경로 설계·gateway 거부 테스트</td>
+<td>job이 돌았다, 결과 파일을 읽었다</td>
+</tr>
+<tr>
+<td>K8s 실행</td>
+<td>배포</td>
+<td>worker 1/1, 과거 GPU 실행 기록</td>
+<td>이번 업데이트에서 새 GPU job·재시작 복구 실험을 했다</td>
+</tr>
+<tr>
+<td>새 native job</td>
+<td>0건</td>
+<td>—</td>
+<td>smoke 성공 (smoke는 <code>NOT_RUN</code>)</td>
+</tr>
+<tr>
+<td>불확실 제출</td>
+<td>2건 미해결</td>
+<td>열어 두는 설계, 테스트 케이스</td>
+<td>zero-loss 증명</td>
+</tr>
+<tr>
+<td>동시성</td>
+<td>테스트만</td>
+<td>CAS·lease·SKIP LOCKED 테스트</td>
+<td>HA, 다중 worker 운영</td>
+</tr>
+<tr>
+<td>보안</td>
+<td>명령 경계</td>
+<td>화이트리스트·키 분리·실측 거부</td>
+<td>root 격리, 멀티테넌트 격리</td>
+</tr>
+<tr>
+<td>GPU 의미</td>
+<td>가상 슬롯</td>
+<td>스케줄러 등록 슬롯</td>
+<td>물리 GPU, A100 성능</td>
+</tr>
+<tr>
+<td>스케줄러</td>
+<td>기존 것 사용</td>
+<td>Kueue admission, slurmctld 배정</td>
+<td>RA가 GPU를 배치, KAI 연동</td>
+</tr>
+<tr>
+<td>아티팩트·MLflow</td>
+<td>코드 경로</td>
+<td>구현된 전달 경로</td>
+<td>현재 모든 실행이 검증됨</td>
+</tr>
+<tr>
+<td>정책 금지</td>
+<td>—</td>
+<td>CPU job 금지, AGX 제외, 새 native job 0</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>과거 사건 하나도 기록해 둔다. UID precondition 확인 중 <code>kubectl delete --raw …?dryRun=All</code>이 dry run으로 동작하지 않아 완료된 2026-10-28 live-training Job 1개와 Pod가 삭제됐다. DB job·usage 행은 그대로이고 native 객체와 Pod 로그는 복구할 수 없다(<a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/RESULTS.md">RESULTS.md</a> Live phase). 그 뒤로 live에서 파괴적 확인 시험을 하지 않는다.</p>
+<hr />
+<h2 id="15">15. 코드 소스 맵</h2>
+<table>
+<thead>
+<tr>
+<th>관심사</th>
+<th>파일</th>
+<th>주요 함수/클래스</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP 경로·인증</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/api.py">api.py</a></td>
+<td><code>create_app</code>, <code>principal</code>, <code>operator</code>, <code>submit</code>, <code>inventory</code>, <code>console_overview</code>, <code>usage_report</code>, <code>job_lifecycle</code>, <code>resolve_submission</code></td>
+</tr>
+<tr>
+<td>Console 읽기 모델</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/console.py">console.py</a></td>
+<td><code>overview</code> (<code>latest_inventory_views</code> 사용)</td>
+</tr>
+<tr>
+<td>접수·멱등성</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/service.py">service.py</a></td>
+<td><code>submit</code>, <code>resolve_submission</code></td>
+</tr>
+<tr>
+<td>계약·상태</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/contracts.py">contracts.py</a></td>
+<td><code>State</code>, <code>JobRequest</code></td>
+</tr>
+<tr>
+<td>저장·outbox</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/store.py">store.py</a></td>
+<td><code>ra_jobs</code>/<code>ra_outbox</code>/<code>ra_usage</code>/<code>ra_entities</code>, <code>claim</code>, <code>finish</code>, <code>change_job</code>, <code>record_usage</code>, <code>job_route_filter</code></td>
+</tr>
+<tr>
+<td>worker</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/worker.py">worker.py</a></td>
+<td><code>Worker.submit_one</code>, <code>reconcile_submission</code>, <code>cancel_one</code>, <code>reconcile_all</code>, <code>MLflowDelivery</code></td>
+</tr>
+<tr>
+<td>어댑터</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/backends.py">backends.py</a></td>
+<td><code>KubernetesBackend</code> (<code>manifest</code>, <code>submit</code>, <code>owns</code>, <code>reconcile</code>, <code>admission</code>, <code>cancel</code>), <code>SlurmBackend</code> (<code>call</code>, <code>validate</code>, <code>submit</code>, <code>reconcile</code>, <code>status</code>, <code>accounting</code>), <code>native_rejection</code>, <code>SubmissionUnknown</code>/<code>Rejected</code>/<code>Ambiguous</code></td>
+</tr>
+<tr>
+<td>route 설정</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/configuration.py">configuration.py</a></td>
+<td><code>worker_configuration</code>, <code>principals</code>, <code>check_configuration</code></td>
+</tr>
+<tr>
+<td>계획 검증</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/scheduling.py">scheduling.py</a></td>
+<td><code>compile_plan</code>, <code>verify_adapter_plan</code></td>
+</tr>
+<tr>
+<td>K8s 인벤토리</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/inventory.py">inventory.py</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/queue_inventory.py">queue_inventory.py</a></td>
+<td><code>InventoryCollector.collect</code>, <code>signal</code>, <code>fresh_view</code>, <code>save_inventory</code>, <code>latest_inventory(_views)</code></td>
+</tr>
+<tr>
+<td>Slurm 인벤토리</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/slurm_inventory.py">slurm_inventory.py</a></td>
+<td><code>SlurmController</code>, <code>SlurmInventoryConfig</code>, <code>SlurmInventoryCollector.read/node_view/queue_view/collect</code></td>
+</tr>
+<tr>
+<td>사용량</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/accounting.py">accounting.py</a></td>
+<td><code>ledger_record</code>, <code>summarize</code>, <code>month_period</code>, <code>period_report</code></td>
+</tr>
+<tr>
+<td>gateway</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/examples/slurm_observer.py">slurm_observer.py</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/examples/slurm_executor.py">slurm_executor.py</a></td>
+<td><code>observe</code>; <code>plan</code>, <code>scheduler_plan</code>, <code>batch</code>, <code>containerized</code>, <code>main</code></td>
+</tr>
+<tr>
+<td>배포</td>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/services/services.yaml">services</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-inventory-virtual-140">inventory-virtual-140</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-accounting-virtual-140">accounting-virtual-140</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-execution-virtual-140">execution-virtual-140</a></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="151">15.1 읽기 전용 점검 명령 (자리표시자 사용)</h3>
+<pre><code class="language-sh"># K8s: 배포 상태 (읽기)
+kubectl -n resource-advisor-lab get deploy ra-api ra-worker ra-inventory ra-virtual-slurm-140-inventory ra-virtual-slurm-140-worker
+kubectl -n resource-advisor-lab logs deploy/ra-virtual-slurm-140-inventory --tail=50
+
+# API: 최신 인벤토리·개요 (토큰은 환경변수, 화면·문서에 출력 금지)
+# 현재 데모처럼 anonymous_project가 설정돼 있으면 Authorization 헤더 없이도 그 Project 범위로 응답한다
+curl -sS -H &quot;Authorization: Bearer $RA_TOKEN&quot; https://&lt;RA_API&gt;/api/v1/compute/inventory/virtual-slurm-140
+curl -sS -H &quot;Authorization: Bearer $RA_TOKEN&quot; https://&lt;RA_API&gt;/api/v1/compute/overview
+curl -sS -H &quot;Authorization: Bearer $RA_TOKEN&quot; &quot;https://&lt;RA_API&gt;/api/v1/compute/usage/report?month=2026-10&quot;
+
+# 가상 Slurm: observer 키가 허용하는 두 읽기만 (다른 명령은 거부되는 것이 정상)
+ssh ra-virtual-slurm-140-observer 'scontrol --json=v0.0.42 show nodes'
+ssh ra-virtual-slurm-140-observer 'squeue --json=v0.0.42 --account=ra-lab --partition=all'
+</code></pre>
+<p>점검 중 하지 말 것: <code>sbatch</code>·<code>scancel</code>, worker <code>replicas</code> 변경, <code>kubectl delete</code>(특히 <code>--raw</code>의 <code>dryRun</code> 신뢰 금지), <code>slurmctld</code> 재시작.</p>
+<hr />
+<h2 id="16-12">16. 면접 예상 질문 12개</h2>
+<ol>
+<li><strong>RA가 스케줄러인가요?</strong> 범용 스케줄러는 아닙니다. Kubernetes에서는 Kueue가 admission(들여보낼지)을, kube-scheduler가 bind를 하고, Slurm에서는 slurmctld가 정합니다. 다만 현재 K8s 경로는 RA가 검증한 후보 노드를 hostname nodeSelector로 고정하므로 kube-scheduler는 그 제약 안에서 bind만 합니다. 노드 선택을 kube-scheduler에 맡기는 풀 단위 위임은 향후 설계입니다. RA는 요청·상태·사용량을 잃지 않게 하는 상위 control plane입니다.</li>
+<li><strong>K8s와 Slurm GPU를 하나의 풀로 합쳤나요?</strong> 아닙니다. 한 GPU를 두 스케줄러가 같이 소유하지 않고, 장부와 화면에서만 나란히 보여 줍니다. 장치 클래스·할당 방식도 합산하지 않습니다.</li>
+<li><strong>Slurm에 왜 REST가 아니라 SSH인가요?</strong> 이 환경에 slurmrestd가 없고, forced-command로 허용 명령을 코드 수준에서 제한하는 편이 범위를 좁히기 쉬웠습니다. 16817 포트가 열려 있어도 쓰지 않습니다. REST 전환은 범위 밖입니다.</li>
+<li><strong>가상 Slurm에서 작업이 돌았나요?</strong> 아닙니다. 관측과 accounting까지 확인했습니다. 실행 route는 예시 설정이고 worker는 0 replica이며 sbatch는 0건입니다. 전용 job UID와 적격 runtime이 생기기 전에는 실행하지 않습니다.</li>
+<li><strong>가상 GPU 8개는 무엇인가요?</strong> Slurm GRES에 등록된 슬롯입니다. 장치는 <code>/dev/null</code> 매핑이라 성능 의미가 없고, RA는 <code>virtual_slot</code>으로 분류합니다.</li>
+<li><strong>응답이 사라지면 중복 제출되나요?</strong> 원격 호출 전에 <code>SUBMITTING</code>을 커밋하고, 불확실하면 attempt 이름으로 reconcile합니다. 재제출하지 않습니다. 다만 미해결 2건이 남아 있어 zero-loss를 증명했다고는 말하지 않습니다.</li>
+<li><strong>Kueue 쿼터 초과와 Slurm 거절의 차이는?</strong> Kueue는 Job을 만들고 admission을 보류합니다. Slurm은 정책에 따라 다릅니다. 과거 lab에서 <code>DenyOnLimit</code>+enforcement를 켰을 때 job별 한도 초과는 제출 거절, account 집계 한도는 대기였습니다. RA는 native 사유로 대기와 거절을 나누고, 거절은 허용 목록 문구일 때만 분류합니다.</li>
+<li><strong>사용량은 실제 사용률인가요?</strong> 아닙니다. native가 기록한 예약량(K8s requests+시각, Slurm AllocTRES+시각)입니다. 모르는 구간은 0이 아닌 unknown으로 남깁니다.</li>
+<li><strong>보안 경계는 충분한가요?</strong> 명령 화이트리스트·키 분리·출발지 제한·host key 고정은 실측으로 거부를 확인했습니다. 하지만 gateway 소유 계정이 docker 그룹이라 root 격리는 아닙니다.</li>
+<li><strong>status가 partial인데 장애인가요?</strong> 아닙니다. 노드·큐 관측은 ok이고 Prometheus 메트릭이 연결되지 않았다는 뜻입니다.</li>
+<li><strong>ClusterID 사건은 무엇이었나요?</strong> accounting 전환 때 ID 불일치로 약 90초 컨트롤러 재시작 루프가 있었고 즉시 롤백했습니다. 큐는 비어 있었고 job counter와 백업은 보존됐습니다. 원인을 소스에서 확인한 뒤 identity 파일만 옮겨 다시 적용했습니다.</li>
+<li><strong>다음 단계는?</strong> 전용 비특권 job UID, 적격 runtime 바인딩, 그다음 2분 이하 smoke 1건과 응답 손실 복구 시험입니다. 그 전에는 데모 범위를 관측으로 한정합니다.</li>
+</ol>
+<hr />
+<h2 id="17">17. 출처</h2>
+<p>전체 목록과 각 출처의 증거 수준은 <a href="#part-2">SOURCES.md</a>에 정리했다.</p></article><article id="part-1"><h1 id="kubernetes-slurm-control-plane">발표 노트: Kubernetes와 가상 Slurm 위의 상위 control plane</h1>
+<ul>
+<li><strong>용도:</strong> NAIS 면접 데모 발표 (5–7분 본 발표 + 50–60초 압축 버전)</li>
+<li><strong>기준:</strong> 2026-10-29. 근거와 상세는 <a href="#part-0">ARCHITECTURE-KO.md</a>, 출처는 <a href="#part-2">SOURCES.md</a></li>
+<li><strong>그림:</strong> <code>figures/01-overview.png</code>, <code>figures/02-kubernetes.png</code>, <code>figures/03-slurm.png</code> (16:9)</li>
+</ul>
+<p>발표 원칙: 각 슬라이드에서 <strong>[배포·관측] / [구현·미검증] / [오픈소스] / [계획]</strong> 중 무엇인지 말로 밝힌다. 수치는 문서에 있는 것만 쓴다.</p>
+<hr />
+<h2 id="1-57">1. 5–7분 흐름</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>시간</th>
+<th>화면</th>
+<th>핵심 메시지</th>
+<th>말할 근거</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0:00–0:40</td>
+<td>제목 + 한 문장</td>
+<td>"스케줄러를 새로 만든 게 아니라, 기존 스케줄러 위에서 요청·상태·사용량을 잃지 않게 하는 계층을 만들었습니다."</td>
+<td>ARCHITECTURE 1절</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0:40–1:50</td>
+<td><code>01-overview.png</code></td>
+<td>연구기관에는 K8s(컨테이너·서빙)와 Slurm(HPC 배치)이 공존합니다. RA는 공통 계약·route·PostgreSQL 장부·어댑터를 담당하고, 배치는 Kueue·kube-scheduler·slurmctld가 합니다. 08:09 UTC 기준 lab에는 API·worker·수집기 2개가 1/1로 떠 있습니다.</td>
+<td>3, 4절</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1:50–3:00</td>
+<td><code>02-kubernetes.png</code></td>
+<td>K8s는 get/list 권한으로 노드·Pod 요청량·Kueue를 30초마다 읽습니다. 제출은 LocalQueue 라벨을 단 Job이고, Kueue는 쿼터 안에서 들여보낼지만 정하고 노드는 고르지 않습니다. <strong>현재는 RA가 검증한 후보 노드를 hostname nodeSelector로 고정</strong>하고, kube-scheduler는 그 제약 안에서 bind합니다(노드를 자유롭게 고르는 풀 단위 위임은 향후 설계). 쿼터 초과는 거절이 아니라 대기입니다. 미측정은 0이 아니라 unknown입니다.</td>
+<td>5절</td>
+</tr>
+<tr>
+<td>4</td>
+<td>3:00–4:20</td>
+<td><code>03-slurm.png</code></td>
+<td>가상 Slurm은 Docker 컨테이너 7개(컨트롤러+노드 6)입니다. RA는 SSH 22번 forced-command로만 들어가서 <code>docker exec</code>로 <code>scontrol</code>/<code>squeue</code> JSON 두 개만 읽습니다. REST·RPC 직접 연결은 없습니다. GPU 8개는 가상 슬롯입니다. SlurmDBD는 내부 네트워크에만 붙였습니다.</td>
+<td>6, 7, 13절</td>
+</tr>
+<tr>
+<td>5</td>
+<td>4:20–5:20</td>
+<td>공통 Job 흐름 표</td>
+<td>접수 → intent 커밋 → outbox lease → <code>SUBMITTING</code> 커밋 → native 호출 → reconcile → 종료+usage 한 트랜잭션. <strong>가상 Slurm 제출은 일부러 막혀 있습니다</strong>(worker 0 replica, runtime 바인딩 없음).</td>
+<td>9절</td>
+</tr>
+<tr>
+<td>6</td>
+<td>5:20–6:20</td>
+<td>한계 매트릭스</td>
+<td>실행 미검증, 새 native job 0, 미해결 불확실 제출 2건, 명령 경계일 뿐 root 격리 아님, HA 아님.</td>
+<td>12, 14절</td>
+</tr>
+<tr>
+<td>7</td>
+<td>6:20–7:00</td>
+<td>다음 단계</td>
+<td>전용 job UID → 적격 runtime → 2분 이하 smoke 1건 → 응답 손실 복구 시험. 그 전에는 관측 데모로 한정합니다.</td>
+<td>16절 Q12</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_1">슬라이드별 말하지 않을 것</h3>
+<ul>
+<li>2번: "GPU 풀을 통합했다" (아님 — 장부와 화면만 나란히)</li>
+<li>3번: "Kueue가 노드를 골랐다", "kube-scheduler가 노드를 자유롭게 골랐다"(현재는 hostname 고정), "이번에 GPU job을 돌렸다" (이번 업데이트 중 새 GPU job·재시작 복구 실험 없음)</li>
+<li>4번: "A100 8장", "Slurm REST 연동", "root 소유 gateway"</li>
+<li>5번: 가상 Slurm job이 실제로 흐르는 것처럼 화살표를 짚기</li>
+<li>6번: "zero-loss 증명"</li>
+</ul>
+<hr />
+<h2 id="2-5060">2. 50–60초 압축 스크립트</h2>
+<blockquote>
+<p>Resource Advisor는 Kubernetes와 Slurm을 대체하지 않는 상위 control plane입니다. 쿠버네티스에서는 Kueue가 들여보낼지를, kube-scheduler가 노드를 정하고, Slurm은 slurmctld가 정합니다. 저희는 공통 Job 계약, 프로젝트별 route, PostgreSQL에 남기는 제출 intent와 사용량 장부, 그리고 응답이 사라졌을 때의 reconcile을 맡습니다.</p>
+<p>지금 lab에는 API, worker, 쿠버네티스 수집기, 가상 Slurm 수집기가 떠 있습니다. 쿠버네티스는 읽기 권한으로 노드와 Pod 요청량, Kueue 큐를 30초마다 봅니다. 가상 Slurm은 Docker로 만든 6노드 클러스터인데, REST가 아니라 SSH forced-command로 들어가 허용된 JSON 조회 두 개만 실행합니다. GPU 8개는 가상 슬롯이라 성능 의미는 없습니다.</p>
+<p>가상 Slurm 실행은 아직 열지 않았습니다. 전용 job 계정과 검증된 런타임이 없어서 worker를 0으로 두었고, 제출은 0건입니다. 다음 단계는 그 두 가지를 갖춘 뒤 짧은 smoke 한 건과 응답 손실 복구 시험입니다.</p>
+</blockquote>
+<p>(약 55초, 분당 약 300자 기준)</p>
+<hr />
+<h2 id="3">3. 데모 순서 (화면이 있을 때)</h2>
+<ol>
+<li>Console 자원 화면: 클러스터 3개, <code>virtual-slurm-140</code> 타일 6개, "공유 슬롯" 표시. <code>lab-slurm</code>이 stale로 보이는 이유(2026-10-22 이후 수집 중단, 이력 보존)를 말한다.</li>
+<li>API <code>GET /api/v1/compute/inventory/virtual-slurm-140</code> 응답에서 <code>sources</code>(<code>slurm_nodes: ok</code>, <code>slurm_queue: ok</code>, <code>prometheus: not_configured</code>)와 <code>status: partial</code>을 짚는다.</li>
+<li><code>deploy/slurm-execution-virtual-140/worker.yaml</code>의 <code>replicas: 0</code>과 <code>executor.json</code>의 <code>native_bindings: []</code>를 보여 주며 실행이 막힌 위치를 설명한다.</li>
+<li>화면에 토큰, 사설 IP, 호스트 키가 나오지 않게 한다. 터미널은 미리 자리표시자 버전으로 준비한다.</li>
+</ol>
+<p>live 화면을 쓸 수 없으면 그림 3장과 <a href="#part-0">ARCHITECTURE-KO.md</a>의 표로 대신한다. 이 경우 "현재 live 상태"라고 말하지 않고 "2026-10-29 기록"이라고 말한다.</p>
+<hr />
+<h2 id="4">4. 예상 질문 대응 요약</h2>
+<p>12개 질문과 답은 <a href="#part-0">ARCHITECTURE-KO.md 16절</a>에 있다. 짧게 외울 핵심만 적는다.</p>
+<table>
+<thead>
+<tr>
+<th>질문 유형</th>
+<th>한 줄 답</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>스케줄러냐</td>
+<td>범용 스케줄러는 아니다. admission은 Kueue, bind는 kube-scheduler, Slurm은 slurmctld. 단 현재 K8s 경로는 RA가 검증한 노드를 hostname nodeSelector로 고정. RA는 장부·계약·reconcile</td>
+</tr>
+<tr>
+<td>실행됐냐</td>
+<td>가상 Slurm은 아니다. 관측·accounting까지</td>
+</tr>
+<tr>
+<td>인증</td>
+<td>Bearer 해시 비교. 현재 데모는 anonymous <code>ra-lab</code> 모드라 헤더 없는 요청도 <code>ra-lab</code> 비운영자로 허용, 운영자 API는 별도</td>
+</tr>
+<tr>
+<td>왜 SSH냐</td>
+<td>slurmrestd 없음, forced-command로 명령을 좁힘</td>
+</tr>
+<tr>
+<td>GPU 8개</td>
+<td>가상 슬롯, <code>/dev/null</code> 매핑</td>
+</tr>
+<tr>
+<td>중복 제출</td>
+<td>intent 선커밋 + attempt 이름 reconcile, 재제출 안 함. 미해결 2건 있음</td>
+</tr>
+<tr>
+<td>쿼터</td>
+<td>native 소유. Kueue는 대기. Slurm은 정책 따라 다름(과거 <code>DenyOnLimit</code>+enforcement에서 job별 초과만 거절, 집계 한도는 대기)</td>
+</tr>
+<tr>
+<td>사용량</td>
+<td>예약량이지 사용률 아님, unknown은 unknown</td>
+</tr>
+<tr>
+<td>보안</td>
+<td>명령 경계. docker 그룹 계정이라 root 격리 아님</td>
+</tr>
+<tr>
+<td>partial</td>
+<td>메트릭 미연결, 장애 아님</td>
+</tr>
+<tr>
+<td>사건</td>
+<td>ClusterID 불일치 ~90초, 롤백, 큐 비어 있었음</td>
+</tr>
+</tbody>
+</table></article><article id="part-2"><h1 id="_1">출처 색인</h1>
+<p><a href="#part-0">ARCHITECTURE-KO.md</a>와 <a href="#part-1">PRESENTATION-NOTES-KO.md</a>의 주장이 기대는 파일 목록이다. 증거 수준은 다음과 같다.</p>
+<ul>
+<li><strong>live</strong>: lab에 배포하고 readback·API·명령 결과로 확인한 고정 기록</li>
+<li><strong>code/test</strong>: 코드와 관련 자동 테스트. 실제 클러스터 실행 아님</li>
+<li><strong>config</strong>: 배포 manifest·설정 파일. 존재가 곧 배포를 뜻하지 않음</li>
+<li><strong>history</strong>: 이번 가상 Slurm 데모 이전의 실장비 기록</li>
+</ul>
+<h2 id="evidence-2026-10-29">고정 evidence (2026-10-29)</h2>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>수준</th>
+<th>쓰인 주장</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/evidence/virtual-slurm-140-inventory-20261029.md">docs/evidence/virtual-slurm-140-inventory-20261029.md</a></td>
+<td>live</td>
+<td>6노드·8슬롯(4/2/1/1), 07:06:50Z 스냅샷 <code>partial</code>, 클러스터 3개(12/2 stale/6), observer 키 허용·거부 목록, <code>/dev/null</code> 가상 장치</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/evidence/slurm-execution-140-20261029.md">docs/evidence/slurm-execution-140-20261029.md</a></td>
+<td>live + code/test</td>
+<td>SlurmDBD 24.11.5·MariaDB 11.8.9, association <code>sim/ra-lab/slurm</code>, ClusterID 623→927 사건, executor/results 키 읽기 전용 확인, 새 job 0, RA 행 수 878/3918/876, 실행 NOT_VALIDATED</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/evidence/deployment-20261029.json">docs/experiments/integrated-operations/evidence/deployment-20261029.json</a></td>
+<td>live</td>
+<td><code>ra-api</code> revision 96, 이미지 소스(커밋 <code>53cd73b</code> + 보존 모듈 5개), 이력 해시 불변, <code>SUBMISSION_UNKNOWN</code> 2건, smoke <code>NOT_RUN</code>, 삭제 사건</td>
+</tr>
+</tbody>
+</table>
+<p>| <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/architecture/kubernetes-slurm-integration/evidence-snapshot.json">evidence-snapshot.json</a> | live (읽기 전용, 08:09 UTC, root 작성) | <strong>현재 상태의 기준</strong>: Deployment replica(<code>ra-api</code>·<code>ra-worker</code>·<code>ra-inventory</code>·<code>ra-virtual-slurm-140-inventory</code> 1/1, <code>ra-slurm-worker</code> 0/0), 클러스터별 노드·가속기 등록 용량, <code>virtual_slurm_execution</code>(<code>api_route_registered: false</code>, <code>worker_deployed: false</code>, 제출 0, <code>NOT_VALIDATED</code>) |</p>
+<p><code>deployment-20261029.json</code>의 revision 96과 이미지 digest는 06:10 UTC 배포 readback의 <strong>과거 기록</strong>이다. 현재 replica·인벤토리 값은 <code>evidence-snapshot.json</code>을 인용한다.</p>
+<h2 id="_2">설계·결과 문서</h2>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>수준</th>
+<th>쓰인 주장</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/ARCHITECTURE.md">docs/experiments/integrated-operations/ARCHITECTURE.md</a></td>
+<td>code/test</td>
+<td>lifecycle·accounting·policy 계약, 대기 사유 분류, route당 worker 1개</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/RESULTS.md">docs/experiments/integrated-operations/RESULTS.md</a></td>
+<td>code/test + live</td>
+<td>테스트 목록, UID precondition 취소, live 배포 결과, 삭제 사건</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/experiments/integrated-operations/CURRENT-STATE-AUDIT.md">docs/experiments/integrated-operations/CURRENT-STATE-AUDIT.md</a></td>
+<td>code/test</td>
+<td>기존 기능 목록, 갭 G1–G8, KAI·SlurmREST 범위 외</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/operations-ko.md">docs/reference/operations-ko.md</a></td>
+<td>설명</td>
+<td>운영 화면 사용 순서, 예약량과 사용률 구분</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/inventory.md">docs/reference/inventory.md</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/evidence/inventory-live.json">docs/evidence/inventory-live.json</a></td>
+<td>history</td>
+<td>Prometheus로 DCGM·Jetson·Mobilint 관측</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/common-gpu-pool.md">docs/reference/common-gpu-pool.md</a></td>
+<td>config</td>
+<td>공유 슬롯은 물리 장치 수가 아님</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/kueue-policy.md">docs/reference/kueue-policy.md</a></td>
+<td>history</td>
+<td>Kueue 쿼터 초과 = admission 대기</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/slurm-policy.md">docs/reference/slurm-policy.md</a></td>
+<td>history</td>
+<td>별도 lab에서 <code>DenyOnLimit</code>+<code>AccountingStorageEnforce=associations,limits,qos</code>일 때 job별 한도 초과·미할당 QOS는 거절, account 집계 한도(<code>AssocGrpCpuLimit</code>)는 대기 (17–23, 33–39행)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/slurm-jetson-runtime-results.md">docs/reference/slurm-jetson-runtime-results.md</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/reference/slurm-vm.md">docs/reference/slurm-vm.md</a></td>
+<td>history</td>
+<td>기존 Slurm backend의 과거 실행. 가상 140과 별개</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">배포 설정</h2>
+<table>
+<thead>
+<tr>
+<th>경로</th>
+<th>수준</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/services/services.yaml">deploy/services/services.yaml</a></td>
+<td>config (배포됨)</td>
+<td><code>ra-api</code> 8443, <code>ra-inventory</code> 30 s, Service</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/inventory-rbac.yaml">deploy/inventory-rbac.yaml</a></td>
+<td>config (배포됨)</td>
+<td>수집기 get/list 권한</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-inventory-virtual-140/README.md">deploy/slurm-inventory-virtual-140/</a></td>
+<td>config (배포됨)</td>
+<td>가상 Slurm 수집기, observer scope, Secret 이름, 롤백</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-accounting-virtual-140/README.md">deploy/slurm-accounting-virtual-140/</a></td>
+<td>config (배포됨)</td>
+<td>slurmdbd·MariaDB, <code>slurm.conf</code> 4줄, ClusterID 처리, 롤백</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/deploy/slurm-execution-virtual-140/README.md">deploy/slurm-execution-virtual-140/</a></td>
+<td>config (<strong>미배포</strong>, replicas 0)</td>
+<td>executor/results scope, 예시 worker route, 실행 불가 이유</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">코드</h2>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>쓰인 부분</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/api.py">src/resource_advisor/api.py</a></td>
+<td><code>PREFIX = "/api/v1/compute"</code>, Bearer 인증과 선택적 <code>anonymous_project</code>(헤더 없는 요청을 설정된 Project의 비운영자 Principal로 매핑, <code>principal</code>), <code>/jobs</code>, <code>/inventory/{cluster_ref}</code>, <code>/overview</code>, <code>/usage/report</code>, <code>/jobs/{id}/lifecycle</code>, <code>/jobs/{id}/submission-resolution</code>, <code>/healthz</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/console.py">src/resource_advisor/console.py</a></td>
+<td><code>overview</code>의 인벤토리 읽기 모델</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/service.py">src/resource_advisor/service.py</a></td>
+<td><code>Service.submit</code> 멱등성·attempt·outbox, <code>resolve_submission</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/contracts.py">src/resource_advisor/contracts.py</a></td>
+<td><code>State</code>, <code>JobRequest</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/store.py">src/resource_advisor/store.py</a></td>
+<td>테이블 4개, <code>claim</code>(SKIP LOCKED), <code>change_job</code>, <code>record_usage</code>, <code>job_route_filter</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/worker.py">src/resource_advisor/worker.py</a></td>
+<td><code>Worker.submit_one</code>, <code>reconcile_submission</code>, <code>adopted_body</code>(adopt 시 <code>external_id</code>=Job 이름, <code>backend_uid</code> 별도 저장), <code>MLflowDelivery</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/backends.py">src/resource_advisor/backends.py</a></td>
+<td><code>KubernetesBackend</code>(<code>manifest</code>가 검증된 후보 <code>node_ref</code>를 <code>kubernetes.io/hostname</code> nodeSelector로 고정, <code>owns</code>는 <code>backend_uid</code>가 묶인 뒤에만 UID 비교, <code>reconcile</code>이 첫 관측 때 UID 저장), <code>SlurmBackend</code>, 예외 3종, <code>native_rejection</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/configuration.py">src/resource_advisor/configuration.py</a></td>
+<td><code>worker_configuration</code> route 검증</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/scheduling.py">src/resource_advisor/scheduling.py</a></td>
+<td><code>verify_adapter_plan</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/inventory.py">src/resource_advisor/inventory.py</a>, <a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/queue_inventory.py">queue_inventory.py</a></td>
+<td>K8s 수집, <code>signal</code>, <code>fresh_view</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/slurm_inventory.py">src/resource_advisor/slurm_inventory.py</a></td>
+<td>Slurm 수집, 응답 검증</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/accounting.py">src/resource_advisor/accounting.py</a></td>
+<td><code>ledger_record</code>, <code>period_report</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/src/resource_advisor/artifacts.py">src/resource_advisor/artifacts.py</a></td>
+<td>아티팩트 전달 경로</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/examples/slurm_observer.py">examples/slurm_observer.py</a></td>
+<td>읽기 전용 forced command</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/examples/slurm_executor.py">examples/slurm_executor.py</a></td>
+<td>실행·결과 forced command (<code>batch</code>, <code>scheduler_plan</code>, <code>containerized</code>)</td>
+</tr>
+</tbody>
+</table>
+<p><code>db.py</code>는 이 저장소에 없다. 테이블 정의는 <code>store.py</code>에 있다.</p>
+<h2 id="_5">기존 면접 자료</h2>
+<ul>
+<li><a href="https://github.com/dsa04156/resource-advisor/blob/docs/integration-architecture-20261029/docs/nais-interview/START-HERE.md">docs/nais-interview/START-HERE.md</a>: 기존 원자료 진입점. 2026-10-07~08 실장비 기록 기반 자료는 history 수준이다.</li>
+</ul></article></main></body></html>

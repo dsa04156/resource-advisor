@@ -1,0 +1,268 @@
+{
+  "observed_at": "2026-10-29T08:09:01.739953+00:00",
+  "scope": "Read-only API and deployment snapshot; no workload submitted. Internal addresses and credentials excluded.",
+  "inventory": [
+    {
+      "cluster_ref": "lab-kubernetes",
+      "backend": "kubernetes",
+      "status": "partial",
+      "collected_at": "2026-10-29T08:08:40.855873+00:00",
+      "nodes": [
+        {
+          "node_ref": "etri-dev0001-jetorn",
+          "ready": true,
+          "accelerators": [
+            {
+              "resource_key": "nvidia.com/gpu.shared",
+              "device_class": "gpu",
+              "allocation_mode": "virtual_slot",
+              "capacity": 2.0
+            }
+          ]
+        },
+        {
+          "node_ref": "etri-dev0002-raspi5",
+          "ready": true,
+          "accelerators": [
+            {
+              "resource_key": "hailo.ai/h8",
+              "device_class": "npu",
+              "allocation_mode": "physical_device",
+              "capacity": 1.0
+            }
+          ]
+        },
+        {
+          "node_ref": "etri-dev0003-raspi5",
+          "ready": true,
+          "accelerators": []
+        },
+        {
+          "node_ref": "etri-dev0004-tedger",
+          "ready": false,
+          "accelerators": [
+            {
+              "resource_key": "rockchip.com/rk3399pro",
+              "device_class": "npu",
+              "allocation_mode": "physical_device",
+              "capacity": 1.0
+            }
+          ]
+        },
+        {
+          "node_ref": "etri-dev0006-raspi5",
+          "ready": true,
+          "accelerators": [
+            {
+              "resource_key": "hailo.ai/h8",
+              "device_class": "npu",
+              "allocation_mode": "physical_device",
+              "capacity": 1.0
+            }
+          ]
+        },
+        {
+          "node_ref": "etri-dev0007-jetagx",
+          "ready": false,
+          "accelerators": [
+            {
+              "resource_key": "nvidia.com/gpu.shared",
+              "device_class": "gpu",
+              "allocation_mode": "virtual_slot",
+              "capacity": 2.0
+            }
+          ]
+        },
+        {
+          "node_ref": "etri-dev0008-raspi5",
+          "ready": true,
+          "accelerators": []
+        },
+        {
+          "node_ref": "etri-dev0009-jetorn",
+          "ready": true,
+          "accelerators": [
+            {
+              "resource_key": "nvidia.com/gpu.shared",
+              "device_class": "gpu",
+              "allocation_mode": "virtual_slot",
+              "capacity": 2.0
+            }
+          ]
+        },
+        {
+          "node_ref": "etri-ser0001-cg0msb",
+          "ready": true,
+          "accelerators": [
+            {
+              "resource_key": "nvidia.com/gpu",
+              "device_class": "gpu",
+              "allocation_mode": "physical_device",
+              "capacity": 1.0
+            }
+          ]
+        },
+        {
+          "node_ref": "etri-ser0002-cgnmsb",
+          "ready": true,
+          "accelerators": [
+            {
+              "resource_key": "npu.intel.com/accel",
+              "device_class": "npu",
+              "allocation_mode": "physical_device",
+              "capacity": 1.0
+            },
+            {
+              "resource_key": "nvidia.com/gpu",
+              "device_class": "gpu",
+              "allocation_mode": "physical_device",
+              "capacity": 1.0
+            }
+          ]
+        },
+        {
+          "node_ref": "etri-ser0003-cg0ms0",
+          "ready": true,
+          "accelerators": [
+            {
+              "resource_key": "nvidia.com/gpu",
+              "device_class": "gpu",
+              "allocation_mode": "physical_device",
+              "capacity": 1.0
+            }
+          ]
+        },
+        {
+          "node_ref": "etri-ser0004-cgnms0",
+          "ready": true,
+          "accelerators": [
+            {
+              "resource_key": "mobilint.com/npu",
+              "device_class": "npu",
+              "allocation_mode": "physical_device",
+              "capacity": 1.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cluster_ref": "lab-slurm",
+      "backend": "slurm",
+      "status": "stale",
+      "collected_at": "2026-10-22T07:55:23.405027+00:00",
+      "nodes": [
+        {
+          "node_ref": "slurm-npu-lab",
+          "ready": null,
+          "accelerators": []
+        },
+        {
+          "node_ref": "slurm-gpu-lab",
+          "ready": null,
+          "accelerators": []
+        }
+      ]
+    },
+    {
+      "cluster_ref": "virtual-slurm-140",
+      "backend": "slurm",
+      "status": "partial",
+      "collected_at": "2026-10-29T08:08:42.834227+00:00",
+      "nodes": [
+        {
+          "node_ref": "virtual-slurm-140-cpu-1",
+          "ready": null,
+          "accelerators": []
+        },
+        {
+          "node_ref": "virtual-slurm-140-cpu-2",
+          "ready": null,
+          "accelerators": []
+        },
+        {
+          "node_ref": "virtual-slurm-140-gpu-big",
+          "ready": null,
+          "accelerators": [
+            {
+              "resource_key": "gres/gpu",
+              "device_class": "gpu",
+              "allocation_mode": "virtual_slot",
+              "capacity": 4
+            }
+          ]
+        },
+        {
+          "node_ref": "virtual-slurm-140-gpu-mid",
+          "ready": null,
+          "accelerators": [
+            {
+              "resource_key": "gres/gpu",
+              "device_class": "gpu",
+              "allocation_mode": "virtual_slot",
+              "capacity": 2
+            }
+          ]
+        },
+        {
+          "node_ref": "virtual-slurm-140-gpu-s1",
+          "ready": null,
+          "accelerators": [
+            {
+              "resource_key": "gres/gpu",
+              "device_class": "gpu",
+              "allocation_mode": "virtual_slot",
+              "capacity": 1
+            }
+          ]
+        },
+        {
+          "node_ref": "virtual-slurm-140-gpu-s2",
+          "ready": null,
+          "accelerators": [
+            {
+              "resource_key": "gres/gpu",
+              "device_class": "gpu",
+              "allocation_mode": "virtual_slot",
+              "capacity": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "deployments": [
+    {
+      "name": "ra-api",
+      "desired": 1,
+      "ready": 1
+    },
+    {
+      "name": "ra-worker",
+      "desired": 1,
+      "ready": 1
+    },
+    {
+      "name": "ra-inventory",
+      "desired": 1,
+      "ready": 1
+    },
+    {
+      "name": "ra-virtual-slurm-140-inventory",
+      "desired": 1,
+      "ready": 1
+    },
+    {
+      "name": "ra-slurm-worker",
+      "desired": 0,
+      "ready": 0
+    }
+  ],
+  "virtual_slurm_execution": {
+    "api_route_registered": false,
+    "worker_deployed": false,
+    "native_workloads_submitted_in_current_work": 0,
+    "runtime_qualification": "NOT_VALIDATED"
+  },
+  "source_commit": "0b89d6e694ca8757640d0451766804a000273d6f"
+}

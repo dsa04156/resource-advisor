@@ -1,0 +1,10 @@
+flowchart TD
+ U[연구자 / Console] --> A[Resource Advisor API]
+ A --> D[(PostgreSQL)]
+ W[Lifecycle Worker] --> D
+ W -. Kubernetes 실행 경로 .-> K[Kubernetes / Kueue]
+ KI[K8s 수집기] --> D
+ SI[Slurm 수집기] --> D
+ KI -->|API / Prometheus| K
+ SI -->|SSH 제한 명령| S[Docker Slurm / SlurmDBD]
+ %% Virtual Slurm worker is NOT deployed.

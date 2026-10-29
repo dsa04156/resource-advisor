@@ -1,0 +1,8 @@
+flowchart LR
+ O[관측 수집기] --> G[SSH forced-command]
+ E[실행 어댑터 키 - 조회만 검증] --> G
+ G -->|docker exec| C[slurmctld]
+ C -. 실행 미검증 .-> N[slurmd 6개 / 가상 GPU 슬롯 8]
+ C -->|6819| A[SlurmDBD]
+ A -->|3306| M[(MariaDB / 영속 볼륨)]
+ %% Public 16817 -> 6817 is not the RA adapter transport.

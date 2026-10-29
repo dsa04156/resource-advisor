@@ -1,0 +1,9 @@
+flowchart LR
+ subgraph OBS[현재 관측]
+ K[Kubernetes API / Prometheus] --> I[Inventory Collector] --> D[공통 DB / 자원 화면]
+ end
+ subgraph EXEC[구현된 실행 경로 - 이번 신규 실증 없음]
+ W[Worker / K8s Adapter - hostname nodeSelector 고정] -. API Job 생성 .-> Q[Kueue Admission]
+ Q -. 승인 .-> S[kube-scheduler - 제약 내 최종 bind]
+ S -.-> R[kubelet / Job 실행]
+ end
