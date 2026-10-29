@@ -492,6 +492,8 @@ def started(service, bundle, sources):
     adapter = backend(k)
     external = adapter.submit(job)
     job["body"]["external_id"] = external
+    # As the worker does: bind the native UID returned with the name, when provided.
+    job["body"]["backend_uid"] = getattr(external, "uid", None)
     return job, k, adapter
 
 
