@@ -2462,12 +2462,20 @@ function jctNode(o) {
     INVENTORY_UNOBSERVED:()=>add(el("div"),badge("인벤토리 기록 없음","warn")),
   }[o.status]?.() || badge(o.status,"warn");
 }
+// Long workload lists stay complete but collapse behind native details; catalog and same-identity entries lead.
+const jctCatalogFirst=list=>{const catalog=new Set((jctData?.workloads||[]).filter(w=>w.in_submission_catalog).map(w=>w.workload_ref));
+  return [...list].sort((a,b)=>(b.relation==="SAME_WORKLOAD_IDENTITY")-(a.relation==="SAME_WORKLOAD_IDENTITY")||catalog.has(b.workload_ref)-catalog.has(a.workload_ref));};
+function jctMore(items,shown,render,label) {
+  const head=items.slice(0,shown).map(render),rest=items.slice(shown);
+  return rest.length?[...head,add(el("details",null,"jct-more"),el("summary",`${label} ${rest.length}개 더 보기`),add(el("div",null,"jct-reasons"),...rest.map(render)))]:head;
+}
 function jctMatrix(sel) {
   if(!sel.accelerator_matrix.length)return empty("프로젝트에 등록된 GPU·NPU 후보가 없습니다.");
+  const link=w=>{const b=el("button",`${w.workload_ref} · 후보 ${w.registered} · ${w.relation==="SAME_WORKLOAD_IDENTITY"?"같은 조건":"조건 다름"}`);b.type="button";b.onclick=()=>jctSelect(w.workload_ref);return b;};
   return table(["가속기","이 작업 후보","다른 등록 작업 (모델·입력 조건)"],sel.accelerator_matrix.map(m=>[
     add(el("span",null,"job-name"),el("strong",m.model||"모델 미확인"),el("small",m.device_class.toUpperCase())),
     m.this_workload.registered?el("span",`등록 ${m.this_workload.registered}개 · 제출 조건 통과 ${m.this_workload.submission_compatible}개`):badge("이 작업에 등록 없음","warn"),
-    m.other_workloads.length?add(el("div",null,"jct-reasons"),...m.other_workloads.map(w=>{const b=el("button",`${w.workload_ref} · 후보 ${w.registered} · ${w.relation==="SAME_WORKLOAD_IDENTITY"?"같은 조건":"조건 다름"}`);b.type="button";b.onclick=()=>jctSelect(w.workload_ref);return b;})):el("span","—")]));
+    m.other_workloads.length?add(el("div",null,"jct-reasons"),...jctMore(jctCatalogFirst(m.other_workloads),3,link,"다른 작업")):el("span","—")]));
 }
 function jctRuns(sel) {
   if(!sel.recent_runs.length)return empty("이 작업의 실행 기록이 없습니다.");
@@ -2536,12 +2544,14 @@ function jctComparison(c) {
 }
 function jctAlternatives(sel) {
   if(!sel.alternatives.length)return empty("이 작업과 다른 가속기를 쓰는 등록 작업이 없습니다.");
-  return table(["작업","가속기","등록 · 제출 조건","관계",""],sel.alternatives.map(w=>[
+  const rows=list=>table(["작업","가속기","등록 · 제출 조건","관계",""],list.map(w=>[
     add(el("span",null,"job-name"),el("strong",w.workload_ref),el("small",w.task_type+" · 입력 "+w.input_shape.join("×"))),
     el("span",w.accelerator_models.join(", ")+" · "+w.device_classes.map(x=>x.toUpperCase()).join("/")),
     el("span",`등록 후보 ${w.registered}개 · 제출 조건 통과 ${w.submission_compatible}개`),
     el("small",w.relation==="SAME_WORKLOAD_IDENTITY"?"같은 모델·입력 조건 · 별도 등록 작업":"모델·입력 조건이 달라 같은 순위로 비교하지 않음"),
     researchButton("이 작업 보기",async()=>jctSelect(w.workload_ref))]));
+  const all=jctCatalogFirst(sel.alternatives),rest=all.slice(5);
+  return add(el("div"),rows(all.slice(0,5)),rest.length?add(el("details",null,"jct-more"),el("summary",`나머지 작업 ${rest.length}개 더 보기`),rows(rest)):null);
 }
 function jctView() {
   const root=el("div",null,"jct-view");
