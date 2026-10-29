@@ -4,179 +4,417 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:">
-<title>스케줄러 기록 재생</title>
+<title>실행 관제 · 기록 재생</title>
 <style>
 :root{
-  --paper:#f5f5f5; --sheet:#ffffff; --ink:#2d3142; --muted:#4f5d75; --faint:#8a93a6; --rule:rgba(45,49,66,.14); --rule-soft:rgba(45,49,66,.08);
-  --accent:#eb6c36; --accent-wash:#fcece4; --native:#2e5aa8; --native-wash:#e8eef8; --slurm:#2d3142; --slurm-wash:#e9ebee;
-  --focus:#2e5aa8; --font:"Noto Sans CJK KR","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --canvas:#f3f5f8; --panel:#ffffff; --inset:#f1f4f8; --line:#e2e7ee; --line-strong:#cbd3df;
+  --ink:#17243b; --ink-2:#47566b; --ink-3:#6c788a;
+  --select:#2563eb; --select-wash:#edf3ff; --select-line:#b9cdfa;
+  --pending:#8a5a00; --pending-mark:#d4930f; --pending-wash:#fdf4e2;
+  --success:#0f6f66; --success-mark:#14897e; --success-wash:#e5f3f1;
+  --failure:#b42335; --failure-wash:#fcecee;
+  --intake:#47566b; --intake-wash:#eef1f5;
+  --font:"Noto Sans CJK KR","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   --mono:ui-monospace,"SFMono-Regular","Noto Sans Mono CJK KR",Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 var(--font);overflow-x:hidden}
+body{margin:0;background:var(--canvas);color:var(--ink);font:13px/1.5 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 button,select,input{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
-.banner{position:sticky;top:0;z-index:5;display:flex;gap:10px;align-items:center;padding:8px 20px;background:var(--ink);color:#fff;font-size:13px}
-.banner b{color:#ffd9c7;font-weight:600}
-.banner .dot{width:8px;height:8px;border-radius:50%;border:2px solid #ffd9c7;flex:none}
-main{max-width:1320px;margin:0 auto;padding:16px 20px 40px}
-header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
-h1{font-size:22px;letter-spacing:-.01em;margin:0;line-height:1.25}
-.sub{margin:2px 0 0;color:var(--muted);font-size:13px}
-fieldset.scenario{border:0;margin:0;padding:0;display:flex;gap:0;border:1px solid var(--rule);border-radius:8px;background:var(--sheet);overflow:hidden}
-fieldset.scenario legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.scenario label{display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;font-size:13px;color:var(--muted)}
-.scenario label+label{border-left:1px solid var(--rule)}
-.scenario input{accent-color:var(--accent);margin:0}
-.scenario label:has(input:checked){background:var(--accent-wash);color:var(--ink);font-weight:600}
-.transport{margin-top:14px;display:grid;grid-template-columns:auto 1fr auto;gap:10px 16px;align-items:center;background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:10px 14px}
-.buttons{display:flex;gap:6px}
-.buttons button{min-width:40px;height:34px;padding:0 10px;border:1px solid var(--rule);border-radius:7px;background:var(--paper);cursor:pointer}
-.buttons button:hover{background:#ebecef}
-.buttons button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
-.buttons button:disabled{opacity:.4;cursor:default}
-.seek{display:flex;flex-direction:column;gap:2px;min-width:0}
-.seek input{width:100%;accent-color:var(--accent);margin:0}
-.ruler{position:relative;height:16px}
-.ruler i{position:absolute;top:3px;width:2px;height:10px;margin-left:-1px;background:var(--rule);border-radius:1px}
-.ruler i.past{background:var(--muted)}
-.ruler i.now{background:var(--accent);top:0;height:16px;width:3px}
-.speed{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
-.speed select{height:34px;border:1px solid var(--rule);border-radius:7px;background:var(--paper);padding:0 6px}
-.clock{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 18px;align-items:baseline;border-top:1px solid var(--rule-soft);padding-top:8px}
-.clock .idx{font:600 15px var(--mono)}
-.clock time{font:600 15px var(--mono)}
-.clock .rel,.clock .gap{color:var(--muted);font-size:13px}
-.clock .title{font-weight:600}
-.gap.long{color:var(--accent)}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;margin-top:14px;align-items:start}
-.board{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
-.board-head,.row{display:grid;grid-template-columns:58px 92px minmax(120px,1.1fr) 120px 112px minmax(96px,.8fr) minmax(140px,1.2fr);gap:10px;align-items:center;padding:0 14px}
-.board-head{height:34px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--rule);background:#fafafa}
-.stage-head{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;text-align:center;font-size:10px;letter-spacing:-.04em;white-space:nowrap}
-.row{min-height:46px;border-bottom:1px solid var(--rule-soft);cursor:pointer;width:100%;text-align:left;background:none;border-left:0;border-right:0;border-top:0}
-.row:last-child{border-bottom:0}
-.row:hover{background:#fafbfc}
-.row[aria-pressed="true"]{background:var(--accent-wash)}
-.row.changed{animation:flash 900ms ease-out}
-@keyframes flash{from{box-shadow:inset 4px 0 0 var(--accent)}to{box-shadow:inset 4px 0 0 transparent}}
-.rid{font:600 13px var(--mono)}
-.lane{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap}
-.lane.kubernetes{background:var(--native-wash);color:var(--native)}
-.lane.slurm{background:var(--slurm-wash);color:var(--slurm);box-shadow:inset 0 0 0 1px var(--slurm)}
-.what{min-width:0}
-.what b{display:block;font-weight:600;font-size:13px;white-space:normal;overflow-wrap:anywhere}
-.what small{color:var(--muted);font-size:12px}
-.track{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
-.track span{height:8px;border-radius:2px;background:var(--rule-soft)}
-.track span.on{background:var(--native)}
-.track span.on.done{background:var(--ink)}
-.track span.on.fail{background:var(--accent)}
-.state{font:600 12px var(--mono);letter-spacing:.02em}
-.state.fail{color:var(--accent)}
-.unknown{color:var(--faint);font-style:italic;font-weight:400;font-family:var(--font)}
-.where{min-width:0;font-size:13px}
-.where .node{font:600 12px var(--mono);background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:1px 5px;margin-right:3px;white-space:nowrap}
-.attempts{display:flex;flex-wrap:wrap;gap:4px;font-size:12px}
-.att{font:600 11px var(--mono);padding:1px 6px;border-radius:4px;border:1px solid var(--rule);white-space:nowrap}
-.att.failed{border-color:var(--accent);color:var(--accent);text-decoration:line-through;text-decoration-thickness:1px}
-.att.current{border-color:var(--ink)}
-.prio{font:600 12px var(--mono)}
-.prio.up{color:var(--accent)}
-aside{display:flex;flex-direction:column;gap:12px}
-.card{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px 14px}
-.card h2{font-size:13px;margin:0 0 8px;color:var(--muted);font-weight:600;letter-spacing:.02em}
-.card h3{font-size:16px;margin:0 0 6px}
-dl{display:grid;grid-template-columns:96px 1fr;gap:4px 10px;margin:0;font-size:13px}
-dt{color:var(--muted)}
-dd{margin:0;min-width:0;overflow-wrap:anywhere}
-ol.log{list-style:none;margin:8px 0 0;padding:0;font-size:12px;max-height:220px;overflow:auto}
-ol.log li{display:grid;grid-template-columns:86px 1fr;gap:8px;padding:3px 0;border-top:1px solid var(--rule-soft)}
-ol.log time{font-family:var(--mono);color:var(--muted)}
-.nodes{display:grid;gap:6px;font-size:12px}
-.nodes div{display:grid;grid-template-columns:70px 1fr;gap:8px;align-items:start}
-.nodes .node{font:600 12px var(--mono)}
-.nodes small{color:var(--muted)}
-.summary{margin-top:16px}
-#mobilint-success{margin-top:14px}
-#mobilint-success[hidden]{display:none}
-#mobilint-success h2{color:var(--ink);font-size:18px;margin-bottom:4px}
-#mobilint-success p{margin:4px 0}
-#mobilint-success a{color:var(--native)}
-#mobilint-success .facts{margin:8px 0}
-#mobilint-row[hidden]{display:none}
-#mobilint-row .separate-date{padding:8px 14px;background:var(--native-wash);color:var(--native);font-size:12px;border-top:1px solid var(--rule)}
-#mobilint-row .row{cursor:default}
-.summary .card{padding:16px 18px}
-.summary p{margin:4px 0;color:var(--muted)}
-.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
-.facts div{border-left:3px solid var(--rule);padding:2px 10px}
-.facts b{display:block;font:600 20px var(--mono)}
-.facts span{font-size:12px;color:var(--muted)}
-.caveat{font-size:12px;color:var(--muted);margin-top:16px;border-top:1px solid var(--rule);padding-top:10px}
-.caveat a{color:var(--native)}
+:focus-visible{outline:2px solid var(--select);outline-offset:2px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-@media (max-width:1100px){
-  .layout{grid-template-columns:1fr}
-  aside{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.mono{font-family:var(--mono)}
+.unknown{color:var(--ink-3);font-style:italic}
+
+/* shell */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+.top h1{display:flex;align-items:baseline;gap:8px;margin:0;font-size:15px;font-weight:650;letter-spacing:-.01em;white-space:nowrap}
+.top h1 .product{font-size:11px;font-weight:600;color:var(--ink-3);letter-spacing:.02em}
+.record{display:inline-flex;align-items:center;gap:8px;height:24px;padding:0 8px;border:1px solid var(--ink);border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap}
+.record .sep{width:1px;height:12px;background:var(--line-strong)}
+.record time{font-family:var(--mono);font-weight:500;color:var(--ink-2)}
+.scenario{display:flex;margin:0;padding:0;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden;background:var(--panel)}
+.scenario legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.scenario label{display:flex;align-items:center;gap:6px;min-height:32px;padding:0 12px;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.scenario label[hidden]{display:none}
+.scenario label+label{border-left:1px solid var(--line-strong)}
+.scenario input{margin:0;accent-color:var(--select)}
+.scenario label:has(input:checked){background:var(--select-wash);color:var(--ink);font-weight:600}
+.scenario label:has(input:focus-visible){outline:2px solid var(--select);outline-offset:-2px}
+.top .spacer{flex:1}
+.prov{position:relative}
+.prov summary{display:flex;align-items:center;min-height:32px;padding:0 12px;border:1px solid var(--line-strong);border-radius:6px;cursor:pointer;list-style:none;color:var(--ink-2);white-space:nowrap}
+.prov summary::-webkit-details-marker{display:none}
+.prov summary::after{content:"";width:6px;height:6px;margin-left:8px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg)}
+.prov[open] summary{background:var(--inset);color:var(--ink)}
+.prov-panel{position:absolute;right:0;top:calc(100% + 4px);z-index:20;width:min(440px,calc(100vw - 32px));max-height:70vh;overflow:auto;padding:12px 16px;background:var(--panel);border:1px solid var(--line-strong);border-radius:8px;box-shadow:0 8px 24px rgba(23,36,59,.12);font-size:12px;color:var(--ink-2)}
+.prov-panel h2{margin:0 0 4px;font-size:12px;color:var(--ink);font-weight:650}
+.prov-panel p{margin:0 0 8px}
+.prov-panel h2+p{margin-top:0}
+.prov-panel * + h2{margin-top:12px}
+.prov-panel a{color:var(--select)}
+.prov-panel code{font:11px var(--mono);overflow-wrap:anywhere;color:var(--ink)}
+.scope-line{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;padding:4px 16px;background:var(--panel);border-bottom:1px solid var(--line);color:var(--ink-2);font-size:12px}
+.scope-line b{color:var(--ink);font-weight:600}
+
+/* filter bar */
+.filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 16px}
+.totals{display:flex;flex-wrap:wrap;gap:4px;margin:0;padding:0;list-style:none}
+.totals button{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:0 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.totals button b{font:600 13px var(--mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.totals button:hover{border-color:var(--line-strong)}
+.totals button[aria-pressed="true"]{border-color:var(--select);background:var(--select-wash);color:var(--ink)}
+.totals button:disabled{cursor:default;opacity:.55}
+.totals button i{width:8px;height:8px;border-radius:2px;background:var(--line-strong)}
+.scope-note{color:var(--ink-3);font-size:12px}
+.filters .grow{flex:1}
+.search{display:flex;align-items:center;gap:6px;color:var(--ink-2)}
+.search input{width:220px;height:32px;padding:0 8px;border:1px solid var(--line-strong);border-radius:6px;background:var(--inset)}
+.search input:focus{background:var(--panel)}
+.active-filter{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 4px 0 8px;border:1px solid var(--select-line);border-radius:6px;background:var(--select-wash);font-size:12px}
+.active-filter[hidden]{display:none}
+.active-filter button{min-width:24px;height:24px;border:0;border-radius:4px;background:none;cursor:pointer;color:var(--select);font-weight:600}
+
+/* state semantics */
+.g-intake{--c:var(--intake);--w:var(--intake-wash);--m:var(--ink-3)}
+.g-wait{--c:var(--pending);--w:var(--pending-wash);--m:var(--pending-mark)}
+.g-run{--c:var(--select);--w:var(--select-wash);--m:var(--select)}
+.g-collect{--c:var(--select);--w:var(--select-wash);--m:var(--select-line)}
+.g-done{--c:var(--success);--w:var(--success-wash);--m:var(--success-mark)}
+.g-fail{--c:var(--failure);--w:var(--failure-wash);--m:var(--failure)}
+.g-before,.g-none{--c:var(--ink-3);--w:transparent;--m:var(--line)}
+.totals button i{background:var(--m)}
+.pill{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 6px;border-radius:4px;background:var(--w);color:var(--c);font:600 11px var(--mono);letter-spacing:.02em;white-space:nowrap}
+.g-before .pill,.pill.g-before,.pill.g-none{border:1px dashed var(--line-strong)}
+
+/* workspace */
+.work{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:8px;padding:0 16px 8px;align-items:start}
+.work>.flow-panel,.work>.board{grid-column:1/-1}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;min-width:0}
+.panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.panel-head h2{margin:0;font-size:13px;font-weight:650}
+.panel-head small{color:var(--ink-3);font-size:11px}
+
+.thead,.row{display:grid;grid-template-columns:52px 128px minmax(0,1fr) 112px 116px;gap:8px;align-items:center;padding:0 12px}
+.thead{height:28px;border-bottom:1px solid var(--line);background:var(--inset);font-size:11px;color:var(--ink-2);font-weight:600}
+.row{width:100%;min-height:40px;padding-top:4px;padding-bottom:4px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;cursor:pointer;box-shadow:inset 3px 0 0 transparent}
+.row:hover{background:#f8fafc}
+.row[aria-pressed="true"]{background:var(--select-wash);box-shadow:inset 3px 0 0 var(--select)}
+.row.changed{animation:flash 900ms cubic-bezier(.23,1,.32,1)}
+@keyframes flash{from{box-shadow:inset 3px 0 0 var(--ink-3)}}
+.rid{font:600 13px var(--mono)}
+.st{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0}
+.st small{font-size:11px;color:var(--pending);overflow-wrap:anywhere;line-height:1.35}
+.st small.plain{color:var(--ink-3)}
+.what{min-width:0;display:flex;flex-direction:column;gap:2px}
+.what b{font-weight:600;overflow-wrap:anywhere;line-height:1.35}
+.what b.unplaced{font-weight:500;color:var(--ink-3)}
+.what span{color:var(--ink-2);font-size:12px;overflow-wrap:anywhere}
+.lane{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:4px;font-size:11px;font-weight:600;border:1px solid var(--line-strong);color:var(--ink-2);white-space:nowrap;vertical-align:1px}
+.lane.slurm{border-color:var(--ink);color:var(--ink)}
+.where{display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-width:0}
+.node{display:inline-flex;align-items:center;height:20px;padding:0 6px;border:1px solid var(--line-strong);border-radius:4px;background:var(--panel);font:600 11px var(--mono);white-space:nowrap}
+.node.actual{border-color:var(--ink);color:var(--ink)}
+.node.target{border-style:dashed;color:var(--ink-2)}
+.node.target::before{content:"대상";font:500 10px var(--font);margin-right:4px;color:var(--ink-3)}
+.node.excluded{border-color:var(--failure);color:var(--failure);text-decoration:line-through}
+.where small{color:var(--ink-3);font-size:11px;width:100%}
+.extra{display:flex;flex-wrap:wrap;gap:4px;font-size:12px;color:var(--ink-2);min-width:0}
+.att{font:600 11px var(--mono);height:20px;display:inline-flex;align-items:center;padding:0 6px;border-radius:4px;border:1px solid var(--line-strong);white-space:nowrap}
+.att.failed{border-color:var(--failure);color:var(--failure);background:var(--failure-wash)}
+.att.current{border-color:var(--ink)}
+.prio{font:600 11px var(--mono);height:20px;display:inline-flex;align-items:center;padding:0 6px;border-radius:4px;background:var(--inset)}
+.prio.up{background:var(--pending-wash);color:var(--pending)}
+.empty{padding:16px 12px;color:var(--ink-3)}
+.sep-row{padding:4px 12px;border-bottom:1px solid var(--line);background:var(--inset);font-size:11px;color:var(--ink-2);font-weight:600}
+#mobilint-row[hidden]{display:none}
+#mobilint-row .row{cursor:default}
+#mobilint-row .row:hover{background:none}
+
+/* collapsed request table */
+.detail-list>summary{display:flex;align-items:baseline;gap:8px;min-height:36px;padding:8px 12px;cursor:pointer;font-weight:600;color:var(--ink);list-style:none}
+.detail-list>summary::-webkit-details-marker{display:none}
+.detail-list>summary::before{content:"";width:6px;height:6px;margin-right:2px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(-45deg)}
+.detail-list[open]>summary::before{transform:translateY(-3px) rotate(45deg)}
+.detail-list>summary small{font-weight:500;color:var(--ink-3);font-size:11px}
+.detail-list[open]>summary{border-bottom:1px solid var(--line)}
+.flow-panel .flow{border-bottom:0}
+
+/* execution flow: arrival -> pending queue -> admission/running nodes -> outcome, one recorded snapshot */
+.flow{display:flex;flex-direction:column;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.flow-note{display:flex;flex-wrap:wrap;gap:2px 12px;margin:0;font-size:11px;color:var(--ink-3)}
+.flow-note b{color:var(--ink-2);font-weight:600}
+.lanes{display:grid;grid-template-columns:92px minmax(0,1.75fr) minmax(0,1fr) 92px;align-items:start}
+.stage{position:relative;min-width:0;padding:0 10px}
+.stage:first-child{padding-left:0}.stage:last-child{padding-right:0}
+.stage+.stage{border-left:1px solid var(--line)}
+.stage:not(:last-child)::after{content:"";position:absolute;right:-5px;top:4px;width:7px;height:7px;border-top:1.5px solid var(--ink-3);border-right:1.5px solid var(--ink-3);background:var(--panel);transform:rotate(45deg)}
+.stage h3{display:flex;align-items:baseline;gap:6px;margin:0 0 4px;font-size:11px;font-weight:650;color:var(--ink-2);white-space:nowrap}
+.stage h3 b{font:600 11px var(--mono);color:var(--ink)}
+.stage .order{margin:-2px 0 4px;font-size:10px;color:var(--ink-3);line-height:1.35}
+.cards{display:grid;gap:4px;margin:0;padding:0;list-style:none}
+.cards.q{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.toks{display:flex;flex-wrap:wrap;gap:4px;margin:0;padding:0;list-style:none}
+.toks .sub{width:100%;font-size:10px;color:var(--ink-3)}
+.card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:0 6px;align-items:baseline;width:100%;padding:4px 6px;border:1px solid var(--line);border-left:3px solid var(--m);border-radius:4px;background:var(--panel);text-align:left;cursor:pointer;font-size:11px;line-height:1.4}
+.card:hover{border-color:var(--line-strong);border-left-color:var(--m)}
+.card[aria-pressed="true"]{background:var(--select-wash);border-color:var(--select);border-left-color:var(--m)}
+.card .ord{font:600 10px var(--mono);color:var(--ink-3)}
+.card .cid{font:600 12px var(--mono);color:var(--ink)}
+.card .cr{display:flex;gap:4px;align-items:baseline;font:600 10px var(--mono);color:var(--ink-2);white-space:nowrap}
+.card .why,.card .ann,.card .on{grid-column:1/-1;min-width:0}
+.card .why{color:var(--c);overflow-wrap:anywhere}
+.card .why.plain{color:var(--ink-3)}
+.card .on{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:2px}
+.card .ann{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.card.moved{box-shadow:0 0 0 2px var(--select-line)}
+.card.dim,.tok.dim{opacity:.45}
+.tok{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 6px;border:1px solid var(--line);border-left:3px solid var(--m);border-radius:4px;background:var(--panel);cursor:pointer;font:600 11px var(--mono);color:var(--ink);white-space:nowrap}
+.tok small{font:500 10px var(--font);color:var(--ink-3)}
+.tok[aria-pressed="true"]{background:var(--select-wash);border-color:var(--select);border-left-color:var(--m)}
+.tok.moved{box-shadow:0 0 0 2px var(--select-line)}
+.tok.attempt{cursor:default;border-style:dashed;border-left-style:solid}
+.bdg{display:inline-flex;align-items:center;height:16px;padding:0 4px;border-radius:3px;border:1px solid var(--line-strong);font:600 10px var(--font);color:var(--ink-2);white-space:nowrap}
+.bdg.p{font-family:var(--mono);background:var(--inset);border-color:transparent;color:var(--ink)}
+.bdg.p.high{background:var(--pending-wash);color:var(--pending)}
+.bdg.promote{border-color:var(--pending-mark);background:var(--pending-wash);color:var(--pending)}
+.bdg.admit,.bdg.barrier{border-color:var(--select-line);background:var(--select-wash);color:var(--select)}
+.bdg.fail{border-color:var(--failure);background:var(--failure-wash);color:var(--failure)}
+.bdg.done{border-color:var(--success-mark);color:var(--success)}
+.bdg.from{border-style:dashed;color:var(--ink-3)}
+.bdg.hist{border-color:transparent;background:var(--inset);color:var(--ink-3)}
+.events{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:0;padding:0 0 6px;border-bottom:1px dashed var(--line);list-style:none}
+.events .evh{margin-right:4px;font-size:11px;font-weight:650;color:var(--ink-2)}
+.events .evh small{font-weight:500;color:var(--ink-3)}
+.ev{display:inline-flex;align-items:center;gap:4px;min-height:22px;padding:0 6px;border:1px solid var(--line);border-left:3px solid var(--k,var(--line-strong));border-radius:4px;background:var(--panel);cursor:pointer;font-size:11px;color:var(--ink-2);text-align:left}
+.ev b{font:600 11px var(--mono);color:var(--ink)}
+.ev[aria-pressed="true"]{border-color:var(--select);background:var(--select-wash);border-left-color:var(--k,var(--select))}
+.ev.k-promote{--k:var(--pending-mark)}.ev.k-admit,.ev.k-barrier{--k:var(--select)}.ev.k-fail{--k:var(--failure)}.ev.k-done{--k:var(--success-mark)}.ev.k-arrive,.ev.k-queue{--k:var(--ink-3)}
+.ev.frame{cursor:default;border-style:dashed;border-left-style:solid}
+.events .none{font-size:11px;color:var(--ink-3)}
+
+/* summary */
+#summary[hidden]{display:none}
+.summary{padding:8px 12px;border-top:1px solid var(--line);background:var(--success-wash)}
+.summary h3{margin:0 0 4px;font-size:12px;font-weight:650;color:var(--success)}
+.facts{display:flex;flex-wrap:wrap;gap:4px 16px;margin:0 0 4px;padding:0;list-style:none}
+.facts li{font-size:12px;color:var(--ink-2)}
+.facts b{font:600 13px var(--mono);color:var(--ink);margin-right:4px}
+.summary p{margin:0;font-size:12px;color:var(--ink-2)}
+
+/* roster */
+.roster{list-style:none;margin:0;padding:4px}
+.roster li+li{margin-top:2px}
+.nbtn{display:grid;grid-template-columns:64px minmax(0,1fr);gap:2px 8px;width:100%;padding:6px 8px;border:1px solid transparent;border-radius:6px;background:none;text-align:left;cursor:pointer}
+.nbtn:hover{background:#f8fafc}
+.nbtn[aria-pressed="true"]{border-color:var(--select-line);background:var(--select-wash)}
+.nbtn.hit{border-color:var(--select);box-shadow:inset 3px 0 0 var(--select)}
+.nbtn.hit-target{border-color:var(--select);border-style:dashed}
+.nbtn.hit-excluded{border-color:var(--failure);border-style:dashed}
+.nbtn.outside{opacity:.55}
+.nbtn .alias{font:600 12px var(--mono);grid-row:span 2}
+.nbtn .model{font-weight:600;font-size:12px;overflow-wrap:anywhere}
+.nbtn .meta{grid-column:2;font-size:11px;color:var(--ink-3)}
+.nbtn .load,.roster .load{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.roster li>.load{margin:-2px 0 2px;padding:0 8px 4px 80px}
+.chip{display:inline-flex;align-items:center;height:18px;padding:0 4px;border-radius:4px;background:var(--w);color:var(--c);font:600 10px var(--mono);white-space:nowrap}
+button.chip{border:1px solid transparent;cursor:pointer}
+button.chip:hover{border-color:var(--c)}
+button.chip[aria-pressed="true"]{border-color:var(--select);box-shadow:0 0 0 1px var(--select)}
+.chip.target{background:none;border:1px dashed var(--line-strong);color:var(--ink-2)}
+.chip.note{background:var(--inset);color:var(--ink-2);font-family:var(--font);font-weight:500}
+.chip.cover{background:none;border:1px solid var(--success-mark);color:var(--success);font-family:var(--font);font-weight:500}
+.chip.excl{background:var(--failure-wash);color:var(--failure);font-family:var(--font);font-weight:500}
+.roster-foot{margin:0;padding:8px 12px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-3)}
+.roster-foot b{color:var(--ink-2);font-weight:600}
+
+/* inspector */
+#detail{padding:12px}
+#detail .ihead{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
+#detail h3{margin:0;font:650 16px var(--mono)}
+.place{display:grid;gap:4px;margin:0 0 8px;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--inset)}
+.place div{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.place .k{width:72px;font-size:11px;color:var(--ink-2);font-weight:600}
+.reason{margin:0 0 8px;padding:6px 8px;border-left:3px solid var(--pending-mark);background:var(--pending-wash);font-size:12px;color:var(--pending)}
+.reason b{display:block;font-size:11px;color:var(--ink-2);font-weight:600}
+dl{display:grid;grid-template-columns:84px 1fr;gap:4px 8px;margin:0;font-size:12px}
+dt{color:var(--ink-2)}
+dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.logh{margin:12px 0 4px;font-size:11px;font-weight:600;color:var(--ink-2)}
+ol.log{list-style:none;margin:0;padding:0;font-size:12px}
+ol.log li{display:grid;grid-template-columns:88px 1fr;gap:8px;padding:4px 0;border-top:1px solid var(--line)}
+ol.log time{font:11px var(--mono);color:var(--ink-3);padding-top:1px}
+ol.log li.fail span{color:var(--failure)}
+
+/* timeline */
+.timeline{position:sticky;bottom:0;z-index:10;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 16px;align-items:center;padding:8px 16px;background:var(--panel);border-top:1px solid var(--line-strong)}
+.buttons{display:flex;gap:4px}
+.buttons button{min-width:36px;height:32px;padding:0 8px;border:1px solid var(--line-strong);border-radius:6px;background:var(--panel);cursor:pointer;font-size:12px}
+.buttons button:hover{background:var(--inset)}
+.buttons button:active{transform:scale(.97)}
+.buttons #play{min-width:96px;font-weight:600}
+.buttons #play[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.buttons button:disabled{opacity:.4;cursor:default;transform:none}
+.seek{display:flex;flex-direction:column;gap:0;min-width:0}
+.seek input{width:100%;margin:0;accent-color:var(--select)}
+.ruler{position:relative;height:10px}
+.ruler i{position:absolute;top:2px;width:2px;height:6px;margin-left:-1px;background:var(--line-strong)}
+.ruler i.past{background:var(--ink-3)}
+.ruler i.k-arrive{background:var(--select-line)}
+.ruler i.k-promote{background:var(--pending-mark);height:8px;top:1px}
+.ruler i.k-fail{background:var(--failure);height:10px;top:0}
+.ruler i.k-final{background:var(--success-mark);height:8px;top:1px}
+.ruler i.now{background:var(--ink);top:0;height:10px;width:3px}
+.speed{display:flex;align-items:center;gap:6px;color:var(--ink-2);font-size:12px;white-space:nowrap}
+.speed select{height:32px;padding:0 4px;border:1px solid var(--line-strong);border-radius:6px;background:var(--inset)}
+.clock{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 16px;font-size:12px;color:var(--ink-2)}
+.clock .idx,.clock time{font:600 12px var(--mono);color:var(--ink)}
+.clock .title{color:var(--ink);font-weight:600}
+.clock .rec-tag{display:none;padding:0 4px;border:1px solid var(--ink);border-radius:4px;font-size:11px;font-weight:600;color:var(--ink)}
+.clock .gap.long{color:var(--pending)}
+.clock .legend{margin-left:auto;display:flex;gap:12px;color:var(--ink-3);font-size:11px}
+.clock .legend span::before{content:"";display:inline-block;width:2px;height:10px;margin-right:4px;vertical-align:-1px;background:var(--c)}
+
+/* desktop app shell: workspace panels scroll locally inside one viewport */
+@media (min-width:1100px) and (min-height:640px){
+  body{height:100vh;display:grid;grid-template-rows:auto auto auto minmax(0,1fr) auto;overflow:hidden}
+  /* one scrolling workspace: full-width flow first, then node summary + inspector, then the collapsed table */
+  .work{height:100%;min-height:0;overflow:auto;grid-template-columns:minmax(0,2fr) minmax(320px,1fr);align-items:start}
+  .side{display:contents}
+  .roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:2px 8px}
+  .roster li+li{margin-top:0}
+  .lanes{grid-template-columns:128px minmax(0,1.9fr) minmax(0,1.2fr) 148px}
+  .cards.q{grid-template-columns:repeat(auto-fill,minmax(196px,1fr))}
+  .cards.r{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+  .card{padding:6px 8px;font-size:12px}
+  .card .cid{font-size:13px}
 }
-@media (max-width:720px){
-  main{padding:12px 12px 32px}
-  .banner{padding:8px 12px;font-size:12px}
-  .transport{grid-template-columns:1fr;padding:10px}
-  .buttons{justify-content:space-between}
-  .buttons button{flex:1}
-  .board-head{display:none}
-  .row{grid-template-columns:52px minmax(0,1fr) auto;grid-template-areas:"id what lane" "track track state" "where where where" "extra extra extra";gap:6px 10px;padding:10px 12px}
-  .row .rid{grid-area:id}.row .what{grid-area:what}.row .lane{grid-area:lane}.row .track{grid-area:track}.row .state{grid-area:state}.row .where{grid-area:where}.row .extra{grid-area:extra}
-  aside{display:flex}
+@media (max-width:1099px){
+  .work{grid-template-columns:1fr}
+  .side{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}
+}
+@media (max-width:760px){
+  .top{padding:8px 12px}
+  .top .spacer{display:none}
+  .scenario{width:100%}
+  .scenario label{flex:1;justify-content:center;padding:0 8px;white-space:normal;text-align:center;line-height:1.25}
+  .scope-line,.filters{padding-left:12px;padding-right:12px}
+  .search{width:100%}.search input{flex:1;width:auto;min-width:0;height:40px}
+  .totals button{min-height:36px}
+  .work{padding:0 12px 8px}
+  .side{grid-template-columns:1fr}
+  .lanes{grid-template-columns:1fr;gap:8px}
+  .stage,.stage:first-child,.stage:last-child{padding:0}
+  .stage+.stage{border-left:0;border-top:1px solid var(--line);padding-top:8px}
+  .stage:not(:last-child)::after{right:auto;left:50%;top:auto;bottom:-13px;transform:rotate(135deg)}
+  .roster li>.load{padding-left:8px}
+  .thead{display:none}
+  .row{grid-template-columns:52px minmax(0,1fr) auto;grid-template-areas:"id st st" "what what what" "where where extra";gap:4px 8px;padding:8px 12px}
+  .row .rid{grid-area:id}.row .st{grid-area:st;flex-direction:row;flex-wrap:wrap;align-items:center}.row .what{grid-area:what}.row .where{grid-area:where}.row .extra{grid-area:extra;justify-content:flex-end}
+  .timeline{grid-template-columns:1fr auto;padding:8px 12px}
+  .seek{grid-column:1/-1;grid-row:1}
+  .buttons button{min-width:40px;height:40px}
+  .speed select{height:40px}
+  .clock .legend,.clock .gap,.clock .rel{display:none}
+  .clock .rec-tag{display:inline}
+  .prov-panel{position:fixed;left:16px;right:16px;top:auto;width:auto}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<div class="banner" role="note"><span class="dot" aria-hidden="true"></span><span><b>저장된 관측 재생 · live 아님.</b> 2026-10-07~08 실행 기록 · 각 행의 실행일을 함께 표시합니다.</span></div>
-<main>
-<header>
-  <div>
-    <h1>K8s · Slurm · GPU/NPU 요청 상태 기록 재생</h1>
-    <p class="sub" id="scope"></p>
-  </div>
+<header class="top">
+  <h1><span class="product">Resource Advisor</span>실행 관제</h1>
+  <span class="record" role="note" aria-label="저장된 관측 기록 재생, live 상태 아님"><span>기록 재생</span><span class="sep" aria-hidden="true"></span><time id="record-date"></time><span class="sep" aria-hidden="true"></span><span>live 아님</span></span>
   <fieldset class="scenario"><legend>시나리오</legend>
     <label><input type="radio" name="scenario" value="fleet" checked> 통합 실행 · K8s + Slurm</label>
     <label><input type="radio" name="scenario" value="adaptive"> 변동 도착·우선순위·재시도</label>
+    <label id="gang-option" hidden><input type="radio" name="scenario" value="gang"> 다중 worker 그룹 승인</label>
   </fieldset>
-</header>
-
-<section class="card" id="mobilint-success" aria-label="모빌린트 실행 성공 기록" hidden data-source-sha256="64ebe1c9d4e585f59e0e7d7b55665d3758d031a0924c2426fb4de6c6ff44bd09">
-  <h2>Mobilint ARIES2 · Candy 실행 성공 <span class="lane kubernetes">Kubernetes</span></h2>
-  <p class="sub">실행일 2026-10-08 · 검증된 Candy 모델 실행 결과</p>
-  <div class="facts">
-    <div><b>SUCCEEDED</b><span>실제 NPU 작업 완료</span></div>
-    <div><b>일치 검증 통과</b><span>고정 입력의 반복 출력 일치</span></div>
-    <div><b>결과 수집 완료</b><span>프로파일 · MLflow 기록 확인</span></div>
-  </div>
-  <details><summary>실행 근거와 검증 범위</summary>
-    <p>Candy 컴파일 모델 · NPU 1개 · CPU 1개 · 메모리 1 GiB. 접수 07:22:15 UTC → 완료 07:22:50 UTC.</p>
-    <p>실제 하드웨어 실행과 반복 출력 일치를 확인한 기록입니다. 스타일 품질 평가나 현재 장비 상태를 뜻하지 않습니다. Firmware identity 미완료로 성능 추천 재사용은 보류돼 있습니다.</p>
-    <p><a href="https://github.com/dsa04156/resource-advisor/blob/a5d1dde87b56ba2794dc6a93559342eb85f1940f/docs/evidence/all-accelerators-20261008-v1.json">원본 성공 기록 · jobs[0]</a> · workload: mobilint-candy-20261008-v1</p>
+  <span class="spacer"></span>
+  <details class="prov" id="prov">
+    <summary>출처 · 범위</summary>
+    <div class="prov-panel">
+      <h2>이 화면의 데이터</h2>
+      <p id="caveat"></p>
+      <h2>시나리오 범위</h2>
+      <p id="prov-scope"></p>
+      <h2>표시 규칙</h2>
+      <p>실행 노드는 Pod/작업 시작·실행이 기록된 뒤에만 “배치”로 표시합니다. 실행 전 기록된 노드는 점선 “대상”(라우팅 대상)이며 할당이 아닙니다. 장치 모델은 실제 배치가 관측된 노드에만 붙입니다. 노드 용량·사용률은 재생 데이터에 없으므로 표시하지 않습니다.</p>
+      <section id="mobilint-success" aria-label="모빌린트 실행 성공 기록" data-source-sha256="64ebe1c9d4e585f59e0e7d7b55665d3758d031a0924c2426fb4de6c6ff44bd09">
+        <h2>Mobilint ARIES2 · 별도 실행일 기록</h2>
+        <p>실행일 2026-10-08 · Candy 컴파일 모델 · NPU 1개 · CPU 1개 · 메모리 1 GiB. 접수 07:22:15 UTC → 완료 07:22:50 UTC. SUCCEEDED · 고정 입력 반복 출력 일치 · 프로파일 · MLflow 기록 확인.</p>
+        <p>실제 하드웨어 실행과 반복 출력 일치를 확인한 기록입니다. 스타일 품질 평가나 현재 장비 상태를 뜻하지 않습니다. Firmware identity 미완료로 성능 추천 재사용은 보류돼 있습니다. 2026-10-07 재생 타임라인에는 포함되지 않습니다.</p>
+        <p><a href="https://github.com/dsa04156/resource-advisor/blob/a5d1dde87b56ba2794dc6a93559342eb85f1940f/docs/evidence/all-accelerators-20261008-v1.json">원본 성공 기록 · jobs[0]</a> · 커밋 <code>a5d1dde87b56ba2794dc6a93559342eb85f1940f</code> · workload <code>mobilint-candy-20261008-v1</code> · 파일 SHA-256 <code>64ebe1c9d4e585f59e0e7d7b55665d3758d031a0924c2426fb4de6c6ff44bd09</code></p>
+      </section>
+    </div>
   </details>
-</section>
+</header>
+<p class="scope-line"><b id="scenario-name"></b><span id="scope"></span></p>
 
-<section class="transport" aria-label="2026-10-07 요청 10건 재생 제어">
+<div class="filters">
+  <ul class="totals" id="totals" aria-label="이 관측 시점의 요청 상태별 건수 · 누르면 표를 거릅니다"></ul>
+  <span class="scope-note" id="totals-note"></span>
+  <span class="grow"></span>
+  <span class="active-filter" id="node-filter" hidden><span id="node-filter-label"></span><button type="button" id="node-filter-clear" aria-label="노드 필터 해제">✕</button></span>
+  <label class="search">검색 <input id="q" type="search" placeholder="요청·노드·장치·사유" autocomplete="off"></label>
+</div>
+
+<main class="work">
+  <section class="panel flow-panel" aria-labelledby="flow-title">
+    <div class="flow" id="flow">
+      <p class="flow-note"><b id="flow-title">실행 흐름 · 이 관측 스냅샷</b><span id="flow-sub"></span></p>
+      <ul class="events" id="events" aria-label="직전 관측 대비 기록 변화"></ul>
+      <div class="lanes" id="lanes"></div>
+    </div>
+  </section>
+  <div class="side">
+    <section class="panel" aria-labelledby="roster-title">
+      <div class="panel-head"><h2 id="roster-title">노드 배치</h2><small>이 관측 시점</small></div>
+      <div class="scroll"><ul class="roster" id="nodes"></ul></div>
+      <p class="roster-foot" id="roster-foot"></p>
+    </section>
+    <section class="panel" aria-labelledby="detail-title">
+      <div class="panel-head"><h2 id="detail-title">선택한 요청</h2><small>이 관측 시점 기준</small></div>
+      <div class="scroll"><div id="detail" aria-live="polite"></div></div>
+    </section>
+  </div>
+  <section class="panel board" aria-labelledby="board-title">
+    <div class="panel-head"><h2 id="board-title" tabindex="-1">요청 목록</h2><small id="board-sub"></small></div>
+    <details class="detail-list" id="detail-list">
+    <summary>요청 상세 목록 <small>요청별 상태·사유·노드 표 · 흐름과 같은 관측</small></summary>
+    <div class="thead" aria-hidden="true"><span>요청</span><span>관측 상태 · 네이티브 사유</span><span>작업 · 경로 · 장치</span><span>배치 노드</span><span id="extra-head">결과 · 기록</span></div>
+    <div class="scroll">
+      <div id="rows"></div>
+      <div id="mobilint-row" hidden>
+        <div class="sep-row">별도 실행일 기록 · 2026-10-08 · 이 재생 타임라인과 무관하게 항상 표시</div>
+        <div class="row" aria-label="요청 11 Mobilint ARIES2 Candy Kubernetes 실행 성공, 2026-10-08">
+          <span class="rid">요청 11</span>
+          <span class="st g-done"><span class="pill">SUCCEEDED</span><small class="plain">2026-10-08 기록</small></span>
+          <span class="what"><b>Mobilint ARIES2 <span class="lane">K8s · Kueue</span></b><span>Candy 모델 추론 · NPU · 가속기 1</span></span>
+          <span class="where"><span class="node actual">NPU-B</span></span>
+          <span class="extra">반복 출력 일치 · 결과 수집 · MLflow 기록</span>
+        </div>
+      </div>
+    </div>
+    </details>
+    <section class="summary" id="summary" aria-live="polite" hidden></section>
+  </section>
+</main>
+
+<section class="timeline" aria-label="관측 기록 재생 제어">
   <div class="buttons">
-    <button id="reset" type="button" title="처음 관측으로 (Home)" aria-label="처음 관측으로">⏮</button>
+    <button id="reset" type="button" title="처음 관측으로 (Home)" aria-label="처음 관측으로">|◀</button>
     <button id="prev" type="button" title="이전 관측 (←)" aria-label="이전 관측">◀</button>
     <button id="play" type="button" aria-pressed="false" title="재생 / 일시정지 (Space)">▶ 재생</button>
-    <button id="next" type="button" title="다음 관측 (→)" aria-label="다음 관측">▶︎|</button>
+    <button id="next" type="button" title="다음 관측 (→)" aria-label="다음 관측">▶|</button>
   </div>
   <div class="seek">
     <label class="sr" for="seek">관측 시점 선택</label>
     <input id="seek" type="range" min="0" value="0" step="1">
     <div class="ruler" id="ruler" aria-hidden="true"></div>
   </div>
-  <label class="speed">재생 속도
+  <label class="speed">속도
     <select id="speed">
       <option value="1">기록 시간 1×</option>
       <option value="5">5×</option>
@@ -184,73 +422,119 @@ ol.log time{font-family:var(--mono);color:var(--muted)}
       <option value="30">30×</option>
     </select>
   </label>
-  <div class="clock" aria-live="polite">
+  <div class="clock">
+    <span class="rec-tag" id="rec-tag">기록 재생 · live 아님</span>
     <span class="idx" id="idx"></span>
     <time id="time"></time>
     <span class="rel" id="rel"></span>
-    <span class="title" id="title"></span>
+    <span class="title" id="title" aria-live="polite"></span>
     <span class="gap" id="gap"></span>
+    <span class="legend" aria-hidden="true" id="legend"></span>
   </div>
 </section>
 
-<div class="layout">
-  <section class="board" aria-label="Kubernetes와 Slurm 실행 기록">
-    <div class="board-head" aria-hidden="true">
-      <span>요청</span><span>네이티브 경로</span><span>장치 모델 · 작업</span>
-      <span class="stage-head"><span>접수</span><span>대기</span><span>할당</span><span>실행</span><span>수집</span><span>종료</span></span>
-      <span>관측 상태</span><span>노드 · 실행일</span><span id="extra-head">결과 · 기록</span>
-    </div>
-    <div id="rows"></div>
-    <div id="mobilint-row" hidden>
-      <div class="row" aria-label="요청 11 Mobilint ARIES2 Candy Kubernetes 실행 성공, 2026-10-08">
-        <span class="rid">요청 11</span>
-        <span class="lane kubernetes">K8s · Kueue</span>
-        <span class="what"><b>Mobilint ARIES2</b><small>Candy 모델 추론</small><br><small>NPU · 가속기 1</small></span>
-        <span class="track" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span class="on done"></span></span>
-        <span class="state">SUCCEEDED</span>
-        <span class="where"><span class="node">NPU-B</span><br><small>2026-10-08</small></span>
-        <span class="extra">반복 출력 일치 · 결과 수집 · MLflow 기록</span>
-      </div>
-    </div>
-  </section>
-  <aside>
-    <section class="card" id="detail" aria-live="polite"></section>
-    <section class="card"><h2>실행 노드 (alias)</h2><div class="nodes" id="nodes"></div></section>
-  </aside>
-</div>
-
-<section class="summary" id="summary" aria-live="polite"></section>
-
-<p class="caveat" id="caveat"></p>
-</main>
-
 <script type="application/json" id="observations">__OBSERVATIONS_JSON__</script>
+<script type="application/json" id="gang-observations">__GANG_JSON__</script>
 <script>
 (() => {
 'use strict';
 const DATA = JSON.parse(document.getElementById('observations').textContent);
-const STAGES = {REQUESTED:0, VALIDATED:0, SUBMITTING:0, QUEUED:1, PENDING:1, REQUEUED:1, ADMITTED:2, RUNNING:3, COLLECTING:4, FINALIZING:4, SUCCEEDED:5, FAILED:5};
+// Supplemental gang_batch export (replay/gang-observations.json), embedded separately so the base payload stays unchanged.
+const GANG = JSON.parse(document.getElementById('gang-observations').textContent || 'null');
+const SCENARIOS = {...DATA.scenarios, ...(GANG?.scenario ? {gang: GANG.scenario} : {})};
 // Recorded node alias to model mapping: replay/DEVICE-MODELS.md
 const DEVICE_MODELS = {"GPU-A": "NVIDIA RTX 5060 Ti", "GPU-B": "NVIDIA RTX 5080", "GPU-C": "NVIDIA GB10", "JET-A": "Jetson Orin Nano", "JET-B": "Jetson AGX Orin", "NPU-A": "Hailo-8", "SLURM-A": "Jetson Orin (Slurm)"};
-const requestNodes = req => req.pods ? req.pods.map(p => p.node).filter(Boolean) : [req.node].filter(Boolean);
-const requestModels = req => [...new Set(requestNodes(req).map(n => DEVICE_MODELS[n] || n))].join(" + ");
 const BACKEND = {kubernetes:'K8s · Kueue', slurm:'Slurm'};
+// Observed-state groups. A node counts as an actual placement only from these states (or a recorded start).
+const GROUPS = [
+  ['before', '도착 전', ['NOT_SUBMITTED']],
+  ['intake', '접수', ['REQUESTED', 'VALIDATED', 'SUBMITTING']],
+  ['wait', '대기', ['QUEUED', 'PENDING', 'REQUEUED']],
+  ['run', '배치·실행', ['ADMITTED', 'RUNNING']],
+  ['collect', '수집', ['COLLECTING', 'FINALIZING']],
+  ['done', '성공', ['SUCCEEDED']],
+  ['fail', '실패', ['FAILED']],
+];
+const GROUP_OF = Object.fromEntries(GROUPS.flatMap(([g, , states]) => states.map(s => [s, g])));
+const PLACED = new Set(['ADMITTED', 'RUNNING', 'COLLECTING', 'FINALIZING', 'SUCCEEDED', 'FAILED']);
 const $ = id => document.getElementById(id);
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
 const unknown = text => el('span', 'unknown', text || '미관측');
-const state = {scenario: 'fleet', index: 0, playing: false, timer: null, selected: 'R01'};
+const state = {scenario: 'fleet', index: 0, playing: false, timer: null, selected: 'R01', group: 'all', node: null, q: ''};
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
-const sc = () => DATA.scenarios[state.scenario];
+const sc = () => SCENARIOS[state.scenario];
+const nodesOf = () => state.scenario === 'gang' ? GANG.nodes : DATA.nodes;
+const attempts = req => req?.previous_attempts || [];
 const frame = (i = state.index) => sc().frames[i];
 const t = iso => new Date(iso).getTime();
-const hhmmss = iso => iso.slice(11, 21).replace(/(\.\d)\d*$/, '$1') + ' UTC';
+const hhmmss = iso => iso.match(/T(\d\d:\d\d:\d\d(?:\.\d)?)/)[1] + ' UTC';
 const secs = s => (s >= 10 ? s.toFixed(0) : s.toFixed(1)) + '초';
+const groupOf = req => req ? GROUP_OF[req.state] || 'intake' : 'none';
+const pill = (req, text) => el('span', 'pill g-' + groupOf(req), text);
+
+// Actual placement needs a recorded start/execution state; an earlier node is only the routing target.
+function placement(req) {
+  if (!req) return {actual: [], target: []};
+  if (req.pods) return {actual: [...new Set(req.pods.map(p => p.node).filter(Boolean))], target: []};
+  if (!req.node) return {actual: [], target: []};
+  return PLACED.has(req.state) || req.started_at ? {actual: [req.node], target: []} : {actual: [], target: [req.node]};
+}
+const models = nodes => [...new Set(nodes.map(n => DEVICE_MODELS[n] || n))].join(' + ');
+const scenarioNodes = () => {
+  const used = new Set();
+  sc().frames.forEach(f => Object.values(f.requests).forEach(r => { const p = placement(r); [...p.actual, ...p.target, ...(r.excluded_nodes || [])].forEach(n => used.add(n)); }));
+  return used;
+};
+let usedNodes = scenarioNodes();
+
+function eventKind(f, last) {
+  if (last) return 'final';
+  if (f.title.startsWith('실패 기록')) return 'fail';
+  if (f.title.startsWith('대기 우선순위')) return 'promote';
+  if (f.title.startsWith('새 요청') || f.title.startsWith('등록된')) return 'arrive';
+  return '';
+}
 
 function renderRuler() {
   const frames = sc().frames, t0 = t(frames[0].observed_at), span = t(frames.at(-1).observed_at) - t0 || 1;
   const ruler = $('ruler'); ruler.replaceChildren();
-  frames.forEach((f, i) => { const tick = el('i'); tick.style.left = ((t(f.observed_at) - t0) / span * 100) + '%'; tick.dataset.i = i; ruler.append(tick); });
+  frames.forEach((f, i) => { const tick = el('i'); tick.style.left = ((t(f.observed_at) - t0) / span * 100) + '%'; tick.dataset.kind = eventKind(f, i === frames.length - 1); ruler.append(tick); });
+  const kinds = new Set(frames.map((f, i) => eventKind(f, i === frames.length - 1)));
+  const legend = $('legend'); legend.replaceChildren();
+  [['arrive', state.scenario !== 'fleet' ? '요청 도착' : '작업 접수', 'var(--select-line)'], ['promote', '우선순위 승격', 'var(--pending-mark)'], ['fail', '실패 기록', 'var(--failure)'], ['final', '최종 관측', 'var(--success-mark)']]
+    .filter(([k]) => kinds.has(k)).forEach(([, label, c]) => { const s = el('span', null, label); s.style.setProperty('--c', c); legend.append(s); });
+}
+
+function searchText(row, req) {
+  if (!req) return row;
+  const p = placement(req);
+  return [row, row.replace('R', '요청 '), req.state, req.reason, req.workload, BACKEND[req.backend], req.device_class, ...p.actual, ...p.target, models(p.actual), ...(req.excluded_nodes || [])].filter(Boolean).join(' ').toLowerCase();
+}
+function visible(row, req) {
+  if (state.group !== 'all' && groupOf(req) !== state.group) return false;
+  if (state.node) { const p = placement(req); if (![...p.actual, ...p.target, ...(req?.excluded_nodes || [])].includes(state.node)) return false; }
+  return !state.q || searchText(row, req).includes(state.q.toLowerCase());
+}
+
+function renderTotals(f) {
+  const rows = sc().rows, list = $('totals'); list.replaceChildren();
+  const count = g => rows.filter(r => (g === 'all') || groupOf(f.requests[r]) === g).length;
+  const items = [['all', '전체', null], ...GROUPS.map(([g, label]) => [g, label, g])];
+  if (rows.some(r => !f.requests[r])) items.push(['none', '기록 없음', 'none']);
+  items.forEach(([g, label]) => {
+    const n = count(g);
+    if (g !== 'all' && n === 0 && state.group !== g && (g === 'before' || g === 'collect' || g === 'none')) return;
+    const li = el('li'), b = el('button', g === 'all' ? '' : 'g-' + g); b.type = 'button'; b.dataset.group = g;
+    if (g !== 'all') b.append(el('i'));
+    b.append(el('span', null, label), el('b', null, String(n)));
+    b.setAttribute('aria-pressed', String(state.group === g));
+    b.setAttribute('aria-label', `${label} ${n}건${g === 'all' ? '' : ' · 표 거르기'}`);
+    b.onclick = () => { state.group = state.group === g || g === 'all' ? 'all' : g; render(); };
+    li.append(b); list.append(li);
+  });
+  const failedAttempts = (f.native_attempts || []).filter(a => a.state === 'FAILED').length;
+  $('totals-note').textContent = `이 관측의 논리 요청 ${rows.length}건` + (failedAttempts ? ` · 실패 시도 ${failedAttempts}건은 같은 요청 행에 보존` : '') + (state.scenario === 'fleet' ? ' · 요청 11은 별도 날짜라 제외' : '');
 }
 
 function renderRow(row, req, prev) {
@@ -259,65 +543,73 @@ function renderRow(row, req, prev) {
   b.onclick = () => { state.selected = row; render(); };
   b.append(el('span', 'rid', row.replace('R', '요청 ')));
   if (!req) {
-    b.append(unknown('기록 없음'), unknown(''), el('span', 'track'), unknown('이 관측에 요청 기록 없음'), el('span', 'where'), el('span', 'extra'));
+    const st = el('span', 'st g-none'); st.append(pill(null, '기록 없음'));
+    b.append(st, unknown('이 관측에 요청 기록 없음'), el('span', 'where'), el('span', 'extra'));
     b.setAttribute('aria-label', `${row} 이 관측에는 요청 기록이 없음`);
     return b;
   }
-  b.append(el('span', 'lane ' + req.backend, BACKEND[req.backend] || req.backend));
-  const what = el('span', 'what'); what.append(el('b', null, requestModels(req) || '장치 배치 미관측'));
-  what.append(el('small', null, req.workload), el('br'));
-  what.append(el('small', null, req.device_class.toUpperCase() + (req.gpu != null ? ` · ${req.gpu} GPU` : req.accelerator_count != null ? ` · 가속기 ${req.accelerator_count}` : '')));
-  b.append(what);
-  const track = el('span', 'track'); track.setAttribute('aria-hidden', 'true');
-  const stage = STAGES[req.state];
-  for (let i = 0; i < 6; i++) { const s = el('span'); if (i === stage) s.className = 'on' + (req.state === 'SUCCEEDED' ? ' done' : req.state === 'FAILED' ? ' fail' : ''); track.append(s); }
-  b.append(track);
-  const st = el('span', 'state' + (req.state === 'FAILED' ? ' fail' : ''));
-  st.append(req.state === 'NOT_SUBMITTED' ? '도착 전' : req.state);
-  if (req.state === 'NOT_SUBMITTED') { st.append(el('br')); st.append(el('small', 'unknown', `계획 도착 +${req.planned_arrival_seconds}초`)); }
-  if (req.reason) { st.append(el('br')); st.append(el('small', 'unknown', req.reason)); }
+  const st = el('span', 'st g-' + groupOf(req));
+  st.append(pill(req, req.state === 'NOT_SUBMITTED' ? '도착 전' : req.state));
+  if (req.state === 'NOT_SUBMITTED') st.append(el('small', 'plain', `계획 도착 +${req.planned_arrival_seconds}초`));
+  if (req.reason) st.append(el('small', null, req.reason));
   b.append(st);
+  const p = placement(req);
+  const what = el('span', 'what'), head = el('b', p.actual.length ? null : 'unplaced', p.actual.length ? models(p.actual) + ' ' : (req.backend ? '장치 배치 미관측 ' : '경로 미정 '));
+  if (req.backend) head.append(el('span', 'lane ' + req.backend, BACKEND[req.backend]));
+  what.append(head, el('span', null, `${req.workload} · ${req.device_class.toUpperCase()}` + (req.gpu != null ? ` · GPU ${req.gpu}` : req.accelerator_count != null ? ` · 가속기 ${req.accelerator_count}` : '')));
+  b.append(what);
   const where = el('span', 'where');
-  const nodes = requestNodes(req);
-  if (nodes.length) nodes.forEach(n => where.append(el('span', 'node', n))); else where.append(unknown(req.state === 'NOT_SUBMITTED' ? '—' : '노드 미관측'));
-  where.append(el('br'), el('small', null, frame().observed_at.slice(0, 10)));
+  p.actual.forEach(n => where.append(el('span', 'node actual', n)));
+  p.target.forEach(n => where.append(el('span', 'node target', n)));
+  (req.excluded_nodes || []).forEach(n => where.append(el('span', 'node excluded', n)));
+  if (!p.actual.length && !p.target.length) where.append(unknown(req.state === 'NOT_SUBMITTED' ? '—' : '노드 미관측'));
+  else if (!p.actual.length) where.append(el('small', null, '실행 노드 미관측'));
   b.append(where);
   const extra = el('span', 'extra');
-  if (state.scenario === 'adaptive') {
-    const box = el('span', 'attempts');
+  if (state.scenario !== 'fleet') {
     const change = (frame().priority_changes || []).find(c => c.row === row);
-    box.append(el('span', 'prio' + (change ? ' up' : ''), `P${req.priority ?? '?'}` + (change ? ` ↑${change.before}→${change.after}` : '')));
-    req.previous_attempts.forEach(a => box.append(el('span', 'att' + (a.state === 'FAILED' ? ' failed' : ''), `${a.attempt.split('·')[1]} ${a.state === 'FAILED' ? '✕' : a.state}${a.pods[0]?.exit_codes?.length ? ' exit ' + a.pods[0].exit_codes.join(',') : ''}`)));
-    if (req.attempt) box.append(el('span', 'att current', req.attempt.split('·')[1]));
-    extra.append(box);
+    extra.append(el('span', 'prio' + (change ? ' up' : ''), `P${req.priority ?? '?'}` + (change ? ` ↑${change.before}→${change.after}` : '')));
+    attempts(req).forEach(a => extra.append(el('span', 'att' + (a.state === 'FAILED' ? ' failed' : ''), `${a.attempt.split('·')[1]} ${a.state === 'FAILED' ? '✕' : a.state}${a.pods?.[0]?.exit_codes?.length ? ' exit ' + a.pods[0].exit_codes.join(',') : ''}`)));
+    if (req.attempt) extra.append(el('span', 'att current', req.attempt.split('·')[1]));
   } else if (req.result) {
-    extra.append(el('span', null, `결과 ${req.result.outcome} · 품질 ${req.result.quality_value}` + (req.mlflow_receipt ? ' · MLflow 기록' : '')));
+    extra.append(el('span', null, `${req.result.outcome} · 품질 ${req.result.quality_value}` + (req.mlflow_receipt ? ' · MLflow' : '')));
   } else extra.append(unknown('결과 미기록'));
   b.append(extra);
-  b.setAttribute('aria-label', `${row} ${BACKEND[req.backend]} ${req.workload} 상태 ${req.state} 노드 ${nodes.join(', ') || '미관측'}`);
+  b.setAttribute('aria-label', `${row} ${BACKEND[req.backend] || '경로 미정'} ${req.workload} 상태 ${req.state} 노드 ${p.actual.join(', ') || (p.target.length ? '대상 ' + p.target.join(', ') + ' 실행 미관측' : '미관측')}`);
   if (prev && prev.state !== req.state && !reduceMotion.matches) b.classList.add('changed');
   return b;
 }
 
 function renderDetail(f) {
-  const box = $('detail'); box.replaceChildren(el('h2', null, '선택한 요청 상세 · 이 관측 시점 기준'));
+  const box = $('detail'); box.replaceChildren();
   const req = f.requests[state.selected];
-  box.append(el('h3', null, state.selected.replace('R', '요청 ')));
+  const head = el('div', 'ihead'); head.append(el('h3', null, state.selected.replace('R', '요청 ')));
+  box.append(head);
   if (!req) { box.append(unknown('이 관측에는 이 요청의 기록이 없습니다.')); return; }
+  head.append(pill(req, req.state));
+  if (req.backend) head.append(el('span', 'lane ' + req.backend, BACKEND[req.backend]));
+  const p = placement(req), place = el('div', 'place');
+  const line = (k, nodes, cls, empty) => { const d = el('div'); d.append(el('span', 'k', k)); if (nodes.length) nodes.forEach(n => { d.append(el('span', 'node ' + cls, n)); if (cls === 'actual') d.append(el('span', null, DEVICE_MODELS[n] || '')); }); else d.append(unknown(empty)); place.append(d); };
+  line('실제 배치', p.actual, 'actual', req.state === 'NOT_SUBMITTED' ? '도착 전' : '배치 미관측');
+  if (p.target.length) line('배치 대상', p.target, 'target', '');
+  if (req.excluded_nodes?.length) line('제외 노드', req.excluded_nodes, 'excluded', '');
+  if (req.pods?.length) { const d = el('div'); d.append(el('span', 'k', 'Pod 상태'), el('span', 'mono', req.pods.map(x => `rank${x.rank} ${x.node} ${x.state}`).join(' · '))); place.append(d); }
+  box.append(place);
+  if (p.target.length) box.append(el('p', 'unknown', '대상 노드는 실행 전 라우팅 결과이며, 이 관측에서 할당은 확인되지 않았습니다.'));
+  if (req.reason) { const r = el('p', 'reason'); r.append(el('b', null, state.scenario === 'fleet' ? '네이티브 기록 사유' : 'Kueue 대기 사유 (분류)'), req.reason); box.append(r); }
   const dl = el('dl');
   const add = (k, v) => { dl.append(el('dt', null, k)); const d = el('dd'); d.append(v == null || v === '' ? unknown() : v); dl.append(d); };
-  add('네이티브 경로', BACKEND[req.backend]);
-  add('장치 모델', requestModels(req));
   add('실행 작업', req.workload);
-  add('관측 상태', req.state);
-  add('사유', req.reason);
+  add('장치 모델', p.actual.length ? models(p.actual) : null);
   if (state.scenario === 'fleet') {
+    add('요청 가속기', req.accelerator_count != null ? `${req.device_class.toUpperCase()} ${req.accelerator_count}` : null);
     add('노드 alias', req.node);
+    add('네이티브 작업', req.native_job_recorded ? '기록 있음' : null);
     add('결과', req.result ? `${req.result.outcome} · 측정 ${req.result.measured ? '예' : '아니오'} · 품질 ${req.result.quality_value}` : null);
     add('MLflow 수신', req.mlflow_receipt ? '기록 있음' : null);
     box.append(dl);
     if (req.lifecycle.length) {
-      box.append(el('p', 'sub', '이 스냅샷에 저장된 상태 이벤트'));
+      box.append(el('p', 'logh', '이 스냅샷에 저장된 상태 이벤트'));
       const ol = el('ol', 'log');
       req.lifecycle.forEach(e => { const li = el('li'); li.append(el('time', null, hhmmss(e.observed_at)), el('span', null, e.state + (e.reason ? ' · ' + e.reason : ''))); ol.append(li); });
       box.append(ol);
@@ -325,87 +617,307 @@ function renderDetail(f) {
   } else {
     add('현재 시도', req.attempt);
     add('우선순위', req.priority != null ? String(req.priority) : null);
-    add('요청 GPU', req.gpu != null ? `${req.gpu}개${req.gpu === 2 ? ' · 독립 worker 2개 (DDP 아님)' : ''}` : null);
-    add('제외 노드', req.excluded_nodes.length ? req.excluded_nodes.join(', ') : null);
+    add('요청 GPU', req.gpu != null ? `${req.gpu}개${req.gpu > 1 ? ` · worker ${req.pods?.length || req.gpu}개 (DDP 아님)` : ''}` : null);
+    if (req.pods?.length > 1) add('worker 준비', workerLine(req));
+    if (req.gang) add('그룹 입장', req.gang.admitted_at ? `Pod ${req.gang.pod_count}개 · 입장 ${hhmmss(req.gang.admitted_at)}` + (req.gang.quota_reserved_at ? ` · 쿼터 예약 ${hhmmss(req.gang.quota_reserved_at)}` : '') : `Pod ${req.gang.pod_count}개 · 입장 미기록`);
+    add('계획 도착', req.planned_arrival_seconds != null ? `+${req.planned_arrival_seconds}초` : null);
     box.append(dl);
     const ol = el('ol', 'log');
-    const line = (when, text) => { const li = el('li'); li.append(el('time', null, when ? hhmmss(when) : '시각 미기록'), el('span', null, text)); ol.append(li); };
-    req.previous_attempts.forEach(a => line(a.submitted_at, `${a.attempt} ${a.state} · P${a.priority} · ` + a.pods.map(p => `${p.node} rank${p.rank} ${p.state} exit ${p.exit_codes.join(',') || '—'} ${p.phases.includes('EXPECTED_FAILURE') ? '(주입 실패)' : ''}`).join('; ')));
-    if (req.attempt) line(req.submitted_at, `${req.attempt} ${req.state} · ` + (req.pods.length ? req.pods.map(p => `${p.node} rank${p.rank} ${p.state}`).join('; ') : 'Pod 미관측'));
-    (f.priority_changes || []).filter(c => c.row === state.selected).forEach(c => line(c.observed_at, `${c.attempt} 우선순위 ${c.before}→${c.after} · ${c.reason}`));
-    if (ol.children.length) { box.append(el('p', 'sub', '시도·승격 기록 (같은 논리 요청)')); box.append(ol); }
+    const entry = (when, text, fail) => { const li = el('li', fail ? 'fail' : ''); li.append(el('time', null, when ? hhmmss(when) : '시각 미기록'), el('span', null, text)); ol.append(li); };
+    attempts(req).forEach(a => entry(a.submitted_at, `${a.attempt} ${a.state} · P${a.priority ?? '?'} · ` + (a.pods || []).map(x => `${x.node} rank${x.rank} ${x.state} exit ${(x.exit_codes || []).join(',') || '—'} ${(x.phases || []).includes('EXPECTED_FAILURE') ? '(주입 실패)' : ''}`).join('; '), a.state === 'FAILED'));
+    if (req.attempt) entry(req.submitted_at, `${req.attempt} ${req.state} · ` + (req.pods?.length ? req.pods.map(x => `${x.node} rank${x.rank} ${x.state}`).join('; ') : 'Pod 미관측'));
+    (f.priority_changes || []).filter(c => c.row === state.selected).forEach(c => entry(c.observed_at, `${c.attempt} 우선순위 ${c.before}→${c.after} · ${c.reason}`));
+    if (ol.children.length) { box.append(el('p', 'logh', '시도·승격 기록 (같은 논리 요청)')); box.append(ol); }
   }
+}
+
+function nodeButton(alias, title, meta, chips, cls) {
+  const li = el('li'), b = el('button', 'nbtn ' + cls); b.type = 'button'; b.dataset.node = alias;
+  b.setAttribute('aria-pressed', String(state.node === alias));
+  b.append(el('span', 'alias', alias), el('span', 'model', title), el('span', 'meta', meta));
+  const load = el('div', 'load'); chips.forEach(c => load.append(c));
+  li.append(b, load); return [li, b];
 }
 
 function renderNodes(f) {
   const box = $('nodes'); box.replaceChildren();
   const on = {};
   Object.entries(f.requests).forEach(([row, r]) => {
-    const nodes = r.pods ? r.pods.map(p => p.node) : [r.node];
-    nodes.filter(Boolean).forEach(n => (on[n] = on[n] || []).push(`${row}·${r.state}`));
+    const p = placement(r);
+    p.actual.forEach(n => (on[n] = on[n] || []).push([row, r, 'actual']));
+    p.target.forEach(n => (on[n] = on[n] || []).push([row, r, 'target']));
   });
-  Object.entries(DATA.nodes).forEach(([alias, meta]) => {
-    const d = el('div'); d.append(el('span', 'node', alias));
-    const txt = el('span'); txt.append(el('strong', null, DEVICE_MODELS[alias] || alias), el('br')); txt.append(el('small', null, `${BACKEND[meta.backend]} · ${meta.accelerator} · ${meta.architecture || '아키텍처 미기록'}`), el('br'));
-    txt.append(on[alias] ? el('span', null, on[alias].join('  ')) : unknown('이 관측에 표시된 요청 없음'));
-    d.append(txt); box.append(d);
+  const sel = placement(f.requests[state.selected]), excluded = f.requests[state.selected]?.excluded_nodes || [];
+  const covered = new Set(Object.values(f.execution_coverage || {}).flat());
+  Object.entries(nodesOf()).forEach(([alias, meta]) => {
+    const chips = (on[alias] || []).map(([row, r, kind]) => {
+      const rank = kind === 'actual' && r.pods?.length > 1 ? r.pods.filter(x => x.node === alias).map(x => ' w' + x.rank).join('') : '';
+      const c = el('button', 'chip ' + (kind === 'target' ? 'target' : 'g-' + groupOf(r)), (kind === 'target' ? '대상 ' : '') + `${row}${rank} ${r.state}`);
+      c.type = 'button'; c.dataset.chip = row; c.dataset.node = alias;
+      c.setAttribute('aria-pressed', String(state.selected === row));
+      c.setAttribute('aria-label', `${alias}의 ${kind === 'target' ? '라우팅 대상' : '실제 배치'} ${row}${rank} ${r.state} · 누르면 이 요청 선택`);
+      c.onclick = () => { state.selected = row; render(); };
+      return c;
+    });
+    if (excluded.includes(alias)) chips.push(el('span', 'chip excl', `${state.selected} 재시도 제외`));
+    if (covered.has(alias)) chips.push(el('span', 'chip cover', '누적 실행 관측'));
+    const outside = !usedNodes.has(alias);
+    if (!chips.length) chips.push(el('span', 'chip note', outside ? '이 시나리오 기록에 없음' : '이 관측에 표시된 요청 없음'));
+    const cls = (sel.actual.includes(alias) ? 'hit' : sel.target.includes(alias) ? 'hit-target' : excluded.includes(alias) ? 'hit-excluded' : '') + (outside ? ' outside' : '');
+    const [li, b] = nodeButton(alias, DEVICE_MODELS[alias] || alias, `${BACKEND[meta.backend]} · ${meta.accelerator} · ${meta.architecture || '아키텍처 미기록'}`, chips, cls);
+    b.setAttribute('aria-label', `${alias} ${DEVICE_MODELS[alias] || ''} · ${(on[alias] || []).map(([row, r, k]) => `${k === 'target' ? '대상 ' : ''}${row} ${r.state}`).join(', ') || '표시된 요청 없음'} · 누르면 이 노드로 표 거르기`);
+    b.onclick = () => { state.node = state.node === alias ? null : alias; render(); };
+    box.append(li);
   });
   if (state.scenario === 'fleet') {
-    const d = el('div'), txt = el('span');
-    txt.append(el('strong', null, 'Mobilint ARIES2'), el('br'), el('small', null, 'Kubernetes · NPU · 2026-10-08'), el('br'), el('span', null, '요청 11 · SUCCEEDED'));
-    d.append(el('span', 'node', 'NPU-B'), txt); box.append(d);
+    const li = el('li'), d = el('div', 'nbtn'); d.style.cursor = 'default';
+    d.append(el('span', 'alias', 'NPU-B'), el('span', 'model', 'Mobilint ARIES2'), el('span', 'meta', 'K8s · Kueue · NPU · 2026-10-08 별도 기록'));
+    const load = el('span', 'load'); load.append(el('span', 'chip g-done', '요청 11 SUCCEEDED')); d.append(load);
+    li.append(d); box.append(li);
   }
-  if (f.queue_observation) box.append(el('p', 'sub', `Kueue 관측: admitted ${f.queue_observation.admitted ?? '—'} · pending ${f.queue_observation.pending ?? '—'}`));
+  const foot = $('roster-foot'); foot.replaceChildren();
+  if (f.queue_observation) { foot.append(el('b', null, `Kueue 관측 admitted ${f.queue_observation.admitted ?? '—'} · pending ${f.queue_observation.pending ?? '—'}`), el('br')); }
+  foot.append('노드 용량·사용률은 재생 데이터에 기록되지 않았습니다. 칩은 이 관측의 요청 상태이며, 점선은 실행 전 라우팅 대상입니다.');
 }
 
 function renderSummary(f, last) {
   const box = $('summary'); box.replaceChildren();
   if (!last) { box.hidden = true; return; }
   box.hidden = false;
-  const card = el('div', 'card'); card.append(el('h2', null, '기록 종료 요약 · 마지막 관측에서만 표시'));
-  const reqs = Object.values(f.requests), facts = el('div', 'facts');
-  const fact = (v, k) => { const d = el('div'); d.append(el('b', null, String(v)), el('span', null, k)); facts.append(d); };
+  box.append(el('h3', null, '기록 종료 요약 · 마지막 관측에서만 표시'));
+  const reqs = Object.values(f.requests), facts = el('ul', 'facts');
+  const fact = (v, k) => { const li = el('li'); li.append(el('b', null, String(v)), k); facts.append(li); };
   const additional = state.scenario === 'fleet' ? 1 : 0;
   fact(`${reqs.filter(r => r.state === 'SUCCEEDED').length + additional}/${reqs.length + additional}`, '표시된 실행 기록 SUCCEEDED');
   fact(new Set(reqs.map(r => r.backend)).size === 2 ? 'K8s + Slurm' : BACKEND[reqs[0].backend], '네이티브 경로');
   if (state.scenario === 'fleet') {
     fact(`${f.execution_coverage.gpu.length} + ${f.execution_coverage.npu.length + 1}`, '실행 노드 GPU + NPU (누적)');
     fact(reqs.filter(r => r.mlflow_receipt).length + 1, 'MLflow 수신 기록');
-  } else {
+  } else if (state.scenario === 'adaptive') {
     fact(f.native_attempts.length, '네이티브 시도 (논리 요청 10)');
     fact(f.priority_changes.length, '대기 우선순위 승격 10→100');
     fact(f.native_attempts.filter(a => a.state === 'FAILED').length, '주입 실패 exit 42 → 다른 노드 재시도');
     fact(secs(f.elapsed_seconds), '기록된 경과 시간');
+  } else {
+    if (f.native_attempts) fact(f.native_attempts.length, `네이티브 시도 (논리 요청 ${sc().rows.length})`);
+    if (f.priority_changes?.length) fact(f.priority_changes.length, '기록된 우선순위 변경');
+    if (f.elapsed_seconds != null) fact(secs(f.elapsed_seconds), '기록된 경과 시간');
   }
-  card.append(facts, el('p', null, state.scenario === 'fleet' ? '2026-10-07 K8s·Slurm 실행 10건과 2026-10-08 Mobilint 실행 1건의 완료 기록입니다. 노드 수는 누적이며 동시 할당 수가 아닙니다.' : sc().scope));
   const span = (t(f.observed_at) - t(sc().frames[0].observed_at)) / 1000;
-  card.append(el('p', null, `관측 ${sc().frames.length}개, 첫 관측부터 ${secs(span)}. 요청별 정확한 실행 시간이 아니라 스냅샷 시각이다.`));
-  box.append(card);
+  box.append(facts, el('p', null, (state.scenario === 'fleet' ? '2026-10-07 K8s·Slurm 실행 10건과 2026-10-08 Mobilint 실행 1건의 완료 기록입니다. 노드 수는 누적이며 동시 할당 수가 아닙니다. ' : sc().scope + ' ') + `관측 ${sc().frames.length}개, 첫 관측부터 ${secs(span)}. 요청별 정확한 실행 시간이 아니라 스냅샷 시각이다.`));
+}
+
+// Execution flow. Stages are the recorded snapshot states; movement badges compare this snapshot with the previous one only.
+const STAGES = [
+  ['entry', '도착 전·접수', ['before', 'intake']],
+  ['queue', '대기 큐', ['wait']],
+  ['run', '승인·실행 노드', ['run', 'collect']],
+  ['out', '결과', ['done', 'fail']],
+];
+const STAGE_OF = Object.fromEntries(STAGES.flatMap(([k, , gs]) => gs.map(g => [g, k])));
+const STAGE_LABEL = Object.fromEntries(STAGES.map(([k, label]) => [k, label]));
+const stageOf = req => req ? STAGE_OF[groupOf(req)] : null;
+const rid = row => row.replace('R', '요청 ');
+const released = req => (req?.pods?.length || 0) > 1 && req.pods.every(x => (x.phases || []).includes('BARRIER_RELEASED'));
+function workerLine(req) {
+  const pods = req.pods || [], ready = pods.filter(x => (x.phases || []).includes('GPU_READY')).length;
+  const g = req.gang, unit = g?.admitted_at ? `Pod ${g.pod_count}개 한 단위 입장 기록 · ` : '';
+  if (released(req)) return unit + `worker ${pods.length}/${pods.length} GPU 준비 · barrier 해제 기록`;
+  return unit + `worker Pod ${pods.length}개 기록 · GPU 준비 ${ready}/${pods.length}` + (req.gpu ? ` · 요청 GPU ${req.gpu}` : '');
+}
+const submittedAt = req => req.submitted_at || attempts(req).at(-1)?.submitted_at || null;
+// Display order of the pending queue: observed priority, then current attempt submission. Not the scheduler's own order.
+function queueOrder(rows, f) {
+  const key = row => { const r = f.requests[row], at = submittedAt(r); return [-(r.priority ?? -Infinity), at ? t(at) : Infinity, row]; };
+  return [...rows].sort((a, b) => { const x = key(a), y = key(b); for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] < y[i] ? -1 : 1; return 0; });
+}
+
+function changes(prev, f) {
+  if (!prev) return [];
+  const out = [], t0 = t(prev.observed_at), t1 = t(f.observed_at);
+  const push = (row, kind, text) => out.push({row, kind, text, id: `${kind}-${row}-${out.length}`});
+  sc().rows.forEach(row => {
+    const a = prev.requests[row], b = f.requests[row];
+    if (!b) return;
+    attempts(b).slice(attempts(a).length).forEach(x => {
+      const nodes = (x.pods || []).map(p => p.node).join(', '), codes = (x.pods || []).flatMap(p => p.exit_codes || []);
+      const injected = (x.pods || []).some(p => (p.phases || []).includes('EXPECTED_FAILURE'));
+      push(row, 'fail', `${x.attempt} ${x.state}${codes.length ? ' exit ' + codes.join(',') : ''}${injected ? ' (주입 실패)' : ''}${nodes ? ' · ' + nodes : ''} → ${b.attempt || '다음 시도'} 기록` + (b.excluded_nodes?.length ? ` · ${b.excluded_nodes.join(', ')} 제외` : ''));
+    });
+    const sa = stageOf(a), sb = stageOf(b);
+    if (!a || a.state !== b.state) {
+      const from = a ? (a.state === 'NOT_SUBMITTED' ? '도착 전' : a.state) : '기록 없음';
+      const p = placement(b), nodes = p.actual.length ? ' · ' + p.actual.join(', ') : '';
+      let kind = 'state';
+      if (sb === 'queue') kind = b.state === 'REQUEUED' ? 'fail' : 'queue';
+      else if (sb === 'run' && sa !== 'run') kind = 'admit';
+      else if (sb === 'out') kind = b.state === 'FAILED' ? 'fail' : 'done';
+      else if (sa == null || a.state === 'NOT_SUBMITTED') kind = 'arrive';
+      push(row, kind, `${from} → ${b.state}${kind === 'queue' && b.reason ? ' · ' + b.reason : ''}${kind === 'admit' ? nodes : ''}`);
+    }
+    if (a?.priority != null && b.priority != null && a.priority !== b.priority) push(row, 'promote', `스냅샷 우선순위 P${a.priority}→P${b.priority}`);
+    if (released(b) && !released(a)) push(row, 'barrier', workerLine(b) + ' · ' + b.pods.map(x => `w${x.rank} ${x.node}`).join(', '));
+  });
+  (f.priority_changes || []).filter(c => t(c.observed_at) > t0 && t(c.observed_at) <= t1)
+    .forEach(c => push(c.row, 'promote', `승격 이벤트 P${c.before}→P${c.after} · ${c.reason}` + (f.requests[c.row]?.priority === c.before ? ' · 스냅샷 값은 아직 P' + c.before : '')));
+  return out;
+}
+
+function flowItem(row, req, ch, prev, f, tag) {
+  const g = groupOf(req), stage = stageOf(req), mine = ch.filter(c => c.row === row);
+  const was = prev ? stageOf(prev.requests[row]) : null, moved = prev && was !== stage;
+  const b = el('button', (tag === 'tok' ? 'tok' : 'card') + ' g-' + g + (moved ? ' moved' : '') + (visible(row, req) ? '' : ' dim'));
+  b.type = 'button'; b.dataset.card = row;
+  b.setAttribute('aria-pressed', String(state.selected === row));
+  b.onclick = () => { state.selected = row; render(); };
+  const said = [];
+  if (tag === 'tok') {
+    b.append(row.slice(1));
+    const note = req.state === 'NOT_SUBMITTED' ? (req.planned_arrival_seconds != null ? `+${req.planned_arrival_seconds}초` : '도착 전') : req.state === 'SUCCEEDED' ? '✓' : req.state === 'FAILED' ? '✕' : req.state;
+    b.append(el('small', null, note));
+    said.push(note);
+  } else {
+    const ord = el('span', 'ord', tag ? String(tag) : '');
+    const right = el('span', 'cr');
+    if (req.priority != null) right.append(el('span', 'bdg p' + (req.priority >= 100 ? ' high' : ''), 'P' + req.priority));
+    const n = req.gpu ?? req.accelerator_count;
+    if (n != null) right.append(el('span', null, `${(req.device_class || 'gpu').toUpperCase()} ${n}`));
+    b.append(ord, el('span', 'cid', rid(row)), right);
+    if (stage === 'queue') {
+      const at = submittedAt(req), waited = at ? (t(f.observed_at) - t(at)) / 1000 : null;
+      const why = el('span', 'why' + (req.reason ? '' : ' plain'), (req.reason || (req.state === 'REQUEUED' ? '재접수 · 사유 미기록' : '대기 사유 미기록')) + (waited != null && waited >= 0 ? ` · 제출 후 ${secs(waited)}` : ''));
+      b.append(why); said.push(why.textContent);
+      if (req.gang?.pod_count > 1) { const u = el('span', 'why plain', `Pod ${req.gang.pod_count}개 묶음 요청 · 입장 전`); b.append(u); said.push(u.textContent); }
+    } else {
+      const on = el('span', 'on'), p = placement(req);
+      on.append(el('span', 'pill', req.state));
+      p.actual.forEach(nd => on.append(el('span', 'node actual', nd)));
+      if (!p.actual.length) on.append(unknown('노드 미관측'));
+      b.append(on); said.push(req.state, ...p.actual);
+      if (req.pods?.length > 1) { const w = el('span', 'why plain', workerLine(req)); b.append(w); said.push(w.textContent); }
+    }
+  }
+  const ann = el('span', 'ann');
+  if (moved && was) ann.append(el('span', 'bdg from', '← ' + STAGE_LABEL[was]));
+  const KIND = {promote: ['promote', '승격'], admit: ['admit', '승인·배치'], barrier: ['barrier', 'worker 준비'], fail: ['fail', '실패·재접수'], done: ['done', '완료']};
+  [...new Set(mine.map(c => c.kind))].filter(k => KIND[k]).forEach(k => ann.append(el('span', 'bdg ' + KIND[k][0], KIND[k][1])));
+  const promoted = (f.priority_changes || []).filter(c => c.row === row && !mine.some(m => m.kind === 'promote'));
+  if (tag !== 'tok' && promoted.length) ann.append(el('span', 'bdg hist', `승격 기록 ${promoted[0].before}→${promoted.at(-1).after}`));
+  const failed = attempts(req).filter(a => a.state === 'FAILED' && !mine.some(m => m.kind === 'fail'));
+  if (tag !== 'tok' && failed.length) ann.append(el('span', 'bdg hist', `${failed.map(a => a.attempt.split('·')[1]).join(',')} 실패 · ${req.attempt?.split('·')[1] || '현재'} 시도`));
+  // Compact result/entry chips keep only the movement outline; their badges are still read out.
+  if (ann.children.length) { if (tag !== 'tok') b.append(ann); said.push(...[...ann.children].map(c => c.textContent)); }
+  b.setAttribute('aria-label', `${rid(row)} ${said.join(' · ')} · 누르면 선택`);
+  return b;
+}
+
+function renderFlow(f, prev, ch) {
+  const lanes = $('lanes'); lanes.replaceChildren();
+  const rows = sc().rows.filter(r => f.requests[r]);
+  const by = Object.fromEntries(STAGES.map(([k]) => [k, rows.filter(r => stageOf(f.requests[r]) === k)]));
+  const hasPriority = rows.some(r => f.requests[r].priority != null);
+  STAGES.forEach(([key, label]) => {
+    const st = el('div', 'stage'), h = el('h3', null, label + ' '); h.append(el('b', null, String(by[key].length)));
+    st.dataset.stage = key; st.append(h);
+    if (key === 'queue') {
+      st.append(el('p', 'order', hasPriority ? '표시 순서: 관측 우선순위 높은 순 → 현재 시도 제출 시각 순. 스케줄러의 실제 처리 순서는 보장하지 않음' : '우선순위 미기록 · 요청 번호 순 표시 (스케줄러 순서 아님)'));
+      const ul = el('ol', 'cards q');
+      (hasPriority ? queueOrder(by.queue, f) : by.queue).forEach((r, i) => { const li = el('li'); li.append(flowItem(r, f.requests[r], ch, prev, f, i + 1)); ul.append(li); });
+      if (!by.queue.length) ul.append(el('li', 'unknown', '대기 중 요청 없음'));
+      st.append(ul);
+    } else if (key === 'run') {
+      const ul = el('ul', 'cards r');
+      by.run.forEach(r => { const li = el('li'); li.append(flowItem(r, f.requests[r], ch, prev, f, '')); ul.append(li); });
+      if (!by.run.length) ul.append(el('li', 'unknown', '실행 기록 없음'));
+      st.append(ul);
+    } else {
+      const ul = el('ul', 'toks');
+      const groups = key === 'entry' ? [['before', '도착 전 (계획 도착)'], ['intake', '접수']] : [['done', '성공'], ['fail', '실패']];
+      groups.forEach(([g, sub]) => {
+        const these = by[key].filter(r => groupOf(f.requests[r]) === g);
+        if (!these.length) return;
+        ul.append(el('li', 'sub', sub));
+        these.forEach(r => { const li = el('li'); li.append(flowItem(r, f.requests[r], ch, prev, f, 'tok')); ul.append(li); });
+      });
+      if (key === 'out') rows.forEach(r => attempts(f.requests[r]).filter(a => a.state === 'FAILED').forEach(a => {
+        const li = el('li'), tk = el('span', 'tok attempt g-fail', a.attempt.replace('R', '')); tk.append(el('small', null, '✕ 이전 시도')); li.append(tk); ul.append(li);
+      }));
+      if (!ul.children.length) ul.append(el('li', 'unknown', key === 'entry' ? '없음' : '아직 없음'));
+      st.append(ul);
+    }
+    lanes.append(st);
+  });
+  $('flow-sub').textContent = `도착 → 대기 큐 → 승인·노드 배치 → 결과 · 파란 테두리 = 직전 관측 대비 단계 이동` + (state.scenario === 'gang' ? ' · 그룹 승인은 workload 승인 + worker barrier이며 원자적 Pod 배치·DDP가 아님' : '');
+  const evs = $('events'); evs.replaceChildren();
+  const head = el('li', 'evh', '이 관측의 기록 변화 '); head.append(el('small', null, prev ? `직전 관측 대비 ${ch.length}건 · 같은 구간의 변화이며 원인 관계는 기록되지 않음` : '첫 관측'));
+  evs.append(head);
+  const qo = f.queue_observation, pq = prev?.queue_observation;
+  if (qo && pq && (qo.admitted !== pq.admitted || qo.pending !== pq.pending)) {
+    const li = el('li'), s = el('span', 'ev frame', `Kueue 관측 admitted ${pq.admitted ?? '—'}→${qo.admitted ?? '—'} · pending ${pq.pending ?? '—'}→${qo.pending ?? '—'}`); li.append(s); evs.append(li);
+  }
+  ch.forEach(c => {
+    const li = el('li'), b = el('button', 'ev k-' + c.kind); b.type = 'button'; b.dataset.event = c.id;
+    b.setAttribute('aria-pressed', String(state.selected === c.row));
+    b.append(el('b', null, rid(c.row)), c.text);
+    b.onclick = () => { state.selected = c.row; render(); };
+    li.append(b); evs.append(li);
+  });
+  if (prev && !ch.length && !(qo && pq && (qo.admitted !== pq.admitted || qo.pending !== pq.pending))) evs.append(el('li', 'none', '요청 상태 변화 없음 (스냅샷 간 상태 미기록)'));
+}
+
+// Focus survives re-render: find the saved element's replacement by its identity, with explicit fallbacks.
+function focusTargets(n) {
+  const d = n?.dataset || {};
+  if (d.chip) return [`#nodes .chip[data-chip="${d.chip}"][data-node="${d.node}"]`, `#nodes .nbtn[data-node="${d.node}"]`];
+  if (d.card) return [`#lanes [data-card="${d.card}"]`, '#board-title'];
+  if (d.event) return [`#events [data-event="${d.event}"]`, `#lanes [data-card="${d.event.split('-')[1]}"]`, '#board-title'];
+  if (d.row) return [`#rows [data-row="${d.row}"]`, '#rows .row', '#board-title'];
+  if (d.node) return [`#nodes .nbtn[data-node="${d.node}"]`];
+  if (d.group) return [`#totals [data-group="${d.group}"]`, '#totals [data-group="all"]'];
+  return [];
 }
 
 function render() {
+  const focused = document.activeElement, restore = focusTargets(focused);
   const frames = sc().frames, f = frame(), prev = state.index > 0 ? frames[state.index - 1] : null, last = state.index === frames.length - 1;
-  $('scope').textContent = state.scenario === 'fleet' && last ? 'Kubernetes · Slurm · CUDA · Hailo · Mobilint | 2026-10-07~08 실행 완료 기록' : state.scenario === 'fleet' ? '2026-10-07 요청 10건 재생 · Mobilint는 2026-10-08 완료 기록을 계속 표시합니다.' : sc().name + ' · ' + sc().scope;
-  $('mobilint-success').hidden = true;
+  const day = frames[0].observed_at.slice(0, 10);
+  $('record-date').dateTime = day;
+  $('record-date').textContent = state.scenario === 'fleet' ? `${day} 실행 · 요청 11은 2026-10-08` : `${day} 실행`;
+  $('scenario-name').textContent = sc().name;
+  $('scope').textContent = state.scenario === 'fleet' && last ? 'Kubernetes · Slurm · CUDA · Hailo · Mobilint | 2026-10-07~08 실행 완료 기록' : state.scenario === 'fleet' ? '2026-10-07 요청 10건 재생 · Mobilint는 2026-10-08 완료 기록을 계속 표시합니다.' : sc().scope;
+  $('prov-scope').textContent = `${sc().name} · ${sc().scope} 실행 별칭 ${sc().run_alias} · ${sc().project_alias} · 기록 상태 ${sc().recorded_state}.`;
   $('mobilint-row').hidden = state.scenario !== 'fleet';
   $('seek').max = frames.length - 1; $('seek').value = state.index;
   $('seek').setAttribute('aria-valuetext', `관측 ${state.index + 1} / ${frames.length}, ${hhmmss(f.observed_at)}`);
   $('idx').textContent = `관측 ${state.index + 1} / ${frames.length}`;
-  $('time').dateTime = f.observed_at; $('time').textContent = hhmmss(f.observed_at);
+  $('time').dateTime = f.observed_at; $('time').textContent = f.observed_at.slice(0, 10) + ' ' + hhmmss(f.observed_at);
   $('rel').textContent = `첫 관측 +${secs((t(f.observed_at) - t(frames[0].observed_at)) / 1000)}`;
   $('title').textContent = f.title;
   const gap = prev ? (t(f.observed_at) - t(prev.observed_at)) / 1000 : null;
   $('gap').textContent = gap == null ? '첫 스냅샷' : `직전 관측과 ${secs(gap)} 간격 · 그 사이 상태 미기록`;
   $('gap').className = 'gap' + (gap > 15 ? ' long' : '');
-  [...$('ruler').children].forEach((tick, i) => tick.className = i === state.index ? 'now' : i < state.index ? 'past' : '');
-  $('extra-head').textContent = state.scenario === 'adaptive' ? '우선순위 · 시도' : '결과 · 기록';
-  const rows = $('rows'); rows.replaceChildren(...sc().rows.map(r => renderRow(r, f.requests[r], prev && prev.requests[r])));
+  [...$('ruler').children].forEach((tick, i) => tick.className = i === state.index ? 'now' : (tick.dataset.kind ? 'k-' + tick.dataset.kind : '') + (i < state.index && !tick.dataset.kind ? 'past' : ''));
+  $('extra-head').textContent = state.scenario !== 'fleet' ? '우선순위 · 시도' : '결과 · 기록';
+  renderTotals(f);
+  const shown = sc().rows.filter(r => visible(r, f.requests[r]));
+  const rows = $('rows'); rows.replaceChildren(...shown.map(r => renderRow(r, f.requests[r], prev && prev.requests[r])));
+  if (!shown.length) rows.append(el('p', 'empty', '이 관측에서 조건에 맞는 요청이 없습니다. 상태·노드 필터나 검색어를 바꿔 보세요.'));
+  const filtered = shown.length !== sc().rows.length;
+  $('board-sub').textContent = filtered ? `${shown.length} / ${sc().rows.length}건 표시 · 필터 적용` : `논리 요청 ${sc().rows.length}건 · 요청 번호 순`;
+  $('node-filter').hidden = !state.node;
+  $('node-filter-label').textContent = state.node ? `노드 ${state.node}의 배치·대상 요청만` : '';
+  renderFlow(f, prev, changes(prev, f));
   renderDetail(f); renderNodes(f); renderSummary(f, last);
   $('prev').disabled = $('reset').disabled = state.index === 0;
   $('next').disabled = last;
   $('play').setAttribute('aria-pressed', String(state.playing));
   $('play').textContent = state.playing ? '❚❚ 일시정지' : '▶ 재생';
-  $('caveat').replaceChildren(`${DATA.notice} 노드·요청·시도 이름은 공개용 alias다. 출처: `, Object.assign(el('a', null, sc().public_summary), {href: sc().public_summary}), ' · replay/PROVENANCE.json', ' · ', Object.assign(el('a', null, 'Mobilint 실행 근거'), {href: document.querySelector('#mobilint-success a').href}));
+  const gang = state.scenario === 'gang';
+  const caveat = [`${gang ? GANG.notice || DATA.notice : DATA.notice} 노드·요청·시도 이름은 공개용 alias다. 시간대 ${gang ? GANG.time_zone || DATA.time_zone : DATA.time_zone}. 정제 데이터 ${gang ? `replay/gang-observations.json (schema ${GANG.schema})` : `replay/observations.json (schema ${DATA.schema})`} · 출처 manifest ${gang ? 'replay/gang-PROVENANCE.json' : 'replay/PROVENANCE.json'} · 공개 요약 `];
+  if (sc().public_summary) caveat.push(Object.assign(el('a', null, sc().public_summary), {href: sc().public_summary}), '.'); else caveat.push(unknown('공개 요약 미기록'));
+  $('caveat').replaceChildren(...caveat);
+  // Rebuilt controls replace the focused one; restore through the saved element, not activeElement (BODY once it is removed).
+  if (focused && focused !== document.body && !focused.isConnected) for (const sel of restore) { const n = document.querySelector(sel); if (n) { n.focus({preventScroll: true}); break; } }
 }
 
 function stop() { clearTimeout(state.timer); state.timer = null; state.playing = false; }
@@ -422,22 +934,28 @@ function togglePlay() {
   state.playing = true; render(); schedule();
 }
 
-document.querySelectorAll('input[name=scenario]').forEach(r => r.onchange = () => { stop(); state.scenario = r.value; state.index = 0; state.selected = 'R01'; renderRuler(); render(); });
+if (GANG?.scenario) $('gang-option').hidden = false;
+document.querySelectorAll('input[name=scenario]').forEach(r => r.onchange = () => { stop(); state.scenario = r.value; state.index = 0; state.selected = sc().rows[0]; state.node = null; state.group = 'all'; usedNodes = scenarioNodes(); renderRuler(); render(); });
 $('play').onclick = togglePlay;
 $('reset').onclick = () => go(0);
 $('prev').onclick = () => go(state.index - 1);
 $('next').onclick = () => go(state.index + 1);
 $('seek').oninput = e => go(Number(e.target.value));
 $('speed').onchange = () => { if (state.playing) { clearTimeout(state.timer); schedule(); } };
+$('q').oninput = e => { state.q = e.target.value.trim(); render(); };
+$('node-filter-clear').onclick = () => { state.node = null; render(); };
 document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('prov').open) { $('prov').open = false; $('prov').querySelector('summary').focus(); return; }
   if (e.target.closest('input,select,textarea') || e.altKey || e.ctrlKey || e.metaKey) return;
-  if (e.key === ' ' && e.target.tagName === 'BUTTON') return;
+  if (e.key === ' ' && e.target.closest('button,summary')) return;
   if (e.key === ' ' || e.key === 'k') { e.preventDefault(); togglePlay(); }
   else if (e.key === 'ArrowRight') { e.preventDefault(); go(state.index + 1); }
   else if (e.key === 'ArrowLeft') { e.preventDefault(); go(state.index - 1); }
   else if (e.key === 'Home') { e.preventDefault(); go(0); }
+  else if (e.key === 'End') { e.preventDefault(); go(sc().frames.length - 1); }
 });
-window.__replay = {state, go, data: DATA};
+document.addEventListener('visibilitychange', () => { if (document.hidden && state.playing) { stop(); render(); } });
+window.__replay = {state, go, data: DATA, scenarios: SCENARIOS};
 if (location.hash === '#success') state.index = DATA.scenarios.fleet.frames.length - 1;
 renderRuler(); render();
 })();

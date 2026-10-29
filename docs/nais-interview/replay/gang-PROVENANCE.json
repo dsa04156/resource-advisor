@@ -1,0 +1,73 @@
+{
+ "schema": "nais-offline-replay-provenance/v1",
+ "exporter": "replay/export_gang_replay.py",
+ "exporter_version": "1.0.0",
+ "output": {
+  "path_from_materials": "replay/gang-observations.json",
+  "schema": "nais-offline-replay-gang/v1",
+  "sha256": "566c1b62937e631eeae5d2a7240396dfff248bb63a21e178cac0d46db6a55c9e"
+ },
+ "raw_inputs": [
+  {
+   "scenario": "gang_batch",
+   "role": "gang",
+   "location": "private run-state store (not published)",
+   "sha256": "9b257df6742b7329717cdfc927da0e73cc421b389f89628850dd4a1a71c64802",
+   "bytes": 3268861,
+   "record_version": 21,
+   "recorded_state": "SUCCEEDED",
+   "events": 19,
+   "event_schema": [
+    "title",
+    "observed_at",
+    "snapshot"
+   ]
+  }
+ ],
+ "extraction_scope": {
+  "per_frame": "one output frame per recorded body.events item, same order and observed_at; no interpolation",
+  "request_fields": "state, Kueue reason category, gpu count, priority, submitted_at, pod rank/node alias/state/exit codes/phase and phase time/barrier worker count/compute correctness, gang pod count, admitted pod count, QuotaReserved/Admitted/Finished times",
+  "aliases": "nodes → GPU-A..C, checked against the recorded CUDA model of each published alias; requests → R01..R10; each request is one native Job → Rnn·a1 (no retries recorded)",
+  "derived": "elapsed_seconds from observed_at; priority_changes is empty because every recorded priority is 0",
+  "replaced": "event titles mapped to fixed templates; Kueue admission messages mapped to categories",
+  "excluded": [
+   "credentials",
+   "endpoints and URLs",
+   "image references and registries",
+   "shell commands and logs",
+   "local absolute paths",
+   "raw job/native/workload identifiers and UIDs",
+   "cluster/local queue and flavor names",
+   "topology assignment values",
+   "node inventory metrics",
+   "raw free-text explanation/verdict/condition messages",
+   "pod names"
+  ]
+ },
+ "public_summary_references": [
+  {
+   "path_from_materials": "../evidence/common-gpu-pool-ten-request.json",
+   "sha256": "1687e2e57a3867d1ac52f553afda684fad4d98c42695a9b6a35330f3455c5f3b",
+   "section": "gang_batch"
+  },
+  {
+   "path_from_materials": "replay/DEVICE-MODELS.md",
+   "sha256": "8f5a018b7f47103f43a08f859f41b0cbe8e9e1d3c5748f7d7b2da1ed7774a496"
+  }
+ ],
+ "extracted_counts": {
+  "frames": 19,
+  "rows": 10,
+  "final_succeeded": 10,
+  "two_gpu_groups": 3,
+  "succeeded_worker_pods": 13,
+  "correct_worker_pods": 13,
+  "barrier_worker_pods": 6,
+  "first_nonzero_queue_observation": {
+   "admitted": 2,
+   "pending": 8
+  },
+  "priority_changes": 0
+ },
+ "command": "rtk proxy python3 docs/nais-interview/replay/export_gang_replay.py --gang <RAW_GANG_BATCH_JSON>"
+}

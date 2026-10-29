@@ -16,6 +16,7 @@ PROV = json.loads((HERE / 'PROVENANCE.json').read_text())
 FLEET, ADAPTIVE = DATA['scenarios']['fleet'], DATA['scenarios']['adaptive']
 RAW_PATHS = {'fleet': os.environ.get('NAIS_RAW_FLEET'), 'adaptive': os.environ.get('NAIS_RAW_ADAPTIVE')}
 needs_raw = pytest.mark.skipif(not all(RAW_PATHS.values()), reason='private raw records not provided')
+MOBILINT_SOURCE_URL = 'https://github.com/dsa04156/resource-advisor/blob/a5d1dde87b56ba2794dc6a93559342eb85f1940f/docs/evidence/all-accelerators-20261008-v1.json'
 PUBLISHED = [HERE / 'observations.json', HERE / 'PROVENANCE.json', HERE / 'export_replay.py', MATERIALS / 'offline-demo.html']
 
 
@@ -130,6 +131,9 @@ FORBIDDEN = [r'etri-', r'hairp', r'\blab-[0-9a-f]', r'ra-lab', r'https?://', r'/
 @pytest.mark.parametrize('path', PUBLISHED, ids=lambda p: p.name)
 def test_published_files_have_no_private_markers(path):
     text = path.read_text()
+    if path.name == 'offline-demo.html':
+        # The Mobilint evidence link is a public URL pinned to a fixed commit; only this exact URL is exempt.
+        text = text.replace(MOBILINT_SOURCE_URL, '')
     if path.name == 'export_replay.py':
         # The exporter legitimately names raw field patterns it maps away; only check for leaked values.
         patterns = [r'etri-', r'\blab-[0-9a-f]', r'/home/', r'\.state/', r'slurm-w\d|slurm-gpu-lab', r'[0-9a-f]{32}']
@@ -194,3 +198,14 @@ def test_no_raw_identifier_string_reaches_published_files():
         text = path.read_text()
         leaked = sorted(t for t in private if t in text and not re.fullmatch(r'v\d+|\d+[a-z]+|[a-z]+\d', t))
         assert not leaked, f'{path.name}: {leaked[:10]}'
+
+
+def test_offline_demo_embeds_payloads_unchanged():
+    html = (MATERIALS / 'offline-demo.html').read_text()
+    template = (HERE / 'offline-demo.template.html').read_text()
+    embed = lambda o: json.dumps(o, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+    gang_path = HERE / 'gang-observations.json'
+    gang = json.loads(gang_path.read_text()) if gang_path.exists() else None
+    base = re.search(r'<script type="application/json" id="observations">(.*?)</script>', html, re.S).group(1)
+    assert base == embed(DATA)
+    assert html == template.replace('__OBSERVATIONS_JSON__', embed(DATA)).replace('__GANG_JSON__', embed(gang))

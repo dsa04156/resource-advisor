@@ -264,8 +264,8 @@ ax.legend(*zip(*hl),loc='lower left',bbox_to_anchor=(0,1.01),ncol=10,frameon=Fal
 save(fig,'11-adaptive-timeline','변동 도착·승격·재시도 관측','정제 replay/observations.json의 adaptive 52개 프레임. 상태는 스냅샷 값 그대로이고 점 사이를 잇지 않는다. 시도 11·승격 6·worker 13은 adaptive-gpu-arrivals.json과 일치.')
 
 # Offline demo: template + sanitized JSON in one self-contained file (no network, opens from file://).
-payload=json.dumps(obs,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
-(BASE/'offline-demo.html').write_text((REPLAY/'offline-demo.template.html').read_text().replace('__OBSERVATIONS_JSON__',payload))
+from replay.build_offline_demo import build as build_offline_demo
+build_offline_demo(obs)
 
 # Self-contained SVG gallery, image index, source manifest, chart table and contact sheet.
 with (OUT/'SOURCES.csv').open('w',newline='') as f:
@@ -309,5 +309,5 @@ with zipfile.ZipFile(BASE/'NAIS-visual-assets.zip','w',zipfile.ZIP_DEFLATED) as 
         if p.is_file():z.write(p,'visuals/'+p.name)
     z.write(__file__,'build_visuals.py')
     z.write(BASE/'offline-demo.html','offline-demo.html')
-    for name in ['observations.json','PROVENANCE.json','export_replay.py','test_replay.py','browser_check.py','offline-demo.template.html','DEVICE-MODELS.md']:z.write(REPLAY/name,'replay/'+name)
+    for name in ['observations.json','PROVENANCE.json','export_replay.py','test_replay.py','browser_check.py','offline-demo.template.html','build_offline_demo.py','DEVICE-MODELS.md']+[n for n in ['gang-observations.json','gang-PROVENANCE.json'] if (REPLAY/n).exists()]:z.write(REPLAY/name,'replay/'+name)
 print(f'Rendered {len(assets)} figures to {OUT}')
