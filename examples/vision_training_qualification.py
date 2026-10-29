@@ -26,11 +26,13 @@ import torch, torchvision
 import vision_training as vt
 a = vt.parser().parse_args(sys.argv[1:])
 manifest = json.load(open(os.path.join(a.data, "manifest.json")))
-a.initial_checkpoint_digest = vt.checkpoint_digest(vt.build_model(a.model, len(manifest["classes"]), a.seed))
+seeded = vt.checkpoint_digest(vt.build_model(a.model, len(manifest["classes"]), a.seed, a.initial_state))
+if a.initial_checkpoint_digest == "pending":
+    a.initial_checkpoint_digest = seeded
 context = {
     "arch": {"aarch64": "arm64", "x86_64": "amd64"}[platform.machine()],
     "accelerator_model": torch.cuda.get_device_name(0),
-    "allocation_mode": "virtual_slot",
+    "allocation_mode": os.environ.get("QUAL_ALLOCATION_MODE", "virtual_slot"),
     "parameters": {},
     "runtime_versions": {"pytorch": torch.__version__, "torchvision": torchvision.__version__},
     "resources": {"accelerator_count": 1},
@@ -188,6 +190,7 @@ def job(args):
                             "command": command,
                             "env": [
                                 {"name": "QUAL_ID", "value": name},
+                                {"name": "QUAL_ALLOCATION_MODE", "value": args.allocation_mode},
                                 {"name": "HOME", "value": "/tmp"},
                                 {"name": "RA_NODE_NAME", "valueFrom": {"fieldRef": {"fieldPath": "spec.nodeName"}}},
                                 {"name": "RA_POD_UID", "valueFrom": {"fieldRef": {"fieldPath": "metadata.uid"}}},
@@ -234,6 +237,7 @@ def main(argv=None):
     p.add_argument("--initial-state", help="pinned state file in the image")
     p.add_argument("--initial-checkpoint-digest", default="pending", help="DDP: expected digest")
     p.add_argument("--ddp-node", action="append", default=[], help="NODE=DEVICE NAME")
+    p.add_argument("--allocation-mode", default="virtual_slot")
     p.add_argument("--collective", choices=("nccl", "gloo"), default="nccl")
     args = p.parse_args(argv)
     if not 1 <= args.steps <= 100 or args.deadline > 1800:
