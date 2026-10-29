@@ -1,6 +1,6 @@
 # Resource Advisor × Kubernetes × 가상 Docker Slurm 통합 아키텍처
 
-- **기준 시각:** 2026-10-29 (배포 상태 readback 07:58 UTC, 상세 evidence 07:06–07:43 UTC)
+- **기준 시각:** 2026-10-29. 현재 상태는 08:09 UTC 읽기 전용 스냅샷([evidence-snapshot.json](evidence-snapshot.json)), 상세 evidence는 06:10–07:43 UTC 기록
 - **대상 브랜치:** `docs/integration-architecture-20261029` (base `0b89d6e`)
 - **용도:** NAIS 연구기술직 면접 데모용 설명 문서. 시연 범위는 "관측 + 공통 계약 + 실행 경로 설계"이며 새 실행 실험은 포함하지 않는다.
 - **같이 보는 자료:** [발표 노트](PRESENTATION-NOTES-KO.md) · [출처 색인](SOURCES.md) · [README](README.md)
@@ -17,9 +17,9 @@
 | 질문 | 답 |
 |---|---|
 | RA가 하는 일 | 공통 Job 계약, 프로젝트×클러스터 route, 제출 intent의 내구 기록(PostgreSQL outbox), 불확실 제출의 reconcile, 종료 상태와 usage 장부, 클러스터 인벤토리 관측 |
-| RA가 하지 않는 일 | GPU 배치 결정(kube-scheduler·Kueue·slurmctld가 결정), 전역 쿼터·공정성, 두 스케줄러의 같은 GPU 공동 소유, Slurm REST 연동 |
-| 지금 실제로 돌고 있는 것 | 네임스페이스 `resource-advisor-lab`의 API, worker, Kubernetes 인벤토리 수집기, 가상 Slurm 인벤토리 수집기(모두 1/1, 07:58 UTC) |
-| 연결된 클러스터 | `lab-kubernetes` 12 노드(live) · `virtual-slurm-140` 6 노드, 가상 GPU 슬롯 8개(4/2/1/1) · `lab-slurm` 2 노드(2026-10-22 이후 stale, 이력만 보존) |
+| RA가 하지 않는 일 | GPU 배치 결정(K8s는 Kueue가 admission, kube-scheduler가 노드 배치를 결정하고, Slurm은 slurmctld가 결정), 전역 쿼터·공정성, 두 스케줄러의 같은 GPU 공동 소유, Slurm REST 연동 |
+| 지금 실제로 돌고 있는 것 | 네임스페이스 `resource-advisor-lab`의 API, worker, Kubernetes 인벤토리 수집기, 가상 Slurm 인벤토리 수집기(모두 1/1, 08:09 UTC [evidence-snapshot.json](evidence-snapshot.json)) |
+| 연결된 클러스터 | `lab-kubernetes` 12 노드(Ready 10, 스냅샷 status `partial`) · `virtual-slurm-140` 6 노드, 가상 GPU 슬롯 8개(4/2/1/1) · `lab-slurm` 2 노드(2026-10-22 이후 stale, 이력만 보존) |
 | 가상 Slurm으로 가는 길 | HTTP·REST가 아니라 **SSH(22) forced-command → `docker exec --user slurm slurmctld` → `scontrol`/`squeue` JSON(v0.0.42)** |
 | 가상 Slurm 실행 | **미검증.** 실행 route는 예시 설정뿐이고 API에 등록되지 않았으며 worker manifest는 `replicas: 0`이다. sbatch는 한 번도 보내지 않았다 |
 | 왜 이 구조인가 | 연구기관 GPU 운영에서는 K8s(서빙·컨테이너)와 Slurm(HPC 배치)이 공존한다. 각 스케줄러의 정책은 그대로 두고, 요청·상태·사용량을 한 장부로 설명할 수 있게 한다 |
@@ -66,20 +66,22 @@
 
 ## 4. 실제 배포 매핑 (2026-10-29)
 
+현재 replica 값은 08:09 UTC 스냅샷([evidence-snapshot.json](evidence-snapshot.json))이다. revision·이미지 digest는 06:10 UTC 배포 readback([deployment-20261029.json](../../experiments/integrated-operations/evidence/deployment-20261029.json))의 **과거 기록**이며, 08:09 스냅샷이 그 값을 다시 확인한 것은 아니다.
+
 | 단위 | 위치 | 상태 | 근거 |
 |---|---|---|---|
-| `ra-api` (HTTPS 8443) | K8s ns `resource-advisor-lab` | **[배포·관측]** 1/1, revision 96, `/healthz` 200 | [deployment-20261029.json](../../experiments/integrated-operations/evidence/deployment-20261029.json), [services.yaml](../../../deploy/services/services.yaml) |
-| `ra-worker` | 같은 ns | **[배포·관측]** 1/1 (Kubernetes route) | [slurm-execution-140 evidence](../../evidence/slurm-execution-140-20261029.md) "No new native jobs" 표 |
-| `ra-inventory` (K8s 수집기, 30 s) | 같은 ns, ServiceAccount `ra-inventory` | **[배포·관측]** 1/1 | [services.yaml](../../../deploy/services/services.yaml), [inventory-rbac.yaml](../../../deploy/inventory-rbac.yaml) |
-| `ra-virtual-slurm-140-inventory` (30 s) | 같은 ns, SA 토큰 미마운트 | **[배포·관측]** 1/1 | [deployment.yaml](../../../deploy/slurm-inventory-virtual-140/deployment.yaml), [inventory evidence](../../evidence/virtual-slurm-140-inventory-20261029.md) |
-| `ra-virtual-slurm-140-worker` | manifest만 존재 | **[구현·미검증]** `replicas: 0`, **배포 안 됨** | [worker.yaml](../../../deploy/slurm-execution-virtual-140/worker.yaml) |
-| `ra-slurm-worker`, `ra-slurm-inventory` (구 `lab-slurm`) | 같은 ns | 0 replicas (stale 이력만) | [slurm-execution-140 evidence](../../evidence/slurm-execution-140-20261029.md) |
+| `ra-api` (HTTPS 8443) | K8s ns `resource-advisor-lab` | **[배포·관측]** 1/1 (08:09Z). 과거 기록: revision 96, `/healthz` 200 (06:10Z) | [evidence-snapshot.json](evidence-snapshot.json), [deployment-20261029.json](../../experiments/integrated-operations/evidence/deployment-20261029.json), [services.yaml](../../../deploy/services/services.yaml) |
+| `ra-worker` | 같은 ns | **[배포·관측]** 1/1 (08:09Z) | [evidence-snapshot.json](evidence-snapshot.json) |
+| `ra-inventory` (K8s 수집기, 30 s) | 같은 ns, ServiceAccount `ra-inventory` | **[배포·관측]** 1/1 (08:09Z) | [evidence-snapshot.json](evidence-snapshot.json), [services.yaml](../../../deploy/services/services.yaml), [inventory-rbac.yaml](../../../deploy/inventory-rbac.yaml) |
+| `ra-virtual-slurm-140-inventory` (30 s) | 같은 ns, SA 토큰 미마운트 | **[배포·관측]** 1/1 (08:09Z) | [evidence-snapshot.json](evidence-snapshot.json), [deployment.yaml](../../../deploy/slurm-inventory-virtual-140/deployment.yaml), [inventory evidence](../../evidence/virtual-slurm-140-inventory-20261029.md) |
+| `ra-virtual-slurm-140-worker` | manifest만 존재 | **[구현·미검증]** `replicas: 0`, **배포 안 됨** (`worker_deployed: false`, `api_route_registered: false`) | [worker.yaml](../../../deploy/slurm-execution-virtual-140/worker.yaml), [evidence-snapshot.json](evidence-snapshot.json) |
+| `ra-slurm-worker`, `ra-slurm-inventory` (구 `lab-slurm`) | 같은 ns | 0 replicas (`ra-slurm-worker` 0/0 at 08:09Z; `lab-slurm` 인벤토리는 stale 이력만) | [evidence-snapshot.json](evidence-snapshot.json), [slurm-execution-140 evidence](../../evidence/slurm-execution-140-20261029.md) |
 | PostgreSQL | Secret `ra-service-db`로 접속 | **[배포·관측]** jobs 878 / outbox 3918 / usage 876 (07:43Z) | 같은 evidence |
 | Docker Slurm `sim` (가상 140) | `<SLURM_HOST>`의 Docker 네트워크 `slurmnet` | **[배포·관측]** `slurmctld` + 노드 컨테이너 6개, 모두 IDLE | [inventory evidence](../../evidence/virtual-slurm-140-inventory-20261029.md) |
 | `slurmdbd` + `slurmdbd-mariadb` | 같은 `slurmnet`, 호스트 포트 publish 없음 | **[배포·관측]** 24.11.5 / MariaDB 11.8.9, named volume `ra-slurmdbd-mariadb` | [accounting README](../../../deploy/slurm-accounting-virtual-140/README.md) |
 | 호스트 native Slurm `etri-slurm` | `<SLURM_HOST>` 호스트 자체 | **사용하지 않음** (다른 클러스터, 건드리지 않음) | 같은 README |
 
-**롤아웃 방식:** `ra-api`는 Argo Application이 없어 이미지 직접 갱신, worker는 last-applied manifest를 image-only diff로 apply(`Recreate`). 이미지 소스는 리뷰된 커밋 `53cd73b` + 기존 미추적 모듈 5개를 바이트 그대로 보존한 것으로, **커밋과 완전히 같은 이미지는 아니다** ([deployment-20261029.json](../../experiments/integrated-operations/evidence/deployment-20261029.json) `image_source`).
+**롤아웃 방식(과거 기록, 06:10Z):** `ra-api`는 Argo Application이 없어 이미지 직접 갱신, worker는 last-applied manifest를 image-only diff로 apply(`Recreate`). 이미지 소스는 리뷰된 커밋 `53cd73b` + 기존 미추적 모듈 5개를 바이트 그대로 보존한 것으로, **커밋과 완전히 같은 이미지는 아니다** ([deployment-20261029.json](../../experiments/integrated-operations/evidence/deployment-20261029.json) `image_source`).
 
 ---
 
@@ -111,8 +113,8 @@
 | 단계 | 누가 | 무엇을 결정 | RA가 보는 것 |
 |---|---|---|---|
 | 제출 | RA worker | `kubectl create -f -`로 Job 생성. 라벨 `kueue.x-k8s.io/queue-name`(LocalQueue), 선택적 `kueue.x-k8s.io/priority-class` | `KubernetesBackend.manifest`/`submit` ([backends.py](../../../src/resource_advisor/backends.py)) |
-| admission | **Kueue** [오픈소스] | ClusterQueue 쿼터 안이면 Job suspend 해제. 초과면 `QuotaReserved=False`로 **대기**(거절 아님) | `KubernetesBackend.admission`이 `kueue.x-k8s.io/job-uid=<UID>`로 Workload를 찾아 조건 기록 |
-| placement | **kube-scheduler** [오픈소스] | Pod를 어느 노드에 둘지 | Pod의 노드·시각을 status로 관측만 |
+| admission | **Kueue** [오픈소스] | 이 Workload를 지금 들여보낼지만 결정. ClusterQueue 쿼터 안이면 쿼터를 예약하고 ResourceFlavor를 할당한 뒤 Job suspend 해제. 초과면 `QuotaReserved=False`로 **대기**(거절 아님). **Pod를 어느 노드에 둘지는 정하지 않는다** | `KubernetesBackend.admission`이 `kueue.x-k8s.io/job-uid=<UID>`로 Workload를 찾아 조건 기록 |
+| placement | **kube-scheduler** [오픈소스] | admission 이후 생성된 Pod를 조건(flavor의 노드 조건, 요청량, taint 등)에 맞는 노드 하나에 bind | Pod의 노드·시각을 status로 관측만 |
 | 실행·종료 | kubelet/컨테이너 런타임 | 실제 실행 | `status`/`result` |
 
 실제 Kueue 거동 기록: 1 GPU 쿼터에 2 GPU 요청 → Job 생성은 성공, `QuotaReserved=False`로 suspend 유지, Pod 없음([kueue-policy.md](../../reference/kueue-policy.md), 2026-10-02 [과거 기록]). 이것이 Slurm QOS의 **제출 거절**과 다른 점이며, RA는 둘을 `QUOTA_OR_LIMIT_PENDING`과 `NATIVE_REJECTED`로 따로 분류한다([ARCHITECTURE.md](../../experiments/integrated-operations/ARCHITECTURE.md) Policy contract).
@@ -222,7 +224,7 @@ t0+ heartbeat 파일 갱신 → readinessProbe(check-heartbeat --max-age 120)
 읽기 Console/API → latest_inventory_views → fresh_view(stale_after_seconds 기본 120)
 ```
 
-2026-10-29 07:06:50Z 스냅샷 결과: `slurm_nodes: ok`, `slurm_queue: ok`(ra-lab/all 범위 0행 — **전체 클러스터 큐가 아님**), `prometheus: not_configured` → **status `partial`**. "partial"은 장애가 아니라 **메트릭 관측이 연결되지 않았다**는 뜻이다. 노드 전부가 offline이라는 의미도 아니다([inventory evidence](../../evidence/virtual-slurm-140-inventory-20261029.md)).
+2026-10-29 07:06:50Z 스냅샷 결과: `slurm_nodes: ok`, `slurm_queue: ok`(ra-lab/all 범위 0행 — **전체 클러스터 큐가 아님**), `prometheus: not_configured` → **status `partial`**. "partial"은 장애가 아니라 **메트릭 관측이 연결되지 않았다**는 뜻이다. 노드 전부가 offline이라는 의미도 아니다([inventory evidence](../../evidence/virtual-slurm-140-inventory-20261029.md)). 08:08:42Z 스냅샷에서도 status는 `partial`이었다([evidence-snapshot.json](evidence-snapshot.json)).
 
 ---
 
@@ -324,9 +326,11 @@ route drift 방지: 계획(`scheduling_plan`)이 저장된 job은 실제 어댑�
 
 | 클러스터 | 노드 | 장치/슬롯 | 상태 | 시점·근거 |
 |---|---|---|---|---|
-| `lab-kubernetes` | 12 | GPU·NPU·Jetson 혼합 (장치 클래스별 별도) | live | API overview, 2026-10-29 ([inventory evidence](../../evidence/virtual-slurm-140-inventory-20261029.md) Combined list) |
-| `virtual-slurm-140` | 6 (IDLE) | `cpu-1`,`cpu-2`: 4 CPU/2000 MiB · `gpu-big` 4 CPU, 슬롯 4 · `gpu-mid` 4 CPU, 슬롯 2 · `gpu-s1`,`gpu-s2` 2 CPU/1000 MiB, 슬롯 1씩 → **가상 GPU 슬롯 8, 예약 0** | partial (메트릭 미연결) | 07:06:50Z 스냅샷 |
-| `lab-slurm` | 2 | — | **stale** since 2026-10-22, 이력만 | 같은 evidence |
+| `lab-kubernetes` | 12 (Ready 10) | 물리 GPU `nvidia.com/gpu` 3 · Jetson 공유 슬롯 `nvidia.com/gpu.shared` 6(노드 3개×2, 그중 1노드 NotReady) · NPU 5(`hailo.ai/h8` 2, `rockchip.com/rk3399pro` 1(NotReady 노드), `npu.intel.com/accel` 1, `mobilint.com/npu` 1) · 가속기 없는 노드 2 | partial | 08:08:40Z, [evidence-snapshot.json](evidence-snapshot.json) |
+| `virtual-slurm-140` | 6 (IDLE, 07:06Z) | `cpu-1`,`cpu-2`: 4 CPU/2000 MiB · `gpu-big` 4 CPU, 슬롯 4 · `gpu-mid` 4 CPU, 슬롯 2 · `gpu-s1`,`gpu-s2` 2 CPU/1000 MiB, 슬롯 1씩 → **가상 GPU 슬롯 8, 예약 0** | partial (메트릭 미연결) | 08:08:42Z [evidence-snapshot.json](evidence-snapshot.json) (슬롯 수 동일); CPU·메모리·IDLE은 07:06:50Z [inventory evidence](../../evidence/virtual-slurm-140-inventory-20261029.md) |
+| `lab-slurm` | 2 | — | **stale** (마지막 수집 2026-10-22T07:55Z), 이력만 | [evidence-snapshot.json](evidence-snapshot.json) |
+
+위 값은 스냅샷 시점의 **등록 용량**이며 사용률이 아니다. 공유 슬롯 6은 물리 GPU 6이 아니고, AGX 노드는 실행 대상에서 제외돼 있다. 스냅샷의 Slurm 노드 `ready`는 null인데, Slurm 노드에는 Kubernetes Ready 조건이 없기 때문이다(노드 상태는 Slurm `state`로 따로 기록).
 
 가상 GPU는 컨테이너 안에서 `/dev/null`을 `/dev/nvidiaN`으로 매핑한 것이다. Slurm은 `gpu:a100`이라고 보고하지만 **물리 GPU가 아니며 A100 성능 주장은 없다.** RA는 이를 `device_class: gpu`, `allocation_mode: virtual_slot`으로 분류하고 Console에 "공유 슬롯"으로 표시한다. Console 헤더의 "GPU 등록 노드"는 가상 슬롯 노드 4개를 등록 수로 센다(프론트엔드 미변경, 한계로 기록).
 
@@ -395,7 +399,7 @@ ssh ra-virtual-slurm-140-observer 'squeue --json=v0.0.42 --account=ra-lab --part
 
 ## 16. 면접 예상 질문 12개
 
-1. **RA가 스케줄러인가요?** 아닙니다. 배치는 kube-scheduler·Kueue·slurmctld가 합니다. RA는 요청·상태·사용량을 잃지 않게 하는 상위 control plane입니다.
+1. **RA가 스케줄러인가요?** 아닙니다. Kubernetes에서는 Kueue가 admission(들여보낼지)을, kube-scheduler가 노드 배치를 정하고, Slurm에서는 slurmctld가 정합니다. RA는 요청·상태·사용량을 잃지 않게 하는 상위 control plane입니다.
 2. **K8s와 Slurm GPU를 하나의 풀로 합쳤나요?** 아닙니다. 한 GPU를 두 스케줄러가 같이 소유하지 않고, 장부와 화면에서만 나란히 보여 줍니다. 장치 클래스·할당 방식도 합산하지 않습니다.
 3. **Slurm에 왜 REST가 아니라 SSH인가요?** 이 환경에 slurmrestd가 없고, forced-command로 허용 명령을 코드 수준에서 제한하는 편이 범위를 좁히기 쉬웠습니다. 16817 포트가 열려 있어도 쓰지 않습니다. REST 전환은 범위 밖입니다.
 4. **가상 Slurm에서 작업이 돌았나요?** 아닙니다. 관측과 accounting까지 확인했습니다. 실행 route는 예시 설정이고 worker는 0 replica이며 sbatch는 0건입니다. 전용 job UID와 적격 runtime이 생기기 전에는 실행하지 않습니다.

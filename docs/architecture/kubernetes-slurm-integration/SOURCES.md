@@ -15,7 +15,9 @@
 | [docs/evidence/slurm-execution-140-20261029.md](../../evidence/slurm-execution-140-20261029.md) | live + code/test | SlurmDBD 24.11.5·MariaDB 11.8.9, association `sim/ra-lab/slurm`, ClusterID 623→927 사건, executor/results 키 읽기 전용 확인, 새 job 0, RA 행 수 878/3918/876, 실행 NOT_VALIDATED |
 | [docs/experiments/integrated-operations/evidence/deployment-20261029.json](../../experiments/integrated-operations/evidence/deployment-20261029.json) | live | `ra-api` revision 96, 이미지 소스(커밋 `53cd73b` + 보존 모듈 5개), 이력 해시 불변, `SUBMISSION_UNKNOWN` 2건, smoke `NOT_RUN`, 삭제 사건 |
 
-배포 상태 07:58 UTC(API·worker·수집기 2개 모두 1/1)는 coordinator가 전달한 readback이며, 이 브랜치에는 그 시각의 별도 evidence 파일이 없다. 07:43Z 기록의 같은 Deployment 1/1 값은 위 slurm-execution evidence에 있다.
+| [evidence-snapshot.json](evidence-snapshot.json) | live (읽기 전용, 08:09 UTC, root 작성) | **현재 상태의 기준**: Deployment replica(`ra-api`·`ra-worker`·`ra-inventory`·`ra-virtual-slurm-140-inventory` 1/1, `ra-slurm-worker` 0/0), 클러스터별 노드·가속기 등록 용량, `virtual_slurm_execution`(`api_route_registered: false`, `worker_deployed: false`, 제출 0, `NOT_VALIDATED`) |
+
+`deployment-20261029.json`의 revision 96과 이미지 digest는 06:10 UTC 배포 readback의 **과거 기록**이다. 현재 replica·인벤토리 값은 `evidence-snapshot.json`을 인용한다.
 
 ## 설계·결과 문서
 

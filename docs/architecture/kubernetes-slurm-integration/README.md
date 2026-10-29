@@ -1,12 +1,13 @@
 # Kubernetes × 가상 Slurm 통합 아키텍처 자료
 
-Resource Advisor가 기존 Kubernetes와 가상 Docker Slurm 위에서 상위 control plane으로 동작하는 구조를 설명하는 NAIS 면접용 자료다. 기준 시각은 2026-10-29다.
+Resource Advisor가 기존 Kubernetes와 가상 Docker Slurm 위에서 상위 control plane으로 동작하는 구조를 설명하는 NAIS 면접용 자료다. 기준 시각은 2026-10-29이며, 현재 상태 값은 08:09 UTC 스냅샷을 따른다.
 
 | 파일 | 내용 | 작성 |
 |---|---|---|
 | [ARCHITECTURE-KO.md](ARCHITECTURE-KO.md) | 본 문서: 요약, 범례, 그림 3장, 배포 매핑, 프로토콜·인증 표, 관측 시퀀스, 공통 Job 흐름, 쿼터·사용량, 보안 경계, 인벤토리, 한계, 코드 맵, 예상 질문 12개 | 문서 작업자 |
 | [PRESENTATION-NOTES-KO.md](PRESENTATION-NOTES-KO.md) | 5–7분 발표 흐름, 50–60초 스크립트, 데모 순서, 질문 대응 요약 | 문서 작업자 |
 | [SOURCES.md](SOURCES.md) | 코드·배포·evidence 출처 색인과 증거 수준 | 문서 작업자 |
+| [evidence-snapshot.json](evidence-snapshot.json) | 08:09 UTC 읽기 전용 배포·인벤토리 스냅샷 (현재 상태 인용 기준) | root가 생성 |
 | [architecture.html](architecture.html) | 그림을 포함한 단일 파일 HTML | root가 생성 |
 | [architecture.pdf](architecture.pdf) | 인쇄·첨부용 PDF | root가 생성 |
 | [figures/01-overview.svg](figures/01-overview.svg) · [png](figures/01-overview.png) | 전체 구조 | root가 생성 |
