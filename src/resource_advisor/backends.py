@@ -746,6 +746,9 @@ class KubernetesBackend:
 
     def cancel(self, job):
         name = job["body"]["external_id"]
+        if not job["body"].get("backend_uid"):
+            # The worker's preceding status observation binds the UID; never delete by name.
+            raise BackendError("Job UID is not bound to this attempt; not deleting")
         raw = self.execute(self.prefix + ["get", "job", name, "--ignore-not-found", "-o", "json"])
         if not raw.strip():
             return

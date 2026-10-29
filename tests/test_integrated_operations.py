@@ -455,7 +455,9 @@ def test_recreated_same_name_kubernetes_job_is_never_adopted(service, foreign_an
         backend.reconcile(body(service, job["id"]))
 
 
-@pytest.mark.parametrize("replaced", ["never", "before_read", "between_read_and_delete", "gone"])
+@pytest.mark.parametrize(
+    "replaced", ["never", "before_read", "between_read_and_delete", "gone", "uid_not_bound"]
+)
 def test_kubernetes_cancel_deletes_only_the_bound_uid(service, replaced):
     from test_backends import row
 
@@ -487,10 +489,12 @@ def test_kubernetes_cancel_deletes_only_the_bound_uid(service, replaced):
         live = foreign
     if replaced == "gone":
         live = None
+    if replaced == "uid_not_bound":
+        del job["body"]["backend_uid"]
     backend = KubernetesBackend(
         namespace="research-a", local_queue="batch", node_selector={"pool": "lab"}, execute=execute
     )
-    if replaced in {"before_read", "between_read_and_delete"}:
+    if replaced in {"before_read", "between_read_and_delete", "uid_not_bound"}:
         with pytest.raises(BackendError):
             backend.cancel(job)
         assert deleted == []
