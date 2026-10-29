@@ -132,7 +132,9 @@ def _connect(source, deadline):
         token = f"{unquote(user)}:{unquote(password or '')}".encode()
         headers["Authorization"] = "Basic " + base64.b64encode(token).decode()
     conn.connect()
-    guard = conn.sock.dup()  # same connection; survives http.client closing its object
+    # A plain socket over a duplicate descriptor of the same connection (works for TLS,
+    # whose SSLSocket cannot dup()); it survives http.client closing its own object.
+    guard = socket.socket(fileno=os.dup(conn.sock.fileno()))
 
     def expire():
         try:

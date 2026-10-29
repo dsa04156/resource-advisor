@@ -364,3 +364,81 @@ def test_the_transfer_deadline_bounds_the_whole_transfer(tmp_path):
     finally:
         server.shutdown()
     assert failure(out) == "STAGING_TRANSFER_TIMEOUT" and took < 1.6
+
+
+@pytest.fixture
+def tls(tmp_path, monkeypatch):
+    """A trusted self-signed certificate for 127.0.0.1 and a server-side context."""
+    import shutil
+    import ssl
+    import subprocess
+
+    if shutil.which("openssl") is None:
+        pytest.skip("openssl not installed")
+    cert, key = tmp_path / "cert.pem", tmp_path / "key.pem"
+    subprocess.run(
+        ["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "1",
+         "-keyout", str(key), "-out", str(cert), "-subj", "/CN=127.0.0.1",
+         "-addext", "subjectAltName=IP:127.0.0.1"],
+        check=True, capture_output=True,
+    )  # fmt: skip
+    monkeypatch.setenv("SSL_CERT_FILE", str(cert))
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain(cert, key)
+    return context
+
+
+def serve_tls(handler_class, context):
+    server = ThreadingHTTPServer(("127.0.0.1", 0), handler_class)
+    server.socket = context.wrap_socket(server.socket, server_side=True)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    return server
+
+
+def test_https_source_is_staged_and_verified(tmp_path, tls):
+    source, digest, size = bundle(tmp_path)
+    handler = partial(SimpleHTTPRequestHandler, directory=str(tmp_path))
+    handler.log_message = lambda *a: None
+    server = serve_tls(handler, tls)
+    try:
+        out = []
+        url = f"https://127.0.0.1:{server.server_port}/{source.name}"
+        code = svt.run(argv(url, digest, size, tmp_path / "c"), env(), train=Trainer(out),
+                       write=out.append)  # fmt: skip
+    finally:
+        server.shutdown()
+    assert code == 0
+    receipt = StagingReceipt.model_validate(lines(out, svt.RECEIPT)[0])
+    assert receipt.source_kind == "http" and receipt.sample.content_verified
+    assert receipt.source_locator.startswith("https://127.0.0.1:")
+
+
+def test_https_transfer_deadline_bounds_the_whole_transfer(tmp_path, tls):
+    import time as clock
+    from http.server import BaseHTTPRequestHandler
+
+    source, digest, size = bundle(tmp_path)
+
+    class Slow(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-Length", str(size))
+            self.end_headers()
+            for byte in source.read_bytes()[:20]:
+                self.wfile.write(bytes([byte]))
+                self.wfile.flush()
+                clock.sleep(0.25)
+
+        def log_message(self, *a):
+            pass
+
+    server = serve_tls(Slow, tls)
+    try:
+        out, started = [], clock.perf_counter()
+        url = f"https://127.0.0.1:{server.server_port}/x.tar"
+        svt.run(argv(url, digest, size, tmp_path / "c", "--timeout-seconds", "1"), env(),
+                train=Trainer(out), write=out.append)  # fmt: skip
+        took = clock.perf_counter() - started
+    finally:
+        server.shutdown()
+    assert failure(out) == "STAGING_TRANSFER_TIMEOUT" and took < 1.6
