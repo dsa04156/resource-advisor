@@ -2676,7 +2676,10 @@ function trainSubmit(x) {
 // Actual members, so a mixed DDP pair names both GPUs.
 function trainName(x) {
   const members=x.members?.length?x.members:[{node_ref:x.node_refs[0],accelerator_model:x.model,gpus:x.physical_devices}];
-  return members.map(a=>`${a.accelerator_model||"모델 미확인"} ×${a.gpus??"?"}`).join(" + ")+(x.physical_devices==null&&x.shared_slots!=null?" · 공유 슬롯":"");
+  // A known auxiliary reservation (e.g. the Mobilint teacher NPU) is part of the
+  // combination; only its resource is known, so no model name or count is added.
+  const aux={"mobilint.com/npu":"Mobilint NPU"}[x.auxiliary_reservation?.resource];
+  return members.map(a=>`${a.accelerator_model||"모델 미확인"} ×${a.gpus??"?"}`).join(" + ")+(aux?" + "+aux:"")+(x.physical_devices==null&&x.shared_slots!=null?" · 공유 슬롯":"");
 }
 function trainSimple(list) {
   return table(["조합","예상 시간","선택"],list.map(x=>[
