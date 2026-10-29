@@ -66,7 +66,9 @@ def build(plan, dataset, observed_at):
     # A plan may name another entry (e.g. the joint KD runner) and its extra signed flags.
     command = (
         *plan.get("entry", ("python3", "/opt/ra-train/vision_training.py")), "--isolated",
-        "--model", plan["model"], "--data", "/opt/ra-train/data",
+        "--model", plan["model"],
+        # A staged entry (staged_vision_training.py) supplies --data from the staged bundle.
+        *(() if plan.get("staged") else ("--data", "/opt/ra-train/data")),
         "--dataset-digest", plan["dataset_digest"],
         "--initial-state", plan["initial_state_path"],
         "--initial-checkpoint-digest", plan["initial_state_digest"],
