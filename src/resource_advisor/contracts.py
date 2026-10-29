@@ -107,11 +107,18 @@ class Resources(Contract):
 
 
 class DistributedNode(Contract):
-    """One allocated host; its own capability evidence is checked, never inferred."""
+    """One allocated host; its own capability evidence is checked, never inferred.
+
+    ``accelerator_model`` is the device that node must expose (models may differ
+    between nodes) and ``validation_ref`` the TRAINING qualification of this exact
+    variant on that model. Each rank verifies its own device against its node entry.
+    """
 
     node_ref: Ref
     capability_ref: Ref
     gpus: int = Field(ge=1, le=64)
+    accelerator_model: str = Field(min_length=1, max_length=256)
+    validation_ref: Ref
 
 
 class DistributedTraining(Contract):

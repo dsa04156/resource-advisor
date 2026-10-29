@@ -16,7 +16,7 @@ existing context and workload signatures are byte-identical; pinned by
 | `strategy="ddp"`, `launcher="torchrun"` | data parallel; every rank holds a full model replica |
 | `collective` | `nccl` (NVIDIA GPUs only) or `gloo` |
 | `rendezvous="c10d-index0"` | torchrun c10d rendezvous hosted by completion index 0 |
-| `nodes` | node SET, sorted by `node_ref`, distinct, each with its own `capability_ref` and `gpus` |
+| `nodes` | node SET, sorted by `node_ref`, distinct, each with its own `capability_ref`, `gpus`, expected `accelerator_model` and `validation_ref` (TRAINING qualification of this exact variant on that GPU model, listed in the variant's `validation_refs`) |
 | `nproc_per_node` | ranks (= GPUs) per node; every node equal |
 | `world_size` | `len(nodes) × nproc_per_node`, ≥ 2 |
 | `memory_semantics="replicated-per-rank"` | per-rank VRAM requirement, never divided |
@@ -47,15 +47,35 @@ reasons. `Service.submit` and the worker's pre-submission check resolve `node_ca
 - `DISTRIBUTED_COLLECTIVE_UNSUPPORTED`: non-GPU devices, or `nccl` on a non-NVIDIA device.
 - `DISTRIBUTED_SLURM_UNSUPPORTED`.
 - `DISTRIBUTED_CANDIDATE_NODE_OUTSIDE_ALLOCATION`.
+- GPU models may differ between nodes (e.g. RTX 5060 Ti + RTX 5080) only when each node's
+  model is declared and separately qualified (`DISTRIBUTED_NODE_MODEL_UNQUALIFIED`). Everything
+  that one Job shares stays identical: backend, cluster binding (one LocalQueue and runtime
+  class), arch, vendor, device class, allocation mode, resource key, runtime versions
+  (PyTorch/CUDA/collective ABI), environment digest (image), memory model, power mode.
 - Per node, against its own capability:
   - `…_EVIDENCE_MISSING`;
-  - `…_CAPABILITY_MISMATCH` (node name smuggled under another capability);
-  - `…_HETEROGENEOUS` (arch, vendor, model, allocation mode, resource key, runtime,
-    environment, memory or power differ from the candidate's capability);
+  - `…_CAPABILITY_MISMATCH` (node name smuggled under another capability, or the
+    declared device model differs from that node's capability);
+  - `…_HETEROGENEOUS` (any shared identity above differs, including the cluster binding);
   - `…_STALE` (never relaxed, even in operational observe mode);
   - `…_UNAVAILABLE`;
   - `…_INSUFFICIENT_GPUS` (physical `allocatable_count`, verified reservation);
   - `…_INSUFFICIENT_HOST`.
+
+Every query and submission caller resolves per-node evidence with
+`Service.node_capabilities`: console candidate rows (training catalog), scheduling plans
+and recommendations, profiling studies, profile lookup and submission warnings.
+
+## Combination builder (`distributed_allocation.py`)
+
+`build_candidates(base, base_cap, capabilities, validation_by_model, counts=(1, 2, 4))`
+returns `{count: [Candidate]}` from real snapshots only. A node is usable when it is fresh,
+ready, physical, reservation-verified, its model is in `validation_by_model`, and its shared
+identity equals the anchor's. Count 1 is the existing candidate. Larger counts are distinct
+nodes with one GPU each, or one node whose physical allocatable count covers every rank.
+Counts that no real set covers are absent; there are no invented 4-GPU or shared-slot sets.
+New candidates must be registered in a new workload version, and they still need DDP
+qualification before any JCT.
 
 ## Kubernetes launcher (`backends.py`)
 
@@ -106,6 +126,9 @@ cluster yet, and none is guessed.
 ## Runtime obligations (vision training owner)
 
 - Initialize from torchrun env.
+- Before `init_process_group`, find the `nodes[]` entry with `node_ref == RA_NODE_NAME` and
+  verify `torch.cuda.get_device_name(LOCAL_RANK) == accelerator_model` (and `LOCAL_WORLD_SIZE ==
+  gpus`); never infer other ranks' devices from rank 0.
 - Use `DistributedSampler` (or equivalent) with the exact global batch.
 - Only `RANK == 0` emits `RESOURCE_ADVISOR_RESULT` and the receipt.
 - Wall time includes communication.

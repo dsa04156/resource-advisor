@@ -361,7 +361,13 @@ class Service:
                     "created_at": now().isoformat(),
                     "external_id": None,
                     "operational_submission": operational,
-                    "submission_warnings": compatibility(spec, candidate, variant, cap)
+                    "submission_warnings": compatibility(
+                        spec,
+                        candidate,
+                        variant,
+                        cap,
+                        node_caps=self.node_capabilities(conn, project, candidate),
+                    )
                     if operational
                     else [],
                     "backend_cluster_id": cap.backend_cluster_id,
@@ -794,7 +800,13 @@ class Service:
             for candidate in spec.candidates:
                 try:
                     _, _, variant, cap = self.bundle(conn, project, spec.ref, candidate.ref)
-                    errors = compatibility(spec, candidate, variant, cap)
+                    errors = compatibility(
+                        spec,
+                        candidate,
+                        variant,
+                        cap,
+                        node_caps=self.node_capabilities(conn, project, candidate),
+                    )
                 except NotFound:
                     errors = ["REGISTRY_ENTRY_MISSING"]
                 except Rejected:

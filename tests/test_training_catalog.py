@@ -202,8 +202,20 @@ def test_typed_distributed_context_reports_world_size_and_node_set(client, pair,
         launcher="torchrun",
         collective="gloo",
         nodes=(
-            contracts.DistributedNode(node_ref="spare-node", capability_ref="spare-cap", gpus=1),
-            contracts.DistributedNode(node_ref="test-worker", capability_ref="cap-1", gpus=1),
+            contracts.DistributedNode(
+                node_ref="spare-node",
+                capability_ref="spare-cap",
+                gpus=1,
+                accelerator_model="fixture-gpu",
+                validation_ref="fixture-validation",
+            ),
+            contracts.DistributedNode(
+                node_ref="test-worker",
+                capability_ref="cap-1",
+                gpus=1,
+                accelerator_model="fixture-gpu",
+                validation_ref="fixture-validation",
+            ),
         ),
         nproc_per_node=1,
         world_size=2,
@@ -248,6 +260,83 @@ def test_typed_distributed_context_reports_world_size_and_node_set(client, pair,
     assert result["memory"]["semantics"] == "replicated-per-rank"
     assert "DISTRIBUTED_STRATEGY_NOT_VALIDATED" in result["blockers"]
     assert result["jct"]["status"] == "NO_ESTIMATE_POLICY"
+
+
+def ddp_workload(service, pair, *, stale_spare=False):
+    """Typed two-node DDP candidate built from the pair's real fixture capabilities."""
+    from resource_advisor.distributed_allocation import build_candidates
+
+    src, v = training(service, pair, "mnv3-src", code="ddp", batch_size=1, global_batch_size=2)
+    _, _, caps = pair
+    [ddp] = build_candidates(
+        src.candidates[0], caps["base"], list(caps.values()),
+        {"fixture-gpu": "fixture-training-evidence"}, counts=(2,),
+    )[2]  # fmt: skip
+    if stale_spare:  # the spare node's own evidence is old; the anchor stays fresh
+        old = caps["spare"].model_copy(
+            update={"ref": "spare-cap-old", "observed_at": now() - timedelta(hours=2)}
+        )
+        service.register("capability", old, "team-a")
+        d = ddp.context.distributed
+        nodes = tuple(
+            n.model_copy(update={"capability_ref": old.ref}) if n.node_ref == old.node_ref else n
+            for n in d.nodes
+        )
+        context = ddp.context.model_copy(
+            update={"distributed": d.model_copy(update={"nodes": nodes})}
+        )
+        ddp = ddp.model_copy(update={"context": context})
+    v = v.model_copy(
+        update={
+            "ref": "mnv3-ddp-variant",
+            "workload_ref": "mnv3-ddp",
+            "distributed_launch": "torchrun-ddp",
+        }
+    )
+    ddp = ddp.model_copy(update={"variant_ref": v.ref})
+    w = src.model_copy(
+        update={"ref": "mnv3-ddp", "candidates": (ddp,), "baseline_candidate_ref": ddp.ref}
+    )
+    service.register("variant", v, "team-a")
+    service.register("workload", w, "team-a")
+    binding = TrainingIsolation(
+        ref=w.ref,
+        project_ref="team-a",
+        workload_ref=w.ref,
+        workload_digest=signature(w),
+        checkpoint_digest=w.identity.model_digest,
+        input_digest=w.identity.dataset_version,
+        checkpoint_size_bytes=64,
+        input_size_bytes=64,
+        validation_refs=("fixture-isolation",),
+    )
+    service.register("training_isolation", binding, "team-a")
+    return w, ddp
+
+
+@pytest.mark.parametrize("stale", [False, True])
+def test_query_api_validates_per_node_evidence_for_distributed_combinations(
+    client, pair, service, stale
+):
+    w, ddp = ddp_workload(service, pair, stale_spare=stale)
+    key = models(client)["mobilenet_v3_small"]["model_key"]
+    combos = get(client, f"/training-catalog?model={key}")["selected"]["combinations"]
+    [row] = [c for c in combos if c["candidate_ref"] == ddp.ref]
+    assert row["strategy"] == "ddp" and row["physical_devices"] == 2
+    distributed = {b for b in row["blockers"] if b.startswith("DISTRIBUTED_NODE")}
+    # The query path resolves each node's own capability: never a permanent
+    # evidence-required rejection, and a stale node is still caught.
+    assert "DISTRIBUTED_NODE_EVIDENCE_REQUIRED" not in row["blockers"]
+    assert distributed == ({"DISTRIBUTED_NODE_STALE"} if stale else set())
+    post(client, "/scheduling-profiles", hetero.scheduling_profile())
+    plan = post(
+        client,
+        "/scheduling-plans",
+        {"profile_ref": "hetero-v1", "workload_ref": w.ref, "candidate_ref": ddp.ref},
+    )
+    excluded = plan.get("excluded", {}).get(ddp.ref, [])
+    assert "DISTRIBUTED_NODE_EVIDENCE_REQUIRED" not in excluded
+    assert ("DISTRIBUTED_NODE_STALE" in excluded) == stale
 
 
 def test_fixed_global_batch_groups_allocations_with_different_local_batches(client, pair, service):

@@ -312,6 +312,7 @@ def candidate_rows(service, conn, project, spec):
         }
         try:
             _, _, variant, cap = service.bundle(conn, project, spec.ref, candidate.ref)
+            nodes = service.node_capabilities(conn, project, candidate)
             base.update(
                 node_ref=cap.node_ref,
                 cluster_ref=cap.backend_cluster_id,
@@ -323,9 +324,14 @@ def candidate_rows(service, conn, project, spec):
                 runtime_versions=variant.runtime_versions,
                 validation_refs=list(variant.validation_refs),
                 capability_observed_at=cap.observed_at.isoformat(),
-                reasons=compatibility(spec, candidate, variant, cap),
+                reasons=compatibility(spec, candidate, variant, cap, node_caps=nodes),
                 submission_reasons=execution_compatibility(
-                    spec, candidate, variant, cap, operational=service.operational_mode
+                    spec,
+                    candidate,
+                    variant,
+                    cap,
+                    operational=service.operational_mode,
+                    node_caps=nodes,
                 ),
             )
         except NotFound:

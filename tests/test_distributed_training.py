@@ -37,7 +37,14 @@ def ddp(hosts=NODES, per_node=1, **change):
         launcher="torchrun",
         collective="nccl",
         nodes=tuple(
-            DistributedNode(node_ref=n, capability_ref="cap-" + n, gpus=per_node) for n in hosts
+            DistributedNode(
+                node_ref=n,
+                capability_ref="cap-" + n,
+                gpus=per_node,
+                accelerator_model="fixture-gpu",
+                validation_ref="fixture-validation",
+            )
+            for n in hosts
         ),
         nproc_per_node=per_node,
         world_size=len(hosts) * per_node,
@@ -46,7 +53,9 @@ def ddp(hosts=NODES, per_node=1, **change):
     return DistributedTraining(**value)
 
 
-def setup(service, bundle, *, d=None, caps=None, identity=None, launch="torchrun-ddp"):
+def setup(
+    service, bundle, *, d=None, caps=None, identity=None, launch="torchrun-ddp", validations=()
+):
     """A training workload whose only candidate is a two-node DDP allocation."""
     spec, binding, _, _ = setup_training(service, bundle)
     _, _, _, cap = bundle
@@ -67,6 +76,7 @@ def setup(service, bundle, *, d=None, caps=None, identity=None, launch="torchrun
             "workload_ref": "ddp-workload",
             "workload_signature": signature(ident),
             "distributed_launch": launch,
+            "validation_refs": (*variant.validation_refs, *validations),
         }
     )
     base = spec.candidates[0]
@@ -164,11 +174,11 @@ def test_existing_single_gpu_signatures_are_byte_identical_to_live_records():
 @pytest.mark.parametrize(
     "change, message",
     [
-        ({"nodes": (DistributedNode(node_ref="node-a", capability_ref="cap-a", gpus=1),) * 2},
+        ({"nodes": (DistributedNode(node_ref="node-a", capability_ref="cap-a", gpus=1, accelerator_model="fixture-gpu", validation_ref="fixture-validation"),) * 2},
          "distinct"),
-        ({"nodes": tuple(DistributedNode(node_ref=n, capability_ref="c-" + n, gpus=1)
+        ({"nodes": tuple(DistributedNode(node_ref=n, capability_ref="c-" + n, gpus=1, accelerator_model="fixture-gpu", validation_ref="fixture-validation")
                          for n in ("node-b", "node-a"))}, "sorted"),
-        ({"nodes": tuple(DistributedNode(node_ref=n, capability_ref="same", gpus=1)
+        ({"nodes": tuple(DistributedNode(node_ref=n, capability_ref="same", gpus=1, accelerator_model="fixture-gpu", validation_ref="fixture-validation")
                          for n in NODES)}, "own capability"),
         ({"world_size": 3}, "world_size"),
         ({"nproc_per_node": 2, "world_size": 4}, "nproc_per_node"),
@@ -208,7 +218,8 @@ def test_two_node_allocation_is_admitted_with_per_node_evidence(service, bundle)
         ("missing", "DISTRIBUTED_NODE_EVIDENCE_MISSING"),
         ("stale", "DISTRIBUTED_NODE_STALE"),
         ("smuggled", "DISTRIBUTED_NODE_CAPABILITY_MISMATCH"),
-        ("heterogeneous", "DISTRIBUTED_NODE_HETEROGENEOUS"),
+        ("heterogeneous", "DISTRIBUTED_NODE_CAPABILITY_MISMATCH"),  # undeclared model
+        ("other-route", "DISTRIBUTED_NODE_HETEROGENEOUS"),
         ("busy", "DISTRIBUTED_NODE_INSUFFICIENT_GPUS"),
         ("shared", "DISTRIBUTED_NODE_HETEROGENEOUS"),
     ],
@@ -220,6 +231,8 @@ def test_every_node_needs_its_own_fresh_identical_physical_evidence(service, bun
         "stale": b.model_copy(update={"observed_at": now() - timedelta(hours=2)}),
         "smuggled": b.model_copy(update={"node_ref": "elsewhere"}),
         "heterogeneous": b.model_copy(update={"accelerator_model": "other-gpu"}),
+        # Another cluster binding (LocalQueue/runtimeClass) cannot share one Job.
+        "other-route": b.model_copy(update={"backend_cluster_id": "other-cluster"}),
         "busy": b.model_copy(update={"allocatable_count": 0}),
         # A shared slot advertised as 2 is still one device, never two GPUs.
         "shared": b.model_copy(
@@ -296,6 +309,107 @@ def test_other_callers_fail_closed_without_node_evidence(service, bundle):
     assert "DISTRIBUTED_NODE_EVIDENCE_REQUIRED" in compatibility(
         spec, spec.candidates[0], variant, cap
     )
+
+
+def mixed(model="fixture-gpu-2", qualification="fixture-validation-2"):
+    """node-b exposes a different GPU model, declared with its own qualification."""
+    nodes = tuple(
+        DistributedNode(
+            node_ref=n,
+            capability_ref="cap-" + n,
+            gpus=1,
+            accelerator_model="fixture-gpu" if n == "node-a" else model,
+            validation_ref="fixture-validation" if n == "node-a" else qualification,
+        )
+        for n in NODES
+    )
+    return ddp(nodes=nodes)
+
+
+def test_mixed_gpu_models_are_admitted_only_with_per_model_qualification(service, bundle):
+    _, _, _, cap = bundle
+    b = cap.model_copy(
+        update={"ref": "cap-node-b", "node_ref": "node-b", "accelerator_model": "fixture-gpu-2"}
+    )
+    setup(service, bundle, d=mixed(), caps={"node-b": b}, validations=("fixture-validation-2",))
+    job = submit(service)
+    nodes = job["body"]["candidate"]["context"]["distributed"]["nodes"]
+    assert [n["accelerator_model"] for n in nodes] == ["fixture-gpu", "fixture-gpu-2"]
+
+
+def test_mixed_gpu_model_without_its_own_qualification_is_rejected(service, bundle):
+    _, _, _, cap = bundle
+    b = cap.model_copy(
+        update={"ref": "cap-node-b", "node_ref": "node-b", "accelerator_model": "fixture-gpu-2"}
+    )
+    setup(service, bundle, d=mixed(), caps={"node-b": b})  # qualification not on the variant
+    with pytest.raises(Rejected, match="DISTRIBUTED_NODE_MODEL_UNQUALIFIED"):
+        submit(service)
+
+
+def test_declared_node_model_must_match_that_nodes_capability(service, bundle):
+    setup(service, bundle, d=mixed(), validations=("fixture-validation-2",))  # b is fixture-gpu
+    with pytest.raises(Rejected, match="DISTRIBUTED_NODE_CAPABILITY_MISMATCH"):
+        submit(service)
+
+
+def test_mixed_models_keep_every_runtime_and_route_identity(service, bundle):
+    _, _, _, cap = bundle
+    b = cap.model_copy(
+        update={
+            "ref": "cap-node-b",
+            "node_ref": "node-b",
+            "accelerator_model": "fixture-gpu-2",
+            "runtime_versions": {"cuda": "other-abi"},
+        }
+    )
+    setup(service, bundle, d=mixed(), caps={"node-b": b}, validations=("fixture-validation-2",))
+    with pytest.raises(Rejected, match="DISTRIBUTED_NODE_HETEROGENEOUS"):
+        submit(service)
+
+
+# --- combination builder ------------------------------------------------------------
+
+
+def test_builder_enumerates_only_real_qualified_physical_node_sets(bundle):
+    from resource_advisor.distributed_allocation import build_candidates
+
+    spec, candidate, _, cap = bundle
+    caps = [cap] + [
+        cap.model_copy(update={"ref": f"cap-{n}", "node_ref": n, **change})
+        for n, change in [
+            ("node-m", {"accelerator_model": "fixture-gpu-2"}),
+            ("node-s", {"allocation_mode": "virtual_slot", "allocatable_count": 2}),
+            ("node-t", {"observed_at": now() - timedelta(hours=2)}),
+            ("node-r", {"backend_cluster_id": "other-cluster"}),
+            ("node-u", {"accelerator_model": "unqualified-gpu"}),
+        ]
+    ]
+    qualified = {"fixture-gpu": "fixture-validation", "fixture-gpu-2": "fixture-validation-2"}
+    built = build_candidates(candidate, cap, caps, qualified, counts=(1, 2, 4))
+    assert built[1] == [candidate]
+    assert 4 not in built  # only two qualified nodes exist: no invented 4-GPU set
+    [pair] = built[2]
+    d = pair.context.distributed
+    assert [(n.node_ref, n.accelerator_model) for n in d.nodes] == [
+        ("node-m", "fixture-gpu-2"),
+        ("test-worker", "fixture-gpu"),
+    ]
+    assert d.world_size == 2 and pair.context.resources.accelerator_count == 1
+    assert pair.capability_ref == cap.ref
+    assert build_candidates(candidate, cap, caps, qualified, counts=(2,)) == {2: built[2]}
+
+
+def test_builder_same_node_only_when_physical_count_covers_every_rank(bundle):
+    from resource_advisor.distributed_allocation import build_candidates
+
+    _, candidate, _, cap = bundle
+    two = cap.model_copy(update={"allocatable_count": 2})
+    base = candidate.model_copy(update={"capability_ref": two.ref})
+    built = build_candidates(base, two, [two], {"fixture-gpu": "fixture-validation"}, counts=(2, 4))
+    [same] = built[2]
+    assert same.context.distributed.placement == "same-node"
+    assert same.context.distributed.nproc_per_node == 2 and 4 not in built
 
 
 # --- Kubernetes adapter -----------------------------------------------------------

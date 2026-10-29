@@ -40,6 +40,8 @@ NODE_IDENTITY = (
     "memory_model",
     "power_mode",
 )
+# GPU model may differ per node, but only when each node's model is separately qualified.
+SHARED_IDENTITY = tuple(k for k in NODE_IDENTITY if k != "accelerator_model")
 
 
 def distributed_reasons(spec, candidate, variant, cap, node_caps, at):
@@ -75,10 +77,13 @@ def distributed_reasons(spec, candidate, variant, cap, node_caps, at):
             reasons.append("DISTRIBUTED_NODE_EVIDENCE_MISSING")
             continue
         age = ((at or now()) - member.observed_at).total_seconds()
-        if member.node_ref != node.node_ref:
+        if member.node_ref != node.node_ref or member.accelerator_model != node.accelerator_model:
             reasons.append("DISTRIBUTED_NODE_CAPABILITY_MISMATCH")
-        elif any(getattr(member, k) != getattr(cap, k) for k in NODE_IDENTITY):
+        elif any(getattr(member, k) != getattr(cap, k) for k in SHARED_IDENTITY):
+            # One Job: same cluster route, image, runtime ABI and allocation kind.
             reasons.append("DISTRIBUTED_NODE_HETEROGENEOUS")
+        elif node.validation_ref not in variant.validation_refs:
+            reasons.append("DISTRIBUTED_NODE_MODEL_UNQUALIFIED")
         elif age < -5 or age > member.valid_for_seconds:
             reasons.append("DISTRIBUTED_NODE_STALE")
         elif not member.ready:

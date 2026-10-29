@@ -124,7 +124,13 @@ class Studies:
             eligible, excluded, units = [], {}, {}
             for c in sorted(spec.candidates, key=lambda c: c.ref != spec.baseline_candidate_ref):
                 _, _, variant, cap = self.service.bundle(conn, project, spec.ref, c.ref)
-                errors = compatibility(spec, c, variant, cap)
+                errors = compatibility(
+                    spec,
+                    c,
+                    variant,
+                    cap,
+                    node_caps=self.service.node_capabilities(conn, project, c),
+                )
                 if not variant.pilot_command:
                     errors.append("COOPERATIVE_PILOT_ENTRYPOINT_REQUIRED")
                 unit = device_unit(c, variant)
@@ -657,7 +663,8 @@ class Studies:
             qualified = []
             for c in candidates:
                 args = self.service.bundle(conn, row["project"], spec.ref, c.ref)
-                if not compatibility(*args):
+                nodes = self.service.node_capabilities(conn, row["project"], c)
+                if not compatibility(*args, node_caps=nodes):
                     qualified.append(c)
             if "fidelity_space" in body:
                 from .fidelity_space import FidelitySpaces

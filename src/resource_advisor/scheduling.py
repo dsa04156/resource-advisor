@@ -279,7 +279,12 @@ def compile_plan(service, conn, project, request):
             continue
         # Recommendation inputs never inherit the operational staleness relaxation.
         errors += execution_compatibility(
-            spec, candidate, variant, cap, operational=service.operational_mode and rec is None
+            spec,
+            candidate,
+            variant,
+            cap,
+            operational=service.operational_mode and rec is None,
+            node_caps=service.node_capabilities(conn, project, candidate),
         )
         if not service.operational_mode and candidate.ref != spec.baseline_candidate_ref:
             errors.append("APPROVAL_REQUIRED")
