@@ -312,6 +312,14 @@ def run_staging(args, stage, barrier, agree=None):
     return receipt, own, window
 
 
+def record_preparation(staging, seconds):
+    """This rank's own measured preparation goes into its own staging receipt (the same
+    object every envelope key carries), never copied from another rank."""
+    if staging is not None:
+        staging[0]["preparation_seconds"] = float(seconds)
+    return staging
+
+
 def sync_batchnorm(model):
     """Global-batch BatchNorm under DDP (same statistics as one device at the global batch)."""
     import torch
@@ -386,6 +394,7 @@ def run(args, environ=os.environ, stage=None):
     batches = batch_schedule(len(train_y), args.global_batch, args.steps, args.seed)
     per_rank = args.global_batch // world
     preparation = time.perf_counter() - prep_start
+    record_preparation(staging, preparation)
 
     job, attempt = environ["RA_JOB_ID"], environ["RA_ATTEMPT_ID"]
     losses, step_seconds = [], []

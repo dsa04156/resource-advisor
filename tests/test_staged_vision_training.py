@@ -67,7 +67,11 @@ class Trainer:
         self.calls.append((train_argv, (svt.Path(args.data) / "manifest.json").read_bytes()))
         result = {"job_id": environ["RA_JOB_ID"], "outcome": "COMPLETED"}
         if environ.get("RANK", "0") == "0" and self.out is not None:
-            envelope = {"result": result, "digest": vt.signature(result), "staging_receipt": receipt}
+            envelope = {
+                "result": result,
+                "digest": vt.signature(result),
+                "staging_receipt": receipt,
+            }
             self.out.append(vt.RESULT + json.dumps(envelope))
 
 
@@ -129,7 +133,9 @@ def test_http_source_is_streamed_and_its_locator_carries_no_secret(tmp_path):
 
 def failure(out):
     [envelope] = lines(out, vt.RESULT)
-    assert "staging_receipt" not in envelope and envelope["digest"] == vt.signature(envelope["result"])
+    assert "staging_receipt" not in envelope and envelope["digest"] == vt.signature(
+        envelope["result"]
+    )
     assert envelope["result"]["outcome"] == "FAILED" and envelope["result"]["measured"] is True
     return envelope["result"]["error_code"]
 
@@ -216,8 +222,11 @@ def test_cache_collision_winner_must_hold_the_receipted_bytes(tmp_path, monkeypa
 
 
 def test_ipv6_source_keeps_its_brackets():
-    assert svt.sanitize("http://u:p@[fd00::1]:8080/d.tar?t=1") == ("http", "http://[fd00::1]:8080/d.tar")
-    assert svt._request("http://[fd00::1]:8080/d.tar").full_url == "http://[fd00::1]:8080/d.tar"
+    assert svt.sanitize("http://u:p@[fd00::1]:8080/d.tar?t=1") == (
+        "http",
+        "http://[fd00::1]:8080/d.tar",
+    )
+    assert svt._target("http://[fd00::1]:8080/d.tar?t=1")[1:4] == ("fd00::1", 8080, "/d.tar?t=1")
 
 
 JOINT_ARGS = [
@@ -259,12 +268,99 @@ def test_joint_runtime_is_an_explicit_choice_and_its_receipt_reaches_the_envelop
 
 
 def test_ddp_rank_receipts_are_lifted_in_rank_order():
+    # Each rank's runtime records its own measured preparation inside its receipt.
+    rank0 = {"pod_uid": "u0", "preparation_seconds": 2.5}
     envelope = {"result": {}, "training_evidence": {
-        "staging_receipt": {"pod_uid": "u0"},
-        "ranks": [{"rank": 1, "staging_receipt": {"pod_uid": "u1"}},
-                  {"rank": 0, "staging_receipt": {"pod_uid": "u0"}}]}}  # fmt: skip
-    envelope["training_evidence"]["preparation_seconds"] = 2.5
+        "staging_receipt": rank0, "preparation_seconds": 2.5,
+        "ranks": [{"rank": 1, "staging_receipt": {"pod_uid": "u1", "preparation_seconds": 9.0}},
+                  {"rank": 0, "staging_receipt": rank0}]}}  # fmt: skip
     lifted = svt.lift_receipts(envelope)
-    # rank 0's own receipt also carries its measured preparation (after staging)
-    assert lifted["staging_receipt"] == {"pod_uid": "u0", "preparation_seconds": 2.5}
+    # The primary receipt is exactly rank 0's own; nothing is synthesized onto it.
+    assert lifted["staging_receipt"] == rank0 == lifted["staging_receipts"][0]
     assert [r["pod_uid"] for r in lifted["staging_receipts"]] == ["u0", "u1"]
+    assert lifted["staging_receipts"][1]["preparation_seconds"] == 9.0
+
+
+def test_single_receipt_is_lifted_unchanged():
+    receipt = {"pod_uid": "u0", "preparation_seconds": 1.5}
+    lifted = svt.lift_receipts({"training_evidence": {"staging_receipt": receipt,
+                                                      "preparation_seconds": 7.0}})  # fmt: skip
+    assert lifted["staging_receipt"] == receipt
+
+
+def serve(handler_class):
+    server = ThreadingHTTPServer(("127.0.0.1", 0), handler_class)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    return server
+
+
+def test_redirects_are_refused_and_credentials_never_leave_the_source(tmp_path):
+    from http.server import BaseHTTPRequestHandler
+
+    source, digest, size = bundle(tmp_path)
+    seen = []
+
+    class Other(BaseHTTPRequestHandler):
+        def do_GET(self):
+            seen.append(self.headers.get("Authorization"))
+            self.send_response(200)
+            self.send_header("Content-Length", str(size))
+            self.end_headers()
+            self.wfile.write(source.read_bytes())
+
+        def log_message(self, *a):
+            pass
+
+    other = serve(Other)
+
+    class Redirect(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(302)
+            self.send_header("Location", f"http://127.0.0.1:{other.server_port}/x.tar")
+            self.end_headers()
+
+        def log_message(self, *a):
+            pass
+
+    origin = serve(Redirect)
+    try:
+        out = []
+        url = f"http://user:pw@127.0.0.1:{origin.server_port}/x.tar"
+        svt.run(
+            argv(url, digest, size, tmp_path / "c"), env(), train=Trainer(out), write=out.append
+        )
+    finally:
+        origin.shutdown()
+        other.shutdown()
+    assert failure(out) == "STAGING_SOURCE_HTTP_302" and seen == []
+
+
+def test_the_transfer_deadline_bounds_the_whole_transfer(tmp_path):
+    import time as clock
+    from http.server import BaseHTTPRequestHandler
+
+    source, digest, size = bundle(tmp_path)
+
+    class Slow(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-Length", str(size))
+            self.end_headers()
+            for byte in source.read_bytes()[:20]:
+                self.wfile.write(bytes([byte]))
+                self.wfile.flush()
+                clock.sleep(0.25)
+
+        def log_message(self, *a):
+            pass
+
+    server = serve(Slow)
+    try:
+        out, started = [], clock.perf_counter()
+        url = f"http://127.0.0.1:{server.server_port}/x.tar"
+        svt.run(argv(url, digest, size, tmp_path / "c", "--timeout-seconds", "1"), env(),
+                train=Trainer(out), write=out.append)  # fmt: skip
+        took = clock.perf_counter() - started
+    finally:
+        server.shutdown()
+    assert failure(out) == "STAGING_TRANSFER_TIMEOUT" and took < 1.6

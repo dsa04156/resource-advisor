@@ -145,6 +145,7 @@ def run(args, environ=os.environ, stage=None):
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     batches = vt.batch_schedule(len(train_y), args.global_batch, args.steps, args.seed)
     preparation = time.perf_counter() - prep_start
+    vt.record_preparation(staging, preparation)
 
     job, attempt = environ["RA_JOB_ID"], environ["RA_ATTEMPT_ID"]
     pin = teacher_pin(args)
@@ -307,7 +308,9 @@ def run(args, environ=os.environ, stage=None):
     }
     if staging is not None:
         evidence.update(
-            staging_receipt=staging[0], staging_seconds=staging[1], staging_window_seconds=staging[2]
+            staging_receipt=staging[0],
+            staging_seconds=staging[1],
+            staging_window_seconds=staging[2],
         )
     envelope = {"result": result, "digest": vt.signature(result), "training_evidence": evidence}
     if args.isolated:

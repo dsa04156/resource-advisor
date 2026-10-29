@@ -481,3 +481,10 @@ def test_sync_batchnorm_keeps_the_pinned_state_and_keys():
 def test_staging_receipt_must_be_a_json_object(bad):
     with pytest.raises((RuntimeError, ValueError)):
         vt.run_staging(args(), lambda a: bad, barrier=lambda: None)
+
+
+def test_each_rank_records_its_own_preparation_in_its_own_receipt():
+    receipt = {"pod_uid": "u1"}
+    staging = (receipt, 0.1, 0.2)
+    assert vt.record_preparation(staging, 3) is staging and receipt["preparation_seconds"] == 3.0
+    assert vt.record_preparation(None, 3) is None

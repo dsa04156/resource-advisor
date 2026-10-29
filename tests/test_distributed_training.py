@@ -1003,34 +1003,28 @@ def test_missing_foreign_or_duplicated_rank_receipts_invalidate_the_result(servi
     assert stored == [None, None, None]
 
 
-def test_rank0_receipt_may_carry_only_its_lifted_preparation_time(service, bundle):
-    # The staged wrapper lifts rank 0's measured runtime preparation onto the top-level
-    # receipt; the member copy is otherwise the identical receipt.
+def test_each_rank_receipt_carries_its_own_preparation_and_rank0_is_exact(service, bundle):
+    def prepared(rs):
+        return [dict(rs[0], preparation_seconds=4.2), dict(rs[1], preparation_seconds=9.1)]
+
     job, row, stored, receipts = staged_ddp(
-        service, bundle, own_change={"preparation_seconds": 4.2}
+        service, bundle, prepared, own_change={"preparation_seconds": 4.2}
     )
     assert row["state"] == State.SUCCEEDED
-    assert "preparation_seconds" not in stored[0]["body"]
+    assert [s["body"]["preparation_seconds"] for s in stored[:2]] == [4.2, 9.1]
 
 
 @pytest.mark.parametrize(
     "own_change",
     [
-        {"preparation_seconds": 4.2, "cache_state": "hot"},  # anything else differs
+        {"preparation_seconds": 4.2},  # synthesized onto the primary only
+        {"cache_state": "hot"},
         {"pod_uid": "uid-1"},  # rank 0's own receipt names another Pod
     ],
 )
-def test_rank0_receipt_must_otherwise_equal_member_zero(service, bundle, own_change):
+def test_rank0_receipt_must_equal_member_zero_exactly(service, bundle, own_change):
     _, row, stored, _ = staged_ddp(service, bundle, own_change=own_change)
     assert row["state"] == State.RESULT_INVALID and stored == [None, None, None]
-
-
-def test_member_preparation_time_must_agree_with_the_lifted_one(service, bundle):
-    def member_prep(rs):
-        return [dict(rs[0], preparation_seconds=1.0), rs[1]]
-
-    _, row, _, _ = staged_ddp(service, bundle, member_prep, own_change={"preparation_seconds": 4.2})
-    assert row["state"] == State.RESULT_INVALID
 
 
 def test_member_receipts_are_immutable_after_success(service, bundle):
@@ -1052,6 +1046,8 @@ def test_wrapper_lifted_envelope_is_accepted_by_member_ingest():
 
     job = {"job_id": "j-1", "attempt_id": "a-1"}
     members = [member_receipt(job, r) for r in RANKS]
+    for member, seconds in zip(members, (3.5, 7.25), strict=True):
+        member["preparation_seconds"] = seconds  # each rank's own, via record_preparation
     evidence = {
         "staging_receipt": members[0],
         "preparation_seconds": 3.5,
@@ -1061,7 +1057,7 @@ def test_wrapper_lifted_envelope_is_accepted_by_member_ingest():
         ],
     }
     envelope = lift_receipts({"training_evidence": evidence})
-    assert envelope["staging_receipt"]["preparation_seconds"] == 3.5
+    assert envelope["staging_receipt"] is members[0]
     body = {
         "candidate": {"context": {"distributed": {"world_size": 2, "nproc_per_node": 1}}},
         "placement": {"distributed": {"ranks": RANKS}},
@@ -1070,4 +1066,7 @@ def test_wrapper_lifted_envelope_is_accepted_by_member_ingest():
     stored = staging_members(
         result, envelope["staging_receipts"], envelope["staging_receipt"], body
     )
-    assert [m["pod_uid"] for m in stored] == ["uid-0", "uid-1"]
+    assert [(m["pod_uid"], m["preparation_seconds"]) for m in stored] == [
+        ("uid-0", 3.5),
+        ("uid-1", 7.25),
+    ]

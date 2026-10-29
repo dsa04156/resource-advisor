@@ -35,6 +35,7 @@ Standard library only, so the image runs it beside the runtime files with
 import argparse
 import base64
 import hashlib
+import http.client
 import json
 import os
 import shutil
@@ -42,9 +43,8 @@ import socket
 import sys
 import tarfile
 import tempfile
+import threading
 import time
-import urllib.error
-import urllib.request
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
 from urllib.parse import unquote, urlsplit, urlunsplit
@@ -108,14 +108,52 @@ def _copy(read, sink, hasher, size, deadline):
     return received
 
 
-def _request(source):
-    """urllib does not take userinfo from the URL: send it as basic auth instead."""
+def _target(source):
+    """(scheme, host without IPv6 brackets, port, request path with query, userinfo)."""
     parts = urlsplit(source)
-    request = urllib.request.Request(urlunsplit(parts._replace(netloc=_netloc(parts), fragment="")))
-    if parts.username is not None:
-        token = f"{unquote(parts.username)}:{unquote(parts.password or '')}".encode()
-        request.add_header("Authorization", "Basic " + base64.b64encode(token).decode())
-    return request
+    path = urlunsplit(("", "", parts.path or "/", parts.query, ""))
+    return parts.scheme, parts.hostname, parts.port, path, parts.username, parts.password
+
+
+def _connect(source, deadline):
+    """One HTTP(S) GET of exactly this URL: redirects are never followed (credentials
+    would leave the declared source), userinfo is sent as basic auth to it only.
+
+    A watchdog shuts the connection down at the overall deadline, so no single
+    socket wait can outlast it. Returns (connection, response, stop watchdog)."""
+    scheme, host, port, path, user, password = _target(source)
+    remaining = deadline - time.perf_counter()
+    if remaining <= 0:
+        raise Unavailable("TRANSFER_TIMEOUT")
+    kind = http.client.HTTPSConnection if scheme == "https" else http.client.HTTPConnection
+    conn = kind(host, port, timeout=remaining)
+    headers = {}
+    if user is not None:
+        token = f"{unquote(user)}:{unquote(password or '')}".encode()
+        headers["Authorization"] = "Basic " + base64.b64encode(token).decode()
+    conn.connect()
+    guard = conn.sock.dup()  # same connection; survives http.client closing its object
+
+    def expire():
+        try:
+            guard.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+
+    timer = threading.Timer(max(0.0, deadline - time.perf_counter()), expire)
+    timer.daemon = True
+    timer.start()
+
+    def stop():
+        timer.cancel()
+        guard.close()
+
+    try:
+        conn.request("GET", path, headers=headers)
+        return conn, conn.getresponse(), stop
+    except BaseException:
+        stop()
+        raise
 
 
 def _cold(source, kind, cache, digest, size, timeout):
@@ -128,17 +166,23 @@ def _cold(source, kind, cache, digest, size, timeout):
         deadline, first = started + timeout, None
         with handle:
             if kind == "http":
-                request = _request(source)
+                conn = stop = None
                 try:
-                    with urllib.request.urlopen(request, timeout=timeout) as response:
-                        if response.status != 200:
-                            raise Unavailable(f"SOURCE_HTTP_{response.status}")
-                        first = time.perf_counter() - started
-                        received = _copy(response.read, handle, hasher, size, deadline)
-                except urllib.error.HTTPError as exc:
-                    raise Unavailable(f"SOURCE_HTTP_{exc.code}") from exc
-                except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
-                    raise Unavailable("SOURCE_UNREACHABLE") from exc
+                    conn, response, stop = _connect(source, deadline)
+                    if response.status != 200:
+                        raise Unavailable(f"SOURCE_HTTP_{response.status}")
+                    first = time.perf_counter() - started
+                    received = _copy(response.read1, handle, hasher, size, deadline)
+                except (OSError, http.client.HTTPException) as exc:
+                    late = time.perf_counter() >= deadline
+                    raise Unavailable("TRANSFER_TIMEOUT" if late else "SOURCE_UNREACHABLE") from exc
+                finally:
+                    if stop is not None:
+                        stop()
+                    if conn is not None:
+                        conn.close()
+                if time.perf_counter() >= deadline:
+                    raise Unavailable("TRANSFER_TIMEOUT")  # cut short by the watchdog
             else:
                 try:
                     with open(source, "rb") as file:
@@ -253,10 +297,9 @@ def lift_receipts(envelope):
     """Envelope keys the ingest reads: rank 0's own receipt and every rank's, by rank."""
     evidence = envelope.get("training_evidence") or {}
     if "staging_receipt" in evidence:
-        own = dict(evidence["staging_receipt"])
-        if evidence.get("preparation_seconds") is not None:  # rank 0's measured preparation
-            own["preparation_seconds"] = evidence["preparation_seconds"]
-        envelope = {**envelope, "staging_receipt": own}
+        # Exactly rank 0's own receipt: each runtime rank records its own measured
+        # preparation inside its receipt, so nothing is added here.
+        envelope = {**envelope, "staging_receipt": evidence["staging_receipt"]}
     ranks = evidence.get("ranks") or []
     if ranks and all("staging_receipt" in r for r in ranks):
         ordered = sorted(ranks, key=lambda r: r["rank"])
