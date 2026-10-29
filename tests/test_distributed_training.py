@@ -586,12 +586,91 @@ def envelope(job):
 def test_result_binds_exactly_one_rank0_envelope(service, bundle, sources, emitters, ok):
     job, k, adapter = started(service, bundle, sources)
     k.pods = [rank_pod(0, "node-a"), rank_pod(1, "node-b")]
+    complete(k)
+    job["body"]["placement"] = adapter.status(job).placement  # recorded as the worker does
     k.logs = {f"pod-{i}": ("step\n" + (envelope(job) if i in emitters else "")) for i in (0, 1)}
     if ok:
         assert adapter.result(job)["result"]["attempt_id"] == job["body"]["attempt_id"]
     else:
         with pytest.raises(BackendError, match="exactly one rank"):
             adapter.result(job)
+
+
+def collected(service, bundle, sources):
+    """A completed two-rank job whose verified placement the worker recorded."""
+    job, k, adapter = started(service, bundle, sources)
+    k.pods = [rank_pod(0, "node-a"), rank_pod(1, "node-b")]
+    complete(k)
+    observation = adapter.status(job)
+    assert observation.state == State.COLLECTING
+    job["body"]["placement"] = observation.placement
+    k.logs = {"pod-0": envelope(job), "pod-1": "step"}
+    return job, k, adapter
+
+
+def test_result_is_never_read_from_a_same_name_replacement_job(service, bundle, sources):
+    job, k, adapter = collected(service, bundle, sources)
+    k.job["metadata"]["uid"] = "replacement-uid"
+    replacement = [rank_pod(0, "outside", uid="replacement-uid", phase="Failed")]
+    del replacement[0]["metadata"]["annotations"]
+    k.pods = replacement
+    k.logs = {"pod-0": envelope(job)}
+    with pytest.raises(BackendError, match="recorded"):
+        adapter.result(job)
+    assert not any(args[3] == "logs" for args, _ in k.calls)
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        lambda p: p["status"].update(phase="Failed"),
+        lambda p: p["spec"].update(nodeName="outside"),
+        lambda p: p["metadata"].update(uid="pod-uid-new"),
+        lambda p: p["metadata"]["annotations"].update(
+            {"batch.kubernetes.io/job-completion-index": "0"}
+        ),
+    ],
+)
+def test_result_revalidates_every_recorded_rank_before_reading_logs(
+    service, bundle, sources, change
+):
+    job, k, adapter = collected(service, bundle, sources)
+    change(k.pods[1])
+    with pytest.raises(BackendError, match="recorded"):
+        adapter.result(job)
+    assert not any(args[3] == "logs" for args, _ in k.calls)
+
+
+def test_result_requires_a_recorded_complete_placement(service, bundle, sources):
+    job, k, adapter = collected(service, bundle, sources)
+    job["body"]["placement"] = None
+    with pytest.raises(BackendError, match="recorded"):
+        adapter.result(job)
+
+
+def test_active_monitoring_repairs_a_lost_owned_service(service, bundle, sources):
+    job, k, adapter = started(service, bundle, sources)
+    k.pods = [rank_pod(0, "node-a", phase="Running"), rank_pod(1, "node-b", phase="Pending")]
+    k.job["status"] = {}
+    k.service = None
+    adapter.status(job)
+    assert k.service is not None
+    assert k.service["metadata"]["ownerReferences"][0]["uid"] == "uid-job"
+    k.service["metadata"]["ownerReferences"][0]["uid"] = "someone-else"
+    with pytest.raises(BackendError, match="SERVICE_CONFLICT"):
+        adapter.status(job)
+    assert not any(args[3] == "delete" and args[4] == "service" for args, _ in k.calls)
+
+
+def test_terminal_job_never_recreates_its_service(service, bundle, sources):
+    job, k, adapter = started(service, bundle, sources)
+    k.pods = [rank_pod(0, "node-a"), rank_pod(1, "node-b")]
+    complete(k)
+    k.service = None
+    created = len([a for a, _ in k.calls if a[3] == "create"])
+    adapter.status(job)
+    assert k.service is None
+    assert len([a for a, _ in k.calls if a[3] == "create"]) == created
 
 
 def test_cancel_deletes_only_the_owned_job(service, bundle, sources):

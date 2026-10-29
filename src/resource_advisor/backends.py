@@ -704,6 +704,13 @@ class KubernetesBackend:
             )
         ]
         if distributed(job):
+            terminal = any(
+                c["type"] in {"Complete", "Failed"} and c["status"] == "True"
+                for c in status.get("conditions", [])
+            )
+            if not terminal and job["state"] != State.CANCEL_REQUESTED:
+                # Ranks rendezvous through the owned Service: repair a lost one while active.
+                self.ensure_service(job, obj)
             return self.distributed_status(job, obj, pods, retained)
         if len(pods) > 1:
             raise BackendError("unexpected multiple Pods for a single non-retrying attempt")
@@ -990,7 +997,24 @@ class KubernetesBackend:
         )
 
     def distributed_result(self, job):
-        """Exactly one rank (global rank 0) may emit the result, from this Job's Pods."""
+        """Exactly one rank (global rank 0) may emit the result, from the recorded ranks.
+
+        Logs are read only from the Job UID and rank Pods that status() recorded as
+        a complete, successful placement on the allocated node set, after checking
+        that each of those Pods is still the same Pod with the same index and node.
+        """
+        d = distributed(job)
+        allowed, n = {x["node_ref"] for x in d["nodes"]}, len(d["nodes"])
+        recorded = job["body"].get("placement") or {}
+        ranks = (recorded.get("distributed") or {}).get("ranks") or []
+        if (
+            not recorded.get("job_uid")
+            or sorted(r["index"] for r in ranks) != list(range(n))
+            or any(r["phase"] != "Succeeded" or not r.get("pod_uid") for r in ranks)
+            or {r["node_name"] for r in ranks} != allowed
+            or len({r["node_name"] for r in ranks}) != n
+        ):
+            raise BackendError("no recorded complete placement to bind the distributed result")
         raw = self.execute(
             self.prefix
             + ["get", "job", job["body"]["external_id"], "--ignore-not-found", "-o", "json"]
@@ -998,26 +1022,37 @@ class KubernetesBackend:
         if not raw.strip():
             raise BackendError("Job missing; distributed result cannot be bound")
         uid = json.loads(raw)["metadata"].get("uid")
-        pods = json.loads(
-            self.execute(
-                self.prefix
-                + [
-                    "get",
-                    "pods",
-                    "-l",
-                    "batch.kubernetes.io/controller-uid=" + str(uid),
-                    "-o",
-                    "json",
-                ]
-            )
-        )["items"]
-        pods = [
-            p
-            for p in pods
+        if uid != recorded["job_uid"]:
+            raise BackendError("Job UID differs from the recorded placement")
+        live = {
+            p["metadata"].get("uid"): p
+            for p in json.loads(
+                self.execute(
+                    self.prefix
+                    + [
+                        "get",
+                        "pods",
+                        "-l",
+                        "batch.kubernetes.io/controller-uid=" + str(uid),
+                        "-o",
+                        "json",
+                    ]
+                )
+            )["items"]
             if any(o.get("uid") == uid for o in p["metadata"].get("ownerReferences", []))
-        ]
-        if len(pods) != len(distributed(job)["nodes"]):
-            raise BackendError("distributed result requires every rank Pod")
+        }
+        pods = []
+        for rank in ranks:
+            pod = live.get(rank["pod_uid"])
+            if (
+                pod is None
+                or pod["metadata"].get("annotations", {}).get(INDEX_ANNOTATION)
+                != str(rank["index"])
+                or pod.get("spec", {}).get("nodeName") != rank["node_name"]
+                or pod.get("status", {}).get("phase") != "Succeeded"
+            ):
+                raise BackendError("rank Pod differs from the recorded placement")
+            pods.append(pod)
         marker = "RESOURCE_ADVISOR_RESULT "
         found = []
         for pod in sorted(pods, key=lambda p: p["metadata"]["name"]):
