@@ -407,12 +407,12 @@ def _intents(conn, project, route_key, identity, at):
         plan = body.get("scheduling_plan") or {}
         cap = body.get("capability", {})
         target = plan.get("target") or {}
-        key = (
-            body.get("candidate", {}).get("backend"),
-            cap.get("backend_cluster_id"),
-            target.get("pool_ref") or cap.get("node_ref"),
-        )
-        if key != route_key:
+        backend, cluster = body.get("candidate", {}).get("backend"), cap.get("backend_cluster_id")
+        keys = {(backend, cluster, target.get("pool_ref") or cap.get("node_ref"))}
+        # A distributed job holds a device on every member node, not only its anchor.
+        d = (body.get("candidate", {}).get("context") or {}).get("distributed") or {}
+        keys.update((backend, cluster, n["node_ref"]) for n in d.get("nodes", ()))
+        if route_key not in keys:
             continue
         frozen = plan.get("recommendation_evidence") or {}
         result.append(
@@ -652,6 +652,159 @@ def _measured_transfer(profiles, bindings, location, candidate, cap, target, rec
     return worst["median_seconds"], {**detail, **worst}
 
 
+def _members(service, conn, project, candidate):
+    """Each distributed node's own capability (node_ref-checked) or a fail-closed reason."""
+    members = {}
+    for node in candidate.context.distributed.nodes:
+        item = service.store.get(conn, "capability", node.capability_ref)
+        if not item or item["project"] not in {project, "*"}:
+            return None, "DISTRIBUTED_MEMBER_CAPABILITY_MISSING"
+        member = CapabilitySnapshot.model_validate(item["body"])
+        if member.node_ref != node.node_ref or member.backend != candidate.backend:
+            return None, "DISTRIBUTED_MEMBER_CAPABILITY_MISMATCH"
+        members[node.node_ref] = member
+    return members, None
+
+
+def _staging_path(per_node, location):
+    """Critical path of parallel member staging from separately measured profiles.
+
+    Members start staging together (barrier) and compute starts after the slowest.
+    Solo measurements do not show contention at a shared source, so members that
+    read the same source endpoint are bounded as if served one after another
+    (sum); distinct sources run in parallel (max). Both bounds are recorded.
+    """
+    groups = {}
+    for n in per_node:
+        groups.setdefault(location.source_endpoint_ref, []).append(n)
+    shared = any(len(g) > 1 for g in groups.values())
+
+    def path(key):
+        return max(sum(n[key] for n in g) for g in groups.values())
+
+    return {
+        "median_seconds": path("median_seconds"),
+        "min_seconds": path("min_seconds"),
+        "max_seconds": path("max_seconds"),
+        "samples": min(n["samples"] for n in per_node),
+        "aggregation": "shared_source_serialized_bound" if shared else "parallel_max",
+        "parallel_lower_bound_seconds": max(n["median_seconds"] for n in per_node),
+        "shared_source_upper_bound_seconds": sum(n["median_seconds"] for n in per_node),
+    }
+
+
+def _distributed(service, conn, project, rec, at, spec, candidate, members, profile, measured, ctx):
+    """Gang prediction over every member route; (CandidatePrediction | None, reasons, detail).
+
+    Queue: each member node's own fresh, complete route snapshot and accepted
+    intents give that member's wait for one physical device (the existing queue
+    model); the gang is admitted when every member is free, so the wait is the
+    slowest member's. This is a lower bound if a freed member device can be
+    backfilled while the gang waits. Admission/readmission come from the
+    distributed profile, whose native admission spans all ranks. Staging (network
+    policy) replaces the profile's separately bounded data_staging with the member
+    staging critical path; DDP communication stays inside compute, added once.
+    """
+    from dataclasses import replace
+
+    from .jct_selection import PROFILE_QUEUE, CandidatePrediction, _critical_path
+
+    d = candidate.context.distributed
+    if d.nproc_per_node != 1:
+        return None, ["DISTRIBUTED_MULTI_DEVICE_MEMBER_QUEUE_UNMODELED"], {}
+    detail, waits, snapshots, accounted = {"members": []}, [], [], []
+    for node, cap in sorted(members.items()):
+        identity = CandidateIdentity(
+            candidate.ref,
+            str(candidate.backend),
+            cap.backend_cluster_id,
+            node,
+            cap.resource_key or "",
+            measured.identity.runtime_digest,
+            measured.identity.workload_digest,
+        )
+        snapshot, view = _queue(service, conn, project, identity, candidate, cap)
+        intents = _intents(
+            conn, project, (str(candidate.backend), cap.backend_cluster_id, node), identity,
+            at.timestamp(),
+        )  # fmt: skip
+        if snapshot is not None and snapshot.capacity_unit != "physical_device":
+            return None, ["DISTRIBUTED_SHARED_SLOT_QUEUE", "DISTRIBUTED_MEMBER:" + node], detail
+        probe = replace(
+            measured,
+            identity=identity,
+            phases=(("compute", 0.0),),
+            overlap_groups=(),
+            admission_seconds=0.0,
+            readmission_seconds=0.0,
+        )
+        [member] = select_candidate(
+            PROFILE_QUEUE,
+            [identity],
+            [probe],
+            now_seconds=at.timestamp(),
+            queues=[snapshot] if snapshot is not None else [],
+            max_queue_age_seconds=rec.max_queue_age_seconds,
+            max_profile_age_seconds=rec.max_profile_age_seconds,
+            intents=intents,
+        ).predictions
+        detail["members"].append(
+            {"node_ref": node, "queue_wait_seconds": member.queue_wait_seconds,
+             "queue_snapshot": view, "reasons": list(member.reasons)}  # fmt: skip
+        )
+        if member.queue_wait_seconds is None:
+            return None, [*member.reasons, "DISTRIBUTED_MEMBER:" + node], detail
+        waits.append(member.queue_wait_seconds)
+        snapshots.append(snapshot.snapshot_ref)
+        accounted.extend(member.accounted_job_ids)
+    wait = max(waits)
+    admission = profile.readmission_seconds if wait > 0 else profile.admission_seconds
+    if admission is None:
+        return None, ["READMISSION_UNKNOWN_OR_INVALID"], detail
+    staging = None
+    if rec.policy == "profile_queue_network":
+        if profile.staging_boundary != "separate":
+            return None, ["STAGING_NOT_SEPARABLE"], detail
+        location, location_reason, network_profiles, bindings = ctx
+        if location is None:
+            return None, [location_reason or "DATA_LOCATION_MISSING"], detail
+        per_node, views = [], {}
+        for node, cap in sorted(members.items()):
+            seconds, item = _measured_transfer(
+                network_profiles, bindings, location, candidate, cap, None, rec, at
+            )
+            if seconds is None:
+                return None, [item["reason"], "DISTRIBUTED_MEMBER:" + node], detail
+            per_node.extend(item["per_node"])
+            views.update(item["bindings"])
+        path = _staging_path(per_node, location)
+        staging = path["median_seconds"]
+        detail["staging"] = {"source": "measured_network", "per_node": per_node,
+                             "bindings": views, "reason": None, **path}  # fmt: skip
+    service_seconds, phases = _critical_path(measured, staging)
+    return (
+        CandidatePrediction(
+            candidate.ref,
+            wait,
+            wait + admission + service_seconds,
+            ("PHASE_CRITICAL_PATH", "DISTRIBUTED_GANG_SLOWEST_MEMBER_WAIT"),
+            admission_seconds=admission,
+            profile_evidence_ref=measured.evidence_ref,
+            queue_snapshot_ref="+".join(snapshots),
+            accounted_job_ids=tuple(dict.fromkeys(accounted)),
+            capacity=len(members),
+            capacity_unit="physical_device",
+            timing_uncertainty_seconds=measured.timing_uncertainty_seconds,
+            timing_notes=measured.timing_notes,
+            phase_seconds=phases,
+            critical_path_seconds=service_seconds,
+            transfer_seconds=staging,
+        ),
+        [],
+        detail,
+    )
+
+
 PREPARATION = ("runtime_startup", "model_preparation")
 OTHER = ("communication", "finalization", "unattributed_in_container")
 
@@ -707,7 +860,7 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
     at = at or now()
     stamp = at.timestamp()
     identities, profiles, queues, intents, notes = [], [], [], [], {}
-    profile_refs, queue_refs, transfers, transfer_details = {}, {}, {}, {}
+    profile_refs, queue_refs, transfers, transfer_details, gang = {}, {}, {}, {}, {}
     location, location_reason = data_location(service, conn, project, spec)
     topology = None
     measured = rec.version == MEASURED_VERSION
@@ -739,11 +892,14 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
             item["variant"],
             item["target"],
         )
-        if candidate.context.distributed is not None and rec.policy != "profile_only":
-            # Queue and transfer models describe one node; multi-node allocations need
-            # all-node cost evidence, which is not representable yet: never anchor-only.
-            notes[candidate.ref] = "DISTRIBUTED_COST_EVIDENCE_REQUIRED"
-            continue
+        members = None
+        if candidate.context.distributed is not None:
+            # Every member's own capability; a profile is checked against the member
+            # its rank 0 ran on, and costs cover all members (never anchor-only).
+            members, reason = _members(service, conn, project, candidate)
+            if reason:
+                notes[candidate.ref] = reason
+                continue
         identity = _identity(spec, candidate, cap, variant, target)
         identities.append(identity)
         mine = sorted(
@@ -752,8 +908,15 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
             reverse=True,
         )
         checked = [
-            (p, _profile_reason(p, spec, candidate, cap, variant, target, rec, at)) for p in mine
-        ]
+            (
+                p,
+                _profile_reason(
+                    p, spec, candidate, members.get(p.node_ref, cap) if members else cap,
+                    variant, target, rec, at,
+                ),
+            )
+            for p in mine
+        ]  # fmt: skip
         valid = [p for p, reason in checked if reason is None]
         if not valid:
             notes[candidate.ref] = checked[0][1] if checked else "PROFILE_MISSING"
@@ -771,26 +934,38 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
             "staging_boundary": p.staging_boundary,
             "overlap_groups": [list(g) for g in p.overlap_groups],
         }
-        profiles.append(
-            MeasuredProfile(
-                identity=identity,
-                evidence_ref=p.ref,
-                measured_at=p.measured_at.timestamp(),
-                compute_seconds=None,
-                preparation_seconds=None,
-                admission_seconds=p.admission_seconds,
-                release_seconds=None,
-                v2_service_seconds=None,
-                qualified=True,
-                quality_passed=p.quality_passed,
-                synthetic=p.synthetic,
-                readmission_seconds=p.readmission_seconds,
-                timing_uncertainty_seconds=p.jct_stddev_seconds,
-                timing_notes=(f"repeats={p.repeats}", "descriptive stddev, not calibrated"),
-                phases=tuple(phases.items()),
-                overlap_groups=tuple(tuple(g) for g in p.overlap_groups),
-            )
+        measured_profile = MeasuredProfile(
+            identity=identity,
+            evidence_ref=p.ref,
+            measured_at=p.measured_at.timestamp(),
+            compute_seconds=None,
+            preparation_seconds=None,
+            admission_seconds=p.admission_seconds,
+            release_seconds=None,
+            v2_service_seconds=None,
+            qualified=True,
+            quality_passed=p.quality_passed,
+            synthetic=p.synthetic,
+            readmission_seconds=p.readmission_seconds,
+            timing_uncertainty_seconds=p.jct_stddev_seconds,
+            timing_notes=(f"repeats={p.repeats}", "descriptive stddev, not calibrated"),
+            phases=tuple(phases.items()),
+            overlap_groups=tuple(tuple(g) for g in p.overlap_groups),
         )
+        profiles.append(measured_profile)
+        if members is not None and rec.policy != "profile_only":
+            prediction, reasons, detail = _distributed(
+                service, conn, project, rec, at, spec, candidate, members, p, measured_profile,
+                (location, location_reason, network_profiles, cache_bindings),
+            )  # fmt: skip
+            gang[candidate.ref] = (prediction, reasons)
+            queue_refs[candidate.ref] = {"members": detail.get("members", [])}
+            if "staging" in detail:
+                transfer_details[candidate.ref] = detail["staging"]
+                network_refs[candidate.ref] = detail["staging"]["per_node"]
+                if detail["staging"]["bindings"]:
+                    binding_refs[candidate.ref] = detail["staging"]["bindings"]
+            continue
         if rec.policy in {"profile_queue", "profile_queue_network"}:
             snapshot, view = _queue(service, conn, project, identity, candidate, cap)
             if snapshot is not None:
@@ -817,7 +992,7 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
                 transfers[candidate.ref], transfer_details[candidate.ref] = _transfer(
                     location, topology, candidate, cap, target, at
                 )
-    ranked = [i for i in identities if i.candidate_ref not in notes]
+    ranked = [i for i in identities if i.candidate_ref not in notes and i.candidate_ref not in gang]
     decision = select_candidate(
         rec.policy,
         ranked,
@@ -829,6 +1004,16 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
         intents=intents,
         transfer_seconds=transfers,
     )
+    if gang:
+        from .jct_selection import CandidatePrediction, SelectionDecision
+
+        merged = decision.predictions + tuple(
+            prediction or CandidatePrediction(ref, None, None, tuple(reasons))
+            for ref, (prediction, reasons) in sorted(gang.items())
+        )
+        known = [p for p in merged if p.predicted_jct_seconds is not None]
+        best = min(known, key=lambda p: (p.predicted_jct_seconds, p.candidate_ref), default=None)
+        decision = SelectionDecision(decision.policy, best and best.candidate_ref, merged)
     views = []
     for prediction in decision.predictions:
         view = asdict(prediction)
@@ -1369,6 +1554,50 @@ def native_receipt(row):
     return receipt
 
 
+def member_receipts(row):
+    """Every recorded DDP rank's own StagingReceipt, bound to that rank's observed Pod.
+
+    ``row["staging_members"]`` holds one receipt per rank; each must name the Pod
+    UID and node the adapter recorded for exactly one rank of this attempt, and all
+    must have staged the same dataset object. Anything else is not member evidence.
+    """
+    from .network_profile import StagingReceipt
+
+    b = row["body"]
+    ranks = ((b.get("placement") or {}).get("distributed") or {}).get("ranks") or []
+    observed = {r.get("pod_uid"): r for r in ranks if r.get("pod_uid")}
+    members = [StagingReceipt.model_validate(x) for x in row.get("staging_members") or ()]
+    if not ranks or len(observed) != len(ranks) or len(members) != len(ranks):
+        raise ValueError(f"{row['id']}: a staging receipt is required from every observed rank")
+    if len({m.pod_uid for m in members}) != len(members) or any(
+        m.identity_source != "kubernetes_downward_api"
+        or m.pod_uid not in observed
+        or m.node_name != observed[m.pod_uid]["node_name"]
+        or (m.job_id, m.attempt_id) != (row["id"], b["attempt_id"])
+        for m in members
+    ):
+        raise ValueError(f"{row['id']}: member staging receipt differs from its observed rank Pod")
+    if len({(m.content_digest, m.size_bytes, m.source_endpoint_ref) for m in members}) != 1:
+        raise ValueError(f"{row['id']}: ranks staged different dataset objects")
+    return members
+
+
+def member_rows(row):
+    """One row per DDP rank (its own Pod/node and receipt) for network_profile_from_receipts."""
+    return [
+        {
+            **row,
+            "body": {
+                **row["body"],
+                "placement": {"source": "kubernetes:Pod", "pod_uid": m.pod_uid,
+                              "node_name": m.node_name},
+            },
+            "staging": m.model_dump(mode="json"),
+        }  # fmt: skip
+        for m in member_receipts(row)
+    ]
+
+
 def network_profile_from_receipts(rows, *, ref, valid_for_seconds):
     """NetworkProfile from RA jobs' own staging receipts (natively identity-checked).
 
@@ -1461,6 +1690,8 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
     substitution abstains. When every job staged its dataset before compute and
     reported a verified receipt measured on its allocated node, ``data_staging`` is
     that separate span and is subtracted from the residual (never counted twice).
+    A DDP job also needs every observed rank's own receipt (``staging_members``);
+    its staging is the slowest member's, and DDP communication stays in compute.
     """
     import statistics
 
@@ -1519,6 +1750,15 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
             ):
                 raise ValueError(f"{row['id']}: staging receipt unrelated, remote or mixed dataset")
             staging = receipt.sample.elapsed_seconds
+            if (b.get("placement") or {}).get("distributed"):
+                # Ranks stage in parallel between barriers; compute starts after the
+                # slowest member, so that member's own staging is the critical path.
+                members = member_receipts(row)
+                if members[0].content_digest != receipt.content_digest or receipt.pod_uid not in {
+                    m.pod_uid for m in members
+                }:
+                    raise ValueError(f"{row['id']}: rank 0 receipt is not one of the rank receipts")
+                staging = max(m.sample.elapsed_seconds for m in members)
         residual = finished - executing - compute - (staging or 0.0)
         if not submitted <= started <= executing <= finished or residual < 0:
             raise ValueError(f"{row['id']}: native boundaries overlap the measured compute span")

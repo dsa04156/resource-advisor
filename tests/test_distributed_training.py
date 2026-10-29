@@ -888,4 +888,5 @@ def test_ddp_data_access_and_cost_evidence_cover_every_node(service, bundle):
     )
     [prediction] = [p for p in evidence["predictions"] if p["candidate_ref"] == "ddp"]
     assert prediction["predicted_jct_seconds"] is None
-    assert prediction["reasons"] == ["DISTRIBUTED_COST_EVIDENCE_REQUIRED"]
+    # No DDP profile or member queue evidence yet: unknown, never anchor-only.
+    assert prediction["reasons"] == ["PROFILE_MISSING"]

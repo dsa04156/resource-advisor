@@ -7,6 +7,7 @@ operator to review and import. Nothing submits jobs or changes cluster state.
   inventory  --nodes-json FILE | --kubectl [--sinfo-text FILE] [--local]
   queue      --pods-json FILE | --kubectl  --route ... (RouteQueueSnapshot)
   profile    --database-url URL --job-id ... (JctProfile from completed RA jobs)
+  network    --database-url URL --job-id ... --node N (NetworkProfile from staging receipts)
   link       --url URL --source EP --target EP --evidence-ref REF [--execute]
   probes     (existing probe hooks and what each establishes)
 """
@@ -80,31 +81,62 @@ def queue(args):
     print(dump(snapshot.model_dump(mode="json")))
 
 
+def stored_rows(store, conn, job_id):
+    """A job with its stored result, rank-0 staging receipt and every rank's own receipt."""
+    row = store.job(conn, job_id)
+    if row is None:
+        sys.exit(f"job {job_id} not found")
+    attempt = row["body"]["attempt_id"]
+    result = store.get(conn, "result", attempt)
+    if result is None:
+        sys.exit(f"job {job_id} has no stored result")
+    value = {"id": row["id"], "state": row["state"], "body": row["body"], "result": result["body"]}
+    staging = store.get(conn, "staging_receipt", attempt)
+    if staging is not None:
+        value["staging"] = staging["body"]
+    ranks = ((row["body"].get("placement") or {}).get("distributed") or {}).get("ranks") or []
+    members = [store.get(conn, "staging_member_receipt", f"{attempt}:{r['index']}") for r in ranks]
+    if any(members):
+        value["staging_members"] = [m["body"] for m in members if m is not None]
+    return value
+
+
 def profile(args):
     from resource_advisor.recommendation import HardwareFingerprint, jct_profile_from_jobs
     from resource_advisor.store import Store
 
     store = Store(args.database_url)
-    rows = []
     with store.transaction() as conn:
-        for job_id in args.job_id:
-            row = store.job(conn, job_id)
-            if row is None:
-                sys.exit(f"job {job_id} not found")
-            result = store.get(conn, "result", row["body"]["attempt_id"])
-            if result is None:
-                sys.exit(f"job {job_id} has no stored result")
-            rows.append(
-                {
-                    "id": row["id"],
-                    "state": row["state"],
-                    "body": row["body"],
-                    "result": result["body"],
-                }
-            )
+        rows = [stored_rows(store, conn, job_id) for job_id in args.job_id]
     hardware = HardwareFingerprint.model_validate(json.loads(Path(args.hardware_json).read_text()))
     made = jct_profile_from_jobs(
         rows, ref=args.ref, valid_for_seconds=args.valid_for_seconds, hardware=hardware
+    )
+    print(dump(made.model_dump(mode="json")))
+
+
+def network_rows(rows, node):
+    """Staging receipts measured on ``node``: a single job's own, or that DDP rank's own."""
+    found = []
+    for row in rows:
+        if (row["body"].get("placement") or {}).get("distributed"):
+            from resource_advisor.recommendation import member_rows
+
+            found += [m for m in member_rows(row) if m["body"]["placement"]["node_name"] == node]
+        elif (row["body"].get("placement") or {}).get("node_name") == node and row.get("staging"):
+            found.append(row)
+    return found
+
+
+def network(args):
+    from resource_advisor.recommendation import network_profile_from_receipts
+    from resource_advisor.store import Store
+
+    store = Store(args.database_url)
+    with store.transaction() as conn:
+        rows = network_rows([stored_rows(store, conn, j) for j in args.job_id], args.node)
+    made = network_profile_from_receipts(
+        rows, ref=args.ref, valid_for_seconds=args.valid_for_seconds
     )
     print(dump(made.model_dump(mode="json")))
 
@@ -165,6 +197,13 @@ def main():
     p.add_argument("--ref", required=True)
     p.add_argument("--valid-for-seconds", type=int, default=86400)
     p.set_defaults(func=profile)
+    p = sub.add_parser("network")
+    p.add_argument("--database-url", required=True)
+    p.add_argument("--job-id", action="append", required=True)
+    p.add_argument("--node", required=True, help="destination node the receipts were staged on")
+    p.add_argument("--ref", required=True)
+    p.add_argument("--valid-for-seconds", type=int, default=3600)
+    p.set_defaults(func=network)
     p = sub.add_parser("link")
     p.add_argument("--url", required=True)
     p.add_argument("--source", required=True)
