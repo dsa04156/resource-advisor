@@ -46,7 +46,8 @@ identity file `StateSaveLocation/clustername` aside to
 `clustername.pre-ra-accounting-<UTC>` (the override that message documents); the
 controller adopts the DBD ID and rewrites the file. ClusterID feeds sluid/federation,
 not job IDs; job state and `NEXT_JOB_ID` are kept. If the controller does not answer
-within 60 s, `slurm.conf` and the original `clustername` are restored.
+within 60 s, it is stopped, `slurm.conf` and the original `clustername` are restored from
+the backup with `docker cp` (no controller RPC needed), and the same container is started again.
 
 ## Rollback
 

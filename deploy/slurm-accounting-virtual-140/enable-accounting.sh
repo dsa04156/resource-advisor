@@ -9,7 +9,8 @@
 # controller's own CLUSTER ID MISMATCH message documents, the one identity file
 # StateSaveLocation/clustername is moved aside (kept) so the controller adopts the DBD
 # ID. ClusterID feeds sluid/federation, not job IDs; job state and counters stay.
-# If the controller does not answer within 60 s, slurm.conf and clustername are restored.
+# If the controller does not answer within 60 s, it is stopped, slurm.conf and the original
+# clustername are restored from the backup, and the same container is started again.
 set -euo pipefail
 CLUSTER_DIR=${CLUSTER_DIR:-$HOME/slurm-docker}
 CONF=$CLUSTER_DIR/shared/slurm.conf
@@ -56,13 +57,19 @@ up() {
 docker exec slurmctld mv /var/spool/slurmctld/clustername "$ASIDE"
 docker restart slurmctld >/dev/null
 if ! up; then
+  # The controller may be crash-looping or hung: stop it, restore both files without
+  # needing it to answer, and start the same container again.
   cp -p "$BACKUP/slurm.conf" "$CONF"
-  up || { echo "controller not answering after restoring slurm.conf; backup: $BACKUP" >&2; exit 1; }
-  # Without accounting the controller wrote a fresh ID; put the original identity back.
-  docker exec slurmctld mv "$ASIDE" /var/spool/slurmctld/clustername
-  docker restart slurmctld >/dev/null
-  up
-  echo "accounting switch failed; restored slurm.conf and clustername; backup: $BACKUP" >&2
+  docker stop slurmctld >/dev/null || true
+  docker cp "$BACKUP/clustername" slurmctld:/var/spool/slurmctld/clustername \
+    || echo "clustername restore failed; copy it from $BACKUP" >&2
+  docker start slurmctld >/dev/null || true
+  if up; then
+    docker exec slurmctld chown slurm:slurm /var/spool/slurmctld/clustername
+    echo "accounting switch failed; restored slurm.conf and clustername; backup: $BACKUP" >&2
+  else
+    echo "controller not answering after restoring slurm.conf and clustername; backup: $BACKUP" >&2
+  fi
   exit 1
 fi
 docker exec slurmctld scontrol reconfigure
