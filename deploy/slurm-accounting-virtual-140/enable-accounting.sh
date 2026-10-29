@@ -42,10 +42,15 @@ AccountingStorageHost=slurmdbd
 AccountingStoragePort=6819
 AccountingStorageTRES=gres/gpu
 CONF
-queue=$(docker exec --user slurm slurmctld squeue -a --noheader --format=%i)
-if [[ -n $queue ]]; then
+# From here every failure restores slurm.conf (set -e alone would leave it edited).
+if ! queue=$(docker exec --user slurm slurmctld squeue -a --noheader --format=%i) || [[ -n $queue ]]
+then
   cp -p "$BACKUP/slurm.conf" "$CONF"
-  echo "queue changed during preparation; restored slurm.conf, no restart" >&2; exit 1
+  echo "queue not empty or unreadable; restored slurm.conf, no restart" >&2; exit 1
+fi
+if ! docker exec slurmctld mv /var/spool/slurmctld/clustername "$ASIDE"; then
+  cp -p "$BACKUP/slurm.conf" "$CONF"
+  echo "could not move clustername aside; restored slurm.conf, no restart" >&2; exit 1
 fi
 up() {
   for _ in $(seq 30); do
@@ -54,9 +59,7 @@ up() {
   done
   return 1
 }
-docker exec slurmctld mv /var/spool/slurmctld/clustername "$ASIDE"
-docker restart slurmctld >/dev/null
-if ! up; then
+if ! docker restart slurmctld >/dev/null || ! up; then
   # The controller may be crash-looping or hung: stop it, restore both files without
   # needing it to answer, and start the same container again.
   cp -p "$BACKUP/slurm.conf" "$CONF"
