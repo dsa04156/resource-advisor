@@ -2187,10 +2187,10 @@ function render() {
   const disclosureKey = (node) => {
     const path = [];
     for (let parent = node; parent && parent !== $("content"); parent = parent.parentElement)
-      if (parent.tagName === "DETAILS") path.unshift(parent.querySelector(":scope > summary")?.textContent || "");
+      if (parent.tagName === "DETAILS") path.unshift(parent.dataset.disclosure || parent.querySelector(":scope > summary")?.textContent || "");
     return JSON.stringify(path);
   };
-  const openSubmissionPanels = ["submit", "placement"].includes(active)
+  const openSubmissionPanels = ["submit", "placement", "training"].includes(active)
     ? new Set([...$("content").querySelectorAll("details[open]")].map(disclosureKey)) : null;
   const focused = document.activeElement;
   const keepFocus = ["model-guide-summary", "model-technical-summary", "model-service", "model-show-staging", "models-refresh", "models-previous", "models-next", "job-search", "resource-search", "workload-search", "template-name", "template-source", "template-device", "template-priority", "template-run", "template-queue", "submit-workload", "submit-candidate", "scheduling-profile", "inference-pool", "poc-gpu-count", "lab-scenario", "lab-resource-mode", "lab-history", "lab-replay-speed", "lab-replay-toggle", "lab-replay-seek", "lab-resource-filter", "job-backend", "job-device", "wizard-type"].includes(focused?.id) || focused?.dataset?.keepFocus
@@ -2590,6 +2590,12 @@ function jctView() {
 }
 
 // Model-first training: model -> registered training condition -> resource combinations.
+// Training disclosures keep a stable key (render() reopens them across polls); summaries
+// carry counts, and condition-scoped ones include the condition so another condition's
+// panel never opens by name alone.
+function trainDetails(key,summary,...content) {
+  const d=add(el("details",null,"jct-more"),el("summary",summary),...content);d.dataset.disclosure=key;return d;
+}
 // Read-only projection; JCT only from the existing recommendation preview, unmeasured stays unknown.
 let trainData=null,trainPending=false,trainUpdated=0,trainError="",trainModel="",trainConfig="",trainProfile="";
 const trainText={MODEL_NAME_MISSING:"모델 이름이 등록되지 않음",NO_TRAINING_VERIFIED_CANDIDATE:"학습 검증된 실행 환경 없음",QUALIFICATION_REJECTED:"학습 격리 검증과 맞지 않음",
@@ -2641,7 +2647,7 @@ function trainModels() {
 }
 function trainUnqualified() {
   const u=trainData.unqualified;if(!u.length)return null;
-  return add(el("details",null,"jct-more"),el("summary",`학습 검증 전 항목 ${u.length}개 · 선택할 수 없음`),table(["등록 작업","모델","이유","검증 단계","실행"],u.map(x=>[
+  return trainDetails("train-unqualified",`학습 검증 전 항목 ${u.length}개 · 선택할 수 없음`,table(["등록 작업","모델","이유","검증 단계","실행"],u.map(x=>[
     code(x.workload_ref),el("span",x.model_name||"(이름 없음)"),add(el("div",null,"jct-reasons"),...[...x.reasons,...(x.candidate_reasons||[])].map(r=>el("small",trainReason(r))),x.strategies?.some(s=>s!=="single")?el("small","선언된 방식: "+x.strategies.map(s=>trainStrategy[s]||s).join(", ")):null),
     el("span",(x.verification||[]).join(", ")),el("span",`${x.runs.total}건 (성공 ${x.runs.succeeded})`)])));
 }
@@ -2655,7 +2661,7 @@ function trainCondition(sel) {
   const loading=trainPending&&trainConfig&&trainConfig!==sel.config_key;
   add(root,add(el("div",null,"view-toolbar jct-toolbar"),label,selector),
     loading?el("p","선택한 조건을 불러오는 중입니다. 아래는 이전 조건의 내용입니다.","muted"):null,
-    add(el("details",null,"jct-more"),el("summary","조건 세부 정보"),facts,
+    trainDetails("train-condition:"+sel.model.model_key+"|"+sel.config_key,"조건 세부 정보",facts,
       el("p","등록된 조건만 고를 수 있습니다. 값을 바꾸려면 새 학습 작업을 등록하고 다시 검증해야 합니다. 같은 조건이라도 등록 작업이 다르면 측정 기록을 공유하지 않습니다.","muted"),
       table(["등록 작업","식별 서명","실행"],c.workloads.map(w=>[code(w.workload_ref),code(w.identity_signature.slice(0,19)+"…"),el("span",`${w.runs.total}건 (성공 ${w.runs.succeeded})`)]))));
   return root;
@@ -2695,8 +2701,8 @@ function trainCombinations(sel) {
   const names=new Set(estimated.map(trainName)),main=[...estimated],others=[];
   for(const x of sel.combinations)if(x.jct.status!=="ESTIMATED"){if(names.has(trainName(x)))others.push(x);else{names.add(trainName(x));main.push(x);}}
   return add(el("div"),trainSimple(main),
-    others.length?add(el("details",null,"jct-more"),el("summary",`다른 등록 항목 ${others.length}개`),trainSimple(others)):null,
-    add(el("details",null,"jct-more"),el("summary","세부 정보 · 근거"),trainDiagnostics(sel)));
+    others.length?trainDetails("train-others:"+sel.model.model_key+"|"+sel.config_key,`다른 등록 항목 ${others.length}개`,trainSimple(others)):null,
+    trainDetails("train-evidence:"+sel.model.model_key+"|"+sel.config_key,"세부 정보 · 근거",trainDiagnostics(sel)));
 }
 function trainDiagnostics(sel) {
   const root=el("div");
@@ -2742,10 +2748,10 @@ function trainingView() {
     root.append(panel("2. 학습 조건",sel.model.model_name,trainCondition(sel)));
     root.append(panel("3. 자원 조합","",trainCombinations(sel)));
     const runs=sel.configs.find(c=>c.config_key===sel.config_key).workloads.flatMap(w=>w.recent_runs).sort((a,b)=>b.created_at.localeCompare(a.created_at));
-    root.append(add(el("details",null,"jct-more"),el("summary",`지난 실행 결과 ${runs.length}건`),
+    root.append(trainDetails("train-runs:"+sel.model.model_key+"|"+sel.config_key,`지난 실행 결과 ${runs.length}건`,
       el("p","실제 JCT는 네이티브 제출·종료 시각이 모두 있는 성공 작업만 표시합니다.","muted"),jctRuns({recent_runs:runs})));
   }
-  root.append(add(el("details",null,"jct-more"),el("summary","물리 장비 범위"),
+  root.append(trainDetails("train-inventory","물리 장비 범위",
     el("p","공유 슬롯은 물리 GPU 수가 아니며, 이 표의 장비는 실행 조합이 아닙니다.","muted"),trainInventory()));
   root.append(add(el("p",null,"muted"),actionLink("이전 JCT 비교 기록 보기","#jct")));
   return root;
