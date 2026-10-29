@@ -32,8 +32,8 @@ spec:
         seccompProfile: {type: RuntimeDefault}
       containers:
       - name: worker
-        # Live composite console-api@88ed35d9 + staged per-rank receipt ingest (6666561 diff).
-        image: 10.254.192.47:5000/resource-advisor/services@sha256:96234ab9f43beea61a72b25c51b6964c048cdca866a8bd9b706ef62162d93fa1
+        # Root full composite (live 88ed35d9 + composite 5d9ce665 / source 6666561).
+        image: 10.254.192.47:5000/resource-advisor/console-api@sha256:9afbe786ec3e4cd067798594f3301ac386359e7ed02c73b19077d1ff8f24b8d5
         command: [python, -m, resource_advisor.cli]
         args: [worker, --config, /config/worker.json, --heartbeat-path, /tmp/heartbeat]
         env:
