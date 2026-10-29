@@ -89,7 +89,10 @@ def _tensors(path, digest, runtime, declared_shape):
     """The staged object's own bytes, re-verified, as validated float32 tensors."""
     import numpy as np
 
-    raw = Path(path).read_bytes()
+    try:
+        raw = Path(path).read_bytes()
+    except OSError:
+        raise Failed("STAGED_INPUT_INVALID") from None
     if hashlib.sha256(raw).hexdigest() != digest:
         raise Failed("STAGED_INPUT_DIGEST_MISMATCH")
     try:
@@ -113,8 +116,11 @@ def _tensors(path, digest, runtime, declared_shape):
 def _resnet(args, model, data, iterations, factory):
     import numpy as np
 
-    config = json.loads(args.config.read_text())
-    if config.get("runtime") != args.runtime:
+    try:
+        config = json.loads(args.config.read_text())
+    except (OSError, ValueError):
+        raise Failed("MODEL_CONFIG_INVALID") from None
+    if not isinstance(config, dict) or config.get("runtime") != args.runtime:
         raise Failed("MODEL_IDENTITY_MISMATCH")
     started = time.perf_counter()
     try:
@@ -129,13 +135,18 @@ def _resnet(args, model, data, iterations, factory):
             or identity["input_contract"] != RESNET_CONTRACT
         ):
             raise Failed("MODEL_IDENTITY_MISMATCH")
-        manifest_path = args.fixture / "manifest.json"
-        manifest_raw = manifest_path.read_bytes()
+        try:
+            manifest_raw = (args.fixture / "manifest.json").read_bytes()
+        except OSError:
+            raise Failed("QUALIFICATION_MANIFEST_INVALID") from None
         if "sha256:" + hashlib.sha256(manifest_raw).hexdigest() != identity["qualification_digest"]:
             raise Failed("QUALIFICATION_MANIFEST_MISMATCH")
-        reference = {
-            s["tensor_sha256"]: s["reference_top1"] for s in json.loads(manifest_raw)["samples"]
-        }
+        try:
+            reference = {
+                s["tensor_sha256"]: s["reference_top1"] for s in json.loads(manifest_raw)["samples"]
+            }
+        except (ValueError, KeyError, TypeError):
+            raise Failed("QUALIFICATION_MANIFEST_INVALID") from None
         expected = [reference.get(hashlib.sha256(t.tobytes()).hexdigest()) for t in data]
         if None in expected:
             raise Failed("STAGED_INPUT_NO_QUALIFIED_REFERENCE")

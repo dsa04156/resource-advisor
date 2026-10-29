@@ -397,6 +397,34 @@ def test_native_and_identity_failures_never_report_success(source, fixture_root,
     assert (result.error_code, receipt) == ("QUALIFICATION_MANIFEST_MISMATCH", None)
 
 
+def test_expected_config_and_file_failures_emit_failed_envelope(source, fixture_root, tmp_path):
+    url = source.put("d.npy", STAGED)
+    root, config = fixture_root
+    args = argv(fixture_root, url, STAGED, tmp_path / "a")
+    args[args.index("--config") + 1] = str(tmp_path / "missing-model.json")
+    result, receipt, envelope, _ = invoke(args)  # staged bytes valid, config absent
+    assert (result.error_code, receipt) == ("MODEL_CONFIG_INVALID", None)
+    assert envelope["result"]["outcome"] == "FAILED" and "staging_receipt" not in envelope
+    config.write_text("{not json")
+    result, receipt, _, _ = invoke(argv(fixture_root, url, STAGED, tmp_path / "b"))
+    assert (result.error_code, receipt) == ("MODEL_CONFIG_INVALID", None)
+    config.write_text("[]")
+    result, receipt, _, _ = invoke(argv(fixture_root, url, STAGED, tmp_path / "c"))
+    assert (result.error_code, receipt) == ("MODEL_IDENTITY_MISMATCH", None)
+
+
+def test_missing_or_malformed_manifest_emits_failed_envelope(source, fixture_root, tmp_path):
+    url = source.put("d.npy", STAGED)
+    manifest = fixture_root[0] / "manifest.json"
+    raw = manifest.read_bytes()
+    manifest.unlink()
+    result, receipt, envelope, _ = invoke(argv(fixture_root, url, STAGED, tmp_path / "a"))
+    assert (result.error_code, receipt) == ("QUALIFICATION_MANIFEST_INVALID", None)
+    assert "staging_receipt" not in envelope
+    assert FakeRuntime.closed >= 1
+    manifest.write_bytes(raw)
+
+
 def test_inputs_must_be_the_accepted_workload_contract(source, fixture_root, tmp_path):
     url = source.put("d.npy", STAGED)
     args = argv(fixture_root, url, STAGED, tmp_path / "never", identity=workload(npy(FIXTURE[:2])))

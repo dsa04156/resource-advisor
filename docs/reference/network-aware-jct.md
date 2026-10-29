@@ -154,11 +154,16 @@ python -m resource_advisor.staged_accelerator_workload --runtime cuda|hailo|mobi
   (`runtime-repeatability-only`, `task_accuracy=null`). A different source model: never ranked
   against ResNet50. No same-source ResNet50 MXQ artifact is qualified.
 - Any staging, input, identity, initialization or native inference failure is `FAILED` with an
-  error code and no receipt. There is no CPU fallback.
+  error code and no receipt, including an unreadable or malformed model configuration
+  (`MODEL_CONFIG_INVALID`) or qualification manifest (`QUALIFICATION_MANIFEST_INVALID`).
+  There is no CPU fallback.
 - Image requirements: Python ≥3.11, `pydantic>=2.10,<3` (arch-matching `pydantic-core`), numpy,
-  the `resource_advisor` modules `contracts`, `network_profile`, `staged_workload`,
-  `staged_accelerator_workload` and `inference_runtime` or `npu_probe` importable,
-  `RA_RUNTIME_IMAGE_DIGEST` set for ResNet runtimes, and the qualified native SDK.
+  `httpx>=0.28,<1` with its dependencies (`httpcore`, `h11`, `anyio`, `idna`, `certifi`,
+  `sniffio` where the anyio version needs it) for cold HTTP staging, the `resource_advisor`
+  modules `contracts`, `network_profile`, `staged_workload`, `staged_accelerator_workload` and
+  `inference_runtime` or `npu_probe` importable, `RA_RUNTIME_IMAGE_DIGEST` set for ResNet
+  runtimes, and the qualified native SDK. `httpx` is imported lazily on the cold path, so an
+  import-only check is not enough: validate a cold HTTP stage inside the actual image.
 - `tests/test_staged_accelerator.py` drives real loopback HTTP bytes through runtime doubles: it
   proves protocol, consumed bytes and boundaries, not GPU/NPU performance.
 
