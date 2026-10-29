@@ -489,7 +489,17 @@ def training_catalog(service, project, model=None, config=None, profile_ref=None
         ordered = sorted(
             groups.items(), key=lambda kv: (condition(kv[1][0].identity)["steps"], kv[0])
         )
-        chosen_key = config if config in groups else ordered[0][0]
+        # Default: the condition with the most successful native runs, so the measured
+        # condition opens first; existing order breaks ties. Explicit choice wins.
+        succeeded = {
+            k: sum(runs.get(s.ref, {}).get("succeeded", 0) for s in members)
+            for k, members in ordered
+        }
+        chosen_key = (
+            config
+            if config in groups
+            else min(enumerate(ordered), key=lambda x: (-succeeded[x[1][0]], x[0]))[1][0]
+        )
         targets = {
             (str(c["backend"]), c.get("cluster_ref"))
             for s in groups[chosen_key]

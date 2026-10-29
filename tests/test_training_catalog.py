@@ -585,3 +585,26 @@ def test_default_estimate_profile_binds_the_selected_candidates_cluster(client, 
     assert selected["estimate_profile"]["ref"] == "only"  # binds cluster lab, outranks policy order
     chosen = get(client, f"/training-catalog?model={key}&profile_ref=queue-elsewhere")["selected"]
     assert chosen["estimate_profile"]["ref"] == "queue-elsewhere"  # explicit choice respected
+
+
+def test_default_condition_is_the_one_with_most_successful_native_runs(client, pair, service):
+    from sqlalchemy import update
+
+    from resource_advisor.store import jobs
+
+    training(service, pair, "mnv3-old", steps=50)  # first in the existing order, never run
+    training(service, pair, "mnv3-staged", steps=100)
+    key = models(client)["mobilenet_v3_small"]["model_key"]
+    selected = get(client, f"/training-catalog?model={key}")["selected"]
+    old, staged = [c["config_key"] for c in selected["configs"]]
+    assert selected["config_key"] == old  # no runs anywhere: existing order decides
+
+    job = service.submit("team-a", JobRequest(workload_ref="mnv3-staged", candidate_ref="base"), "s1")
+    with service.store.transaction() as conn:
+        conn.execute(update(jobs).where(jobs.c.id == job["job_id"]).values(state="SUCCEEDED"))
+
+    selected = get(client, f"/training-catalog?model={key}")["selected"]
+    assert selected["config_key"] == staged  # measured condition opens by default
+    assert [c["config_key"] for c in selected["configs"]] == [old, staged]  # all selectable
+    explicit = get(client, f"/training-catalog?model={key}&config={old}")["selected"]
+    assert explicit["config_key"] == old  # an explicit choice is never overridden
