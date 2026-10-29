@@ -227,6 +227,9 @@ class Store:
             from .right_sizing import record_feedback
 
             record_feedback(self, conn, row, state, body)
+            from .recommendation import record_outcome
+
+            record_outcome(self, conn, row, state, body)
             self.enqueue_tracking(conn, row, body)
             if body.get("termination", {}).get("retention_finalizer"):
                 self.enqueue(

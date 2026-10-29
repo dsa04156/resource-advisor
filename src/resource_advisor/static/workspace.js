@@ -1152,7 +1152,7 @@ export function createWorkflowWorkspace(c) {
         ),
       );
     parts.summary.append(actions);
-    parts.result = result
+    const outcome = result
       ? add(
           el("div"),
           c.dashboardStats([
@@ -1177,6 +1177,11 @@ export function createWorkflowWorkspace(c) {
       : c.empty(
           "아직 수집된 결과가 없어요. 완료 상태와 결과 수집 상태는 별도로 확인해 주세요.",
         );
+    parts.result = add(
+      el("div"),
+      outcome,
+      job.scheduling_plan ? c.recommendationPanel(job) : null,
+    );
     const events = job.lifecycle_events || [];
     parts.events = events.length
       ? table(

@@ -1320,6 +1320,82 @@ function schedulingFlow(job = null, preview = null) {
   return row;
 }
 function stateBadgeText(state) { return ({FAILED:"실패",RESULT_INVALID:"결과 검증 실패",CANCELED:"취소"})[state] || state; }
+// Frozen estimate vs native outcome. Spread is descriptive (never calibrated) and a
+// missing component stays "—"; shadow estimates are not executed outcomes.
+const recommendationCache = new Map();
+async function recommendationFetch(path) {
+  const response = await fetch(API + path, { headers: authHeaders(), cache: "no-store" });
+  if (response.status === 404) throw new Error("이 프로젝트에서 볼 수 없는 기록입니다.");
+  if (!response.ok) throw new Error("추천 근거를 불러오지 못했습니다 (" + response.status + ").");
+  return response.json();
+}
+function recommendationPanel(job) {
+  const body = el("div", null, "evidence");
+  const key = job.job_id + ":" + job.state;
+  const show = (value) => body.replaceChildren(value.error ? el("p", value.error, "error-message") : recommendationEvidence(value.link, value.comparison));
+  const cached = recommendationCache.get(key);
+  if (cached) show(cached);
+  else {
+    body.append(el("p", "추천 근거를 불러오는 중…", "muted"));
+    (async () => {
+      try {
+        const link = await recommendationFetch("/jobs/" + encodeURIComponent(job.job_id) + "/recommendation");
+        const comparison = link.comparison ? await recommendationFetch("/recommendation-comparisons/" + encodeURIComponent(link.comparison.ref)) : null;
+        const value = { link, comparison }; recommendationCache.set(key, value); show(value);
+      } catch (e) { show({ error: e.message }); }
+    })();
+  }
+  return panel("추천 근거 · 예측과 실제", "제출 전에 고정한 후보별 예측과 백엔드가 기록한 실제 완료 시간입니다. 분산은 관측 기술 통계이며 보정된 신뢰구간이 아닙니다.", body);
+}
+function seconds(v) { return v == null ? "—" : duration(v); }
+function stagingText(s) {
+  if (!s) return "—";
+  if (s.source !== "measured_network") return seconds(s.seconds) + ({ profile_phase: " · 프로파일 구간", topology_link: " · 링크 모델", not_required: " · 데이터 불필요" }[s.source] || "");
+  const age = s.per_node?.length ? Math.max(...s.per_node.map(n => n.age_seconds)) : null;
+  return `${seconds(s.seconds)} · 실측 ${s.cache_state === "hot" ? "캐시 적중" : "원격 전송"} · ${s.samples}회${s.samples > 1 ? ` (${seconds(s.min_seconds)}–${seconds(s.max_seconds)})` : ""}${age == null ? "" : " · " + Math.round(age) + "초 전 측정"}`;
+}
+function recommendationEvidence(link, comparison) {
+  const rec = link.recommendation, evidence = link.recommendation_evidence;
+  if (!rec) return add(el("div"), el("p", "이 작업은 추천 정책 없이 제출되었습니다. 실제 완료 시간만 기록합니다.", "muted"), outcomeTable(link.outcome),
+    comparison ? comparisonTable(comparison, link.comparison.arm) : null);
+  const root = add(el("div"),
+    add(el("div", null, "state-line"), badge(rec.policy), badge(rec.version || "—"), badge(rec.status, rec.status === "SELECTED" ? "good" : "warn")),
+    el("small", "예측 고정 시각: " + stamp(evidence?.evaluated_at) + " · 선택 후보: " + (rec.selected_candidate_ref || "—")));
+  const predictions = evidence?.predictions || [];
+  if (!predictions.length) root.append(empty("후보별 예측이 기록되지 않았습니다."));
+  else root.append(table(["후보", "예측 JCT", "구성 요소", "데이터 적재", "분산 미상 · 이유"], predictions.map(p => {
+    const b = p.breakdown, missing = b ? b.uncertainty.missing : [];
+    const parts = b ? [["큐", b.queue_wait_seconds], ["승인", b.admission_seconds], ["준비", b.preparation_seconds], ["계산", b.compute_seconds], ["기타", b.other_seconds]]
+      .map(([k, v]) => k + " " + seconds(v)).join(" · ") : "—";
+    return [add(el("span"), el("strong", p.candidate_ref), p.candidate_ref === link.candidate_ref ? badge("선택", "good") : null),
+      el("strong", seconds(p.predicted_jct_seconds)), el("small", parts), el("small", stagingText(b?.staging)),
+      el("small", [...(p.reasons || []).map(reasonText), ...missing].join(" · ") || "—")];
+  })));
+  root.append(outcomeTable(link.outcome));
+  if (comparison) root.append(comparisonTable(comparison, link.comparison.arm));
+  return root;
+}
+function outcomeTable(o) {
+  if (!o) return el("p", "아직 종료되지 않았습니다. 실제 JCT와 오차는 종료 후 기록됩니다.", "muted");
+  const a = o.actual, e = o.error;
+  return add(el("div"), el("h3", "예측 대비 실제"), table(["항목", "값"], [
+    ["예측 JCT", seconds(o.prediction?.predicted_jct_seconds) + (o.prediction ? "" : " · " + (o.prediction_reason || "예측 없음"))],
+    ["실제 JCT", a.jct_seconds == null ? `— · ${a.status}${a.reason ? " · " + a.reason : ""}` : seconds(a.jct_seconds) + " · " + a.boundary],
+    ["오차 (실제−예측)", e ? `${seconds(e.signed_seconds)} · 절대 ${seconds(e.absolute_seconds)} · 상대 ${e.relative == null ? "—" : fmt(e.relative * 100, 1) + "%"}` : "— (계산하지 않음)"],
+  ].map(([k, v]) => [el("span", k), el("strong", v)])));
+}
+function comparisonTable(c, arm) {
+  const names = { static: "Static", profile_only: "Profile Only", profile_queue: "Profile + Queue", profile_queue_network: "Profile + Queue + Network" };
+  const rows = c.arm_order.map(key => {
+    const a = c.arms[key], shadow = a.predictions.find(p => p.candidate_ref === a.selected_candidate_ref), run = c.executed[key][0];
+    return [add(el("span"), el("strong", names[key] || key), key === arm ? badge("이 작업", "good") : null),
+      el("span", a.selected_candidate_ref || "—"), el("span", seconds(shadow?.predicted_jct_seconds) + (shadow ? " (그림자 예측)" : "")),
+      el("span", run ? run.state + (run.matches_frozen_selection ? "" : " · 고정 선택과 다름") : "미실행"),
+      el("span", seconds(run?.outcome?.actual?.jct_seconds)), el("span", seconds(run?.outcome?.error?.signed_seconds))];
+  });
+  return add(el("div"), el("h3", "정책 비교 · " + c.ref), el("small", "그림자 예측은 " + stamp(c.frozen_at) + "에 고정했습니다. 실제 값은 정책별로 따로 실행한 작업의 결과이며, 실행하지 않은 정책의 성능을 추정하지 않습니다.", "muted"),
+    table(["정책", "선택 후보", "예측 JCT", "실행 상태", "실제 JCT", "오차"], rows));
+}
 function schedulingProgress(job) {
   const plan=job.scheduling_plan;
   const body=add(el("div"),schedulingFlow(job),
@@ -2253,7 +2329,7 @@ function disconnectedView() {
 const workspaceUI = createWorkflowWorkspace({
   el, add, badge, stateBadge, table, stamp, duration, actionLink, empty, details, fmt,
   API, authHeaders, selectionKey, canSubmit, workloadPurpose, reasonText,
-  schedulingProgress, dashboardStats, cancelButton, retryJobButton, researchButton, openExperiment,
+  schedulingProgress, recommendationPanel, dashboardStats, cancelButton, retryJobButton, researchButton, openExperiment,
   submissionModel, updateDraft, draftSubmitButton, kubeflowSubmitOption, liveExecution, submissionTools, candidateEvaluation, schedulingFlow, modes,
   get data() { return data; }, get draft() { return submissionDraft; },
   generation: () => generation, render, preview: refreshSchedulingPreview, openJob: showJob,

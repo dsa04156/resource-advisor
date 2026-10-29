@@ -402,6 +402,7 @@ class Worker:
                 sampling_receipt=envelope.get("sampling_receipt"),
                 thermal_trace=envelope.get("thermal_trace"),
                 load_trace=envelope.get("load_trace"),
+                staging_receipt=envelope.get("staging_receipt"),
             )
 
 
@@ -458,6 +459,7 @@ class MLflowDelivery:
                 phases = self.store.get(conn, "phase_profile", attempt)
                 training = self.store.get(conn, "training_receipt", attempt)
                 sampling = self.store.get(conn, "sampling_receipt", attempt)
+                outcome = self.store.get(conn, "jct_outcome", attempt)
             experiment_id = self.experiments[project]
             start_time = int(
                 datetime.fromisoformat(job.get("started_at") or job["created_at"]).timestamp()
@@ -533,6 +535,18 @@ class MLflowDelivery:
                             "output_checkpoint_digest"
                         ],
                         "training.auto_promote": "false",
+                    }
+                )
+            if outcome:
+                o = outcome["body"]
+                tags.update(
+                    {
+                        "recommendation.policy": o["policy"],
+                        "recommendation.version": str(o["version"]),
+                        "recommendation.status": str(o["recommendation_status"]),
+                        "recommendation.candidate_ref": o["candidate_ref"],
+                        "recommendation.outcome_status": o["actual"]["status"],
+                        "recommendation.outcome_digest": outcome["digest"],
                     }
                 )
             if job["request"].get("parent_run_ref"):
@@ -627,6 +641,28 @@ class MLflowDelivery:
                             "step": 0,
                         }
                     )
+            if outcome and timestamp is not None:
+                o = outcome["body"]
+                error = o["error"] or {}
+                metrics.extend(
+                    {
+                        "key": "recommendation." + key,
+                        "value": value,
+                        "timestamp": timestamp,
+                        "step": 0,
+                    }
+                    for key, value in (
+                        (
+                            "predicted_jct_seconds",
+                            (o["prediction"] or {}).get("predicted_jct_seconds"),
+                        ),
+                        ("actual_jct_seconds", o["actual"]["jct_seconds"]),
+                        ("error_signed_seconds", error.get("signed_seconds")),
+                        ("error_absolute_seconds", error.get("absolute_seconds")),
+                        ("error_relative", error.get("relative")),
+                    )
+                    if value is not None and o["actual"]["status"] == "OBSERVED"
+                )
             self.post(
                 "runs/log-batch",
                 {

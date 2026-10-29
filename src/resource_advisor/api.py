@@ -598,12 +598,16 @@ def create_app(
         with service.store.transaction() as conn:
             return required(service.store, conn, "topology_snapshot", ref, p.project)
 
+    from .network_profile import NetworkProfile
     from .recommendation import (
         DataLocation,
         JctProfile,
         NodePool,
+        RecommendationComparisonRequest,
         RouteQueueSnapshot,
+        comparison,
         decision_linkage,
+        freeze_comparison,
         import_evidence,
     )
 
@@ -613,6 +617,7 @@ def create_app(
         ("/route-queue-snapshots", "route_queue_snapshot", RouteQueueSnapshot),
         ("/data-locations", "data_location", DataLocation),
         ("/node-pools", "node_pool", NodePool),
+        ("/network-profiles", "network_profile", NetworkProfile),
     ]:
 
         def register_evidence(value: model, p=Depends(operator), kind=kind):
@@ -623,6 +628,16 @@ def create_app(
     @app.get(PREFIX + "/jobs/{job_id}/recommendation")
     def job_recommendation(job_id: str, p=Depends(principal)):
         return decision_linkage(service, p.project, job_id)
+
+    @app.post(PREFIX + "/recommendation-comparisons")
+    def freeze_recommendation_comparison(
+        value: RecommendationComparisonRequest, p=Depends(principal)
+    ):
+        return freeze_comparison(service, p.project, value)
+
+    @app.get(PREFIX + "/recommendation-comparisons/{ref}")
+    def recommendation_comparison(ref: str, p=Depends(principal)):
+        return comparison(service, p.project, ref)
 
     @app.post(PREFIX + "/placement-plans")
     def placement_plan(value: PlacementRequest, p=Depends(principal)):

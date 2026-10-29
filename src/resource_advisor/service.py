@@ -478,6 +478,7 @@ class Service:
         sampling_receipt=None,
         thermal_trace=None,
         load_trace=None,
+        staging_receipt=None,
     ):
         """Trusted collector only. Require backend completion before result acceptance."""
         with self.store.transaction() as conn:
@@ -512,6 +513,11 @@ class Service:
                         or signature(training["body"]) != signature(training_receipt)
                     ):
                         raise Conflict("terminal training receipt is immutable")
+                    staged = self.store.get(conn, "staging_receipt", result.attempt_id)
+                    if staging_receipt is not None and (
+                        staged is None or signature(staged["body"]) != signature(staging_receipt)
+                    ):
+                        raise Conflict("terminal staging receipt is immutable")
                     stored = self.store.get(conn, "phase_profile", result.attempt_id)
                     if phase_profile is not None and (
                         stored is None or signature(stored["body"]) != signature(phase_profile)
@@ -602,6 +608,23 @@ class Service:
                     body["load_context"] = summarize(load)
             elif load_trace is not None:
                 raise Rejected("load trace without completed qualified telemetry workload")
+            if staging_receipt is not None:
+                from .network_profile import StagingReceipt
+
+                try:
+                    staging = StagingReceipt.model_validate(staging_receipt)
+                except ValueError as exc:
+                    raise Rejected("invalid staging receipt") from exc
+                if (staging.job_id, staging.attempt_id) != (result.job_id, result.attempt_id):
+                    problems.append("STAGING_RECEIPT_UNRELATED")
+                elif not problems:
+                    self.store.put(
+                        conn,
+                        "staging_receipt",
+                        result.attempt_id,
+                        project,
+                        staging.model_dump(mode="json"),
+                    )
             if phase_profile is not None:
                 from .diagnostics import validate_profile
 

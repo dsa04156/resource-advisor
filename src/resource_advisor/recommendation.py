@@ -13,7 +13,7 @@ from dataclasses import asdict
 from datetime import datetime
 from typing import Literal
 
-from pydantic import AwareDatetime, Field, model_validator
+from pydantic import AwareDatetime, Field, model_serializer, model_validator
 
 from .contracts import TERMINAL, Backend, CapabilitySnapshot, Contract, Digest, Ref, now, signature
 from .jct_selection import (
@@ -27,6 +27,9 @@ from .jct_selection import (
 )
 
 VERSION = "hetero-rec-v1"
+# v2 replaces the separately bounded staging phase with destination-measured
+# NetworkProfiles instead of a topology link model; v1 records keep their meaning.
+MEASURED_VERSION = "hetero-rec-v2"
 PhaseName = Literal[PHASES]
 FINGERPRINT = (
     "arch",
@@ -45,7 +48,7 @@ FINGERPRINT = (
 class RecommendationPolicy(Contract):
     """B3/B4/B5 policies. ``fallback=legacy`` is explicit and always recorded."""
 
-    version: Literal["hetero-rec-v1"] = VERSION
+    version: Literal["hetero-rec-v1", "hetero-rec-v2"] = VERSION
     policy: Literal["profile_only", "profile_queue", "profile_queue_network"]
     max_profile_age_seconds: int = Field(default=86400, ge=1, le=7 * 86400)
     max_queue_age_seconds: int = Field(default=30, ge=1, le=3600)
@@ -54,7 +57,10 @@ class RecommendationPolicy(Contract):
 
     @model_validator(mode="after")
     def network_needs_topology(self):
-        if (self.policy == "profile_queue_network") != (self.topology_snapshot_ref is not None):
+        if self.version == MEASURED_VERSION:
+            if self.topology_snapshot_ref is not None:
+                raise ValueError("measured-network mode uses NetworkProfiles, not a topology")
+        elif (self.policy == "profile_queue_network") != (self.topology_snapshot_ref is not None):
             raise ValueError("only the network policy takes, and it requires, a topology snapshot")
         return self
 
@@ -214,6 +220,15 @@ class DataLocation(Contract):
     accessible_nodes: tuple[NodeAddress, ...] = Field(max_length=256)
     provenance_ref: Ref
     observed_at: AwareDatetime
+    # Exact object identity; measured-network mode matches NetworkProfiles on it.
+    content_digest: Digest | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_signature(self, handler):
+        value = handler(self)
+        if self.content_digest is None:
+            value.pop("content_digest", None)
+        return value
 
 
 def _epoch(value):
@@ -493,6 +508,113 @@ def _transfer(location, snapshot, candidate, cap, target, at):
     return worst, details
 
 
+def _measured_transfer(profiles, location, candidate, cap, target, rec, at):
+    """Latest fresh destination measurement per allowed node (worst member for pools).
+
+    The latest observation of a node reflects its observed cache state (cold or
+    hot); a hot cache is never assumed without a verified read.
+    """
+    from .network_profile import summary
+
+    nodes = [m["node_ref"] for m in target["members"]] if target else [cap.node_ref]
+    detail = {"source": "measured_network", "per_node": [], "reason": None}
+    if location.content_digest is None:
+        return None, {**detail, "reason": "DATA_DIGEST_UNKNOWN"}
+    worst = None
+    for node in nodes:
+        mine = sorted(
+            (
+                p
+                for p in profiles
+                if p.workload_ref == location.workload_ref
+                and p.dataset_version == location.dataset_version
+                and p.source_endpoint_ref == location.source_endpoint_ref
+                and str(p.backend) == str(candidate.backend)
+                and p.cluster_ref == cap.backend_cluster_id
+                and p.node_ref == node
+            ),
+            key=lambda p: (p.observed_at, p.ref),
+            reverse=True,
+        )
+        if not mine:
+            return None, {**detail, "reason": "NETWORK_PROFILE_MISSING", "node_ref": node}
+        p = mine[0]
+        age = (at - p.observed_at).total_seconds()
+        reason = (
+            "NETWORK_DATASET_MISMATCH"
+            if p.content_digest != location.content_digest or p.size_bytes != location.size_bytes
+            else "NETWORK_PROFILE_FROM_FUTURE"
+            if age < -5
+            else "NETWORK_PROFILE_STALE"
+            if age > min(p.valid_for_seconds, rec.max_profile_age_seconds)
+            else None
+        )
+        if reason:
+            return None, {**detail, "reason": reason, "node_ref": node, "profile_ref": p.ref}
+        stats = summary(p)
+        detail["per_node"].append(
+            {
+                "node_ref": node,
+                "ref": p.ref,
+                "digest": signature(p),
+                "cache_state": p.cache_state,
+                "observed_at": p.observed_at.isoformat(),
+                "age_seconds": age,
+                **stats,
+            }
+        )
+        if worst is None or stats["median_seconds"] > worst["median_seconds"]:
+            worst = {**stats, "cache_state": p.cache_state}
+    return worst["median_seconds"], {**detail, **worst}
+
+
+PREPARATION = ("runtime_startup", "model_preparation")
+OTHER = ("communication", "finalization", "unattributed_in_container")
+
+
+def breakdown(prediction, profile_ref, staging):
+    """Separate cost components and what is (not) known about their spread.
+
+    Spread is observed and descriptive (sample stddev or min/max); no component
+    is calibrated, and a single sample or a point queue estimate is listed as
+    missing spread rather than reported as zero uncertainty.
+    """
+    phases = dict(prediction.phase_seconds)
+    missing = []
+    if prediction.predicted_jct_seconds is None:
+        return None
+    if prediction.queue_wait_seconds is not None and prediction.queue_snapshot_ref:
+        missing.append("queue_wait_spread")
+    if prediction.admission_seconds is not None:
+        missing.append("admission_spread")
+    if profile_ref["repeats"] < 2 or prediction.timing_uncertainty_seconds is None:
+        missing.append("profile_spread")
+    if staging["source"] == "measured_network" and staging["samples"] < 2:
+        missing.append("staging_spread")
+    return {
+        "queue_wait_seconds": prediction.queue_wait_seconds,
+        "admission_seconds": prediction.admission_seconds,
+        "preparation_seconds": sum(phases.get(k, 0.0) for k in PREPARATION),
+        "staging": {**staging, "seconds": phases.get("data_staging")},
+        "compute_seconds": phases.get("compute"),
+        "other_seconds": sum(phases.get(k, 0.0) for k in OTHER),
+        "phase_seconds": phases,
+        "critical_path_seconds": prediction.critical_path_seconds,
+        "combination": "sequential sum; each overlap group adds only its longest phase",
+        "overlap_groups": profile_ref.get("overlap_groups", []),
+        "uncertainty": {
+            "calibrated": False,
+            "kind": "observed descriptive spread; not a confidence interval",
+            "profile_repeats": profile_ref["repeats"],
+            "profile_jct_stddev_seconds": prediction.timing_uncertainty_seconds,
+            "staging_range_seconds": [staging["min_seconds"], staging["max_seconds"]]
+            if staging.get("samples", 0) >= 2
+            else None,
+            "missing": missing,
+        },
+    }
+
+
 def rank(service, conn, project, spec, rec, eligible, *, at=None):
     """Select among hard-filtered candidates; returns (index | None, record, evidence)."""
     from .placement import TopologySnapshot, snapshot_view
@@ -504,7 +626,16 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
     profile_refs, queue_refs, transfers, transfer_details = {}, {}, {}, {}
     location, location_reason = data_location(service, conn, project, spec)
     topology = None
-    if rec.policy == "profile_queue_network":
+    measured = rec.version == MEASURED_VERSION
+    network_profiles, network_refs = [], {}
+    if measured and rec.policy == "profile_queue_network":
+        from .network_profile import NetworkProfile
+
+        network_profiles = [
+            NetworkProfile.model_validate(x["body"])
+            for x in service.store.list(conn, "network_profile", project)
+        ]
+    elif rec.policy == "profile_queue_network":
         topology = TopologySnapshot.model_validate(
             required(service.store, conn, "topology_snapshot", rec.topology_snapshot_ref, project)
         )
@@ -545,6 +676,7 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
             "repeats": p.repeats,
             "node_ref": p.node_ref,
             "staging_boundary": p.staging_boundary,
+            "overlap_groups": [list(g) for g in p.overlap_groups],
         }
         profiles.append(
             MeasuredProfile(
@@ -580,6 +712,12 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
             elif location is None:
                 transfers[candidate.ref] = None
                 transfer_details[candidate.ref] = location_reason or "DATA_LOCATION_MISSING"
+            elif measured:
+                # Staging inside compute abstains in select_candidate (never added).
+                transfers[candidate.ref], transfer_details[candidate.ref] = _measured_transfer(
+                    network_profiles, location, candidate, cap, target, rec, at
+                )
+                network_refs[candidate.ref] = transfer_details[candidate.ref]["per_node"]
             else:
                 transfers[candidate.ref], transfer_details[candidate.ref] = _transfer(
                     location, topology, candidate, cap, target, at
@@ -596,7 +734,38 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
         intents=intents,
         transfer_seconds=transfers,
     )
-    predictions = [asdict(p) for p in decision.predictions] + [
+    views = []
+    for prediction in decision.predictions:
+        view = asdict(prediction)
+        detail = transfer_details.get(prediction.candidate_ref)
+        if isinstance(detail, dict) and detail.get("reason"):
+            view["reasons"] = list(view["reasons"]) + [detail["reason"]]
+        staging = (
+            detail
+            if isinstance(detail, dict) and detail.get("source") == "measured_network"
+            else {
+                "source": "not_required"
+                if profile_refs.get(prediction.candidate_ref, {}).get("staging_boundary")
+                == "not_required"
+                else "topology_link"
+                if rec.policy == "profile_queue_network"
+                else "profile_phase",
+                "samples": 0,
+            }
+        )
+        if staging.get("source") == "measured_network":
+            staging = {
+                **{k: v for k, v in staging.items() if k not in {"per_node", "reason"}},
+                "profile_refs": [n["ref"] for n in staging["per_node"]],
+                "per_node": staging["per_node"],
+            }
+        view["breakdown"] = (
+            breakdown(prediction, profile_refs[prediction.candidate_ref], staging)
+            if prediction.candidate_ref in profile_refs
+            else None
+        )
+        views.append(view)
+    predictions = views + [
         {"candidate_ref": ref, "predicted_jct_seconds": None, "reasons": [reason]}
         for ref, reason in sorted(notes.items())
     ]
@@ -622,6 +791,11 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
         if topology
         else None,
     }
+    if measured:
+        record["network_profiles"] = {
+            ref: [{"ref": n["ref"], "digest": n["digest"]} for n in nodes]
+            for ref, nodes in sorted(network_refs.items())
+        }
     evidence = {
         "evaluated_at": at.isoformat(),
         "predictions": predictions,
@@ -686,7 +860,238 @@ def decision_linkage(service, project, job_id):
             "quality_passed": body.get("quality_passed"),
             "actual_capability_ref": body.get("actual_capability_ref"),
             "profile_excluded": body.get("profile_excluded"),
+            "outcome": (service.store.get(conn, "jct_outcome", body["attempt_id"]) or {}).get(
+                "body"
+            ),
+            "comparison": _comparison_arm(row["idempotency_key"]),
         }
+
+
+def _comparison_arm(key):
+    if not (key or "").startswith("cmp:"):
+        return None
+    ref, _, arm = key[4:].rpartition(":")
+    return {"ref": ref, "arm": arm} if ref and arm in COMPARISON_ARMS else None
+
+
+def record_outcome(store, conn, row, state, body):
+    """Immutable frozen-prediction vs native-JCT record for a scheduled terminal attempt.
+
+    The prediction is the one frozen in the accepted plan before submission. Actual
+    JCT is native submit → native finish, the span the estimate covers (queue wait,
+    admission and allocation phases). Non-success or missing timestamps keep a
+    status and reason; no JCT or error is fabricated.
+    """
+    from .contracts import State
+
+    plan = body.get("scheduling_plan")
+    if not plan:
+        return
+    rec = plan.get("recommendation") or {}
+    evidence = plan.get("recommendation_evidence") or {}
+    selected = plan["candidate_ref"]
+    chosen = next(
+        (p for p in evidence.get("predictions", []) if p["candidate_ref"] == selected), None
+    )
+    predicted = (chosen or {}).get("predicted_jct_seconds")
+    submitted, finished = body.get("scheduler_submitted_at"), body.get("backend_finished_at")
+    jct, reason = None, None
+    if state != State.SUCCEEDED:
+        status, reason = "NOT_COMPLETED", f"{state}:{body.get('error') or 'NO_ERROR_RECORDED'}"
+    elif not submitted or not finished:
+        status, reason = "TIMESTAMPS_MISSING", "NATIVE_SUBMIT_OR_FINISH_UNOBSERVED"
+    else:
+        jct = _epoch(finished) - _epoch(submitted)
+        status = "OBSERVED" if jct >= 0 else "TIMESTAMPS_INVALID"
+        if jct < 0:
+            jct, reason = None, "NATIVE_FINISH_BEFORE_SUBMIT"
+    error = None
+    if jct is not None and predicted is not None:
+        signed = jct - predicted
+        error = {
+            "signed_seconds": signed,
+            "absolute_seconds": abs(signed),
+            "relative": signed / jct if jct > 0 else None,
+            "convention": "actual - predicted; positive means slower than predicted",
+        }
+    outcome = {
+        "job_id": row["id"],
+        "attempt_id": body["attempt_id"],
+        "state": str(state),
+        "policy": rec.get("policy", "legacy"),
+        "version": rec.get("version"),
+        "recommendation_status": rec.get("status"),
+        "candidate_ref": selected,
+        "scheduling_plan_digest": body.get("scheduling_plan_digest"),
+        "plan_reasons": plan.get("reason", []),
+        "prediction": None
+        if predicted is None
+        else {
+            "predicted_jct_seconds": predicted,
+            "evaluated_at": evidence.get("evaluated_at"),
+            "frozen": "in the accepted plan before native submission",
+            "reasons": chosen.get("reasons", []),
+            "breakdown": chosen.get("breakdown"),
+        },
+        "prediction_reason": None if predicted is not None else "PREDICTION_UNAVAILABLE",
+        "actual": {
+            "status": status,
+            "reason": reason,
+            "submitted_at": submitted,
+            "finished_at": finished,
+            "jct_seconds": jct,
+            "boundary": "native scheduler_submitted_at → backend_finished_at",
+        },
+        "error": error,
+    }
+    store.put(conn, "jct_outcome", body["attempt_id"], row["project"], outcome)
+
+
+# --- Four-policy comparison: frozen shadow estimates, then independent executions. ---
+
+COMPARISON_ARMS = ("static", "profile_only", "profile_queue", "profile_queue_network")
+
+
+class RecommendationComparisonRequest(Contract):
+    ref: Ref
+    workload_ref: Ref
+    static_profile_ref: Ref
+    static_candidate_ref: Ref
+    profile_refs: dict[Literal["profile_only", "profile_queue", "profile_queue_network"], Ref]
+
+    @model_validator(mode="after")
+    def every_policy_arm(self):
+        if set(self.profile_refs) != set(COMPARISON_ARMS[1:]):
+            raise ValueError("profile_only, profile_queue and profile_queue_network are required")
+        return self
+
+
+def comparison_key(ref, arm):
+    """Idempotency key that links an executed job to its comparison arm."""
+    return f"cmp:{ref}:{arm}"
+
+
+def freeze_comparison(service, project, request):
+    """Evaluate all four arms in one transaction and store them before any submission."""
+    from .scheduling import SchedulingPlanRequest, SchedulingProfile, compile_plan
+    from .service import Rejected, required
+    from .store import Conflict
+
+    with service.store.transaction() as conn:
+        existing = service.store.get(conn, "recommendation_comparison", request.ref)
+        if existing and existing["project"] == project:
+            if existing["body"]["request"] != request.model_dump(mode="json"):
+                raise Conflict("comparison reference reused with a different request")
+            return _comparison_view(service, conn, project, existing)
+        arms = {}
+        for arm in COMPARISON_ARMS:
+            static = arm == "static"
+            profile_ref = request.static_profile_ref if static else request.profile_refs[arm]
+            profile = SchedulingProfile.model_validate(
+                required(service.store, conn, "scheduling_profile", profile_ref, project)
+            )
+            rec = profile.policy.recommendation
+            if static != (rec is None) or (rec is not None and rec.policy != arm):
+                raise Rejected(f"{arm} arm requires a matching {arm} scheduling profile")
+            try:
+                result = compile_plan(
+                    service,
+                    conn,
+                    project,
+                    SchedulingPlanRequest(
+                        profile_ref=profile_ref,
+                        workload_ref=request.workload_ref,
+                        candidate_ref=request.static_candidate_ref if static else None,
+                    ),
+                )
+            except ValueError as exc:
+                raise Rejected(str(exc)) from exc
+            if static and not result["accepted"]:
+                raise Rejected("STATIC_CANDIDATE_NOT_ELIGIBLE: " + str(result["excluded"]))
+            plan = result["plan"] or {}
+            evidence = plan.get("recommendation_evidence") or result.get("recommendation_evidence")
+            arms[arm] = {
+                "profile_ref": profile_ref,
+                "policy": rec.policy if rec else "static",
+                "version": rec.version if rec else None,
+                "accepted": result["accepted"],
+                "status": (plan.get("recommendation") or result.get("recommendation") or {}).get(
+                    "status", "STATIC" if static else None
+                ),
+                "selected_candidate_ref": plan.get("candidate_ref"),
+                "digest": result["digest"],
+                "reasons": result["reasons"],
+                "excluded": result["excluded"],
+                "candidate_pool": [
+                    e["candidate_ref"] for e in plan.get("evaluation", result.get("evaluation", []))
+                ],
+                "evaluated_at": (evidence or {}).get("evaluated_at"),
+                "predictions": (evidence or {}).get("predictions", []),
+            }
+        body = {
+            "ref": request.ref,
+            "project_ref": project,
+            "request": request.model_dump(mode="json"),
+            "kind": "shadow_estimates_frozen_before_submission",
+            "frozen_at": now().isoformat(),
+            "workload_ref": request.workload_ref,
+            "arm_order": list(COMPARISON_ARMS),
+            "arms": arms,
+            "claims": (
+                "Shadow estimates cover every candidate under each policy at one instant. "
+                "Executed outcomes are separate jobs run independently per arm; no "
+                "counterfactual measured performance is inferred from shadow estimates."
+            ),
+        }
+        saved = service.store.put(conn, "recommendation_comparison", request.ref, project, body)
+        return _comparison_view(service, conn, project, saved)
+
+
+def comparison(service, project, ref):
+    from .service import NotFound
+
+    with service.store.transaction() as conn:
+        item = service.store.get(conn, "recommendation_comparison", ref)
+        if not item or item["project"] != project:
+            raise NotFound("comparison not found")
+        return _comparison_view(service, conn, project, item)
+
+
+def _comparison_view(service, conn, project, item):
+    from sqlalchemy import select
+
+    from .store import jobs
+
+    body = item["body"]
+    executed = {}
+    for arm in body["arm_order"]:
+        rows = conn.execute(
+            select(jobs).where(
+                jobs.c.project == project,
+                jobs.c.idempotency_key == comparison_key(body["ref"], arm),
+            )
+        ).mappings()
+        frozen = body["arms"][arm]["selected_candidate_ref"]
+        executed[arm] = [
+            {
+                "kind": "independently_executed",
+                "job_id": row["id"],
+                "state": row["state"],
+                "candidate_ref": row["body"]["candidate"]["ref"],
+                "matches_frozen_selection": row["body"]["candidate"]["ref"] == frozen,
+                "scheduling_plan_digest": row["body"].get("scheduling_plan_digest"),
+                "outcome": (
+                    service.store.get(conn, "jct_outcome", row["body"]["attempt_id"]) or {}
+                ).get("body"),
+            }
+            for row in rows
+        ]
+    return {
+        **body,
+        "arms": {arm: body["arms"][arm] for arm in body["arm_order"]},
+        "frozen_digest": item["digest"],
+        "executed": executed,
+    }
 
 
 # --- Collectors: pure transforms over read-only native observations. ---------------
@@ -695,14 +1100,20 @@ def decision_linkage(service, project, job_id):
 def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
     """Aggregate COMPLETED, quality-passed RA jobs with native timestamps on one node.
 
-    Each row is a job record plus ``result``: its stored ExecutionResult body.
+    Each row is a job record plus ``result``: its stored ExecutionResult body, and
+    optionally ``staging``: its stored StagingReceipt body.
 
     Phases come only from native boundaries: admission = submit→allocation start,
     runtime_startup = allocation start→container start, compute = workload-reported
-    elapsed, unattributed_in_container = remaining container time. Staging is inside
-    compute for these jobs (no separate boundary), so network substitution abstains.
+    elapsed, unattributed_in_container = remaining container time. Without staging
+    receipts staging is inside compute (no separate boundary), so network
+    substitution abstains. When every job staged its dataset before compute and
+    reported a verified receipt measured on its allocated node, ``data_staging`` is
+    that separate span and is subtracted from the residual (never counted twice).
     """
     import statistics
+
+    from .network_profile import StagingReceipt
 
     rows = list(rows)
     if not rows:
@@ -710,6 +1121,10 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
     first = rows[0]["body"]
     keys = ("workload_signature", "context_signature")
     samples = []
+    staged = {row.get("staging") is not None for row in rows}
+    if len(staged) > 1:
+        raise ValueError("mixed staged and unstaged jobs: staging boundaries differ")
+    staged = staged.pop()
     for row in rows:
         b = row["body"]
         if row["state"] != "SUCCEEDED" or not b.get("quality_passed"):
@@ -743,7 +1158,19 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
             raise ValueError(f"{row['id']}: native timestamps incomplete")
         submitted, started, executing, finished = (_epoch(s) for s in stamps)
         compute = result["measurements"]["elapsed_seconds"]
-        residual = finished - executing - compute
+        staging = None
+        if staged:
+            receipt = StagingReceipt.model_validate(row["staging"])
+            first_receipt = StagingReceipt.model_validate(rows[0]["staging"])
+            if (
+                receipt.attempt_id != b["attempt_id"]
+                or receipt.observer_host != node
+                or (receipt.content_digest, receipt.size_bytes)
+                != (first_receipt.content_digest, first_receipt.size_bytes)
+            ):
+                raise ValueError(f"{row['id']}: staging receipt unrelated, remote or mixed dataset")
+            staging = receipt.sample.elapsed_seconds
+        residual = finished - executing - compute - (staging or 0.0)
         if not submitted <= started <= executing <= finished or residual < 0:
             raise ValueError(f"{row['id']}: native boundaries overlap the measured compute span")
         samples.append(
@@ -752,6 +1179,7 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
                 "runtime_startup": executing - started,
                 "compute": compute,
                 "unattributed_in_container": residual,
+                "data_staging": staging,
                 "total": finished - submitted,
                 "peak": result["measurements"]["peak_memory_mib"],
                 "finished": finished,
@@ -785,8 +1213,12 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
         valid_for_seconds=valid_for_seconds,
         repeats=len(samples),
         admission_seconds=mean("admission"),
-        phases={k: mean(k) for k in ("runtime_startup", "compute", "unattributed_in_container")},
-        staging_boundary="inside_compute",
+        phases={
+            k: mean(k)
+            for k in ("runtime_startup", "compute", "unattributed_in_container")
+            + (("data_staging",) if staged else ())
+        },
+        staging_boundary="separate" if staged else "inside_compute",
         jct_stddev_seconds=statistics.stdev(s["total"] for s in samples)
         if len(samples) > 1
         else None,
