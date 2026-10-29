@@ -1,0 +1,41 @@
+# Frozen Mobilint ARIES ResNet50 MXQ teacher (forward pass only) for joint KD on GB10.
+# Pre-reserved auxiliary Pod: the KD variant pins this Pod UID; a new Pod needs a new variant.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ra-vt-kd-teacher-20261029b
+  namespace: ra-vision-training
+  labels: {app.kubernetes.io/part-of: ra-vision-training, component: mobilint-teacher}
+spec:
+  automountServiceAccountToken: false
+  enableServiceLinks: false
+  restartPolicy: Never
+  activeDeadlineSeconds: 7200
+  terminationGracePeriodSeconds: 3
+  securityContext: {seccompProfile: {type: RuntimeDefault}}
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchFields: [{key: metadata.name, operator: In, values: [etri-ser0004-cgnms0]}]
+  containers:
+    - name: teacher
+      image: 10.254.192.47:5000/ra-npu-mobilint@sha256:8e933ecf8fc02d119cc2b7de0ad61ee11d64888bca698f317f0307e737b1848a
+      imagePullPolicy: IfNotPresent
+      command: [python3, -u, -I, /opt/ra-teacher/mobilint_teacher.py, --model, /opt/ra-teacher/resnet50_IMAGENET1K_V1.mxq,
+                --model-sha256, 48b1ca4e669ac9d293148a748c06c352a7f542c5999f5f8eb2d1f5a31cf21e2d, --port, "8080"]
+      env:
+        - {name: NODE_NAME, valueFrom: {fieldRef: {fieldPath: spec.nodeName}}}
+        - {name: POD_UID, valueFrom: {fieldRef: {fieldPath: metadata.uid}}}
+        - {name: PYTHONDONTWRITEBYTECODE, value: "1"}
+        - {name: OMP_NUM_THREADS, value: "1"}
+      ports: [{containerPort: 8080, name: http}]
+      resources:
+        requests: {cpu: "1", memory: 1Gi, mobilint.com/npu: "1", ephemeral-storage: 1Gi}
+        limits: {cpu: "1", memory: 2Gi, mobilint.com/npu: "1", ephemeral-storage: 2Gi}
+      securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+      readinessProbe:
+        httpGet: {path: /v1/teacher/health, port: 8080}
+        initialDelaySeconds: 1
+        periodSeconds: 2
+        timeoutSeconds: 3
