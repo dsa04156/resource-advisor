@@ -55,9 +55,50 @@ identities, settled observation and native receipts (unresolved never passes).
 - Python 3.11 (qualified runtime version) focused set: 194 passed.
 - Each fix was first shown failing against the unfixed code.
 
-## Live phase
+## Review round 2 fixes (2026-10-29)
 
-Not run. To be filled only with real evidence per [PLAN.md](PLAN.md): exact
-sanitized attempt/native IDs, observation boundaries, timestamps, raw evidence
-checksums (`manifest.json` from the trial runner), independent recalculation
-and the commands used. Failures and access blockers are recorded here as found.
+Kubernetes cancellation reads the Job, requires attempt annotations and a bound
+UID (refused when no UID is bound), then deletes via `DeleteOptions.preconditions.uid`
+with explicit propagation, so a same-name replacement is refused rather than
+deleted. Targeted tests failed on the prior code and pass now. Full suite at
+`4361066` on Python 3.11: 1477 passed, 11 PostgreSQL-only skipped; the two later
+commits were checked with the related test files only (158 passed).
+
+Remaining trial-runner defects (round 2, not fixed): an empty native receipt for
+an unresolved attempt can still close a cohort; limits are checked after the
+POST; per-key identities are persisted only at the end of `submit`. The runner
+was **not used** live and must not be used until these are fixed.
+
+## Live phase (2026-10-29) — deployment only
+
+Evidence: [evidence/deployment-20261029.json](evidence/deployment-20261029.json).
+Level: deployed to the owned lab and read back; **no new native workload ran**.
+
+| Unit | Rollout | Readback |
+|---|---|---|
+| `ra-api` | direct image update, revision 96 (no Argo Application exists for it) | 1/1 ready, in-pod source tree matches build, Python 3.11.15 |
+| `ra-live-training-worker` | last-applied manifest, image-only diff, Recreate | 1 pod, ready, 0 restarts, source matches |
+| `ra-live-training-slurm-worker` | same | 1 pod, ready, 0 restarts, source matches |
+| Slurm VM gateway | root-owned file replaced, previous kept as backup | SHA-256 `80d4d8be…` → `6db6728d…` |
+
+Image source = reviewed commit `53cd73b` (108 files) plus 5 pre-existing untracked
+modules preserved byte-for-byte from the previous deployment. It is not a pure
+commit-exact image.
+
+- API: `/healthz` 200; `/jobs/{id}/lifecycle` and `/usage/report?month=2026-10`
+  return 200 (404 before); `/usage/summary` byte-identical to before.
+- History: 876 terminal jobs and 876 usage rows hash identically before and after
+  rollout; 878 jobs total. The two `live-k8s-cpu` `SUBMISSION_UNKNOWN` attempts from
+  2026-10-28 stay open. They were not acknowledged and not reused as test jobs, and
+  no reconciliation record had been written yet at readback (06:10Z).
+- Backup before rollout: existing `backup_metadata.py`, captured but not
+  restore-verified.
+- **Native smoke: NOT_RUN.** The registered live-training workloads carry an
+  immutable 900 s run limit, above the frozen 120 s/job bound (observed 10/28
+  runtimes: Kubernetes 69–78 s, Slurm VM 148–165 s). New bindings were out of scope.
+  Response-loss, restart and 10-job cohort trials were also not run.
+  New native jobs: 0.
+- **Incident:** while checking UID-precondition delete semantics, a
+  `kubectl delete --raw …?dryRun=All` request was not a dry run. It deleted one
+  owned, completed 2026-10-28 live-training Job (`a-4d76d3bd…`) and its Pod. Its DB
+  job and usage rows are unchanged; the native object and Pod log are lost.

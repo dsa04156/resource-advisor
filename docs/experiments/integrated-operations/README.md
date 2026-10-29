@@ -13,7 +13,7 @@ to be shown on owned lab hardware. It does not replace `docs/PROJECT-PURPOSE.md`
 | [RUNBOOK.md](RUNBOOK.md) | Build, rollout, trial, rollback |
 | [RESULTS.md](RESULTS.md) | Software-phase results; live results section empty until run |
 
-## What changed (software level: code + tests, not deployed)
+## What changed (code + tests; deployed to the owned lab 2026-10-29, see RESULTS)
 
 - Every reconcile of an uncertain submission is recorded (`MATCHED`, `NO_MATCH`,
   `AMBIGUOUS`, `QUERY_FAILED`); only successful no-match queries accumulate.
@@ -49,7 +49,8 @@ NPU는 서로 합치지 않습니다. 실제 장애 복구 시연은 소유한 C
 
 ## Limitations
 
-- Not deployed; no live result in this phase. CPU/VM trials cannot support GPU-hour
+- Deployed and read back on 2026-10-29; no new native workload ran (bounded trials
+  NOT_RUN, see RESULTS). CPU/VM trials cannot support GPU-hour
   or GPU performance claims. Physical Slurm is unreachable.
 - Acknowledgement does not prove absence. A native job submitted but invisible to
   queries remains possible; its usage appears only if it is later matched.

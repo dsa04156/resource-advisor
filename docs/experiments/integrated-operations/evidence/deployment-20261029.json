@@ -1,0 +1,126 @@
+{
+  "kind": "integrated-operations-deployment",
+  "date": "2026-10-29",
+  "level": "live deployment readback; no new native workload executed",
+  "reviewed_commit": "53cd73be9a5e7c47a945eab26dfb46ae30700869",
+  "image_source": "image source = reviewed commit files + preserved extras; not a pure commit-exact image",
+  "preserved_extras": {
+    "profile_reuse_workload.py": "8fd662e661f3fd37fdecf9ca5de6dcc9a799159450d02ea3a78af7572565be2a",
+    "vlm_lora.py": "12eadffa79c88bcb6e1eedd2e08bcd459f324d85ed8deb698f6489e4abdb2b9e",
+    "vlm_lora_loader.py": "b7f5d46626cb117132719238306e04eddf49dd80d0f96081883d33dbab602ea7",
+    "vlm_lora_provider.py": "7cec0427f9a64f0e94071a6f6ce10bdaf43f015b287cf5d18dbd68499be64874",
+    "vlm_lora_runtime.py": "703671d89086b9e14eaa49e3ac4d39f3d85055458606802dcdab5511d56a5473"
+  },
+  "units": {
+    "api": {
+      "deployment": "ra-api",
+      "rollout": "direct image update (no resource-advisor Argo Application exists; stale tracking-id/gitops-release annotations kept as historical metadata)",
+      "revision": 96
+    },
+    "kubernetes_route_worker": {
+      "deployment": "ra-live-training-worker",
+      "rollout": "kubectl apply of last-applied manifest, image-only diff, Recreate"
+    },
+    "slurm_route_worker": {
+      "deployment": "ra-live-training-slurm-worker",
+      "rollout": "kubectl apply of last-applied manifest, image-only diff, Recreate"
+    }
+  },
+  "images": {
+    "api": {
+      "before": "resource-advisor/console-api@sha256:376440bd36a5922355151c588ac9fd7eae67d342ab58660a84ce1a0ca7bdc488",
+      "after": "resource-advisor/console-api@sha256:a26268dbd51ffd6ed99743c6e7c6591abbe43fdc48173d63702e2c80f0f3c77d",
+      "base": "resource-advisor/console-api@sha256:97cd7faf4ab0a47f11e802b034a0a727c5ba5b54e357e417124e4f90e1a8b86d",
+      "python": "3.11",
+      "lock_sha256": "9e65d6e9b2dbc7c6c5ec7c8791947497ca5cab20267227a7c76ab2508975316b",
+      "source_tree_sha256": "7e42f0d36fdcd5ba3eaab4d97f2d771aa30dab8260f90a9e3173b33e88b76143",
+      "commit_files": 108
+    },
+    "worker": {
+      "before": "resource-advisor/services@sha256:671755834f17f2568e341bce6c17115f37f52f993edeeb7fd6f2ab6db852b446",
+      "after": "resource-advisor/services@sha256:da044f3a7d6213745130de325c15237ecd74ea09b560004efb37eed98a2804e7",
+      "base": "resource-advisor/services@sha256:da6b42ef549db0c75b10d006036764b8ebf40430532e23cd853ef9e0429957ed",
+      "python": "3.11",
+      "lock_sha256": "9e65d6e9b2dbc7c6c5ec7c8791947497ca5cab20267227a7c76ab2508975316b",
+      "source_tree_sha256": "7e42f0d36fdcd5ba3eaab4d97f2d771aa30dab8260f90a9e3173b33e88b76143",
+      "commit_files": 108
+    },
+    "slurm-worker": {
+      "before": "resource-advisor/slurm-worker@sha256:19035231239b2ac7a20142c824ee9a6eaf264ff2d73e85399995c6825711e495",
+      "after": "resource-advisor/slurm-worker@sha256:0338b8b497fd78cf6d8a7f3aba0a72d75895ffd970ac360eeb38041fd889729d",
+      "base": "resource-advisor/services@sha256:f429939bbd32aa8f200b44a1059ae5136527869823029fcab764a2b1a3121908",
+      "python": "3.11",
+      "lock_sha256": "9e65d6e9b2dbc7c6c5ec7c8791947497ca5cab20267227a7c76ab2508975316b",
+      "source_tree_sha256": "7e42f0d36fdcd5ba3eaab4d97f2d771aa30dab8260f90a9e3173b33e88b76143",
+      "commit_files": 108
+    }
+  },
+  "slurm_gateway_sha256": {
+    "before": "80d4d8bea93fa2190ce38768ad9b87b7f8de0a6920b997a2e5db166e4c4602f1",
+    "after": "6db6728d1a27053b8fb1b1b957169b8ed38c4381107cdfdd58d3e2f49d891bab"
+  },
+  "readback_utc": "2026-10-29T06:10:00Z",
+  "in_container_source": {
+    "api": {
+      "python": "3.11.15",
+      "files": 113,
+      "tree_matches_build": true
+    },
+    "worker": {
+      "python": "3.11.15",
+      "files": 113,
+      "tree_matches_build": true
+    },
+    "slurm-worker": {
+      "python": "3.11.15",
+      "files": 113,
+      "tree_matches_build": true
+    }
+  },
+  "history": {
+    "terminal_jobs_count_sha256_before": "876|d9098f26d735c820740cd6eb08e839b60c152bde2090052caca58d89249ae935",
+    "terminal_jobs_count_sha256_after": "876|d9098f26d735c820740cd6eb08e839b60c152bde2090052caca58d89249ae935",
+    "usage_count_sha256_before": "876|dad78e2364331859ea1ba4d53ab10e86859062ead42cc54049922144d72a6de2",
+    "usage_count_sha256_after": "876|dad78e2364331859ea1ba4d53ab10e86859062ead42cc54049922144d72a6de2",
+    "jobs_total": 878,
+    "usage_rows": 876,
+    "open_outbox": 2,
+    "query": "sha256 over id|state|version|body of terminal jobs and attempt|project|backend|allocated|body of usage, ordered"
+  },
+  "api_checks": {
+    "healthz": 200,
+    "lifecycle_before": 404,
+    "lifecycle_after": 200,
+    "usage_report_before": 404,
+    "usage_report_after": 200,
+    "usage_report_boundary": "[start, end) UTC",
+    "usage_summary_unchanged": true
+  },
+  "pre_existing_unresolved": {
+    "count": 2,
+    "cluster": "live-k8s-cpu",
+    "state": "SUBMISSION_UNKNOWN since 2026-10-28T11:11Z",
+    "reconciliation_history_at_readback": "not yet recorded (outbox backoff <=300 s)",
+    "not_acknowledged": true,
+    "not_used_as_test_jobs": true
+  },
+  "native_smoke": {
+    "status": "NOT_RUN",
+    "reason": "existing registered live-training workloads carry immutable max_run_seconds=900, above the preregistered 120 s/job bound; new bindings were out of scope",
+    "new_native_jobs": 0
+  },
+  "backup": {
+    "tool": "examples/backup_metadata.py",
+    "status": "CAPTURED_NOT_RESTORE_VERIFIED",
+    "archive_sha256": "1a21e1ea6c53d975c939eb9ddd2953b192dd0965ffe6c81dbf063d4bdf64c1fc",
+    "ra_jobs_rows": 878,
+    "ra_outbox_rows": 3918,
+    "ra_entities_rows": 102516
+  },
+  "incident": {
+    "summary": "an owned, completed 2026-10-28 live-training Kubernetes Job (and its Pod) was deleted by kubectl delete --raw with ?dryRun=All, which did not act as a dry run",
+    "db_job_and_usage": "unchanged",
+    "native_object": "not recoverable",
+    "attempt_id": "a-4d76d3bdb2234d54b3677533ee2b3ced"
+  }
+}

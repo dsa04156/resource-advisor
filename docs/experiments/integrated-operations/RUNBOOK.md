@@ -122,6 +122,22 @@ it shows two consecutive `NO_MATCH`, an operator credential with a subject may
 "reason":"…"}`. That is audit only: the attempt stays open and is still adopted
 if the native job appears. Never resubmit it.
 
+## 3a. As executed on 2026-10-29
+
+- No `resource-advisor-*` Argo Application exists in the lab, so `ra-api` was
+  updated with `kubectl set image`. Its `argocd.argoproj.io/tracking-id` and
+  `resource-advisor.io/gitops-release` annotations are stale historical metadata.
+  Do not claim GitOps sync.
+- Images were built with `examples/update_service.py` from a private staging copy:
+  the reviewed commit plus the 5 untracked modules already deployed, to avoid
+  dropping them with the source layer's opaque whiteout.
+- Route workers: server dry-run and `kubectl diff` of the last-applied manifest with
+  only the image changed, then `apply`.
+- VM gateway: `scp … </dev/null` and `ssh -n`. Without these, ssh consumes the rest
+  of a heredoc-driven script.
+- Never check delete semantics on real objects: `kubectl delete --raw` ignored
+  `?dryRun=All`.
+
 ## 4. Rollback
 
 Code rollback is safe for data: older code ignores the new JSON keys
