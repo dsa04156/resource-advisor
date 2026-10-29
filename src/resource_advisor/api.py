@@ -649,6 +649,17 @@ def create_app(
 
         return jct_report(service, p.project, workload_ref)
 
+    @app.get(PREFIX + "/training-catalog")
+    def training_options(
+        model: str | None = None,
+        config: str | None = None,
+        profile_ref: str | None = None,
+        p=Depends(principal),
+    ):
+        from .training_catalog import training_catalog
+
+        return training_catalog(service, p.project, model, config, profile_ref)
+
     @app.get(PREFIX + "/recommendation-comparisons/{ref}")
     def recommendation_comparison(ref: str, p=Depends(principal)):
         return comparison(service, p.project, ref)

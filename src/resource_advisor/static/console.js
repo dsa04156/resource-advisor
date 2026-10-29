@@ -232,6 +232,11 @@ const views = {
     "추천 근거 · 실제 결과",
     "추천에 사용한 근거 실행과 승인 후 독립 실행의 결과를 비교합니다.",
   ],
+  training: [
+    "MODEL-FIRST TRAINING",
+    "학습 자원 추천",
+    "모델과 등록된 학습 조건을 고른 뒤 자원 조합별 예상 JCT와 측정 근거를 확인합니다. 측정되지 않은 조합은 예상하지 않습니다.",
+  ],
   jct: [
     "EVIDENCE",
     "JCT 비교",
@@ -2175,6 +2180,7 @@ function render() {
   if (active === "models" && !modelsPending && (!modelsUpdated || ($("auto").checked && Date.now() - modelsUpdated > 15000))) refreshModels();
   if (active === "scheduler-lab" && !labPending && Date.now()-labUpdated > 3000) refreshLab();
   if (active === "scenario" && !scenarioPending && Date.now()-scenarioUpdated > 3000) refreshScenario();
+  if (active === "training" && !trainPending && (!trainUpdated || ($("auto").checked && Date.now()-trainUpdated > 15000))) refreshTraining();
   if (active === "jct" && !jctPending && (!jctUpdated || ($("auto").checked && Date.now()-jctUpdated > 15000))) refreshJct();
   if (["operations","experiments","pipelines","notebooks","jobs"].includes(active) && !researchPending && Date.now()-researchUpdated>30000) refreshResearch();
   const motionBefore = active === "scheduler-lab" ? captureLabMotion() : null;
@@ -2218,6 +2224,7 @@ function render() {
       history: historyView,
       recommendations: recommendationsView,
       jct: jctView,
+      training: trainingView,
     }[active](),
   );
   if (openSubmissionPanels)
@@ -2261,6 +2268,7 @@ function reset(message = "") {
   scenarioData=null; scenarioRecent=[]; scenarioRef=""; scenarioUpdated=0; scenarioPending=false; scenarioError=""; scenarioCursor=null; scenarioSubmission=null; stopScenarioReplay();
   researchData=null; researchRuns=null; researchPending=false; experimentSelection.clear(); researchUpdated=0;
   jctData=null; jctPending=false; jctUpdated=0; jctError="";
+  trainData=null; trainPending=false; trainUpdated=0; trainError="";
   controller?.abort();
   controller = null;
   pending = false;
@@ -2391,7 +2399,8 @@ $("refresh").onclick = () => { if (active === "placement") placementUI.refresh()
 function navigate(event) {
   const view = new URL(event?.newURL || location.href).hash.slice(1);
   if (view === "main") return; // The skip link must not change the selected view.
-  active = views[view] ? view : "home";
+  // The model-first training flow is the starting view when no route is chosen.
+  active = views[view] ? view : view ? "home" : "training";
   if(active!=="scheduler-lab")stopLabReplay();
   document.querySelectorAll("nav a").forEach((a) => {
     if (a.dataset.view === active) a.setAttribute("aria-current", "page");
@@ -2575,6 +2584,115 @@ function jctView() {
   root.append(panel("기록된 측정 근거","기록된 행의 수와 유효기간만 셉니다. 기록이 있다고 예측에 쓸 수 있는 것은 아닙니다. 모델·데이터 동일성, 캐시 바인딩, 정책 시효는 비교를 고정할 때 판정되며 제외 이유는 정책 비교에 남습니다. 없는 근거는 0이 아니라 알 수 없음입니다.",jctReadiness(sel)));
   root.append(panel("정책 비교 · 예측 대비 실제",`${sel.comparisons.length}건 · 같은 작업 안에서만 비교`,sel.comparisons.length?add(el("div"),...sel.comparisons.map(jctComparison)):
     empty("이 작업에 고정된 정책 비교가 없습니다. 네 정책의 스케줄링 프로파일과 측정 근거가 등록된 뒤 비교를 고정할 수 있습니다. 결과가 없다는 것은 성공도 실패도 아닌 미실행입니다.")));
+  return root;
+}
+
+// Model-first training: model -> registered training condition -> resource combinations.
+// Read-only projection; JCT only from the existing recommendation preview, unmeasured stays unknown.
+let trainData=null,trainPending=false,trainUpdated=0,trainError="",trainModel="",trainConfig="",trainProfile="";
+const trainText={MODEL_NAME_MISSING:"모델 이름이 등록되지 않음",NO_TRAINING_VERIFIED_CANDIDATE:"학습 검증된 실행 환경 없음",QUALIFICATION_REJECTED:"학습 격리 검증과 맞지 않음",
+  TRAINING_NOT_VERIFIED:"이 후보는 학습 검증 전",DISTRIBUTED_STRATEGY_NOT_VALIDATED:"분산 학습 방식 검증 전",REGISTRY_ENTRY_MISSING:"실행 환경 등록 정보 없음",
+  NPU_NO_TRAINING_RUNTIME:"NPU 런타임은 학습을 지원하지 않음 (추론 전용)",NO_TRAINING_VARIANT:"학습 검증된 실행 환경이 등록되지 않음",DEVICE_CLASS_UNREPORTED:"장치 종류가 보고되지 않음",
+  PROFILE_MISSING:"이 조건·장치의 측정 프로파일 없음",PROFILE_STALE:"측정 프로파일이 오래됨",NO_FRESH_INVENTORY:"최신 인벤토리 없음",OBSERVED_REQUEST_HEADROOM:"요청 여유 관측",
+  WAIT_FOR_BACKEND_RESOURCES:"자원 대기 중",OBSERVED_NODE_UNAVAILABLE:"노드 사용 불가"};
+const trainReason=r=>trainText[r]||reasonText(r);
+const trainStrategy={single:"단일 장치",ddp:"DDP (데이터 병렬)",fsdp:"샤딩 (FSDP)",zero:"샤딩 (ZeRO)"};
+const trainJct={NO_ESTIMATE_POLICY:"추정 정책 없음",PILOT_REQUIRED:"측정 필요 · 파일럿 실행 전",EXCLUDED_BY_POLICY:"추정 정책에서 제외",UNKNOWN:"알 수 없음",ESTIMATE_ERROR:"추정 오류"};
+const trainAvail={available:"여유 관측",busy:"사용 중",unknown:"확인 불가",unavailable:"사용 불가"};
+async function refreshTraining() {
+  trainPending=true;const session=generation,model=trainModel;
+  try {
+    const q=new URLSearchParams();if(model)q.set("model",model);if(model&&trainConfig)q.set("config",trainConfig);if(model&&trainProfile)q.set("profile_ref",trainProfile);
+    const response=await fetch(API+"/training-catalog"+(q.size?"?"+q:""),{headers:authHeaders(),cache:"no-store"});
+    const value=await response.json();
+    if(!response.ok)throw new Error(typeof value.detail==="string"?value.detail:"학습 카탈로그를 불러오지 못했습니다 ("+response.status+").");
+    if(session!==generation)return;
+    trainData=value;trainError="";
+    if(!model&&value.models.length)trainModel=value.models[0].model_key;
+    if(value.selected){trainConfig=value.selected.config_key;trainProfile=value.selected.estimate_profile?.ref||"";}
+  } catch(error) { if(session===generation){trainError=error instanceof TypeError?"학습 카탈로그 API에 연결하지 못했습니다.":error.message;if(model){trainModel="";trainConfig="";}} }
+  finally { if(session===generation){trainPending=false;trainUpdated=trainModel===model?Date.now():0;render();} }
+}
+function trainModels() {
+  const root=el("div",null,"train-models");
+  for(const m of trainData.models){
+    const b=el("button",null,"train-model"+(m.model_key===trainModel?" chosen":""));b.type="button";b.setAttribute("aria-pressed",String(m.model_key===trainModel));
+    b.onclick=()=>{trainModel=m.model_key;trainConfig="";trainUpdated=0;render();};
+    b.append(add(el("span",null,"state-line"),el("strong",m.model_name),m.qualified?null:badge("검증 전 · 실행 불가","warn")),el("small",`학습 조건 ${m.condition_count}개 · 등록 작업 ${m.workload_count}개`),el("small",`실행 ${m.runs.total}건 (성공 ${m.runs.succeeded}) · ${m.devices.join(", ")||"장치 미확인"}`));
+    root.append(b);
+  }
+  return root.childElementCount?root:empty("학습 검증된 모델이 아직 없습니다. 실제 학습으로 검증된 실행 환경이 등록되면 여기에 나타납니다.");
+}
+function trainUnqualified() {
+  const u=trainData.unqualified;if(!u.length)return null;
+  return add(el("details",null,"jct-more"),el("summary",`학습 검증 전 항목 ${u.length}개 · 선택할 수 없음`),table(["등록 작업","모델","이유","검증 단계","실행"],u.map(x=>[
+    code(x.workload_ref),el("span",x.model_name||"(이름 없음)"),add(el("div",null,"jct-reasons"),...[...x.reasons,...(x.candidate_reasons||[])].map(r=>el("small",trainReason(r))),x.strategies?.some(s=>s!=="single")?el("small","선언된 방식: "+x.strategies.map(s=>trainStrategy[s]||s).join(", ")):null),
+    el("span",(x.verification||[]).join(", ")),el("span",`${x.runs.total}건 (성공 ${x.runs.succeeded})`)])));
+}
+function trainCondition(sel) {
+  const root=el("div"),selector=el("select");selector.id="train-config";selector.dataset.keepFocus="true";
+  for(const c of sel.configs){const k=c.condition;selector.append(new Option(`${k.steps} step · 배치 ${k.batch_size}${k.global_batch_size?" (전역 "+k.global_batch_size+")":""} · ${k.precision} · ${k.optimizer||"최적화기 미기록"} · 등록 ${c.workloads.length}개`,c.config_key));}
+  selector.value=sel.config_key;selector.onchange=()=>{trainConfig=selector.value;trainUpdated=0;render();};
+  const label=el("label","등록된 학습 조건");label.htmlFor=selector.id;
+  const c=sel.configs.find(x=>x.config_key===sel.config_key),k=c.condition,facts=el("dl",null,"policy-facts");
+  for(const [a,b] of [["학습 step",String(k.steps)],["배치",`${k.batch_size}${k.global_batch_size?" · 전역 "+k.global_batch_size:""} · 누적 ${k.gradient_accumulation}`],["정밀도",k.precision],["최적화기",k.optimizer?k.optimizer+(Object.keys(k.optimizer_parameters).length?" "+JSON.stringify(k.optimizer_parameters):""):"기록 없음"],["입력",k.input_shape.join("×")],["데이터",k.dataset_version.slice(0,19)+"…"],["시드",String(k.seed)],["측정 경계",k.measurement_boundary]])facts.append(el("dt",a),el("dd",b));
+  root.append(add(el("div",null,"view-toolbar jct-toolbar"),label,selector),facts,
+    el("p","등록된 조건만 고를 수 있습니다. 값을 바꾸려면 새 학습 작업을 등록하고 다시 검증해야 합니다. 같은 조건이라도 등록 작업이 다르면 측정 기록을 공유하지 않습니다.","muted"),
+    table(["등록 작업","식별 서명","실행"],c.workloads.map(w=>[code(w.workload_ref),code(w.identity_signature.slice(0,19)+"…"),el("span",`${w.runs.total}건 (성공 ${w.runs.succeeded})`)])));
+  return root;
+}
+function trainSubmit(x) {
+  if(!x.submittable_now||x.verification!=="TRAINING_VERIFIED")return el("small","제출 불가");
+  const b=el("button","학습 실행 화면으로");b.type="button";
+  b.onclick=()=>{showAllTemplates=!(data.submission_catalog||[]).some(w=>w.workload_ref===x.workload_ref);submissionDraft.workload=x.workload_ref;submissionDraft.candidate=x.candidate_ref;schedulingPreview=null;location.hash="submit";};
+  return b;
+}
+function trainCombinations(sel) {
+  const root=el("div");
+  if(sel.estimate_profiles.length){
+    const s=el("select");s.id="train-profile";s.dataset.keepFocus="true";for(const r of sel.estimate_profiles)s.append(new Option(r,r));s.value=sel.estimate_profile?.ref||"";
+    s.onchange=()=>{trainProfile=s.value;trainUpdated=0;render();};const l=el("label","추정 정책");l.htmlFor=s.id;root.append(add(el("div",null,"view-toolbar jct-toolbar"),l,s));
+  } else root.append(el("p","추천 정책이 등록되지 않아 예상 JCT를 계산하지 않습니다. 모든 조합의 JCT는 알 수 없음으로 표시됩니다.","error-message"));
+  if(!sel.combinations.length)return add(root,empty("이 조건에 등록된 자원 조합이 없습니다."));
+  root.append(table(["자원 조합","노드","메모리 (장치당)","현재 가용성","예상 JCT","대기 · 준비 · 전송 · 학습","측정 근거","차단 사유","동작"],sel.combinations.map(x=>{
+    const j=x.jct,b=j.breakdown,u=b?.uncertainty,m=x.memory;
+    const count=x.physical_devices!=null?`물리 ${x.device_class?.toUpperCase()||"장치"} ${x.physical_devices}개`:x.shared_slots!=null?`공유 슬롯 ${x.shared_slots}개 · 물리 GPU 수 아님`:"가속기 없음";
+    return [add(el("span",null,"job-name"),el("strong",(x.model||"모델 미확인")),el("small",count),el("small",(trainStrategy[x.strategy]||x.strategy)+" · "+x.backend),el("small",x.workload_ref+" / "+x.candidate_ref)),
+      add(el("div"),el("span",x.node_refs.join(", ")||"노드 미확인"),x.node_observation?jctNode(x.node_observation):null),
+      add(el("div"),el("span",m.measured_peak_mib_per_device!=null?`측정 최대 ${fmt(m.measured_peak_mib_per_device,0)} MiB`:"측정 없음"),el("small",`허용 ${fmt(m.required_peak_mib_per_device,0)} MiB · ${m.memory_model} · 장치 간 합산 안 함`)),
+      x.availability?add(el("div"),badge(trainAvail[x.availability.status]||x.availability.status,x.availability.status==="available"?"":"warn"),el("small",x.availability.reason?trainReason(x.availability.reason):"")):badge("관측 없음","warn"),
+      j.status==="ESTIMATED"?add(el("div"),el("strong",seconds(j.predicted_seconds)),el("small",u?.profile_jct_stddev_seconds!=null?`관측 표준편차 ${seconds(u.profile_jct_stddev_seconds)} · 신뢰구간 아님`:"분산 기록 없음 · 신뢰구간 아님")):
+        add(el("div"),badge(trainJct[j.status]||j.status,"warn"),...(j.reasons||[]).slice(0,3).map(r=>el("small",trainReason(r)))),
+      b?el("small",`대기 ${seconds(b.queue_wait_seconds)} · 준비 ${seconds(b.preparation_seconds)} · 전송 ${seconds(b.staging?.seconds)} · 학습 ${seconds(b.compute_seconds)}`):el("small","—"),
+      add(el("div"),badge(x.evidence==="MEASURED"?"측정 기록 있음":"측정 없음",x.evidence==="MEASURED"?"":"warn"),el("small",x.verification||"검증 단계 미확인")),
+      x.blockers.length||x.warnings.length?add(el("div",null,"jct-reasons"),...x.blockers.map(r=>el("small",trainReason(r))),...x.warnings.map(r=>el("small","경고: "+trainReason(r)))):el("span","—"),
+      add(el("div",null,"jct-reasons"),trainSubmit(x),x.evidence==="UNMEASURED"&&x.submittable_now?el("small","실행하면 이 조합의 첫 측정이 됩니다"):null)];
+  })));
+  return root;
+}
+function trainInventory() {
+  const rows=trainData.inventory;if(!rows.length)return empty("인벤토리 관측 기록이 없습니다.");
+  return table(["노드","자원","종류","물리 장치 · 공유 슬롯","요청 중","노드 Ready","학습"],rows.map(r=>[
+    el("span",r.node_ref),code(r.resource_key),el("span",(r.device_class||"?").toUpperCase()),
+    el("span",r.physical_devices!=null?`물리 ${fmt(r.physical_devices,0)}개`:r.shared_slots!=null?`공유 슬롯 ${fmt(r.shared_slots,0)}개 (물리 수 미보고)`:"미보고"),
+    el("span",r.requested==null?"—":fmt(r.requested,0)),el("span",r.node_ready==null?"확인 불가":r.node_ready?"Ready":"NotReady"),
+    r.training_qualified?badge("학습 검증 후보 있음"):add(el("div"),badge("학습 불가","warn"),el("small",trainReason(r.training_reason)))]));
+}
+function trainingView() {
+  const root=el("div",null,"jct-view training-view");
+  if(!trainData)return add(root,trainError?el("p",trainError,"error-message"):empty("학습 카탈로그를 불러오는 중…"));
+  if(trainError)root.append(el("p",trainError,"error-message"));
+  root.append(panel("1. 모델 선택","등록된 학습 모델입니다. 실제 학습 검증 전 모델은 이유를 확인할 수 있지만 실행할 수 없습니다. 추론·스모크 작업은 학습 모델로 보이지 않습니다.",add(el("div"),trainModels(),trainUnqualified())));
+  const sel=trainData.selected;
+  if(!sel||sel.model.model_key!==trainModel){if(trainData.models.length)root.append(empty(trainPending?"선택한 모델의 조건을 불러오는 중…":"모델을 선택하세요."));}
+  else {
+    root.append(panel("2. 학습 조건",sel.model.model_name+" · 등록된 조건 "+sel.configs.length+"개",trainCondition(sel)));
+    root.append(panel("3. 자원 조합과 예상 JCT","등록된 실행 후보만 조합으로 보입니다. 측정되지 않은 조합은 다른 장치나 GPU 수에서 나눠 추정하지 않습니다. 현재 가용성은 실행 가능 여부와 별개입니다.",trainCombinations(sel)));
+    const runs=sel.configs.find(c=>c.config_key===sel.config_key).workloads.flatMap(w=>w.recent_runs).sort((a,b)=>b.created_at.localeCompare(a.created_at));
+    root.append(panel("4. 실행 결과","이 조건의 최근 학습 실행입니다. 실제 JCT는 네이티브 제출·종료 시각이 모두 있는 성공 작업만 표시합니다.",jctRuns({recent_runs:runs})));
+  }
+  root.append(panel("물리 장비 범위","인벤토리에 보이는 GPU·NPU와 학습 가능 여부입니다. 공유 슬롯은 물리 GPU 수가 아니며, 이 표의 장비는 실행 조합이 아닙니다.",trainInventory()));
+  root.append(add(el("p",null,"muted"),actionLink("이전 JCT 비교 기록 보기","#jct")));
   return root;
 }
 

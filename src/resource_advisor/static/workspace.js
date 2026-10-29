@@ -10,6 +10,10 @@ export function createWorkflowWorkspace(c) {
     "RESULT_INVALID",
   ]);
   const groups = {
+    training: [
+      ["training", "학습 자원 추천"],
+      ["jct", "JCT 비교 기록"],
+    ],
     home: [
       ["home", "시작하기"],
       ["operations", "운영 현황"],
@@ -34,7 +38,6 @@ export function createWorkflowWorkspace(c) {
     experiments: [
       ["experiments", "실험 비교"],
       ["recommendations", "추천 근거"],
-      ["jct", "JCT 비교"],
       ["scheduler-lab", "스케줄링 실험실"],
       ["scenario", "자원 요청 시나리오"],
     ],

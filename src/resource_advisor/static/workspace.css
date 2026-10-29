@@ -2503,3 +2503,34 @@ tr.selected td {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Model-first training: model cards reuse the submission card tokens. */
+.train-models {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.train-model {
+  text-align: left;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 36px;
+}
+.train-model strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+.train-model small {
+  color: var(--muted);
+}
+.train-model.chosen {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+  background: var(--accent-soft);
+}
