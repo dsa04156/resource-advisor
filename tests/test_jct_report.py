@@ -107,6 +107,7 @@ def test_readiness_names_candidates_evidence_freshness_and_other_accelerators(
     assert base["network_profiles"] == {
         "fresh": 1,
         "stale": 0,
+        "future": 0,
         "latest_observed_at": base["network_profiles"]["latest_observed_at"],
     }
     assert spare["network_profiles"]["fresh"] == 1
@@ -134,7 +135,10 @@ def test_recent_native_runs_show_result_jct_and_links_without_a_comparison(clien
     job = service.submit("team-a", JobRequest(workload_ref="pair-work", candidate_ref="base"), "r1")
     jr_settle(job["job_id"])
 
-    report = get(client, "/jct-report?workload_ref=pair-work")["selected"]
+    response = get(client, "/jct-report?workload_ref=pair-work")
+    runs = {w["workload_ref"]: w["runs"] for w in response["workloads"]}
+    assert runs["pair-work"] == {"total": 1, "succeeded": 1}
+    report = response["selected"]
     assert report["comparisons"] == []
     [run] = report["recent_runs"]
     assert run["job_id"] == job["job_id"]
@@ -148,12 +152,30 @@ def test_recent_native_runs_show_result_jct_and_links_without_a_comparison(clien
     assert get(client, "/jct-report?workload_ref=npu-work")["selected"]["recent_runs"] == []
 
 
-def test_inventory_node_state_is_reported_apart_from_submission_conditions(client, pair, service):
-    from test_inventory import config, source
+def inventory(service, *, node_refs=("node-a", "test-worker"), age=None, save=True, **source):
+    from test_inventory import config
+    from test_inventory import source as kubectl
 
     from resource_advisor.inventory import InventoryCollector, save_inventory
 
-    snapshot = InventoryCollector(config(), execute=source()).collect()
+    cfg = config().model_copy(update={"node_refs": node_refs})
+    snapshot = InventoryCollector(cfg, execute=kubectl(**source)).collect()
+    if age is not None:
+        snapshot["collected_at"] = (now() - age).isoformat()
+    if save:
+        save_inventory(service.store, "team-a", snapshot)
+    return snapshot
+
+
+def node_states(client):
+    rows = get(client, "/jct-report?workload_ref=pair-work")["selected"]["candidates"]
+    return {c["candidate_ref"]: c["node_observation"] for c in rows}
+
+
+def test_inventory_node_state_is_reported_apart_from_submission_conditions(client, pair, service):
+    snapshot = inventory(service, node_refs=("node-a",), save=False)
+    from resource_advisor.inventory import save_inventory
+
     down = json.loads(json.dumps(snapshot["nodes"][0]))
     down["node_ref"] = "test-worker"
     down["ready"] = {**down["ready"], "value": False}
@@ -170,8 +192,46 @@ def test_inventory_node_state_is_reported_apart_from_submission_conditions(clien
     assert base["node_observation"]["status"] == "NOT_READY"
     assert base["node_observation"]["blockers"] == ["NotReady"]
     assert base["node_observation"]["observed_at"] is not None
-    assert spare["node_observation"]["status"] == "NODE_MISSING"
+    # Outside every authorized inventory scope: not observed, never "missing".
+    assert spare["node_observation"]["status"] == "NOT_IN_INVENTORY_SCOPE"
     assert spare["node_observation"]["inventories"][0]["cluster_ref"] == "lab"
+
+
+def test_only_a_fresh_successful_node_listing_concludes_a_node_is_missing(client, pair, service):
+    inventory(service)  # authorized test-worker, absent from a successful node listing
+    observed = node_states(client)["base"]
+    assert observed["status"] == "NODE_MISSING"
+    assert observed["node_listing"] == "ok"
+
+
+def test_stale_inventory_cannot_conclude_a_node_is_missing(client, pair, service):
+    inventory(service, age=timedelta(minutes=10))
+    observed = node_states(client)["base"]
+    assert observed["status"] == "UNKNOWN"
+    assert observed["snapshot_status"] == "stale"
+    assert observed["age_seconds"] >= 600
+
+
+def test_failed_node_listing_cannot_conclude_a_node_is_missing(client, pair, service, monkeypatch):
+    from test_inventory import source as kubectl
+
+    from resource_advisor.backends import BackendError
+
+    def broken(**_):
+        execute = kubectl()
+
+        def run(args, **kw):
+            if "nodes" in args and "--raw" not in args:
+                raise BackendError("nodes unavailable")
+            return execute(args, **kw)
+
+        return run
+
+    monkeypatch.setattr("test_inventory.source", broken)
+    inventory(service)
+    observed = node_states(client)["base"]
+    assert observed["status"] == "UNKNOWN"
+    assert observed["node_listing"] == "unavailable"
 
 
 def test_without_inventory_node_state_stays_unobserved(client, pair):
@@ -189,3 +249,28 @@ def test_accelerator_matrix_separates_this_workload_from_other_identities(client
     assert npu["other_workloads"] == [
         {"workload_ref": "npu-work", "relation": "DIFFERENT_WORKLOAD_IDENTITY", "registered": 1}
     ]
+
+
+def test_future_or_stale_rows_are_recorded_but_not_counted_within_validity(client, pair, service):
+    spec, variant, caps = pair
+    future = now() + timedelta(hours=1)
+    # Imports reject future timestamps; rows written under clock skew must still
+    # never read as within validity.
+    rows = [
+        ("jct_profile", hetero.jct_profile(spec, variant, caps["base"], "base", 3.0)),
+        ("network_profile", network("test-worker", [1.0])),
+        ("route_queue_snapshot", hetero.queue_snapshot("q-f", "test-worker")),
+    ]
+    with service.store.transaction() as conn:
+        for kind, model in rows:
+            body = model.model_dump(mode="json")
+            stamp = "measured_at" if kind == "jct_profile" else "observed_at"
+            body[stamp] = future.isoformat()
+            service.store.put(conn, kind, body["ref"], "team-a", body)
+
+    report = get(client, "/jct-report?workload_ref=pair-work")["selected"]
+    base = {c["candidate_ref"]: c for c in report["candidates"]}["base"]["readiness"]
+    assert base["jct_profiles"]["fresh"] == 0 and base["jct_profiles"]["future"] == 1
+    assert base["network_profiles"]["fresh"] == 0 and base["network_profiles"]["future"] == 1
+    assert base["queue"]["future"] is True and base["queue"]["stale"] is True
+    assert "not a prediction eligibility" in base["semantics"]

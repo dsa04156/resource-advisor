@@ -2448,14 +2448,17 @@ function jctOpenJob(id) {
 }
 // Inventory node state is separate from the submission contract; absence stays explicit.
 function jctNode(o) {
-  const when=o.observed_at?el("small",o.cluster_ref+" · "+stamp(o.observed_at)+(o.sample_status&&o.sample_status!=="ok"?" · "+(labels[o.sample_status]||o.sample_status):"")):null;
-  const checked=o.inventories?.length?el("small","확인한 인벤토리: "+o.inventories.map(i=>i.cluster_ref+" "+stamp(i.collected_at)).join(", ")):null;
+  // Each inventory keeps its own status and age; a missing node is concluded only from a fresh, successful node listing.
+  const scope=i=>`${i.cluster_ref} · ${labels[i.snapshot_status]||i.snapshot_status} · ${Math.round(i.age_seconds)}초 전 수집 · 노드 목록 ${i.node_listing==="ok"?"성공":i.node_listing}`;
+  const when=o.cluster_ref?el("small",scope(o)+(o.sample_status&&o.sample_status!=="ok"?" · 노드 신호 "+(labels[o.sample_status]||o.sample_status):"")):null;
+  const checked=o.inventories?.length?add(el("div"),...o.inventories.map(i=>el("small",scope(i)))):null;
   return {
     READY:()=>add(el("div"),badge("Ready"),when),
     NOT_READY:()=>add(el("div",null,"jct-reasons"),badge("NotReady","bad"),...(o.blockers||[]).map(b=>el("small",b)),when),
     BLOCKED:()=>add(el("div",null,"jct-reasons"),badge("스케줄 불가","warn"),...(o.blockers||[]).map(b=>el("small",b)),when),
     UNKNOWN:()=>add(el("div"),badge("상태 확인 불가","warn"),when),
-    NODE_MISSING:()=>add(el("div"),badge("인벤토리에 노드 없음","bad"),checked),
+    NODE_MISSING:()=>add(el("div"),badge("최신 노드 목록에 없음","bad"),when),
+    NOT_IN_INVENTORY_SCOPE:()=>add(el("div"),badge("인벤토리 관측 범위 밖","warn"),checked),
     INVENTORY_UNOBSERVED:()=>add(el("div"),badge("인벤토리 기록 없음","warn")),
   }[o.status]?.() || badge(o.status,"warn");
 }
@@ -2479,9 +2482,11 @@ function jctRuns(sel) {
   }));
 }
 function jctSelect(ref) { jctSelected=ref;jctUpdated=0;render();window.scrollTo(0,0); }
-function jctCount(fresh,stale,extra) {
-  if(!fresh&&!stale&&!extra)return badge("기록 없음","warn");
-  return add(el("span",null,"jct-count"),el("strong",fresh+"건 유효"),stale?badge("오래됨 "+stale,"warn"):null,extra?badge("사용 불가 "+extra,"warn"):null);
+function jctCount(c) {
+  // Recorded rows inside their own validity window; prediction eligibility is judged only when a plan is frozen.
+  if(!c.fresh&&!c.stale&&!c.future&&!c.unusable)return badge("기록 없음","warn");
+  return add(el("span",null,"jct-count"),el("strong","유효기간 내 기록 "+c.fresh+"건"),c.stale?badge("오래됨 "+c.stale,"warn"):null,
+    c.future?badge("미래 시각 "+c.future,"warn"):null,c.unusable?badge("측정 품질 미달·합성 "+c.unusable,"warn"):null);
 }
 function jctCandidates(sel) {
   return table(["후보","장치","제출 조건","노드 관측","JCT 프로파일","큐 관측","네트워크 측정","캐시 바인딩"],sel.candidates.map(c=>{
@@ -2491,10 +2496,10 @@ function jctCandidates(sel) {
       add(el("div",null,"jct-reasons"),badge(c.submittable_now?"통과":"미충족",c.submittable_now?"good":"warn"),
         ...(c.submission_reasons||[]).map(x=>el("small",reasonText(x))),...(c.submission_warnings||[]).map(x=>el("small","경고: "+reasonText(x)))),
       jctNode(c.node_observation),
-      !r?el("span","—"):add(el("div"),jctCount(p.fresh,p.stale,p.unusable),p.latest_measured_at?el("small","최근 "+stamp(p.latest_measured_at)):null),
-      !r?el("span","—"):!q?badge("기록 없음","warn"):add(el("div"),badge(q.stale?"오래됨":"기준 시간 안",q.stale?"warn":""),
+      !r?el("span","—"):add(el("div"),jctCount(p),p.latest_measured_at?el("small","최근 "+stamp(p.latest_measured_at)):null),
+      !r?el("span","—"):!q?badge("기록 없음","warn"):add(el("div"),badge(q.future?"미래 시각":q.stale?"오래됨":"기준 시간 안",q.stale?"warn":""),
         el("small",`${Math.round(q.age_seconds)}초 전 · 기준 ${q.max_age_seconds}초 · ${q.complete?"완전":"불완전"} · 실행 ${q.running}/${q.capacity} · 대기 ${q.pending}`)),
-      !r?el("span","—"):add(el("div"),jctCount(n.fresh,n.stale),n.latest_observed_at?el("small","최근 "+stamp(n.latest_observed_at)):null),
+      !r?el("span","—"):add(el("div"),jctCount(n),n.latest_observed_at?el("small","최근 "+stamp(n.latest_observed_at)):null),
       !r?el("span","—"):r.cache_bindings?el("span",r.cache_bindings+"개"):badge("없음","warn")];
   }));
 }
@@ -2502,15 +2507,15 @@ function jctReadiness(sel) {
   const ready=sel.candidates.filter(c=>c.readiness),total=sel.candidates.length;
   const count=f=>`${ready.filter(c=>f(c.readiness)).length}/${total}`;
   const rows=[
-    ["유효한 JCT 프로파일",count(r=>r.jct_profiles.fresh>0),"같은 모델·입력 조건으로 이 후보에서 측정한 실행 기록"],
-    ["기준 시간 안의 큐 관측",count(r=>r.queue&&!r.queue.stale),"오래되거나 불완전한 큐 관측은 대기 시간을 알 수 없음으로 처리"],
-    ["유효한 네트워크 측정",count(r=>r.network_profiles.fresh>0),"이 작업의 데이터를 해당 노드로 옮긴 실측 기록"],
-    ["캐시 바인딩",count(r=>r.cache_bindings>0),"작업이 실제로 읽는 캐시 위치 확인 기록"],
+    ["JCT 프로파일 기록 (유효기간 내)",count(r=>r.jct_profiles.fresh>0),"같은 모델·입력 조건으로 이 후보에서 측정했다고 기록된 행"],
+    ["큐 관측 기록 (기준 시간 안)",count(r=>r.queue&&!r.queue.stale),"오래되거나 미래 시각인 관측은 세지 않음 · 불완전 여부는 후보 표에 표시"],
+    ["네트워크 측정 기록 (유효기간 내)",count(r=>r.network_profiles.fresh>0),"이 작업과 노드로 기록된 데이터 전송 실측 행"],
+    ["캐시 바인딩 기록",count(r=>r.cache_bindings>0),"해당 노드에 기록된 캐시 위치 행"],
   ];
   const policies=Object.entries(jctArmNames).map(([arm,name])=>[el("strong",name),
     sel.policy_profiles[arm].length?el("span",sel.policy_profiles[arm].join(", ")):badge("정책 프로파일 없음","warn")]);
   return add(el("div",null,"jct-split"),
-    table(["예측 근거","준비된 후보","의미"],rows.map(([a,b,c])=>[el("strong",a),el("span",b),el("small",c)])),
+    table(["기록된 근거","기록이 있는 후보","의미"],rows.map(([a,b,c])=>[el("strong",a),el("span",b),el("small",c)])),
     table(["비교 정책","스케줄링 프로파일"],policies));
 }
 function jctComparison(c) {
@@ -2542,7 +2547,7 @@ function jctView() {
   const root=el("div",null,"jct-view");
   if(!jctData)return add(root,jctError?el("p",jctError,"error-message"):empty("JCT 근거를 불러오는 중…"));
   const selector=el("select");selector.id="jct-workload";selector.dataset.keepFocus="true";
-  for(const w of jctData.workloads)selector.append(new Option(`${w.workload_ref} · ${w.accelerator_models.join("/")||"CPU"} · 후보 ${w.registered}`,w.workload_ref));
+  for(const w of jctData.workloads)selector.append(new Option(`${w.workload_ref} · ${w.accelerator_models.join("/")||"CPU"} · 후보 ${w.registered} · 실행 ${w.runs.total}건 (성공 ${w.runs.succeeded})`,w.workload_ref));
   selector.value=jctSelected;selector.onchange=()=>jctSelect(selector.value);
   const label=el("label","비교할 작업");label.htmlFor=selector.id;
   root.append(add(el("div",null,"view-toolbar jct-toolbar"),label,selector,researchButton("새로고침",async()=>{jctUpdated=0;await refreshJct();})));
@@ -2557,7 +2562,7 @@ function jctView() {
   root.append(panel("최근 실제 실행","이 작업으로 제출된 최근 작업입니다. 비교 없이도 실제 결과를 확인할 수 있습니다. JCT는 네이티브 제출·종료 시각이 모두 있는 성공 작업만 계산합니다.",jctRuns(sel)));
   root.append(panel("가속기 호환성","가속기별로 이 작업에 등록된 후보와 다른 등록 작업을 나눠 보여줍니다. 다른 작업의 결과는 모델·입력 조건이 같을 때만 같은 순위로 비교할 수 있습니다.",jctMatrix(sel)));
   root.append(panel("다른 가속기 작업","다른 GPU·NPU 장비가 등록되어 있어도 이 작업의 실행 환경과 호환된다는 뜻은 아닙니다. 각 작업의 결과는 해당 작업에서 따로 확인하세요.",jctAlternatives(sel)));
-  root.append(panel("예측 준비 상태","기록된 근거 수만 셉니다. 없는 근거는 0이 아니라 알 수 없음으로 처리됩니다.",jctReadiness(sel)));
+  root.append(panel("기록된 측정 근거","기록된 행의 수와 유효기간만 셉니다. 기록이 있다고 예측에 쓸 수 있는 것은 아닙니다. 모델·데이터 동일성, 캐시 바인딩, 정책 시효는 비교를 고정할 때 판정되며 제외 이유는 정책 비교에 남습니다. 없는 근거는 0이 아니라 알 수 없음입니다.",jctReadiness(sel)));
   root.append(panel("정책 비교 · 예측 대비 실제",`${sel.comparisons.length}건 · 같은 작업 안에서만 비교`,sel.comparisons.length?add(el("div"),...sel.comparisons.map(jctComparison)):
     empty("이 작업에 고정된 정책 비교가 없습니다. 네 정책의 스케줄링 프로파일과 측정 근거가 등록된 뒤 비교를 고정할 수 있습니다. 결과가 없다는 것은 성공도 실패도 아닌 미실행입니다.")));
   return root;

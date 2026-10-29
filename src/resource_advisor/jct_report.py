@@ -63,14 +63,17 @@ def _summary(spec, rows, catalog):
 def _readiness(store, conn, project, spec, row, at, queue_age):
     node, cluster, backend = row.get("node_ref"), row.get("cluster_ref"), str(row["backend"])
     sig = signature(spec.identity)
-    profiles = {"fresh": 0, "stale": 0, "unusable": 0, "latest_measured_at": None}
+    profiles = {"fresh": 0, "stale": 0, "future": 0, "unusable": 0, "latest_measured_at": None}
     for x in store.list(conn, "jct_profile", project):
         p = x["body"]
         if p["workload_signature"] != sig or p["candidate_ref"] != row["candidate_ref"]:
             continue
+        age = _age(at, p["measured_at"])
         if p.get("synthetic") or not p.get("quality_passed", True):
             profiles["unusable"] += 1
-        elif _age(at, p["measured_at"]) <= p["valid_for_seconds"]:
+        elif age < 0:
+            profiles["future"] += 1
+        elif age <= p["valid_for_seconds"]:
             profiles["fresh"] += 1
         else:
             profiles["stale"] += 1
@@ -94,14 +97,15 @@ def _readiness(store, conn, project, spec, row, at, queue_age):
             "observed_at": q["observed_at"],
             "age_seconds": age,
             "max_age_seconds": queue_age,
-            "stale": age > queue_age,
+            "future": age < 0,
+            "stale": age < 0 or age > queue_age,
             "complete": q["complete"],
             "incomplete_reasons": q.get("incomplete_reasons", []),
             "running": len(q.get("running", [])),
             "pending": len(q.get("pending", [])),
             "capacity": q["capacity"],
         }
-    network = {"fresh": 0, "stale": 0, "latest_observed_at": None}
+    network = {"fresh": 0, "stale": 0, "future": 0, "latest_observed_at": None}
     for x in store.list(conn, "network_profile", project):
         n = x["body"]
         if (n["workload_ref"], n["backend"], n["cluster_ref"], n["node_ref"]) != (
@@ -111,8 +115,9 @@ def _readiness(store, conn, project, spec, row, at, queue_age):
             node,
         ):
             continue
-        fresh = _age(at, n["observed_at"]) <= n["valid_for_seconds"]
-        network["fresh" if fresh else "stale"] += 1
+        age = _age(at, n["observed_at"])
+        bucket = "future" if age < 0 else "fresh" if age <= n["valid_for_seconds"] else "stale"
+        network[bucket] += 1
         network["latest_observed_at"] = max(
             filter(None, [network["latest_observed_at"], n["observed_at"]])
         )
@@ -123,6 +128,11 @@ def _readiness(store, conn, project, spec, row, at, queue_age):
         == (backend, cluster, node)
     )
     return {
+        "semantics": (
+            "Recorded rows split by their own validity window; future timestamps never "
+            "count. This is not a prediction eligibility check: identity, dataset, "
+            "binding and policy age are judged only when a plan or comparison is frozen."
+        ),
         "jct_profiles": profiles,
         "queue": queue,
         "network_profiles": network,
@@ -130,14 +140,30 @@ def _readiness(store, conn, project, spec, row, at, queue_age):
     }
 
 
-def _node_observation(inventory, row):
+NODE_LISTING = {"kubernetes": "nodes", "slurm": "slurm_nodes"}
+
+
+def _node_observation(inventory, row, at):
     """Inventory view of the candidate's node, independent of the submission contract.
 
     Matched by backend and node name: capability cluster refs are logical and need
-    not equal the inventory cluster. Absent or stale observations stay unknown.
+    not equal the inventory cluster. Inventories list only their authorized nodes,
+    so a node outside every scope is unobserved, not absent. Absence is concluded
+    only when an unexpired snapshot's node listing succeeded without that
+    authorized Kubernetes node; stale or failed observations stay unknown.
     """
     node, backend = row.get("node_ref"), str(row["backend"])
     views = [s for s in inventory if s.get("backend", "kubernetes") == backend]
+
+    def scope(s):
+        return {
+            "cluster_ref": s["cluster_ref"],
+            "snapshot_status": s["status"],
+            "collected_at": s["collected_at"],
+            "age_seconds": _age(at, s["collected_at"]),
+            "node_listing": (s.get("sources") or {}).get(NODE_LISTING.get(backend), "unreported"),
+        }
+
     if not views:
         return {"status": "INVENTORY_UNOBSERVED", "inventories": []}
     for s in views:
@@ -146,32 +172,47 @@ def _node_observation(inventory, row):
             continue
         sample = (n.get("scheduler_state") if backend == "slurm" else n.get("ready")) or {}
         blockers = n.get("scheduling_blockers") or []
-        if sample.get("status") != "ok":
-            status = "UNKNOWN"
-        elif backend != "slurm" and sample.get("value") is not True:
-            status = "NOT_READY"
+        view = scope(s)
+        if sample.get("status") == "ok":
+            if backend != "slurm" and sample.get("value") is not True:
+                status = "NOT_READY"
+            else:
+                status = "BLOCKED" if blockers else "READY"
+        elif (
+            backend == "kubernetes"
+            and view["snapshot_status"] != "stale"
+            and view["node_listing"] == "ok"
+            and sample.get("status") == "unavailable"
+        ):
+            status = "NODE_MISSING"
         else:
-            status = "BLOCKED" if blockers else "READY"
+            status = "UNKNOWN"
         return {
             "status": status,
-            "cluster_ref": s["cluster_ref"],
-            "snapshot_status": s["status"],
-            "collected_at": s["collected_at"],
+            **view,
             "observed_at": sample.get("observed_at"),
             "sample_status": sample.get("status"),
             "blockers": blockers,
         }
-    return {
-        "status": "NODE_MISSING",
-        "inventories": [
-            {
-                "cluster_ref": s["cluster_ref"],
-                "status": s["status"],
-                "collected_at": s["collected_at"],
-            }
-            for s in views
-        ],
-    }
+    return {"status": "NOT_IN_INVENTORY_SCOPE", "inventories": [scope(s) for s in views]}
+
+
+def _run_counts(conn, project):
+    from sqlalchemy import func, select
+
+    from .store import jobs
+
+    ref = jobs.c.body["request"]["workload_ref"].as_string()
+    counts = {}
+    for workload_ref, state, n in conn.execute(
+        select(ref, jobs.c.state, func.count())
+        .where(jobs.c.project == project)
+        .group_by(ref, jobs.c.state)
+    ):
+        c = counts.setdefault(workload_ref, {"total": 0, "succeeded": 0})
+        c["total"] += n
+        c["succeeded"] += n if state == "SUCCEEDED" else 0
+    return counts
 
 
 RECENT_RUNS = 10
@@ -312,6 +353,9 @@ def jct_report(service, project, workload_ref=None):
         rows = {s.ref: candidate_rows(service, conn, project, s) for s in specs}
         catalog = set(service.console_workloads)
         index = [_summary(s, rows[s.ref], catalog) for s in specs]
+        runs = _run_counts(conn, project)
+        for w in index:
+            w["runs"] = runs.get(w["workload_ref"], {"total": 0, "succeeded": 0})
         result = {
             "project_ref": project,
             "generated_at": at.isoformat(),
@@ -349,7 +393,7 @@ def jct_report(service, project, workload_ref=None):
                 "readiness": _readiness(store, conn, project, spec, c, at, queue_age)
                 if c.get("node_ref")
                 else None,
-                "node_observation": _node_observation(inventory, c)
+                "node_observation": _node_observation(inventory, c, at)
                 if c.get("node_ref")
                 else {"status": "REGISTRY_ENTRY_MISSING"},
             }
