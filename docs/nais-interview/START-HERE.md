@@ -7,6 +7,10 @@
 사용자가 PPT를 직접 구성할 수 있도록 설명 원자료·원본 데이터 링크·이미지를 제공한 상태다.
 이 자료는 완성된 발표 덱이 아니다. 아래 자료를 먼저 읽고 사용자가 요청하는 후속 편집을 수행한다.
 
+## Kubernetes × 가상 Slurm 통합 아키텍처 (2026-10-29)
+
+[통합 아키텍처 문서](../architecture/kubernetes-slurm-integration/ARCHITECTURE-KO.md)와 [발표 노트](../architecture/kubernetes-slurm-integration/PRESENTATION-NOTES-KO.md)를 본다. 가상 Slurm은 관측·accounting만 배포됐고 실행은 미검증이다.
+
 ## 실증 기록 기반 관리 화면 — 발표 우선 자료
 
 - [관리 화면](management/index.html), [캡처 갤러리](management/captures/gallery.html), [PNG 8장 ZIP](NAIS-management-captures.zip).
