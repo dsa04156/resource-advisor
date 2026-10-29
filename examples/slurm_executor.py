@@ -3,6 +3,11 @@
 The operator owns this file, its scope and the SSH authorized_keys. This is a
 command boundary, not a sandbox for jobs: Slurm/cgroups and Unix permissions
 remain responsible for execution isolation. No shell evaluates request text.
+
+With an operator-named ``container`` the scheduler commands run as fixed argv
+through ``docker exec --user <user> <container>`` (a containerized controller);
+results are then read on the host from ``host_output_dir``, owned by
+``result_owner_uid``. Neither option lets a request choose the container or path.
 """
 
 import argparse
@@ -172,6 +177,28 @@ def batch(config, script):
     )
 
 
+def containerized(config, command):
+    container = config.get("container")
+    if container is None:
+        return command
+    if any(not isinstance(v, str) or not re.fullmatch(REF, v) for v in [container, config["user"]]):
+        raise ValueError("invalid configured container or user")
+    # docker exec does not inherit the gateway environment; pass the fixed one.
+    return [
+        "/usr/bin/docker",
+        "exec",
+        *(["--interactive"] if command[0] == "/usr/bin/sbatch" else []),
+        "--user",
+        config["user"],
+        "--env",
+        "TZ=UTC",
+        "--env",
+        "SLURM_TIME_FORMAT=%Y-%m-%dT%H:%M:%S%z",
+        container,
+        *command,
+    ]
+
+
 def plan(config, original, script=""):
     if not isinstance(original, str) or len(original) > 4096:
         raise ValueError("bounded command required")
@@ -186,9 +213,17 @@ def plan(config, original, script=""):
         path = Path(argv[4])
         if str(path.parent) != config["output_dir"] or not re.fullmatch(REF + r"\.log", path.name):
             raise ValueError("result path escaped scope")
-        return ("read" if argv[2] == "65537" else "read-progress"), str(path)
+        host_dir = config.get("host_output_dir", config["output_dir"])
+        if not isinstance(host_dir, str) or not re.fullmatch(r"/[A-Za-z0-9_/.-]+", host_dir):
+            raise ValueError("invalid configured host output directory")
+        return ("read" if argv[2] == "65537" else "read-progress"), str(Path(host_dir) / path.name)
     if config["mode"] != "controller":
         raise ValueError("unknown gateway mode")
+    command, data = scheduler_plan(config, argv, script)
+    return containerized(config, command), data
+
+
+def scheduler_plan(config, argv, script):
     if argv == ["sbatch", "--parsable"]:
         return ["/usr/bin/sbatch", "--parsable"], batch(config, script)
     account, partition, user = (config[k] for k in ["account", "partition", "user"])
@@ -263,7 +298,10 @@ def main():
             fd = os.open(data, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
             with os.fdopen(fd, "rb") as handle:
                 info = os.fstat(handle.fileno())
-                if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid():
+                owner = config.get("result_owner_uid", os.getuid())
+                if type(owner) is not int:
+                    raise ValueError("invalid configured result owner")
+                if not stat.S_ISREG(info.st_mode) or info.st_uid != owner:
                     raise ValueError("result must be an owned regular file")
                 handle.seek(max(0, info.st_size - size))
                 sys.stdout.buffer.write(handle.read(size))
@@ -284,7 +322,7 @@ def main():
             },
         )
         if result.returncode:
-            if command[0] == "/usr/bin/sbatch":
+            if "/usr/bin/sbatch" in command:
                 # Only Slurm's own rejection lines; the worker allow-lists the reason.
                 # A timeout or any other failure stays an uncertain submission.
                 for line in result.stderr.splitlines():
