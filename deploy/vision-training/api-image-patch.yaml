@@ -1,0 +1,9 @@
+# Apply only this image change to the existing LAN API deployment:
+# kubectl -n resource-advisor-lab patch deployment ra-api --type=strategic --patch-file deploy/vision-training/api-image-patch.yaml
+# Preserve its existing config, TLS, credentials, and resources.
+spec:
+  template:
+    spec:
+      containers:
+        - name: api
+          image: 10.254.192.47:5000/resource-advisor/console-api@sha256:4c7b43b018323d731b9ff067f4287f41fa1df5f081bc4c2e2de8f805be74464d
