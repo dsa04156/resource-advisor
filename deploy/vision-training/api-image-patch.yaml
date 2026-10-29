@@ -6,4 +6,4 @@ spec:
     spec:
       containers:
         - name: api
-          image: 10.254.192.47:5000/resource-advisor/console-api@sha256:4c7b43b018323d731b9ff067f4287f41fa1df5f081bc4c2e2de8f805be74464d
+          image: 10.254.192.47:5000/resource-advisor/console-api@sha256:ee1fadf939743b6227ca44be344581d3f592eda68476e750e4fde51b2d8f3a8e
