@@ -927,8 +927,9 @@ def member_receipt(job, rank, **change):
     return value
 
 
-def staged_ddp(service, bundle, change=None, own_change=None):
-    """A collected two-rank job whose envelope carries every rank's staging receipt."""
+def staged_ddp(service, bundle, change=None, own_change=None, *, members=True):
+    """A collected two-rank job whose envelope carries every rank's staging receipt
+    (``members=False`` omits the member list)."""
     from test_worker import SchedulerDouble
 
     from resource_advisor.backends import Observation
@@ -963,8 +964,8 @@ def staged_ddp(service, bundle, change=None, own_change=None):
             "input_readonly": True, "source_not_mounted": True,
             "output_checkpoint": {"step": 1}, "output_checkpoint_digest": signature({"step": 1}),
         }  # fmt: skip
-        return dict(envelope, training_receipt=training, staging_receipts=receipts,
-                    staging_receipt=own)  # fmt: skip
+        envelope = dict(envelope, training_receipt=training, staging_receipt=own)
+        return dict(envelope, staging_receipts=receipts) if members else envelope
 
     backend.result = result
     worker.reconcile_all()
@@ -1025,6 +1026,86 @@ def test_each_rank_receipt_carries_its_own_preparation_and_rank0_is_exact(servic
 def test_rank0_receipt_must_equal_member_zero_exactly(service, bundle, own_change):
     _, row, stored, _ = staged_ddp(service, bundle, own_change=own_change)
     assert row["state"] == State.RESULT_INVALID and stored == [None, None, None]
+
+
+def test_a_staged_ddp_outcome_without_member_receipts_is_invalid(service, bundle):
+    _, row, stored, _ = staged_ddp(service, bundle, members=False)
+    assert row["state"] == State.RESULT_INVALID
+    assert "STAGING_MEMBER_RECEIPTS_MISSING" in row["body"]["error"] and stored == [None] * 3
+
+
+@pytest.mark.parametrize(
+    "field, value",
+    [
+        ("content_digest", "sha256:" + "b" * 64),
+        ("size_bytes", 1001),
+        ("source_endpoint_ref", "other-storage"),
+        ("source_locator", "http://storage.invalid/other.tar"),
+    ],
+)
+def test_every_member_must_stage_the_same_dataset_object(service, bundle, field, value):
+    def other(rs):
+        changed = dict(rs[1], **{field: value})
+        if field == "size_bytes":  # a self-consistent receipt of another object size
+            changed["sample"] = dict(changed["sample"], bytes=value)
+        return [rs[0], changed]
+
+    _, row, stored, _ = staged_ddp(service, bundle, other)
+    assert row["state"] == State.RESULT_INVALID
+    assert "STAGING_MEMBER_DATASET_MISMATCH" in row["body"]["error"] and stored == [None] * 3
+
+
+def cache_bindings(**override):
+    value = {
+        node: {"ref": "bind-" + node, "cache_path": "/var/cache/ra", "storage_mode": "ephemeral",
+               "storage_identity": None}
+        for node in ("node-a", "node-b")
+    }  # fmt: skip
+    for node, change in override.items():
+        value[node.replace("_", "-")].update(change)
+    return value
+
+
+def test_every_member_is_checked_against_its_own_frozen_cache_binding():
+    from resource_advisor.contracts import ExecutionResult
+    from resource_advisor.service import member_staging
+
+    job = {"job_id": "j-1", "attempt_id": "a-1"}
+    members = [member_receipt(job, r, cache_binding_ref="bind-" + r["node_name"]) for r in RANKS]
+    result = ExecutionResult.model_construct(job_id="j-1", attempt_id="a-1", outcome="COMPLETED")
+
+    def body(bindings):
+        return {
+            "candidate": {"context": {"distributed": {"world_size": 2, "nproc_per_node": 1}}},
+            "placement": {"distributed": {"ranks": RANKS}},
+            "scheduling_plan": {"staging_bindings": bindings},
+        }
+
+    stored, problems, checks = member_staging(result, members, members[0], body(cache_bindings()))
+    assert problems == [] and len(stored) == 2
+    assert [(c["node_ref"], c["status"]) for c in checks] == [
+        ("node-b", "MATCHED"),
+        ("node-a", "MATCHED"),
+    ]
+    moved = cache_bindings(node_a={"cache_path": "/elsewhere"})
+    stored, problems, checks = member_staging(result, members, members[0], body(moved))
+    assert stored is None and problems == ["STAGING_MEMBER_BINDING_MISMATCH"]
+    assert checks[1]["reasons"] == ["CACHE_PATH"]
+    missing = {"node-b": cache_bindings()["node-b"]}
+    assert member_staging(result, members, members[0], body(missing))[1] == [
+        "STAGING_MEMBER_BINDING_MISMATCH"
+    ]
+
+
+def test_staged_variant_command_alone_requires_member_proof():
+    from resource_advisor.service import staged_distributed
+
+    body = {"candidate": {"context": {"distributed": {"world_size": 2}}},
+            "variant": {"command": ["python3", "/opt/ra-train/staged_vision_training.py"]}}  # fmt: skip
+    assert staged_distributed(body, None, None)
+    body["variant"]["command"] = ["python3", "/opt/ra-train/vision_training.py"]
+    assert not staged_distributed(body, None, None)  # historical non-staged DDP unchanged
+    assert not staged_distributed({"candidate": {"context": {}}}, {"x": 1}, None)
 
 
 def test_member_receipts_are_immutable_after_success(service, bundle):

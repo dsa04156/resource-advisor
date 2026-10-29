@@ -86,6 +86,53 @@ def staging_members(result, receipts, own, body):
     return bodies
 
 
+DATASET_OBJECT = (
+    "content_digest",
+    "size_bytes",
+    "source_endpoint_ref",
+    "source_kind",
+    "source_locator",
+)
+
+
+def staged_distributed(body, staging_receipt, staging_receipts):
+    """A DDP attempt whose data was staged (receipts, frozen plan bindings or a staged
+    entry); its outcome then needs every member's own staging proof."""
+    if not (body.get("candidate") or {}).get("context", {}).get("distributed"):
+        return False
+    command = (body.get("variant") or {}).get("command") or ()
+    return (
+        staging_receipt is not None
+        or staging_receipts is not None
+        or bool((body.get("scheduling_plan") or {}).get("staging_bindings"))
+        or any(str(part).endswith("staged_vision_training.py") for part in command)
+    )
+
+
+def member_staging(result, receipts, own, body):
+    """(member bodies, problems, per-member binding checks) for a staged DDP outcome.
+
+    Every member must be present and bound to an observed rank Pod, all members must
+    have staged the same dataset object from the same source, and when the accepted
+    plan froze cache bindings each member must match its own node's binding."""
+    if receipts is None:
+        return None, ["STAGING_MEMBER_RECEIPTS_MISSING"], None
+    members = staging_members(result, receipts, own, body)
+    if members is None:
+        return None, ["STAGING_MEMBER_RECEIPTS_INVALID"], None
+    if len({tuple(m.get(k) for k in DATASET_OBJECT) for m in members}) != 1:
+        return None, ["STAGING_MEMBER_DATASET_MISMATCH"], None
+    bindings = (body.get("scheduling_plan") or {}).get("staging_bindings")
+    if not bindings or result.outcome != "COMPLETED":
+        return members, [], None
+    from .recommendation import staging_binding_check
+
+    checks = [staging_binding_check(bindings, m, {"node_name": m["node_name"]}) for m in members]
+    if any(c["status"] != "MATCHED" for c in checks):
+        return None, ["STAGING_MEMBER_BINDING_MISMATCH"], checks
+    return members, [], checks
+
+
 class Service:
     def __init__(
         self, store, *, accept_synthetic=False, operational_mode=False, console_workloads=()
@@ -763,11 +810,14 @@ class Service:
                         project,
                         staging.model_dump(mode="json"),
                     )
-            if staging_receipts is not None:
-                members = staging_members(result, staging_receipts, staging_receipt, body)
-                if members is None:
-                    problems.append("STAGING_MEMBER_RECEIPTS_INVALID")
-                elif not problems:
+            if staged_distributed(body, staging_receipt, staging_receipts):
+                members, member_problems, checks = member_staging(
+                    result, staging_receipts, staging_receipt, body
+                )
+                problems.extend(member_problems)
+                if checks is not None:
+                    body["staging_member_binding_checks"] = checks
+                if members is not None and not problems:
                     for index, member in enumerate(members):
                         self.store.put(
                             conn,
@@ -776,6 +826,8 @@ class Service:
                             project,
                             member,
                         )
+            elif staging_receipts is not None:
+                problems.append("STAGING_MEMBER_RECEIPTS_INVALID")  # not a distributed attempt
             bindings = (body.get("scheduling_plan") or {}).get("staging_bindings")
             if bindings and result.outcome == "COMPLETED":
                 from .recommendation import staging_binding_check
