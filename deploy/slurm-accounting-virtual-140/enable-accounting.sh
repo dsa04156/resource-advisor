@@ -64,10 +64,12 @@ if ! docker restart slurmctld >/dev/null || ! up; then
   # needing it to answer, and start the same container again.
   cp -p "$BACKUP/slurm.conf" "$CONF"
   docker stop slurmctld >/dev/null || true
-  docker cp "$BACKUP/clustername" slurmctld:/var/spool/slurmctld/clustername \
-    || echo "clustername restore failed; copy it from $BACKUP" >&2
+  restored=yes
+  docker cp "$BACKUP/clustername" slurmctld:/var/spool/slurmctld/clustername || restored=no
   docker start slurmctld >/dev/null || true
-  if up; then
+  if [[ $restored == no ]]; then
+    echo "accounting switch failed; restored slurm.conf only, clustername NOT restored; copy it from $BACKUP" >&2
+  elif up; then
     docker exec slurmctld chown slurm:slurm /var/spool/slurmctld/clustername
     echo "accounting switch failed; restored slurm.conf and clustername; backup: $BACKUP" >&2
   else

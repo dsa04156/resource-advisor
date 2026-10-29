@@ -17,7 +17,7 @@ case "$*" in
   "exec slurmctld cat /var/spool/slurmctld/clustername") printf 'sim|623' ;;
   "exec slurmctld scontrol ping") [[ -e $STUB/started ]] ;;
   "start slurmctld") touch "$STUB/started" ;;
-  cp\ *) cp "$2" "$STUB/restored-clustername" ;;
+  cp\ *) [[ -z ${CP_FAILS:-} ]] && cp "$2" "$STUB/restored-clustername" ;;
 esac
 """
 
@@ -61,3 +61,11 @@ def test_failed_switch_restores_identity_without_controller_rpc(tmp_path):
     assert next(c for c in tail if c.startswith("cp ")).endswith(
         "slurmctld:/var/spool/slurmctld/clustername"
     )
+
+
+def test_failed_identity_copy_is_reported_and_container_still_started(tmp_path):
+    run, stub, conf = switch(tmp_path, CP_FAILS="1")
+    assert run.returncode == 1 and "clustername NOT restored" in run.stderr
+    assert "restored slurm.conf and clustername" not in run.stderr
+    assert conf.read_text() == "ClusterName=sim\n"
+    assert "start slurmctld" in (stub / "calls").read_text().splitlines()
