@@ -1,0 +1,150 @@
+# Isolated quota for bounded vision training (one GPU per node, no cohort, no
+# preemption of other queues). Quotas are Kueue admission only; device plugins and
+# the actual free GPU still decide placement.
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ResourceFlavor
+metadata:
+  name: ra-vt-orin9
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  nodeLabels:
+    kubernetes.io/hostname: etri-dev0009-jetorn
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: ra-vt-orin9
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: resource-advisor-lab
+  queueingStrategy: BestEffortFIFO
+  resourceGroups:
+  - coveredResources: [cpu, memory, nvidia.com/gpu.shared]
+    flavors:
+    - name: ra-vt-orin9
+      resources:
+      - {name: cpu, nominalQuota: '4'}
+      - {name: memory, nominalQuota: 6Gi}
+      - {name: nvidia.com/gpu.shared, nominalQuota: '1'}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata:
+  name: ra-vt-orin9
+  namespace: resource-advisor-lab
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  clusterQueue: ra-vt-orin9
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ResourceFlavor
+metadata:
+  name: ra-vt-gb10
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  nodeLabels:
+    kubernetes.io/hostname: etri-ser0003-cg0ms0
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: ra-vt-gb10
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: resource-advisor-lab
+  queueingStrategy: BestEffortFIFO
+  resourceGroups:
+  - coveredResources: [cpu, memory, nvidia.com/gpu]
+    flavors:
+    - name: ra-vt-gb10
+      resources:
+      - {name: cpu, nominalQuota: '4'}
+      - {name: memory, nominalQuota: 6Gi}
+      - {name: nvidia.com/gpu, nominalQuota: '1'}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata:
+  name: ra-vt-gb10
+  namespace: resource-advisor-lab
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  clusterQueue: ra-vt-gb10
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ResourceFlavor
+metadata:
+  name: ra-vt-rtx5080
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  nodeLabels:
+    kubernetes.io/hostname: etri-ser0002-cgnmsb
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: ra-vt-rtx5080
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: resource-advisor-lab
+  queueingStrategy: BestEffortFIFO
+  resourceGroups:
+  - coveredResources: [cpu, memory, nvidia.com/gpu]
+    flavors:
+    - name: ra-vt-rtx5080
+      resources:
+      - {name: cpu, nominalQuota: '4'}
+      - {name: memory, nominalQuota: 6Gi}
+      - {name: nvidia.com/gpu, nominalQuota: '1'}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata:
+  name: ra-vt-rtx5080
+  namespace: resource-advisor-lab
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  clusterQueue: ra-vt-rtx5080
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ResourceFlavor
+metadata:
+  name: ra-vt-rtx5060
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  nodeLabels:
+    kubernetes.io/hostname: etri-ser0001-cg0msb
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: ra-vt-rtx5060
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: resource-advisor-lab
+  queueingStrategy: BestEffortFIFO
+  resourceGroups:
+  - coveredResources: [cpu, memory, nvidia.com/gpu]
+    flavors:
+    - name: ra-vt-rtx5060
+      resources:
+      - {name: cpu, nominalQuota: '4'}
+      - {name: memory, nominalQuota: 6Gi}
+      - {name: nvidia.com/gpu, nominalQuota: '1'}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata:
+  name: ra-vt-rtx5060
+  namespace: resource-advisor-lab
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  clusterQueue: ra-vt-rtx5060

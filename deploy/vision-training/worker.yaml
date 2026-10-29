@@ -1,0 +1,64 @@
+# Acceptance worker owning only the vision-training (lab-vt-*) routes listed in its private
+# config (scope_deliveries=true, coordinate_studies=false, no serving). Historical
+# routes stay with the stopped ra-worker/ra-slurm-worker Deployments.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ra-vision-training-worker
+  namespace: resource-advisor-lab
+  labels:
+    app.kubernetes.io/name: ra-vision-training-worker
+    app.kubernetes.io/part-of: resource-advisor
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app.kubernetes.io/name: ra-vision-training-worker}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ra-vision-training-worker
+        app.kubernetes.io/part-of: resource-advisor
+    spec:
+      serviceAccountName: ra-worker
+      automountServiceAccountToken: true
+      terminationGracePeriodSeconds: 60
+      nodeSelector: {kubernetes.io/hostname: etri-ser0001-cg0msb}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+      - name: worker
+        image: 10.254.192.47:5000/resource-advisor/services@sha256:1fdf30457063a054c77ebb128d3a2da35a055fce7e8bf44abb4267ce64294d1b
+        command: [python, -m, resource_advisor.cli]
+        args: [worker, --config, /config/worker.json, --heartbeat-path, /tmp/heartbeat]
+        env:
+        - name: RA_DATABASE_URL
+          valueFrom: {secretKeyRef: {name: ra-service-db, key: url}}
+        - {name: HOME, value: /tmp}
+        - {name: PYTHONDONTWRITEBYTECODE, value: '1'}
+        envFrom:
+        - secretRef: {name: ra-artifact-client}
+        resources:
+          requests: {cpu: 100m, memory: 256Mi}
+          limits: {cpu: '1', memory: 1Gi}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities: {drop: [ALL]}
+        volumeMounts:
+        - {name: config, mountPath: /config, readOnly: true}
+        - {name: tmp, mountPath: /tmp}
+        readinessProbe:
+          exec:
+            command: [python, -m, resource_advisor.cli, check-heartbeat, --path, /tmp/heartbeat, --max-age, '60']
+          periodSeconds: 10
+          timeoutSeconds: 5
+      volumes:
+      - name: config
+        secret: {secretName: ra-vision-training-worker-config, defaultMode: 288}
+      - name: tmp
+        emptyDir: {sizeLimit: 64Mi}
