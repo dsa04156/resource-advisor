@@ -47,7 +47,7 @@ evidence, not execution or training qualification. Zero native workloads were su
   `tests/test_slurm_accounting_script.py` (stubbed Docker): 2 regressions for the two review
   P2s in the rollback path (fixed in 49ef4bc, fde5d54; each fails on the prior commit). The
   live switch had already run with the earlier script; the fixed script was copied to the host
-  (sha256 `ded819e8…`) and not re-run.
+  (sha256 matching the final commit) and not re-run; a failed `clustername` copy is reported, not claimed restored.
 - Review: independent spec + standards reviews of 16811e1...7caa130 found no transport
   defects; the two rollback P2s above are fixed.
 - Installed 07:43Z: `~/.ra-virtual-slurm/slurm_executor.py` (sha256 `c4169551…`, 0600),
