@@ -1,7 +1,9 @@
 """Read views over JCT comparison evidence: comparison list and per-workload readiness."""
 
+import json
 from datetime import timedelta
 
+import pytest
 import test_heterogeneous_recommendation as hetero
 import test_network_recommendation as network_rec
 from test_network_recommendation import (
@@ -123,3 +125,67 @@ def test_readiness_is_project_scoped(client, pair):
     assert get(client, "/jct-report", token="other-operator")["workloads"] == []
     response = client.get(URL + "/jct-report?workload_ref=pair-work", headers=h("other-operator"))
     assert response.status_code == 404
+
+
+def test_recent_native_runs_show_result_jct_and_links_without_a_comparison(client, pair, service):
+    from resource_advisor.contracts import JobRequest
+
+    jr_settle = network_rec.finish_with_native_timestamps(service, seconds=9.0)
+    job = service.submit("team-a", JobRequest(workload_ref="pair-work", candidate_ref="base"), "r1")
+    jr_settle(job["job_id"])
+
+    report = get(client, "/jct-report?workload_ref=pair-work")["selected"]
+    assert report["comparisons"] == []
+    [run] = report["recent_runs"]
+    assert run["job_id"] == job["job_id"]
+    assert run["state"] == "SUCCEEDED"
+    assert run["candidate_ref"] == "base"
+    assert run["jct"]["status"] == "OBSERVED"
+    assert run["jct"]["jct_seconds"] == pytest.approx(9.0)
+    assert run["jct"]["boundary"] == "native scheduler_submitted_at → backend_finished_at"
+    assert "tracking" in run and "result" in run
+    npu_workload(service, pair)
+    assert get(client, "/jct-report?workload_ref=npu-work")["selected"]["recent_runs"] == []
+
+
+def test_inventory_node_state_is_reported_apart_from_submission_conditions(client, pair, service):
+    from test_inventory import config, source
+
+    from resource_advisor.inventory import InventoryCollector, save_inventory
+
+    snapshot = InventoryCollector(config(), execute=source()).collect()
+    down = json.loads(json.dumps(snapshot["nodes"][0]))
+    down["node_ref"] = "test-worker"
+    down["ready"] = {**down["ready"], "value": False}
+    down["scheduling_blockers"] = ["NotReady"]
+    snapshot["nodes"].append(down)
+    save_inventory(service.store, "team-a", snapshot)
+
+    rows = {
+        c["candidate_ref"]: c
+        for c in get(client, "/jct-report?workload_ref=pair-work")["selected"]["candidates"]
+    }
+    base, spare = rows["base"], rows["spare"]
+    assert base["submittable_now"] is True  # submission contract is a separate check
+    assert base["node_observation"]["status"] == "NOT_READY"
+    assert base["node_observation"]["blockers"] == ["NotReady"]
+    assert base["node_observation"]["observed_at"] is not None
+    assert spare["node_observation"]["status"] == "NODE_MISSING"
+    assert spare["node_observation"]["inventories"][0]["cluster_ref"] == "lab"
+
+
+def test_without_inventory_node_state_stays_unobserved(client, pair):
+    rows = get(client, "/jct-report?workload_ref=pair-work")["selected"]["candidates"]
+    assert {c["node_observation"]["status"] for c in rows} == {"INVENTORY_UNOBSERVED"}
+
+
+def test_accelerator_matrix_separates_this_workload_from_other_identities(client, pair, service):
+    npu_workload(service, pair)
+    matrix = get(client, "/jct-report?workload_ref=pair-work")["selected"]["accelerator_matrix"]
+    rows = {(m["device_class"], m["model"]): m for m in matrix}
+    gpu, npu = rows[("gpu", "fixture-gpu")], rows[("npu", "ARIES2")]
+    assert gpu["this_workload"] == {"registered": 2, "submission_compatible": 2}
+    assert npu["this_workload"] == {"registered": 0, "submission_compatible": 0}
+    assert npu["other_workloads"] == [
+        {"workload_ref": "npu-work", "relation": "DIFFERENT_WORKLOAD_IDENTITY", "registered": 1}
+    ]

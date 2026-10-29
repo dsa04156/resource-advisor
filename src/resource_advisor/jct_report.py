@@ -130,9 +130,178 @@ def _readiness(store, conn, project, spec, row, at, queue_age):
     }
 
 
+def _node_observation(inventory, row):
+    """Inventory view of the candidate's node, independent of the submission contract.
+
+    Matched by backend and node name: capability cluster refs are logical and need
+    not equal the inventory cluster. Absent or stale observations stay unknown.
+    """
+    node, backend = row.get("node_ref"), str(row["backend"])
+    views = [s for s in inventory if s.get("backend", "kubernetes") == backend]
+    if not views:
+        return {"status": "INVENTORY_UNOBSERVED", "inventories": []}
+    for s in views:
+        n = next((n for n in s["nodes"] if n["node_ref"] == node), None)
+        if n is None:
+            continue
+        sample = (n.get("scheduler_state") if backend == "slurm" else n.get("ready")) or {}
+        blockers = n.get("scheduling_blockers") or []
+        if sample.get("status") != "ok":
+            status = "UNKNOWN"
+        elif backend != "slurm" and sample.get("value") is not True:
+            status = "NOT_READY"
+        else:
+            status = "BLOCKED" if blockers else "READY"
+        return {
+            "status": status,
+            "cluster_ref": s["cluster_ref"],
+            "snapshot_status": s["status"],
+            "collected_at": s["collected_at"],
+            "observed_at": sample.get("observed_at"),
+            "sample_status": sample.get("status"),
+            "blockers": blockers,
+        }
+    return {
+        "status": "NODE_MISSING",
+        "inventories": [
+            {
+                "cluster_ref": s["cluster_ref"],
+                "status": s["status"],
+                "collected_at": s["collected_at"],
+            }
+            for s in views
+        ],
+    }
+
+
+RECENT_RUNS = 10
+
+
+def _recent_runs(service, conn, project, workload_ref):
+    """Latest native jobs of this workload through the console job projection.
+
+    JCT is the recorded outcome when one exists, else native scheduler submit to
+    backend finish for a succeeded job; anything else stays unknown with a reason.
+    """
+    from sqlalchemy import select
+
+    from .console import job_view
+    from .store import jobs
+
+    rows = conn.execute(
+        select(jobs)
+        .where(
+            jobs.c.project == project,
+            jobs.c.body["request"]["workload_ref"].as_string() == workload_ref,
+        )
+        .order_by(jobs.c.body["created_at"].as_string().desc(), jobs.c.id.desc())
+        .limit(RECENT_RUNS)
+    ).mappings()
+    runs = []
+    for row in rows:
+        view, body = job_view(service, conn, row), row["body"]
+        outcome = service.store.get(conn, "jct_outcome", body["attempt_id"])
+        if outcome and outcome["project"] == project:
+            jct = {**outcome["body"]["actual"], "source": "jct_outcome"}
+        else:
+            submitted, finished = (
+                body.get("scheduler_submitted_at"),
+                body.get("backend_finished_at"),
+            )
+            jct = {
+                "status": "NOT_COMPLETED",
+                "jct_seconds": None,
+                "submitted_at": submitted,
+                "finished_at": finished,
+                "boundary": "native scheduler_submitted_at → backend_finished_at",
+                "source": "native_timestamps",
+            }
+            if row["state"] == "SUCCEEDED":
+                if submitted and finished:
+                    seconds = (
+                        datetime.fromisoformat(finished) - datetime.fromisoformat(submitted)
+                    ).total_seconds()
+                    ok = seconds >= 0
+                    jct.update(
+                        status="OBSERVED" if ok else "TIMESTAMPS_INVALID",
+                        jct_seconds=seconds if ok else None,
+                    )
+                else:
+                    jct["status"] = "TIMESTAMPS_MISSING"
+        result = view["result"]
+        runs.append(
+            {
+                "job_id": view["job_id"],
+                "state": view["state"],
+                "error": view["error"],
+                "created_at": view["created_at"],
+                "candidate_ref": view["candidate_ref"],
+                "node_ref": view["node_ref"],
+                "device_class": view["device_class"],
+                "accelerator_model": view["accelerator_model"],
+                "result": None
+                if result is None
+                else {
+                    "outcome": result.get("outcome"),
+                    "measured": result.get("measured"),
+                    "evidence_kind": result.get("evidence_kind"),
+                    "compute_seconds": (result.get("measurements") or {}).get("elapsed_seconds"),
+                },
+                "quality_passed": view["quality_passed"],
+                "tracking": view["tracking"],
+                "jct": jct,
+            }
+        )
+    return runs
+
+
+def _matrix(specs, rows, selected):
+    """Accelerator family/model against this workload and other registered workloads."""
+    sig = {s.ref: signature(s.identity) for s in specs}
+    keys = sorted(
+        {
+            (c["device_class"], c.get("model"))
+            for refs in rows.values()
+            for c in refs
+            if c.get("device_class") in {"gpu", "npu"}
+        },
+        key=lambda k: (k[0], k[1] or ""),
+    )
+    matrix = []
+    for device_class, model in keys:
+
+        def match(c, device_class=device_class, model=model):
+            return c.get("device_class") == device_class and c.get("model") == model
+
+        own = [c for c in rows[selected.ref] if match(c)]
+        matrix.append(
+            {
+                "device_class": device_class,
+                "model": model,
+                "this_workload": {
+                    "registered": len(own),
+                    "submission_compatible": sum(1 for c in own if c["submittable_now"]),
+                },
+                "other_workloads": [
+                    {
+                        "workload_ref": s.ref,
+                        "relation": "SAME_WORKLOAD_IDENTITY"
+                        if sig[s.ref] == sig[selected.ref]
+                        else "DIFFERENT_WORKLOAD_IDENTITY",
+                        "registered": sum(1 for c in rows[s.ref] if match(c)),
+                    }
+                    for s in specs
+                    if s.ref != selected.ref and any(match(c) for c in rows[s.ref])
+                ],
+            }
+        )
+    return matrix
+
+
 def jct_report(service, project, workload_ref=None):
     """Workload index, and for one workload its candidates, evidence and comparisons."""
     from .console import candidate_rows
+    from .inventory import latest_inventory_views
     from .service import NotFound
 
     store, at = service.store, now()
@@ -173,12 +342,21 @@ def jct_report(service, project, workload_ref=None):
             ),
             default=DEFAULT_QUEUE_AGE,
         )
+        inventory = latest_inventory_views(conn, project, at=at)
         candidates = [
-            {**c, "readiness": _readiness(store, conn, project, spec, c, at, queue_age)}
-            if c.get("node_ref")
-            else {**c, "readiness": None}
+            {
+                **c,
+                "readiness": _readiness(store, conn, project, spec, c, at, queue_age)
+                if c.get("node_ref")
+                else None,
+                "node_observation": _node_observation(inventory, c)
+                if c.get("node_ref")
+                else {"status": "REGISTRY_ENTRY_MISSING"},
+            }
             for c in rows[spec.ref]
         ]
+        recent = _recent_runs(service, conn, project, spec.ref)
+        matrix = _matrix(specs, rows, spec)
         summary = next(w for w in index if w["workload_ref"] == spec.ref)
         own_classes, own_models = set(summary["device_classes"]), set(summary["accelerator_models"])
         alternatives = [
@@ -205,5 +383,7 @@ def jct_report(service, project, workload_ref=None):
         "policy_profiles": policies,
         "comparisons": list_comparisons(service, project, spec.ref)["items"],
         "alternatives": alternatives,
+        "accelerator_matrix": matrix,
+        "recent_runs": recent,
     }
     return result
