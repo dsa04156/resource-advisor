@@ -8,13 +8,13 @@ from datetime import timedelta
 from typing import Literal
 
 from pydantic import Field, model_serializer, model_validator
-from sqlalchemy import func, or_, select
+from sqlalchemy import or_, select
 
 from .contracts import TERMINAL, Contract, Ref, Resources, WorkloadSpec, now, signature
-from .inventory import fresh_view
+from .inventory import latest_inventory_views
 from .policy import execution_compatibility
 from .recommendation import RecommendationPolicy
-from .store import entities, jobs
+from .store import jobs
 
 
 class SchedulingPolicy(Contract):
@@ -126,28 +126,13 @@ class SchedulingPlanRequest(Contract):
 
 
 def node_observations(conn, project):
-    """Latest authorized inventory per cluster; missing telemetry stays unknown."""
-    ranked = (
-        select(
-            entities.c.ref,
-            func.row_number()
-            .over(
-                partition_by=entities.c.body["cluster_ref"].as_string(),
-                order_by=(entities.c.created_at.desc(), entities.c.ref.desc()),
-            )
-            .label("rank"),
-        )
-        .where(entities.c.kind == "inventory", entities.c.project == project)
-        .subquery()
-    )
-    rows = conn.execute(
-        select(entities.c.body)
-        .join(ranked, entities.c.ref == ranked.c.ref)
-        .where(entities.c.kind == "inventory", entities.c.project == project, ranked.c.rank == 1)
-    ).scalars()
+    """Latest authorized inventory per cluster; missing telemetry stays unknown.
+
+    Uses the index-backed per-cluster seek (latest_inventory_views) instead of a
+    window over every stored snapshot, whose JSON bodies are large and many.
+    """
     result = {}
-    for raw in rows:
-        snapshot = fresh_view(raw)
+    for snapshot in latest_inventory_views(conn, project):
         for node in snapshot["nodes"]:
             key = (snapshot.get("backend", "kubernetes"), node["node_ref"])
             observation = {
