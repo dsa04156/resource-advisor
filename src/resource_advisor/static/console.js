@@ -707,11 +707,11 @@ function deviceSearchText(n, s) {
 }
 function deviceDetection(n, s, key, r) {
   const d = deviceIdentity(n, s, key, r), seen = observed(r.allocatable, s), status = nodeStatus(n, s);
-  const seenLabel = status.ready ? "장치 감지" : "장치 보고 · 노드 " + status.label;
+  const fresh = seen.status === "ok", seenLabel = (status.ready && fresh ? "장치 감지" : "장치 보고") + (status.ready ? "" : " · 노드 " + status.label);
   return add(el("div", null, "device-allocation"),
     add(el("div"), badge(d.cls), el("strong", d.vendor || key)),
     d.models.length ? el("small", "등록 모델 " + d.models.join(" / ")) : null, el("small", key),
-    el("span", seen.status === "ok" ? `${seenLabel} · ${fmt(value(r.requested,s))} 예약 / ${fmt(seen.value)} ${modes[r.allocation_mode] || "단위 미확인"}`
+    el("span", fresh ? `${seenLabel} · ${fmt(value(r.requested,s))} 예약 / ${fmt(seen.value)} ${modes[r.allocation_mode] || "단위 미확인"}`
       : seenLabel + " · " + (labels[seen.status] || "확인 불가")),
     el("small", `${r.allocatable?.source || "출처 미확인"} · ${stamp(r.allocatable?.observed_at)}`));
 }

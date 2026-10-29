@@ -86,3 +86,18 @@ test("resource search matches class, vendor and model, keeping busy/NotReady nod
   assert.deepEqual(nodeRefs(render("rockchip")), ["etri-dev0004-tedger"]);
   assert.deepEqual(nodeRefs(render("intel")), ["etri-ser0002-cgnmsb"]);
 });
+
+test("stale or unavailable allocatable keeps the device listed but not detected", () => {
+  const node = snapshot.inventory[0].nodes.find((n) => n.node_ref === "etri-dev0002-raspi5"), original = node.resources["hailo.ai/h8"].allocatable;
+  try {
+    for (const [sample, label] of [[{ ...original, observed_at: "2026-10-29T06:00:00+00:00" }, "오래된 값"], [{ ...original, value: null, status: "unavailable" }, "확인 불가"]]) {
+      node.resources["hailo.ai/h8"].allocatable = sample;
+      const card = render().findAll("accelerator-signal").find((c) => c.textContent.includes("etri-dev0002-raspi5")).textContent;
+      assert.ok(card.includes("Hailo") && card.includes("HAILO8") && card.includes(`장치 보고 · ${label}`), card);
+      assert.doesNotMatch(card, /장치 감지/);
+      assert.ok(nodeRefs(render("hailo")).includes("etri-dev0002-raspi5"));
+    }
+  } finally {
+    node.resources["hailo.ai/h8"].allocatable = original;
+  }
+});
