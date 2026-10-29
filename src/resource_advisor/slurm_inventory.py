@@ -229,12 +229,12 @@ class SlurmInventoryCollector(PrometheusReader):
         try:
             capacities = tres_values(raw.get("tres"))
         except ValueError:
-            capacities = {}
+            capacities = None
         try:
             allocations = tres_values(raw.get("tres_used"))
         except ValueError:
             allocations = {}
-        for key, kind in self.config.gres_types.items():
+        for key, kind in (self.config.gres_types if capacities is not None else {}).items():
 
             def count(mapping, resource_key):
                 v = mapping.get(resource_key)

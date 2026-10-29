@@ -258,6 +258,21 @@ def test_gres_capacity_without_accounting_tres_uses_configured_gres_registration
     assert cpu_view["accelerator_inventory"]["value"]["reported_gres"] is False
 
 
+@pytest.mark.parametrize(
+    "tres", ["cpu=4,gres/gpu=1,gres/gpu=99", "cpu=4,gres/gpu=broken,bad", "cpu=4,cpu=4", None]
+)
+def test_malformed_tres_never_falls_back_to_gres_capacity(tres):
+    n = node()
+    n.update(gres="gpu:a100:4", gres_used="gpu:a100:0(IDX:N/A)", gres_drained="N/A", tres=tres)
+    cfg = config(
+        gres_types={"gres/gpu": {"device_class": "gpu", "allocation_mode": "virtual_slot"}}
+    )
+    execute, _ = source(nodes=[n])
+    view = SlurmInventoryCollector(cfg, execute=execute).collect()["nodes"][0]
+    assert "gres/gpu" not in view["resources"]
+    assert view["accelerator_inventory"]["status"] == "unclassified"
+
+
 @pytest.mark.parametrize("failure", ["nodes", "jobs"])
 def test_scheduler_failures_do_not_erase_actual_host_telemetry(failure):
     execute, _ = source(fail=failure)
