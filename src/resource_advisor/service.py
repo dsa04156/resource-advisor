@@ -5,7 +5,7 @@ import statistics
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from sqlalchemy import func, insert, select
+from sqlalchemy import func, insert, select, update
 from sqlalchemy.exc import IntegrityError
 
 from .contracts import (
@@ -22,7 +22,7 @@ from .contracts import (
     signature,
 )
 from .policy import compatibility, context_signature, execution_compatibility
-from .store import Conflict, jobs
+from .store import Conflict, jobs, outbox
 
 
 class NotFound(ValueError):
@@ -418,6 +418,8 @@ class Service:
                     "owner_last_heartbeat_at",
                     "operational_submission",
                     "submission_warnings",
+                    "submission_resolution",
+                    "native_rejection",
                 ]
             },
         }
@@ -445,6 +447,65 @@ class Service:
             body["error"] = reason
         self.store.change_job(conn, row, State.CANCEL_REQUESTED, body)
         self.store.enqueue(conn, "cancel-" + body["attempt_id"], "cancel", {"job_id": row["id"]})
+
+    def resolve_submission(self, project, job_id, *, decision, reason, subject):
+        """Record an operator's audited acknowledgement of an uncertain submission.
+
+        It changes neither scheduler nor job state and claims no absence: the
+        attempt stays SUBMISSION_UNKNOWN/CANCEL_REQUESTED and keeps reconciling
+        without resubmission, so a late native match is still adopted.
+        """
+        from .submission_lifecycle import resolution_blockers
+
+        if decision != "ACKNOWLEDGE_UNRESOLVED":
+            raise Rejected("unsupported resolution decision")
+        with self.store.transaction() as conn:
+            row = self.store.job(conn, job_id)
+            if not row or row["project"] != project:
+                raise NotFound("job not found")
+            existing = row["body"].get("submission_resolution")
+            if existing:
+                if (existing["decision"], existing["reason"], existing["requested_by"]) != (
+                    decision,
+                    reason,
+                    subject,
+                ):
+                    raise Conflict("a different resolution was already requested")
+                return self.public_job(row)
+            blockers = resolution_blockers(row)
+            if blockers:
+                raise Rejected("resolution not permitted: " + ",".join(blockers))
+            body = row["body"]
+            request = {
+                "job_id": row["id"],
+                "attempt_id": body["attempt_id"],
+                "decision": decision,
+                "reason": reason,
+                "requested_by": subject,
+                "requested_at": now().isoformat(),
+                "state_at_request": row["state"],
+                "evidence": body["submission_reconciliation"],
+            }
+            # Immutable audit record, separate from the mutable job body.
+            self.store.put(conn, "submission_resolution", body["attempt_id"], project, request)
+            self.store.change_job(
+                conn,
+                row,
+                row["state"],
+                dict(body, submission_resolution={**request, "status": "ACKNOWLEDGED"}),
+            )
+            # One fresh reconcile now; a leased event is left to its worker.
+            conn.execute(
+                update(outbox)
+                .where(
+                    outbox.c.id.in_(
+                        ["submit-" + body["attempt_id"], "cancel-" + body["attempt_id"]]
+                    ),
+                    outbox.c.status == "PENDING",
+                )
+                .values(lease_until=None)
+            )
+            return self.public_job(self.store.job(conn, job_id))
 
     def heartbeat(self, project, job_id):
         with self.store.transaction() as conn:

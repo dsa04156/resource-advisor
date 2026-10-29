@@ -47,13 +47,26 @@ def principals(credentials):
         )
         require(
             isinstance(identity, dict)
-            and set(identity) <= {"project", "operator", "subject"}
+            and set(identity) <= {"project", "operator", "subject", "institution_projects"}
             and valid_ref(identity.get("project"))
             and isinstance(identity.get("operator", False), bool)
             and ("subject" not in identity or valid_ref(identity["subject"])),
             "INVALID_PRINCIPAL",
         )
-        result[digest] = Principal(**identity)
+        institution = identity.get("institution_projects")
+        require(
+            institution is None
+            or (
+                identity.get("operator") is True
+                and isinstance(institution, list)
+                and all(valid_ref(project) for project in institution)
+                and identity["project"] in institution
+            ),
+            "INVALID_INSTITUTION_SCOPE",
+        )
+        result[digest] = Principal(
+            **{**identity, "institution_projects": tuple(sorted(set(institution or ())))}
+        )
     return result
 
 

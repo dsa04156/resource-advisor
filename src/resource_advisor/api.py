@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 
 from .contracts import (
+    TERMINAL,
     ApprovalRequest,
     CapabilitySnapshot,
     ExecutionResult,
@@ -42,6 +43,8 @@ class Principal:
     project: str
     operator: bool = False
     subject: str | None = None
+    # Operator-only reporting scope; never widens job or submission access.
+    institution_projects: tuple[str, ...] = ()
 
 
 def create_app(
@@ -928,6 +931,59 @@ def create_app(
                 "groups": summarize(records),
                 "semantics": "Known reservations only; unknown and legacy counts are explicit. Units from different device classes/modes are not combined.",
             }
+
+    @app.get(PREFIX + "/usage/report")
+    def usage_report(
+        month: str | None = Query(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$"),
+        start: str | None = None,
+        end: str | None = None,
+        scope: Literal["project", "institution"] = "project",
+        p=Depends(principal),
+    ):
+        from .accounting import month_period, period_report
+
+        if (month is None) == (start is None or end is None) or (start is None) != (end is None):
+            raise HTTPException(422, "Provide either month or both start and end")
+        if scope == "institution" and not (p.operator and p.institution_projects):
+            raise HTTPException(403, "Institution reporting scope is not configured")
+        projects = list(p.institution_projects) if scope == "institution" else [p.project]
+        try:
+            bounds = month_period(month) if month else (start, end)
+            with service.store.transaction() as conn:
+                records = conn.execute(select(usage).where(usage.c.project.in_(projects)))
+                open_jobs = conn.execute(
+                    select(jobs).where(
+                        jobs.c.project.in_(projects), jobs.c.state.not_in(list(TERMINAL))
+                    )
+                )
+                report = period_report(
+                    list(records.mappings()), *bounds, open_jobs=list(open_jobs.mappings())
+                )
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from None
+        return {"scope": scope, "projects": sorted(projects), **report}
+
+    class SubmissionResolution(BaseModel):
+        decision: Literal["ACKNOWLEDGE_UNRESOLVED"]
+        reason: str = Field(min_length=8, max_length=512)
+
+    @app.get(PREFIX + "/jobs/{job_id}/lifecycle")
+    def job_lifecycle(job_id: str, p=Depends(principal)):
+        from .submission_lifecycle import lifecycle
+
+        with service.store.transaction() as conn:
+            row = service.store.job(conn, job_id)
+            if not row or row["project"] != p.project:
+                raise NotFound("job not found")
+            return lifecycle(service, conn, row)
+
+    @app.post(PREFIX + "/jobs/{job_id}/submission-resolution")
+    def resolve_submission(job_id: str, value: SubmissionResolution, p=Depends(operator)):
+        if not p.subject:
+            raise HTTPException(403, "Audited resolution requires an operator subject")
+        return service.resolve_submission(
+            p.project, job_id, decision=value.decision, reason=value.reason, subject=p.subject
+        )
 
     @app.get("/metrics")
     def metrics(p=Depends(operator)):

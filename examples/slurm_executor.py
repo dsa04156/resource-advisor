@@ -281,6 +281,16 @@ def main():
             },
         )
         if result.returncode:
+            if command[0] == "/usr/bin/sbatch":
+                # Only Slurm's own rejection lines; the worker allow-lists the reason.
+                # A timeout or any other failure stays an uncertain submission.
+                for line in result.stderr.splitlines():
+                    if re.fullmatch(
+                        r"sbatch: error: (?:Batch job submission failed: [ -~]{1,200}"
+                        r"|(?:QOS|Assoc)[A-Za-z]{1,64})",
+                        line,
+                    ):
+                        print(line, file=sys.stderr)
             raise ValueError("scheduler rejected request")
         sys.stdout.write(result.stdout)
         return 0

@@ -51,7 +51,14 @@ GUIDANCE = {
 def job_attention(job):
     state = job["state"]
     reason = job.get("scheduler_reason") if state == "QUEUED" else job.get("error")
-    if state == "SUBMISSION_UNKNOWN":
+    if state == "SUBMISSION_UNKNOWN" and (job.get("submission_resolution") or {}).get("status") == (
+        "ACKNOWLEDGED"
+    ):
+        title, action = (
+            "제출 결과 미확정(운영자 확인됨)",
+            "실행 여부와 할당량은 미확인입니다. 재제출하지 않고 대조를 계속합니다.",
+        )
+    elif state == "SUBMISSION_UNKNOWN":
         title, action = (
             "제출 결과 확인 중",
             "백엔드에 기존 작업이 있는지 확인하세요. 중복 제출하지 마세요.",
@@ -63,6 +70,11 @@ def job_attention(job):
         title, action = (
             "백엔드 상태 조회 실패",
             "연결과 작업 조회 권한을 확인하세요. 마지막 상태는 현재 상태와 다를 수 있습니다.",
+        )
+    elif str(reason).startswith("NATIVE_REJECTED:"):
+        title, action = (
+            "스케줄러 정책이 제출 거부",
+            "네이티브 job은 생성되지 않았습니다. 계정·QOS·큐 정책과 요청량을 확인하세요.",
         )
     elif reason in GUIDANCE:
         title, action = GUIDANCE[reason]

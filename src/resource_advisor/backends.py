@@ -14,11 +14,58 @@ from .contracts import State, now
 
 
 class BackendError(RuntimeError):
-    pass
+    # Allow-listed native rejection code parsed from stderr; never raw output.
+    rejection = None
 
 
 class SubmissionUnknown(BackendError):
     """Submission might have reached the scheduler. Never automatically resubmit."""
+
+
+class SubmissionRejected(BackendError):
+    """The scheduler definitively refused to create the native job."""
+
+    def __init__(self, code):
+        super().__init__(code)
+        self.code = code
+
+
+class SubmissionAmbiguous(BackendError):
+    """Several or foreign native objects carry this attempt's name."""
+
+
+# Observed definitive refusals only (docs/evidence/slurm-policy.json and the
+# Kubernetes API's pre-persistence authorization/admission/validation errors).
+# Exact lines of the failing submit command; timeouts, communication errors and
+# AlreadyExists stay uncertain.
+SLURM_REJECTIONS = {
+    "Job violates accounting/QOS policy (job submit limit, user's size and/or time limits)": (
+        "SLURM_QOS_POLICY"
+    ),
+    "Invalid qos specification": "SLURM_INVALID_QOS",
+    "Invalid account or account/partition combination specified": "SLURM_INVALID_ACCOUNT",
+    "Invalid partition name specified": "SLURM_INVALID_PARTITION",
+    "Requested node configuration is not available": "SLURM_NODE_CONFIGURATION_UNAVAILABLE",
+    "Invalid generic resource (gres) specification": "SLURM_INVALID_GRES",
+}
+KUBERNETES_REJECTIONS = {"Forbidden": "KUBERNETES_FORBIDDEN", "Invalid": "KUBERNETES_INVALID"}
+
+
+def native_rejection(stderr):
+    """Return an allow-listed rejection code, or None when the outcome is uncertain."""
+    lines = (stderr or "").splitlines()
+    prefix = "sbatch: error: Batch job submission failed: "
+    failed = [line[len(prefix) :] for line in lines if line.startswith(prefix)]
+    if failed:
+        code = SLURM_REJECTIONS.get(failed[-1]) if len(failed) == 1 else None
+        limits = [
+            line[len("sbatch: error: ") :]
+            for line in lines
+            if re.fullmatch(r"sbatch: error: (?:QOS|Assoc)[A-Za-z]{1,64}", line)
+        ]
+        return code and ":".join([code, *limits[:1]])
+    server = re.match(r"Error from server \((\w+)\): ", lines[0]) if lines else None
+    return KUBERNETES_REJECTIONS.get(server.group(1)) if server else None
 
 
 @dataclass
@@ -93,7 +140,9 @@ def run(argv, *, stdin=None, timeout=30):
         raise BackendError(type(exc).__name__) from exc
     if proc.returncode:
         # Backend output may contain site paths or credentials: keep it out of public API.
-        raise BackendError(f"{argv[0]} exited with code {proc.returncode}")
+        error = BackendError(f"{argv[0]} exited with code {proc.returncode}")
+        error.rejection = native_rejection(proc.stderr)
+        raise error
     return proc.stdout
 
 
@@ -422,6 +471,8 @@ class KubernetesBackend:
             )
             return obj["metadata"]["name"]
         except BackendError as exc:
+            if exc.rejection:
+                raise SubmissionRejected(exc.rejection) from exc
             raise SubmissionUnknown(str(exc)) from exc
 
     def reconcile(self, job):
@@ -438,7 +489,7 @@ class KubernetesBackend:
             or annotations.get("resource-advisor/context-signature")
             != job["body"]["context_signature"]
         ):
-            raise BackendError("existing Job does not match this attempt")
+            raise SubmissionAmbiguous("existing Job does not match this attempt")
         return obj["metadata"]["name"]
 
     def status(self, job):
@@ -902,6 +953,8 @@ class SlurmBackend:
         try:
             output = self.call(["sbatch", "--parsable"], stdin=script).strip()
         except BackendError as exc:
+            if exc.rejection:
+                raise SubmissionRejected(exc.rejection) from exc
             raise SubmissionUnknown(str(exc)) from exc
         if not re.fullmatch(r"[0-9]+(?:;[A-Za-z0-9_.-]+)?", output):
             raise SubmissionUnknown("sbatch returned no unambiguous job ID")
@@ -950,7 +1003,7 @@ class SlurmBackend:
             and re.fullmatch(r"\d+", line.split("|")[0])
         }
         if len(ids) > 1:
-            raise BackendError("multiple external jobs match one attempt")
+            raise SubmissionAmbiguous("multiple external jobs match one attempt")
         return next(iter(ids), None)
 
     @staticmethod

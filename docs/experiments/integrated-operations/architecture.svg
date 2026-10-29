@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Helvetica, Arial, sans-serif">
+  <title>Resource Advisor integrated operations architecture</title>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#334"/></marker>
+    <style>
+      .box{fill:#fff;stroke:#334;stroke-width:2;rx:12}
+      .own{fill:#eef4ff}
+      .nat{fill:#f3f7ee}
+      .t{font-size:24px;font-weight:700;fill:#112}
+      .s{font-size:17px;fill:#334}
+      .l{stroke:#334;stroke-width:2;fill:none;marker-end:url(#a)}
+      .lbl{font-size:15px;fill:#445}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#fafbfc"/>
+  <text x="60" y="70" font-size="34" font-weight="700" fill="#112">Resource Advisor: control plane above native schedulers</text>
+  <text x="60" y="105" class="s">Owns identity, intent, reconciliation, terminal usage ledger, diagnostics. Native schedulers own admission, quota, priority, placement.</text>
+
+  <rect x="60" y="170" width="250" height="110" rx="12" fill="#ffffff" stroke="#334" stroke-width="2"/>
+  <text x="80" y="215" class="t">Client / console</text>
+  <text x="80" y="250" class="s">Idempotency-Key per request</text>
+
+  <rect x="60" y="560" width="250" height="110" rx="12" fill="#ffffff" stroke="#334" stroke-width="2"/>
+  <text x="80" y="605" class="t">Operator</text>
+  <text x="80" y="640" class="s">subject-bound, project-scoped</text>
+
+  <rect x="400" y="170" width="360" height="500" rx="12" fill="#eef4ff" stroke="#334" stroke-width="2"/>
+  <text x="420" y="215" class="t">FastAPI API</text>
+  <text x="420" y="255" class="s">POST /jobs</text>
+  <text x="420" y="285" class="s">GET /jobs/{id}/lifecycle</text>
+  <text x="420" y="315" class="s">POST …/submission-resolution</text>
+  <text x="420" y="340" class="s">   ACKNOWLEDGE_UNRESOLVED (audit only)</text>
+  <text x="420" y="370" class="s">GET /usage/report (UTC period)</text>
+  <text x="420" y="400" class="s">GET /usage/summary</text>
+
+  <rect x="820" y="170" width="330" height="500" rx="12" fill="#eef4ff" stroke="#334" stroke-width="2"/>
+  <text x="840" y="215" class="t">PostgreSQL</text>
+  <text x="840" y="255" class="s">ra_jobs: state, attempt, external_id,</text>
+  <text x="840" y="280" class="s">  reconciliation history, version CAS</text>
+  <text x="840" y="315" class="s">ra_outbox: leased events, token fence</text>
+  <text x="840" y="350" class="s">ra_usage: one row per terminal attempt</text>
+  <text x="840" y="375" class="s">  (same transaction as terminal state)</text>
+  <text x="840" y="410" class="s">ra_entities: immutable receipts,</text>
+  <text x="840" y="435" class="s">  results, resolution audit</text>
+
+  <rect x="820" y="720" width="330" height="130" rx="12" fill="#eef4ff" stroke="#334" stroke-width="2"/>
+  <text x="840" y="765" class="t">Worker (1 replica / route)</text>
+  <text x="840" y="800" class="s">intent → submit → reconcile → terminal</text>
+  <text x="840" y="828" class="s">never resubmits an uncertain attempt</text>
+
+  <rect x="1250" y="170" width="300" height="230" rx="12" fill="#f3f7ee" stroke="#334" stroke-width="2"/>
+  <text x="1270" y="215" class="t">Kubernetes + Kueue</text>
+  <text x="1270" y="255" class="s">LocalQueue → ClusterQueue</text>
+  <text x="1270" y="285" class="s">QuotaReserved / Admitted</text>
+  <text x="1270" y="315" class="s">Job name = attempt ID</text>
+  <text x="1270" y="345" class="s">annotations: job-id, context</text>
+
+  <rect x="1250" y="440" width="300" height="230" rx="12" fill="#f3f7ee" stroke="#334" stroke-width="2"/>
+  <text x="1270" y="485" class="t">Slurm</text>
+  <text x="1270" y="525" class="s">account / partition / QOS</text>
+  <text x="1270" y="555" class="s">forced-command SSH gateway</text>
+  <text x="1270" y="585" class="s">squeue %r · sacct AllocTRES</text>
+  <text x="1270" y="615" class="s">job name = attempt ID</text>
+
+  <path d="M310 225 H400" stroke="#334" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <path d="M310 615 H400" stroke="#334" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <path d="M760 300 H820" stroke="#334" stroke-width="2" fill="none" marker-end="url(#a)"/><text x="768" y="290" class="lbl">one tx</text>
+  <path d="M985 720 V670" stroke="#334" stroke-width="2" fill="none" marker-end="url(#a)"/><text x="995" y="700" class="lbl">lease / commit</text>
+  <path d="M1150 785 H1200 V285 H1250" stroke="#334" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <path d="M1200 555 H1250" stroke="#334" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <text x="1160" y="880" class="lbl">submit · reconcile · status · cancel</text>
+</svg>

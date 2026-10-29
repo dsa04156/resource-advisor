@@ -53,7 +53,7 @@ worker는 기존 상태 관측에 다음을 더해 job 기록에 저장합니다
 - GPU 학습이 아닙니다. 서버 GPU는 다른 프로젝트가 점유 중이어서 Kubernetes와 VM 모두 CPU 학습으로 검증합니다.
 - VM은 사용자 공간 QEMU TCG(KVM 없음)라 CPU 성능 수치는 실제 서버와 비교할 수 없습니다.
 - 진행 표시는 polling 기반입니다. 스트리밍, 체크포인트 재개, 자동 promotion은 없습니다.
-- `SUBMISSION_UNKNOWN` 기록은 운영자 확인 전까지 재제출하지 않으며, 이를 해소하는 운영 도구는 이번 범위에 없습니다.
+- `SUBMISSION_UNKNOWN` 기록은 재제출하지 않습니다. 운영자는 `/jobs/{id}/lifecycle`로 대조 이력을 보고 감사 기록이 남는 확인(`ACKNOWLEDGE_UNRESOLVED`)만 할 수 있으며, 이는 종료·부재 판정이 아닙니다([integrated operations](../experiments/integrated-operations/README.md)).
 
 ## 운영 runbook (lab)
 

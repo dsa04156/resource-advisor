@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 import httpx
 from sqlalchemy import select
 
-from .backends import BackendError, SubmissionUnknown
+from .backends import BackendError, SubmissionAmbiguous, SubmissionRejected, SubmissionUnknown
 from .contracts import TERMINAL, ExecutionResult, State, now, signature
 from .policy import execution_compatibility
 from .service import NotFound, Rejected, required
@@ -40,10 +40,10 @@ class Worker:
                 return True
             backend = self.backend(row)
             if row["state"] in {State.SUBMITTING, State.SUBMISSION_UNKNOWN}:
-                external = backend.reconcile(row)
+                external, outcome = self.reconcile_submission(row, backend)
                 if not external:
                     raise SubmissionUnknown(
-                        "no matching external job yet; operator resolution required"
+                        f"reconciliation {outcome}; operator resolution required"
                     )
             elif row["state"] == State.VALIDATED:
                 with self.store.transaction() as conn:
@@ -135,7 +135,7 @@ class Worker:
                     State.SUBMISSION_UNKNOWN,
                     State.CANCEL_REQUESTED,
                 }:
-                    body = dict(latest["body"], external_id=external)
+                    body = self.adopted_body(latest, external)
                     body.setdefault("queued_at", now().isoformat())
                     target = (
                         State.CANCEL_REQUESTED
@@ -143,6 +143,30 @@ class Worker:
                         else State.QUEUED
                     )
                     self.store.change_job(conn, latest, target, body)
+            self.store.finish(event)
+        except SubmissionRejected as exc:
+            # The scheduler refused creation: terminal with proven zero allocation.
+            with self.store.transaction() as conn:
+                latest = self.store.job(conn, event["body"]["job_id"])
+                if latest["state"] in {
+                    State.SUBMITTING,
+                    State.CANCEL_REQUESTED,
+                } and not latest["body"].get("external_id"):
+                    rejection = {
+                        "code": exc.code,
+                        "observed_at": now().isoformat(),
+                        "backend": latest["body"]["candidate"]["backend"],
+                    }
+                    self.store.change_job(
+                        conn,
+                        latest,
+                        State.FAILED,
+                        dict(
+                            latest["body"],
+                            error="NATIVE_REJECTED:" + exc.code,
+                            native_rejection=rejection,
+                        ),
+                    )
             self.store.finish(event)
         except (BackendError, Conflict, ValueError) as exc:
             # Exceptions after intent can be transport failures or malformed successful responses.
@@ -157,6 +181,52 @@ class Worker:
                     )
             self.store.finish(event, type(exc).__name__)
         return True
+
+    def reconcile_submission(self, row, backend):
+        """Ask the scheduler for this attempt and keep a bounded record of the answer.
+
+        Only a successful query without a match is NO_MATCH. A failed query or
+        several/foreign matches never count as evidence of absence.
+        """
+        try:
+            external = backend.reconcile(row)
+            outcome = "MATCHED" if external else "NO_MATCH"
+        except SubmissionAmbiguous:
+            external, outcome = None, "AMBIGUOUS"
+        except (BackendError, ValueError, KeyError, TypeError):
+            external, outcome = None, "QUERY_FAILED"
+        stamp = now().isoformat()
+        with self.store.transaction() as conn:
+            latest = self.store.job(conn, row["id"])
+            if latest["state"] not in TERMINAL:
+                record = dict(latest["body"].get("submission_reconciliation") or {})
+                record.setdefault("first_checked_at", stamp)
+                record["checks"] = record.get("checks", 0) + 1
+                record["last_checked_at"], record["last_outcome"] = stamp, outcome
+                record["consecutive_no_match"] = (
+                    record.get("consecutive_no_match", 0) + 1 if outcome == "NO_MATCH" else 0
+                )
+                record["recent"] = [
+                    *record.get("recent", []),
+                    {"at": stamp, "outcome": outcome},
+                ][-10:]
+                self.store.change_job(
+                    conn,
+                    latest,
+                    latest["state"],
+                    dict(latest["body"], submission_reconciliation=record),
+                )
+        return external, outcome
+
+    @staticmethod
+    def adopted_body(latest, external):
+        body = dict(latest["body"], external_id=external)
+        resolution = body.get("submission_resolution")
+        if resolution and resolution.get("status") == "ACKNOWLEDGED":
+            body["submission_resolution"] = dict(
+                resolution, status="SUPERSEDED_BY_NATIVE_MATCH", closed_at=now().isoformat()
+            )
+        return body
 
     def expire_owner_leases(self):
         # Only explicit workflow-owned attempts opt in; ordinary research jobs
@@ -208,12 +278,15 @@ class Worker:
                 return True
             if not row["body"].get("external_id"):
                 # Never mark a possibly submitted job cancelled without remote confirmation.
-                external = self.backend(row).reconcile(row)
+                external, outcome = self.reconcile_submission(row, self.backend(row))
                 if not external:
-                    raise SubmissionUnknown("cannot confirm absence after cancellation")
+                    raise SubmissionUnknown(
+                        f"cannot confirm absence after cancellation ({outcome})"
+                    )
                 with self.store.transaction() as conn:
+                    latest = self.store.job(conn, row["id"])
                     self.store.change_job(
-                        conn, row, State.CANCEL_REQUESTED, dict(row["body"], external_id=external)
+                        conn, latest, State.CANCEL_REQUESTED, self.adopted_body(latest, external)
                     )
                 row = self._row(row["id"])
             backend = self.backend(row)

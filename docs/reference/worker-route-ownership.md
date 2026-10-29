@@ -19,7 +19,8 @@ exact: routes `(A, cluster-1)` and `(B, cluster-2)` do not authorize `(A, cluste
 An empty route map owns no compute jobs. Missing-job events are left untouched;
 they require operator investigation, not scheduler submission. Existing
 PostgreSQL `SKIP LOCKED`, lease-token fencing and unknown-submission reconciliation
-remain in effect. Duplicate workers for the same route are supported as before.
+remain in effect. Duplicate workers for the same route are covered by software
+concurrency tests only; operational qualification is one worker replica per route.
 
 Artifact and MLflow delivery retain their own existing configuration and shared
 outbox behavior; this change does not introduce independent delivery-tenant
