@@ -2653,7 +2653,7 @@ function trainCondition(sel) {
   const c=sel.configs.find(x=>x.config_key===sel.config_key),k=c.condition,facts=el("dl",null,"policy-facts");
   for(const [a,b] of [["학습 방식",c.objective?trainObjective[c.objective]:"미분류 · "+k.measurement_boundary],["학습 step",String(k.steps)],["배치",`${k.batch_size}${k.global_batch_size?" · 전역 "+k.global_batch_size:""} · 누적 ${k.gradient_accumulation}`],["정밀도",k.precision],["최적화기",k.optimizer?k.optimizer+(Object.keys(k.optimizer_parameters).length?" "+JSON.stringify(k.optimizer_parameters):""):"기록 없음"],["입력",k.input_shape.join("×")],["데이터",k.dataset_version.slice(0,19)+"…"],["시드",String(k.seed)],["측정 경계",k.measurement_boundary]])facts.append(el("dt",a),el("dd",b));
   const loading=trainPending&&trainConfig&&trainConfig!==sel.config_key;
-  root.append(add(el("div",null,"view-toolbar jct-toolbar"),label,selector),
+  add(root,add(el("div",null,"view-toolbar jct-toolbar"),label,selector),
     loading?el("p","선택한 조건을 불러오는 중입니다. 아래는 이전 조건의 내용입니다.","muted"):null,facts,
     el("p","등록된 조건만 고를 수 있습니다. 값을 바꾸려면 새 학습 작업을 등록하고 다시 검증해야 합니다. 같은 조건이라도 등록 작업이 다르면 측정 기록을 공유하지 않습니다.","muted"),
     table(["등록 작업","식별 서명","실행"],c.workloads.map(w=>[code(w.workload_ref),code(w.identity_signature.slice(0,19)+"…"),el("span",`${w.runs.total}건 (성공 ${w.runs.succeeded})`)])));
