@@ -510,3 +510,43 @@ def test_malformed_or_foreign_synchronization_provenance_is_rejected(client, gro
     body = network("node-a", [4.0]).model_dump(mode="json") | {"staging_group": group}
     response = client.post(URL + "/network-profiles", headers=h("operator"), json=body)
     assert response.status_code == 422  # rejected at import, never reaches /scheduling-plans
+
+
+def test_collected_ddp_profile_keeps_each_members_unpack_for_network_replacement():
+    made = jct_profile_from_jobs([prepared_row((0.5, 3.0), (2.0, 3.0))], ref="ddp",
+                                 valid_for_seconds=600, hardware=HARDWARE)  # fmt: skip
+    assert made.phases["model_preparation"] == 5.0  # node-a unpack 3 + rank 0 preparation 2
+    assert made.member_unpack_seconds == {"node-a": 3.0, "node-b": 0.5}
+    assert made.staging_unpack_seconds == 3.0
+
+
+PAIRED = {"runtime_startup": 3.0, "data_staging": 4.0, "model_preparation": 5.0,
+          "compute": 10.0, "unattributed_in_container": 1.0}  # fmt: skip
+
+
+def test_policy_d_keeps_each_members_transfer_paired_with_its_own_unpack(service, client):
+    post(client, "/jct-profiles", ddp_profile(service, client, phases=PAIRED,
+                                              member_unpack_seconds={"node-a": 3.0, "node-b": 0.5},
+                                              staging_unpack_seconds=3.0))  # fmt: skip
+    for node in dt.NODES:
+        post(client, "/route-queue-snapshots", queue(node))
+    network_evidence(client, {"node-a": [4.0], "node-b": [6.0]}, {"node-a": SYNC, "node-b": SYNC})
+
+    p, _, _ = prediction(client, NETWORK)
+
+    phases = dict(p["phase_seconds"])
+    # barrier path = max(node-b 6 + 0.5, node-a 4 + 3) = 7, not max transfer 6 with
+    # node-a's 3 s unpack left in preparation (26 s); preparation keeps rank 0's 2 s
+    assert phases["data_staging"] == 7.0 and phases["model_preparation"] == 2.0
+    assert p["predicted_jct_seconds"] == pytest.approx(1.0 + 3.0 + 7.0 + 2.0 + 10.0 + 1.0)
+
+
+def test_policy_d_abstains_when_the_unpack_pairing_is_unknown(service, client):
+    post(client, "/jct-profiles", ddp_profile(service, client, phases=PAIRED))
+    for node in dt.NODES:
+        post(client, "/route-queue-snapshots", queue(node))
+    network_evidence(client, {"node-a": [4.0], "node-b": [6.0]}, {"node-a": SYNC, "node-b": SYNC})
+
+    p, _, _ = prediction(client, NETWORK)
+    assert p["predicted_jct_seconds"] is None
+    assert p["reasons"] == ["STAGING_UNPACK_PAIRING_UNKNOWN"]

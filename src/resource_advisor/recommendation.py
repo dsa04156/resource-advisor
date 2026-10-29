@@ -125,12 +125,18 @@ class JctProfile(Contract):
     # Coarsest native timestamp used for admission/startup/residual (Kubernetes
     # records whole seconds). Omitted when unset, so older signatures are unchanged.
     timestamp_resolution_seconds: float | None = Field(default=None, gt=0, le=60)
+    # DDP only: each member node's own measured unpack, and the (barrier-path)
+    # member's unpack included in ``model_preparation``, so a network replacement
+    # can re-pair every member's transfer with its own unpack. Omitted when unset.
+    member_unpack_seconds: dict[Ref, float] | None = None
+    staging_unpack_seconds: float | None = Field(default=None, ge=0)
 
     @model_serializer(mode="wrap")
     def preserve_legacy_signature(self, handler):
         value = handler(self)
-        if self.timestamp_resolution_seconds is None:
-            value.pop("timestamp_resolution_seconds", None)
+        for key in ("timestamp_resolution_seconds", "member_unpack_seconds", "staging_unpack_seconds"):
+            if getattr(self, key) is None:
+                value.pop(key, None)
         return value
 
     @model_validator(mode="after")
@@ -147,6 +153,15 @@ class JctProfile(Contract):
         # A span prepared before the job (warm service) must not reenter its JCT.
         if set(self.excluded_preexisting_phases) & set(self.phases):
             raise ValueError("preexisting preparation/service spans cannot also be counted")
+        if (self.member_unpack_seconds is None) != (self.staging_unpack_seconds is None):
+            raise ValueError("member unpacks and the included staging unpack go together")
+        if self.member_unpack_seconds is not None and (
+            "model_preparation" not in self.phases
+            or "data_staging" not in self.phases
+            or any(v < 0 for v in self.member_unpack_seconds.values())
+            or self.staging_unpack_seconds > max(self.member_unpack_seconds.values())
+        ):
+            raise ValueError("member unpacks need separate staging and preparation phases")
         return self
 
 
@@ -697,7 +712,7 @@ def _members(service, conn, project, candidate):
     return members, None
 
 
-def _staging_path(per_node, location, nodes):
+def _staging_path(per_node, location, nodes, unpack=None):
     """Critical path of parallel member staging, from per-member measurements.
 
     Members start staging together (barrier) and compute starts after the slowest.
@@ -706,8 +721,11 @@ def _staging_path(per_node, location, nodes):
     contention is already inside each sample: the path is the slowest member.
     Separately measured (solo) samples do not show contention at a shared source,
     so those members are bounded as if served one after another (sum); distinct
-    sources run in parallel (max). Both bounds are recorded.
+    sources run in parallel (max). Both bounds are recorded. With ``unpack``
+    ({node: seconds}) every member's own unpack follows its own transfer inside
+    the barrier window; a serialized group then ends with its longest unpack.
     """
+    unpack = unpack or {}
     groups = {n["staging_group"] for n in per_node}
     [group] = groups if len(groups) == 1 else [None]
     synchronized = group is not None and group.partition("@")[2] == "+".join(sorted(nodes))
@@ -716,10 +734,18 @@ def _staging_path(per_node, location, nodes):
         sources.setdefault(location.source_endpoint_ref, []).append(n)
     shared = not synchronized and any(len(g) > 1 for g in sources.values())
 
+    def own(n, key):
+        return n[key] + unpack.get(n["node_ref"], 0.0)
+
     def path(key):
         if synchronized:
-            return max(n[key] for n in per_node)
-        return max(sum(n[key] for n in g) for g in sources.values())
+            return max(own(n, key) for n in per_node)
+        return max(
+            sum(n[key] for n in g) + max(unpack.get(n["node_ref"], 0.0) for n in g)
+            if len(g) > 1
+            else own(g[0], key)
+            for g in sources.values()
+        )
 
     return {
         "median_seconds": path("median_seconds"),
@@ -732,8 +758,10 @@ def _staging_path(per_node, location, nodes):
         if shared
         else "parallel_max",
         "staging_group": group if synchronized else None,
-        "parallel_lower_bound_seconds": max(n["median_seconds"] for n in per_node),
-        "shared_source_upper_bound_seconds": sum(n["median_seconds"] for n in per_node),
+        "parallel_lower_bound_seconds": max(own(n, "median_seconds") for n in per_node),
+        "shared_source_upper_bound_seconds": sum(n["median_seconds"] for n in per_node)
+        + max(unpack.get(n["node_ref"], 0.0) for n in per_node),
+        "includes_member_unpack": bool(unpack),
     }
 
 
@@ -815,6 +843,22 @@ def _distributed(service, conn, project, rec, at, spec, candidate, members, prof
         location, location_reason, network_profiles, bindings = ctx
         if location is None:
             return None, [location_reason or "DATA_LOCATION_MISSING"], detail
+        # A DDP profile's model_preparation holds its barrier-path member's unpack:
+        # replacing only the transfer would pair a new transfer with another
+        # member's unpack. Re-pair every member's own unpack, or abstain.
+        unpack = profile.member_unpack_seconds
+        if "model_preparation" in profile.phases and (
+            unpack is None or set(unpack) != set(members)
+        ):
+            return None, ["STAGING_UNPACK_PAIRING_UNKNOWN"], detail
+        if unpack is not None:
+            measured = replace(
+                measured,
+                phases=tuple(
+                    (k, v - profile.staging_unpack_seconds if k == "model_preparation" else v)
+                    for k, v in measured.phases
+                ),
+            )
         per_node, views = [], {}
         for node, cap in sorted(members.items()):
             seconds, item = _measured_transfer(
@@ -824,7 +868,7 @@ def _distributed(service, conn, project, rec, at, spec, candidate, members, prof
                 return None, [item["reason"], "DISTRIBUTED_MEMBER:" + node], detail
             per_node.extend(item["per_node"])
             views.update(item["bindings"])
-        path = _staging_path(per_node, location, members)
+        path = _staging_path(per_node, location, members, unpack)
         staging = path["median_seconds"]
         detail["staging"] = {"source": "measured_network", "per_node": per_node,
                              "bindings": views, "reason": None, **path}  # fmt: skip
@@ -1763,7 +1807,7 @@ def _staging_group(rows):
 
 
 def _ddp_staging_path(row, receipt):
-    """(data_staging, unpack, preparation) on rank 0's timeline of one DDP attempt.
+    """(data_staging, unpack, preparation, {node: unpack}) on rank 0's DDP timeline.
 
     Every rank transfers and unpacks between two barriers, so the staging window
     is one rank's own transfer + unpack (the largest sum), never the maximum
@@ -1780,13 +1824,14 @@ def _ddp_staging_path(row, receipt):
     if own is None or members[0].content_digest != receipt.content_digest:
         raise ValueError(f"{row['id']}: rank 0 receipt is not one of the rank receipts")
     if any(m.unpack_seconds is None for m in members):
-        return max(m.sample.elapsed_seconds for m in members), None, None
+        return max(m.sample.elapsed_seconds for m in members), None, None, None
     critical = max(members, key=lambda m: (m.sample.elapsed_seconds + m.unpack_seconds, m.pod_uid))
     complete = all(m.preparation_seconds is not None for m in members)
     return (
         critical.sample.elapsed_seconds,
         critical.unpack_seconds,
         own.preparation_seconds if complete else None,
+        {m.node_name: m.unpack_seconds for m in members},
     )
 
 
@@ -1820,7 +1865,7 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
         raise ValueError("no completed jobs")
     first = rows[0]["body"]
     keys = ("workload_signature", "context_signature")
-    samples, resolutions = [], []
+    samples, resolutions, pairings = [], [], []
     staged = {row.get("staging") is not None for row in rows}
     if len(staged) > 1:
         raise ValueError("mixed staged and unstaged jobs: staging boundaries differ")
@@ -1871,9 +1916,11 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
             staging = receipt.sample.elapsed_seconds
             unpack, preparation = receipt.unpack_seconds, receipt.preparation_seconds
             if (b.get("placement") or {}).get("distributed"):
-                staging, unpack, preparation = _ddp_staging_path(row, receipt)
+                staging, unpack, preparation, unpacks = _ddp_staging_path(row, receipt)
             if unpack is not None and preparation is not None:
                 prepared = unpack + preparation
+                if (b.get("placement") or {}).get("distributed"):
+                    pairings.append((unpacks, unpack))
         residual = finished - executing - compute - (staging or 0.0) - (prepared or 0.0)
         if not submitted <= started <= executing <= finished or residual < 0:
             raise ValueError(f"{row['id']}: native boundaries overlap the measured compute span")
@@ -1940,7 +1987,25 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
         job_ids=tuple(row["id"] for row in rows),
         source="ra_jobs",
         timestamp_resolution_seconds=max(resolutions),
+        **_unpack_pairing(pairings, samples),
     )
+
+
+def _unpack_pairing(pairings, samples):
+    """Mean per-member unpack and included unpack of DDP rows with model_preparation."""
+    import statistics
+
+    if not pairings or len(pairings) != len(samples):
+        return {}
+    nodes = {frozenset(unpacks) for unpacks, _ in pairings}
+    if len(nodes) != 1:
+        raise ValueError("DDP jobs ran on different member nodes: unpacks cannot be paired")
+    return {
+        "member_unpack_seconds": {
+            n: statistics.fmean(u[n] for u, _ in pairings) for n in sorted(nodes.pop())
+        },
+        "staging_unpack_seconds": statistics.fmean(c for _, c in pairings),
+    }
 
 
 def queue_snapshot_from_pods(
