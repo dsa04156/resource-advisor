@@ -637,6 +637,18 @@ def create_app(
     ):
         return freeze_comparison(service, p.project, value)
 
+    @app.get(PREFIX + "/recommendation-comparisons")
+    def recommendation_comparisons(workload_ref: str | None = None, p=Depends(principal)):
+        from .jct_report import list_comparisons
+
+        return list_comparisons(service, p.project, workload_ref)
+
+    @app.get(PREFIX + "/jct-report")
+    def jct_readiness(workload_ref: str | None = None, p=Depends(principal)):
+        from .jct_report import jct_report
+
+        return jct_report(service, p.project, workload_ref)
+
     @app.get(PREFIX + "/recommendation-comparisons/{ref}")
     def recommendation_comparison(ref: str, p=Depends(principal)):
         return comparison(service, p.project, ref)

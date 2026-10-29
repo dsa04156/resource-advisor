@@ -2458,3 +2458,48 @@ tr.selected td {
   .placement-check { padding-top: 0; }
   .placement-action-buttons button { flex: 1 1 auto; }
 }
+
+/* JCT comparison: dense evidence tables, amber for missing or stale records. */
+.jct-view .panel {
+  margin-bottom: 24px;
+}
+.jct-toolbar select {
+  flex: 1;
+  min-width: 0;
+  max-width: 520px;
+}
+.jct-reasons,
+.jct-count {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  align-items: center;
+}
+.jct-reasons small {
+  flex-basis: 100%;
+  color: var(--warning);
+}
+.jct-split {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 16px;
+}
+.jct-comparison + .jct-comparison {
+  margin-top: 24px;
+}
+.jct-comparison .state-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.jct-view td small {
+  display: block;
+  color: var(--muted);
+}
+@media (max-width: 760px) {
+  .jct-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

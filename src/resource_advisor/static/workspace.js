@@ -34,6 +34,7 @@ export function createWorkflowWorkspace(c) {
     experiments: [
       ["experiments", "실험 비교"],
       ["recommendations", "추천 근거"],
+      ["jct", "JCT 비교"],
       ["scheduler-lab", "스케줄링 실험실"],
       ["scenario", "자원 요청 시나리오"],
     ],
@@ -426,6 +427,13 @@ export function createWorkflowWorkspace(c) {
           "wizard-note",
         ),
       );
+    root.append(
+      el(
+        "p",
+        "‘제출 조건 통과’는 등록·호환·검증 시효를 확인한 수예요. 장치가 지금 비어 있거나 정상 동작한다는 뜻은 아니에요.",
+        "wizard-note",
+      ),
+    );
     const cards = el("div", null, "wizard-cards");
     for (const w of m.items.filter(
       (w) =>
@@ -449,7 +457,12 @@ export function createWorkflowWorkspace(c) {
         add(
           el("div", null, "workload-card-top"),
           badge(w.template_ref ? "저장한 템플릿" : names[w.task_type] || w.task_type),
-          el("small", ready ? "실행 가능 " + ready + "/" + candidates.length : "실행 조건 확인 필요"),
+          el(
+            "small",
+            candidates.length
+              ? "등록 후보 " + candidates.length + "개 · 제출 조건 통과 " + ready + "개"
+              : "등록 후보 없음",
+          ),
         ),
         el("h3", title(w)),
         el("code", w.workload_ref),
@@ -537,6 +550,10 @@ export function createWorkflowWorkspace(c) {
         ),
       );
     root.append(set);
+    const jct = el("a", "후보별 JCT 근거·정책 비교 보기", "action-link");
+    jct.href = "#jct";
+    jct.onclick = () => c.openJct(m.workload.workload_ref);
+    root.append(jct);
     return root;
   }
   function fact(list, label, value) {

@@ -204,46 +204,7 @@ def overview(
         compat_page["items"] = []
         for row in rows:
             spec = WorkloadSpec.model_validate(row["body"])
-            candidates = []
-            for candidate in spec.candidates:
-                base = {
-                    "candidate_ref": candidate.ref,
-                    "backend": candidate.backend,
-                    "variant_ref": candidate.variant_ref,
-                    "capability_ref": candidate.capability_ref,
-                    "resources": candidate.context.resources.model_dump(mode="json"),
-                }
-                try:
-                    _, _, variant, cap = service.bundle(conn, project, spec.ref, candidate.ref)
-                    base.update(
-                        node_ref=cap.node_ref,
-                        cluster_ref=cap.backend_cluster_id,
-                        model=cap.accelerator_model,
-                        device_class=cap.device_class,
-                        resource_key=cap.resource_key,
-                        allocation_mode=cap.allocation_mode,
-                        verification=variant.verification,
-                        runtime_versions=variant.runtime_versions,
-                        validation_refs=list(variant.validation_refs),
-                        capability_observed_at=cap.observed_at.isoformat(),
-                        reasons=compatibility(spec, candidate, variant, cap),
-                        submission_reasons=execution_compatibility(
-                            spec, candidate, variant, cap, operational=service.operational_mode
-                        ),
-                    )
-                except NotFound:
-                    base["reasons"] = ["REGISTRY_ENTRY_MISSING"]
-                except Rejected:
-                    base["reasons"] = ["QUALIFICATION_REJECTED"]
-                base["contract_compatible_now"] = not base["reasons"]
-                base["submission_reasons"] = base.get("submission_reasons", base["reasons"])
-                if not service.operational_mode and candidate.ref != spec.baseline_candidate_ref:
-                    base["submission_reasons"] = [*base["submission_reasons"], "APPROVAL_REQUIRED"]
-                base["submittable_now"] = not base["submission_reasons"]
-                base["submission_warnings"] = [
-                    r for r in base["reasons"] if r not in base["submission_reasons"]
-                ]
-                candidates.append(base)
+            candidates = candidate_rows(service, conn, project, spec)
             compat_page["items"].append(
                 {
                     "workload_ref": spec.ref,
@@ -332,6 +293,55 @@ def overview(
         "observations": observations,
         "semantics": "Recorded state; inventory is not model qualification or admission. Null is unknown.",
     }
+
+
+def candidate_rows(service, conn, project, spec):
+    """Registered candidates with contract and submission-condition reasons.
+
+    Counts derived from these rows mean registration and admission checks, not
+    free capacity or live device health.
+    """
+    candidates = []
+    for candidate in spec.candidates:
+        base = {
+            "candidate_ref": candidate.ref,
+            "backend": candidate.backend,
+            "variant_ref": candidate.variant_ref,
+            "capability_ref": candidate.capability_ref,
+            "resources": candidate.context.resources.model_dump(mode="json"),
+        }
+        try:
+            _, _, variant, cap = service.bundle(conn, project, spec.ref, candidate.ref)
+            base.update(
+                node_ref=cap.node_ref,
+                cluster_ref=cap.backend_cluster_id,
+                model=cap.accelerator_model,
+                device_class=cap.device_class,
+                resource_key=cap.resource_key,
+                allocation_mode=cap.allocation_mode,
+                verification=variant.verification,
+                runtime_versions=variant.runtime_versions,
+                validation_refs=list(variant.validation_refs),
+                capability_observed_at=cap.observed_at.isoformat(),
+                reasons=compatibility(spec, candidate, variant, cap),
+                submission_reasons=execution_compatibility(
+                    spec, candidate, variant, cap, operational=service.operational_mode
+                ),
+            )
+        except NotFound:
+            base["reasons"] = ["REGISTRY_ENTRY_MISSING"]
+        except Rejected:
+            base["reasons"] = ["QUALIFICATION_REJECTED"]
+        base["contract_compatible_now"] = not base["reasons"]
+        base["submission_reasons"] = base.get("submission_reasons", base["reasons"])
+        if not service.operational_mode and candidate.ref != spec.baseline_candidate_ref:
+            base["submission_reasons"] = [*base["submission_reasons"], "APPROVAL_REQUIRED"]
+        base["submittable_now"] = not base["submission_reasons"]
+        base["submission_warnings"] = [
+            r for r in base["reasons"] if r not in base["submission_reasons"]
+        ]
+        candidates.append(base)
+    return candidates
 
 
 def transfer_evidence(store, conn, project, rec):
