@@ -78,6 +78,18 @@
       "bytes": 5922,
       "sha256": "fbb02d8a49fd8299dc7255f463b3714366a69048245691947429b87c58a1890c"
     },
+    "historical-scenarios/01-request-wait-run.png": {
+      "bytes": 191345,
+      "sha256": "7da06b3463dfd4cc7bdb2c7b52c62b16c6106b382a7d245693985e8895380382"
+    },
+    "historical-scenarios/02-kueue-priority.png": {
+      "bytes": 379813,
+      "sha256": "da4101734b3e2e5a8a0e96c6979a12d929989a60d70cb6f0a479ec8f8181d3c4"
+    },
+    "historical-scenarios/README.md": {
+      "bytes": 1656,
+      "sha256": "7719343fa311c0a4aa5d88ba8d06b7c1db907d0c4a6cd7783630c9aff9344ce3"
+    },
     "screenshots/01-resource-overview.png": {
       "bytes": 150439,
       "sha256": "6d76a817801ce8f43c264f2c79e818076fb6942405a7e451339715cfa704215f"
