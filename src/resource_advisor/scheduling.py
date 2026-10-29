@@ -194,6 +194,30 @@ def availability(candidate, cap, observations):
     return {**result, "status": "available", "reason": "OBSERVED_REQUEST_HEADROOM"}
 
 
+def distributed_availability(candidate, members, observations):
+    """Every allocated node must be observed with headroom; the worst node decides."""
+    if any(m is None for m in members):
+        return {"status": "unknown", "reason": "DISTRIBUTED_NODE_EVIDENCE_MISSING", "headroom": {}}
+    per_node = [
+        {"node_ref": m.node_ref, **availability(candidate, m, observations)} for m in members
+    ]
+    for status in ("unavailable", "busy", "unknown"):
+        worst = next((n for n in per_node if n["status"] == status), None)
+        if worst:
+            return {
+                "status": status,
+                "reason": worst["reason"],
+                "headroom": {},
+                "per_node": per_node,
+            }
+    return {
+        "status": "available",
+        "reason": "OBSERVED_REQUEST_HEADROOM",
+        "headroom": {},
+        "per_node": per_node,
+    }
+
+
 def plan_digest(plan):
     # Inventory/queue evidence may refresh without changing the actual execution
     # plan; the selected candidate, target and frozen profile refs stay signed.
@@ -278,13 +302,20 @@ def compile_plan(service, conn, project, request):
             excluded[candidate.ref] = errors + ["CANDIDATE_CONTRACT_UNAVAILABLE"]
             continue
         # Recommendation inputs never inherit the operational staleness relaxation.
+        node_caps = service.node_capabilities(conn, project, candidate)
         errors += execution_compatibility(
             spec,
             candidate,
             variant,
             cap,
             operational=service.operational_mode and rec is None,
-            node_caps=service.node_capabilities(conn, project, candidate),
+            node_caps=node_caps,
+        )
+        # A distributed allocation runs on every declared node, not only the anchor.
+        members = (
+            [node_caps.get(n.capability_ref) for n in candidate.context.distributed.nodes]
+            if candidate.context.distributed is not None
+            else [cap]
         )
         if not service.operational_mode and candidate.ref != spec.baseline_candidate_ref:
             errors.append("APPROVAL_REQUIRED")
@@ -336,7 +367,7 @@ def compile_plan(service, conn, project, request):
                 target["members"] = [m for m in target["members"] if m["node_ref"] in readable]
                 if not target["members"]:
                     errors.append("DATA_ACCESS_DENIED")
-            elif cap.node_ref not in readable:
+            elif any(m is None or m.node_ref not in readable for m in members):
                 errors.append("DATA_ACCESS_DENIED")
         if target and target["members"]:
             from .contracts import CapabilitySnapshot
@@ -350,6 +381,8 @@ def compile_plan(service, conn, project, request):
             ]
             live, usable = pool_availability(candidate, members, observations)
             target["members"] = [{"capability_ref": m.ref, "node_ref": m.node_ref} for m in usable]
+        elif len(members) > 1 or members[0] is not cap:
+            live = distributed_availability(candidate, members, observations)
         else:
             live = availability(candidate, cap, observations)
         key = (str(candidate.backend), cap.node_ref)

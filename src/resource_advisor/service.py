@@ -40,6 +40,12 @@ def required(store, conn, kind, ref, project):
     return item["body"]
 
 
+class NodeEvidence(dict):
+    """capability_ref -> CapabilitySnapshot, plus natively proven validation refs."""
+
+    qualified = None
+
+
 class Service:
     def __init__(
         self, store, *, accept_synthetic=False, operational_mode=False, console_workloads=()
@@ -86,16 +92,56 @@ class Service:
             )["body"]
 
     def node_capabilities(self, conn, project, candidate):
-        """Each distributed node's own capability evidence (missing ones absent)."""
+        """Each distributed node's own capability evidence (missing ones absent).
+
+        ``qualified`` holds (node_ref, validation_ref) pairs proven by a native
+        training job of this project on that node's GPU model, so a reference
+        name alone, or another model's proof, never qualifies a node.
+        """
         d = candidate.context.distributed
         if d is None:
             return None
-        found = {}
+        found = NodeEvidence()
         for node in d.nodes:
             item = self.store.get(conn, "capability", node.capability_ref)
             if item and item["project"] in {project, "*"}:
                 found[node.capability_ref] = CapabilitySnapshot.model_validate(item["body"])
+        row = self.store.get(conn, "variant", candidate.variant_ref)
+        if row and row["project"] == project:
+            variant = RuntimeVariant.model_validate(row["body"])
+            found.qualified = frozenset(
+                (n.node_ref, n.validation_ref)
+                for n in d.nodes
+                if self.node_qualified(conn, project, n, variant)
+            )
         return found
+
+    def node_qualified(self, conn, project, node, variant):
+        """A SUCCEEDED training job of this project, with its persisted training
+        receipt, that ran the same model and runtime on this node's GPU model
+        (``validation_ref`` is a per-model qualification of the variant)."""
+        row = (
+            conn.execute(
+                select(jobs).where(jobs.c.project == project, jobs.c.id == node.validation_ref)
+            )
+            .mappings()
+            .first()
+        )
+        if row is None or row["state"] != State.SUCCEEDED:
+            return False
+        body = row["body"]
+        ran, cap = body.get("variant") or {}, body.get("capability") or {}
+        receipt = self.store.get(conn, "training_receipt", body.get("attempt_id"))
+        return (
+            body.get("spec", {}).get("identity", {}).get("task_type") == "training"
+            and cap.get("accelerator_model") == node.accelerator_model
+            and ran.get("model_digest") == variant.model_digest
+            and ran.get("image") == variant.image
+            and ran.get("environment_digest") == variant.environment_digest
+            and ran.get("runtime_versions") == variant.runtime_versions
+            and receipt is not None
+            and receipt["project"] == project
+        )
 
     def bundle(self, conn, project, workload_ref, candidate_ref):
         spec = WorkloadSpec.model_validate(

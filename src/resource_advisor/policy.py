@@ -82,7 +82,11 @@ def distributed_reasons(spec, candidate, variant, cap, node_caps, at):
         elif any(getattr(member, k) != getattr(cap, k) for k in SHARED_IDENTITY):
             # One Job: same cluster route, image, runtime ABI and allocation kind.
             reasons.append("DISTRIBUTED_NODE_HETEROGENEOUS")
-        elif node.validation_ref not in variant.validation_refs:
+        elif node.validation_ref not in variant.validation_refs or (
+            node.node_ref,
+            node.validation_ref,
+        ) not in (getattr(node_caps, "qualified", None) or ()):
+            # The reference must name this node's native training proof, not just a string.
             reasons.append("DISTRIBUTED_NODE_MODEL_UNQUALIFIED")
         elif age < -5 or age > member.valid_for_seconds:
             reasons.append("DISTRIBUTED_NODE_STALE")

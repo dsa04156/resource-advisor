@@ -53,8 +53,38 @@ def ddp(hosts=NODES, per_node=1, **change):
     return DistributedTraining(**value)
 
 
+def prove(service, ref, model, variant, *, state="SUCCEEDED", receipt=True, **ran):
+    """A finished native training job of this variant on ``model`` (store-level double)."""
+    from sqlalchemy import insert
+
+    from resource_advisor.store import jobs
+
+    body = {
+        "attempt_id": "attempt-" + ref,
+        "spec": {"identity": {"task_type": "training"}},
+        "capability": {"node_ref": "qualifying-node", "accelerator_model": model},
+        "variant": {**variant.model_dump(mode="json"), **ran},
+    }
+    with service.store.transaction() as conn:
+        conn.execute(
+            insert(jobs).values(id=ref, project="team-a", idempotency_key="proof-" + ref,
+                                request_digest=None, state=state, epoch=1, version=1, body=body)
+        )  # fmt: skip
+        if receipt:
+            service.store.put(conn, "training_receipt", body["attempt_id"], "team-a",
+                              {"job_id": ref, "output_checkpoint": {}})  # fmt: skip
+
+
 def setup(
-    service, bundle, *, d=None, caps=None, identity=None, launch="torchrun-ddp", validations=()
+    service,
+    bundle,
+    *,
+    d=None,
+    caps=None,
+    identity=None,
+    launch="torchrun-ddp",
+    validations=(),
+    proven=True,
 ):
     """A training workload whose only candidate is a two-node DDP allocation."""
     spec, binding, _, _ = setup_training(service, bundle)
@@ -106,6 +136,13 @@ def setup(
     )
     service.register("variant", variant, "team-a")
     service.register("workload", ddp_spec, "team-a")
+    if proven:
+        models = {}
+        for node in d.nodes:
+            models.setdefault(node.validation_ref, node.accelerator_model)
+        for ref, model in models.items():
+            if ref in variant.validation_refs:
+                prove(service, ref, model, variant)
     service.register(
         "training_isolation",
         binding.model_copy(update={"ref": "ddp-workload", "workload_ref": "ddp-workload",
@@ -350,6 +387,39 @@ def test_mixed_gpu_model_without_its_own_qualification_is_rejected(service, bund
 def test_declared_node_model_must_match_that_nodes_capability(service, bundle):
     setup(service, bundle, d=mixed(), validations=("fixture-validation-2",))  # b is fixture-gpu
     with pytest.raises(Rejected, match="DISTRIBUTED_NODE_CAPABILITY_MISMATCH"):
+        submit(service)
+
+
+def test_reused_proof_of_another_gpu_model_never_qualifies_a_node(service, bundle):
+    _, _, _, cap = bundle
+    b = cap.model_copy(
+        update={"ref": "cap-node-b", "node_ref": "node-b", "accelerator_model": "fixture-gpu-2"}
+    )
+    # node-b names node-a's model proof: the string is on the variant, the proof is not its model.
+    setup(service, bundle, d=mixed(qualification="fixture-validation"), caps={"node-b": b})
+    with pytest.raises(Rejected, match="DISTRIBUTED_NODE_MODEL_UNQUALIFIED"):
+        submit(service)
+
+
+@pytest.mark.parametrize(
+    "proof",
+    [
+        {"state": "FAILED"},
+        {"receipt": False},
+        {"image": "example.invalid/other@sha256:" + "0" * 64},
+        {"runtime_versions": {"cuda": "other"}},
+        None,
+    ],
+)
+def test_a_validation_name_needs_a_matching_native_training_proof(service, bundle, proof):
+    setup(service, bundle, proven=False)
+    if proof is not None:
+        with service.store.transaction() as conn:
+            variant = RuntimeVariant.model_validate(
+                service.store.get(conn, "variant", "ddp-variant")["body"]
+            )
+        prove(service, "fixture-validation", "fixture-gpu", variant, **proof)
+    with pytest.raises(Rejected, match="DISTRIBUTED_NODE_MODEL_UNQUALIFIED"):
         submit(service)
 
 
@@ -736,3 +806,86 @@ def test_worker_completes_only_after_every_rank_and_binds_rank0_result(service, 
     with service.store.transaction() as conn:
         final = service.store.job(conn, job["id"])
     assert final["state"] == State.FAILED and final["body"].get("result_digest") is None
+
+
+# --- all-node scheduling, data access and cost evidence ------------------------------
+
+
+def inventory(service, gpu_headroom):
+    """Fresh inventory with per-node GPU request headroom (collector output, then shaped)."""
+    from test_inventory import config
+    from test_inventory import source as kubectl
+
+    from resource_advisor.inventory import InventoryCollector, save_inventory
+
+    snapshot = InventoryCollector(config(), execute=kubectl()).collect()
+    template = snapshot["nodes"][0]
+    nodes = []
+    for node, headroom in gpu_headroom.items():
+        item = json.loads(json.dumps(template))
+        item["node_ref"] = node
+        gpu = json.loads(json.dumps(item["resources"]["vendor/gpu.shared"]))
+        gpu["request_headroom"]["value"] = headroom
+        item["resources"]["nvidia.com/gpu"] = gpu
+        nodes.append(item)
+    snapshot["nodes"] = nodes
+    save_inventory(service.store, "team-a", snapshot)
+
+
+def preview(service, profile):
+    from test_heterogeneous_recommendation import scheduling_profile
+
+    from resource_advisor.scheduling import SchedulingPlanRequest, compile_plan
+
+    service.register("scheduling_profile", profile or scheduling_profile(), "team-a")
+    with service.store.transaction() as conn:
+        result = compile_plan(
+            service,
+            conn,
+            "team-a",
+            SchedulingPlanRequest(profile_ref=(profile or scheduling_profile()).ref,
+                                  workload_ref="ddp-workload"),
+        )  # fmt: skip
+    evaluation = (result.get("plan") or {}).get("evaluation") or result.get("evaluation", [])
+    return result, next(e for e in evaluation if e["candidate_ref"] == "ddp")
+
+
+def test_ddp_availability_needs_headroom_on_every_allocated_node(service, bundle):
+    setup(service, bundle)
+    inventory(service, {"node-a": 1, "node-b": 0})
+    _, row = preview(service, None)
+    assert row["availability"]["status"] == "busy"
+    assert {n["node_ref"]: n["status"] for n in row["availability"]["per_node"]} == {
+        "node-a": "available",
+        "node-b": "busy",
+    }
+    inventory(service, {"node-a": 1, "node-b": 1})
+    _, row = preview(service, None)
+    assert row["availability"]["status"] == "available"
+
+
+def test_ddp_data_access_and_cost_evidence_cover_every_node(service, bundle):
+    from test_heterogeneous_recommendation import location, scheduling_profile
+
+    spec = setup(service, bundle)
+    inventory(service, {"node-a": 1, "node-b": 1})
+    service.register("data_location", location(spec, ["node-a"]), "team-a")
+    only = scheduling_profile("only", {"policy": "profile_only"})
+    _, row = preview(service, only)
+    assert "DATA_ACCESS_DENIED" in row["reasons"]  # node-b cannot read the dataset
+
+    from sqlalchemy import delete
+
+    from resource_advisor.store import entities
+
+    with service.store.transaction() as conn:  # replace the location (one per dataset version)
+        conn.execute(delete(entities).where(entities.c.kind == "data_location"))
+    service.register("data_location", location(spec, list(NODES), ref="data-2"), "team-a")
+    queue = scheduling_profile("queue", {"policy": "profile_queue"})
+    result, row = preview(service, queue)
+    evidence = (result.get("plan") or {}).get("recommendation_evidence") or result.get(
+        "recommendation_evidence"
+    )
+    [prediction] = [p for p in evidence["predictions"] if p["candidate_ref"] == "ddp"]
+    assert prediction["predicted_jct_seconds"] is None
+    assert prediction["reasons"] == ["DISTRIBUTED_COST_EVIDENCE_REQUIRED"]

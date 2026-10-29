@@ -739,6 +739,11 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
             item["variant"],
             item["target"],
         )
+        if candidate.context.distributed is not None and rec.policy != "profile_only":
+            # Queue and transfer models describe one node; multi-node allocations need
+            # all-node cost evidence, which is not representable yet: never anchor-only.
+            notes[candidate.ref] = "DISTRIBUTED_COST_EVIDENCE_REQUIRED"
+            continue
         identity = _identity(spec, candidate, cap, variant, target)
         identities.append(identity)
         mine = sorted(

@@ -299,6 +299,9 @@ def ddp_workload(service, pair, *, stale_spare=False):
     )
     service.register("variant", v, "team-a")
     service.register("workload", w, "team-a")
+    from test_distributed_training import prove
+
+    prove(service, "fixture-training-evidence", "fixture-gpu", v)  # native per-model proof
     binding = TrainingIsolation(
         ref=w.ref,
         project_ref="team-a",
@@ -453,3 +456,20 @@ def test_run_rows_show_the_attested_npu_teacher_from_the_training_receipt(client
         aux["reservation_kind"] == "pre-reserved auxiliary Pod; not a joint scheduler reservation"
     )
     assert get(client, "/training-catalog", token="other-operator")["models"] == []
+
+
+def test_conditions_keep_objectives_apart_and_ignore_only_the_declared_batch_axis(
+    client, pair, service
+):
+    common = {"global_batch_size": 16, "dataset_version": signature("input")}
+    training(service, pair, "kd-16", code="k16", batch_size=16, gradient_accumulation=1,
+             input_shape=(16, 3, 32, 32), config_digest=signature("kd"), **common)  # fmt: skip
+    training(service, pair, "kd-8", code="k8", batch_size=8, gradient_accumulation=2,
+             input_shape=(8, 3, 32, 32), config_digest=signature("kd"), **common)  # fmt: skip
+    training(service, pair, "ce-16", code="c16", batch_size=16, gradient_accumulation=1,
+             input_shape=(16, 3, 32, 32), config_digest=signature("ce"), **common)  # fmt: skip
+    key = models(client)["mobilenet_v3_small"]["model_key"]
+    configs = get(client, f"/training-catalog?model={key}")["selected"]["configs"]
+    groups = sorted(sorted(w["workload_ref"] for w in c["workloads"]) for c in configs)
+    assert groups == [["ce-16"], ["kd-16", "kd-8"]]
+    assert {c["condition"]["config_digest"] for c in configs} == {signature("kd"), signature("ce")}

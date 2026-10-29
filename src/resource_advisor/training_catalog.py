@@ -56,6 +56,9 @@ def condition_key(identity):
     if c["global_batch_size"] is not None:
         c.pop("batch_size")
         c.pop("gradient_accumulation")
+        if c["sample_shape"] is not None:
+            # Axis 0 is the declared per-rank micro batch; it varies with the allocation.
+            c.pop("input_shape")
     return signature(c)
 
 
@@ -65,6 +68,11 @@ def condition(identity):
     return {
         "dataset_version": i.dataset_version,
         "input_shape": list(i.input_shape),
+        # Training identities declare input_shape[0] as the per-rank micro batch.
+        "sample_shape": list(i.input_shape[1:])
+        if len(i.input_shape) > 1 and i.input_shape[0] == i.batch_size
+        else None,
+        "config_digest": i.config_digest,
         "batch_size": i.batch_size,
         "global_batch_size": i.global_batch_size,
         "gradient_accumulation": i.gradient_accumulation,
