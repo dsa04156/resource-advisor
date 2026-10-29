@@ -1,0 +1,152 @@
+# Continuous route queue observer for the vision-training candidate routes, including
+# the common RTX 5060 Ti + RTX 5080 DDP route observed per member node. Every 30 s it
+# lists all Pods, Nodes and Kueue LocalQueues once and stores fresh RouteQueueSnapshots
+# through the evidence import path. Read-only cluster access; the existing ra-inventory
+# SA cannot list LocalQueues outside resource-advisor-lab. The DB URL is the existing
+# ra-service-db Secret.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ra-queue-observer
+  namespace: resource-advisor-lab
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ra-queue-observer
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+rules:
+  - apiGroups: [""]
+    resources: [pods, nodes]
+    verbs: [list]
+  - apiGroups: [kueue.x-k8s.io]
+    resources: [localqueues]
+    verbs: [list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ra-queue-observer
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ra-queue-observer
+subjects:
+  - kind: ServiceAccount
+    name: ra-queue-observer
+    namespace: resource-advisor-lab
+---
+# Capacities are verified against node capacity/allocatable each tick; a mismatch fails
+# the snapshot closed. queue_targets lists every LocalQueue by the nodes its ClusterQueue
+# flavors (or, for ra-vt-ddp-amd64, the launcher's node affinity) can place on; pending
+# demand in any other LocalQueue fails every route closed.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ra-queue-observer-config
+  namespace: resource-advisor-lab
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+data:
+  observer.json: |
+    {
+      "project_ref": "ra-lab",
+      "interval_seconds": 30,
+      "routes": [
+        {"cluster_ref": "lab-vt-orin9-v1", "resource_key": "nvidia.com/gpu.shared", "capacity_unit": "logical_slot",
+         "nodes": [{"node_ref": "etri-dev0009-jetorn", "capacity": 2}]},
+        {"cluster_ref": "lab-vt-gb10-v1", "resource_key": "nvidia.com/gpu", "capacity_unit": "physical_device",
+         "nodes": [{"node_ref": "etri-ser0003-cg0ms0", "capacity": 1}]},
+        {"cluster_ref": "lab-vt-rtx5080-v1", "resource_key": "nvidia.com/gpu", "capacity_unit": "physical_device",
+         "nodes": [{"node_ref": "etri-ser0002-cgnmsb", "capacity": 1}]},
+        {"cluster_ref": "lab-vt-rtx5060-v1", "resource_key": "nvidia.com/gpu", "capacity_unit": "physical_device",
+         "nodes": [{"node_ref": "etri-ser0001-cg0msb", "capacity": 1}]},
+        {"cluster_ref": "lab-vt-ddp-amd64-v1", "resource_key": "nvidia.com/gpu", "capacity_unit": "physical_device",
+         "nodes": [{"node_ref": "etri-ser0001-cg0msb", "capacity": 1}, {"node_ref": "etri-ser0002-cgnmsb", "capacity": 1}]}
+      ],
+      "queue_targets": {
+        "resource-advisor-lab/ra-vt-orin9": {"nodes": ["etri-dev0009-jetorn"], "resource_keys": ["nvidia.com/gpu.shared"]},
+        "resource-advisor-lab/ra-vt-gb10": {"nodes": ["etri-ser0003-cg0ms0"], "resource_keys": ["nvidia.com/gpu"]},
+        "resource-advisor-lab/ra-vt-rtx5080": {"nodes": ["etri-ser0002-cgnmsb"], "resource_keys": ["nvidia.com/gpu"]},
+        "resource-advisor-lab/ra-vt-rtx5060": {"nodes": ["etri-ser0001-cg0msb"], "resource_keys": ["nvidia.com/gpu"]},
+        "resource-advisor-lab/ra-vt-ddp-amd64": {"nodes": ["etri-ser0001-cg0msb", "etri-ser0002-cgnmsb"], "resource_keys": ["nvidia.com/gpu"]},
+        "resource-advisor-lab/ra-f0-gpu": {"nodes": ["etri-ser0001-cg0msb", "etri-ser0002-cgnmsb", "etri-ser0003-cg0ms0", "etri-dev0001-jetorn", "etri-dev0005-jetagx"], "resource_keys": ["nvidia.com/gpu", "nvidia.com/gpu.shared"]},
+        "resource-advisor-lab/ra-rtx5060": {"nodes": ["etri-ser0001-cg0msb", "etri-ser0002-cgnmsb", "etri-ser0003-cg0ms0", "etri-dev0001-jetorn", "etri-dev0005-jetagx"], "resource_keys": ["nvidia.com/gpu", "nvidia.com/gpu.shared"]},
+        "resource-advisor-lab/ra-spark": {"nodes": ["etri-ser0001-cg0msb", "etri-ser0002-cgnmsb", "etri-ser0003-cg0ms0", "etri-dev0001-jetorn", "etri-dev0005-jetagx"], "resource_keys": ["nvidia.com/gpu", "nvidia.com/gpu.shared"]},
+        "resource-advisor-lab/ra-jetson-nano": {"nodes": ["etri-ser0001-cg0msb", "etri-ser0002-cgnmsb", "etri-ser0003-cg0ms0", "etri-dev0001-jetorn", "etri-dev0005-jetagx"], "resource_keys": ["nvidia.com/gpu", "nvidia.com/gpu.shared"]},
+        "resource-advisor-lab/ra-jetson-agx": {"nodes": ["etri-ser0001-cg0msb", "etri-ser0002-cgnmsb", "etri-ser0003-cg0ms0", "etri-dev0001-jetorn", "etri-dev0005-jetagx"], "resource_keys": ["nvidia.com/gpu", "nvidia.com/gpu.shared"]},
+        "hairp-scheduling-lab/gpu-pool": {"nodes": ["etri-ser0001-cg0msb", "etri-ser0002-cgnmsb", "etri-ser0003-cg0ms0", "etri-dev0001-jetorn", "etri-dev0005-jetagx"], "resource_keys": ["nvidia.com/gpu", "nvidia.com/gpu.shared"]},
+        "hairp-scheduling-lab/multi-gpu-poc": {"nodes": ["etri-ser0001-cg0msb", "etri-ser0002-cgnmsb", "etri-ser0003-cg0ms0"], "resource_keys": ["nvidia.com/gpu"]},
+        "hairp-scheduling-lab/gpu-lab": {"nodes": ["etri-ser0001-cg0msb", "etri-ser0002-cgnmsb"], "resource_keys": ["nvidia.com/gpu"]},
+        "mlops/training": {"nodes": ["etri-ser0001-cg0msb"], "resource_keys": ["nvidia.com/gpu"]},
+        "kubeflow-user-mlops/training": {"nodes": ["etri-ser0001-cg0msb"], "resource_keys": ["nvidia.com/gpu"]},
+        "resource-advisor-team-b/research": {"nodes": ["etri-ser0002-cgnmsb"], "resource_keys": ["nvidia.com/gpu"]},
+        "resource-advisor-lab/ra-hailo-lab": {"nodes": ["etri-dev0006-raspi5"], "resource_keys": ["hailo.ai/h8"]},
+        "resource-advisor-lab/ra-hailo-second": {"nodes": ["etri-dev0002-raspi5"], "resource_keys": ["hailo.ai/h8"]},
+        "resource-advisor-lab/ra-intel-npu": {"nodes": ["etri-ser0002-cgnmsb"], "resource_keys": ["npu.intel.com/accel"]},
+        "resource-advisor-lab/ra-live-cpu": {"nodes": ["etri-ser0001-cg0msb"], "resource_keys": ["cpu"]},
+        "resource-advisor-lab/ra-mobilint": {"nodes": ["etri-ser0004-cgnms0"], "resource_keys": ["mobilint.com/npu"]},
+        "resource-advisor-lab/ra-rockchip-npu": {"nodes": ["etri-dev0004-tedger"], "resource_keys": ["rockchip.com/rk3399pro"]}
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ra-queue-observer
+  namespace: resource-advisor-lab
+  labels:
+    app.kubernetes.io/name: ra-queue-observer
+    app.kubernetes.io/part-of: ra-vision-training
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app.kubernetes.io/name: ra-queue-observer}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ra-queue-observer
+        app.kubernetes.io/part-of: ra-vision-training
+    spec:
+      serviceAccountName: ra-queue-observer
+      # Same node as ra-api: the console-api base layers are already present.
+      nodeSelector: {kubernetes.io/hostname: etri-ser0001-cg0msb}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: observer
+          # console-api composite @88ed35d9 + appended resource_advisor/route_queue_observer.py
+          image: 10.254.192.47:5000/resource-advisor/console-api@sha256:4240bd205c5655f309c0b79166425f79ab970c5688c9315197bca6f24ef2e3f9
+          command: [python, -m, resource_advisor.route_queue_observer]
+          args: [--config, /config/observer.json, --in-cluster, --heartbeat-path, /tmp/heartbeat]
+          env:
+            - name: RA_DATABASE_URL
+              valueFrom: {secretKeyRef: {name: ra-service-db, key: url}}
+            - {name: PYTHONDONTWRITEBYTECODE, value: "1"}
+            - {name: HOME, value: /tmp}
+          readinessProbe:
+            exec:
+              command: [python, -m, resource_advisor.cli, check-heartbeat, --path, /tmp/heartbeat, --max-age, "90"]
+            periodSeconds: 15
+            timeoutSeconds: 5
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 384Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          volumeMounts:
+            - {name: config, mountPath: /config, readOnly: true}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: config
+          configMap: {name: ra-queue-observer-config}
+        - name: tmp
+          emptyDir: {sizeLimit: 16Mi}
