@@ -23,7 +23,7 @@ its history and the `live-vm-slurm` execution route are separate and unchanged.
 Accounting (SlurmDBD) was added on 2026-10-29, see
 [`../slurm-accounting-virtual-140`](../slurm-accounting-virtual-140/README.md). The execution
 route in [`../slurm-execution-virtual-140`](../slurm-execution-virtual-140/README.md) is
-configured but `NOT_VALIDATED`: no qualified native runtime, worker at 0 replicas, no job
+configured but `NOT_VALIDATED`: no qualified native runtime, worker not deployed (0 replicas), no job
 submitted through Resource Advisor.
 
 ## Transport

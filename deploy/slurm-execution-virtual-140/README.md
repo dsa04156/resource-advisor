@@ -12,6 +12,10 @@ operator enables a qualified native runtime.
 | [`worker-route.example.json`](worker-route.example.json) | worker route `ra-lab`/`virtual-slurm-140`, `native_runtimes: {}` |
 | [`worker.yaml`](worker.yaml) | `ra-virtual-slurm-140-worker`, **replicas 0** |
 
+Gateway files and the two keys were installed on 2026-10-29 and checked with read-only
+`squeue`/`sacct` and denials only; see
+[`docs/evidence/slurm-execution-140-20261029.md`](../../docs/evidence/slurm-execution-140-20261029.md).
+
 ## Why nothing can execute
 
 - Worker: `native_runtimes` is empty, so `SlurmBackend.validate` raises
