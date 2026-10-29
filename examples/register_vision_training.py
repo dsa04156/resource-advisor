@@ -21,6 +21,8 @@ from resource_advisor import vision_training
 from resource_advisor.contracts import (
     Candidate,
     CapabilitySnapshot,
+    DistributedNode,
+    DistributedTraining,
     ExecutionContext,
     ExecutionPolicy,
     ProfilingPolicy,
@@ -56,6 +58,11 @@ def build(plan, dataset, observed_at):
     cp_digest = "sha256:" + hashlib.sha256(cp).hexdigest()
     inp_digest = "sha256:" + hashlib.sha256(inp).hexdigest()
     batch, steps = plan["global_batch"], plan["steps"]
+    # A distributed plan (one DDP candidate over plan["candidates"] as its member nodes)
+    # signs the per-rank micro batch as the input shape and the fixed global batch.
+    ddp = plan.get("distributed")
+    world = len(plan["candidates"]) if ddp else 1
+    micro = batch // world
     # A plan may name another entry (e.g. the joint KD runner) and its extra signed flags.
     command = (
         *plan.get("entry", ("python3", "/opt/ra-train/vision_training.py")), "--isolated",
@@ -66,6 +73,7 @@ def build(plan, dataset, observed_at):
         "--global-batch", str(batch), "--steps", str(steps),
         "--lr", str(plan["lr"]), "--weight-decay", str(plan["weight_decay"]),
         "--seed", str(plan["seed"]),
+        *(("--strategy", "ddp") if ddp else ()),
         *plan.get("extra_args", ()),
     )
     quality = QualityPolicy(
@@ -78,8 +86,8 @@ def build(plan, dataset, observed_at):
         dataset_version=inp_digest,
         config_digest=plan.get("config_digest") or signature({"command": command}),
         task_type="training",
-        input_shape=(batch, 3, 224, 224),
-        batch_size=batch,
+        input_shape=(micro, 3, 224, 224),
+        batch_size=micro,
         global_batch_size=batch,
         precision="fp32",
         seed=plan["seed"],
@@ -125,6 +133,8 @@ def build(plan, dataset, observed_at):
             evidence_refs=(c["validation_ref"],),
         )
         capabilities.append(capability)
+        if ddp:
+            continue
         candidates.append(
             Candidate(
                 ref=c["candidate"],
@@ -147,6 +157,53 @@ def build(plan, dataset, observed_at):
                 ),
             )
         )
+    if ddp:
+        first = plan["candidates"][0]
+        distributed = DistributedTraining(
+            strategy="ddp",
+            launcher="torchrun",
+            collective=ddp["collective"],
+            nodes=tuple(
+                sorted(
+                    (
+                        DistributedNode(
+                            node_ref=c["node"],
+                            capability_ref=cap.ref,
+                            gpus=1,
+                            accelerator_model=c["accelerator_model"],
+                            validation_ref=c["validation_ref"],
+                        )
+                        for c, cap in zip(plan["candidates"], capabilities, strict=True)
+                    ),
+                    key=lambda n: n.node_ref,
+                )
+            ),
+            nproc_per_node=1,
+            world_size=world,
+        )
+        candidates.append(
+            Candidate(
+                ref=ddp["candidate"],
+                variant_ref=f"{ref}-{first['arch']}",
+                capability_ref=capabilities[0].ref,
+                backend="kubernetes",
+                context=ExecutionContext(
+                    arch=first["arch"],
+                    environment_digest=environment_of(first["image"]),
+                    runtime_versions=first["runtime_versions"],
+                    accelerator_model=first["accelerator_model"],
+                    memory_model=first["memory_model"],
+                    power_mode="default",
+                    allocation_mode="physical_device",
+                    resources=Resources(
+                        host_cpu=plan["host_cpu"],
+                        host_memory_mib=plan["host_memory_mib"],
+                        accelerator_count=1,
+                    ),
+                    distributed=distributed,
+                ),
+            )
+        )
     variant_bodies = [
         RuntimeVariant(
             ref=vref,
@@ -162,9 +219,10 @@ def build(plan, dataset, observed_at):
             environment_digest=environment_of(v["c"]["image"]),
             command=command,
             verification="TRAINING_VERIFIED",
-            validation_refs=tuple(v["validation"]),
-            supported_shapes=((batch, 3, 224, 224),),
+            validation_refs=tuple(v["validation"]) + tuple(plan.get("extra_validation_refs", ())),
+            supported_shapes=((micro, 3, 224, 224),),
             runtime_versions=v["c"]["runtime_versions"],
+            distributed_launch="torchrun-ddp" if ddp else None,
         )
         for vref, v in variants.items()
     ]
@@ -187,7 +245,8 @@ def build(plan, dataset, observed_at):
         input_digest=inp_digest,
         checkpoint_size_bytes=len(cp),
         input_size_bytes=len(inp),
-        validation_refs=tuple(c["validation_ref"] for c in plan["candidates"]),
+        validation_refs=tuple(c["validation_ref"] for c in plan["candidates"])
+        + tuple(plan.get("extra_validation_refs", ())),
     )
     return {
         "capabilities": [c.model_dump(mode="json") for c in capabilities],

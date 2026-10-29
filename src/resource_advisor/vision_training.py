@@ -132,6 +132,17 @@ def checkpoint_digest(model):
     return "sha256:" + h.hexdigest()
 
 
+def parameter_digest(model):
+    """Digest of trainable parameters only (DDP keeps these identical on every rank)."""
+    h = hashlib.sha256()
+    for name, tensor in sorted(model.named_parameters()):
+        value = tensor.detach().to("cpu").contiguous()
+        h.update(name.encode() + b"\0" + str(value.dtype).encode() + b"\0")
+        h.update(json.dumps(list(value.shape)).encode() + b"\0")
+        h.update(value.numpy().tobytes())
+    return "sha256:" + h.hexdigest()
+
+
 def build_model(name, classes, seed, initial_state=None):
     """Seeded architecture; a pinned state file makes the start identical across runtimes."""
     import torch
@@ -232,6 +243,7 @@ RANK_KEYS = (
     "device_name",
     "initial_checkpoint_digest",
     "output_checkpoint_digest",
+    "output_parameter_digest",
 )
 
 
@@ -253,7 +265,8 @@ def check_ranks(records, world):
         raise RuntimeError("distributed rank record lacks observed identity")
     if len({r["pod_uid"] for r in records}) != world or len({r["node"] for r in records}) != world:
         raise RuntimeError("distributed ranks do not run on distinct Pods and nodes")
-    if len({(r["initial_checkpoint_digest"], r["output_checkpoint_digest"]) for r in records}) != 1:
+    # BatchNorm buffers are rank-local after the last forward; parameters must match.
+    if len({(r["initial_checkpoint_digest"], r["output_parameter_digest"]) for r in records}) != 1:
         raise RuntimeError("DDP replicas diverged")
     if records[0]["initial_checkpoint_digest"] == records[0]["output_checkpoint_digest"]:
         raise RuntimeError("training produced no parameter change")
@@ -392,6 +405,7 @@ def run(args, environ=os.environ, stage=None):
             "device_name": torch.cuda.get_device_name(device),
             "initial_checkpoint_digest": initial,
             "output_checkpoint_digest": output,
+            "output_parameter_digest": parameter_digest(core),
             "loop_seconds": float(elapsed),
             "peak_memory_mib": float(peak),
             "losses_digest": signature(losses),

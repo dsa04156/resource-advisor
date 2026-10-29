@@ -315,6 +315,7 @@ def rank_record(rank, **overrides):
         "device_name": "GPU",
         "initial_checkpoint_digest": "sha256:" + "1" * 64,
         "output_checkpoint_digest": "sha256:" + "2" * 64,
+        "output_parameter_digest": "sha256:" + "4" * 64,
         "loop_seconds": 1.0,
         "peak_memory_mib": 10.0,
         "losses_digest": f"sha256:{rank}",
@@ -328,6 +329,26 @@ def test_rank_records_accept_distinct_members_with_identical_replicas():
     assert [r["rank"] for r in vt.check_ranks(records, 2)] == [0, 1]
 
 
+def test_rank_local_batchnorm_buffers_may_differ_but_parameters_may_not():
+    # DDP broadcasts rank 0 buffers before each forward; the last forward updates them locally.
+    buffers = [rank_record(0), rank_record(1, output_checkpoint_digest="sha256:" + "5" * 64)]
+    assert len(vt.check_ranks(buffers, 2)) == 2
+    with pytest.raises(RuntimeError, match="diverged"):
+        vt.check_ranks([rank_record(0), rank_record(1, output_parameter_digest="sha256:6")], 2)
+
+
+@pytest.mark.skipif(importlib.util.find_spec("torch") is None, reason="torch not installed")
+def test_parameter_digest_ignores_buffers_only():
+    import torch
+
+    model = torch.nn.Sequential(torch.nn.Conv2d(3, 4, 3), torch.nn.BatchNorm2d(4))
+    before = vt.parameter_digest(model), vt.checkpoint_digest(model)
+    model.train()
+    with torch.no_grad():
+        model(torch.rand(2, 3, 64, 64))  # BatchNorm running stats only
+    assert vt.parameter_digest(model) == before[0] and vt.checkpoint_digest(model) != before[1]
+
+
 @pytest.mark.parametrize(
     "bad",
     [
@@ -335,7 +356,7 @@ def test_rank_records_accept_distinct_members_with_identical_replicas():
         [rank_record(0), rank_record(0)],
         [rank_record(0), rank_record(1, node="node-0")],
         [rank_record(0), rank_record(1, pod_uid=None)],
-        [rank_record(0), rank_record(1, output_checkpoint_digest="sha256:" + "3" * 64)],
+        [rank_record(0), rank_record(1, output_parameter_digest="sha256:" + "3" * 64)],
         [rank_record(0), rank_record(1, initial_checkpoint_digest="sha256:" + "3" * 64)],
         [
             rank_record(0, output_checkpoint_digest="sha256:" + "1" * 64),
