@@ -5,14 +5,14 @@ tests passed and **installed live with read-only checks**; execution route **con
 NOT_VALIDATED** (no job ran). Not physical GPU
 evidence, not execution or training qualification. Zero native workloads were submitted.
 
-## Accounting (live, Docker cluster `sim` on 10.254.192.140)
+## Accounting (live, Docker cluster `sim` on <SLURM_HOST>)
 
 | Item | Result |
 |---|---|
 | Services | `slurmdbd` (`slurm-sim-dbd:24.11.5`, image `sha256:d06e2c7f…`, slurmdbd `24.11.5-4+deb13u1`) and `slurmdbd-mariadb` (`mariadb@sha256:c4124d1a…`, 11.8.9) on `slurmnet`, no published ports, named volume `ra-slurmdbd-mariadb` |
 | Secrets | generated on the host into a 0700 directory, never printed; 0 matches of either password in `docker logs` or `docker inspect` env |
 | Controller | `AccountingStorageType=accounting_storage/slurmdbd`, host `slurmdbd:6819`; TRES `cpu,mem,energy,node,billing,fs/disk,vmem,pages,gres/gpu,gres/gpumem,gres/gpuutil`; same container (not recreated), 6 nodes idle, `NEXT_JOB_ID=3` before and after |
-| Registration | `sacctmgr show cluster`: `sim` at `172.19.0.2:6817`, RPC 10752; associations `sim/ra-lab/slurm` (QOS `normal`) |
+| Registration | `sacctmgr show cluster`: `sim` at `<CONTROLLER_INTERNAL_ENDPOINT>`, RPC 10752; associations `sim/ra-lab/slurm` (QOS `normal`) |
 | Query | `docker exec --user slurm slurmctld sacct -X …` exit 0, 0 rows (no jobs since accounting began) |
 | Persistence | after `docker restart slurmdbd-mariadb slurmdbd`, associations still present and controller `sacct` exit 0; `sdiag` DBD agent queue 0 |
 | Backups | `~/slurm-docker/backup-ra-accounting-20261029T073141Z/` and `…T073508Z/` (slurm.conf, `scontrol show config`, StateSaveLocation tar, `clustername`); original `clustername` (`sim|623`) also kept in the spool as `clustername.pre-ra-accounting-20261029T073508Z` |
@@ -39,12 +39,12 @@ evidence, not execution or training qualification. Zero native workloads were su
   host-side result reads. Requests cannot choose the container, user, path or flags.
 - Route `ra-lab`/`virtual-slurm-140`: gateway scope `gpu-big`, `gpu:a100` ×1
   (virtual slot), empty `native_bindings`/`training_bindings`; worker `native_runtimes: {}`;
-  Deployment `ra-virtual-slurm-140-worker` at 0 replicas.
+  Deployment manifest `ra-virtual-slurm-140-worker` specifies 0 replicas and is not deployed; the route is an example configuration, not registered in the API.
 - Tests: `tests/test_slurm_executor.py` 10 passed (5 new: container wrapping, invalid
   container/user, submission rejected before Docker without an enabled runtime, host
   result mapping, configured result owner, committed route/gateway cannot submit);
   20 related gateway tests in `test_slurm_training.py`/`test_integrated_operations.py` passed.
-  `tests/test_slurm_accounting_script.py` (stubbed Docker): 2 regressions for the two review
+  `tests/test_slurm_accounting_script.py` (stubbed Docker): 3 tests passed, covering the two review
   P2s in the rollback path (fixed in 49ef4bc, fde5d54; each fails on the prior commit). The
   live switch had already run with the earlier script; the fixed script was copied to the host
   (sha256 matching the final commit) and not re-run; a failed `clustername` copy is reported, not claimed restored.
@@ -52,9 +52,9 @@ evidence, not execution or training qualification. Zero native workloads were su
   defects; the two rollback P2s above are fixed.
 - Installed 07:43Z: `~/.ra-virtual-slurm/slurm_executor.py` (sha256 `c4169551…`, 0600),
   `executor.json`, `results.json`; `authorized_keys` backed up, two lines added
-  (`ra-virtual-slurm-140-executor`, `-results`, both `restrict,from="10.254.192.47"`), observer
+  (`ra-virtual-slurm-140-executor`, `-results`, both `restrict,from="<ADVISOR_EGRESS_IP>"`), observer
   line unchanged; `/jobs/ra-lab` created as `slurm` (empty).
-- Live checks from 10.254.192.47 (no `sbatch`, no port forwarding tested):
+- Live checks from <ADVISOR_EGRESS_IP> (no `sbatch`, no port forwarding tested):
 
 | Key | Request | Result |
 |---|---|---|

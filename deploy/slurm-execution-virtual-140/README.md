@@ -35,7 +35,7 @@ filtered by complete `(project, cluster)` pairs (`store.job_route_filter`).
 operator-set `container`: the already-scoped argv runs as
 `/usr/bin/docker exec [--interactive] --user <user> --env TZ=UTC --env SLURM_TIME_FORMAT=… <container> /usr/bin/<cmd> …`.
 Requests cannot choose the container, user, path or flags. Two keys, separate from
-the read-only observer key, each `restrict,from="10.254.192.47"`, forced to:
+the read-only observer key, each `restrict,from="<ADVISOR_EGRESS_IP>"`, forced to:
 
 ```
 /usr/bin/python3 -I /home/etri/.ra-virtual-slurm/slurm_executor.py --config /home/etri/.ra-virtual-slurm/executor.json   # ra-virtual-slurm-140-executor

@@ -1,7 +1,7 @@
 # SlurmDBD accounting for the Docker "sim" cluster (`virtual-slurm-140`)
 
 Adds persistent accounting to the user-supplied Docker Slurm 24.11.5 cluster on the
-`10.254.192.140` host (`~/slurm-docker`, containers `slurmctld`, `cpu-1/2`, `gpu-big`,
+`<SLURM_HOST>` host (`~/slurm-docker`, containers `slurmctld`, `cpu-1/2`, `gpu-big`,
 `gpu-mid`, `gpu-s1/2` on network `slurmnet`). The host's native `etri-slurm`
 (ports 6817/6819, MariaDB on 127.0.0.1:3306) is a different cluster and is not touched.
 
