@@ -372,19 +372,77 @@ def test_native_timestamp_resolution_is_reported_apart_from_n1_spread(service, c
     assert "profile_spread" in uncertainty["missing"]
 
 
-def test_measured_unpack_and_preparation_leave_only_true_residue_unattributed():
+def prepared_row(unpack, preparation):
     row = staged_ddp_row()
     for m in row["staging_members"]:
-        m["unpack_seconds"] = 0.5 if m["pod_uid"] == "uid-0" else 1.5
+        rank = 0 if m["pod_uid"] == "uid-0" else 1
+        m["unpack_seconds"] = unpack[rank]
+        if preparation[rank] is not None:
+            m["preparation_seconds"] = preparation[rank]
     row["staging"] = {**row["staging_members"][0], "preparation_seconds": 2.0}
-    made = jct_profile_from_jobs([row], ref="ddp", valid_for_seconds=600, hardware=HARDWARE)
-    # critical member (rank 0, 6 s transfer) unpack 0.5 + rank-0 preparation 2.0, once
-    assert made.phases == {"runtime_startup": 3.0, "compute": 10.0, "data_staging": 6.0,
-                           "model_preparation": 2.5, "unattributed_in_container": 1.5}  # fmt: skip
+    return row
 
+
+@pytest.mark.parametrize(
+    ("unpack", "preparation", "phases"),
+    [
+        # rank 0: transfer 6 + unpack 0.5 is the slowest staging path; its own
+        # preparation follows (rank 1's longer preparation waits inside compute's
+        # first collective, so it is never added again)
+        ((0.5, 1.5), (2.0, 3.0), {"data_staging": 6.0, "model_preparation": 2.5,
+                                  "unattributed_in_container": 1.5}),
+        # rank 1: transfer 4 + unpack 3 = 7 is the barrier path, one rank's own
+        # transfer and unpack, never max(transfer) + max(unpack) across ranks
+        ((0.5, 3.0), (2.0, 3.0), {"data_staging": 4.0, "model_preparation": 5.0,
+                                  "unattributed_in_container": 1.0}),
+        # a member without its own preparation: no rank 0 substitution, the
+        # preparation stays in the unattributed residual
+        ((0.5, 1.5), (2.0, None), {"data_staging": 6.0, "unattributed_in_container": 4.0}),
+    ],
+)  # fmt: skip
+def test_ddp_preparation_follows_one_synchronized_rank_path(unpack, preparation, phases):
+    made = jct_profile_from_jobs([prepared_row(unpack, preparation)], ref="ddp",
+                                 valid_for_seconds=600, hardware=HARDWARE)  # fmt: skip
+    assert made.phases == {"runtime_startup": 3.0, "compute": 10.0, **phases}
+
+
+def test_mixed_preparation_evidence_is_refused():
+    row = prepared_row((0.5, 1.5), (2.0, 3.0))
     plain = staged_ddp_row()
     plain["id"] = "j-2"
     for m in (*plain["staging_members"], plain["staging"]):
         m["job_id"] = "j-2"
     with pytest.raises(ValueError, match="preparation"):
         jct_profile_from_jobs([row, plain], ref="mixed", valid_for_seconds=600, hardware=HARDWARE)
+
+
+def pod(name, request, *, job=None, node="node-a"):
+    annotations = {"resource-advisor/job-id": job} if job else {}
+    return {
+        "metadata": {"name": name, "namespace": "lab", "annotations": annotations},
+        "spec": {"nodeName": node,
+                 "containers": [{"resources": {"requests": {"vendor/gpu.shared": request}}}]},
+        "status": {"phase": "Running", "startTime": now().isoformat()},
+    }  # fmt: skip
+
+
+def snapshot_of(pods):
+    from resource_advisor.recommendation import queue_snapshot_from_pods
+
+    return queue_snapshot_from_pods(
+        pods, ref="q", project_ref="team-a", cluster_ref="lab", route_ref="node-a",
+        nodes={"node-a"}, resource_key="vendor/gpu.shared", capacity=2,
+        capacity_unit="logical_slot", observed_at=now(), evidence_ref="fixture",
+        expected_occupancy={"j-2": 30.0, "j-1": 30.0},
+    )  # fmt: skip
+
+
+def test_a_pod_holding_several_units_never_reads_as_one_occupant():
+    # capacity 2, one known Pod holding both slots: a one-item complete snapshot
+    # would leave a phantom free slot for the selector.
+    snap = snapshot_of([pod("p", "2", job="j-2")])
+    assert not snap.complete
+    assert snap.incomplete_reasons == ("MULTI_UNIT_DEMAND_UNMODELED:j-2:2",)
+
+    one = snapshot_of([pod("p", "1", job="j-1")])
+    assert one.complete and [i.job_id for i in one.running] == ["j-1"]

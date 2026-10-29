@@ -1742,6 +1742,34 @@ def _staging_group(rows):
     return f"ddp:{attempts}@{groups[0]['nodes']}"
 
 
+def _ddp_staging_path(row, receipt):
+    """(data_staging, unpack, preparation) on rank 0's timeline of one DDP attempt.
+
+    Every rank transfers and unpacks between two barriers, so the staging window
+    is one rank's own transfer + unpack (the largest sum), never the maximum
+    transfer of one rank added to the maximum unpack of another. Rank 0 then
+    prepares and starts its measured compute; a slower peer's preparation is
+    waited for inside that compute (first collective), so only rank 0's own
+    preparation is a phase. Preparation is used only when every rank reported
+    its own; otherwise it stays in the residual (no rank 0 substitution). Without
+    every rank's unpack, staging is the slowest transfer (a lower bound of the
+    window) and unpack/preparation stay in the residual.
+    """
+    members = member_receipts(row)
+    own = next((m for m in members if m.pod_uid == receipt.pod_uid), None)
+    if own is None or members[0].content_digest != receipt.content_digest:
+        raise ValueError(f"{row['id']}: rank 0 receipt is not one of the rank receipts")
+    if any(m.unpack_seconds is None for m in members):
+        return max(m.sample.elapsed_seconds for m in members), None, None
+    critical = max(members, key=lambda m: (m.sample.elapsed_seconds + m.unpack_seconds, m.pod_uid))
+    complete = all(m.preparation_seconds is not None for m in members)
+    return (
+        critical.sample.elapsed_seconds,
+        critical.unpack_seconds,
+        own.preparation_seconds if complete else None,
+    )
+
+
 def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
     """Aggregate COMPLETED, quality-passed RA jobs with native timestamps on one node.
 
@@ -1759,9 +1787,9 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
     its staging is the slowest member's, and DDP communication stays in compute.
     When every receipt also carries the measured bundle unpack and runtime
     preparation (data verification/preprocessing, model build), their sum is
-    ``model_preparation`` (DDP: the critical member's unpack plus rank 0's
-    preparation) and is subtracted from the residual once; whatever remains is
-    ``unattributed_in_container``, never relabeled.
+    ``model_preparation`` (DDP: see ``_ddp_staging_path``) and is subtracted from
+    the residual once; whatever remains is ``unattributed_in_container``, never
+    relabeled.
     """
     import statistics
 
@@ -1821,19 +1849,11 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
             ):
                 raise ValueError(f"{row['id']}: staging receipt unrelated, remote or mixed dataset")
             staging = receipt.sample.elapsed_seconds
-            unpack = receipt.unpack_seconds
+            unpack, preparation = receipt.unpack_seconds, receipt.preparation_seconds
             if (b.get("placement") or {}).get("distributed"):
-                # Ranks stage in parallel between barriers; compute starts after the
-                # slowest member, so that member's own staging is the critical path.
-                members = member_receipts(row)
-                if members[0].content_digest != receipt.content_digest or receipt.pod_uid not in {
-                    m.pod_uid for m in members
-                }:
-                    raise ValueError(f"{row['id']}: rank 0 receipt is not one of the rank receipts")
-                critical = max(members, key=lambda m: m.sample.elapsed_seconds)
-                staging, unpack = critical.sample.elapsed_seconds, critical.unpack_seconds
-            if unpack is not None and receipt.preparation_seconds is not None:
-                prepared = unpack + receipt.preparation_seconds
+                staging, unpack, preparation = _ddp_staging_path(row, receipt)
+            if unpack is not None and preparation is not None:
+                prepared = unpack + preparation
         residual = finished - executing - compute - (staging or 0.0) - (prepared or 0.0)
         if not submitted <= started <= executing <= finished or residual < 0:
             raise ValueError(f"{row['id']}: native boundaries overlap the measured compute span")
@@ -1923,6 +1943,8 @@ def queue_snapshot_from_pods(
     A Pod's expected occupancy is known only through ``expected_occupancy`` (job id
     → seconds, e.g. a frozen RA plan). External long-running occupants stay unknown,
     which marks the snapshot incomplete instead of pretending the device is free.
+    Each item is one unit of ``resource_key``; a Pod requesting any other amount
+    also marks the snapshot incomplete rather than being counted as one unit.
     """
     from .inventory import pod_request
 
@@ -1932,7 +1954,10 @@ def queue_snapshot_from_pods(
         spec, status = pod.get("spec", {}), pod.get("status", {})
         if status.get("phase") in {"Succeeded", "Failed"}:
             continue
-        if not resource_key or not pod_request(pod, resource_key):
+        if not resource_key:
+            continue
+        amount = pod_request(pod, resource_key)
+        if not amount:
             continue
         node = spec.get("nodeName")
         if node is not None and node not in nodes:
@@ -1945,6 +1970,10 @@ def queue_snapshot_from_pods(
         occupancy = expected_occupancy.get(job_id) if job_id else None
         if occupancy is None:
             reasons.append("OCCUPANCY_UNKNOWN:" + name)
+        if amount != 1:
+            # The queue model has one unit per item: a Pod holding several units (or a
+            # fraction) is not one occupant, and is never priced as one.
+            reasons.append(f"MULTI_UNIT_DEMAND_UNMODELED:{name}:{amount}")
         started = status.get("startTime")
         item = QueueItem(
             job_id=name[:128], expected_occupancy_seconds=occupancy, started_at=started
