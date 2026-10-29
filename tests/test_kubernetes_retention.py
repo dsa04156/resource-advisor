@@ -93,7 +93,9 @@ class Scheduler:
             assert manifest["spec"]["template"]["metadata"]["finalizers"] == [FINALIZER]
             return json.dumps(self.obj)
         if "delete" in args:
-            assert "--cascade=foreground" in args
+            options = json.loads(kwargs["stdin"])
+            assert options["propagationPolicy"] == "Foreground"
+            assert options["preconditions"] == {"uid": self.obj["metadata"]["uid"]}
             self.obj["metadata"]["deletionTimestamp"] = "2026-10-03T00:00:06Z"
             return "deleted"
         if "patch" in args:

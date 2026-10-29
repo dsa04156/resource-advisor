@@ -455,6 +455,50 @@ def test_recreated_same_name_kubernetes_job_is_never_adopted(service, foreign_an
         backend.reconcile(body(service, job["id"]))
 
 
+@pytest.mark.parametrize("replaced", ["never", "before_read", "between_read_and_delete", "gone"])
+def test_kubernetes_cancel_deletes_only_the_bound_uid(service, replaced):
+    from test_backends import row
+
+    job = row(service)
+    owner = {
+        "resource-advisor/job-id": job["id"],
+        "resource-advisor/context-signature": job["body"]["context_signature"],
+    }
+    job["body"].update(external_id=job["body"]["attempt_id"], backend_uid="u1")
+    live = {"metadata": {"name": job["body"]["attempt_id"], "uid": "u1", "annotations": owner}}
+    foreign = {"metadata": {"name": job["body"]["attempt_id"], "uid": "u2", "annotations": {}}}
+    deleted = []
+
+    def execute(args, **kwargs):
+        nonlocal live
+        if "delete" in args:
+            options = json.loads(kwargs["stdin"])
+            assert "--raw" in args and options["propagationPolicy"] == "Background"
+            if live is None or options["preconditions"]["uid"] != live["metadata"]["uid"]:
+                raise BackendError("kubectl exited with code 1")  # API server 409/404
+            deleted.append(live["metadata"]["uid"])
+            return "{}"
+        current = live
+        if replaced == "between_read_and_delete":
+            live = foreign  # replaced right after this read
+        return json.dumps(current) if current else ""
+
+    if replaced == "before_read":
+        live = foreign
+    if replaced == "gone":
+        live = None
+    backend = KubernetesBackend(
+        namespace="research-a", local_queue="batch", node_selector={"pool": "lab"}, execute=execute
+    )
+    if replaced in {"before_read", "between_read_and_delete"}:
+        with pytest.raises(BackendError):
+            backend.cancel(job)
+        assert deleted == []
+    else:
+        backend.cancel(job)
+        assert deleted == ([] if replaced == "gone" else ["u1"])
+
+
 @pytest.mark.parametrize(
     "records,expected",
     [

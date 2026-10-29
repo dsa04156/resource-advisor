@@ -745,10 +745,27 @@ class KubernetesBackend:
         }
 
     def cancel(self, job):
+        name = job["body"]["external_id"]
+        raw = self.execute(self.prefix + ["get", "job", name, "--ignore-not-found", "-o", "json"])
+        if not raw.strip():
+            return
+        obj = json.loads(raw)
+        if not self.owns(job, obj):
+            raise BackendError("Job identity does not match this attempt; not deleting")
+        # The UID precondition makes the delete atomic: a same-name replacement
+        # created after this read is refused by the API server (409), never deleted.
+        # Raw DELETE of a Job orphans its Pods unless propagation is explicit.
+        options = {
+            "kind": "DeleteOptions",
+            "apiVersion": "v1",
+            "preconditions": {"uid": obj["metadata"]["uid"]},
+            "propagationPolicy": "Foreground" if self.retain_termination_evidence else "Background",
+        }
         self.execute(
             self.prefix
-            + ["delete", "job", job["body"]["external_id"], "--ignore-not-found", "--wait=false"]
-            + (["--cascade=foreground"] if self.retain_termination_evidence else [])
+            + ["delete", "--raw", f"/apis/batch/v1/namespaces/{self.namespace}/jobs/{name}"]
+            + ["-f", "-"],
+            stdin=json.dumps(options),
         )
 
     def progress(self, job, observation):
