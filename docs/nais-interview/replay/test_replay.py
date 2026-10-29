@@ -208,4 +208,6 @@ def test_offline_demo_embeds_payloads_unchanged():
     gang = json.loads(gang_path.read_text()) if gang_path.exists() else None
     base = re.search(r'<script type="application/json" id="observations">(.*?)</script>', html, re.S).group(1)
     assert base == embed(DATA)
-    assert html == template.replace('__OBSERVATIONS_JSON__', embed(DATA)).replace('__GANG_JSON__', embed(gang))
+    sim_path = HERE / 'simulation-observations.json'
+    sim = json.loads(sim_path.read_text()) if sim_path.exists() else None
+    assert html == template.replace('__OBSERVATIONS_JSON__', embed(DATA)).replace('__GANG_JSON__', embed(gang)).replace('__SIM_JSON__', embed(sim))

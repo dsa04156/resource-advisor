@@ -2,6 +2,7 @@
 
 observations.json goes into __OBSERVATIONS_JSON__ exactly as before; the optional supplemental
 gang-observations.json goes into a separate __GANG_JSON__ slot (`null` when absent), so the base payload is unchanged.
+The synthetic simulation-observations.json (generate_simulation.py) goes into its own __SIM_JSON__ slot (`null` when absent).
 Run: rtk proxy python3 docs/nais-interview/replay/build_offline_demo.py
 """
 from pathlib import Path
@@ -18,8 +19,10 @@ def build(obs=None):
     obs = obs if obs is not None else json.loads((REPLAY / 'observations.json').read_text())
     gang_path = REPLAY / 'gang-observations.json'
     gang = json.loads(gang_path.read_text()) if gang_path.exists() else None
+    sim_path = REPLAY / 'simulation-observations.json'
+    sim = json.loads(sim_path.read_text()) if sim_path.exists() else None
     html = (REPLAY / 'offline-demo.template.html').read_text()
-    html = html.replace('__OBSERVATIONS_JSON__', embed(obs)).replace('__GANG_JSON__', embed(gang))
+    html = html.replace('__OBSERVATIONS_JSON__', embed(obs)).replace('__GANG_JSON__', embed(gang)).replace('__SIM_JSON__', embed(sim))
     (REPLAY.parent / 'offline-demo.html').write_text(html)
 
 

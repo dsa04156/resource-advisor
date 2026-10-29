@@ -33,6 +33,7 @@ button,select,input{font:inherit;color:inherit}
 .record{display:inline-flex;align-items:center;gap:8px;height:24px;padding:0 8px;border:1px solid var(--ink);border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap}
 .record .sep{width:1px;height:12px;background:var(--line-strong)}
 .record time{font-family:var(--mono);font-weight:500;color:var(--ink-2)}
+.record.sim,.clock .rec-tag.sim{border-style:dashed;border-color:var(--pending-mark);background:var(--pending-wash);color:var(--pending)}
 .scenario{display:flex;margin:0;padding:0;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden;background:var(--panel)}
 .scenario legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .scenario label{display:flex;align-items:center;gap:6px;min-height:32px;padding:0 12px;cursor:pointer;color:var(--ink-2);white-space:nowrap}
@@ -112,6 +113,7 @@ button,select,input{font:inherit;color:inherit}
 .what span{color:var(--ink-2);font-size:12px;overflow-wrap:anywhere}
 .lane{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:4px;font-size:11px;font-weight:600;border:1px solid var(--line-strong);color:var(--ink-2);white-space:nowrap;vertical-align:1px}
 .lane.slurm{border-color:var(--ink);color:var(--ink)}
+.lane.sim{border-style:dashed;border-color:var(--pending-mark);color:var(--pending)}
 .where{display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-width:0}
 .node{display:inline-flex;align-items:center;height:20px;padding:0 6px;border:1px solid var(--line-strong);border-radius:4px;background:var(--panel);font:600 11px var(--mono);white-space:nowrap}
 .node.actual{border-color:var(--ink);color:var(--ink)}
@@ -325,8 +327,9 @@ ol.log li.fail span{color:var(--failure)}
 <body>
 <header class="top">
   <h1><span class="product">Resource Advisor</span>실행 관제</h1>
-  <span class="record" role="note" aria-label="저장된 관측 기록 재생, live 상태 아님"><span>기록 재생</span><span class="sep" aria-hidden="true"></span><time id="record-date"></time><span class="sep" aria-hidden="true"></span><span>live 아님</span></span>
+  <span class="record" id="record" role="note" aria-label="저장된 관측 기록 재생, live 상태 아님"><span id="record-kind">기록 재생</span><span class="sep" aria-hidden="true"></span><time id="record-date"></time><span class="sep" aria-hidden="true"></span><span>live 아님</span></span>
   <fieldset class="scenario"><legend>시나리오</legend>
+    <label id="sim-option" hidden><input type="radio" name="scenario" value="sim"> <span id="sim-label">시뮬레이션 · 합성</span></label>
     <label><input type="radio" name="scenario" value="fleet" checked> 통합 실행 · K8s + Slurm</label>
     <label><input type="radio" name="scenario" value="adaptive"> 변동 도착·우선순위·재시도</label>
     <label id="gang-option" hidden><input type="radio" name="scenario" value="gang"> 다중 worker 그룹 승인</label>
@@ -340,7 +343,7 @@ ol.log li.fail span{color:var(--failure)}
       <h2>시나리오 범위</h2>
       <p id="prov-scope"></p>
       <h2>표시 규칙</h2>
-      <p>실행 노드는 Pod/작업 시작·실행이 기록된 뒤에만 “배치”로 표시합니다. 실행 전 기록된 노드는 점선 “대상”(라우팅 대상)이며 할당이 아닙니다. 장치 모델은 실제 배치가 관측된 노드에만 붙입니다. 노드 용량·사용률은 재생 데이터에 없으므로 표시하지 않습니다.</p>
+      <p id="prov-rules">실행 노드는 Pod/작업 시작·실행이 기록된 뒤에만 “배치”로 표시합니다. 실행 전 기록된 노드는 점선 “대상”(라우팅 대상)이며 할당이 아닙니다. 장치 모델은 실제 배치가 관측된 노드에만 붙입니다. 노드 용량·사용률은 재생 데이터에 없으므로 표시하지 않습니다.</p>
       <section id="mobilint-success" aria-label="모빌린트 실행 성공 기록" data-source-sha256="64ebe1c9d4e585f59e0e7d7b55665d3758d031a0924c2426fb4de6c6ff44bd09">
         <h2>Mobilint ARIES2 · 별도 실행일 기록</h2>
         <p>실행일 2026-10-08 · Candy 컴파일 모델 · NPU 1개 · CPU 1개 · 메모리 1 GiB. 접수 07:22:15 UTC → 완료 07:22:50 UTC. SUCCEEDED · 고정 입력 반복 출력 일치 · 프로파일 · MLflow 기록 확인.</p>
@@ -435,16 +438,19 @@ ol.log li.fail span{color:var(--failure)}
 
 <script type="application/json" id="observations">__OBSERVATIONS_JSON__</script>
 <script type="application/json" id="gang-observations">__GANG_JSON__</script>
+<script type="application/json" id="simulation">__SIM_JSON__</script>
 <script>
 (() => {
 'use strict';
 const DATA = JSON.parse(document.getElementById('observations').textContent);
 // Supplemental gang_batch export (replay/gang-observations.json), embedded separately so the base payload stays unchanged.
 const GANG = JSON.parse(document.getElementById('gang-observations').textContent || 'null');
-const SCENARIOS = {...DATA.scenarios, ...(GANG?.scenario ? {gang: GANG.scenario} : {})};
+// Synthetic simulation (replay/simulation-observations.json from generate_simulation.py): never a recorded run.
+const SIM = JSON.parse(document.getElementById('simulation').textContent || 'null');
+const SCENARIOS = {...(SIM?.scenario ? {sim: SIM.scenario} : {}), ...DATA.scenarios, ...(GANG?.scenario ? {gang: GANG.scenario} : {})};
 // Recorded node alias to model mapping: replay/DEVICE-MODELS.md
 const DEVICE_MODELS = {"GPU-A": "NVIDIA RTX 5060 Ti", "GPU-B": "NVIDIA RTX 5080", "GPU-C": "NVIDIA GB10", "JET-A": "Jetson Orin Nano", "JET-B": "Jetson AGX Orin", "NPU-A": "Hailo-8", "SLURM-A": "Jetson Orin (Slurm)"};
-const BACKEND = {kubernetes:'K8s · Kueue', slurm:'Slurm'};
+const BACKEND = {kubernetes:'K8s · Kueue', slurm:'Slurm', sim:'시뮬레이션 · 합성'};
 // Observed-state groups. A node counts as an actual placement only from these states (or a recorded start).
 const GROUPS = [
   ['before', '도착 전', ['NOT_SUBMITTED']],
@@ -460,15 +466,18 @@ const PLACED = new Set(['ADMITTED', 'RUNNING', 'COLLECTING', 'FINALIZING', 'SUCC
 const $ = id => document.getElementById(id);
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
 const unknown = text => el('span', 'unknown', text || '미관측');
-const state = {scenario: 'fleet', index: 0, playing: false, timer: null, selected: 'R01', group: 'all', node: null, q: ''};
+const state = {scenario: SIM?.scenario ? 'sim' : 'fleet', index: SIM?.scenario?.initial_index || 0, playing: false, timer: null, selected: 'R01', group: 'all', node: null, q: ''};
+const PROV_RULES = $('prov-rules')?.textContent;
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
 const sc = () => SCENARIOS[state.scenario];
-const nodesOf = () => state.scenario === 'gang' ? GANG.nodes : DATA.nodes;
+const isSim = () => state.scenario === 'sim';
+const nodesOf = () => state.scenario === 'gang' ? GANG.nodes : isSim() ? SIM.nodes : DATA.nodes;
 const attempts = req => req?.previous_attempts || [];
 const frame = (i = state.index) => sc().frames[i];
 const t = iso => new Date(iso).getTime();
-const hhmmss = iso => iso.match(/T(\d\d:\d\d:\d\d(?:\.\d)?)/)[1] + ' UTC';
+// The simulation runs on a virtual clock: show seconds from its T0, never a wall-clock date.
+const hhmmss = iso => isSim() ? `가상 T+${Math.round((t(iso) - t(sc().frames[0].observed_at)) / 1000)}초` : iso.match(/T(\d\d:\d\d:\d\d(?:\.\d)?)/)[1] + ' UTC';
 const secs = s => (s >= 10 ? s.toFixed(0) : s.toFixed(1)) + '초';
 const groupOf = req => req ? GROUP_OF[req.state] || 'intake' : 'none';
 const pill = (req, text) => el('span', 'pill g-' + groupOf(req), text);
@@ -480,7 +489,8 @@ function placement(req) {
   if (!req.node) return {actual: [], target: []};
   return PLACED.has(req.state) || req.started_at ? {actual: [req.node], target: []} : {actual: [], target: [req.node]};
 }
-const models = nodes => [...new Set(nodes.map(n => DEVICE_MODELS[n] || n))].join(' + ');
+const modelOf = n => DEVICE_MODELS[n] || (isSim() && SIM.nodes[n]?.label) || n;
+const models = nodes => [...new Set(nodes.map(modelOf))].join(' + ');
 const scenarioNodes = () => {
   const used = new Set();
   sc().frames.forEach(f => Object.values(f.requests).forEach(r => { const p = placement(r); [...p.actual, ...p.target, ...(r.excluded_nodes || [])].forEach(n => used.add(n)); }));
@@ -534,7 +544,7 @@ function renderTotals(f) {
     li.append(b); list.append(li);
   });
   const failedAttempts = (f.native_attempts || []).filter(a => a.state === 'FAILED').length;
-  $('totals-note').textContent = `이 관측의 논리 요청 ${rows.length}건` + (failedAttempts ? ` · 실패 시도 ${failedAttempts}건은 같은 요청 행에 보존` : '') + (state.scenario === 'fleet' ? ' · 요청 11은 별도 날짜라 제외' : '');
+  $('totals-note').textContent = isSim() ? `이 가상 프레임의 합성 요청 ${rows.length}건 · 실행 기록 아님` : `이 관측의 논리 요청 ${rows.length}건` + (failedAttempts ? ` · 실패 시도 ${failedAttempts}건은 같은 요청 행에 보존` : '') + (state.scenario === 'fleet' ? ' · 요청 11은 별도 날짜라 제외' : '');
 }
 
 function renderRow(row, req, prev) {
@@ -554,7 +564,7 @@ function renderRow(row, req, prev) {
   if (req.reason) st.append(el('small', null, req.reason));
   b.append(st);
   const p = placement(req);
-  const what = el('span', 'what'), head = el('b', p.actual.length ? null : 'unplaced', p.actual.length ? models(p.actual) + ' ' : (req.backend ? '장치 배치 미관측 ' : '경로 미정 '));
+  const what = el('span', 'what'), head = el('b', p.actual.length ? null : 'unplaced', p.actual.length ? models(p.actual) + ' ' : isSim() ? '가상 배정 전 ' : (req.backend ? '장치 배치 미관측 ' : '경로 미정 '));
   if (req.backend) head.append(el('span', 'lane ' + req.backend, BACKEND[req.backend]));
   what.append(head, el('span', null, `${req.workload} · ${req.device_class.toUpperCase()}` + (req.gpu != null ? ` · GPU ${req.gpu}` : req.accelerator_count != null ? ` · 가속기 ${req.accelerator_count}` : '')));
   b.append(what);
@@ -562,7 +572,7 @@ function renderRow(row, req, prev) {
   p.actual.forEach(n => where.append(el('span', 'node actual', n)));
   p.target.forEach(n => where.append(el('span', 'node target', n)));
   (req.excluded_nodes || []).forEach(n => where.append(el('span', 'node excluded', n)));
-  if (!p.actual.length && !p.target.length) where.append(unknown(req.state === 'NOT_SUBMITTED' ? '—' : '노드 미관측'));
+  if (!p.actual.length && !p.target.length) where.append(unknown(req.state === 'NOT_SUBMITTED' ? '—' : isSim() ? '배정 전' : '노드 미관측'));
   else if (!p.actual.length) where.append(el('small', null, '실행 노드 미관측'));
   b.append(where);
   const extra = el('span', 'extra');
@@ -589,14 +599,14 @@ function renderDetail(f) {
   head.append(pill(req, req.state));
   if (req.backend) head.append(el('span', 'lane ' + req.backend, BACKEND[req.backend]));
   const p = placement(req), place = el('div', 'place');
-  const line = (k, nodes, cls, empty) => { const d = el('div'); d.append(el('span', 'k', k)); if (nodes.length) nodes.forEach(n => { d.append(el('span', 'node ' + cls, n)); if (cls === 'actual') d.append(el('span', null, DEVICE_MODELS[n] || '')); }); else d.append(unknown(empty)); place.append(d); };
-  line('실제 배치', p.actual, 'actual', req.state === 'NOT_SUBMITTED' ? '도착 전' : '배치 미관측');
+  const line = (k, nodes, cls, empty) => { const d = el('div'); d.append(el('span', 'k', k)); if (nodes.length) nodes.forEach(n => { d.append(el('span', 'node ' + cls, n)); if (cls === 'actual') d.append(el('span', null, DEVICE_MODELS[n] || (isSim() ? modelOf(n) : ''))); }); else d.append(unknown(empty)); place.append(d); };
+  line(isSim() ? '가상 배정' : '실제 배치', p.actual, 'actual', req.state === 'NOT_SUBMITTED' ? '도착 전' : isSim() ? '배정 전 (대기)' : '배치 미관측');
   if (p.target.length) line('배치 대상', p.target, 'target', '');
   if (req.excluded_nodes?.length) line('제외 노드', req.excluded_nodes, 'excluded', '');
   if (req.pods?.length) { const d = el('div'); d.append(el('span', 'k', 'Pod 상태'), el('span', 'mono', req.pods.map(x => `rank${x.rank} ${x.node} ${x.state}`).join(' · '))); place.append(d); }
   box.append(place);
   if (p.target.length) box.append(el('p', 'unknown', '대상 노드는 실행 전 라우팅 결과이며, 이 관측에서 할당은 확인되지 않았습니다.'));
-  if (req.reason) { const r = el('p', 'reason'); r.append(el('b', null, state.scenario === 'fleet' ? '네이티브 기록 사유' : 'Kueue 대기 사유 (분류)'), req.reason); box.append(r); }
+  if (req.reason) { const r = el('p', 'reason'); r.append(el('b', null, state.scenario === 'fleet' ? '네이티브 기록 사유' : isSim() ? '시뮬레이션 대기 사유 (합성)' : 'Kueue 대기 사유 (분류)'), req.reason); box.append(r); }
   const dl = el('dl');
   const add = (k, v) => { dl.append(el('dt', null, k)); const d = el('dd'); d.append(v == null || v === '' ? unknown() : v); dl.append(d); };
   add('실행 작업', req.workload);
@@ -614,6 +624,15 @@ function renderDetail(f) {
       req.lifecycle.forEach(e => { const li = el('li'); li.append(el('time', null, hhmmss(e.observed_at)), el('span', null, e.state + (e.reason ? ' · ' + e.reason : ''))); ol.append(li); });
       box.append(ol);
     }
+  } else if (isSim()) {
+    add('데이터', '합성 시뮬레이션 · 실제 제출·실행 기록 아님');
+    add('우선순위', String(req.priority));
+    add('요청 GPU', req.gpu > 1 ? `${req.gpu}개 그룹 · 한 가상 노드에 함께 배정` : `${req.gpu}개`);
+    add('가상 도착', `T+${req.planned_arrival_seconds}초`);
+    add('가상 시작', req.started_at ? hhmmss(req.started_at) : unknown('시작 전'));
+    add('가상 소요', `${req.duration_seconds}초 (생성 규칙 값)`);
+    add('가상 완료', req.finished_at ? hhmmss(req.finished_at) : unknown('완료 전'));
+    box.append(dl);
   } else {
     add('현재 시도', req.attempt);
     add('우선순위', req.priority != null ? String(req.priority) : null);
@@ -642,8 +661,11 @@ function nodeButton(alias, title, meta, chips, cls) {
 function renderNodes(f) {
   const box = $('nodes'); box.replaceChildren();
   const on = {};
+  const doneOn = {};
   Object.entries(f.requests).forEach(([row, r]) => {
     const p = placement(r);
+    // Simulation: a node lists what runs there now; finished requests are counted, not listed.
+    if (isSim() && r.state === 'SUCCEEDED') { p.actual.forEach(n => doneOn[n] = (doneOn[n] || 0) + 1); return; }
     p.actual.forEach(n => (on[n] = on[n] || []).push([row, r, 'actual']));
     p.target.forEach(n => (on[n] = on[n] || []).push([row, r, 'target']));
   });
@@ -661,11 +683,13 @@ function renderNodes(f) {
     });
     if (excluded.includes(alias)) chips.push(el('span', 'chip excl', `${state.selected} 재시도 제외`));
     if (covered.has(alias)) chips.push(el('span', 'chip cover', '누적 실행 관측'));
+    if (meta.capacity_gpu != null) chips.unshift(el('span', 'chip note', `가상 배정 GPU ${f.allocated_gpu?.[alias] ?? 0}/${meta.capacity_gpu} · 선언 용량`));
+    if (doneOn[alias]) chips.push(el('span', 'chip cover', `가상 완료 ${doneOn[alias]}건`));
     const outside = !usedNodes.has(alias);
     if (!chips.length) chips.push(el('span', 'chip note', outside ? '이 시나리오 기록에 없음' : '이 관측에 표시된 요청 없음'));
     const cls = (sel.actual.includes(alias) ? 'hit' : sel.target.includes(alias) ? 'hit-target' : excluded.includes(alias) ? 'hit-excluded' : '') + (outside ? ' outside' : '');
-    const [li, b] = nodeButton(alias, DEVICE_MODELS[alias] || alias, `${BACKEND[meta.backend]} · ${meta.accelerator} · ${meta.architecture || '아키텍처 미기록'}`, chips, cls);
-    b.setAttribute('aria-label', `${alias} ${DEVICE_MODELS[alias] || ''} · ${(on[alias] || []).map(([row, r, k]) => `${k === 'target' ? '대상 ' : ''}${row} ${r.state}`).join(', ') || '표시된 요청 없음'} · 누르면 이 노드로 표 거르기`);
+    const [li, b] = nodeButton(alias, modelOf(alias), `${BACKEND[meta.backend]} · ${meta.accelerator} · ${meta.architecture || '아키텍처 미기록'}`, chips, cls);
+    b.setAttribute('aria-label', `${alias} ${modelOf(alias)} · ${(on[alias] || []).map(([row, r, k]) => `${k === 'target' ? '대상 ' : ''}${row} ${r.state}`).join(', ') || '표시된 요청 없음'} · 누르면 이 노드로 표 거르기`);
     b.onclick = () => { state.node = state.node === alias ? null : alias; render(); };
     box.append(li);
   });
@@ -677,16 +701,26 @@ function renderNodes(f) {
   }
   const foot = $('roster-foot'); foot.replaceChildren();
   if (f.queue_observation) { foot.append(el('b', null, `Kueue 관측 admitted ${f.queue_observation.admitted ?? '—'} · pending ${f.queue_observation.pending ?? '—'}`), el('br')); }
-  foot.append('노드 용량·사용률은 재생 데이터에 기록되지 않았습니다. 칩은 이 관측의 요청 상태이며, 점선은 실행 전 라우팅 대상입니다.');
+  foot.append(isSim() ? '합성 시뮬레이션의 가상 노드입니다. 용량은 시뮬레이션에 선언한 값이고, 배정 GPU는 규칙으로 계산한 값이며 측정 사용률이 아닙니다. 실제 장비와 무관합니다.' : '노드 용량·사용률은 재생 데이터에 기록되지 않았습니다. 칩은 이 관측의 요청 상태이며, 점선은 실행 전 라우팅 대상입니다.');
 }
 
 function renderSummary(f, last) {
   const box = $('summary'); box.replaceChildren();
   if (!last) { box.hidden = true; return; }
   box.hidden = false;
-  box.append(el('h3', null, '기록 종료 요약 · 마지막 관측에서만 표시'));
+  box.append(el('h3', null, isSim() ? '시뮬레이션 종료 요약 · 합성 데이터 · 마지막 프레임에서만 표시' : '기록 종료 요약 · 마지막 관측에서만 표시'));
   const reqs = Object.values(f.requests), facts = el('ul', 'facts');
   const fact = (v, k) => { const li = el('li'); li.append(el('b', null, String(v)), k); facts.append(li); };
+  if (isSim()) {
+    const peak = Math.max(...sc().frames.map(x => Object.values(x.requests).filter(r => r.state === 'RUNNING').length));
+    const cap = Object.values(SIM.nodes).reduce((a, n) => a + n.capacity_gpu, 0);
+    fact(`${reqs.filter(r => r.state === 'SUCCEEDED').length}/${reqs.length}`, '가상 완료 (합성)');
+    fact(peak, '최대 동시 실행 (가상)');
+    fact(`${Object.keys(SIM.nodes).length} · GPU ${cap}`, '가상 노드 · 선언 용량');
+    fact(secs((t(f.observed_at) - t(sc().frames[0].observed_at)) / 1000), '가상 경과');
+    box.append(facts, el('p', null, sc().scope + ` 프레임 ${sc().frames.length}개. 실제 작업 제출·클러스터 호출·측정 없이 생성 규칙으로 계산한 값이다.`));
+    return;
+  }
   const additional = state.scenario === 'fleet' ? 1 : 0;
   fact(`${reqs.filter(r => r.state === 'SUCCEEDED').length + additional}/${reqs.length + additional}`, '표시된 실행 기록 SUCCEEDED');
   fact(new Set(reqs.map(r => r.backend)).size === 2 ? 'K8s + Slurm' : BACKEND[reqs[0].backend], '네이티브 경로');
@@ -820,7 +854,7 @@ function renderFlow(f, prev, ch) {
     const st = el('div', 'stage'), h = el('h3', null, label + ' '); h.append(el('b', null, String(by[key].length)));
     st.dataset.stage = key; st.append(h);
     if (key === 'queue') {
-      st.append(el('p', 'order', hasPriority ? '표시 순서: 관측 우선순위 높은 순 → 현재 시도 제출 시각 순. 스케줄러의 실제 처리 순서는 보장하지 않음' : '우선순위 미기록 · 요청 번호 순 표시 (스케줄러 순서 아님)'));
+      st.append(el('p', 'order', isSim() ? '시뮬레이션 규칙 순서: 우선순위 높은 순 → 가상 도착 순 · 합성 데이터' : hasPriority ? '표시 순서: 관측 우선순위 높은 순 → 현재 시도 제출 시각 순. 스케줄러의 실제 처리 순서는 보장하지 않음' : '우선순위 미기록 · 요청 번호 순 표시 (스케줄러 순서 아님)'));
       const ul = el('ol', 'cards q');
       (hasPriority ? queueOrder(by.queue, f) : by.queue).forEach((r, i) => { const li = el('li'); li.append(flowItem(r, f.requests[r], ch, prev, f, i + 1)); ul.append(li); });
       if (!by.queue.length) ul.append(el('li', 'unknown', '대기 중 요청 없음'));
@@ -847,9 +881,11 @@ function renderFlow(f, prev, ch) {
     }
     lanes.append(st);
   });
-  $('flow-sub').textContent = `도착 → 대기 큐 → 승인·노드 배치 → 결과 · 파란 테두리 = 직전 관측 대비 단계 이동` + (state.scenario === 'gang' ? ' · 그룹 승인은 workload 승인 + worker barrier이며 원자적 Pod 배치·DDP가 아님' : '');
+  $('flow-title').textContent = isSim() ? '실행 흐름 · 시뮬레이션 프레임 (합성)' : '실행 흐름 · 이 관측 스냅샷';
+  $('flow-sub').textContent = (isSim() ? '도착 → 대기 큐 → 가상 노드 배정 → 완료 · 파란 테두리 = 직전 프레임 대비 단계 이동 · 실제 실행 기록 아님' : `도착 → 대기 큐 → 승인·노드 배치 → 결과 · 파란 테두리 = 직전 관측 대비 단계 이동`) + (state.scenario === 'gang' ? ' · 그룹 승인은 workload 승인 + worker barrier이며 원자적 Pod 배치·DDP가 아님' : '');
   const evs = $('events'); evs.replaceChildren();
-  const head = el('li', 'evh', '이 관측의 기록 변화 '); head.append(el('small', null, prev ? `직전 관측 대비 ${ch.length}건 · 같은 구간의 변화이며 원인 관계는 기록되지 않음` : '첫 관측'));
+  const head = el('li', 'evh', isSim() ? '이 프레임의 시뮬레이션 변화 (합성) ' : '이 관측의 기록 변화 ');
+  head.append(el('small', null, isSim() ? (prev ? `직전 프레임 대비 ${ch.length}건 · 생성 규칙으로 계산 · 기록 아님` : '첫 가상 프레임') : prev ? `직전 관측 대비 ${ch.length}건 · 같은 구간의 변화이며 원인 관계는 기록되지 않음` : '첫 관측'));
   evs.append(head);
   const qo = f.queue_observation, pq = prev?.queue_observation;
   if (qo && pq && (qo.admitted !== pq.admitted || qo.pending !== pq.pending)) {
@@ -880,21 +916,28 @@ function focusTargets(n) {
 function render() {
   const focused = document.activeElement, restore = focusTargets(focused);
   const frames = sc().frames, f = frame(), prev = state.index > 0 ? frames[state.index - 1] : null, last = state.index === frames.length - 1;
-  const day = frames[0].observed_at.slice(0, 10);
-  $('record-date').dateTime = day;
-  $('record-date').textContent = state.scenario === 'fleet' ? `${day} 실행 · 요청 11은 2026-10-08` : `${day} 실행`;
+  const day = frames[0].observed_at.slice(0, 10), sim = isSim();
+  $('record').classList.toggle('sim', sim); $('rec-tag').classList.toggle('sim', sim);
+  $('record').setAttribute('aria-label', sim ? '합성 시뮬레이션, 저장된 실행 기록 아님, live 상태 아님' : '저장된 관측 기록 재생, live 상태 아님');
+  $('record-kind').textContent = sim ? '합성 시뮬레이션' : '기록 재생';
+  $('rec-tag').textContent = sim ? '합성 시뮬레이션 · 기록 아님' : '기록 재생 · live 아님';
+  if (sim) $('record-date').removeAttribute('datetime'); else $('record-date').dateTime = day;
+  $('record-date').textContent = sim ? '실행 기록 아님 · 가상 시계' : state.scenario === 'fleet' ? `${day} 실행 · 요청 11은 2026-10-08` : `${day} 실행`;
+  $('mobilint-success').hidden = sim;
+  $('prov-rules').textContent = sim ? '합성 시뮬레이션: 요청·가상 노드·시각·배정은 generate_simulation.py가 고정 규칙으로 만든 값입니다. 실제 작업 제출·클러스터 호출·장비 측정은 없고, 가상 노드 용량은 선언 값입니다. 기존 기록 재생 시나리오의 데이터는 바꾸지 않았습니다.' : PROV_RULES;
   $('scenario-name').textContent = sc().name;
   $('scope').textContent = state.scenario === 'fleet' && last ? 'Kubernetes · Slurm · CUDA · Hailo · Mobilint | 2026-10-07~08 실행 완료 기록' : state.scenario === 'fleet' ? '2026-10-07 요청 10건 재생 · Mobilint는 2026-10-08 완료 기록을 계속 표시합니다.' : sc().scope;
-  $('prov-scope').textContent = `${sc().name} · ${sc().scope} 실행 별칭 ${sc().run_alias} · ${sc().project_alias} · 기록 상태 ${sc().recorded_state}.`;
+  $('prov-scope').textContent = sim ? `${sc().name} · ${sc().scope} 별칭 ${sc().run_alias} · 합성 데이터.` : `${sc().name} · ${sc().scope} 실행 별칭 ${sc().run_alias} · ${sc().project_alias} · 기록 상태 ${sc().recorded_state}.`;
   $('mobilint-row').hidden = state.scenario !== 'fleet';
   $('seek').max = frames.length - 1; $('seek').value = state.index;
   $('seek').setAttribute('aria-valuetext', `관측 ${state.index + 1} / ${frames.length}, ${hhmmss(f.observed_at)}`);
-  $('idx').textContent = `관측 ${state.index + 1} / ${frames.length}`;
-  $('time').dateTime = f.observed_at; $('time').textContent = f.observed_at.slice(0, 10) + ' ' + hhmmss(f.observed_at);
+  $('idx').textContent = `${sim ? '가상 프레임' : '관측'} ${state.index + 1} / ${frames.length}`;
+  $('time').dateTime = f.observed_at; $('time').textContent = sim ? hhmmss(f.observed_at) : f.observed_at.slice(0, 10) + ' ' + hhmmss(f.observed_at);
+  if (sim) $('time').removeAttribute('datetime');
   $('rel').textContent = `첫 관측 +${secs((t(f.observed_at) - t(frames[0].observed_at)) / 1000)}`;
   $('title').textContent = f.title;
   const gap = prev ? (t(f.observed_at) - t(prev.observed_at)) / 1000 : null;
-  $('gap').textContent = gap == null ? '첫 스냅샷' : `직전 관측과 ${secs(gap)} 간격 · 그 사이 상태 미기록`;
+  $('gap').textContent = gap == null ? (sim ? '첫 가상 프레임' : '첫 스냅샷') : sim ? `직전 프레임과 가상 ${secs(gap)}` : `직전 관측과 ${secs(gap)} 간격 · 그 사이 상태 미기록`;
   $('gap').className = 'gap' + (gap > 15 ? ' long' : '');
   [...$('ruler').children].forEach((tick, i) => tick.className = i === state.index ? 'now' : (tick.dataset.kind ? 'k-' + tick.dataset.kind : '') + (i < state.index && !tick.dataset.kind ? 'past' : ''));
   $('extra-head').textContent = state.scenario !== 'fleet' ? '우선순위 · 시도' : '결과 · 기록';
@@ -913,9 +956,12 @@ function render() {
   $('play').setAttribute('aria-pressed', String(state.playing));
   $('play').textContent = state.playing ? '❚❚ 일시정지' : '▶ 재생';
   const gang = state.scenario === 'gang';
+  if (sim) { $('caveat').replaceChildren(`${SIM.notice} 합성 데이터 replay/simulation-observations.json (schema ${SIM.schema}) · 생성기 ${SIM.generator} · 출처 manifest 없음(기록 아님).`); }
+  else {
   const caveat = [`${gang ? GANG.notice || DATA.notice : DATA.notice} 노드·요청·시도 이름은 공개용 alias다. 시간대 ${gang ? GANG.time_zone || DATA.time_zone : DATA.time_zone}. 정제 데이터 ${gang ? `replay/gang-observations.json (schema ${GANG.schema})` : `replay/observations.json (schema ${DATA.schema})`} · 출처 manifest ${gang ? 'replay/gang-PROVENANCE.json' : 'replay/PROVENANCE.json'} · 공개 요약 `];
   if (sc().public_summary) caveat.push(Object.assign(el('a', null, sc().public_summary), {href: sc().public_summary}), '.'); else caveat.push(unknown('공개 요약 미기록'));
   $('caveat').replaceChildren(...caveat);
+  }
   // Rebuilt controls replace the focused one; restore through the saved element, not activeElement (BODY once it is removed).
   if (focused && focused !== document.body && !focused.isConnected) for (const sel of restore) { const n = document.querySelector(sel); if (n) { n.focus({preventScroll: true}); break; } }
 }
@@ -935,7 +981,8 @@ function togglePlay() {
 }
 
 if (GANG?.scenario) $('gang-option').hidden = false;
-document.querySelectorAll('input[name=scenario]').forEach(r => r.onchange = () => { stop(); state.scenario = r.value; state.index = 0; state.selected = sc().rows[0]; state.node = null; state.group = 'all'; usedNodes = scenarioNodes(); renderRuler(); render(); });
+if (SIM?.scenario) { $('sim-option').hidden = false; $('sim-label').textContent = `${SIM.scenario.rows.length}건 시뮬레이션 · 합성`; }
+document.querySelectorAll('input[name=scenario]').forEach(r => r.onchange = () => { stop(); state.scenario = r.value; state.index = sc().initial_index || 0; state.selected = sc().rows[0]; state.node = null; state.group = 'all'; usedNodes = scenarioNodes(); renderRuler(); render(); });
 $('play').onclick = togglePlay;
 $('reset').onclick = () => go(0);
 $('prev').onclick = () => go(state.index - 1);
@@ -956,7 +1003,8 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden && state.playing) { stop(); render(); } });
 window.__replay = {state, go, data: DATA, scenarios: SCENARIOS};
-if (location.hash === '#success') state.index = DATA.scenarios.fleet.frames.length - 1;
+if (location.hash === '#success') { state.scenario = 'fleet'; state.index = DATA.scenarios.fleet.frames.length - 1; usedNodes = scenarioNodes(); }
+document.querySelector(`input[name=scenario][value=${state.scenario}]`).checked = true;
 renderRuler(); render();
 })();
 </script>

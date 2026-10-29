@@ -45,6 +45,9 @@ with sync_playwright() as p:
         errors = []
         page.on('pageerror', lambda e: errors.append(str(e)))
         page.goto(PAGE)
+        # The synthetic simulation is the default view (browser_check_simulation.py); these checks cover the recorded modes.
+        if page.locator('input[value=sim]').count():
+            page.check('input[value=fleet]')
         b = board(page)
         check(f'{name}: starts at frame 0, paused, no request state', b['index'] == 0 and not b['playing'] and b['expected'] == {} and 'SUCCEEDED' not in b['text'])
         check(f'{name}: summary hidden at start', not b['summary'])
