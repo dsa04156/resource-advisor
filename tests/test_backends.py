@@ -89,7 +89,7 @@ def test_versioned_variant_explicitly_reuses_approved_runtime_bundle(service):
         "readOnly": True,
     }
     assert all(m["readOnly"] for m in pod["containers"][0]["volumeMounts"])
-    assert {e["name"]: e["value"] for e in pod["containers"][0]["env"]}["PYTHONPATH"] == (
+    assert {e["name"]: e.get("value") for e in pod["containers"][0]["env"]}["PYTHONPATH"] == (
         "/opt/resource-advisor:/opt/qualified-runtime/site"
     )
 

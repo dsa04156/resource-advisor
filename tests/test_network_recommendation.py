@@ -65,9 +65,13 @@ def network(node, seconds, *, ref=None, cache="cold", project="team-a", **change
         "backend": "kubernetes",
         "cluster_ref": "lab",
         "node_ref": node,
-        "observer_host": node,
+        # Kubernetes evidence comes from RA job receipts: the observer is a Pod.
+        "observer_host": f"pod-{node}",
+        "identity_source": "ra_job_receipts",
+        "native_job_ids": [f"job-{node}-{n}" for n in range(len(seconds))],
         "cache_state": cache,
         "cache_locator": "/var/cache/ra",
+        "cache_storage_identity": "11:22",
         "observed_at": now() - timedelta(minutes=1),
         "valid_for_seconds": 3600,
         "samples": [
@@ -106,6 +110,21 @@ def network_setup(client, pair, *, spare_profile=None, base_compute=2.0, staging
     post(client, "/data-locations", measured_location(spec))
     post(client, "/network-profiles", network("test-worker", [5.0, 6.0, 7.0]))
     post(client, "/network-profiles", spare_profile or network("spare-node", [0.5], cache="hot"))
+    post(client, "/cache-bindings", binding("spare-node"))
+
+
+def binding(node, *, ref=None, path="/var/cache/ra", mode="persistent", identity="11:22"):
+    return {
+        "ref": ref or f"cache-{node}",
+        "project_ref": "team-a",
+        "backend": "kubernetes",
+        "cluster_ref": "lab",
+        "node_ref": node,
+        "cache_path": path,
+        "storage_mode": mode,
+        "storage_identity": identity if mode == "persistent" else None,
+        "evidence_ref": "fixture-binding",
+    }
 
 
 def plan(client, profile="measured", **request):
@@ -308,7 +327,7 @@ def test_four_policies_are_frozen_as_shadow_estimates_then_linked_to_executed_jo
     # profile_only: base 2+1+2=5 < spare 2+1+4=7; network: measured staging flips it.
     assert arms["profile_only"]["selected_candidate_ref"] == "base"
     assert arms["profile_queue_network"]["selected_candidate_ref"] == "spare"
-    assert {c for a in arms.values() for c in a["candidate_pool"]} == {"base", "spare"}
+    assert all(a["candidate_pool"] == ["base", "spare"] for a in arms.values())
     assert all(a["digest"].startswith("sha256:") for a in arms.values())
     assert frozen["executed"] == {arm: [] for arm in arms}
 
@@ -324,6 +343,13 @@ def test_four_policies_are_frozen_as_shadow_estimates_then_linked_to_executed_jo
         assert job["state"] == "SUCCEEDED"
         assert job["candidate_ref"] == arms[arm]["selected_candidate_ref"]
         assert job["matches_frozen_selection"] is True
+        # Execution used the frozen forecast; the error is paired with that same forecast.
+        assert job["submission_predicted_jct_seconds"] == job["frozen_predicted_jct_seconds"]
+        if arm != "static":
+            assert (
+                job["outcome"]["prediction"]["predicted_jct_seconds"]
+                == (job["frozen_predicted_jct_seconds"])
+            )
         assert job["outcome"]["actual"]["jct_seconds"] == pytest.approx(9.0)
         link = client.get(URL + f"/jobs/{job['job_id']}/recommendation", headers=h("user"))
         assert link.json()["comparison"] == {"ref": "cmp-1", "arm": arm}
@@ -353,3 +379,108 @@ def test_comparison_rejects_an_ineligible_static_candidate_or_wrong_policy_arm(c
     assert response.status_code == 422
     other = client.get(URL + "/recommendation-comparisons/cmp-1", headers=h("other-operator"))
     assert other.status_code == 404
+
+
+def hot_only_setup(client, pair, cache_binding):
+    spec, variant, caps = pair
+    post(client, "/scheduling-profiles", scheduling_profile("measured", NETWORK))
+    post(client, "/jct-profiles", jct_profile(spec, variant, caps["spare"], "spare", 4.0))
+    post(client, "/route-queue-snapshots", queue_snapshot("q-spare", "spare-node"))
+    post(client, "/data-locations", measured_location(spec))
+    post(client, "/network-profiles", network("spare-node", [0.01], cache="hot"))
+    if cache_binding:
+        post(client, "/cache-bindings", cache_binding)
+
+
+@pytest.mark.parametrize(
+    "cache_binding",
+    [
+        None,
+        binding("spare-node", path="/cache-not-mounted-in-job"),
+        binding("spare-node", identity="99:99"),
+        binding("spare-node", mode="ephemeral"),
+    ],
+    ids=["no-binding", "other-path", "other-storage", "ephemeral"],
+)
+def test_hot_evidence_from_another_cache_never_prices_the_job(client, pair, cache_binding):
+    hot_only_setup(client, pair, cache_binding)
+    result = plan(client, candidate_ref="spare")
+    assert result["accepted"] is False
+    spare = by_candidate(result)["spare"]
+    assert spare["predicted_jct_seconds"] is None
+    assert "NETWORK_CACHE_BINDING_UNPROVEN" in spare["reasons"]
+
+
+def test_unproven_hot_evidence_falls_back_to_cold_and_says_so(client, pair):
+    hot_only_setup(client, pair, binding("spare-node", path="/elsewhere"))
+    cold = network("spare-node", [3.0], observed_at=now() - timedelta(minutes=5))
+    post(client, "/network-profiles", cold)
+    spare = by_candidate(plan(client, candidate_ref="spare"))["spare"]
+    assert spare["breakdown"]["staging"]["cache_state"] == "cold"
+    assert spare["breakdown"]["staging"]["seconds"] == 3.0
+    [node] = spare["breakdown"]["staging"]["per_node"]
+    assert node["hot_evidence_rejected"] == "NETWORK_CACHE_BINDING_UNPROVEN"
+
+
+def test_bound_hot_cache_is_handed_to_execution_in_the_signed_plan(client, pair):
+    network_setup(client, pair)
+    result = plan(client)
+    assert result["plan"]["candidate_ref"] == "spare"
+    bindings = result["plan"]["staging_bindings"]
+    assert bindings["spare-node"]["ref"] == "cache-spare-node"
+    assert bindings["spare-node"]["cache_path"] == "/var/cache/ra"
+    assert result["plan"]["recommendation"]["cache_bindings"]["spare"] == bindings
+
+
+def test_kubernetes_hostname_evidence_is_not_node_evidence(client, pair):
+    spec, variant, caps = pair
+    claimed = network(
+        "spare-node",
+        [0.5],
+        ref="cli-in-pod",
+        observer_host="spare-node",
+        identity_source=None,
+        native_job_ids=None,
+    )
+    network_setup(client, pair, spare_profile=claimed)
+    spare = by_candidate(plan(client))["spare"]
+    assert "NETWORK_IDENTITY_NOT_NATIVE" in spare["reasons"]
+
+
+def test_a_drifted_arm_is_rejected_and_recorded_not_reselected(client, pair, service):
+    spec, variant, caps = pair
+    comparison_setup(client, pair)
+    frozen = run_comparison(ApiClient(client), comparison(), execute=False)
+    assert frozen["arms"]["profile_queue_network"]["frozen_predicted_jct_seconds"] == 7.5
+    # Newer evidence after the freeze makes base faster under the network policy.
+    newer = jct_profile(
+        spec, variant, caps["base"], "base", 0.1, ref="jct-base-newer", measured_at=now()
+    )
+    post(client, "/jct-profiles", newer)
+    settle = finish_with_native_timestamps(service)
+    linked = run_comparison(ApiClient(client), comparison(), execute=True, settle=settle)
+    assert linked["executed"]["profile_queue_network"] == []
+    [event] = linked["arm_events"]["profile_queue_network"]
+    assert event["status"] == "DRIFT_REJECTED"
+    assert "SCHEDULING_PLAN_CHANGED" in event["reason"]
+    # The static arm's frozen contract is unaffected by ranking evidence.
+    assert linked["executed"]["static"][0]["candidate_ref"] == "base"
+
+
+def test_unequal_hard_pools_are_rejected_before_static_is_fixed(client, pair):
+    spec, variant, caps = pair
+    comparison_setup(client, pair)
+    # Policy arms apply the data-access hard filter; the static legacy profile does not.
+    narrowed = measured_location(
+        spec,
+        ref="data-narrow",
+        accessible_nodes=[
+            {"backend": "kubernetes", "cluster_ref": "lab", "node_ref": "test-worker"}
+        ],
+    )
+    client.post(URL + "/data-locations", headers=h("operator"), json=narrowed)
+    response = client.post(
+        URL + "/recommendation-comparisons", headers=h("user"), json=comparison(ref="cmp-pool")
+    )
+    assert response.status_code == 422
+    assert "COMPARISON_POOL_MISMATCH" in response.text

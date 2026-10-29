@@ -598,7 +598,7 @@ def create_app(
         with service.store.transaction() as conn:
             return required(service.store, conn, "topology_snapshot", ref, p.project)
 
-    from .network_profile import NetworkProfile
+    from .network_profile import CacheBinding, NetworkProfile
     from .recommendation import (
         DataLocation,
         JctProfile,
@@ -609,6 +609,7 @@ def create_app(
         decision_linkage,
         freeze_comparison,
         import_evidence,
+        submit_comparison_arm,
     )
 
     # Operator/collector-imported, immutable recommendation evidence.
@@ -618,6 +619,7 @@ def create_app(
         ("/data-locations", "data_location", DataLocation),
         ("/node-pools", "node_pool", NodePool),
         ("/network-profiles", "network_profile", NetworkProfile),
+        ("/cache-bindings", "cache_binding", CacheBinding),
     ]:
 
         def register_evidence(value: model, p=Depends(operator), kind=kind):
@@ -638,6 +640,11 @@ def create_app(
     @app.get(PREFIX + "/recommendation-comparisons/{ref}")
     def recommendation_comparison(ref: str, p=Depends(principal)):
         return comparison(service, p.project, ref)
+
+    @app.post(PREFIX + "/recommendation-comparisons/{ref}/arms/{arm}/jobs")
+    def submit_recommendation_comparison_arm(ref: str, arm: str, p=Depends(principal)):
+        # Idempotent per (comparison, arm); the frozen contract is the request.
+        return submit_comparison_arm(service, p.project, ref, arm)
 
     @app.post(PREFIX + "/placement-plans")
     def placement_plan(value: PlacementRequest, p=Depends(principal)):

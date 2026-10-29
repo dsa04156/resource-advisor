@@ -148,6 +148,13 @@ def progress_from_log(log, job, source):
     }
 
 
+DOWNWARD_IDENTITY = (
+    ("RA_NODE_NAME", "spec.nodeName"),
+    ("RA_POD_NAME", "metadata.name"),
+    ("RA_POD_UID", "metadata.uid"),
+)
+
+
 def identity_environment(job):
     b = job["body"]
     values = {
@@ -174,6 +181,10 @@ def identity_environment(job):
         )
     if b["variant"].get("load_context_policy"):
         values["RA_LOAD_CONTEXT_POLICY"] = b["variant"]["load_context_policy"]
+    staging = (b.get("scheduling_plan") or {}).get("staging_bindings")
+    if staging:
+        # The accepted plan's cache destination per node; the workload must use it.
+        values["RA_STAGING_BINDINGS_JSON"] = json.dumps(staging, separators=(",", ":"))
     return values
 
 
@@ -375,6 +386,12 @@ class KubernetesBackend:
                                 "env": [
                                     {"name": k, "value": v}
                                     for k, v in identity_environment(job).items()
+                                ]
+                                # Scheduler-owned identity (Downward API). A collector
+                                # trusts it only after matching the observed Pod.
+                                + [
+                                    {"name": name, "valueFrom": {"fieldRef": {"fieldPath": path}}}
+                                    for name, path in DOWNWARD_IDENTITY
                                 ],
                                 "resources": {"requests": resources, "limits": dict(resources)},
                                 "securityContext": {

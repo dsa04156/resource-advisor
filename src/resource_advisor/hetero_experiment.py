@@ -539,30 +539,19 @@ def render_reports(plan, results_csv, status_csv):
 def run_comparison(client, request, *, execute=False, settle=None, timeout_seconds=120):
     """Freeze the four-arm comparison, then (optionally) run one job per arm in turn.
 
-    Each arm's job settles before the next is submitted so no arm's job becomes
-    queued demand in another arm's estimate. Static submits the frozen eligible
-    candidate under its frozen plan digest; policy arms select at submission.
+    Each arm is submitted by the server under its frozen plan digest and frozen
+    prediction; drift is rejected and recorded as an arm event, never reselected.
+    Each job settles before the next arm so no arm's job is queued demand in
+    another arm's estimate.
     """
-    from .recommendation import comparison_key
-
     frozen = client.post("/recommendation-comparisons", request)
     if not execute or "arms" not in frozen:
         return frozen
     settle = settle or (lambda job_id: _settle_one(client, job_id, timeout_seconds))
     for arm in frozen["arm_order"]:
-        frozen_arm = frozen["arms"][arm]
-        if not frozen_arm["accepted"] or frozen["executed"][arm]:
+        if not frozen["arms"][arm]["accepted"] or frozen["executed"][arm]:
             continue
-        body = {
-            "workload_ref": frozen["workload_ref"],
-            "scheduling_profile_ref": frozen_arm["profile_ref"],
-        }
-        if arm == "static":
-            body.update(
-                candidate_ref=frozen_arm["selected_candidate_ref"],
-                scheduling_plan_digest=frozen_arm["digest"],
-            )
-        response = client.post("/jobs", body, idempotency_key=comparison_key(frozen["ref"], arm))
+        response = client.post(f"/recommendation-comparisons/{frozen['ref']}/arms/{arm}/jobs", {})
         if "job_id" in response:
             settle(response["job_id"])
     return client.get(f"/recommendation-comparisons/{frozen['ref']}")

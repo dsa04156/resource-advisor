@@ -123,7 +123,10 @@ class Service:
             )
         return spec, candidate, variant, cap
 
-    def submit(self, project: str, request: JobRequest, key: str):
+    def submit(self, project: str, request: JobRequest, key: str, *, expected_prediction=None):
+        """``expected_prediction`` (comparison arms) rejects a plan whose selected
+        estimate differs from the frozen one; a supplied automatic plan digest must
+        likewise reproduce, so a frozen contract is never silently reselected."""
         request_body = request.model_dump(mode="json")
         for field in ("scheduling_profile_ref", "scheduling_plan_digest"):
             if getattr(request, field) is None:
@@ -163,7 +166,6 @@ class Service:
                         or request.approval_ref
                         or request.study_ref
                         or request.probe_plan_ref
-                        or request.scheduling_plan_digest
                     ):
                         raise Rejected(
                             "Automatic scheduling requires an observe request and profile"
@@ -184,6 +186,11 @@ class Service:
                         raise Rejected(
                             "SCHEDULING_POLICY_REJECTED: " + str(automatic_plan["excluded"])
                         )
+                    if (
+                        request.scheduling_plan_digest
+                        and automatic_plan["digest"] != request.scheduling_plan_digest
+                    ):
+                        raise Rejected("SCHEDULING_PLAN_CHANGED: the frozen plan drifted")
                     request = request.model_copy(
                         update={
                             "candidate_ref": automatic_plan["plan"]["candidate_ref"],
@@ -241,6 +248,21 @@ class Service:
                         raise Rejected("SCHEDULING_POLICY_REJECTED: " + str(compiled["excluded"]))
                     if compiled["digest"] != request.scheduling_plan_digest:
                         raise Rejected("SCHEDULING_PLAN_CHANGED: preview the policy again")
+                    if expected_prediction is not None:
+                        evidence = compiled["plan"].get("recommendation_evidence") or {}
+                        now_predicted = next(
+                            (
+                                p.get("predicted_jct_seconds")
+                                for p in evidence.get("predictions", [])
+                                if p["candidate_ref"] == compiled["plan"]["candidate_ref"]
+                            ),
+                            None,
+                        )
+                        if now_predicted is None or abs(now_predicted - expected_prediction) > 1e-9:
+                            raise Rejected(
+                                f"COMPARISON_PREDICTION_DRIFT: frozen {expected_prediction}, "
+                                f"now {now_predicted}"
+                            )
                     scheduling = compiled["plan"]
                     spec = apply_plan(spec, scheduling)
                 operational = (
@@ -625,6 +647,13 @@ class Service:
                         project,
                         staging.model_dump(mode="json"),
                     )
+            bindings = (body.get("scheduling_plan") or {}).get("staging_bindings")
+            if bindings and result.outcome == "COMPLETED":
+                from .recommendation import staging_binding_check
+
+                body["staging_binding_check"] = staging_binding_check(
+                    bindings, staging_receipt, body.get("placement")
+                )
             if phase_profile is not None:
                 from .diagnostics import validate_profile
 

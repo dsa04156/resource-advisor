@@ -508,18 +508,45 @@ def _transfer(location, snapshot, candidate, cap, target, at):
     return worst, details
 
 
-def _measured_transfer(profiles, location, candidate, cap, target, rec, at):
+def _binding_view(binding):
+    return {
+        "ref": binding.ref,
+        "digest": signature(binding),
+        "cache_path": binding.cache_path,
+        "storage_mode": binding.storage_mode,
+        "storage_identity": binding.storage_identity,
+    }
+
+
+def _measured_transfer(profiles, bindings, location, candidate, cap, target, rec, at):
     """Latest fresh destination measurement per allowed node (worst member for pools).
 
-    The latest observation of a node reflects its observed cache state (cold or
-    hot); a hot cache is never assumed without a verified read.
+    Kubernetes evidence must come from RA job receipts whose Pod identity matched
+    the adapter's observation (a Pod's hostname is not its node). A hot read is
+    used only when its observed cache path and directory identity equal the
+    node's persistent ``cache_binding`` that the plan hands to execution;
+    otherwise the latest fresh cold measurement is used, or the node abstains
+    with NETWORK_CACHE_BINDING_UNPROVEN. A hot cache is never assumed.
     """
     from .network_profile import summary
 
     nodes = [m["node_ref"] for m in target["members"]] if target else [cap.node_ref]
-    detail = {"source": "measured_network", "per_node": [], "reason": None}
+    detail = {"source": "measured_network", "per_node": [], "reason": None, "bindings": {}}
     if location.content_digest is None:
         return None, {**detail, "reason": "DATA_DIGEST_UNKNOWN"}
+
+    def reason_for(p):
+        age = (at - p.observed_at).total_seconds()
+        return (
+            "NETWORK_DATASET_MISMATCH"
+            if p.content_digest != location.content_digest or p.size_bytes != location.size_bytes
+            else "NETWORK_PROFILE_FROM_FUTURE"
+            if age < -5
+            else "NETWORK_PROFILE_STALE"
+            if age > min(p.valid_for_seconds, rec.max_profile_age_seconds)
+            else None
+        )
+
     worst = None
     for node in nodes:
         mine = sorted(
@@ -538,19 +565,39 @@ def _measured_transfer(profiles, location, candidate, cap, target, rec, at):
         )
         if not mine:
             return None, {**detail, "reason": "NETWORK_PROFILE_MISSING", "node_ref": node}
+        if str(candidate.backend) == "kubernetes":
+            mine = [p for p in mine if p.identity_source == "ra_job_receipts"]
+            if not mine:
+                return None, {**detail, "reason": "NETWORK_IDENTITY_NOT_NATIVE", "node_ref": node}
         p = mine[0]
-        age = (at - p.observed_at).total_seconds()
-        reason = (
-            "NETWORK_DATASET_MISMATCH"
-            if p.content_digest != location.content_digest or p.size_bytes != location.size_bytes
-            else "NETWORK_PROFILE_FROM_FUTURE"
-            if age < -5
-            else "NETWORK_PROFILE_STALE"
-            if age > min(p.valid_for_seconds, rec.max_profile_age_seconds)
-            else None
-        )
+        reason = reason_for(p)
         if reason:
             return None, {**detail, "reason": reason, "node_ref": node, "profile_ref": p.ref}
+        own = [
+            b
+            for b in bindings
+            if str(b.backend) == str(candidate.backend)
+            and b.cluster_ref == cap.backend_cluster_id
+            and b.node_ref == node
+        ]
+        binding = own[0] if len(own) == 1 else None
+        if binding:
+            detail["bindings"][node] = _binding_view(binding)
+        hot_rejected = None
+        if p.cache_state == "hot" and not (
+            binding
+            and binding.storage_mode == "persistent"
+            and p.cache_locator == binding.cache_path
+            and p.cache_storage_identity == binding.storage_identity
+        ):
+            hot_rejected = (
+                "NETWORK_CACHE_BINDING_AMBIGUOUS"
+                if len(own) > 1
+                else "NETWORK_CACHE_BINDING_UNPROVEN"
+            )
+            p = next((q for q in mine if q.cache_state == "cold" and not reason_for(q)), None)
+            if p is None:
+                return None, {**detail, "reason": hot_rejected, "node_ref": node}
         stats = summary(p)
         detail["per_node"].append(
             {
@@ -558,13 +605,17 @@ def _measured_transfer(profiles, location, candidate, cap, target, rec, at):
                 "ref": p.ref,
                 "digest": signature(p),
                 "cache_state": p.cache_state,
+                "source_kind": p.source_kind,
+                "identity_source": p.identity_source or "observer_host",
+                "cache_binding_ref": binding.ref if binding else None,
+                "hot_evidence_rejected": hot_rejected,
                 "observed_at": p.observed_at.isoformat(),
-                "age_seconds": age,
+                "age_seconds": (at - p.observed_at).total_seconds(),
                 **stats,
             }
         )
         if worst is None or stats["median_seconds"] > worst["median_seconds"]:
-            worst = {**stats, "cache_state": p.cache_state}
+            worst = {**stats, "cache_state": p.cache_state, "source_kind": p.source_kind}
     return worst["median_seconds"], {**detail, **worst}
 
 
@@ -627,13 +678,17 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
     location, location_reason = data_location(service, conn, project, spec)
     topology = None
     measured = rec.version == MEASURED_VERSION
-    network_profiles, network_refs = [], {}
+    network_profiles, network_refs, cache_bindings, binding_refs = [], {}, [], {}
     if measured and rec.policy == "profile_queue_network":
-        from .network_profile import NetworkProfile
+        from .network_profile import CacheBinding, NetworkProfile
 
         network_profiles = [
             NetworkProfile.model_validate(x["body"])
             for x in service.store.list(conn, "network_profile", project)
+        ]
+        cache_bindings = [
+            CacheBinding.model_validate(x["body"])
+            for x in service.store.list(conn, "cache_binding", project)
         ]
     elif rec.policy == "profile_queue_network":
         topology = TopologySnapshot.model_validate(
@@ -715,9 +770,11 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
             elif measured:
                 # Staging inside compute abstains in select_candidate (never added).
                 transfers[candidate.ref], transfer_details[candidate.ref] = _measured_transfer(
-                    network_profiles, location, candidate, cap, target, rec, at
+                    network_profiles, cache_bindings, location, candidate, cap, target, rec, at
                 )
                 network_refs[candidate.ref] = transfer_details[candidate.ref]["per_node"]
+                if transfer_details[candidate.ref]["bindings"]:
+                    binding_refs[candidate.ref] = transfer_details[candidate.ref]["bindings"]
             else:
                 transfers[candidate.ref], transfer_details[candidate.ref] = _transfer(
                     location, topology, candidate, cap, target, at
@@ -755,7 +812,7 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
         )
         if staging.get("source") == "measured_network":
             staging = {
-                **{k: v for k, v in staging.items() if k not in {"per_node", "reason"}},
+                **{k: v for k, v in staging.items() if k not in {"per_node", "reason", "bindings"}},
                 "profile_refs": [n["ref"] for n in staging["per_node"]],
                 "per_node": staging["per_node"],
             }
@@ -796,6 +853,9 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
             ref: [{"ref": n["ref"], "digest": n["digest"]} for n in nodes]
             for ref, nodes in sorted(network_refs.items())
         }
+        if binding_refs:
+            # Signed into the plan; execution receives the selected candidate's entry.
+            record["cache_bindings"] = dict(sorted(binding_refs.items()))
     evidence = {
         "evaluated_at": at.isoformat(),
         "predictions": predictions,
@@ -874,6 +934,36 @@ def _comparison_arm(key):
     return {"ref": ref, "arm": arm} if ref and arm in COMPARISON_ARMS else None
 
 
+def staging_binding_check(bindings, receipt, placement):
+    """Did the job stage into the cache binding its plan was priced against?"""
+    if receipt is None:
+        return {"status": "NO_RECEIPT"}
+    node = (placement or {}).get("node_name") or receipt.get("node_name")
+    binding = bindings.get(node)
+    if binding is None:
+        return {"status": "MISMATCH", "reason": "NODE_WITHOUT_BINDING", "node_ref": node}
+    reasons = [
+        name
+        for name, ok in (
+            ("BINDING_REF", receipt.get("cache_binding_ref") == binding["ref"]),
+            ("CACHE_PATH", receipt.get("cache_locator") == binding["cache_path"]),
+            (
+                "STORAGE_IDENTITY",
+                binding["storage_mode"] == "ephemeral"
+                or receipt.get("cache_storage_identity") == binding["storage_identity"],
+            ),
+        )
+        if not ok
+    ]
+    return {
+        "status": "MISMATCH" if reasons else "MATCHED",
+        "reasons": reasons,
+        "node_ref": node,
+        "binding_ref": binding["ref"],
+        "observed_cache_state": receipt.get("cache_state"),
+    }
+
+
 def record_outcome(store, conn, row, state, body):
     """Immutable frozen-prediction vs native-JCT record for a scheduled terminal attempt.
 
@@ -944,6 +1034,8 @@ def record_outcome(store, conn, row, state, body):
         },
         "error": error,
     }
+    if body.get("staging_binding_check"):
+        outcome["staging_binding_check"] = body["staging_binding_check"]
     store.put(conn, "jct_outcome", body["attempt_id"], row["project"], outcome)
 
 
@@ -971,11 +1063,46 @@ def comparison_key(ref, arm):
     return f"cmp:{ref}:{arm}"
 
 
+def _selected_prediction(predictions, candidate_ref):
+    chosen = next((p for p in predictions if p["candidate_ref"] == candidate_ref), None)
+    return (chosen or {}).get("predicted_jct_seconds")
+
+
+def _hard_pool(result):
+    plan = result["plan"] or {}
+    return sorted(
+        e["candidate_ref"]
+        for e in plan.get("evaluation", result.get("evaluation", []))
+        if e.get("eligible")
+    )
+
+
 def freeze_comparison(service, project, request):
-    """Evaluate all four arms in one transaction and store them before any submission."""
+    """Evaluate all four arms in one transaction and store them before any submission.
+
+    Every arm must see the same hard-eligible candidate pool (profile constraints,
+    bindings, data access, availability); an unknown estimate does not remove a
+    candidate from the pool. Unequal pools are rejected rather than intersected.
+    Static then fixes its candidate inside that pool.
+    """
     from .scheduling import SchedulingPlanRequest, SchedulingProfile, compile_plan
     from .service import Rejected, required
     from .store import Conflict
+
+    def compile_arm(conn, profile_ref, candidate_ref=None):
+        try:
+            return compile_plan(
+                service,
+                conn,
+                project,
+                SchedulingPlanRequest(
+                    profile_ref=profile_ref,
+                    workload_ref=request.workload_ref,
+                    candidate_ref=candidate_ref,
+                ),
+            )
+        except ValueError as exc:
+            raise Rejected(str(exc)) from exc
 
     with service.store.transaction() as conn:
         existing = service.store.get(conn, "recommendation_comparison", request.ref)
@@ -983,7 +1110,7 @@ def freeze_comparison(service, project, request):
             if existing["body"]["request"] != request.model_dump(mode="json"):
                 raise Conflict("comparison reference reused with a different request")
             return _comparison_view(service, conn, project, existing)
-        arms = {}
+        arms, pools, open_results = {}, {}, {}
         for arm in COMPARISON_ARMS:
             static = arm == "static"
             profile_ref = request.static_profile_ref if static else request.profile_refs[arm]
@@ -993,23 +1120,24 @@ def freeze_comparison(service, project, request):
             rec = profile.policy.recommendation
             if static != (rec is None) or (rec is not None and rec.policy != arm):
                 raise Rejected(f"{arm} arm requires a matching {arm} scheduling profile")
-            try:
-                result = compile_plan(
-                    service,
-                    conn,
-                    project,
-                    SchedulingPlanRequest(
-                        profile_ref=profile_ref,
-                        workload_ref=request.workload_ref,
-                        candidate_ref=request.static_candidate_ref if static else None,
-                    ),
-                )
-            except ValueError as exc:
-                raise Rejected(str(exc)) from exc
-            if static and not result["accepted"]:
-                raise Rejected("STATIC_CANDIDATE_NOT_ELIGIBLE: " + str(result["excluded"]))
+            open_results[arm] = (profile_ref, rec, compile_arm(conn, profile_ref))
+            pools[arm] = _hard_pool(open_results[arm][2])
+        if len({tuple(p) for p in pools.values()}) != 1:
+            raise Rejected(f"COMPARISON_POOL_MISMATCH: {pools}")
+        pool = pools["static"]
+        if request.static_candidate_ref not in pool:
+            raise Rejected(f"STATIC_CANDIDATE_NOT_ELIGIBLE: pool {pool}")
+        for arm in COMPARISON_ARMS:
+            static = arm == "static"
+            profile_ref, rec, result = open_results[arm]
+            if static:
+                result = compile_arm(conn, profile_ref, request.static_candidate_ref)
+                if not result["accepted"]:
+                    raise Rejected("STATIC_CANDIDATE_NOT_ELIGIBLE: " + str(result["excluded"]))
             plan = result["plan"] or {}
             evidence = plan.get("recommendation_evidence") or result.get("recommendation_evidence")
+            predictions = (evidence or {}).get("predictions", [])
+            selected = plan.get("candidate_ref")
             arms[arm] = {
                 "profile_ref": profile_ref,
                 "policy": rec.policy if rec else "static",
@@ -1018,15 +1146,18 @@ def freeze_comparison(service, project, request):
                 "status": (plan.get("recommendation") or result.get("recommendation") or {}).get(
                     "status", "STATIC" if static else None
                 ),
-                "selected_candidate_ref": plan.get("candidate_ref"),
+                "selected_candidate_ref": selected,
+                # The execution contract: submission must reproduce this digest and,
+                # for policy arms, this prediction, or it is rejected as drift.
                 "digest": result["digest"],
+                "frozen_predicted_jct_seconds": None
+                if static
+                else _selected_prediction(predictions, selected),
                 "reasons": result["reasons"],
                 "excluded": result["excluded"],
-                "candidate_pool": [
-                    e["candidate_ref"] for e in plan.get("evaluation", result.get("evaluation", []))
-                ],
+                "candidate_pool": pool,
                 "evaluated_at": (evidence or {}).get("evaluated_at"),
-                "predictions": (evidence or {}).get("predictions", []),
+                "predictions": predictions,
             }
         body = {
             "ref": request.ref,
@@ -1035,16 +1166,72 @@ def freeze_comparison(service, project, request):
             "kind": "shadow_estimates_frozen_before_submission",
             "frozen_at": now().isoformat(),
             "workload_ref": request.workload_ref,
+            "candidate_pool": pool,
             "arm_order": list(COMPARISON_ARMS),
             "arms": arms,
             "claims": (
                 "Shadow estimates cover every candidate under each policy at one instant. "
-                "Executed outcomes are separate jobs run independently per arm; no "
-                "counterfactual measured performance is inferred from shadow estimates."
+                "Each arm's job is submitted only under its frozen plan and prediction "
+                "(drift is rejected and recorded); no counterfactual measured performance "
+                "is inferred from shadow estimates."
             ),
         }
         saved = service.store.put(conn, "recommendation_comparison", request.ref, project, body)
         return _comparison_view(service, conn, project, saved)
+
+
+def submit_comparison_arm(service, project, ref, arm):
+    """Submit exactly the frozen arm contract, or record and reject its drift."""
+    from .contracts import JobRequest
+    from .service import NotFound, Rejected
+
+    with service.store.transaction() as conn:
+        item = service.store.get(conn, "recommendation_comparison", ref)
+        if not item or item["project"] != project or arm not in COMPARISON_ARMS:
+            raise NotFound("comparison arm not found")
+        body = item["body"]
+        events = [
+            x for x in service.store.list(conn, "comparison_arm_event", project)
+            if x["body"]["comparison_ref"] == ref and x["body"]["arm"] == arm
+        ]  # fmt: skip
+    frozen = body["arms"][arm]
+    static = arm == "static"
+
+    def record(status, reason):
+        with service.store.transaction() as conn:
+            service.store.put(
+                conn,
+                "comparison_arm_event",
+                f"{ref}:{arm}:{len(events) + 1}",
+                project,
+                {
+                    "comparison_ref": ref,
+                    "arm": arm,
+                    "status": status,
+                    "reason": reason[:1000],
+                    "observed_at": now().isoformat(),
+                },
+            )
+
+    if not frozen["accepted"]:
+        record("NOT_ACCEPTED_AT_FREEZE", ",".join(frozen["reasons"]))
+        raise Rejected("COMPARISON_ARM_NOT_ACCEPTED_AT_FREEZE")
+    request = JobRequest(
+        workload_ref=body["workload_ref"],
+        scheduling_profile_ref=frozen["profile_ref"],
+        scheduling_plan_digest=frozen["digest"],
+        candidate_ref=frozen["selected_candidate_ref"] if static else None,
+    )
+    try:
+        return service.submit(
+            project,
+            request,
+            comparison_key(ref, arm),
+            expected_prediction=frozen.get("frozen_predicted_jct_seconds"),
+        )
+    except Rejected as exc:
+        record("DRIFT_REJECTED", str(exc))
+        raise
 
 
 def comparison(service, project, ref):
@@ -1063,7 +1250,12 @@ def _comparison_view(service, conn, project, item):
     from .store import jobs
 
     body = item["body"]
-    executed = {}
+    executed, events = {}, {}
+    all_events = [
+        x["body"]
+        for x in service.store.list(conn, "comparison_arm_event", project)
+        if x["body"]["comparison_ref"] == body["ref"]
+    ]
     for arm in body["arm_order"]:
         rows = conn.execute(
             select(jobs).where(
@@ -1071,30 +1263,132 @@ def _comparison_view(service, conn, project, item):
                 jobs.c.idempotency_key == comparison_key(body["ref"], arm),
             )
         ).mappings()
-        frozen = body["arms"][arm]["selected_candidate_ref"]
-        executed[arm] = [
-            {
-                "kind": "independently_executed",
-                "job_id": row["id"],
-                "state": row["state"],
-                "candidate_ref": row["body"]["candidate"]["ref"],
-                "matches_frozen_selection": row["body"]["candidate"]["ref"] == frozen,
-                "scheduling_plan_digest": row["body"].get("scheduling_plan_digest"),
-                "outcome": (
-                    service.store.get(conn, "jct_outcome", row["body"]["attempt_id"]) or {}
-                ).get("body"),
-            }
-            for row in rows
-        ]
+        frozen = body["arms"][arm]
+        executed[arm] = []
+        for row in rows:
+            plan = row["body"].get("scheduling_plan") or {}
+            submitted = _selected_prediction(
+                (plan.get("recommendation_evidence") or {}).get("predictions", []),
+                row["body"]["candidate"]["ref"],
+            )
+            executed[arm].append(
+                {
+                    "kind": "independently_executed",
+                    "job_id": row["id"],
+                    "state": row["state"],
+                    "candidate_ref": row["body"]["candidate"]["ref"],
+                    "matches_frozen_selection": row["body"]["candidate"]["ref"]
+                    == frozen["selected_candidate_ref"],
+                    "scheduling_plan_digest": row["body"].get("scheduling_plan_digest"),
+                    "frozen_predicted_jct_seconds": frozen.get("frozen_predicted_jct_seconds"),
+                    # Forecast of the submitted plan; the outcome error uses this one.
+                    "submission_predicted_jct_seconds": submitted,
+                    "outcome": (
+                        service.store.get(conn, "jct_outcome", row["body"]["attempt_id"]) or {}
+                    ).get("body"),
+                }
+            )
+        events[arm] = sorted(
+            (e for e in all_events if e["arm"] == arm), key=lambda e: e["observed_at"]
+        )
     return {
         **body,
         "arms": {arm: body["arms"][arm] for arm in body["arm_order"]},
         "frozen_digest": item["digest"],
         "executed": executed,
+        "arm_events": events,
     }
 
 
 # --- Collectors: pure transforms over read-only native observations. ---------------
+
+
+def native_receipt(row):
+    """The row's StagingReceipt, bound to the adapter-observed execution identity.
+
+    A Kubernetes Downward API claim counts only when its node name and Pod UID
+    equal the Pod the adapter itself observed for this attempt; a host claim must
+    name the observed node. Anything else is unrelated or remote evidence.
+    """
+    from .network_profile import StagingReceipt
+
+    b = row["body"]
+    receipt = StagingReceipt.model_validate(row["staging"])
+    placement = b.get("placement") or {}
+    node = placement.get("node_name")
+    if receipt.attempt_id != b["attempt_id"] or receipt.job_id != row["id"] or node is None:
+        raise ValueError(f"{row['id']}: staging receipt unrelated, remote or mixed dataset")
+    if receipt.identity_source == "kubernetes_downward_api":
+        if (
+            placement.get("source") != "kubernetes:Pod"
+            or not placement.get("pod_uid")
+            or receipt.pod_uid != placement["pod_uid"]
+            or receipt.node_name != node
+        ):
+            raise ValueError(f"{row['id']}: Pod identity differs from the observed Pod (remote)")
+    elif (receipt.node_name or receipt.observer_host) != node or receipt.observer_host != node:
+        raise ValueError(f"{row['id']}: staging receipt unrelated, remote or mixed dataset")
+    return receipt
+
+
+def network_profile_from_receipts(rows, *, ref, valid_for_seconds):
+    """NetworkProfile from RA jobs' own staging receipts (natively identity-checked).
+
+    This is the Kubernetes measurement path: the job's Pod stages the dataset and
+    the adapter's Pod observation vouches for the node. All receipts must share
+    dataset, source, node, cache state, cache path and observed cache identity.
+    """
+    from .network_profile import MAX_BYTES, MAX_SECONDS, NetworkProfile
+
+    rows = list(rows)
+    if not rows:
+        raise ValueError("no staged jobs")
+    receipts = [native_receipt(row) for row in rows]
+    first, body = receipts[0], rows[0]["body"]
+    key = lambda r, row: (  # noqa: E731 - local identity tuple
+        r.content_digest,
+        r.size_bytes,
+        r.source_endpoint_ref,
+        r.source_locator,
+        r.cache_state,
+        r.cache_locator,
+        r.cache_storage_identity,
+        row["body"]["placement"]["node_name"],
+        row["body"]["candidate"]["backend"],
+        row["body"]["capability"]["backend_cluster_id"],
+        row["body"]["spec"]["ref"],
+        row["body"]["spec"]["identity"]["dataset_version"],
+    )
+    if any(key(r, row) != key(first, rows[0]) for r, row in zip(receipts, rows, strict=True)):
+        raise ValueError("receipts differ in dataset, source, node or cache identity")
+    finished = [row["body"].get("backend_finished_at") for row in rows]
+    if any(f is None for f in finished):
+        raise ValueError("native finish time unobserved")
+    return NetworkProfile(
+        ref=ref,
+        project_ref=body["spec"]["project_ref"],
+        workload_ref=body["spec"]["ref"],
+        dataset_version=body["spec"]["identity"]["dataset_version"],
+        content_digest=first.content_digest,
+        size_bytes=first.size_bytes,
+        source_endpoint_ref=first.source_endpoint_ref,
+        source_kind=first.source_kind or "http",
+        source_locator=first.source_locator,
+        backend=body["candidate"]["backend"],
+        cluster_ref=body["capability"]["backend_cluster_id"],
+        node_ref=body["placement"]["node_name"],
+        observer_host=first.observer_host,
+        cache_state=first.cache_state,
+        cache_locator=first.cache_locator,
+        cache_storage_identity=first.cache_storage_identity,
+        observed_at=max(datetime.fromisoformat(f) for f in finished),
+        valid_for_seconds=valid_for_seconds,
+        samples=tuple(r.sample for r in receipts),
+        limits={"max_bytes": MAX_BYTES, "timeout_seconds": MAX_SECONDS},
+        method="RA job staging receipts matched to the adapter-observed Pod/node",
+        identity_source="ra_job_receipts",
+        native_job_ids=tuple(row["id"] for row in rows),
+    )
 
 
 def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
@@ -1160,13 +1454,11 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
         compute = result["measurements"]["elapsed_seconds"]
         staging = None
         if staged:
-            receipt = StagingReceipt.model_validate(row["staging"])
+            receipt = native_receipt(row)
             first_receipt = StagingReceipt.model_validate(rows[0]["staging"])
-            if (
-                receipt.attempt_id != b["attempt_id"]
-                or receipt.observer_host != node
-                or (receipt.content_digest, receipt.size_bytes)
-                != (first_receipt.content_digest, first_receipt.size_bytes)
+            if (receipt.content_digest, receipt.size_bytes) != (
+                first_receipt.content_digest,
+                first_receipt.size_bytes,
             ):
                 raise ValueError(f"{row['id']}: staging receipt unrelated, remote or mixed dataset")
             staging = receipt.sample.elapsed_seconds

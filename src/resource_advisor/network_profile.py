@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Literal
 from urllib.parse import urlsplit, urlunsplit
 
-from pydantic import AwareDatetime, Field, model_validator
+from pydantic import AwareDatetime, Field, model_serializer, model_validator
 
 from .contracts import Backend, Contract, Digest, Ref, now
 
@@ -34,6 +34,67 @@ MAX_BYTES = 2**30
 MAX_SECONDS = 120
 MAX_REPEATS = 10
 CHUNK = 1024 * 1024
+# The total deadline is enforced by a watchdog that closes the response; the
+# abort lands within this scheduling/close tolerance after the deadline.
+DEADLINE_TOLERANCE_SECONDS = 0.25
+
+
+def _omit_none(value, keys):
+    for key in keys:
+        if value.get(key) is None:
+            value.pop(key, None)
+    return value
+
+
+def storage_identity(path):
+    """Observed identity of a cache directory: device and inode, not a declared name."""
+    st = os.stat(path)
+    return f"{st.st_dev}:{st.st_ino}"
+
+
+def execution_identity(env=None, hostname=None):
+    """Who is executing: native Kubernetes Pod identity (Downward API) or this host.
+
+    The Downward API values are only a claim until a collector compares them with
+    the adapter's own observation of the Pod (UID and node); see
+    ``recommendation.network_profile_from_receipts``.
+    """
+    env = os.environ if env is None else env
+    host = hostname or socket.gethostname()
+    if env.get("RA_POD_UID") and env.get("RA_NODE_NAME"):
+        return {
+            "identity_source": "kubernetes_downward_api",
+            "node_name": env["RA_NODE_NAME"],
+            "pod_name": env.get("RA_POD_NAME"),
+            "pod_uid": env["RA_POD_UID"],
+            "observer_host": host,
+        }
+    return {"identity_source": "host", "node_name": host, "observer_host": host}
+
+
+class CacheBinding(Contract):
+    """Operator-declared cache destination of one execution route.
+
+    ``persistent`` storage keeps entries between jobs and carries the observed
+    device:inode identity of the directory as seen *by the job*; ``ephemeral``
+    storage (container scratch) is empty for every job, so hot evidence never applies.
+    """
+
+    ref: Ref
+    project_ref: Ref
+    backend: Backend
+    cluster_ref: Ref
+    node_ref: Ref
+    cache_path: str = Field(min_length=2, max_length=512, pattern=r"^/")
+    storage_mode: Literal["persistent", "ephemeral"]
+    storage_identity: str | None = Field(default=None, pattern=r"^\d+:\d+$")
+    evidence_ref: Ref
+
+    @model_validator(mode="after")
+    def persistent_needs_identity(self):
+        if (self.storage_mode == "persistent") != (self.storage_identity is not None):
+            raise ValueError("only persistent storage has, and it requires, an observed identity")
+        return self
 
 
 class AccessSample(Contract):
@@ -67,10 +128,27 @@ class NetworkProfile(Contract):
     samples: tuple[AccessSample, ...] = Field(min_length=1, max_length=MAX_REPEATS)
     limits: dict[str, int]
     method: str = Field(min_length=1, max_length=256)
+    # Optional (omitted from the digest when unset): observed cache directory
+    # identity, and native RA job receipts when built by the receipt collector.
+    cache_storage_identity: str | None = Field(default=None, pattern=r"^\d+:\d+$")
+    identity_source: Literal["observer_host", "ra_job_receipts"] | None = None
+    native_job_ids: tuple[Ref, ...] | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_signature(self, handler):
+        return _omit_none(
+            handler(self), ("cache_storage_identity", "identity_source", "native_job_ids")
+        )
 
     @model_validator(mode="after")
     def complete_verified_destination_evidence(self):
-        if self.node_ref != self.observer_host:
+        if self.identity_source == "ra_job_receipts":
+            # node_ref is the adapter-observed node; observer_host may be a Pod name.
+            if not self.native_job_ids or len(self.native_job_ids) != len(self.samples):
+                raise ValueError("receipt evidence names one native RA job per sample")
+        elif self.native_job_ids is not None:
+            raise ValueError("native job ids belong to receipt-derived evidence")
+        elif self.node_ref != self.observer_host:
             raise ValueError("network evidence must be measured on its destination node")
         if any(
             s.bytes != self.size_bytes
@@ -102,6 +180,30 @@ class StagingReceipt(Contract):
     cache_state: Literal["cold", "hot"]
     cache_locator: str = Field(min_length=1, max_length=512)
     sample: AccessSample
+    # Optional (omitted when unset). Native identity is checked against the
+    # adapter's observed placement; the binding ref is the plan's cache binding.
+    source_kind: Literal["http", "file"] | None = None
+    identity_source: Literal["host", "kubernetes_downward_api"] | None = None
+    node_name: str | None = Field(default=None, max_length=253)
+    pod_name: str | None = Field(default=None, max_length=253)
+    pod_uid: str | None = Field(default=None, max_length=64)
+    cache_storage_identity: str | None = Field(default=None, pattern=r"^\d+:\d+$")
+    cache_binding_ref: Ref | None = None
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_signature(self, handler):
+        return _omit_none(
+            handler(self),
+            (
+                "source_kind",
+                "identity_source",
+                "node_name",
+                "pod_name",
+                "pod_uid",
+                "cache_storage_identity",
+                "cache_binding_ref",
+            ),
+        )
 
     @model_validator(mode="after")
     def complete_verified_staging(self):
@@ -164,33 +266,60 @@ class Unavailable(Exception):
 
 
 def _http(source, sink, hasher, size, deadline, timeout):
+    """Stream with a total wall-clock bound.
+
+    Per-read socket timeouts alone let a slow drip run indefinitely, and a
+    buffered chunk iterator only checks time after a full chunk. A watchdog
+    therefore closes the client at the deadline, and every piece is checked as it
+    arrives; the abort lands within ``DEADLINE_TOLERANCE_SECONDS``.
+    """
+    import threading
+
     import httpx
 
     started = time.perf_counter()
     first = None
     received = 0
+    client = httpx.Client(timeout=timeout, follow_redirects=False)
+    expired = threading.Event()
+
+    def expire():
+        expired.set()
+        client.close()
+
+    watchdog = threading.Timer(max(0.0, deadline - started), expire)
+    watchdog.daemon = True
+    watchdog.start()
     try:
-        with httpx.Client(timeout=timeout, follow_redirects=False) as client:
-            with client.stream("GET", source) as response:
-                if response.status_code != 200:
-                    raise Unavailable(f"SOURCE_HTTP_{response.status_code}")
-                for chunk in response.iter_bytes(CHUNK):
-                    if first is None:
-                        first = time.perf_counter() - started
-                    received += len(chunk)
-                    if received > size:
-                        raise Unavailable("SIZE_MISMATCH")
-                    if time.perf_counter() > deadline:
-                        raise Unavailable("TRANSFER_TIMEOUT")
-                    hasher.update(chunk)
-                    sink.write(chunk)
+        with client.stream("GET", source) as response:
+            if response.status_code != 200:
+                raise Unavailable(f"SOURCE_HTTP_{response.status_code}")
+            for chunk in response.iter_bytes():
+                if expired.is_set() or time.perf_counter() > deadline:
+                    raise Unavailable("TRANSFER_TIMEOUT")
+                if first is None:
+                    first = time.perf_counter() - started
+                received += len(chunk)
+                if received > size:
+                    raise Unavailable("SIZE_MISMATCH")
+                hasher.update(chunk)
+                sink.write(chunk)
+        if expired.is_set():
+            raise Unavailable("TRANSFER_TIMEOUT")
+    except Unavailable:
+        raise
     except httpx.TimeoutException as exc:
         raise Unavailable("TRANSFER_TIMEOUT") from exc
     except httpx.ConnectError as exc:
-        raise Unavailable("SOURCE_UNREACHABLE") from exc
-    except httpx.HTTPError as exc:
-        # Includes a peer closing before Content-Length: never full evidence.
-        raise Unavailable("TRANSFER_INCOMPLETE") from exc
+        raise Unavailable("TRANSFER_TIMEOUT" if expired.is_set() else "SOURCE_UNREACHABLE") from exc
+    except (httpx.HTTPError, OSError, RuntimeError) as exc:
+        # A peer closing early, or the watchdog closing the client: never full evidence.
+        raise Unavailable(
+            "TRANSFER_TIMEOUT" if expired.is_set() else "TRANSFER_INCOMPLETE"
+        ) from exc
+    finally:
+        watchdog.cancel()
+        client.close()
     return received, first
 
 
@@ -262,6 +391,10 @@ def measure(args, *, hostname=None):
     hostname = hostname or socket.gethostname()
     node = args.node_ref or hostname
     reasons = []
+    if os.environ.get("KUBERNETES_SERVICE_HOST"):
+        # Inside a Pod the hostname is the Pod name and nothing native vouches for
+        # the node: measure through an RA job and build evidence from its receipts.
+        reasons.append("KUBERNETES_POD_REQUIRES_NATIVE_RECEIPT")
     if node != hostname:
         reasons.append("OBSERVER_NOT_TARGET")
     if not (0 < args.max_bytes <= MAX_BYTES and 0 < args.timeout_seconds <= MAX_SECONDS):
@@ -313,6 +446,7 @@ def measure(args, *, hostname=None):
         cache_locator=str(cache),
         observed_at=now(),
         valid_for_seconds=args.valid_for_seconds,
+        cache_storage_identity=storage_identity(cache),
         samples=tuple(samples),
         limits={"max_bytes": args.max_bytes, "timeout_seconds": args.timeout_seconds},
         method=(

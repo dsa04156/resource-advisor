@@ -467,6 +467,10 @@ def compile_plan(service, conn, project, request):
         recommendation["selected_candidate_ref"] = candidate.ref
         plan["recommendation"] = recommendation
         plan["recommendation_evidence"] = evidence
+        bindings = (recommendation.get("cache_bindings") or {}).get(candidate.ref)
+        if bindings:
+            # Execution must stage into the cache the estimate was priced against.
+            plan["staging_bindings"] = bindings
         plan["reason"][1] = (
             f"{rec.policy} estimate ({rec.version}); legacy order only as recorded fallback"
         )

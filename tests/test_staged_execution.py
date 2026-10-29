@@ -1,8 +1,9 @@
 """End-to-end on this host: real staging bytes, real subprocess, frozen prediction → JCT.
 
-The backend here runs the actual staged workload as a local subprocess and reports
-its own process timestamps. It is local execution, not Kubernetes/Slurm hardware
-evidence; the adapters' contracts are unchanged and tested elsewhere.
+The backend double runs the actual staged workload as a local subprocess with the
+real adapter's identity environment, plus Downward-API-shaped Pod identity that it
+also reports as its own Pod observation. It is local execution, not Kubernetes or
+Slurm hardware evidence; the Kubernetes manifest itself is tested in test_backends.
 """
 
 import hashlib
@@ -12,14 +13,15 @@ import socket
 import subprocess
 import sys
 import threading
+import uuid
 from datetime import timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
 
-from resource_advisor.backends import Observation, result_from_log
+from resource_advisor.backends import Observation, identity_environment, result_from_log
 from resource_advisor.contracts import JobRequest, State, now
-from resource_advisor.network_profile import main as network_cli
+from resource_advisor.network_profile import CacheBinding, storage_identity
 from resource_advisor.recommendation import (
     DataLocation,
     HardwareFingerprint,
@@ -27,6 +29,7 @@ from resource_advisor.recommendation import (
     RouteQueueSnapshot,
     decision_linkage,
     jct_profile_from_jobs,
+    network_profile_from_receipts,
 )
 from resource_advisor.worker import Worker
 
@@ -56,26 +59,24 @@ def source():
 
 
 class LocalProcessBackend:
-    """Runs the real workload process here; timestamps are this process's own."""
+    """Runs the real workload here as a 'Pod' it names; timestamps are its own."""
 
-    def __init__(self, env):
-        self.env, self.runs = env, {}
+    def __init__(self, env, *, claimed_uid=None):
+        self.env, self.runs, self.claimed_uid = env, {}, claimed_uid
 
     def validate(self, job):
         pass
 
     def submit(self, job):
-        b = job["body"]
         submitted = now()
+        uid = str(uuid.uuid4())
         env = {
             **os.environ,
             **self.env,
-            "RA_JOB_ID": job["id"],
-            "RA_ATTEMPT_ID": b["attempt_id"],
-            "RA_EPOCH": str(b["epoch"]),
-            "RA_WORKLOAD_SIGNATURE": b["workload_signature"],
-            "RA_CONTEXT_SIGNATURE": b["context_signature"],
-            "RA_WORK_UNITS": str(b["spec"]["identity"]["work_units"]),
+            **identity_environment(job),  # the real adapter's env, incl. cache binding
+            "RA_NODE_NAME": HOST,
+            "RA_POD_NAME": "pod-" + job["id"],
+            "RA_POD_UID": self.claimed_uid or uid,
         }
         started = now()
         done = subprocess.run(
@@ -86,21 +87,26 @@ class LocalProcessBackend:
             timeout=60,
             check=True,
         )
-        self.runs[job["id"]] = (submitted, started, now(), done.stdout)
+        self.runs[job["id"]] = (submitted, started, now(), done.stdout, uid)
         return "local-" + job["id"]
 
     def reconcile(self, job):
         return "local-" + job["id"] if job["id"] in self.runs else None
 
     def status(self, job):
-        submitted, started, finished, _ = self.runs[job["id"]]
+        submitted, started, finished, _, uid = self.runs[job["id"]]
         return Observation(
             State.COLLECTING,
             submitted_at=submitted.isoformat(),
             started_at=started.isoformat(),
             execution_started_at=started.isoformat(),
             finished_at=finished.isoformat(),
-            placement={"node_name": HOST, "source": "local-process"},
+            placement={
+                "source": "kubernetes:Pod",
+                "node_name": HOST,
+                "pod_name": "pod-" + job["id"],
+                "pod_uid": uid,
+            },
         )
 
     def result(self, job):
@@ -142,92 +148,82 @@ def rows(service, job_ids):
         return out
 
 
+def dataset_env(source, cache):
+    return {
+        "RA_DATASET_SOURCE": source,
+        "RA_DATASET_SHA256": DIGEST,
+        "RA_DATASET_SIZE_BYTES": str(len(PAYLOAD)),
+        "RA_DATASET_CACHE_DIR": str(cache),
+        "RA_DATASET_SOURCE_ENDPOINT": "loopback-http",
+    }
+
+
+def run_fixed(service, worker, spec, key):
+    job = service.submit("team-a", JobRequest(workload_ref=spec.ref, candidate_ref="local"), key)
+    assert worker.submit_one()
+    worker.reconcile_all()
+    assert service.get_job("team-a", job["job_id"])["state"] == "SUCCEEDED"
+    return job["job_id"]
+
+
+def hardware(cap):
+    return HardwareFingerprint(
+        accelerator_vendor=cap.accelerator_vendor,
+        accelerator_model=cap.accelerator_model,
+        device_class=cap.device_class,
+        memory_model=cap.memory_model,
+        allocation_mode=cap.allocation_mode,
+        logical_slot=False,
+    )
+
+
 def test_staged_job_feeds_a_separate_staging_profile_and_a_measured_recommendation(
-    service, local, source, tmp_path, capsys
+    service, local, source, tmp_path
 ):
     from test_heterogeneous_recommendation import scheduling_profile
 
     spec, cap = local
-    cache = tmp_path / "dest-cache"
-    backend = LocalProcessBackend(
-        {
-            "RA_DATASET_SOURCE": source,
-            "RA_DATASET_SHA256": DIGEST,
-            "RA_DATASET_SIZE_BYTES": str(len(PAYLOAD)),
-            "RA_DATASET_CACHE_DIR": str(cache),
-            "RA_DATASET_SOURCE_ENDPOINT": "loopback-http",
-        }
-    )
-    worker = Worker(service, {("team-a", "lab"): backend})
+    cache = (tmp_path / "dest-cache").resolve()
+    worker = Worker(service, {("team-a", "lab"): LocalProcessBackend(dataset_env(source, cache))})
 
     # 1. Profiling job: cold staging (actual bytes copied), then compute over them.
-    job = service.submit("team-a", JobRequest(workload_ref=spec.ref, candidate_ref="local"), "p-1")
-    assert worker.submit_one()
-    worker.reconcile_all()
-    assert service.get_job("team-a", job["job_id"])["state"] == "SUCCEEDED"
-    [row] = rows(service, [job["job_id"]])
-    assert row["staging"]["cache_state"] == "cold"
-    assert row["staging"]["sample"]["bytes"] == len(PAYLOAD)
+    [cold] = rows(service, [run_fixed(service, worker, spec, "p-1")])
+    assert cold["staging"]["cache_state"] == "cold"
+    assert cold["staging"]["sample"]["bytes"] == len(PAYLOAD)
+    assert cold["staging"]["pod_uid"] == cold["body"]["placement"]["pod_uid"]
 
     # 2. Collector: staging is its own phase, subtracted from the residual.
     profile = jct_profile_from_jobs(
-        [row],
-        ref="staged-profile",
-        valid_for_seconds=3600,
-        hardware=HardwareFingerprint(
-            accelerator_vendor=cap.accelerator_vendor,
-            accelerator_model=cap.accelerator_model,
-            device_class=cap.device_class,
-            memory_model=cap.memory_model,
-            allocation_mode=cap.allocation_mode,
-            logical_slot=False,
-        ),
+        [cold], ref="staged-profile", valid_for_seconds=3600, hardware=hardware(cap)
     )
     assert profile.staging_boundary == "separate"
-    assert profile.phases["data_staging"] == row["staging"]["sample"]["elapsed_seconds"]
-    assert profile.phases["compute"] == row["result"]["measurements"]["elapsed_seconds"]
+    assert profile.phases["data_staging"] == cold["staging"]["sample"]["elapsed_seconds"]
+    assert profile.phases["compute"] == cold["result"]["measurements"]["elapsed_seconds"]
     assert profile.phases["unattributed_in_container"] >= 0
     service.register("jct_profile", profile, "team-a")
 
-    # 3. Destination measurement of the same cache the next job will read (hot).
-    code = network_cli(
-        [
-            "measure",
-            "--source",
-            source,
-            "--sha256",
-            DIGEST,
-            "--size-bytes",
-            str(len(PAYLOAD)),
-            "--cache-dir",
-            str(cache),
-            "--mode",
-            "hot",
-            "--ref",
-            "net-local-hot",
-            "--project",
-            "team-a",
-            "--workload-ref",
-            spec.ref,
-            "--dataset-version",
-            spec.identity.dataset_version,
-            "--source-endpoint-ref",
-            "loopback-http",
-            "--backend",
-            "kubernetes",
-            "--cluster-ref",
-            "lab",
-            "--repeats",
-            "3",
-            "--max-bytes",
-            str(4 * 1024 * 1024),
-        ]
+    # 3. A second job reads the now-populated cache: hot evidence from its own
+    #    receipt, identity-checked against the observed Pod, plus the cache binding.
+    [hot] = rows(service, [run_fixed(service, worker, spec, "p-2")])
+    measured = network_profile_from_receipts([hot], ref="net-local-hot", valid_for_seconds=3600)
+    assert measured.cache_state == "hot" and measured.node_ref == HOST
+    assert measured.identity_source == "ra_job_receipts" and measured.native_job_ids == (hot["id"],)
+    service.register("network_profile", measured, "team-a")
+    service.register(
+        "cache_binding",
+        CacheBinding(
+            ref="local-cache",
+            project_ref="team-a",
+            backend="kubernetes",
+            cluster_ref="lab",
+            node_ref=HOST,
+            cache_path=str(cache),
+            storage_mode="persistent",
+            storage_identity=storage_identity(cache),
+            evidence_ref="local-stat",
+        ),
+        "team-a",
     )
-    measured = json.loads(capsys.readouterr().out)
-    assert code == 0, measured
-    from resource_advisor.network_profile import NetworkProfile
-
-    service.register("network_profile", NetworkProfile.model_validate(measured), "team-a")
     service.register(
         "data_location",
         DataLocation(
@@ -267,8 +263,10 @@ def test_staged_job_feeds_a_separate_staging_profile_and_a_measured_recommendati
     )
     service.register("scheduling_profile", policy, "team-a")
 
-    # 4. Automatic job: prediction frozen at acceptance, then actually executed.
+    # 4. Automatic job: prediction frozen at acceptance; execution stages into the
+    #    plan's bound cache (not the variant default) and ingest confirms it.
     request = JobRequest(workload_ref=spec.ref, scheduling_profile_ref=policy.ref)
+    worker.backends[("team-a", "lab")].env["RA_DATASET_CACHE_DIR"] = str(tmp_path / "unbound")
     second = service.submit("team-a", request, "e-1")
     assert worker.submit_one()
     worker.reconcile_all()
@@ -279,49 +277,65 @@ def test_staged_job_feeds_a_separate_staging_profile_and_a_measured_recommendati
     assert staging["source"] == "measured_network" and staging["cache_state"] == "hot"
     assert staging["profile_refs"] == ["net-local-hot"]
     outcome = link["outcome"]
+    assert outcome["staging_binding_check"]["status"] == "MATCHED"
     assert outcome["actual"]["status"] == "OBSERVED" and outcome["actual"]["jct_seconds"] > 0
     assert outcome["prediction"]["predicted_jct_seconds"] == chosen["predicted_jct_seconds"]
     assert outcome["error"]["signed_seconds"] == pytest.approx(
         outcome["actual"]["jct_seconds"] - chosen["predicted_jct_seconds"]
     )
     [executed] = rows(service, [second["job_id"]])
-    assert executed["staging"]["cache_state"] == "hot"  # the job really read the cache
+    assert executed["staging"]["cache_state"] == "hot"  # the job really read the bound cache
+    assert executed["staging"]["cache_binding_ref"] == "local-cache"
+    assert not (tmp_path / "unbound").exists()
 
 
-def test_mixed_or_remote_staging_receipts_cannot_form_a_profile(service, local, source, tmp_path):
+def test_claimed_pod_identity_must_match_the_observed_pod(service, local, source, tmp_path):
     spec, cap = local
-    backend = LocalProcessBackend(
-        {
-            "RA_DATASET_SOURCE": source,
-            "RA_DATASET_SHA256": DIGEST,
-            "RA_DATASET_SIZE_BYTES": str(len(PAYLOAD)),
-            "RA_DATASET_CACHE_DIR": str(tmp_path / "c"),
-            "RA_DATASET_SOURCE_ENDPOINT": "loopback-http",
-        }
-    )
+    backend = LocalProcessBackend(dataset_env(source, tmp_path / "c"), claimed_uid="forged-uid")
     worker = Worker(service, {("team-a", "lab"): backend})
-    ids = []
-    for key in ("m-1", "m-2"):
-        ids.append(
-            service.submit("team-a", JobRequest(workload_ref=spec.ref, candidate_ref="local"), key)[
-                "job_id"
-            ]
-        )
-        assert worker.submit_one()
-        worker.reconcile_all()
-    first, second = rows(service, ids)
-    hardware = HardwareFingerprint(
-        accelerator_vendor="nvidia",
-        accelerator_model=cap.accelerator_model,
-        device_class="gpu",
-        memory_model="unified",
-        allocation_mode="physical_device",
-        logical_slot=False,
+    [row] = rows(service, [run_fixed(service, worker, spec, "f-1")])
+    with pytest.raises(ValueError, match="remote"):
+        network_profile_from_receipts([row], ref="x", valid_for_seconds=60)
+    with pytest.raises(ValueError, match="remote"):
+        jct_profile_from_jobs([row], ref="x", valid_for_seconds=60, hardware=hardware(cap))
+
+
+def test_mixed_staged_and_unstaged_jobs_cannot_form_a_profile(service, local, source, tmp_path):
+    spec, cap = local
+    worker = Worker(
+        service, {("team-a", "lab"): LocalProcessBackend(dataset_env(source, tmp_path))}
+    )
+    first, second = rows(
+        service, [run_fixed(service, worker, spec, "m-1"), run_fixed(service, worker, spec, "m-2")]
     )
     with pytest.raises(ValueError, match="mixed staged"):
         jct_profile_from_jobs(
-            [first, {**second, "staging": None}], ref="x", valid_for_seconds=60, hardware=hardware
+            [first, {**second, "staging": None}],
+            ref="x",
+            valid_for_seconds=60,
+            hardware=hardware(cap),
         )
-    remote = {**second, "staging": {**second["staging"], "observer_host": "other-node"}}
-    with pytest.raises(ValueError, match="remote"):
-        jct_profile_from_jobs([first, remote], ref="x", valid_for_seconds=60, hardware=hardware)
+
+
+def test_kubernetes_adapter_supplies_scheduler_owned_identity_and_plan_binding(service):
+    from test_backends import row as job_row
+
+    from resource_advisor.backends import KubernetesBackend
+
+    job = job_row(service)
+    pod = KubernetesBackend(
+        namespace="research-a", local_queue="batch", node_selector={"pool": "lab"}
+    ).manifest(job)
+    env = pod["spec"]["template"]["spec"]["containers"][0]["env"]
+    fields = {e["name"]: e["valueFrom"]["fieldRef"]["fieldPath"] for e in env if "valueFrom" in e}
+    assert fields == {
+        "RA_NODE_NAME": "spec.nodeName",
+        "RA_POD_NAME": "metadata.name",
+        "RA_POD_UID": "metadata.uid",
+    }
+    assert "RA_STAGING_BINDINGS_JSON" not in {e["name"] for e in env}  # legacy plan: none
+    job["body"]["scheduling_plan"] = {
+        "staging_bindings": {"test-worker": {"ref": "c", "cache_path": "/var/cache/ra"}}
+    }
+    bound = identity_environment(job)
+    assert json.loads(bound["RA_STAGING_BINDINGS_JSON"])["test-worker"]["ref"] == "c"

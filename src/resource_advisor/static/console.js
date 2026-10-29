@@ -1322,7 +1322,9 @@ function schedulingFlow(job = null, preview = null) {
 function stateBadgeText(state) { return ({FAILED:"실패",RESULT_INVALID:"결과 검증 실패",CANCELED:"취소"})[state] || state; }
 // Frozen estimate vs native outcome. Spread is descriptive (never calibrated) and a
 // missing component stays "—"; shadow estimates are not executed outcomes.
-const recommendationCache = new Map();
+// Frozen comparison forecasts are immutable and cached by ref; job outcomes and
+// executed arms are mutable, so they are refetched each time the panel is built.
+const recommendationLast = new Map(), frozenComparisons = new Map();
 async function recommendationFetch(path) {
   const response = await fetch(API + path, { headers: authHeaders(), cache: "no-store" });
   if (response.status === 404) throw new Error("이 프로젝트에서 볼 수 없는 기록입니다.");
@@ -1331,20 +1333,22 @@ async function recommendationFetch(path) {
 }
 function recommendationPanel(job) {
   const body = el("div", null, "evidence");
-  const key = job.job_id + ":" + job.state;
   const show = (value) => body.replaceChildren(value.error ? el("p", value.error, "error-message") : recommendationEvidence(value.link, value.comparison));
-  const cached = recommendationCache.get(key);
-  if (cached) show(cached);
-  else {
-    body.append(el("p", "추천 근거를 불러오는 중…", "muted"));
-    (async () => {
-      try {
-        const link = await recommendationFetch("/jobs/" + encodeURIComponent(job.job_id) + "/recommendation");
-        const comparison = link.comparison ? await recommendationFetch("/recommendation-comparisons/" + encodeURIComponent(link.comparison.ref)) : null;
-        const value = { link, comparison }; recommendationCache.set(key, value); show(value);
-      } catch (e) { show({ error: e.message }); }
-    })();
-  }
+  const last = recommendationLast.get(job.job_id);
+  if (last) show(last); else body.append(el("p", "추천 근거를 불러오는 중…", "muted"));
+  (async () => {
+    try {
+      const link = await recommendationFetch("/jobs/" + encodeURIComponent(job.job_id) + "/recommendation");
+      let comparison = null;
+      if (link.comparison) {
+        const live = await recommendationFetch("/recommendation-comparisons/" + encodeURIComponent(link.comparison.ref));
+        const frozen = frozenComparisons.get(live.ref) || { arms: live.arms, frozen_at: live.frozen_at, frozen_digest: live.frozen_digest };
+        frozenComparisons.set(live.ref, frozen);
+        comparison = { ...live, ...frozen };
+      }
+      const value = { link, comparison }; recommendationLast.set(job.job_id, value); show(value);
+    } catch (e) { if (!last) show({ error: e.message }); else body.prepend(el("p", "최신 상태를 다시 불러오지 못했습니다: " + e.message + " · 아래는 이전에 받은 기록입니다.", "error-message")); }
+  })();
   return panel("추천 근거 · 예측과 실제", "제출 전에 고정한 후보별 예측과 백엔드가 기록한 실제 완료 시간입니다. 분산은 관측 기술 통계이며 보정된 신뢰구간이 아닙니다.", body);
 }
 function seconds(v) { return v == null ? "—" : duration(v); }
@@ -1352,7 +1356,9 @@ function stagingText(s) {
   if (!s) return "—";
   if (s.source !== "measured_network") return seconds(s.seconds) + ({ profile_phase: " · 프로파일 구간", topology_link: " · 링크 모델", not_required: " · 데이터 불필요" }[s.source] || "");
   const age = s.per_node?.length ? Math.max(...s.per_node.map(n => n.age_seconds)) : null;
-  return `${seconds(s.seconds)} · 실측 ${s.cache_state === "hot" ? "캐시 적중" : "원격 전송"} · ${s.samples}회${s.samples > 1 ? ` (${seconds(s.min_seconds)}–${seconds(s.max_seconds)})` : ""}${age == null ? "" : " · " + Math.round(age) + "초 전 측정"}`;
+  const how = s.cache_state === "hot" ? "바인딩된 캐시 읽기" : "콜드 복사" + ({ http: " (HTTP)", file: " (파일)" }[s.source_kind] || "");
+  const rejected = s.per_node?.some(n => n.hot_evidence_rejected) ? " · 캐시 증거 제외(바인딩 미확인)" : "";
+  return `${seconds(s.seconds)} · 실측 ${how} · ${s.samples}회${s.samples > 1 ? ` (${seconds(s.min_seconds)}–${seconds(s.max_seconds)})` : ""}${age == null ? "" : " · " + Math.round(age) + "초 전 측정"}${rejected}`;
 }
 function recommendationEvidence(link, comparison) {
   const rec = link.recommendation, evidence = link.recommendation_evidence;
@@ -1387,14 +1393,18 @@ function outcomeTable(o) {
 function comparisonTable(c, arm) {
   const names = { static: "Static", profile_only: "Profile Only", profile_queue: "Profile + Queue", profile_queue_network: "Profile + Queue + Network" };
   const rows = c.arm_order.map(key => {
-    const a = c.arms[key], shadow = a.predictions.find(p => p.candidate_ref === a.selected_candidate_ref), run = c.executed[key][0];
+    const a = c.arms[key], run = c.executed[key][0], events = c.arm_events?.[key] || [];
+    const status = run ? run.state : events.length ? events.at(-1).status + " · 제출 안 함" : "미실행";
     return [add(el("span"), el("strong", names[key] || key), key === arm ? badge("이 작업", "good") : null),
-      el("span", a.selected_candidate_ref || "—"), el("span", seconds(shadow?.predicted_jct_seconds) + (shadow ? " (그림자 예측)" : "")),
-      el("span", run ? run.state + (run.matches_frozen_selection ? "" : " · 고정 선택과 다름") : "미실행"),
-      el("span", seconds(run?.outcome?.actual?.jct_seconds)), el("span", seconds(run?.outcome?.error?.signed_seconds))];
+      el("span", a.selected_candidate_ref || "—"),
+      el("span", seconds(a.frozen_predicted_jct_seconds)),
+      el("span", seconds(run?.submission_predicted_jct_seconds)),
+      el("span", status),
+      el("span", run?.outcome?.actual?.jct_seconds == null ? "—" : `${seconds(run.outcome.actual.jct_seconds)} · ${seconds(run.outcome.error?.signed_seconds)}`)];
   });
-  return add(el("div"), el("h3", "정책 비교 · " + c.ref), el("small", "그림자 예측은 " + stamp(c.frozen_at) + "에 고정했습니다. 실제 값은 정책별로 따로 실행한 작업의 결과이며, 실행하지 않은 정책의 성능을 추정하지 않습니다.", "muted"),
-    table(["정책", "선택 후보", "예측 JCT", "실행 상태", "실제 JCT", "오차"], rows));
+  return add(el("div"), el("h3", "정책 비교 · " + c.ref),
+    el("small", "고정 예측은 " + stamp(c.frozen_at) + "에 저장했습니다. 각 정책은 고정한 계획과 예측 그대로만 제출되며, 달라지면 제출하지 않고 이유를 기록합니다. 오차는 실제 JCT − 제출 시 예측입니다.", "muted"),
+    table(["정책", "선택 후보", "고정 예측", "제출 시 예측", "실행 상태", "실제 JCT · 오차"], rows));
 }
 function schedulingProgress(job) {
   const plan=job.scheduling_plan;

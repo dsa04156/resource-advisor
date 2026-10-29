@@ -21,6 +21,7 @@ DIGEST = hashlib.sha256(PAYLOAD).hexdigest()
 
 class Handler(BaseHTTPRequestHandler):
     truncate = False
+    drip = False
     requests = []
 
     def do_GET(self):  # noqa: N802 - http.server API
@@ -29,6 +30,18 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Length", str(len(PAYLOAD)))
         self.end_headers()
+        if type(self).drip:
+            # Keeps the socket active (no inactivity timeout) far past the budget.
+            import time
+
+            try:
+                for offset in range(0, 8000, 100):
+                    self.wfile.write(PAYLOAD[offset : offset + 100])
+                    self.wfile.flush()
+                    time.sleep(0.05)
+            except OSError:
+                pass
+            return
         self.wfile.write(body)
 
     def log_message(self, *args):
@@ -37,7 +50,7 @@ class Handler(BaseHTTPRequestHandler):
 
 @pytest.fixture
 def server():
-    Handler.truncate, Handler.requests = False, []
+    Handler.truncate, Handler.drip, Handler.requests = False, False, []
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
@@ -174,3 +187,33 @@ def test_profile_rejects_partial_or_nonfinite_samples(tmp_path, capsys, server):
     ):
         with pytest.raises(ValueError):
             NetworkProfile.model_validate({**body, "samples": [sample]})
+
+
+def test_slow_drip_is_cut_at_the_total_deadline(tmp_path, capsys, server):
+    import time
+
+    from resource_advisor.network_profile import DEADLINE_TOLERANCE_SECONDS
+
+    Handler.drip = True
+    started = time.monotonic()
+    code, body = run(tmp_path, capsys, server + "/data.bin", "--timeout-seconds", "1")
+    elapsed = time.monotonic() - started
+    assert code == 2 and body["reasons"] == ["TRANSFER_TIMEOUT"]
+    # Two repeats are requested but the first sample already fails: one deadline.
+    assert elapsed < 1 + DEADLINE_TOLERANCE_SECONDS + 0.25
+    assert list((tmp_path / "cache").iterdir()) == []  # own partial file removed
+
+
+def test_cli_inside_a_pod_refuses_to_name_a_node(tmp_path, capsys, server, monkeypatch):
+    monkeypatch.setenv("KUBERNETES_SERVICE_HOST", "10.0.0.1")
+    code, body = run(tmp_path, capsys, server + "/data.bin")
+    assert code == 2 and "KUBERNETES_POD_REQUIRES_NATIVE_RECEIPT" in body["reasons"]
+
+
+def test_measurement_records_the_observed_cache_directory_identity(tmp_path, capsys, server):
+    from resource_advisor.network_profile import storage_identity
+
+    code, body = run(tmp_path, capsys, server + "/data.bin")
+    assert code == 0
+    assert body["cache_storage_identity"] == storage_identity(tmp_path / "cache")
+    assert "identity_source" not in body  # unset optional fields keep legacy digests
