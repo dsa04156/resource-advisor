@@ -1,0 +1,1909 @@
+{
+  "jct_profiles": [
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-jct-ddp-rtx5060-rtx5080-20261029",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "candidate_ref": "ddp-rtx5060-rtx5080",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0002-cgnmsb",
+      "resource_key": "nvidia.com/gpu",
+      "workload_signature": "sha256:55096e45f6413b56d056895c2b43572469068bec99e9d13e381fc2e03808bd6f",
+      "context_signature": "sha256:543e04adad96fe4aad3be31becea7a330ad8036236921bf10b52546d0dbd1556",
+      "environment_digest": "sha256:b2d92c21d4658210efc996f310c31f2db06df9f4f33c6939881b9797be4549f7",
+      "runtime_versions": {
+        "pytorch": "2.8.0+cu128",
+        "torchvision": "0.23.0+cu128"
+      },
+      "hardware": {
+        "accelerator_vendor": "nvidia",
+        "accelerator_model": "NVIDIA GeForce RTX 5080",
+        "device_class": "gpu",
+        "memory_model": "discrete",
+        "dedicated_memory_mib": null,
+        "allocation_mode": "physical_device",
+        "physical_device_ref": null,
+        "logical_slot": false
+      },
+      "precision": "fp32",
+      "batch_size": 8,
+      "input_shape": [
+        8,
+        3,
+        224,
+        224
+      ],
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "measured_at": "2026-10-29T14:16:50Z",
+      "valid_for_seconds": 86400,
+      "repeats": 5,
+      "admission_seconds": 0.4,
+      "readmission_seconds": null,
+      "phases": {
+        "runtime_startup": 2.0,
+        "compute": 4.748592234984971,
+        "unattributed_in_container": 7.709012805647217,
+        "data_staging": 0.1984216142212972,
+        "model_preparation": 21.343973345146516
+      },
+      "overlap_groups": [],
+      "staging_boundary": "separate",
+      "excluded_preexisting_phases": [],
+      "jct_stddev_seconds": 4.669047011971501,
+      "peak_memory_mib": 262.408203125,
+      "load": {},
+      "quality_passed": true,
+      "synthetic": false,
+      "job_ids": [
+        "j-d4b18425ede34a2980d95cb99aaff097",
+        "j-1dc02e508dbe4526b7928a9f8a1027d5",
+        "j-ddab5ca703b845a4aae2ec9b37636dfc",
+        "j-fa6bdbda83c145cbb17f95b8b20fc156",
+        "j-90d83bb7d495472b9e8c64f11d38606d"
+      ],
+      "artifact_refs": [],
+      "source": "ra_jobs",
+      "timestamp_resolution_seconds": 1.0,
+      "member_unpack_seconds": {
+        "etri-ser0001-cg0msb": 0.011548503398080357,
+        "etri-ser0002-cgnmsb": 0.011802716366946697
+      },
+      "staging_unpack_seconds": 0.011802716366946697
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-jct-gb10-20261029",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "candidate_ref": "gb10",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-gb10-v1",
+      "node_ref": "etri-ser0003-cg0ms0",
+      "resource_key": "nvidia.com/gpu",
+      "workload_signature": "sha256:9d81760f97ae077456458eacaeb779ab279dcf987be28cf192950e1070b91b4f",
+      "context_signature": "sha256:726d5839f84d0027bd7f4bdad2525907c1002ed9069c6ec7f806cdfee815e9d4",
+      "environment_digest": "sha256:a548d03c632d4c2be2908fe4ff7de0ccd347dfdf4f7b83745ff54fda19ee1a0a",
+      "runtime_versions": {
+        "pytorch": "2.9.1+cu130",
+        "torchvision": "0.24.1"
+      },
+      "hardware": {
+        "accelerator_vendor": "nvidia",
+        "accelerator_model": "NVIDIA GB10",
+        "device_class": "gpu",
+        "memory_model": "unified",
+        "dedicated_memory_mib": null,
+        "allocation_mode": "physical_device",
+        "physical_device_ref": null,
+        "logical_slot": false
+      },
+      "precision": "fp32",
+      "batch_size": 16,
+      "input_shape": [
+        16,
+        3,
+        224,
+        224
+      ],
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "measured_at": "2026-10-29T14:08:53Z",
+      "valid_for_seconds": 86400,
+      "repeats": 5,
+      "admission_seconds": 0.2,
+      "readmission_seconds": null,
+      "phases": {
+        "runtime_startup": 1.6,
+        "compute": 1.014355492638424,
+        "unattributed_in_container": 3.9471761981025337,
+        "data_staging": 0.1700857943855226,
+        "model_preparation": 1.6683825148735196
+      },
+      "overlap_groups": [],
+      "staging_boundary": "separate",
+      "excluded_preexisting_phases": [],
+      "jct_stddev_seconds": 0.5477225575051661,
+      "peak_memory_mib": 385.91943359375,
+      "load": {},
+      "quality_passed": true,
+      "synthetic": false,
+      "job_ids": [
+        "j-7b18f5c5202b48fca1beeabec0081dbf",
+        "j-a2088f7375e94535ba2b14db949025c3",
+        "j-9f704f04c4544865b30cb3bc5319ebc1",
+        "j-b8d32c591139480ba3cbfb116e9accd2",
+        "j-e634c51ca52d48a8bf66344f00a01b65"
+      ],
+      "artifact_refs": [],
+      "source": "ra_jobs",
+      "timestamp_resolution_seconds": 1.0
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-jct-joint-20261029",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "candidate_ref": "gb10",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-gb10-v1",
+      "node_ref": "etri-ser0003-cg0ms0",
+      "resource_key": "nvidia.com/gpu",
+      "workload_signature": "sha256:096571a1b760beb0a066b5922cfc5c180de19b972dfb1885e7b7b44cf33640e7",
+      "context_signature": "sha256:595715de14dc69595b6a913ea361ed0e6fae50436819c5ab45dd4cc5178d1564",
+      "environment_digest": "sha256:a548d03c632d4c2be2908fe4ff7de0ccd347dfdf4f7b83745ff54fda19ee1a0a",
+      "runtime_versions": {
+        "pytorch": "2.9.1+cu130",
+        "torchvision": "0.24.1"
+      },
+      "hardware": {
+        "accelerator_vendor": "nvidia",
+        "accelerator_model": "NVIDIA GB10",
+        "device_class": "gpu",
+        "memory_model": "unified",
+        "dedicated_memory_mib": null,
+        "allocation_mode": "physical_device",
+        "physical_device_ref": null,
+        "logical_slot": false
+      },
+      "precision": "fp32",
+      "batch_size": 16,
+      "input_shape": [
+        16,
+        3,
+        224,
+        224
+      ],
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "measured_at": "2026-10-29T14:19:44Z",
+      "valid_for_seconds": 86400,
+      "repeats": 5,
+      "admission_seconds": 0.0,
+      "readmission_seconds": null,
+      "phases": {
+        "runtime_startup": 2.0,
+        "compute": 9.117918012617157,
+        "unattributed_in_container": 4.057540117390454,
+        "data_staging": 0.16639699484221637,
+        "model_preparation": 1.658144875150174
+      },
+      "overlap_groups": [],
+      "staging_boundary": "separate",
+      "excluded_preexisting_phases": [],
+      "jct_stddev_seconds": 0.0,
+      "peak_memory_mib": 386.4384765625,
+      "load": {},
+      "quality_passed": true,
+      "synthetic": false,
+      "job_ids": [
+        "j-c542c1458c00490b896070f304801104",
+        "j-efdd692c6dd143249b1ef4b71901955f",
+        "j-206ab73014724387bc6d397547111aac",
+        "j-83201fa34a5240539672aeeda3c6fe2e",
+        "j-80d6e99f4eeb4837a960e13db2aef344"
+      ],
+      "artifact_refs": [],
+      "source": "ra_jobs",
+      "timestamp_resolution_seconds": 1.0
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-jct-orin9-20261029",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "candidate_ref": "orin9",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-orin9-v1",
+      "node_ref": "etri-dev0009-jetorn",
+      "resource_key": "nvidia.com/gpu.shared",
+      "workload_signature": "sha256:9d81760f97ae077456458eacaeb779ab279dcf987be28cf192950e1070b91b4f",
+      "context_signature": "sha256:4645913fb2e4289a1fada408f0faa3e4b7c7dda4feac86e4ca5d22660e5c6020",
+      "environment_digest": "sha256:a548d03c632d4c2be2908fe4ff7de0ccd347dfdf4f7b83745ff54fda19ee1a0a",
+      "runtime_versions": {
+        "pytorch": "2.9.1+cu130",
+        "torchvision": "0.24.1"
+      },
+      "hardware": {
+        "accelerator_vendor": "nvidia",
+        "accelerator_model": "Orin",
+        "device_class": "gpu",
+        "memory_model": "unified",
+        "dedicated_memory_mib": null,
+        "allocation_mode": "virtual_slot",
+        "physical_device_ref": null,
+        "logical_slot": true
+      },
+      "precision": "fp32",
+      "batch_size": 16,
+      "input_shape": [
+        16,
+        3,
+        224,
+        224
+      ],
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "measured_at": "2026-10-29T14:09:47Z",
+      "valid_for_seconds": 86400,
+      "repeats": 5,
+      "admission_seconds": 0.0,
+      "readmission_seconds": null,
+      "phases": {
+        "runtime_startup": 5.4,
+        "compute": 5.596084101381711,
+        "unattributed_in_container": 19.79984141760506,
+        "data_staging": 1.1497234178241342,
+        "model_preparation": 1.8543510631890967
+      },
+      "overlap_groups": [],
+      "staging_boundary": "separate",
+      "excluded_preexisting_phases": [],
+      "jct_stddev_seconds": 2.9495762407505253,
+      "peak_memory_mib": 385.91943359375,
+      "load": {},
+      "quality_passed": true,
+      "synthetic": false,
+      "job_ids": [
+        "j-a16f16e301484eb792afe4b2656d5fe3",
+        "j-3085e66e72034a89843db9a9347334a9",
+        "j-152ac2af2df248169728504d6a70c7f6",
+        "j-5c4504b6cfd447e8ba8c8c0f4aa2e069",
+        "j-573be21e649a4e9eaefd7f7986a368f3"
+      ],
+      "artifact_refs": [],
+      "source": "ra_jobs",
+      "timestamp_resolution_seconds": 1.0
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-jct-rtx5060-20261029",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "candidate_ref": "rtx5060",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0001-cg0msb",
+      "resource_key": "nvidia.com/gpu",
+      "workload_signature": "sha256:9d81760f97ae077456458eacaeb779ab279dcf987be28cf192950e1070b91b4f",
+      "context_signature": "sha256:0d2cfb376af73f54aa000f17d673d44b896a16d33c16efaddc2a4f5601cc5ae1",
+      "environment_digest": "sha256:b2d92c21d4658210efc996f310c31f2db06df9f4f33c6939881b9797be4549f7",
+      "runtime_versions": {
+        "pytorch": "2.8.0+cu128",
+        "torchvision": "0.23.0+cu128"
+      },
+      "hardware": {
+        "accelerator_vendor": "nvidia",
+        "accelerator_model": "NVIDIA GeForce RTX 5060 Ti",
+        "device_class": "gpu",
+        "memory_model": "discrete",
+        "dedicated_memory_mib": null,
+        "allocation_mode": "physical_device",
+        "physical_device_ref": null,
+        "logical_slot": false
+      },
+      "precision": "fp32",
+      "batch_size": 16,
+      "input_shape": [
+        16,
+        3,
+        224,
+        224
+      ],
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "measured_at": "2026-10-29T14:14:58Z",
+      "valid_for_seconds": 86400,
+      "repeats": 5,
+      "admission_seconds": 0.0,
+      "readmission_seconds": null,
+      "phases": {
+        "runtime_startup": 2.0,
+        "compute": 0.7067400103987893,
+        "unattributed_in_container": 3.843546622400754,
+        "data_staging": 0.07661993640067521,
+        "model_preparation": 3.973093430799781
+      },
+      "overlap_groups": [],
+      "staging_boundary": "separate",
+      "excluded_preexisting_phases": [],
+      "jct_stddev_seconds": 0.8944271909999159,
+      "peak_memory_mib": 384.91943359375,
+      "load": {},
+      "quality_passed": true,
+      "synthetic": false,
+      "job_ids": [
+        "j-4995c64422994ee9bf1c8587be7ade7a",
+        "j-a3d4d7c7030f4ecdbe151b037143ba96",
+        "j-b6ed1efce93b487a8e6e6e48c10371aa",
+        "j-d487fc9763f64fd184440e5152a74c73",
+        "j-c9707b0ef1fc46968faaf2d95488bce2"
+      ],
+      "artifact_refs": [],
+      "source": "ra_jobs",
+      "timestamp_resolution_seconds": 1.0
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-jct-rtx5080-20261029",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "candidate_ref": "rtx5080",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0002-cgnmsb",
+      "resource_key": "nvidia.com/gpu",
+      "workload_signature": "sha256:9d81760f97ae077456458eacaeb779ab279dcf987be28cf192950e1070b91b4f",
+      "context_signature": "sha256:af0fade8f732f1fad8c352f2d08dc5c6326dbed3607f38294245c14b38b656d5",
+      "environment_digest": "sha256:b2d92c21d4658210efc996f310c31f2db06df9f4f33c6939881b9797be4549f7",
+      "runtime_versions": {
+        "pytorch": "2.8.0+cu128",
+        "torchvision": "0.23.0+cu128"
+      },
+      "hardware": {
+        "accelerator_vendor": "nvidia",
+        "accelerator_model": "NVIDIA GeForce RTX 5080",
+        "device_class": "gpu",
+        "memory_model": "discrete",
+        "dedicated_memory_mib": null,
+        "allocation_mode": "physical_device",
+        "physical_device_ref": null,
+        "logical_slot": false
+      },
+      "precision": "fp32",
+      "batch_size": 16,
+      "input_shape": [
+        16,
+        3,
+        224,
+        224
+      ],
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "measured_at": "2026-10-29T14:15:48Z",
+      "valid_for_seconds": 86400,
+      "repeats": 5,
+      "admission_seconds": 0.2,
+      "readmission_seconds": null,
+      "phases": {
+        "runtime_startup": 2.2,
+        "compute": 0.5862517880275846,
+        "unattributed_in_container": 3.192145381588489,
+        "data_staging": 0.16776535022072495,
+        "model_preparation": 20.053837480163203
+      },
+      "overlap_groups": [],
+      "staging_boundary": "separate",
+      "excluded_preexisting_phases": [],
+      "jct_stddev_seconds": 8.203657720797473,
+      "peak_memory_mib": 384.91943359375,
+      "load": {},
+      "quality_passed": true,
+      "synthetic": false,
+      "job_ids": [
+        "j-72e1b2b4006d480583742bcb66192d8a",
+        "j-52a4bec44f6947f8b0efb8dbeb23cac2",
+        "j-210f4eb524c74ad3925db61dbc7252fd",
+        "j-aabcd3d40a3242598267936d20ea8025",
+        "j-466fc16051e14d93b7bf3c4cce9994da"
+      ],
+      "artifact_refs": [],
+      "source": "ra_jobs",
+      "timestamp_resolution_seconds": 1.0
+    }
+  ],
+  "network_profiles": [
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-d4b18425ede3-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0002-cgnmsb",
+      "observer_host": "a-b8a87151431048faa99e50f055045722-0",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:07:22.795810Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.17368817701935768,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0020479849772527814
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66309:23203357",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-d4b18425ede34a2980d95cb99aaff097"
+      ],
+      "staging_group": "ddp:j-d4b18425ede34a2980d95cb99aaff097/a-b8a87151431048faa99e50f055045722@etri-ser0001-cg0msb+etri-ser0002-cgnmsb"
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-d4b18425ede3-1",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0001-cg0msb",
+      "observer_host": "a-b8a87151431048faa99e50f055045722-1",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:07:22.108987Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.07266233199334238,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.001821415004087612
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "2050:1312930",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-d4b18425ede34a2980d95cb99aaff097"
+      ],
+      "staging_group": "ddp:j-d4b18425ede34a2980d95cb99aaff097/a-b8a87151431048faa99e50f055045722@etri-ser0001-cg0msb+etri-ser0002-cgnmsb"
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-1dc02e508dbe-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0002-cgnmsb",
+      "observer_host": "a-cc73bc6d8a5d48d1a4ff4809f054432d-0",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:09:51.897982Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.21621530398260802,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0017047959845513105
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66309:23203381",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-1dc02e508dbe4526b7928a9f8a1027d5"
+      ],
+      "staging_group": "ddp:j-1dc02e508dbe4526b7928a9f8a1027d5/a-cc73bc6d8a5d48d1a4ff4809f054432d@etri-ser0001-cg0msb+etri-ser0002-cgnmsb"
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-1dc02e508dbe-1",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0001-cg0msb",
+      "observer_host": "a-cc73bc6d8a5d48d1a4ff4809f054432d-1",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:09:51.156447Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.060242007006308995,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0020771300041815266
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "2050:1311789",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-1dc02e508dbe4526b7928a9f8a1027d5"
+      ],
+      "staging_group": "ddp:j-1dc02e508dbe4526b7928a9f8a1027d5/a-cc73bc6d8a5d48d1a4ff4809f054432d@etri-ser0001-cg0msb+etri-ser0002-cgnmsb"
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-ddab5ca703b8-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0002-cgnmsb",
+      "observer_host": "a-f2dcbd617c3b449da12b778e0f3d6274-0",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:11:57.699848Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.18943350401241332,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.001991058001294732
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66309:23203405",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-ddab5ca703b845a4aae2ec9b37636dfc"
+      ],
+      "staging_group": "ddp:j-ddab5ca703b845a4aae2ec9b37636dfc/a-f2dcbd617c3b449da12b778e0f3d6274@etri-ser0001-cg0msb+etri-ser0002-cgnmsb"
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-ddab5ca703b8-1",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0001-cg0msb",
+      "observer_host": "a-f2dcbd617c3b449da12b778e0f3d6274-1",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:11:57.027148Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.10265877499477938,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.001628693993552588
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "2050:1313392",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-ddab5ca703b845a4aae2ec9b37636dfc"
+      ],
+      "staging_group": "ddp:j-ddab5ca703b845a4aae2ec9b37636dfc/a-f2dcbd617c3b449da12b778e0f3d6274@etri-ser0001-cg0msb+etri-ser0002-cgnmsb"
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-fa6bdbda83c1-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0002-cgnmsb",
+      "observer_host": "a-42189d65da254d7c952a405819de3198-0",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:13:57.264634Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.21024791104719043,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0018765430431813002
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66309:23203429",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-fa6bdbda83c145cbb17f95b8b20fc156"
+      ],
+      "staging_group": "ddp:j-fa6bdbda83c145cbb17f95b8b20fc156/a-42189d65da254d7c952a405819de3198@etri-ser0001-cg0msb+etri-ser0002-cgnmsb"
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-fa6bdbda83c1-1",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0001-cg0msb",
+      "observer_host": "a-42189d65da254d7c952a405819de3198-1",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:13:56.540432Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.07178273699537385,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.002269210002850741
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "2050:1312822",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-fa6bdbda83c145cbb17f95b8b20fc156"
+      ],
+      "staging_group": "ddp:j-fa6bdbda83c145cbb17f95b8b20fc156/a-42189d65da254d7c952a405819de3198@etri-ser0001-cg0msb+etri-ser0002-cgnmsb"
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-90d83bb7d495-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0002-cgnmsb",
+      "observer_host": "a-ad285deaacb24373bf91e386d81e9c52-0",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:16:28.820370Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.20252317504491657,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0017039859667420387
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66309:23203453",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-90d83bb7d495472b9e8c64f11d38606d"
+      ],
+      "staging_group": "ddp:j-90d83bb7d495472b9e8c64f11d38606d/a-ad285deaacb24373bf91e386d81e9c52@etri-ser0001-cg0msb+etri-ser0002-cgnmsb"
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-90d83bb7d495-1",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0001-cg0msb",
+      "observer_host": "a-ad285deaacb24373bf91e386d81e9c52-1",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:16:28.089026Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.05709104100242257,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.002010099997278303
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "2050:1313499",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-90d83bb7d495472b9e8c64f11d38606d"
+      ],
+      "staging_group": "ddp:j-90d83bb7d495472b9e8c64f11d38606d/a-ad285deaacb24373bf91e386d81e9c52@etri-ser0001-cg0msb+etri-ser0002-cgnmsb"
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-7b18f5c5202b-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-gb10-v1",
+      "node_ref": "etri-ser0003-cg0ms0",
+      "observer_host": "a-b118fc08d35f45f3ad574a2cc927c7b9-nwqc2",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:05:10.713974Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.17271327693015337,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0037668838631361723
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66306:11930405",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-7b18f5c5202b48fca1beeabec0081dbf"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-a2088f7375e9-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-gb10-v1",
+      "node_ref": "etri-ser0003-cg0ms0",
+      "observer_host": "a-2b9ee9d59ac44d4eb78dbe6ef48eb256-wcxd4",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:07:07.063453Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.16761256498284638,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.004720478085801005
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66306:11930601",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-a2088f7375e94535ba2b14db949025c3"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-9f704f04c454-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-gb10-v1",
+      "node_ref": "etri-ser0003-cg0ms0",
+      "observer_host": "a-b792d49fb94040af8092ea0453501bc7-xfs6l",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:07:51.187910Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.1712394489441067,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.00502929394133389
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66306:11930785",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-9f704f04c4544865b30cb3bc5319ebc1"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-b8d32c591139-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-gb10-v1",
+      "node_ref": "etri-ser0003-cg0ms0",
+      "observer_host": "a-b3b1e7d2e69545a9aea6690ad4e3dd7b-f42jk",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:08:10.273975Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.17089311499148607,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.004330214112997055
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66306:11930897",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-b8d32c591139480ba3cbfb116e9accd2"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-e634c51ca52d-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-gb10-v1",
+      "node_ref": "etri-ser0003-cg0ms0",
+      "observer_host": "a-10b8ea2a49d247ed84714849fab86800-dnknc",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:08:50.280120Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.1679705660790205,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0046693149488419294
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66306:11931081",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-e634c51ca52d48a8bf66344f00a01b65"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-c542c1458c00-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-gb10-v1",
+      "node_ref": "etri-ser0003-cg0ms0",
+      "observer_host": "a-f74808d3a5b743e89069db1d87fd33f6-czpfk",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:17:43.639290Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.15651008603163064,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0012744779232889414
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66306:11931289",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-c542c1458c00490b896070f304801104"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-efdd692c6dd1-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-gb10-v1",
+      "node_ref": "etri-ser0003-cg0ms0",
+      "observer_host": "a-9db96aa9aa9847f58cfcf614a94740d2-5tc4p",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:18:10.865341Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.16466590110212564,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0023570391349494457
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66306:11931413",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-efdd692c6dd143249b1ef4b71901955f"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-206ab7301472-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-gb10-v1",
+      "node_ref": "etri-ser0003-cg0ms0",
+      "observer_host": "a-ebaf2168a9054694a408ec82e15c5146-m4mc2",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:18:37.794856Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.17790107615292072,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.002357057062909007
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66306:11931585",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-206ab73014724387bc6d397547111aac"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-83201fa34a52-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-gb10-v1",
+      "node_ref": "etri-ser0003-cg0ms0",
+      "observer_host": "a-e2c51a617c1d43169437d77929cada2e-hr622",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:19:04.902751Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.17265060893259943,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0039093890227377415
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66306:11931769",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-83201fa34a5240539672aeeda3c6fe2e"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-80d6e99f4eeb-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-gb10-v1",
+      "node_ref": "etri-ser0003-cg0ms0",
+      "observer_host": "a-eae2b93aa6984b468377c9aef4c874be-ccf6v",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:19:33.119017Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.16025730199180543,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.003285126993432641
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66306:11931941",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-80d6e99f4eeb4837a960e13db2aef344"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-a16f16e30148-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-orin9-v1",
+      "node_ref": "etri-dev0009-jetorn",
+      "observer_host": "a-58818fb236bb4e29be03218870c87bf3-pmqxt",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:05:17.226392Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 1.0454652960179374,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.01402738702017814
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "45825:6573559",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-a16f16e301484eb792afe4b2656d5fe3"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-3085e66e7203-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-orin9-v1",
+      "node_ref": "etri-dev0009-jetorn",
+      "observer_host": "a-90b971a39594484ca6e33e32a22d4b85-8g9bs",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:06:04.955464Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 1.0492087840102613,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.014796365983784199
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "45825:6573965",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-3085e66e72034a89843db9a9347334a9"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-152ac2af2df2-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-orin9-v1",
+      "node_ref": "etri-dev0009-jetorn",
+      "observer_host": "a-882e20cad5da483695cf259669da5f28-vzd9k",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:07:30.919545Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 1.3456013940740377,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.016424581059254706
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "45825:6574371",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-152ac2af2df248169728504d6a70c7f6"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-5c4504b6cfd4-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-orin9-v1",
+      "node_ref": "etri-dev0009-jetorn",
+      "observer_host": "a-09c0dea5ea804e0b945b088cec2c5132-6mgks",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:08:38.196589Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 1.003621794981882,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.02291196200530976
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "45825:6574777",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-5c4504b6cfd447e8ba8c8c0f4aa2e069"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-573be21e649a-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-orin9-v1",
+      "node_ref": "etri-dev0009-jetorn",
+      "observer_host": "a-60c301bc3e8241358ea2ef1ac6bc9a53-8mxts",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:09:37.828126Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 1.3047198200365528,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.015211572055704892
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "45825:6575183",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-573be21e649a4e9eaefd7f7986a368f3"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-4995c6442299-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0001-cg0msb",
+      "observer_host": "a-60d41182eeea44808396494c52be987a-l4mbl",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:05:05.060914Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.08222440000099596,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.004440304008312523
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "2050:1313252",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-4995c64422994ee9bf1c8587be7ade7a"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-a3d4d7c7030f-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0001-cg0msb",
+      "observer_host": "a-d64d2a818b2e424786fc84afbe692a3b-tqn6v",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:08:26.690955Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.0721827560046222,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0013878500030841678
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "2050:1311447",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-a3d4d7c7030f4ecdbe151b037143ba96"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-b6ed1efce93b-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0001-cg0msb",
+      "observer_host": "a-2ac8e9af977d4390b7cf0fc02893d9e6-dgn8n",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:10:49.141244Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.07379354099975899,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.001608880003914237
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "2050:1313471",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-b6ed1efce93b487a8e6e6e48c10371aa"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-d487fc9763f6-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0001-cg0msb",
+      "observer_host": "a-ef3214a243b448238eeb114958b9edca-jn7hb",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:12:48.760989Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.08056729599775281,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0013154900079825893
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "2050:1311720",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-d487fc9763f64fd184440e5152a74c73"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-c9707b0ef1fc-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0001-cg0msb",
+      "observer_host": "a-5b4948b40b1e4344aaa15e7ffca44231-bx2xr",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:14:54.096396Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.07433168900024612,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.001317111004027538
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "2050:1313604",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-c9707b0ef1fc46968faaf2d95488bce2"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-72e1b2b4006d-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0002-cgnmsb",
+      "observer_host": "a-02672b4ba582460fbb706ccab3a502c7-cs25f",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:05:29.380735Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.16445557004772127,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.001950589008629322
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66309:23203341",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-72e1b2b4006d480583742bcb66192d8a"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-52a4bec44f69-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0002-cgnmsb",
+      "observer_host": "a-980e488795bb4ebe9d40224b0c3af62e-j6xvf",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:08:56.422845Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.1735917601035908,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.001958825043402612
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66309:23203365",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-52a4bec44f6947f8b0efb8dbeb23cac2"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-210f4eb524c7-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0002-cgnmsb",
+      "observer_host": "a-e5d1a094cb79496ab54689645a17328e-6zttc",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:11:11.116628Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.1714216349646449,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.0018153820419684052
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66309:23203389",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-210f4eb524c74ad3925db61dbc7252fd"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-aabcd3d40a32-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0002-cgnmsb",
+      "observer_host": "a-9f72b4d64eaf4d6884e0498a445d6741-bzz92",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:13:09.798660Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.16788118402473629,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.002191274077631533
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66309:23203413",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-aabcd3d40a3242598267936d20ea8025"
+      ]
+    },
+    {
+      "schema_version": "v1",
+      "ref": "vt-repeat5-net-466fc16051e1-0",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-mnv3s-b16s50-staged-v2",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "source_kind": "http",
+      "source_locator": "http://10.254.192.47:30817/vision-dataset-v1.tar",
+      "backend": "kubernetes",
+      "cluster_ref": "lab-vt-ddp-amd64-v1",
+      "node_ref": "etri-ser0002-cgnmsb",
+      "observer_host": "a-cbe9b5d300574ae88c25259bf6e893ba-mqhsl",
+      "cache_state": "cold",
+      "cache_locator": "/tmp/ra-stage",
+      "observed_at": "2026-10-29T14:15:15.422424Z",
+      "valid_for_seconds": 86400,
+      "samples": [
+        {
+          "elapsed_seconds": 0.16147660196293145,
+          "bytes": 16558080,
+          "content_verified": true,
+          "first_byte_seconds": 0.002221698989160359
+        }
+      ],
+      "limits": {
+        "max_bytes": 1073741824,
+        "timeout_seconds": 120
+      },
+      "method": "RA job staging receipts matched to the adapter-observed Pod/node",
+      "cache_storage_identity": "66309:23203437",
+      "identity_source": "ra_job_receipts",
+      "native_job_ids": [
+        "j-466fc16051e14d93b7bf3c4cce9994da"
+      ]
+    }
+  ],
+  "data_locations": [
+    {
+      "ref": "vt-data-c542c1458c00",
+      "project_ref": "ra-lab",
+      "workload_ref": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "dataset_version": "sha256:19fede4dc66bb4eddfadd39485042c8c6875998eaa9e056c0a7fd4f9df4eb1cd",
+      "size_bytes": 16558080,
+      "source_endpoint_ref": "ra-vt-dataset-source-ser0001",
+      "storage_kind": "http",
+      "accessible_nodes": [
+        {
+          "backend": "kubernetes",
+          "cluster_ref": "lab-vt-gb10-v1",
+          "node_ref": "etri-ser0003-cg0ms0"
+        },
+        {
+          "backend": "kubernetes",
+          "cluster_ref": "lab-vt-gb10-v1",
+          "node_ref": "etri-ser0003-cg0ms0"
+        },
+        {
+          "backend": "kubernetes",
+          "cluster_ref": "lab-vt-gb10-v1",
+          "node_ref": "etri-ser0003-cg0ms0"
+        },
+        {
+          "backend": "kubernetes",
+          "cluster_ref": "lab-vt-gb10-v1",
+          "node_ref": "etri-ser0003-cg0ms0"
+        },
+        {
+          "backend": "kubernetes",
+          "cluster_ref": "lab-vt-gb10-v1",
+          "node_ref": "etri-ser0003-cg0ms0"
+        }
+      ],
+      "provenance_ref": "j-c542c1458c00490b896070f304801104",
+      "observed_at": "2026-10-29T14:17:43.639290Z",
+      "content_digest": "sha256:64dfa50a05062cd99dc781d9df041f690fb154ec2f4cce60a71caab67d8093f1"
+    }
+  ],
+  "current_predictions": [
+    {
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "orin9",
+      "status": "ESTIMATED",
+      "predicted_seconds": 33.95499640221242,
+      "reasons": [
+        "PHASE_CRITICAL_PATH"
+      ],
+      "profile_repeats": 5
+    },
+    {
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "gb10",
+      "status": "ESTIMATED",
+      "predicted_seconds": 8.597884771693497,
+      "reasons": [
+        "PHASE_CRITICAL_PATH"
+      ],
+      "profile_repeats": 5
+    },
+    {
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "rtx5080",
+      "status": "ESTIMATED",
+      "predicted_seconds": 26.393711251742207,
+      "reasons": [
+        "PHASE_CRITICAL_PATH"
+      ],
+      "profile_repeats": 5
+    },
+    {
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "rtx5060",
+      "status": "ESTIMATED",
+      "predicted_seconds": 10.59771175259957,
+      "reasons": [
+        "PHASE_CRITICAL_PATH"
+      ],
+      "profile_repeats": 5
+    },
+    {
+      "workload": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "candidate": "ddp-rtx5060-rtx5080",
+      "status": "ESTIMATED",
+      "predicted_seconds": 36.40410156082362,
+      "reasons": [
+        "PHASE_CRITICAL_PATH",
+        "DISTRIBUTED_GANG_SLOWEST_MEMBER_WAIT"
+      ],
+      "profile_repeats": 5
+    },
+    {
+      "workload": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "candidate": "gb10",
+      "status": "ESTIMATED",
+      "predicted_seconds": 16.99386030714959,
+      "reasons": [
+        "PHASE_CRITICAL_PATH"
+      ],
+      "profile_repeats": 5
+    }
+  ],
+  "historical_unestimated_registrations": [
+    {
+      "workload": "vt-mnv3s-b16s50-staged-v1",
+      "candidate": "orin9",
+      "status": "PILOT_REQUIRED",
+      "predicted_seconds": null,
+      "reasons": [
+        "PROFILE_MISSING"
+      ],
+      "profile_repeats": null
+    },
+    {
+      "workload": "vt-mnv3s-b16s50-staged-v1",
+      "candidate": "gb10",
+      "status": "PILOT_REQUIRED",
+      "predicted_seconds": null,
+      "reasons": [
+        "PROFILE_MISSING"
+      ],
+      "profile_repeats": null
+    },
+    {
+      "workload": "vt-mnv3s-b16s50-staged-v1",
+      "candidate": "rtx5080",
+      "status": "PILOT_REQUIRED",
+      "predicted_seconds": null,
+      "reasons": [
+        "PROFILE_MISSING"
+      ],
+      "profile_repeats": null
+    },
+    {
+      "workload": "vt-mnv3s-b16s50-staged-v1",
+      "candidate": "rtx5060",
+      "status": "PILOT_REQUIRED",
+      "predicted_seconds": null,
+      "reasons": [
+        "PROFILE_MISSING"
+      ],
+      "profile_repeats": null
+    },
+    {
+      "workload": "vt-kd-mnv3s-b16s50-gb10-v1",
+      "candidate": "gb10",
+      "status": "UNKNOWN",
+      "predicted_seconds": null,
+      "reasons": [
+        "STAGING_NOT_SEPARABLE"
+      ],
+      "profile_repeats": null
+    }
+  ]
+}
