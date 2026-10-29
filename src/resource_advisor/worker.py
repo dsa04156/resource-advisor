@@ -58,6 +58,7 @@ class Worker:
                         operational=row["body"].get("operational_submission", False)
                         and row["body"]["request"]["mode"] == "observe"
                         and not row["body"]["request"].get("approval_ref"),
+                        node_caps=self.service.node_capabilities(conn, row["project"], args[1]),
                     )
                     if row["body"]["request"].get("study_ref"):
                         study = self.store.study(conn, row["body"]["request"]["study_ref"])

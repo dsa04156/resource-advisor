@@ -106,6 +106,53 @@ class Resources(Contract):
     accelerator_count: int = Field(ge=0, le=64)
 
 
+class DistributedNode(Contract):
+    """One allocated host; its own capability evidence is checked, never inferred."""
+
+    node_ref: Ref
+    capability_ref: Ref
+    gpus: int = Field(ge=1, le=64)
+
+
+class DistributedTraining(Contract):
+    """Data-parallel training over an explicit physical node set.
+
+    ``nodes`` is a canonical (node_ref-sorted) SET: the scheduler maps job ranks
+    to hosts, so ranks are never preassigned; collectors verify the observed
+    placement against this set. Each rank holds a full model replica, so memory
+    requirements are per rank and never divided by ``world_size``.
+    """
+
+    schema_version: Literal["v1"] = "v1"
+    strategy: Literal["ddp"]
+    launcher: Literal["torchrun"]
+    collective: Literal["nccl", "gloo"]
+    # torchrun c10d rendezvous hosted at completion index 0; global ranks are
+    # assigned by rendezvous, so exactly one rank (global 0) emits the result.
+    rendezvous: Literal["c10d-index0"] = "c10d-index0"
+    nodes: tuple[DistributedNode, ...] = Field(min_length=1, max_length=16)
+    nproc_per_node: int = Field(ge=1, le=64)
+    world_size: int = Field(ge=2, le=1024)
+    memory_semantics: Literal["replicated-per-rank"] = "replicated-per-rank"
+
+    @property
+    def placement(self) -> str:
+        return "same-node" if len(self.nodes) == 1 else "multi-node"
+
+    @model_validator(mode="after")
+    def explicit_homogeneous_node_set(self):
+        refs = [n.node_ref for n in self.nodes]
+        if refs != sorted(refs) or len(set(refs)) != len(refs):
+            raise ValueError("distributed nodes must be distinct and sorted by node_ref")
+        if len({n.capability_ref for n in self.nodes}) != len(self.nodes):
+            raise ValueError("each distributed node needs its own capability evidence")
+        if any(n.gpus != self.nproc_per_node for n in self.nodes):
+            raise ValueError("every node must run nproc_per_node ranks, one GPU each")
+        if self.world_size != len(self.nodes) * self.nproc_per_node:
+            raise ValueError("world_size must equal nodes x nproc_per_node")
+        return self
+
+
 class ExecutionContext(Contract):
     arch: Literal["amd64", "arm64"]
     environment_digest: Digest
@@ -118,14 +165,23 @@ class ExecutionContext(Contract):
     parameters: dict[str, int | float | str] = Field(default_factory=dict)
     host_cpu_model: str | None = Field(default=None, min_length=1, max_length=256)
     runtime_flags: dict[str, int | float | str | bool] = Field(default_factory=dict)
+    # Per-node/Pod resources stay in ``resources``; total accelerators = world_size.
+    distributed: DistributedTraining | None = None
 
     @model_serializer(mode="wrap")
     def preserve_legacy_signature(self, handler):
         value = handler(self)
-        for key in ("host_cpu_model", "runtime_flags"):
+        for key in ("host_cpu_model", "runtime_flags", "distributed"):
             if not getattr(self, key):
                 value.pop(key, None)
         return value
+
+    @model_validator(mode="after")
+    def distributed_resources_are_per_node(self):
+        d = self.distributed
+        if d is not None and self.resources.accelerator_count != d.nproc_per_node:
+            raise ValueError("distributed resources are per node: accelerators == nproc_per_node")
+        return self
 
 
 class ThermalPolicy(Contract):
@@ -159,10 +215,14 @@ class RuntimeVariant(Contract):
     kubernetes_runtime_bundle_ref: Ref | None = None
     thermal_policy: ThermalPolicy | None = None
     load_context_policy: Literal["linux-cgroup-v2-brackets-v1"] | None = None
+    # The qualified launch the command supports; required for distributed contexts.
+    distributed_launch: Literal["torchrun-ddp"] | None = None
 
     @model_serializer(mode="wrap")
     def preserve_legacy_signature(self, handler):
         value = handler(self)
+        if self.distributed_launch is None:
+            value.pop("distributed_launch", None)
         if self.thermal_policy is None:
             value.pop("thermal_policy", None)
         if self.load_context_policy is None:

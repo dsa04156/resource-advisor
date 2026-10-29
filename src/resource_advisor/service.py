@@ -85,6 +85,18 @@ class Service:
                 conn, "job_template", template.ref, project, template.model_dump(mode="json")
             )["body"]
 
+    def node_capabilities(self, conn, project, candidate):
+        """Each distributed node's own capability evidence (missing ones absent)."""
+        d = candidate.context.distributed
+        if d is None:
+            return None
+        found = {}
+        for node in d.nodes:
+            item = self.store.get(conn, "capability", node.capability_ref)
+            if item and item["project"] in {project, "*"}:
+                found[node.capability_ref] = CapabilitySnapshot.model_validate(item["body"])
+        return found
+
     def bundle(self, conn, project, workload_ref, candidate_ref):
         spec = WorkloadSpec.model_validate(
             required(self.store, conn, "workload", workload_ref, project)
@@ -269,7 +281,12 @@ class Service:
                     self.operational_mode and request.mode == "observe" and not request.approval_ref
                 )
                 errors = execution_compatibility(
-                    spec, candidate, variant, cap, operational=operational
+                    spec,
+                    candidate,
+                    variant,
+                    cap,
+                    operational=operational,
+                    node_caps=self.node_capabilities(conn, project, candidate),
                 )
                 if errors:
                     raise Rejected(",".join(errors))

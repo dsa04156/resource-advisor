@@ -1,0 +1,80 @@
+{
+ "candidate": {
+  "backend": "kubernetes",
+  "capability_ref": "cap-cuda-jetson-nano-v1",
+  "context": {
+   "accelerator_model": "Orin",
+   "allocation_mode": "virtual_slot",
+   "arch": "arm64",
+   "environment_digest": "sha256:f43365545d737d9b8354ad900e08c3d8a1ffb234797fb28b2ee6ff421abbf166",
+   "memory_model": "unified",
+   "parameters": {},
+   "power_mode": "observed-default",
+   "resources": {
+    "accelerator_count": 1,
+    "host_cpu": 1.0,
+    "host_memory_mib": 512
+   },
+   "runtime_versions": {
+    "cuda_driver_api": "12060"
+   }
+  },
+  "ref": "candidate-3",
+  "variant_ref": "cuda-smoke-auto-v1-runtime-3"
+ },
+ "identity": {
+  "batch_size": 1,
+  "code_digest": "sha256:ba3a18c8eafc261fa4133f321c36b596165bcc903f53fa80e570214fa010c34e",
+  "config_digest": "sha256:0ccf2fa5ee3c86351ce78e44bf14afed63803be1b2e4189165af14353f1672b6",
+  "dataset_version": "generated-index-0-to-4095-v1",
+  "global_batch_size": null,
+  "gradient_accumulation": 1,
+  "input_shape": [
+   4096
+  ],
+  "measurement_boundary": "cuda-squares-4096-sync-kernel-v1-output-buffer-memory",
+  "model_digest": "sha256:940c8bdbe83b1c9ba4dd1c2107fb7073402d1100888444840ab502f42c658ceb",
+  "precision": "int32",
+  "quality_contract_digest": "sha256:1055482667361a765187cce431fa67a626e91e621c23c89f0b816c2075f6bbad",
+  "seed": 0,
+  "task_type": "benchmark",
+  "work_units": 10
+ },
+ "recorded": {
+  "context_signature": "sha256:b209d7b28247a7798551a665f057feeeda3df377cc13df8f61bb1491d875b07c",
+  "job_id": "j-bb58556e0d6243b58f51aa5b9e67995a",
+  "source": "live ra-lab job 2026-10-29 (cuda-smoke-auto-v1 candidate-3)",
+  "workload_signature": "sha256:fd16d50c0f2ad282cc8c5bb923a26637543946f6d5d33007e458928b8edece63"
+ },
+ "variant": {
+  "accelerator_vendor": "nvidia",
+  "arch": "arm64",
+  "command": [
+   "python",
+   "/opt/cuda_probe.py"
+  ],
+  "compiled_artifact_digest": null,
+  "device_class": "gpu",
+  "environment_digest": "sha256:f43365545d737d9b8354ad900e08c3d8a1ffb234797fb28b2ee6ff421abbf166",
+  "image": "192.168.0.56:5000/resource-advisor/cuda-probe@sha256:0ef6c159496b37a657613214faab49989df9051fb8b6aa29d08fcdce5c8643f3",
+  "model_digest": "sha256:940c8bdbe83b1c9ba4dd1c2107fb7073402d1100888444840ab502f42c658ceb",
+  "pilot_command": null,
+  "precision": "int32",
+  "project_ref": "ra-lab",
+  "ref": "cuda-smoke-auto-v1-runtime-3",
+  "runtime_versions": {
+   "cuda_driver_api": "12060"
+  },
+  "supported_shapes": [
+   [
+    4096
+   ]
+  ],
+  "validation_refs": [
+   "qual-cuda-jetson-nano-v1"
+  ],
+  "verification": "MODEL_VERIFIED",
+  "workload_ref": "cuda-smoke-auto-v1",
+  "workload_signature": "sha256:fd16d50c0f2ad282cc8c5bb923a26637543946f6d5d33007e458928b8edece63"
+ }
+}

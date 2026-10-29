@@ -20,7 +20,77 @@ def context_signature(candidate: Candidate, variant: RuntimeVariant) -> str:
         value["load_context_policy"] = variant.load_context_policy
     if variant.kubernetes_runtime_bundle_ref is not None:
         value["kubernetes_runtime_bundle_ref"] = variant.kubernetes_runtime_bundle_ref
+    if variant.distributed_launch is not None:
+        value["distributed_launch"] = variant.distributed_launch
     return signature(value)
+
+
+# Per-node evidence must match the candidate's own qualified capability exactly.
+NODE_IDENTITY = (
+    "backend",
+    "backend_cluster_id",
+    "arch",
+    "accelerator_vendor",
+    "accelerator_model",
+    "device_class",
+    "allocation_mode",
+    "resource_key",
+    "runtime_versions",
+    "environment_digest",
+    "memory_model",
+    "power_mode",
+)
+
+
+def distributed_reasons(spec, candidate, variant, cap, node_caps, at):
+    """Distributed launch checks; ``node_caps`` maps capability_ref -> snapshot.
+
+    Every allocated node is validated against its own fresh capability, which must
+    be identical hardware/runtime to the candidate's; shared slots never count as
+    GPUs. Without per-node evidence the candidate fails closed.
+    """
+    ctx, d = candidate.context, candidate.context.distributed
+    if d is None:
+        return ["DISTRIBUTED_LAUNCH_MISMATCH"] if variant.distributed_launch else []
+    i = spec.identity
+    errors = {
+        "DISTRIBUTED_LAUNCH_MISMATCH": variant.distributed_launch != "torchrun-ddp",
+        "DISTRIBUTED_SLURM_UNSUPPORTED": candidate.backend == "slurm",
+        "DISTRIBUTED_TRAINING_ONLY": i.task_type != "training",
+        "DISTRIBUTED_GLOBAL_BATCH_MISMATCH": i.global_batch_size
+        != i.batch_size * d.world_size * i.gradient_accumulation,
+        "DISTRIBUTED_SHARED_SLOT_UNSUPPORTED": ctx.allocation_mode != "physical_device"
+        or cap.allocation_mode != "physical_device",
+        "DISTRIBUTED_COLLECTIVE_UNSUPPORTED": cap.device_class != "gpu"
+        or (d.collective == "nccl" and cap.accelerator_vendor != "nvidia"),
+        "DISTRIBUTED_CANDIDATE_NODE_OUTSIDE_ALLOCATION": (cap.node_ref, cap.ref)
+        not in {(n.node_ref, n.capability_ref) for n in d.nodes},
+    }
+    reasons = [reason for reason, failed in errors.items() if failed]
+    if node_caps is None:
+        return reasons + ["DISTRIBUTED_NODE_EVIDENCE_REQUIRED"]
+    for node in d.nodes:
+        member = node_caps.get(node.capability_ref)
+        if member is None:
+            reasons.append("DISTRIBUTED_NODE_EVIDENCE_MISSING")
+            continue
+        age = ((at or now()) - member.observed_at).total_seconds()
+        if member.node_ref != node.node_ref:
+            reasons.append("DISTRIBUTED_NODE_CAPABILITY_MISMATCH")
+        elif any(getattr(member, k) != getattr(cap, k) for k in NODE_IDENTITY):
+            reasons.append("DISTRIBUTED_NODE_HETEROGENEOUS")
+        elif age < -5 or age > member.valid_for_seconds:
+            reasons.append("DISTRIBUTED_NODE_STALE")
+        elif not member.ready:
+            reasons.append("DISTRIBUTED_NODE_UNAVAILABLE")
+        elif member.allocatable_count < node.gpus or not member.reservation_verified:
+            reasons.append("DISTRIBUTED_NODE_INSUFFICIENT_GPUS")
+        elif (
+            ctx.resources.host_cpu > member.host_cpu
+            or ctx.resources.host_memory_mib > member.host_memory_mib
+        ):
+            reasons.append("DISTRIBUTED_NODE_INSUFFICIENT_HOST")
+    return sorted(set(reasons), key=reasons.index)
 
 
 def compatibility(
@@ -29,6 +99,7 @@ def compatibility(
     variant: RuntimeVariant,
     cap: CapabilitySnapshot,
     at: datetime | None = None,
+    node_caps: dict | None = None,
 ) -> list[str]:
     errors = []
     ctx = candidate.context
@@ -91,13 +162,16 @@ def compatibility(
     for reason, failed in checks.items():
         if failed:
             errors.append(reason)
-    return errors
+    return errors + distributed_reasons(spec, candidate, variant, cap, node_caps, at)
 
 
-def execution_compatibility(spec, candidate, variant, cap, *, operational=False):
-    """Manual lab runs may use older observations; never forge renewed evidence."""
-    errors = compatibility(spec, candidate, variant, cap)
-    if operational and cap.observed_at <= now():
+def execution_compatibility(spec, candidate, variant, cap, *, operational=False, node_caps=None):
+    """Manual lab runs may use older observations; never forge renewed evidence.
+
+    Distributed per-node staleness is never relaxed: every node needs fresh evidence.
+    """
+    errors = compatibility(spec, candidate, variant, cap, node_caps=node_caps)
+    if operational and cap.observed_at <= now() and candidate.context.distributed is None:
         errors = [
             reason
             for reason in errors

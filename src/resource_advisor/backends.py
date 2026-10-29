@@ -221,6 +221,41 @@ def policy_priority(job, mapping, default=None):
     raise BackendError("requested priority is not enabled for this project/backend")
 
 
+RDZV_PORT = 29400
+INDEX_ANNOTATION = "batch.kubernetes.io/job-completion-index"
+ATTEMPT_LABEL = "resource-advisor/attempt-id"
+
+
+def distributed(job):
+    """The signed DistributedTraining of this attempt, or None for single-Pod jobs."""
+    return job["body"]["candidate"]["context"].get("distributed")
+
+
+def torchrun_command(command, d, attempt):
+    """torchrun (``python -m torch.distributed.run``) around the qualified command.
+
+    Documented c10d rendezvous hosted by completion index 0 (stable DNS through
+    the attempt's headless Service); no restarts, so one rank failure ends all.
+    """
+    if len(command) < 2 or command[0] not in {"python", "python3"}:
+        raise BackendError("DISTRIBUTED_COMMAND_UNSUPPORTED")
+    if command[1] == "-m" and len(command) < 3:
+        raise BackendError("DISTRIBUTED_COMMAND_UNSUPPORTED")
+    target = list(command[1:])  # script path or ``-m module``, then its arguments
+    return [
+        command[0],
+        "-m",
+        "torch.distributed.run",
+        f"--nnodes={len(d['nodes'])}",
+        f"--nproc-per-node={d['nproc_per_node']}",
+        "--rdzv-backend=c10d",
+        f"--rdzv-id={attempt}",
+        f"--rdzv-endpoint={attempt}-0.{attempt}:{RDZV_PORT}",
+        "--max-restarts=0",
+        *target,
+    ]
+
+
 class KubernetesBackend:
     def __init__(
         self,
@@ -321,7 +356,9 @@ class KubernetesBackend:
             # hostname restriction without replacing it by the member allowlist.
             members = sorted(m["node_ref"] for m in target["members"])
             if allowed_host and members != [allowed_host]:
-                raise BackendError("pool placement conflicts with the configured hostname allowlist")
+                raise BackendError(
+                    "pool placement conflicts with the configured hostname allowlist"
+                )
             for key, value in target.get("kubernetes_node_selector", {}).items():
                 if selectors.get(key, value) != value:
                     raise BackendError("pool selector conflicts with the configured node pool")
@@ -469,7 +506,130 @@ class KubernetesBackend:
                 isolate_manifest(manifest, job, self.training_sources)
             except ValueError as exc:
                 raise BackendError("invalid training source binding") from exc
+        if distributed(job):
+            self.distribute(manifest, job, distributed(job))
         return manifest
+
+    def distribute(self, manifest, job, d):
+        """One Indexed Job: a Pod per allocated node, per-Pod GPU request, Kueue-gated.
+
+        The node set is enforced by required node affinity plus hostname
+        anti-affinity between this attempt's Pods; which index lands on which
+        node is the scheduler's choice and is verified from observation.
+        """
+        b, attempt = job["body"], job["body"]["attempt_id"]
+        nodes = [n["node_ref"] for n in d["nodes"]]
+        if pool_target(job):
+            raise BackendError("DISTRIBUTED_POOL_TARGET_UNSUPPORTED")
+        if self.retain_termination_evidence:
+            raise BackendError("DISTRIBUTED_TERMINATION_RETENTION_UNSUPPORTED")
+        pod = manifest["spec"]["template"]["spec"]
+        if pod.get("hostNetwork"):
+            raise BackendError("DISTRIBUTED_HOST_NETWORK_UNSUPPORTED")
+        allowed_host = self.node_selector.get("kubernetes.io/hostname")
+        if allowed_host and nodes != [allowed_host]:
+            raise BackendError(
+                "distributed node set conflicts with the configured hostname allowlist"
+            )
+        if b["capability"]["node_ref"] not in nodes:
+            raise BackendError("candidate capability node is outside the distributed node set")
+        if not re.fullmatch(r"[a-z]([-a-z0-9]{0,61}[a-z0-9])?", attempt):
+            raise BackendError("attempt id is not a valid rendezvous Service name")
+        pod["nodeSelector"].pop("kubernetes.io/hostname", None)
+        affinity = {
+            "nodeAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                    "nodeSelectorTerms": [
+                        {
+                            "matchExpressions": [
+                                {"key": "kubernetes.io/hostname", "operator": "In", "values": nodes}
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+        if len(nodes) > 1:
+            affinity["podAntiAffinity"] = {
+                "requiredDuringSchedulingIgnoredDuringExecution": [
+                    {
+                        "labelSelector": {"matchLabels": {ATTEMPT_LABEL: attempt}},
+                        "topologyKey": "kubernetes.io/hostname",
+                    }
+                ]
+            }
+        pod["affinity"] = affinity
+        pod["subdomain"] = attempt
+        manifest["spec"]["template"]["metadata"].setdefault("labels", {})[ATTEMPT_LABEL] = attempt
+        manifest["spec"].update(
+            completionMode="Indexed", completions=len(nodes), parallelism=len(nodes), backoffLimit=0
+        )
+        main = pod["containers"][0]
+        main["command"] = torchrun_command(main["command"], d, attempt)
+        main["env"] += [
+            {"name": "RA_DISTRIBUTED_JSON", "value": json.dumps(d, sort_keys=True)},
+            {
+                "name": "RA_NODE_INDEX",
+                "valueFrom": {
+                    "fieldRef": {"fieldPath": f"metadata.annotations['{INDEX_ANNOTATION}']"}
+                },
+            },
+        ]
+        main["ports"] = [{"name": "rdzv", "containerPort": RDZV_PORT}]
+
+    def service_manifest(self, job, obj):
+        """Headless rendezvous Service owned by this exact Job UID (GC with the Job)."""
+        attempt, uid = job["body"]["attempt_id"], obj["metadata"]["uid"]
+        return {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "name": attempt,
+                "namespace": self.namespace,
+                "labels": {"app.kubernetes.io/managed-by": "resource-advisor"},
+                "annotations": {"resource-advisor/job-id": job["id"]},
+                "ownerReferences": [
+                    {
+                        "apiVersion": "batch/v1",
+                        "kind": "Job",
+                        "name": obj["metadata"]["name"],
+                        "uid": uid,
+                        "controller": True,
+                        "blockOwnerDeletion": True,
+                    }
+                ],
+            },
+            "spec": {
+                "clusterIP": "None",
+                # Rendezvous happens before any rank is Ready.
+                "publishNotReadyAddresses": True,
+                "selector": {ATTEMPT_LABEL: attempt, "batch.kubernetes.io/controller-uid": uid},
+                "ports": [{"name": "rdzv", "port": RDZV_PORT, "targetPort": RDZV_PORT}],
+            },
+        }
+
+    def ensure_service(self, job, obj):
+        """Create the owned Service once the Job UID is known; never adopt others."""
+        attempt, uid = job["body"]["attempt_id"], obj["metadata"]["uid"]
+        raw = self.execute(
+            self.prefix + ["get", "service", attempt, "--ignore-not-found", "-o", "json"]
+        )
+        if raw.strip():
+            existing = json.loads(raw)
+            if (
+                not any(
+                    o.get("kind") == "Job" and o.get("uid") == uid
+                    for o in existing["metadata"].get("ownerReferences", [])
+                )
+                or existing["metadata"].get("annotations", {}).get("resource-advisor/job-id")
+                != job["id"]
+            ):
+                raise BackendError("DISTRIBUTED_SERVICE_CONFLICT")
+            return
+        self.execute(
+            self.prefix + ["create", "-f", "-", "-o", "json"],
+            stdin=json.dumps(self.service_manifest(job, obj)),
+        )
 
     def submit(self, job):
         try:
@@ -479,6 +639,9 @@ class KubernetesBackend:
                     stdin=json.dumps(self.manifest(job)),
                 )
             )
+            if distributed(job):
+                # A lost Service is repaired by reconcile (Job stays Kueue-suspended).
+                self.ensure_service(job, obj)
             return obj["metadata"]["name"]
         except BackendError as exc:
             raise SubmissionUnknown(str(exc)) from exc
@@ -498,6 +661,8 @@ class KubernetesBackend:
             != job["body"]["context_signature"]
         ):
             raise BackendError("existing Job does not match this attempt")
+        if distributed(job):
+            self.ensure_service(job, obj)
         return obj["metadata"]["name"]
 
     def status(self, job):
@@ -538,6 +703,8 @@ class KubernetesBackend:
                 for owner in p["metadata"].get("ownerReferences", [])
             )
         ]
+        if distributed(job):
+            return self.distributed_status(job, obj, pods, retained)
         if len(pods) > 1:
             raise BackendError("unexpected multiple Pods for a single non-retrying attempt")
         pod_status = pods[0].get("status", {}) if pods else {}
@@ -664,6 +831,212 @@ class KubernetesBackend:
             **retained,
         )
 
+    def distributed_status(self, job, obj, pods, retained):
+        """All ranks of one Indexed Job; success needs every index on the allocated set.
+
+        ``pods`` are already restricted to this Job UID. Placement off the signed
+        node set (or two ranks on one host) fails the attempt and stops it.
+        """
+        d = distributed(job)
+        allowed, n = {x["node_ref"] for x in d["nodes"]}, len(d["nodes"])
+        status = obj.get("status", {})
+        submitted = obj["metadata"].get("creationTimestamp")
+
+        def container(pod):
+            return next(
+                (
+                    c.get("state", {})
+                    for c in pod.get("status", {}).get("containerStatuses", [])
+                    if c["name"] == "workload"
+                ),
+                {},
+            )
+
+        ranks = []
+        for pod in pods:
+            index = pod["metadata"].get("annotations", {}).get(INDEX_ANNOTATION)
+            if index is None or not index.isdigit() or not int(index) < n:
+                raise BackendError("distributed Pod without a valid completion index")
+            ranks.append(
+                {
+                    "index": int(index),
+                    "pod_name": pod["metadata"].get("name"),
+                    "pod_uid": pod["metadata"].get("uid"),
+                    "node_name": pod.get("spec", {}).get("nodeName"),
+                    "phase": pod.get("status", {}).get("phase"),
+                    "state": container(pod),
+                    "scheduled": next(
+                        (
+                            c.get("lastTransitionTime")
+                            for c in pod.get("status", {}).get("conditions", [])
+                            if c["type"] == "PodScheduled" and c["status"] == "True"
+                        ),
+                        None,
+                    ),
+                    "requests": next(
+                        (
+                            c.get("resources", {}).get("requests", {})
+                            for c in pod.get("spec", {}).get("containers", [])
+                            if c["name"] == "workload"
+                        ),
+                        {},
+                    ),
+                }
+            )
+        ranks.sort(key=lambda r: (r["index"], r["pod_name"] or ""))
+        active = [r for r in ranks if r["phase"] not in {"Failed"}]
+        placed = [r["node_name"] for r in active if r["node_name"]]
+        misplaced = any(x not in allowed for x in placed) or len(set(placed)) != len(placed)
+        complete = len(ranks) == n and {r["index"] for r in ranks} == set(range(n))
+        all_scheduled = complete and all(r["scheduled"] for r in ranks)
+        latest = lambda key: max(filter(None, key), default=None)  # noqa: E731
+        scheduled = latest(r["scheduled"] for r in ranks) if all_scheduled else None
+        started = (
+            latest(
+                r["state"].get("terminated", r["state"].get("running", {})).get("startedAt")
+                for r in ranks
+            )
+            if all_scheduled
+            else None
+        )
+        finished = latest(r["state"].get("terminated", {}).get("finishedAt") for r in ranks)
+        allocation = None
+        if all_scheduled:
+            key = job["body"]["capability"]["resource_key"]
+            counts = [number(r["requests"].get(key)) for r in ranks]
+            allocation = {
+                "source": "kubernetes:scheduled workload container requests (all ranks)",
+                "accelerator_count": None if None in counts else sum(counts),
+                "per_pod_accelerator_count": counts,
+                "cpu": None,
+                "memory_mib": None,
+            }
+        zero = next((r for r in ranks if r["index"] == 0), None)
+        observed = {
+            "placement": {
+                "source": "kubernetes:Pod",
+                "job_uid": obj["metadata"].get("uid"),
+                "pod_name": zero["pod_name"],
+                "pod_uid": zero["pod_uid"],
+                "node_name": zero["node_name"],
+                "phase": zero["phase"],
+                "distributed": {
+                    "placement": "same-node" if n == 1 else "multi-node",
+                    "world_size": d["world_size"],
+                    "ranks": [
+                        {k: r[k] for k in ("index", "pod_name", "pod_uid", "node_name", "phase")}
+                        for r in ranks
+                    ],
+                },
+            }
+            if zero and zero["node_name"]
+            else None,
+            "admission": self.admission(obj) if self.observe_admission else None,
+        }
+        common = dict(
+            allocation=allocation,
+            execution_started_at=started,
+            submitted_at=submitted,
+            **observed,
+            **retained,
+        )
+        if misplaced:
+            # Never let a rank keep running off the verified node set.
+            self.cancel(job)
+            return Observation(
+                State.FAILED, scheduled, finished, "DISTRIBUTED_PLACEMENT_MISMATCH", **common
+            )
+        for condition in status.get("conditions", []):
+            if condition["type"] == "Failed" and condition["status"] == "True":
+                return Observation(
+                    State.FAILED,
+                    scheduled,
+                    finished,
+                    condition.get("reason", "BACKEND_FAILED"),
+                    **common,
+                )
+            if condition["type"] == "Complete" and condition["status"] == "True":
+                if not (
+                    complete
+                    and all(r["phase"] == "Succeeded" for r in ranks)
+                    and set(placed) == allowed
+                    and len(placed) == n
+                ):
+                    return Observation(
+                        State.FAILED,
+                        scheduled,
+                        finished,
+                        "DISTRIBUTED_PLACEMENT_UNVERIFIED",
+                        **common,
+                    )
+                return Observation(State.COLLECTING, scheduled, finished, **common)
+        running = any("running" in r["state"] or "terminated" in r["state"] for r in ranks)
+        reason = None
+        if not running:
+            reason = next(
+                (
+                    r["state"].get("waiting", {}).get("reason")
+                    for r in ranks
+                    if r["state"].get("waiting", {}).get("reason")
+                ),
+                None,
+            )
+            if not reason and obj.get("spec", {}).get("suspend"):
+                reason = "AdmissionPending"
+            if reason and not re.fullmatch(r"[A-Za-z0-9_.-]{1,128}", reason):
+                reason = None
+        return Observation(
+            State.RUNNING if running else State.QUEUED, scheduled, scheduler_reason=reason, **common
+        )
+
+    def distributed_result(self, job):
+        """Exactly one rank (global rank 0) may emit the result, from this Job's Pods."""
+        raw = self.execute(
+            self.prefix
+            + ["get", "job", job["body"]["external_id"], "--ignore-not-found", "-o", "json"]
+        )
+        if not raw.strip():
+            raise BackendError("Job missing; distributed result cannot be bound")
+        uid = json.loads(raw)["metadata"].get("uid")
+        pods = json.loads(
+            self.execute(
+                self.prefix
+                + [
+                    "get",
+                    "pods",
+                    "-l",
+                    "batch.kubernetes.io/controller-uid=" + str(uid),
+                    "-o",
+                    "json",
+                ]
+            )
+        )["items"]
+        pods = [
+            p
+            for p in pods
+            if any(o.get("uid") == uid for o in p["metadata"].get("ownerReferences", []))
+        ]
+        if len(pods) != len(distributed(job)["nodes"]):
+            raise BackendError("distributed result requires every rank Pod")
+        marker = "RESOURCE_ADVISOR_RESULT "
+        found = []
+        for pod in sorted(pods, key=lambda p: p["metadata"]["name"]):
+            log = self.execute(
+                self.prefix
+                + [
+                    "logs",
+                    "pod/" + pod["metadata"]["name"],
+                    "--container",
+                    "workload",
+                    "--tail=100",
+                ]
+            )
+            if any(line.startswith(marker) for line in log.splitlines()):
+                found.append(log)
+        if len(found) != 1:
+            raise BackendError("exactly one rank must emit the distributed result")
+        return result_from_log(found[0])
+
     def admission(self, obj):
         """Kueue Workload owned by this exact Job UID; never matched by name alone."""
         uid = obj["metadata"].get("uid")
@@ -740,6 +1113,8 @@ class KubernetesBackend:
         release(self, receipt)
 
     def result(self, job):
+        if distributed(job):
+            return self.distributed_result(job)
         return result_from_log(
             self.execute(
                 self.prefix
@@ -866,6 +1241,9 @@ class SlurmBackend:
         return check, guarded
 
     def script(self, job):
+        if distributed(job):
+            # No verified multi-node Slurm launch shape exists yet; never guess one.
+            raise BackendError("DISTRIBUTED_SLURM_UNSUPPORTED")
         b = job["body"]
         training = None
         if b["spec"]["identity"]["task_type"] == "training":
@@ -963,7 +1341,8 @@ class SlurmBackend:
                 and ".." not in route[k].split("/")
                 for k in ("source_dir", "work_dir")
             )
-            or command[-4:] != ["--host-source", route["source_dir"], "--host-work", route["work_dir"]]
+            or command[-4:]
+            != ["--host-source", route["source_dir"], "--host-work", route["work_dir"]]
         ):
             raise BackendError("invalid Slurm training source binding")
         return binding.model_dump(mode="json")
@@ -1249,11 +1628,7 @@ class SlurmBackend:
             if target
             else {job["body"]["capability"]["node_ref"]}
         )
-        if (
-            node not in allowed
-            or state != "COMPLETED"
-            or exitcode != "0:0"
-        ):
+        if node not in allowed or state != "COMPLETED" or exitcode != "0:0":
             raise BackendError("result allocation does not match the completed attempt")
         path = f"{self.output_dir}/{job['body']['attempt_id']}.log"
         return result_from_log(
