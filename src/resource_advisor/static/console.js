@@ -2634,7 +2634,7 @@ function trainModels() {
   for(const m of trainData.models){
     const b=el("button",null,"train-model"+(m.model_key===trainModel?" chosen":""));b.type="button";b.setAttribute("aria-pressed",String(m.model_key===trainModel));
     b.onclick=()=>{trainModel=m.model_key;trainConfig="";trainProfile="";trainReselect();};
-    b.append(add(el("span",null,"state-line"),el("strong",m.model_name),m.qualified?null:badge("검증 전 · 실행 불가","warn")),el("small",`학습 조건 ${m.condition_count}개 · 등록 작업 ${m.workload_count}개`),el("small",`실행 ${m.runs.total}건 (성공 ${m.runs.succeeded}) · ${m.devices.join(", ")||"장치 미확인"}`));
+    b.append(add(el("span",null,"state-line"),el("strong",m.model_name),m.qualified?null:el("small","실행 불가")),el("small",m.devices.join(", ")||"장치 미확인"));
     root.append(b);
   }
   return root.childElementCount?root:empty("학습 검증된 모델이 아직 없습니다. 실제 학습으로 검증된 실행 환경이 등록되면 여기에 나타납니다.");
@@ -2654,24 +2654,53 @@ function trainCondition(sel) {
   for(const [a,b] of [["학습 방식",c.objective?trainObjective[c.objective]:"미분류 · "+k.measurement_boundary],["학습 step",String(k.steps)],["배치",`${k.batch_size}${k.global_batch_size?" · 전역 "+k.global_batch_size:""} · 누적 ${k.gradient_accumulation}`],["정밀도",k.precision],["최적화기",k.optimizer?k.optimizer+(Object.keys(k.optimizer_parameters).length?" "+JSON.stringify(k.optimizer_parameters):""):"기록 없음"],["입력",k.input_shape.join("×")],["데이터",k.dataset_version.slice(0,19)+"…"],["시드",String(k.seed)],["측정 경계",k.measurement_boundary]])facts.append(el("dt",a),el("dd",b));
   const loading=trainPending&&trainConfig&&trainConfig!==sel.config_key;
   add(root,add(el("div",null,"view-toolbar jct-toolbar"),label,selector),
-    loading?el("p","선택한 조건을 불러오는 중입니다. 아래는 이전 조건의 내용입니다.","muted"):null,facts,
-    el("p","등록된 조건만 고를 수 있습니다. 값을 바꾸려면 새 학습 작업을 등록하고 다시 검증해야 합니다. 같은 조건이라도 등록 작업이 다르면 측정 기록을 공유하지 않습니다.","muted"),
-    table(["등록 작업","식별 서명","실행"],c.workloads.map(w=>[code(w.workload_ref),code(w.identity_signature.slice(0,19)+"…"),el("span",`${w.runs.total}건 (성공 ${w.runs.succeeded})`)])));
+    loading?el("p","선택한 조건을 불러오는 중입니다. 아래는 이전 조건의 내용입니다.","muted"):null,
+    add(el("details",null,"jct-more"),el("summary","조건 세부 정보"),facts,
+      el("p","등록된 조건만 고를 수 있습니다. 값을 바꾸려면 새 학습 작업을 등록하고 다시 검증해야 합니다. 같은 조건이라도 등록 작업이 다르면 측정 기록을 공유하지 않습니다.","muted"),
+      table(["등록 작업","식별 서명","실행"],c.workloads.map(w=>[code(w.workload_ref),code(w.identity_signature.slice(0,19)+"…"),el("span",`${w.runs.total}건 (성공 ${w.runs.succeeded})`)]))));
   return root;
 }
+// 선택 fills the submission draft and opens it; it never submits a job by itself.
+let trainChosen="";
+const trainKey=x=>x.workload_ref+"/"+x.candidate_ref;
 function trainSubmit(x) {
-  if(!x.submittable_now||x.verification!=="TRAINING_VERIFIED")return el("small","제출 불가");
-  const b=el("button","학습 실행 화면으로");b.type="button";
-  b.onclick=()=>{showAllTemplates=!(data.submission_catalog||[]).some(w=>w.workload_ref===x.workload_ref);submissionDraft.workload=x.workload_ref;submissionDraft.candidate=x.candidate_ref;schedulingPreview=null;location.hash="submit";};
+  const b=el("button",trainChosen===trainKey(x)?"선택됨":"선택");b.type="button";
+  if(!x.submittable_now||x.verification!=="TRAINING_VERIFIED"){
+    b.disabled=true;
+    return add(el("div",null,"train-pick"),b,el("small",x.blockers?.includes("AUXILIARY_RESERVATION_REQUIRED")?"NPU 교사 예약 필요":"지금 실행 불가"));
+  }
+  b.setAttribute("aria-pressed",String(trainChosen===trainKey(x)));
+  b.onclick=()=>{trainChosen=trainKey(x);showAllTemplates=!(data.submission_catalog||[]).some(w=>w.workload_ref===x.workload_ref);submissionDraft.workload=x.workload_ref;submissionDraft.candidate=x.candidate_ref;schedulingPreview=null;location.hash="submit";};
   return b;
 }
+// Actual members, so a mixed DDP pair names both GPUs.
+function trainName(x) {
+  const members=x.members?.length?x.members:[{node_ref:x.node_refs[0],accelerator_model:x.model,gpus:x.physical_devices}];
+  return members.map(a=>`${a.accelerator_model||"모델 미확인"} ×${a.gpus??"?"}`).join(" + ")+(x.physical_devices==null&&x.shared_slots!=null?" · 공유 슬롯":"");
+}
+function trainSimple(list) {
+  return table(["조합","예상 시간","선택"],list.map(x=>[
+    add(el("span",null,"job-name"),el("strong",trainName(x)),x.strategy&&x.strategy!=="single"?el("small",trainStrategy[x.strategy]||x.strategy):null),
+    x.jct.status==="ESTIMATED"?el("strong",seconds(x.jct.predicted_seconds)):el("span","추정 없음","muted"),
+    trainSubmit(x)]));
+}
 function trainCombinations(sel) {
+  if(!sel.combinations.length)return empty("이 조건에 등록된 자원 조합이 없습니다.");
+  // Estimated combinations first (fastest first); an unestimated row whose name is
+  // already shown (an older duplicate registration) moves into the details.
+  const estimated=sel.combinations.filter(x=>x.jct.status==="ESTIMATED").sort((a,b)=>a.jct.predicted_seconds-b.jct.predicted_seconds);
+  const names=new Set(estimated.map(trainName)),main=[...estimated],others=[];
+  for(const x of sel.combinations)if(x.jct.status!=="ESTIMATED"){if(names.has(trainName(x)))others.push(x);else{names.add(trainName(x));main.push(x);}}
+  return add(el("div"),trainSimple(main),
+    others.length?add(el("details",null,"jct-more"),el("summary",`다른 등록 항목 ${others.length}개`),trainSimple(others)):null,
+    add(el("details",null,"jct-more"),el("summary","세부 정보 · 근거"),trainDiagnostics(sel)));
+}
+function trainDiagnostics(sel) {
   const root=el("div");
   if(sel.estimate_profiles.length){
     const s=el("select");s.id="train-profile";s.dataset.keepFocus="true";for(const r of sel.estimate_profiles)s.append(new Option(r,r));s.value=sel.estimate_profiles.includes(trainProfile)?trainProfile:sel.estimate_profile?.ref||"";
     s.onchange=()=>{trainProfile=s.value;trainReselect();};const l=el("label","추정 정책");l.htmlFor=s.id;root.append(add(el("div",null,"view-toolbar jct-toolbar"),l,s));
   } else root.append(el("p","추천 정책이 등록되지 않아 예상 JCT를 계산하지 않습니다. 모든 조합의 JCT는 알 수 없음으로 표시됩니다.","error-message"));
-  if(!sel.combinations.length)return add(root,empty("이 조건에 등록된 자원 조합이 없습니다."));
   root.append(table(["자원 조합","노드","메모리 (장치당)","현재 가용성","예상 JCT","대기 · 준비 · 전송 · 학습","측정 근거","차단 사유","동작"],sel.combinations.map(x=>{
     const j=x.jct,b=j.breakdown,u=b?.uncertainty,m=x.memory;
     const count=x.physical_devices!=null?`물리 ${x.device_class?.toUpperCase()||"장치"} ${x.physical_devices}개`:x.shared_slots!=null?`공유 슬롯 ${x.shared_slots}개 · 물리 GPU 수 아님`:"가속기 없음";
@@ -2703,16 +2732,18 @@ function trainingView() {
   const root=el("div",null,"jct-view training-view");
   if(!trainData)return add(root,trainError?el("p",trainError,"error-message"):empty("학습 카탈로그를 불러오는 중…"));
   if(trainError)root.append(el("p",trainError,"error-message"));
-  root.append(panel("1. 모델 선택","등록된 학습 모델입니다. 실제 학습 검증 전 모델은 이유를 확인할 수 있지만 실행할 수 없습니다. 추론·스모크 작업은 학습 모델로 보이지 않습니다.",add(el("div"),trainModels(),trainUnqualified())));
+  root.append(panel("1. 모델","",add(el("div"),trainModels(),trainUnqualified())));
   const sel=trainData.selected;
   if(!sel||sel.model.model_key!==trainModel){if(trainData.models.length)root.append(empty(trainPending?"선택한 모델의 조건을 불러오는 중…":"모델을 선택하세요."));}
   else {
-    root.append(panel("2. 학습 조건",sel.model.model_name+" · 등록된 조건 "+sel.configs.length+"개",trainCondition(sel)));
-    root.append(panel("3. 자원 조합과 예상 JCT","등록된 실행 후보만 조합으로 보입니다. 측정되지 않은 조합은 다른 장치나 GPU 수에서 나눠 추정하지 않습니다. 현재 가용성은 실행 가능 여부와 별개입니다.",trainCombinations(sel)));
+    root.append(panel("2. 학습 조건",sel.model.model_name,trainCondition(sel)));
+    root.append(panel("3. 자원 조합","",trainCombinations(sel)));
     const runs=sel.configs.find(c=>c.config_key===sel.config_key).workloads.flatMap(w=>w.recent_runs).sort((a,b)=>b.created_at.localeCompare(a.created_at));
-    root.append(panel("4. 실행 결과","이 조건의 최근 학습 실행입니다. 실제 JCT는 네이티브 제출·종료 시각이 모두 있는 성공 작업만 표시합니다.",jctRuns({recent_runs:runs})));
+    root.append(add(el("details",null,"jct-more"),el("summary",`지난 실행 결과 ${runs.length}건`),
+      el("p","실제 JCT는 네이티브 제출·종료 시각이 모두 있는 성공 작업만 표시합니다.","muted"),jctRuns({recent_runs:runs})));
   }
-  root.append(panel("물리 장비 범위","인벤토리에 보이는 GPU·NPU와 학습 가능 여부입니다. 공유 슬롯은 물리 GPU 수가 아니며, 이 표의 장비는 실행 조합이 아닙니다.",trainInventory()));
+  root.append(add(el("details",null,"jct-more"),el("summary","물리 장비 범위"),
+    el("p","공유 슬롯은 물리 GPU 수가 아니며, 이 표의 장비는 실행 조합이 아닙니다.","muted"),trainInventory()));
   root.append(add(el("p",null,"muted"),actionLink("이전 JCT 비교 기록 보기","#jct")));
   return root;
 }

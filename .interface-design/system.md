@@ -285,3 +285,9 @@ Polling preserves drafts/focus, selected image/blob and completed result. Upload
 ## 이기종 자원 조합 검토 (#placement) — 2026-10-28
 
 Intent: 연구자가 제출 전에 단계별 등록 작업의 실제 GPU/NPU 후보와 측정 링크를 비교한다. Focal: 단계별 후보 표와 선택된 단계 경로(장치 카드 → 측정 링크 → 장치 카드). 대형 KPI 카드 없음. 작업 공간 토큰(#17243b navy ink, #2563eb blue)을 재사용하고 `.placement-console` 범위에 `--verified #0f6f66`(teal, 유효 기간 내 스냅샷·측정된 링크에만), `--path-ink`(navy, 단계 카드 좌측선·결과 헤더)를 둔다. amber는 미측정/만료/여유 미확인, muted는 제외·사용 불가. 결과 헤더는 navy, 거절은 어두운 amber. 단계 사이 전송 입력은 점선 connector(fieldset) 위에 생산자→소비자 방향으로 놓는다. 측정 대역폭/요청 지연과 예상 통신 시간(추정)은 다른 줄·다른 라벨. 관측 여유는 항상 "예약 아님". 푸터 "배치 검토이며 작업을 실행하거나 자원을 예약하지 않습니다." 고정. 실행·학습 버튼 없음; 계획 JSON 내려받기만 제공. 1366에서 경로 가로 3열, 1100px 이하 세로, 450px 이하 전송 입력 1열; 표는 local overflow.
+
+Training resource selection (#training): model and registered condition choosers, then
+one three-column table (combination / expected time / 선택). Estimated combinations come
+first; an unestimated duplicate of a shown combination, condition facts, estimate
+policy, per-candidate evidence, inventory and past runs stay in native details. 선택
+only fills the submission draft; blocked combinations show a disabled 선택 and one short reason.

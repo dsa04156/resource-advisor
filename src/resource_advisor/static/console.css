@@ -1180,3 +1180,13 @@ main:has(.lab-page){padding-top:12px}.lab-resource .measure meter{margin:2px 0}.
   .model-technical dd { margin-bottom: 12px; }
   .models-controls { gap: 8px; }
 }
+
+/* #training: a disabled 선택 keeps one short reason under it. */
+.train-pick {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+.train-pick small {
+  color: var(--muted);
+}
