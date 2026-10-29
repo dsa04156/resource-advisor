@@ -1,0 +1,4938 @@
+{
+ "generated_at": "2026-10-29T06:31:18.570742+00:00",
+ "project_ref": "ra-lab",
+ "inventory": [
+  {
+   "schema_version": "v1",
+   "ref": "inv-912f2d9097fb403382f1c1bce7f0e706",
+   "cluster_ref": "lab-kubernetes",
+   "backend": "kubernetes",
+   "collected_at": "2026-10-29T06:31:04.191814+00:00",
+   "stale_after_seconds": 120,
+   "status": "partial",
+   "sources": {
+    "nodes": "ok",
+    "pods": "ok",
+    "metrics_api": "ok",
+    "kueue:resource-advisor-lab": "ok",
+    "localqueues:resource-advisor-lab": "ok",
+    "clusterqueue:ra-f0-gpu": "ok",
+    "clusterqueue:ra-hailo-lab": "ok",
+    "clusterqueue:ra-rtx5060": "ok",
+    "clusterqueue:ra-spark": "ok",
+    "clusterqueue:ra-jetson-nano": "ok",
+    "clusterqueue:ra-jetson-agx": "ok",
+    "clusterqueue:hairp-gpu-pool": "ok",
+    "clusterqueue:ra-hailo-second": "unavailable",
+    "clusterqueue:ra-mobilint": "unavailable",
+    "clusterqueue:ra-intel-npu": "unavailable",
+    "clusterqueue:ra-rockchip-npu": "unavailable"
+   },
+   "nodes": [
+    {
+     "node_ref": "etri-dev0001-jetorn",
+     "hardware": {
+      "architecture": "arm64",
+      "operatingSystem": "linux",
+      "osImage": "Ubuntu 22.04.5 LTS",
+      "kernelVersion": "5.15.148-tegra",
+      "kubeletVersion": "v1.32.10-kubeedge-v1.23.0",
+      "containerRuntimeVersion": "containerd://2.2.1"
+     },
+     "resources": {
+      "cpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 6.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 6.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.75,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 5.25,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "ephemeral-storage": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 502085459968.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 451876913224.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 451876913224.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "memory": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 7989956608.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 7885099008.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 385875968.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 7499223040.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "nvidia.com/gpu.shared": {
+       "device_class": "gpu",
+       "allocation_mode": "virtual_slot",
+       "capacity": {
+        "value": 2.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 2.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 2.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "pods": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 8.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 102.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      }
+     },
+     "telemetry": {
+      "cpu_usage_cores": {
+       "value": 0.31687359,
+       "observed_at": "2026-10-29T06:29:41Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "cores"
+      },
+      "memory_working_set_bytes": {
+       "value": 3805700096.0,
+       "observed_at": "2026-10-29T06:29:41Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "node:memory_available_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "bytes"
+      },
+      "gpu-0:utilization": {
+       "value": 0.0,
+       "observed_at": "2026-10-29T06:31:06.990000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "percent"
+      }
+     },
+     "ready": {
+      "value": true,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kubernetes",
+      "status": "ok",
+      "unit": null
+     },
+     "scheduling_blockers": [],
+     "taints": []
+    },
+    {
+     "node_ref": "etri-dev0002-raspi5",
+     "hardware": {
+      "architecture": "arm64",
+      "operatingSystem": "linux",
+      "osImage": "Debian GNU/Linux 13 (trixie)",
+      "kernelVersion": "6.12.75+rpt-rpi-2712",
+      "kubeletVersion": "v1.32.10-kubeedge-v1.23.0",
+      "containerRuntimeVersion": "containerd://1.7.18"
+     },
+     "resources": {
+      "cpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 4.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 4.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.97,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 3.03,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "ephemeral-storage": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 503208910848.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 452888019014.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 452888019014.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "hailo.ai/h8": {
+       "device_class": "npu",
+       "allocation_mode": "physical_device",
+       "capacity": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "memory": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 17002577920.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 16897720320.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 448790528.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 16448929792.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "pods": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 8.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 102.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      }
+     },
+     "telemetry": {
+      "cpu_usage_cores": {
+       "value": 1.043765634,
+       "observed_at": "2026-10-29T06:29:46Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "cores"
+      },
+      "memory_working_set_bytes": {
+       "value": 3066871808.0,
+       "observed_at": "2026-10-29T06:29:46Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "node:memory_available_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "bytes"
+      }
+     },
+     "ready": {
+      "value": true,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kubernetes",
+      "status": "ok",
+      "unit": null
+     },
+     "scheduling_blockers": [],
+     "taints": []
+    },
+    {
+     "node_ref": "etri-dev0003-raspi5",
+     "hardware": {
+      "architecture": "arm64",
+      "operatingSystem": "linux",
+      "osImage": "Debian GNU/Linux 13 (trixie)",
+      "kernelVersion": "6.12.75+rpt-rpi-2712",
+      "kubeletVersion": "v1.32.10-kubeedge-v1.23.0",
+      "containerRuntimeVersion": "containerd://1.7.24"
+     },
+     "resources": {
+      "cpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 4.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 4.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 1.035,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 2.965,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "ephemeral-storage": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 251763482624.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 226587133987.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 226587133987.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "memory": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 8454602752.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 8349745152.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 549453824.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 7800291328.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "pods": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 9.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 101.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      }
+     },
+     "telemetry": {
+      "cpu_usage_cores": {
+       "value": 1.862134736,
+       "observed_at": "2026-10-29T06:29:44Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "cores"
+      },
+      "memory_working_set_bytes": {
+       "value": 1844133888.0,
+       "observed_at": "2026-10-29T06:29:44Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "node:memory_available_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "bytes"
+      }
+     },
+     "ready": {
+      "value": true,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kubernetes",
+      "status": "ok",
+      "unit": null
+     },
+     "scheduling_blockers": [],
+     "taints": []
+    },
+    {
+     "node_ref": "etri-dev0004-tedger",
+     "hardware": {
+      "architecture": "arm64",
+      "operatingSystem": "linux",
+      "osImage": "Debian GNU/Linux 10 (buster)",
+      "kernelVersion": "4.4.194",
+      "kubeletVersion": "v1.32.10-kubeedge-v1.23.0",
+      "containerRuntimeVersion": "containerd://1.7.32"
+     },
+     "resources": {
+      "cpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 6.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 6.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.955,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 5.045,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "ephemeral-storage": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 127596531712.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 114836878351.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 114836878351.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "memory": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 4032139264.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 3927281664.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 562036736.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 3365244928.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "pods": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 10.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 100.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "rockchip.com/rk3399pro": {
+       "device_class": "npu",
+       "allocation_mode": "physical_device",
+       "capacity": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      }
+     },
+     "telemetry": {
+      "cpu_usage_cores": {
+       "value": null,
+       "observed_at": null,
+       "source": "metrics_api",
+       "status": "unavailable",
+       "unit": "cores"
+      },
+      "memory_working_set_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "metrics_api",
+       "status": "unavailable",
+       "unit": "bytes"
+      },
+      "node:memory_available_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "collector_unhealthy",
+       "unit": "bytes"
+      }
+     },
+     "ready": {
+      "value": false,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kubernetes",
+      "status": "ok",
+      "unit": null
+     },
+     "scheduling_blockers": [
+      "MemoryPressure",
+      "DiskPressure",
+      "PIDPressure",
+      "NotReady"
+     ],
+     "taints": [
+      {
+       "key": "node.kubernetes.io/unreachable",
+       "effect": "NoSchedule"
+      },
+      {
+       "key": "node.kubernetes.io/unreachable",
+       "effect": "NoExecute"
+      }
+     ]
+    },
+    {
+     "node_ref": "etri-dev0006-raspi5",
+     "hardware": {
+      "architecture": "arm64",
+      "operatingSystem": "linux",
+      "osImage": "Debian GNU/Linux 13 (trixie)",
+      "kernelVersion": "6.18.39+rpt-rpi-2712",
+      "kubeletVersion": "v1.32.10-kubeedge-v1.23.0",
+      "containerRuntimeVersion": "containerd://1.7.24"
+     },
+     "resources": {
+      "cpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 4.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 4.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 1.72,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 2.28,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "ephemeral-storage": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 30800633856.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 27720570425.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 27720570425.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "hailo.ai/h8": {
+       "device_class": "npu",
+       "allocation_mode": "physical_device",
+       "capacity": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "memory": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 4245831680.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 4140974080.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 1388314624.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 2752659456.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "pods": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 8.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 102.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      }
+     },
+     "telemetry": {
+      "cpu_usage_cores": {
+       "value": 0.235651788,
+       "observed_at": "2026-10-29T06:29:42Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "cores"
+      },
+      "memory_working_set_bytes": {
+       "value": 1644199936.0,
+       "observed_at": "2026-10-29T06:29:42Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "node:memory_available_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "bytes"
+      }
+     },
+     "ready": {
+      "value": true,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kubernetes",
+      "status": "ok",
+      "unit": null
+     },
+     "scheduling_blockers": [],
+     "taints": []
+    },
+    {
+     "node_ref": "etri-dev0007-jetagx",
+     "hardware": {
+      "architecture": "arm64",
+      "operatingSystem": "linux",
+      "osImage": "Ubuntu 24.04.4 LTS",
+      "kernelVersion": "6.8.12-1021-tegra",
+      "kubeletVersion": "v1.32.10-kubeedge-v1.23.0",
+      "containerRuntimeVersion": "containerd://2.3.4"
+     },
+     "resources": {
+      "cpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 12.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 12.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.725,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 11.275,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "ephemeral-storage": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 57806061568.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 52025455326.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 52025455326.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "memory": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 65932681216.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 65827823616.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 318767104.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 65509056512.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "nvidia.com/gpu.shared": {
+       "device_class": "gpu",
+       "allocation_mode": "virtual_slot",
+       "capacity": {
+        "value": 2.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 2.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 2.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "pods": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 7.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 103.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      }
+     },
+     "telemetry": {
+      "cpu_usage_cores": {
+       "value": null,
+       "observed_at": null,
+       "source": "metrics_api",
+       "status": "unavailable",
+       "unit": "cores"
+      },
+      "memory_working_set_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "metrics_api",
+       "status": "unavailable",
+       "unit": "bytes"
+      }
+     },
+     "ready": {
+      "value": false,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kubernetes",
+      "status": "ok",
+      "unit": null
+     },
+     "scheduling_blockers": [
+      "MemoryPressure",
+      "DiskPressure",
+      "PIDPressure",
+      "NotReady"
+     ],
+     "taints": [
+      {
+       "key": "node.kubernetes.io/unreachable",
+       "effect": "NoSchedule"
+      },
+      {
+       "key": "node.kubernetes.io/unreachable",
+       "effect": "NoExecute"
+      }
+     ]
+    },
+    {
+     "node_ref": "etri-dev0008-raspi5",
+     "hardware": {
+      "architecture": "arm64",
+      "operatingSystem": "linux",
+      "osImage": "Debian GNU/Linux 13 (trixie)",
+      "kernelVersion": "6.18.34+rpt-rpi-2712",
+      "kubeletVersion": "v1.32.10-kubeedge-v1.23.0",
+      "containerRuntimeVersion": "containerd://1.7.24"
+     },
+     "resources": {
+      "cpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 4.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 4.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.965,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 3.035,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "ephemeral-storage": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 30800633856.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 27720570425.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 27720570425.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "memory": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 4245815296.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 4140957696.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 427819008.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 3713138688.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "pods": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 7.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 103.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      }
+     },
+     "telemetry": {
+      "cpu_usage_cores": {
+       "value": 1.226994837,
+       "observed_at": "2026-10-29T06:29:38Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "cores"
+      },
+      "memory_working_set_bytes": {
+       "value": 874037248.0,
+       "observed_at": "2026-10-29T06:29:38Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "bytes"
+      }
+     },
+     "ready": {
+      "value": true,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kubernetes",
+      "status": "ok",
+      "unit": null
+     },
+     "scheduling_blockers": [],
+     "taints": []
+    },
+    {
+     "node_ref": "etri-dev0009-jetorn",
+     "hardware": {
+      "architecture": "arm64",
+      "operatingSystem": "linux",
+      "osImage": "Ubuntu 24.04.4 LTS",
+      "kernelVersion": "6.8.12-1021-tegra",
+      "kubeletVersion": "v1.32.10-kubeedge-v1.23.0-2+da0ee076a31934",
+      "containerRuntimeVersion": "containerd://2.2.1"
+     },
+     "resources": {
+      "cpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 6.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 6.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.725,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 5.275,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "ephemeral-storage": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 123811053568.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 111429948027.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 111429948027.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "memory": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 7849254912.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 7744397312.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 318767104.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 7425630208.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "nvidia.com/gpu.shared": {
+       "device_class": "gpu",
+       "allocation_mode": "virtual_slot",
+       "capacity": {
+        "value": 2.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 2.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 2.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "pods": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 7.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 103.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      }
+     },
+     "telemetry": {
+      "cpu_usage_cores": {
+       "value": 0.226528001,
+       "observed_at": "2026-10-29T06:29:46Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "cores"
+      },
+      "memory_working_set_bytes": {
+       "value": 1684373504.0,
+       "observed_at": "2026-10-29T06:29:46Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "bytes"
+      }
+     },
+     "ready": {
+      "value": true,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kubernetes",
+      "status": "ok",
+      "unit": null
+     },
+     "scheduling_blockers": [],
+     "taints": []
+    },
+    {
+     "node_ref": "etri-ser0001-cg0msb",
+     "hardware": {
+      "architecture": "amd64",
+      "operatingSystem": "linux",
+      "osImage": "Ubuntu 24.04.3 LTS",
+      "kernelVersion": "7.0.0-38-generic",
+      "kubeletVersion": "v1.31.14",
+      "containerRuntimeVersion": "containerd://1.7.18"
+     },
+     "resources": {
+      "cpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 24.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 24.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 10.205,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 13.795,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "ephemeral-storage": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 501809635328.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 451628671048.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 134217728.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 451494453320.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "memory": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 134759313408.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 134654455808.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 19499319296.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 115155136512.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "nvidia.com/gpu": {
+       "device_class": "gpu",
+       "allocation_mode": "physical_device",
+       "capacity": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "pods": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 58.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 52.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      }
+     },
+     "telemetry": {
+      "cpu_usage_cores": {
+       "value": 2.975840106,
+       "observed_at": "2026-10-29T06:29:46Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "cores"
+      },
+      "memory_working_set_bytes": {
+       "value": 33870946304.0,
+       "observed_at": "2026-10-29T06:29:46Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "node:memory_available_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "bytes"
+      },
+      "gpu-0:utilization": {
+       "value": 0.0,
+       "observed_at": "2026-10-29T06:30:55.969000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "percent"
+      },
+      "gpu-0:memory_used_bytes": {
+       "value": 511705088.0,
+       "observed_at": "2026-10-29T06:30:55.969000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "gpu-0:memory_free_bytes": {
+       "value": 7569670144.0,
+       "observed_at": "2026-10-29T06:30:55.969000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "gpu-0:power": {
+       "value": 3.082,
+       "observed_at": "2026-10-29T06:30:55.969000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "watts"
+      },
+      "gpu-0:temperature": {
+       "value": 39.0,
+       "observed_at": "2026-10-29T06:30:55.969000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "celsius"
+      }
+     },
+     "ready": {
+      "value": true,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kubernetes",
+      "status": "ok",
+      "unit": null
+     },
+     "scheduling_blockers": [],
+     "taints": []
+    },
+    {
+     "node_ref": "etri-ser0002-cgnmsb",
+     "hardware": {
+      "architecture": "amd64",
+      "operatingSystem": "linux",
+      "osImage": "Ubuntu 24.04.4 LTS",
+      "kernelVersion": "7.0.0-38-generic",
+      "kubeletVersion": "v1.31.14",
+      "containerRuntimeVersion": "containerd://2.2.4"
+     },
+     "resources": {
+      "cpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 24.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 24.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 4.46,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 19.54,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "ephemeral-storage": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 1030967009280.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 927870306816.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 927870306816.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "hami.io/vgpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 10.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 10.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 9.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "memory": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 32871325696.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 32766468096.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 11306795008.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 21459673088.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "npu.intel.com/accel": {
+       "device_class": "npu",
+       "allocation_mode": "physical_device",
+       "capacity": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "nvidia.com/gpu": {
+       "device_class": "gpu",
+       "allocation_mode": "physical_device",
+       "capacity": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "pods": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 35.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 75.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      }
+     },
+     "telemetry": {
+      "cpu_usage_cores": {
+       "value": 0.737258388,
+       "observed_at": "2026-10-29T06:29:46Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "cores"
+      },
+      "memory_working_set_bytes": {
+       "value": 7364599808.0,
+       "observed_at": "2026-10-29T06:29:46Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "node:memory_available_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "bytes"
+      },
+      "gpu-0:utilization": {
+       "value": 0.0,
+       "observed_at": "2026-10-29T06:31:04.792000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "percent"
+      },
+      "gpu-0:memory_used_bytes": {
+       "value": 932184064.0,
+       "observed_at": "2026-10-29T06:31:04.792000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "gpu-0:memory_free_bytes": {
+       "value": 15654191104.0,
+       "observed_at": "2026-10-29T06:31:04.792000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "gpu-0:power": {
+       "value": 4.172,
+       "observed_at": "2026-10-29T06:31:04.792000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "watts"
+      },
+      "gpu-0:temperature": {
+       "value": 32.0,
+       "observed_at": "2026-10-29T06:31:04.792000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "celsius"
+      }
+     },
+     "ready": {
+      "value": true,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kubernetes",
+      "status": "ok",
+      "unit": null
+     },
+     "scheduling_blockers": [],
+     "taints": []
+    },
+    {
+     "node_ref": "etri-ser0003-cg0ms0",
+     "hardware": {
+      "architecture": "arm64",
+      "operatingSystem": "linux",
+      "osImage": "Ubuntu 24.04.3 LTS",
+      "kernelVersion": "6.17.0-1032-nvidia",
+      "kubeletVersion": "v1.31.14",
+      "containerRuntimeVersion": "containerd://2.2.1"
+     },
+     "resources": {
+      "cpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 20.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 20.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 3.285,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 16.715,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "ephemeral-storage": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 4031871553536.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 3628684392175.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 67108864.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 3628617283311.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "memory": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 130663165952.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 130558308352.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 7455375360.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 123102932992.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "nvidia.com/gpu": {
+       "device_class": "gpu",
+       "allocation_mode": "physical_device",
+       "capacity": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "pods": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 20.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 90.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      }
+     },
+     "telemetry": {
+      "cpu_usage_cores": {
+       "value": 0.262844012,
+       "observed_at": "2026-10-29T06:29:45Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "cores"
+      },
+      "memory_working_set_bytes": {
+       "value": 8212332544.0,
+       "observed_at": "2026-10-29T06:29:45Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "node:memory_available_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "bytes"
+      }
+     },
+     "ready": {
+      "value": true,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kubernetes",
+      "status": "ok",
+      "unit": null
+     },
+     "scheduling_blockers": [],
+     "taints": []
+    },
+    {
+     "node_ref": "etri-ser0004-cgnms0",
+     "hardware": {
+      "architecture": "amd64",
+      "operatingSystem": "linux",
+      "osImage": "Ubuntu 22.04.5 LTS",
+      "kernelVersion": "6.8.0-138-generic",
+      "kubeletVersion": "v1.31.14",
+      "containerRuntimeVersion": "containerd://2.2.1"
+     },
+     "resources": {
+      "cpu": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 16.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 16.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 2.36,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 13.64,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "ephemeral-storage": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 470307422208.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 423276679287.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 423276679287.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "memory": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 33418391552.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 33313533952.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 2954887168.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 30358646784.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "mobilint.com/npu": {
+       "device_class": "npu",
+       "allocation_mode": "physical_device",
+       "capacity": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 0.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 1.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      },
+      "pods": {
+       "device_class": "unknown",
+       "allocation_mode": "unknown",
+       "capacity": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "allocatable": {
+        "value": 110.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "requested": {
+        "value": 20.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       },
+       "request_headroom": {
+        "value": 90.0,
+        "observed_at": "2026-10-29T06:31:04.191814+00:00",
+        "source": "kubernetes",
+        "status": "ok",
+        "unit": null
+       }
+      }
+     },
+     "telemetry": {
+      "cpu_usage_cores": {
+       "value": 0.66515806,
+       "observed_at": "2026-10-29T06:29:47Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "cores"
+      },
+      "memory_working_set_bytes": {
+       "value": 5139030016.0,
+       "observed_at": "2026-10-29T06:29:47Z",
+       "source": "metrics_api",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "node:memory_available_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "bytes"
+      },
+      "npu-0:utilization": {
+       "value": 0.0,
+       "observed_at": "2026-10-29T06:31:01.108000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "percent"
+      },
+      "npu-0:memory_used_bytes": {
+       "value": 0.0,
+       "observed_at": "2026-10-29T06:31:01.108000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "bytes"
+      },
+      "npu-0:temperature": {
+       "value": 58.0,
+       "observed_at": "2026-10-29T06:31:01.108000+00:00",
+       "source": "prometheus",
+       "status": "ok",
+       "unit": "celsius"
+      }
+     },
+     "ready": {
+      "value": true,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kubernetes",
+      "status": "ok",
+      "unit": null
+     },
+     "scheduling_blockers": [],
+     "taints": []
+    }
+   ],
+   "queues": [
+    {
+     "namespace": "resource-advisor-lab",
+     "local_queues": {
+      "value": [
+       {
+        "ref": "ra-f0-gpu",
+        "cluster_queue": "hairp-gpu-pool",
+        "scope": "local_queue_namespace",
+        "active": true,
+        "stop_policy": "None",
+        "queueing_strategy": null,
+        "cohort": null,
+        "conditions": [
+         {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can submit new workloads to localQueue",
+          "lastTransitionTime": "2026-10-07T02:36:40Z",
+          "current_generation": true
+         }
+        ],
+        "pending_workloads": 0,
+        "reserving_workloads": 0,
+        "admitted_workloads": 0,
+        "resources": [
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         }
+        ],
+        "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+       },
+       {
+        "ref": "ra-hailo-lab",
+        "cluster_queue": "ra-hailo-lab",
+        "scope": "local_queue_namespace",
+        "active": true,
+        "stop_policy": "None",
+        "queueing_strategy": null,
+        "cohort": null,
+        "conditions": [
+         {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can submit new workloads to localQueue",
+          "lastTransitionTime": "2026-10-02T20:00:20Z",
+          "current_generation": true
+         }
+        ],
+        "pending_workloads": 0,
+        "reserving_workloads": 0,
+        "admitted_workloads": 0,
+        "resources": [
+         {
+          "flavor": "ra-hailo-lab",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "ra-hailo-lab",
+          "resource": "hailo.ai/h8",
+          "unit": "resource_units",
+          "device_class": "npu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "ra-hailo-lab",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         }
+        ],
+        "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+       },
+       {
+        "ref": "ra-hailo-second",
+        "cluster_queue": "ra-hailo-second",
+        "scope": "local_queue_namespace",
+        "active": true,
+        "stop_policy": "None",
+        "queueing_strategy": null,
+        "cohort": null,
+        "conditions": [
+         {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can submit new workloads to localQueue",
+          "lastTransitionTime": "2026-10-08T07:06:50Z",
+          "current_generation": true
+         }
+        ],
+        "pending_workloads": 0,
+        "reserving_workloads": 0,
+        "admitted_workloads": 0,
+        "resources": [
+         {
+          "flavor": "ra-hailo-second",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "ra-hailo-second",
+          "resource": "hailo.ai/h8",
+          "unit": "resource_units",
+          "device_class": "npu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "ra-hailo-second",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         }
+        ],
+        "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+       },
+       {
+        "ref": "ra-intel-npu",
+        "cluster_queue": "ra-intel-npu",
+        "scope": "local_queue_namespace",
+        "active": true,
+        "stop_policy": "None",
+        "queueing_strategy": null,
+        "cohort": null,
+        "conditions": [
+         {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can submit new workloads to localQueue",
+          "lastTransitionTime": "2026-10-08T07:15:40Z",
+          "current_generation": true
+         }
+        ],
+        "pending_workloads": 0,
+        "reserving_workloads": 0,
+        "admitted_workloads": 0,
+        "resources": [
+         {
+          "flavor": "ra-intel-npu",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "ra-intel-npu",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "ra-intel-npu",
+          "resource": "npu.intel.com/accel",
+          "unit": "resource_units",
+          "device_class": "npu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         }
+        ],
+        "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+       },
+       {
+        "ref": "ra-jetson-agx",
+        "cluster_queue": "hairp-gpu-pool",
+        "scope": "local_queue_namespace",
+        "active": true,
+        "stop_policy": "None",
+        "queueing_strategy": null,
+        "cohort": null,
+        "conditions": [
+         {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can submit new workloads to localQueue",
+          "lastTransitionTime": "2026-10-07T02:36:41Z",
+          "current_generation": true
+         }
+        ],
+        "pending_workloads": 0,
+        "reserving_workloads": 0,
+        "admitted_workloads": 0,
+        "resources": [
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         }
+        ],
+        "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+       },
+       {
+        "ref": "ra-jetson-nano",
+        "cluster_queue": "hairp-gpu-pool",
+        "scope": "local_queue_namespace",
+        "active": true,
+        "stop_policy": "None",
+        "queueing_strategy": null,
+        "cohort": null,
+        "conditions": [
+         {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can submit new workloads to localQueue",
+          "lastTransitionTime": "2026-10-07T02:36:42Z",
+          "current_generation": true
+         }
+        ],
+        "pending_workloads": 0,
+        "reserving_workloads": 0,
+        "admitted_workloads": 0,
+        "resources": [
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         }
+        ],
+        "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+       },
+       {
+        "ref": "ra-live-cpu",
+        "cluster_queue": "ra-live-training-cpu",
+        "scope": "local_queue_namespace",
+        "active": true,
+        "stop_policy": "None",
+        "queueing_strategy": null,
+        "cohort": null,
+        "conditions": [
+         {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can submit new workloads to localQueue",
+          "lastTransitionTime": "2026-10-28T11:07:47Z",
+          "current_generation": true
+         }
+        ],
+        "pending_workloads": 0,
+        "reserving_workloads": 0,
+        "admitted_workloads": 0,
+        "resources": [
+         {
+          "flavor": "ra-live-cpu",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "ra-live-cpu",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         }
+        ],
+        "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+       },
+       {
+        "ref": "ra-mobilint",
+        "cluster_queue": "ra-mobilint",
+        "scope": "local_queue_namespace",
+        "active": true,
+        "stop_policy": "None",
+        "queueing_strategy": null,
+        "cohort": null,
+        "conditions": [
+         {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can submit new workloads to localQueue",
+          "lastTransitionTime": "2026-10-08T07:06:50Z",
+          "current_generation": true
+         }
+        ],
+        "pending_workloads": 0,
+        "reserving_workloads": 0,
+        "admitted_workloads": 0,
+        "resources": [
+         {
+          "flavor": "ra-mobilint",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "ra-mobilint",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "ra-mobilint",
+          "resource": "mobilint.com/npu",
+          "unit": "resource_units",
+          "device_class": "npu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         }
+        ],
+        "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+       },
+       {
+        "ref": "ra-rockchip-npu",
+        "cluster_queue": "ra-rockchip-npu",
+        "scope": "local_queue_namespace",
+        "active": true,
+        "stop_policy": "None",
+        "queueing_strategy": null,
+        "cohort": null,
+        "conditions": [
+         {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can submit new workloads to localQueue",
+          "lastTransitionTime": "2026-10-08T07:30:34Z",
+          "current_generation": true
+         }
+        ],
+        "pending_workloads": 0,
+        "reserving_workloads": 0,
+        "admitted_workloads": 0,
+        "resources": [
+         {
+          "flavor": "ra-rockchip-npu",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "ra-rockchip-npu",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "ra-rockchip-npu",
+          "resource": "rockchip.com/rk3399pro",
+          "unit": "resource_units",
+          "device_class": "npu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         }
+        ],
+        "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+       },
+       {
+        "ref": "ra-rtx5060",
+        "cluster_queue": "hairp-gpu-pool",
+        "scope": "local_queue_namespace",
+        "active": true,
+        "stop_policy": "None",
+        "queueing_strategy": null,
+        "cohort": null,
+        "conditions": [
+         {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can submit new workloads to localQueue",
+          "lastTransitionTime": "2026-10-07T02:36:43Z",
+          "current_generation": true
+         }
+        ],
+        "pending_workloads": 0,
+        "reserving_workloads": 0,
+        "admitted_workloads": 0,
+        "resources": [
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         }
+        ],
+        "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+       },
+       {
+        "ref": "ra-spark",
+        "cluster_queue": "hairp-gpu-pool",
+        "scope": "local_queue_namespace",
+        "active": true,
+        "stop_policy": "None",
+        "queueing_strategy": null,
+        "cohort": null,
+        "conditions": [
+         {
+          "type": "Active",
+          "status": "True",
+          "reason": "Ready",
+          "message": "Can submit new workloads to localQueue",
+          "lastTransitionTime": "2026-10-07T02:36:44Z",
+          "current_generation": true
+         }
+        ],
+        "pending_workloads": 0,
+        "reserving_workloads": 0,
+        "admitted_workloads": 0,
+        "resources": [
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-multi-gpu",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-a",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "cpu",
+          "unit": "cores",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "memory",
+          "unit": "bytes",
+          "device_class": "unknown",
+          "allocation_mode": "unknown",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "nvidia.com/gpu",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "physical_device",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         },
+         {
+          "flavor": "hairp-pool-jetson-b",
+          "resource": "nvidia.com/gpu.shared",
+          "unit": "resource_units",
+          "device_class": "gpu",
+          "allocation_mode": "virtual_slot",
+          "nominal_quota": null,
+          "borrowing_limit": null,
+          "reserved": 0.0,
+          "admitted": 0.0,
+          "borrowed_reservation": null
+         }
+        ],
+        "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+       }
+      ],
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "ok",
+      "unit": null
+     },
+     "workloads": {
+      "value": [],
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "ok",
+      "unit": null
+     }
+    }
+   ],
+   "cluster_queues": [
+    {
+     "ref": "ra-f0-gpu",
+     "observation": {
+      "value": {
+       "ref": "ra-f0-gpu",
+       "cluster_queue": "ra-f0-gpu",
+       "scope": "cluster_queue_all_namespaces",
+       "active": true,
+       "stop_policy": "None",
+       "queueing_strategy": "BestEffortFIFO",
+       "cohort": null,
+       "conditions": [
+        {
+         "type": "Active",
+         "status": "True",
+         "reason": "Ready",
+         "message": "Can admit new workloads",
+         "lastTransitionTime": "2026-10-02T04:34:07Z",
+         "current_generation": true
+        }
+       ],
+       "pending_workloads": 0,
+       "reserving_workloads": 0,
+       "admitted_workloads": 0,
+       "resources": [
+        {
+         "flavor": "ra-f0-gpu",
+         "resource": "cpu",
+         "unit": "cores",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 2.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "ra-f0-gpu",
+         "resource": "memory",
+         "unit": "bytes",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 2147483648.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "ra-f0-gpu",
+         "resource": "nvidia.com/gpu",
+         "unit": "resource_units",
+         "device_class": "gpu",
+         "allocation_mode": "physical_device",
+         "nominal_quota": 1.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        }
+       ],
+       "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+      },
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "ok",
+      "unit": null
+     }
+    },
+    {
+     "ref": "ra-hailo-lab",
+     "observation": {
+      "value": {
+       "ref": "ra-hailo-lab",
+       "cluster_queue": "ra-hailo-lab",
+       "scope": "cluster_queue_all_namespaces",
+       "active": true,
+       "stop_policy": "None",
+       "queueing_strategy": "BestEffortFIFO",
+       "cohort": null,
+       "conditions": [
+        {
+         "type": "Active",
+         "status": "True",
+         "reason": "Ready",
+         "message": "Can admit new workloads",
+         "lastTransitionTime": "2026-10-02T20:00:20Z",
+         "current_generation": true
+        }
+       ],
+       "pending_workloads": 0,
+       "reserving_workloads": 0,
+       "admitted_workloads": 0,
+       "resources": [
+        {
+         "flavor": "ra-hailo-lab",
+         "resource": "cpu",
+         "unit": "cores",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 1.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "ra-hailo-lab",
+         "resource": "hailo.ai/h8",
+         "unit": "resource_units",
+         "device_class": "npu",
+         "allocation_mode": "physical_device",
+         "nominal_quota": 1.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "ra-hailo-lab",
+         "resource": "memory",
+         "unit": "bytes",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 1073741824.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        }
+       ],
+       "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+      },
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "ok",
+      "unit": null
+     }
+    },
+    {
+     "ref": "ra-rtx5060",
+     "observation": {
+      "value": {
+       "ref": "ra-rtx5060",
+       "cluster_queue": "ra-rtx5060",
+       "scope": "cluster_queue_all_namespaces",
+       "active": true,
+       "stop_policy": "None",
+       "queueing_strategy": "BestEffortFIFO",
+       "cohort": null,
+       "conditions": [
+        {
+         "type": "Active",
+         "status": "True",
+         "reason": "Ready",
+         "message": "Can admit new workloads",
+         "lastTransitionTime": "2026-10-06T06:58:07Z",
+         "current_generation": true
+        }
+       ],
+       "pending_workloads": 0,
+       "reserving_workloads": 0,
+       "admitted_workloads": 0,
+       "resources": [
+        {
+         "flavor": "ra-rtx5060",
+         "resource": "cpu",
+         "unit": "cores",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 1.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "ra-rtx5060",
+         "resource": "memory",
+         "unit": "bytes",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 536870912.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "ra-rtx5060",
+         "resource": "nvidia.com/gpu",
+         "unit": "resource_units",
+         "device_class": "gpu",
+         "allocation_mode": "physical_device",
+         "nominal_quota": 1.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        }
+       ],
+       "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+      },
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "ok",
+      "unit": null
+     }
+    },
+    {
+     "ref": "ra-spark",
+     "observation": {
+      "value": {
+       "ref": "ra-spark",
+       "cluster_queue": "ra-spark",
+       "scope": "cluster_queue_all_namespaces",
+       "active": true,
+       "stop_policy": "None",
+       "queueing_strategy": "BestEffortFIFO",
+       "cohort": null,
+       "conditions": [
+        {
+         "type": "Active",
+         "status": "True",
+         "reason": "Ready",
+         "message": "Can admit new workloads",
+         "lastTransitionTime": "2026-10-06T06:58:07Z",
+         "current_generation": true
+        }
+       ],
+       "pending_workloads": 0,
+       "reserving_workloads": 0,
+       "admitted_workloads": 0,
+       "resources": [
+        {
+         "flavor": "ra-spark",
+         "resource": "cpu",
+         "unit": "cores",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 1.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "ra-spark",
+         "resource": "memory",
+         "unit": "bytes",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 536870912.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "ra-spark",
+         "resource": "nvidia.com/gpu",
+         "unit": "resource_units",
+         "device_class": "gpu",
+         "allocation_mode": "physical_device",
+         "nominal_quota": 1.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        }
+       ],
+       "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+      },
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "ok",
+      "unit": null
+     }
+    },
+    {
+     "ref": "ra-jetson-nano",
+     "observation": {
+      "value": {
+       "ref": "ra-jetson-nano",
+       "cluster_queue": "ra-jetson-nano",
+       "scope": "cluster_queue_all_namespaces",
+       "active": true,
+       "stop_policy": "None",
+       "queueing_strategy": "BestEffortFIFO",
+       "cohort": null,
+       "conditions": [
+        {
+         "type": "Active",
+         "status": "True",
+         "reason": "Ready",
+         "message": "Can admit new workloads",
+         "lastTransitionTime": "2026-10-06T06:58:07Z",
+         "current_generation": true
+        }
+       ],
+       "pending_workloads": 0,
+       "reserving_workloads": 0,
+       "admitted_workloads": 0,
+       "resources": [
+        {
+         "flavor": "ra-jetson-nano",
+         "resource": "cpu",
+         "unit": "cores",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 1.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "ra-jetson-nano",
+         "resource": "memory",
+         "unit": "bytes",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 536870912.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "ra-jetson-nano",
+         "resource": "nvidia.com/gpu.shared",
+         "unit": "resource_units",
+         "device_class": "gpu",
+         "allocation_mode": "virtual_slot",
+         "nominal_quota": 1.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        }
+       ],
+       "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+      },
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "ok",
+      "unit": null
+     }
+    },
+    {
+     "ref": "ra-jetson-agx",
+     "observation": {
+      "value": {
+       "ref": "ra-jetson-agx",
+       "cluster_queue": "ra-jetson-agx",
+       "scope": "cluster_queue_all_namespaces",
+       "active": true,
+       "stop_policy": "None",
+       "queueing_strategy": "BestEffortFIFO",
+       "cohort": null,
+       "conditions": [
+        {
+         "type": "Active",
+         "status": "True",
+         "reason": "Ready",
+         "message": "Can admit new workloads",
+         "lastTransitionTime": "2026-10-06T06:58:07Z",
+         "current_generation": true
+        }
+       ],
+       "pending_workloads": 0,
+       "reserving_workloads": 0,
+       "admitted_workloads": 0,
+       "resources": [
+        {
+         "flavor": "ra-jetson-agx",
+         "resource": "cpu",
+         "unit": "cores",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 1.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "ra-jetson-agx",
+         "resource": "memory",
+         "unit": "bytes",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 536870912.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "ra-jetson-agx",
+         "resource": "nvidia.com/gpu.shared",
+         "unit": "resource_units",
+         "device_class": "gpu",
+         "allocation_mode": "virtual_slot",
+         "nominal_quota": 1.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        }
+       ],
+       "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+      },
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "ok",
+      "unit": null
+     }
+    },
+    {
+     "ref": "hairp-gpu-pool",
+     "observation": {
+      "value": {
+       "ref": "hairp-gpu-pool",
+       "cluster_queue": "hairp-gpu-pool",
+       "scope": "cluster_queue_all_namespaces",
+       "active": true,
+       "stop_policy": "None",
+       "queueing_strategy": "BestEffortFIFO",
+       "cohort": null,
+       "conditions": [
+        {
+         "type": "Active",
+         "status": "True",
+         "reason": "Ready",
+         "message": "Can admit new workloads",
+         "lastTransitionTime": "2026-10-07T02:36:39Z",
+         "current_generation": true
+        }
+       ],
+       "pending_workloads": 0,
+       "reserving_workloads": 0,
+       "admitted_workloads": 0,
+       "resources": [
+        {
+         "flavor": "hairp-multi-gpu",
+         "resource": "cpu",
+         "unit": "cores",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 3.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "hairp-multi-gpu",
+         "resource": "memory",
+         "unit": "bytes",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 3221225472.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "hairp-multi-gpu",
+         "resource": "nvidia.com/gpu",
+         "unit": "resource_units",
+         "device_class": "gpu",
+         "allocation_mode": "physical_device",
+         "nominal_quota": 3.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "hairp-multi-gpu",
+         "resource": "nvidia.com/gpu.shared",
+         "unit": "resource_units",
+         "device_class": "gpu",
+         "allocation_mode": "virtual_slot",
+         "nominal_quota": 0.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "hairp-pool-jetson-a",
+         "resource": "cpu",
+         "unit": "cores",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 2.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "hairp-pool-jetson-a",
+         "resource": "memory",
+         "unit": "bytes",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 1073741824.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "hairp-pool-jetson-a",
+         "resource": "nvidia.com/gpu",
+         "unit": "resource_units",
+         "device_class": "gpu",
+         "allocation_mode": "physical_device",
+         "nominal_quota": 0.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "hairp-pool-jetson-a",
+         "resource": "nvidia.com/gpu.shared",
+         "unit": "resource_units",
+         "device_class": "gpu",
+         "allocation_mode": "virtual_slot",
+         "nominal_quota": 2.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "hairp-pool-jetson-b",
+         "resource": "cpu",
+         "unit": "cores",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 2.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "hairp-pool-jetson-b",
+         "resource": "memory",
+         "unit": "bytes",
+         "device_class": "unknown",
+         "allocation_mode": "unknown",
+         "nominal_quota": 1073741824.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "hairp-pool-jetson-b",
+         "resource": "nvidia.com/gpu",
+         "unit": "resource_units",
+         "device_class": "gpu",
+         "allocation_mode": "physical_device",
+         "nominal_quota": 0.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        },
+        {
+         "flavor": "hairp-pool-jetson-b",
+         "resource": "nvidia.com/gpu.shared",
+         "unit": "resource_units",
+         "device_class": "gpu",
+         "allocation_mode": "virtual_slot",
+         "nominal_quota": 2.0,
+         "borrowing_limit": null,
+         "reserved": 0.0,
+         "admitted": 0.0,
+         "borrowed_reservation": 0.0
+        }
+       ],
+       "semantics": "Scheduler quota/reservation/admission; not utilization, immediate availability or guaranteed queue order. Null is unknown or not declared."
+      },
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "ok",
+      "unit": null
+     }
+    },
+    {
+     "ref": "ra-hailo-second",
+     "observation": {
+      "value": null,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "unavailable",
+      "unit": null
+     }
+    },
+    {
+     "ref": "ra-mobilint",
+     "observation": {
+      "value": null,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "unavailable",
+      "unit": null
+     }
+    },
+    {
+     "ref": "ra-intel-npu",
+     "observation": {
+      "value": null,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "unavailable",
+      "unit": null
+     }
+    },
+    {
+     "ref": "ra-rockchip-npu",
+     "observation": {
+      "value": null,
+      "observed_at": "2026-10-29T06:31:04.191814+00:00",
+      "source": "kueue",
+      "status": "unavailable",
+      "unit": null
+     }
+    }
+   ],
+   "execution_qualification": "inventory never grants runtime qualification"
+  },
+  {
+   "schema_version": "v1",
+   "backend": "slurm",
+   "ref": "inv-ac67bc73a3284d9eaae7eb0eaf0d7282",
+   "cluster_ref": "lab-slurm",
+   "collected_at": "2026-10-22T07:55:23.405027+00:00",
+   "stale_after_seconds": 120,
+   "status": "stale",
+   "sources": {
+    "slurm_nodes": "unavailable",
+    "slurm_queue": "unavailable",
+    "prometheus": "partial"
+   },
+   "nodes": [
+    {
+     "node_ref": "slurm-npu-lab",
+     "hardware": null,
+     "resources": {},
+     "telemetry": {
+      "node:memory_available_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "bytes"
+      },
+      "node:memory_total_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "bytes"
+      },
+      "node:cpu_non_idle_cores": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "cores"
+      },
+      "node:cpu_count": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "count"
+      }
+     },
+     "scheduler_state": {
+      "value": null,
+      "observed_at": null,
+      "source": "slurm-controller",
+      "status": "unavailable",
+      "unit": null
+     },
+     "accelerator_inventory": {
+      "value": null,
+      "observed_at": null,
+      "source": "slurm-controller",
+      "status": "unavailable",
+      "unit": null
+     },
+     "scheduling_blockers": []
+    },
+    {
+     "node_ref": "slurm-gpu-lab",
+     "hardware": null,
+     "resources": {},
+     "telemetry": {
+      "node:memory_available_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "bytes"
+      },
+      "node:memory_total_bytes": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "bytes"
+      },
+      "node:cpu_non_idle_cores": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "cores"
+      },
+      "node:cpu_count": {
+       "value": null,
+       "observed_at": null,
+       "source": "prometheus",
+       "status": "unavailable",
+       "unit": "count"
+      }
+     },
+     "scheduler_state": {
+      "value": null,
+      "observed_at": null,
+      "source": "slurm-controller",
+      "status": "unavailable",
+      "unit": null
+     },
+     "accelerator_inventory": {
+      "value": null,
+      "observed_at": null,
+      "source": "slurm-controller",
+      "status": "unavailable",
+      "unit": null
+     },
+     "scheduling_blockers": []
+    }
+   ],
+   "queues": [],
+   "cluster_queues": [],
+   "slurm_queue": {
+    "value": null,
+    "observed_at": null,
+    "source": "slurm-controller",
+    "status": "unavailable",
+    "unit": null
+   },
+   "execution_qualification": "inventory never grants runtime qualification or admission"
+  }
+ ],
+ "job_counts": {
+  "SUCCEEDED": 822,
+  "RESULT_INVALID": 1,
+  "SUBMISSION_UNKNOWN": 2,
+  "CANCELED": 34,
+  "FAILED": 11
+ },
+ "submission_catalog": [
+  {
+   "workload_ref": "live-train-vm-b",
+   "task_type": "training",
+   "measurement_boundary": "mlp-sgd-cpu-live-v1",
+   "candidates": [
+    {
+     "candidate_ref": "cpu",
+     "backend": "slurm",
+     "node_ref": "ra-slurm-vm",
+     "model": "none (CPU-only training)",
+     "device_class": "cpu",
+     "resource_key": null,
+     "allocation_mode": "cpu_only",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-28T11:37:00+00:00"
+    }
+   ]
+  },
+  {
+   "workload_ref": "live-train-vm-a",
+   "task_type": "training",
+   "measurement_boundary": "mlp-sgd-cpu-live-v1",
+   "candidates": [
+    {
+     "candidate_ref": "cpu",
+     "backend": "slurm",
+     "node_ref": "ra-slurm-vm",
+     "model": "none (CPU-only training)",
+     "device_class": "cpu",
+     "resource_key": null,
+     "allocation_mode": "cpu_only",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-28T11:37:00+00:00"
+    }
+   ]
+  },
+  {
+   "workload_ref": "live-train-k8s-b",
+   "task_type": "training",
+   "measurement_boundary": "mlp-sgd-cpu-live-v1",
+   "candidates": [
+    {
+     "candidate_ref": "cpu",
+     "backend": "kubernetes",
+     "node_ref": "etri-ser0001-cg0msb",
+     "model": "none (CPU-only training)",
+     "device_class": "cpu",
+     "resource_key": null,
+     "allocation_mode": "cpu_only",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-28T11:03:42+00:00"
+    }
+   ]
+  },
+  {
+   "workload_ref": "live-train-k8s-a",
+   "task_type": "training",
+   "measurement_boundary": "mlp-sgd-cpu-live-v1",
+   "candidates": [
+    {
+     "candidate_ref": "cpu",
+     "backend": "kubernetes",
+     "node_ref": "etri-ser0001-cg0msb",
+     "model": "none (CPU-only training)",
+     "device_class": "cpu",
+     "resource_key": null,
+     "allocation_mode": "cpu_only",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-28T11:03:42+00:00"
+    }
+   ]
+  },
+  {
+   "workload_ref": "rockchip-resnet18-host-20261008-v2",
+   "task_type": "inference",
+   "measurement_boundary": "blocking-host-input-to-NPU-output; memory=host-process-peak-RSS",
+   "candidates": [
+    {
+     "candidate_ref": "device",
+     "backend": "kubernetes",
+     "node_ref": "etri-dev0004-tedger",
+     "model": "RK3399Pro",
+     "device_class": "npu",
+     "resource_key": "rockchip.com/rk3399pro",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-08T08:45:42.820414+00:00"
+    }
+   ]
+  },
+  {
+   "workload_ref": "intel-conv-20261008-v1",
+   "task_type": "inference",
+   "measurement_boundary": "blocking-host-input-to-NPU-output; memory=host-process-peak-RSS",
+   "candidates": [
+    {
+     "candidate_ref": "device",
+     "backend": "kubernetes",
+     "node_ref": "etri-ser0002-cgnmsb",
+     "model": "Intel-NPU-3720",
+     "device_class": "npu",
+     "resource_key": "npu.intel.com/accel",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-08T07:29:07.333080+00:00"
+    }
+   ]
+  },
+  {
+   "workload_ref": "mobilint-candy-20261008-v1",
+   "task_type": "inference",
+   "measurement_boundary": "blocking-host-input-to-NPU-output; memory=host-process-peak-RSS",
+   "candidates": [
+    {
+     "candidate_ref": "device",
+     "backend": "kubernetes",
+     "node_ref": "etri-ser0004-cgnms0",
+     "model": "ARIES2",
+     "device_class": "npu",
+     "resource_key": "mobilint.com/npu",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-08T07:18:45.758480+00:00"
+    }
+   ]
+  },
+  {
+   "workload_ref": "hailo-resnet50-auto-20261008-v2",
+   "task_type": "inference",
+   "measurement_boundary": "synchronous-host-float32-NHWC-to-NPU-output; memory=host-process-peak-RSS",
+   "candidates": [
+    {
+     "candidate_ref": "candidate-1",
+     "backend": "kubernetes",
+     "node_ref": "etri-dev0006-raspi5",
+     "model": "HAILO8",
+     "device_class": "npu",
+     "resource_key": "hailo.ai/h8",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-08T07:17:46+00:00"
+    },
+    {
+     "candidate_ref": "candidate-2",
+     "backend": "kubernetes",
+     "node_ref": "etri-dev0002-raspi5",
+     "model": "HAILO8",
+     "device_class": "npu",
+     "resource_key": "hailo.ai/h8",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-08T07:07:04+00:00"
+    }
+   ]
+  },
+  {
+   "workload_ref": "cuda-sustained-auto-v2",
+   "task_type": "benchmark",
+   "measurement_boundary": "cuda-squares-4096-sync-kernel-v1-output-buffer-memory-timed-90s-windows",
+   "candidates": [
+    {
+     "candidate_ref": "candidate-1",
+     "backend": "kubernetes",
+     "node_ref": "etri-ser0001-cg0msb",
+     "model": "NVIDIA GeForce RTX 5060 Ti",
+     "device_class": "gpu",
+     "resource_key": "nvidia.com/gpu",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-07T05:07:29.863909+00:00"
+    },
+    {
+     "candidate_ref": "candidate-2",
+     "backend": "kubernetes",
+     "node_ref": "etri-ser0003-cg0ms0",
+     "model": "NVIDIA GB10",
+     "device_class": "gpu",
+     "resource_key": "nvidia.com/gpu",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-07T05:07:29.905706+00:00"
+    },
+    {
+     "candidate_ref": "candidate-3",
+     "backend": "kubernetes",
+     "node_ref": "etri-dev0001-jetorn",
+     "model": "Orin",
+     "device_class": "gpu",
+     "resource_key": "nvidia.com/gpu.shared",
+     "allocation_mode": "virtual_slot",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-07T05:07:29.960099+00:00"
+    },
+    {
+     "candidate_ref": "candidate-4",
+     "backend": "kubernetes",
+     "node_ref": "etri-dev0005-jetagx",
+     "model": "Orin",
+     "device_class": "gpu",
+     "resource_key": "nvidia.com/gpu.shared",
+     "allocation_mode": "virtual_slot",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-07T05:07:30.019664+00:00"
+    },
+    {
+     "candidate_ref": "candidate-5",
+     "backend": "kubernetes",
+     "node_ref": "etri-ser0002-cgnmsb",
+     "model": "NVIDIA GeForce RTX 5080",
+     "device_class": "gpu",
+     "resource_key": "nvidia.com/gpu",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-08T06:05:40.440035+00:00"
+    }
+   ]
+  },
+  {
+   "workload_ref": "right-sizing-slurm-20261008-v1",
+   "task_type": "benchmark",
+   "measurement_boundary": "synchronized-cnn-forward-only-four-inputs-v1",
+   "candidates": [
+    {
+     "candidate_ref": "orin",
+     "backend": "slurm",
+     "node_ref": "slurm-w2",
+     "model": "Orin",
+     "device_class": "gpu",
+     "resource_key": "gpu:orin_nano",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-08T06:01:33.064600+00:00"
+    }
+   ]
+  },
+  {
+   "workload_ref": "cuda-smoke-auto-v1",
+   "task_type": "benchmark",
+   "measurement_boundary": "cuda-squares-4096-sync-kernel-v1-output-buffer-memory",
+   "candidates": [
+    {
+     "candidate_ref": "candidate-1",
+     "backend": "kubernetes",
+     "node_ref": "etri-ser0001-cg0msb",
+     "model": "NVIDIA GeForce RTX 5060 Ti",
+     "device_class": "gpu",
+     "resource_key": "nvidia.com/gpu",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-06T07:17:49.643349+00:00"
+    },
+    {
+     "candidate_ref": "candidate-2",
+     "backend": "kubernetes",
+     "node_ref": "etri-ser0003-cg0ms0",
+     "model": "NVIDIA GB10",
+     "device_class": "gpu",
+     "resource_key": "nvidia.com/gpu",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-06T07:18:27.728381+00:00"
+    },
+    {
+     "candidate_ref": "candidate-3",
+     "backend": "kubernetes",
+     "node_ref": "etri-dev0001-jetorn",
+     "model": "Orin",
+     "device_class": "gpu",
+     "resource_key": "nvidia.com/gpu.shared",
+     "allocation_mode": "virtual_slot",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-06T07:18:27.769461+00:00"
+    },
+    {
+     "candidate_ref": "candidate-4",
+     "backend": "kubernetes",
+     "node_ref": "etri-dev0005-jetagx",
+     "model": "Orin",
+     "device_class": "gpu",
+     "resource_key": "nvidia.com/gpu.shared",
+     "allocation_mode": "virtual_slot",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-06T07:18:27.805916+00:00"
+    }
+   ]
+  },
+  {
+   "workload_ref": "e5-kernel-cache-v2",
+   "task_type": "inference",
+   "measurement_boundary": "cnn-batch32-serial-input-transfer-4-forwards-v1",
+   "candidates": [
+    {
+     "candidate_ref": "cache",
+     "backend": "kubernetes",
+     "node_ref": "etri-ser0002-cgnmsb",
+     "model": "NVIDIA GeForce RTX 5080",
+     "device_class": "gpu",
+     "resource_key": "nvidia.com/gpu",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-03T10:08:00.284944+00:00"
+    }
+   ]
+  },
+  {
+   "workload_ref": "hailo-resnet50-disjoint100-v1",
+   "task_type": "inference",
+   "measurement_boundary": "synchronous-host-float32-NHWC-to-NPU-output; memory=host-process-peak-RSS",
+   "candidates": [
+    {
+     "candidate_ref": "hailo-physical",
+     "backend": "kubernetes",
+     "node_ref": "etri-dev0006-raspi5",
+     "model": "HAILO8",
+     "device_class": "npu",
+     "resource_key": "hailo.ai/h8",
+     "allocation_mode": "physical_device",
+     "submittable_now": true,
+     "contract_compatible_now": false,
+     "capability_observed_at": "2026-10-03T07:21:38.224138+00:00"
+    }
+   ]
+  }
+ ]
+}

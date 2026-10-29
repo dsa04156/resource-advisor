@@ -692,6 +692,29 @@ function nodeStatus(n, s) {
   const ready = known && (slurm ? Array.isArray(sample.value) && !(n.scheduling_blockers || []).length : sample.value === true && !(n.scheduling_blockers || []).length);
   return { ready, known, label: !known ? labels[sample.status] || "확인 불가" : slurm ? sample.value.join(" · ") : ready ? "Ready" : "스케줄 불가" };
 }
+const deviceVendors = { "hailo.ai": ["Hailo", "하일로"], "mobilint.com": ["Mobilint", "모빌인트"], "intel.com": ["Intel", "인텔"], "rockchip.com": ["Rockchip", "록칩"], "nvidia.com": ["NVIDIA", "엔비디아"] };
+function deviceIdentity(n, s, key, r) {
+  const domain = key.split("/")[0], vendor = Object.entries(deviceVendors).find(([d]) => domain === d || domain.endsWith("." + d))?.[1] || [];
+  const models = [...new Set((data.submission_catalog || []).flatMap(w => w.candidates)
+    .filter(c => c.node_ref === n.node_ref && c.resource_key === key && c.backend === (s.backend || "kubernetes") && c.model).map(c => c.model))];
+  return { cls: r.device_class.toUpperCase(), vendor: vendor[0] || null, aliases: vendor, models };
+}
+function deviceSearchText(n, s) {
+  return [n.node_ref, ...Object.entries(n.resources).flatMap(([key, r]) => {
+    if (!["gpu", "npu"].includes(r.device_class)) return [key];
+    const d = deviceIdentity(n, s, key, r); return [key, d.cls, ...d.aliases, ...d.models];
+  })].join(" ").toLowerCase();
+}
+function deviceDetection(n, s, key, r) {
+  const d = deviceIdentity(n, s, key, r), seen = observed(r.allocatable, s), status = nodeStatus(n, s);
+  const seenLabel = status.ready ? "장치 감지" : "장치 보고 · 노드 " + status.label;
+  return add(el("div", null, "device-allocation"),
+    add(el("div"), badge(d.cls), el("strong", d.vendor || key)),
+    d.models.length ? el("small", "등록 모델 " + d.models.join(" / ")) : null, el("small", key),
+    el("span", seen.status === "ok" ? `${seenLabel} · ${fmt(value(r.requested,s))} 예약 / ${fmt(seen.value)} ${modes[r.allocation_mode] || "단위 미확인"}`
+      : seenLabel + " · " + (labels[seen.status] || "확인 불가")),
+    el("small", `${r.allocatable?.source || "출처 미확인"} · ${stamp(r.allocatable?.observed_at)}`));
+}
 function nodeCard(n, s) {
   const slurm = s.backend === "slurm", status = nodeStatus(n, s), cpu = n.resources.cpu || {}, mem = n.resources.memory || {};
   const devices = Object.entries(n.resources).filter(([,r]) => ["gpu", "npu"].includes(r.device_class));
@@ -709,9 +732,7 @@ function nodeCard(n, s) {
   allocation.append(el("span", `미예약 CPU ${fmt(value(cpu.request_headroom, s))} cores`),
     el("span", `미예약 메모리 ${value(mem.request_headroom,s) == null ? "—" : fmt(value(mem.request_headroom,s) / 2 ** 30)} GiB`));
   card.append(allocation);
-  for (const [key, r] of devices) card.append(add(el("div", null, "device-allocation"),
-    add(el("div"), badge(r.device_class.toUpperCase()), el("strong", key)),
-    el("span", `${fmt(value(r.requested,s))} 예약 / ${fmt(value(r.allocatable,s))} ${modes[r.allocation_mode] || "단위 미확인"}`)));
+  for (const [key, r] of devices) card.append(deviceDetection(n, s, key, r));
   const utils = Object.entries(n.telemetry).filter(([k]) => k.endsWith(":utilization"));
   for (const [key, sample] of utils) card.append(measure(key.split(":")[0] + " 사용률", sample, s, 100, "%"));
   if (!utils.length) card.append(el("small", devices.length ? "가속기 사용률 미측정" : "가속기 등록 정보 없음", "node-note"));
@@ -1043,7 +1064,8 @@ function execution() {
   for (const {n,s} of allNodes) {
     const devices=Object.entries(n.resources).filter(([,r])=>["gpu","npu"].includes(r.device_class));
     if (!devices.length) continue;
-    const card=add(el("article",null,"accelerator-signal"),el("small",s.backend==="slurm"?"SLURM":"KUBERNETES"),el("h3",n.node_ref));
+    const card=add(el("article",null,"accelerator-signal"),el("small",s.backend==="slurm"?"SLURM":"KUBERNETES"),el("h3",n.node_ref),badge(nodeStatus(n,s).label,nodeStatus(n,s).ready?"good":"warn"));
+    for (const [key,r] of devices) card.append(deviceDetection(n,s,key,r));
     const utils=Object.entries(n.telemetry).filter(([k])=>k.endsWith(":utilization"));
     if (!utils.length) card.append(el("p","가속기 사용률 미측정","muted"));
     for (const [key,sample] of utils) card.append(measure(key.split(":")[0]+" 사용률",sample,s,100,"%"));
@@ -1067,7 +1089,7 @@ function execution() {
   const search = el("input"); search.id = "resource-search"; search.type = "search"; search.placeholder = "노드 · GPU · NPU 검색"; search.setAttribute("aria-label", "자원 검색"); search.value = resourceSearch;
   search.oninput = () => { resourceSearch = search.value; render(); }; toolbar.append(search); root.append(toolbar);
   const selected = allNodes.filter(({n,s}) => (resourceBackend === "all" || (s.backend || "kubernetes") === resourceBackend)
-    && (n.node_ref + " " + Object.keys(n.resources).join(" ")).toLowerCase().includes(resourceSearch.toLowerCase()));
+    && deviceSearchText(n,s).includes(resourceSearch.toLowerCase()));
   const grid = add(el("div", null, "node-grid"), ...selected.map(({n,s}) => nodeCard(n,s)));
   root.append(selected.length ? grid : empty("조건에 맞는 자원이 없습니다."));
   root.append(el("p", "예약 여유와 실제 사용률은 다릅니다. 오래된 값·미측정 값은 막대를 표시하지 않습니다.", "muted"));
