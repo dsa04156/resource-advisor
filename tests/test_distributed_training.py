@@ -591,6 +591,32 @@ def test_indexed_job_requests_gpus_per_pod_and_keeps_kueue(service, bundle, sour
     assert json.loads(env["RA_DISTRIBUTED_JSON"]["value"])["world_size"] == 2
 
 
+def test_a_job_whose_rendezvous_service_cannot_be_created_is_removed(service, bundle, sources):
+    # Kueue admits the Job at once; without its Service every rank would hold a GPU
+    # until the rendezvous timeout while the attempt is already reported failed.
+    from resource_advisor.backends import SubmissionUnknown
+
+    global SOURCES
+    setup(service, bundle)
+    job = submit(service)
+    SOURCES = sources(job)
+    k = Kubectl()
+    real = k.__call__
+
+    def forbidden(args, stdin=None, **kw):
+        if args[3] == "create" and json.loads(stdin)["kind"] == "Service":
+            k.calls.append((args, stdin))
+            raise BackendError("kubectl exited with code 1")
+        return real(args, stdin, **kw)
+
+    with pytest.raises(SubmissionUnknown):
+        backend(forbidden).submit(job)
+    [delete] = [(args, stdin) for args, stdin in k.calls if deletes_job(args, job)]
+    assert json.loads(delete[1])["preconditions"] == {"uid": "uid-job"}
+    assert json.loads(delete[1])["propagationPolicy"] == "Background"
+    assert k.job is None
+
+
 def test_rendezvous_service_is_created_after_and_owned_by_the_job_uid(service, bundle, sources):
     job, k, adapter = started(service, bundle, sources)
     kinds = [json.loads(stdin)["kind"] for args, stdin in k.calls if args[3] == "create"]

@@ -640,11 +640,32 @@ class KubernetesBackend:
                 )
             )
             if distributed(job):
-                # A lost Service is repaired by reconcile (Job stays Kueue-suspended).
-                self.ensure_service(job, obj)
+                try:
+                    self.ensure_service(job, obj)
+                except BackendError:
+                    # Kueue admits the Job at once: without its rendezvous Service every
+                    # rank would hold its GPU until the rendezvous timeout. Remove exactly
+                    # the Job just created (UID precondition), then report the failure.
+                    self.discard_created(obj)
+                    raise
             return obj["metadata"]["name"]
         except BackendError as exc:
             raise SubmissionUnknown(str(exc)) from exc
+
+    def discard_created(self, obj):
+        options = {
+            "kind": "DeleteOptions",
+            "apiVersion": "v1",
+            "preconditions": {"uid": obj["metadata"]["uid"]},
+            "propagationPolicy": "Background",  # a raw Job DELETE otherwise orphans Pods
+        }
+        name = obj["metadata"]["name"]
+        self.execute(
+            self.prefix
+            + ["delete", "--raw", f"/apis/batch/v1/namespaces/{self.namespace}/jobs/{name}"]
+            + ["-f", "-"],
+            stdin=json.dumps(options),
+        )
 
     def reconcile(self, job):
         raw = self.execute(
