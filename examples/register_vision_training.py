@@ -56,8 +56,9 @@ def build(plan, dataset, observed_at):
     cp_digest = "sha256:" + hashlib.sha256(cp).hexdigest()
     inp_digest = "sha256:" + hashlib.sha256(inp).hexdigest()
     batch, steps = plan["global_batch"], plan["steps"]
+    # A plan may name another entry (e.g. the joint KD runner) and its extra signed flags.
     command = (
-        "python3", "/opt/ra-train/vision_training.py", "--isolated",
+        *plan.get("entry", ("python3", "/opt/ra-train/vision_training.py")), "--isolated",
         "--model", plan["model"], "--data", "/opt/ra-train/data",
         "--dataset-digest", plan["dataset_digest"],
         "--initial-state", plan["initial_state_path"],
@@ -65,6 +66,7 @@ def build(plan, dataset, observed_at):
         "--global-batch", str(batch), "--steps", str(steps),
         "--lr", str(plan["lr"]), "--weight-decay", str(plan["weight_decay"]),
         "--seed", str(plan["seed"]),
+        *plan.get("extra_args", ()),
     )
     quality = QualityPolicy(
         metric="holdout_top1", minimum=0.0, minimum_repeats=1,
@@ -74,7 +76,7 @@ def build(plan, dataset, observed_at):
         code_digest=plan["code_digest"],
         model_digest=cp_digest,
         dataset_version=inp_digest,
-        config_digest=signature({"command": command}),
+        config_digest=plan.get("config_digest") or signature({"command": command}),
         task_type="training",
         input_shape=(batch, 3, 224, 224),
         batch_size=batch,
@@ -83,7 +85,7 @@ def build(plan, dataset, observed_at):
         seed=plan["seed"],
         work_units=steps,
         quality_contract_digest=signature(quality),
-        measurement_boundary=vision_training.BOUNDARY,
+        measurement_boundary=plan.get("measurement_boundary", vision_training.BOUNDARY),
         model_name=plan["model"],
         optimizer="adamw",
         optimizer_parameters={"lr": plan["lr"], "weight_decay": plan["weight_decay"]},
