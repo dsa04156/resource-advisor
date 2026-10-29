@@ -2458,3 +2458,506 @@ tr.selected td {
   .placement-check { padding-top: 0; }
   .placement-action-buttons button { flex: 1 1 auto; }
 }
+
+/* Operations console theme (2026-10-29): slate rack sidebar, compact topbar,
+   dense tables and dot status signals. Layout, routes and controls are unchanged. */
+:root {
+  --ink: #111827;
+  --secondary: #4b5563;
+  --muted: #6b7280;
+  --canvas: #f3f4f6;
+  --inset: #f3f5f8;
+  --line: #e2e5ea;
+  --accent: #2563eb;
+  --accent-soft: #eef3fe;
+  --rack: #111a22;
+  --rack-line: #223040;
+  --rack-text: #9aa7b6;
+  --signal: #3ecf9e;
+  font-size: 13px;
+  line-height: 1.55;
+}
+button,
+input,
+select {
+  border-radius: 6px;
+}
+button {
+  min-height: 34px;
+  font-size: 12px;
+}
+input,
+select {
+  min-height: 34px;
+  padding: 6px 10px;
+}
+:focus-visible {
+  outline: 2px solid #6d9bf5;
+  outline-offset: 2px;
+}
+
+/* Status: a coloured dot plus text; never colour alone. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 2px 9px 2px 8px;
+  font-size: 11px;
+  font-weight: 550;
+  white-space: nowrap;
+  background: #f1f3f6;
+  color: var(--secondary);
+}
+.badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.85;
+  flex: none;
+}
+.badge.good {
+  color: #0f7a55;
+  background: #e8f6ef;
+}
+.badge.bad {
+  color: #b42335;
+  background: #fdecee;
+}
+.badge.warn {
+  color: #8a5a0b;
+  background: #fdf3e0;
+}
+
+/* Rack sidebar (desktop only; mobile keeps the light stacked navigation). */
+@media (min-width: 821px) {
+  .layout {
+    grid-template-columns: 216px minmax(0, 1fr);
+  }
+  .sidebar {
+    background: var(--rack);
+    border-right: 1px solid var(--rack-line);
+    padding: 18px 12px 14px;
+    color: var(--rack-text);
+  }
+  .brand {
+    margin: 0 6px 22px;
+    color: #f3f6f9;
+  }
+  .brand > img {
+    width: 28px;
+    height: 28px;
+  }
+  .brand > span {
+    font-size: 15px;
+    letter-spacing: 0.02em;
+  }
+  .brand span {
+    color: #f3f6f9;
+  }
+  .brand small {
+    color: #6f7d8d;
+  }
+  /* The topbar action is the single global create entry on desktop. */
+  .sidebar-create {
+    display: none;
+  }
+  .sidebar nav {
+    gap: 2px;
+  }
+  .sidebar nav a {
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: var(--rack-text);
+    border-radius: 6px;
+    position: relative;
+  }
+  .sidebar nav a img {
+    filter: invert(0.72);
+    width: 16px;
+    height: 16px;
+  }
+  .sidebar nav a:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e7ecf1;
+  }
+  .sidebar nav a[aria-current="page"] {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font-weight: 600;
+  }
+  .sidebar nav a[aria-current="page"] img {
+    filter: invert(1);
+  }
+  .sidebar nav a[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    left: -12px;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--signal);
+  }
+  .nav-count {
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--rack-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .sidebar-tools summary {
+    color: #7c8a9a;
+    font-size: 12px;
+    min-height: 34px;
+  }
+  .sidebar-tools summary img {
+    filter: invert(0.6);
+  }
+  .sidebar-tools summary:hover {
+    color: #e7ecf1;
+  }
+  .sidebar-tools nav a {
+    font-size: 12px;
+    min-height: 30px;
+    padding: 5px 10px 5px 32px;
+  }
+  .tenant-card {
+    border: 0;
+    border-top: 1px solid var(--rack-line);
+    border-radius: 0;
+    background: none;
+    color: #e7ecf1;
+    padding: 12px 6px 0;
+  }
+  .tenant-card strong {
+    color: #e7ecf1;
+  }
+  .tenant-card small {
+    color: #6f7d8d;
+  }
+  .connection-dot {
+    background: var(--signal);
+    box-shadow: 0 0 0 3px rgba(62, 207, 158, 0.16);
+  }
+  .sidebar :focus-visible {
+    outline-color: var(--signal);
+  }
+}
+
+/* Compact topbar (sticky on desktop) and tabs. */
+@media (min-width: 821px) {
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 15;
+  }
+}
+.topbar {
+  min-height: 60px;
+  padding: 10px 28px;
+  border-bottom: 1px solid var(--line);
+}
+.topbar h1 {
+  font-size: 18px;
+  font-weight: 650;
+  margin: 0;
+  line-height: 1.35;
+}
+.topbar .eyebrow {
+  font-size: 11px;
+  margin: 0;
+}
+.refresh {
+  gap: 10px;
+}
+.refresh button {
+  width: 34px;
+  min-height: 34px;
+  border: 1px solid var(--line);
+}
+.refresh .action-link {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.section-tabs {
+  min-height: 40px;
+  padding: 0 28px;
+  gap: 24px;
+}
+.section-tabs a {
+  min-height: 40px;
+  font-size: 12px;
+  color: var(--secondary);
+}
+.section-tabs a:hover {
+  color: var(--ink);
+}
+main {
+  padding: 20px 28px 36px;
+}
+.view-description {
+  margin: 0 0 16px;
+}
+
+/* Panels and cards: flat, tighter radii and padding. */
+.panel,
+.workspace-panel {
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.panel h2,
+.workspace-panel h2 {
+  font-size: 15px;
+}
+.panel-head,
+.workspace-panel-heading {
+  margin-bottom: 12px;
+}
+.welcome-block {
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+.welcome-block h2 {
+  font-size: 20px;
+}
+.start-guide,
+.home-status-strip {
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.guide-step {
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+.guide-step > .ui-icon {
+  width: 20px;
+  height: 20px;
+}
+.guide-step:hover {
+  border-color: #b9c9ee;
+  background: #fff;
+}
+/* KPI strip: label above a tabular value, a 3px tone rail on the left. */
+.home-status {
+  border-radius: 8px;
+  padding: 10px 14px;
+  border-left: 3px solid #cfd5dd;
+  flex-direction: column;
+  align-items: start;
+  gap: 2px;
+}
+.home-status > span {
+  font-size: 11px;
+}
+.home-status > strong {
+  font-size: 20px;
+  line-height: 1.3;
+}
+.home-status.good {
+  border-left-color: #1f9d6c;
+}
+.home-status.warn {
+  border-left-color: #c48a1d;
+}
+.home-status.bad {
+  border-left-color: #c93b4b;
+}
+.dashboard-stats {
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.dashboard-stat {
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.dashboard-stat strong {
+  font-size: 22px;
+  margin: 4px 0 2px;
+}
+.stats article {
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.stats article strong {
+  font-size: 20px;
+}
+.starter-card,
+.workload-card {
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 132px;
+  gap: 10px;
+}
+.starter-card h3,
+.workload-card h3 {
+  font-size: 14px;
+}
+.node-card,
+.queue-card,
+.fleet-hero {
+  border-radius: 8px;
+}
+
+/* Dense tables: single-line rows where the content allows. */
+.table-wrap {
+  border-radius: 6px;
+}
+th {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  background: #f8f9fb;
+  padding: 8px 12px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line);
+}
+td,
+.workloads-page td {
+  padding: 8px 12px;
+}
+.workloads-page th {
+  padding: 8px 12px;
+}
+tbody tr:hover td {
+  background: #f8fafd;
+}
+tr.selected td,
+tr.selected:hover td {
+  background: var(--accent-soft);
+}
+td small {
+  margin-top: 1px;
+  font-size: 11px;
+}
+td button {
+  min-height: 28px;
+  padding: 3px 10px;
+}
+td .job-select {
+  min-height: 0;
+  padding: 2px 0;
+}
+
+/* Jobs: one create entry (the page menu), filters on a single tool row,
+   and the full width for the table until a workload is selected. */
+.content-shell:has(.new-workload) .refresh .action-link {
+  display: none;
+}
+.workloads-head {
+  margin-bottom: 12px;
+}
+.workloads-head h2 {
+  font-size: 16px;
+}
+.new-workload > button {
+  min-height: 34px;
+  padding: 0 14px;
+}
+.jobs-panel {
+  padding: 12px;
+}
+.jobs-toolbar,
+.view-toolbar {
+  gap: 8px;
+  padding: 0 0 12px;
+}
+.jobs-toolbar select {
+  min-width: 120px;
+}
+.status-filters button {
+  min-height: 28px;
+  padding: 4px 10px;
+}
+.segmented button {
+  min-height: 28px;
+}
+.workloads-split {
+  gap: 16px;
+}
+@media (min-width: 1280px) {
+  .workloads-split:not(.has-selection) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workloads-split:not(.has-selection) .selected-job {
+    display: none;
+  }
+  .selected-job {
+    top: 76px;
+    max-height: calc(100vh - 92px);
+  }
+}
+.selected-job {
+  padding: 16px;
+}
+dialog {
+  border-radius: 10px;
+}
+/* Fleet hero on the light shell: readable headline, one primary and one secondary
+   action, instrument totals in ink (the earlier light override left them faint). */
+.fleet-hero {
+  min-height: 0;
+  border-radius: 8px;
+  padding: 20px 24px;
+  gap: 24px;
+}
+.fleet-hero h2 {
+  color: var(--ink);
+  font-size: 28px;
+  letter-spacing: -0.04em;
+  margin: 4px 0 0;
+}
+.fleet-hero h2 strong {
+  color: #0f7a55;
+}
+.fleet-hero .live-kicker {
+  color: #0f7a55;
+  font-size: 11px;
+  margin: 0 0 12px;
+}
+.fleet-hero .eyebrow {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+.fleet-hero p:not(.eyebrow):not(.live-kicker) {
+  color: var(--secondary);
+  font-size: 12px;
+  margin: 8px 0 16px;
+}
+.hero-actions .action-link,
+.fleet-hero .hero-actions .action-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #fff;
+}
+.hero-actions .action-link:last-child,
+.fleet-hero .hero-actions .action-link:last-child {
+  background: #fff;
+  border-color: var(--line);
+  color: var(--ink);
+}
+.fleet-hero .fleet-instrument {
+  border-radius: 8px;
+  padding: 14px;
+  background: var(--inset);
+}
+.fleet-instrument small {
+  color: var(--muted);
+}
+.fleet-instrument strong {
+  color: var(--ink);
+}
