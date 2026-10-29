@@ -28,7 +28,7 @@ import statistics
 import sys
 import time
 
-from .contracts import ExecutionResult, Measurements, signature
+from .contracts import ExecutionResult, Measurements, now, signature
 from .network_profile import (
     CHUNK,
     StagingReceipt,
@@ -91,6 +91,7 @@ def run(env=None, *, argv=None, write=print):
         raise ValueError("a cache directory or plan cache binding is required")
     try:
         path, sample, state, kind, locator = stage(args.source, digest, size, cache_dir)
+        staged_at = now()
     except Unavailable as exc:
         result = ExecutionResult(
             **identity, outcome="FAILED", evidence_kind="hardware", error_code=f"STAGING_{exc}"
@@ -138,6 +139,7 @@ def run(env=None, *, argv=None, write=print):
         cache_locator=str(path.parent),
         cache_storage_identity=storage_identity(path.parent),
         cache_binding_ref=binding_ref,
+        staged_at=staged_at,
         sample=sample,
     )
     _emit(write, result, receipt)

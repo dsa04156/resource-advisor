@@ -189,12 +189,15 @@ class StagingReceipt(Contract):
     pod_uid: str | None = Field(default=None, max_length=64)
     cache_storage_identity: str | None = Field(default=None, pattern=r"^\d+:\d+$")
     cache_binding_ref: Ref | None = None
+    # When staging finished (before compute); a collector's freshness basis.
+    staged_at: AwareDatetime | None = None
 
     @model_serializer(mode="wrap")
     def preserve_legacy_signature(self, handler):
         return _omit_none(
             handler(self),
             (
+                "staged_at",
                 "source_kind",
                 "identity_source",
                 "node_name",

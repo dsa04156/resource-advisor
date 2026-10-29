@@ -109,8 +109,9 @@ def network_setup(client, pair, *, spare_profile=None, base_compute=2.0, staging
     post(client, "/route-queue-snapshots", queue_snapshot("q-spare", "spare-node"))
     post(client, "/data-locations", measured_location(spec))
     post(client, "/network-profiles", network("test-worker", [5.0, 6.0, 7.0]))
-    post(client, "/network-profiles", spare_profile or network("spare-node", [0.5], cache="hot"))
+    post(client, "/network-profiles", spare_profile or network("spare-node", [0.5]))
     post(client, "/cache-bindings", binding("spare-node"))
+    post(client, "/cache-bindings", binding("test-worker"))
 
 
 def binding(node, *, ref=None, path="/var/cache/ra", mode="persistent", identity="11:22"):
@@ -153,7 +154,7 @@ def test_measured_destination_access_replaces_profile_staging_once(client, pair)
     assert predictions["spare"]["predicted_jct_seconds"] == 7.5
     spare = predictions["spare"]["breakdown"]
     assert spare["staging"]["source"] == "measured_network"
-    assert spare["staging"]["cache_state"] == "hot"
+    assert spare["staging"]["cache_state"] == "cold"
     assert spare["staging"]["seconds"] == 0.5
     assert spare["queue_wait_seconds"] == 0.0 and spare["admission_seconds"] == 1.0
     assert spare["preparation_seconds"] == 2.0 and spare["compute_seconds"] == 4.0
@@ -168,7 +169,7 @@ def test_measured_destination_access_replaces_profile_staging_once(client, pair)
     assert "staging_spread" not in base["uncertainty"]["missing"]
     record = result["plan"]["recommendation"]
     assert record["version"] == "hetero-rec-v2"
-    assert record["network_profiles"]["spare"][0]["ref"] == "net-spare-node-hot"
+    assert record["network_profiles"]["spare"][0]["ref"] == "net-spare-node-cold"
     assert record["topology_snapshot"] is None
 
 
@@ -393,36 +394,50 @@ def hot_only_setup(client, pair, cache_binding):
 
 
 @pytest.mark.parametrize(
-    "cache_binding",
+    "cache_binding,reason",
     [
-        None,
-        binding("spare-node", path="/cache-not-mounted-in-job"),
-        binding("spare-node", identity="99:99"),
-        binding("spare-node", mode="ephemeral"),
+        (None, "NETWORK_CACHE_BINDING_UNPROVEN"),
+        (binding("spare-node", path="/cache-not-mounted-in-job"), "NETWORK_CACHE_BINDING_MISMATCH"),
+        (binding("spare-node", identity="99:99"), "NETWORK_CACHE_BINDING_MISMATCH"),
+        # Same path and identity, but the Kubernetes adapter mounts no persistent cache.
+        (binding("spare-node"), "NETWORK_CACHE_ATTACHMENT_UNSUPPORTED"),
+        (binding("spare-node", mode="ephemeral"), "NETWORK_CACHE_ATTACHMENT_UNSUPPORTED"),
     ],
-    ids=["no-binding", "other-path", "other-storage", "ephemeral"],
+    ids=["no-binding", "other-path", "other-storage", "no-pod-attachment", "ephemeral"],
 )
-def test_hot_evidence_from_another_cache_never_prices_the_job(client, pair, cache_binding):
+def test_hot_evidence_never_prices_a_job_without_an_attached_cache(
+    client, pair, cache_binding, reason
+):
     hot_only_setup(client, pair, cache_binding)
     result = plan(client, candidate_ref="spare")
     assert result["accepted"] is False
     spare = by_candidate(result)["spare"]
     assert spare["predicted_jct_seconds"] is None
-    assert "NETWORK_CACHE_BINDING_UNPROVEN" in spare["reasons"]
+    assert reason in spare["reasons"]
 
 
-def test_unproven_hot_evidence_falls_back_to_cold_and_says_so(client, pair):
-    hot_only_setup(client, pair, binding("spare-node", path="/elsewhere"))
+def test_unattached_hot_evidence_falls_back_to_bound_cold_and_says_so(client, pair):
+    hot_only_setup(client, pair, binding("spare-node"))
     cold = network("spare-node", [3.0], observed_at=now() - timedelta(minutes=5))
     post(client, "/network-profiles", cold)
     spare = by_candidate(plan(client, candidate_ref="spare"))["spare"]
     assert spare["breakdown"]["staging"]["cache_state"] == "cold"
     assert spare["breakdown"]["staging"]["seconds"] == 3.0
     [node] = spare["breakdown"]["staging"]["per_node"]
-    assert node["hot_evidence_rejected"] == "NETWORK_CACHE_BINDING_UNPROVEN"
+    assert node["hot_evidence_rejected"] == "NETWORK_CACHE_ATTACHMENT_UNSUPPORTED"
 
 
-def test_bound_hot_cache_is_handed_to_execution_in_the_signed_plan(client, pair):
+def test_cold_copy_into_other_storage_never_prices_the_bound_destination(client, pair):
+    fast = network(
+        "spare-node", [0.01], cache_locator="/fast-local-cache", cache_storage_identity="1:1"
+    )
+    network_setup(client, pair, spare_profile=fast)
+    spare = by_candidate(plan(client))["spare"]
+    assert spare["predicted_jct_seconds"] is None
+    assert "NETWORK_CACHE_BINDING_MISMATCH" in spare["reasons"]
+
+
+def test_bound_cache_is_handed_to_execution_in_the_signed_plan(client, pair):
     network_setup(client, pair)
     result = plan(client)
     assert result["plan"]["candidate_ref"] == "spare"

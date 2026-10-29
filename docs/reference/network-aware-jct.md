@@ -10,7 +10,7 @@ scheduler is replaced. Kueue/kube-scheduler/Slurm keep admission and node choice
 
 | Piece | Where | Contract |
 |---|---|---|
-| `NetworkProfile` | `network_profile.py`, `POST /network-profiles` (operator) | Immutable, project-scoped. Workload/dataset version, `sha256` content digest, size, source endpoint + sanitized locator, backend/cluster/**node = observer host**, cold/hot cache state, cache locator, `observed_at`, validity, 1–10 complete verified samples, limits. |
+| `NetworkProfile` | `network_profile.py`, `POST /network-profiles` (operator) | Immutable, project-scoped. Workload/dataset version, `sha256` content digest, size, source endpoint + sanitized locator, backend/cluster/node (CLI: node = observer host; Kubernetes: built from RA job receipts whose Downward API Pod UID/node equal the adapter-observed Pod, `identity_source=ra_job_receipts`), observed cache directory identity (`device:inode`), cold/hot cache state, cache locator, `observed_at`, validity, 1–10 complete verified samples, limits. |
 | Measurement CLI | `python -m resource_advisor.network_profile measure` | Runs **on the destination**. Streams HTTP(S) or copies a local/mounted file into an explicit cache dir (`cold`), or reads a verified cache entry (`hot`). Monotonic clock, fsync, full SHA-256. |
 | `StagingReceipt` | `staged_workload.py` → result envelope `staging_receipt` → `Service.ingest` | One attempt's own staging, timed apart from its measured compute span. |
 | Collector | `jct_profile_from_jobs` | If every job has a verified receipt measured on its allocated node, `data_staging` becomes a separate phase (`staging_boundary="separate"`) and is subtracted from the residual. Otherwise staging stays `inside_compute` (unchanged). |
@@ -69,6 +69,35 @@ next, so no arm's job is queued demand in another arm's estimate. `GET` lists th
 `independently_executed` with `matches_frozen_selection` and their outcomes. Shadow estimates
 are never presented as measured performance of an arm that was not executed.
 
+## Execution binding and identity (review rounds 1–2)
+
+- **Cache binding.** `POST /cache-bindings` (operator) declares, per backend/cluster/node, the
+  execution cache path and `persistent` (with observed `device:inode`) or `ephemeral` storage.
+  Every measurement (cold or hot) must match the node's binding path (and identity when
+  persistent) or the node abstains: `NETWORK_CACHE_BINDING_UNPROVEN` (no binding),
+  `NETWORK_CACHE_BINDING_AMBIGUOUS`, `NETWORK_CACHE_BINDING_MISMATCH`.
+- **Hot needs an attachment.** A hot read is admitted only where the cache persists into the
+  job: a Slurm job on the node's own filesystem with a persistent binding. The Kubernetes
+  adapter mounts no cache volume, so Kubernetes hot evidence is rejected
+  (`NETWORK_CACHE_ATTACHMENT_UNSUPPORTED`) and the latest bound cold copy is used, or the node
+  abstains. The plan carries the selected binding (`staging_bindings`, signed); the adapter
+  passes it as `RA_STAGING_BINDINGS_JSON`, the staged workload stages into it, and ingest records
+  `staging_binding_check` MATCHED/MISMATCH in the outcome.
+- **Native identity.** Kubernetes Jobs receive `RA_NODE_NAME`/`RA_POD_NAME`/`RA_POD_UID` via the
+  Downward API. `network_profile_from_receipts` and `jct_profile_from_jobs` accept a receipt only
+  when its node and Pod UID equal the adapter's own Pod observation. The CLI refuses to run
+  inside a Pod (`KUBERNETES_POD_REQUIRES_NATIVE_RECEIPT`); Kubernetes candidates use only
+  receipt-derived evidence (`NETWORK_IDENTITY_NOT_NATIVE` otherwise).
+- **Freshness.** Each receipt carries `staged_at` (end of staging, before compute). It must lie
+  inside the job's native execution span (±5 s); stale samples are dropped and the profile's
+  `observed_at` is the oldest kept sample, never a later job finish.
+- **Total deadline.** HTTP reads are closed by a watchdog at the deadline (tolerance
+  `DEADLINE_TOLERANCE_SECONDS` = 0.25 s), independent of buffering or socket activity.
+- **Frozen comparison arms.** `POST /recommendation-comparisons/{ref}/arms/{arm}/jobs` submits the
+  frozen plan digest (and, for policy arms, the frozen prediction); drift is rejected and
+  recorded as an arm event (`DRIFT_REJECTED`), never reselected. All arms must share the same
+  hard-eligible pool before Static is fixed (`COMPARISON_POOL_MISMATCH`).
+
 ## Runbook
 
 ```bash
@@ -78,7 +107,7 @@ rtk proxy uv run --locked python -m resource_advisor.network_profile measure \
   --source https://storage.example/datasets/v1.bin --sha256 <hex> --size-bytes <n> \
   --cache-dir /var/cache/ra-datasets --mode cold --ref net-<node>-cold \
   --project <project> --workload-ref <workload> --dataset-version <version> \
-  --source-endpoint-ref <endpoint> --backend kubernetes --cluster-ref <cluster> \
+  --source-endpoint-ref <endpoint> --backend slurm --cluster-ref <cluster> \
   --repeats 3 --max-bytes <cap> --timeout-seconds 60 --out net.json
 #    then POST net.json to /api/v1/compute/network-profiles as an operator.
 # 2. Declare DataLocation with content_digest; profile jobs with the staged workload

@@ -14,7 +14,7 @@ import subprocess
 import sys
 import threading
 import uuid
-from datetime import timedelta
+from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
@@ -209,6 +209,11 @@ def test_staged_job_feeds_a_separate_staging_profile_and_a_measured_recommendati
     assert measured.cache_state == "hot" and measured.node_ref == HOST
     assert measured.identity_source == "ra_job_receipts" and measured.native_job_ids == (hot["id"],)
     service.register("network_profile", measured, "team-a")
+    cold_evidence = network_profile_from_receipts(
+        [cold], ref="net-local-cold", valid_for_seconds=3600
+    )
+    assert cold_evidence.observed_at == datetime.fromisoformat(cold["staging"]["staged_at"])
+    service.register("network_profile", cold_evidence, "team-a")
     service.register(
         "cache_binding",
         CacheBinding(
@@ -274,8 +279,11 @@ def test_staged_job_feeds_a_separate_staging_profile_and_a_measured_recommendati
     assert link["state"] == "SUCCEEDED"
     [chosen] = link["recommendation_evidence"]["predictions"]
     staging = chosen["breakdown"]["staging"]
-    assert staging["source"] == "measured_network" and staging["cache_state"] == "hot"
-    assert staging["profile_refs"] == ["net-local-hot"]
+    # The adapter mounts no persistent cache into a Pod, so the newer hot read is
+    # not admitted; the bound cold copy prices the job.
+    assert staging["source"] == "measured_network" and staging["cache_state"] == "cold"
+    assert staging["profile_refs"] == ["net-local-cold"]
+    assert staging["per_node"][0]["hot_evidence_rejected"] == "NETWORK_CACHE_ATTACHMENT_UNSUPPORTED"
     outcome = link["outcome"]
     assert outcome["staging_binding_check"]["status"] == "MATCHED"
     assert outcome["actual"]["status"] == "OBSERVED" and outcome["actual"]["jct_seconds"] > 0
@@ -339,3 +347,31 @@ def test_kubernetes_adapter_supplies_scheduler_owned_identity_and_plan_binding(s
     }
     bound = identity_environment(job)
     assert json.loads(bound["RA_STAGING_BINDINGS_JSON"])["test-worker"]["ref"] == "c"
+
+
+def test_receipt_evidence_keeps_each_staging_time_and_drops_stale_samples(
+    service, local, source, tmp_path
+):
+    spec, cap = local
+    worker = Worker(
+        service, {("team-a", "lab"): LocalProcessBackend(dataset_env(source, tmp_path))}
+    )
+    [row] = rows(service, [run_fixed(service, worker, spec, "t-1")])
+    staged = datetime.fromisoformat(row["staging"]["staged_at"])
+    finished = datetime.fromisoformat(row["body"]["backend_finished_at"])
+    assert staged <= finished
+    profile = network_profile_from_receipts([row], ref="t", valid_for_seconds=3600)
+    assert profile.observed_at == staged  # not the later job finish
+    old = {**row["staging"], "staged_at": (staged - timedelta(hours=2)).isoformat()}
+    with pytest.raises(ValueError, match="outside the native execution span"):
+        network_profile_from_receipts([{**row, "staging": old}], ref="t", valid_for_seconds=3600)
+    aged = {
+        **row,
+        "body": {
+            **row["body"],
+            "execution_started_at": (staged - timedelta(hours=3)).isoformat(),
+        },
+        "staging": old,
+    }
+    with pytest.raises(ValueError, match="stale"):
+        network_profile_from_receipts([aged], ref="t", valid_for_seconds=3600)

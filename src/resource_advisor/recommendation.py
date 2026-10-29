@@ -10,7 +10,7 @@ confidence, guarantees or optimality claims.
 """
 
 from dataclasses import asdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Literal
 
 from pydantic import AwareDatetime, Field, model_serializer, model_validator
@@ -583,21 +583,54 @@ def _measured_transfer(profiles, bindings, location, candidate, cap, target, rec
         binding = own[0] if len(own) == 1 else None
         if binding:
             detail["bindings"][node] = _binding_view(binding)
-        hot_rejected = None
-        if p.cache_state == "hot" and not (
-            binding
-            and binding.storage_mode == "persistent"
-            and p.cache_locator == binding.cache_path
-            and p.cache_storage_identity == binding.storage_identity
-        ):
-            hot_rejected = (
-                "NETWORK_CACHE_BINDING_AMBIGUOUS"
-                if len(own) > 1
-                else "NETWORK_CACHE_BINDING_UNPROVEN"
+        if binding is None:
+            # Every measurement includes destination writes/reads; without the
+            # execution's declared destination it prices no specific storage.
+            return None, {
+                **detail,
+                "reason": "NETWORK_CACHE_BINDING_AMBIGUOUS"
+                if own
+                else "NETWORK_CACHE_BINDING_UNPROVEN",
+                "node_ref": node,
+            }
+
+        def same_destination(q, binding=binding):
+            return q.cache_locator == binding.cache_path and (
+                binding.storage_mode == "ephemeral"
+                or q.cache_storage_identity == binding.storage_identity
             )
-            p = next((q for q in mine if q.cache_state == "cold" and not reason_for(q)), None)
+
+        def hot_attached(binding=binding):
+            # Hot needs storage that persists into the job. The Kubernetes adapter
+            # mounts no cache volume (only read-only runtime/source), so a Pod's
+            # path is a fresh container directory; a Slurm job runs on the node's
+            # own filesystem, where the observed device:inode is the attachment.
+            return str(candidate.backend) == "slurm" and binding.storage_mode == "persistent"
+
+        hot_rejected = None
+        if p.cache_state == "hot" and not (same_destination(p) and hot_attached()):
+            hot_rejected = (
+                "NETWORK_CACHE_ATTACHMENT_UNSUPPORTED"
+                if same_destination(p)
+                else "NETWORK_CACHE_BINDING_MISMATCH"
+            )
+            p = next(
+                (
+                    q
+                    for q in mine
+                    if q.cache_state == "cold" and not reason_for(q) and same_destination(q)
+                ),
+                None,
+            )
             if p is None:
                 return None, {**detail, "reason": hot_rejected, "node_ref": node}
+        elif not same_destination(p):
+            return None, {
+                **detail,
+                "reason": "NETWORK_CACHE_BINDING_MISMATCH",
+                "node_ref": node,
+                "profile_ref": p.ref,
+            }
         stats = summary(p)
         detail["per_node"].append(
             {
@@ -1361,9 +1394,28 @@ def network_profile_from_receipts(rows, *, ref, valid_for_seconds):
     )
     if any(key(r, row) != key(first, rows[0]) for r, row in zip(receipts, rows, strict=True)):
         raise ValueError("receipts differ in dataset, source, node or cache identity")
-    finished = [row["body"].get("backend_finished_at") for row in rows]
-    if any(f is None for f in finished):
-        raise ValueError("native finish time unobserved")
+    # Each sample keeps its own staging time, which must lie inside the job's
+    # native execution span; stale samples are dropped, never refreshed by a
+    # later job finish. Freshness is the oldest kept sample (conservative).
+    at, kept = now(), []
+    for r, row in zip(receipts, rows, strict=True):
+        b = row["body"]
+        start = b.get("execution_started_at") or b.get("started_at")
+        finish = b.get("backend_finished_at")
+        if r.staged_at is None or start is None or finish is None:
+            raise ValueError(f"{row['id']}: staging time or native boundaries unobserved")
+        if not (
+            datetime.fromisoformat(start) - timedelta(seconds=5)
+            <= r.staged_at
+            <= datetime.fromisoformat(finish) + timedelta(seconds=5)
+        ):
+            raise ValueError(f"{row['id']}: staging time outside the native execution span")
+        if (at - r.staged_at).total_seconds() <= valid_for_seconds:
+            kept.append((r, row))
+    if not kept:
+        raise ValueError("every staging observation is stale")
+    receipts, rows = [r for r, _ in kept], [row for _, row in kept]
+    first, body = receipts[0], rows[0]["body"]
     return NetworkProfile(
         ref=ref,
         project_ref=body["spec"]["project_ref"],
@@ -1381,7 +1433,7 @@ def network_profile_from_receipts(rows, *, ref, valid_for_seconds):
         cache_state=first.cache_state,
         cache_locator=first.cache_locator,
         cache_storage_identity=first.cache_storage_identity,
-        observed_at=max(datetime.fromisoformat(f) for f in finished),
+        observed_at=min(r.staged_at for r in receipts),
         valid_for_seconds=valid_for_seconds,
         samples=tuple(r.sample for r in receipts),
         limits={"max_bytes": MAX_BYTES, "timeout_seconds": MAX_SECONDS},
