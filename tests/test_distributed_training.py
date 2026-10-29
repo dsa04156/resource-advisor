@@ -560,7 +560,7 @@ def test_placement_off_the_node_set_fails_and_stops_the_job(service, bundle, sou
         State.FAILED,
         "DISTRIBUTED_PLACEMENT_MISMATCH",
     )
-    assert any(args[3] == "delete" and args[4] == "job" for args, _ in k.calls)
+    assert any(deletes_job(args, job) for args, _ in k.calls)
 
 
 def test_one_rank_failure_fails_the_whole_job_without_reading_a_result(service, bundle, sources):
@@ -675,11 +675,21 @@ def test_terminal_job_never_recreates_its_service(service, bundle, sources):
     assert len([a for a, _ in k.calls if a[3] == "create"]) == created
 
 
+def deletes_job(args, job):
+    """A delete of this attempt's Job, by name or by its raw API path (UID precondition)."""
+    target = " ".join(args[4:])
+    return (
+        args[3] == "delete"
+        and job["body"]["attempt_id"] in target
+        and (args[4] == "job" or "/jobs/" in target)
+    )
+
+
 def test_cancel_deletes_only_the_owned_job(service, bundle, sources):
     job, k, adapter = started(service, bundle, sources)
     adapter.cancel(job)
     deletes = [args for args, _ in k.calls if args[3] == "delete"]
-    assert deletes == [k.calls[-1][0]] and deletes[0][4:6] == ["job", job["body"]["attempt_id"]]
+    assert deletes == [k.calls[-1][0]] and deletes_job(deletes[0], job)
     # The Service is a garbage-collected dependent (ownerReference), never deleted by name.
     assert k.service["metadata"]["ownerReferences"][0]["uid"] == "uid-job"
 
