@@ -2492,8 +2492,10 @@ function jctRuns(sel) {
     const j=r.jct,res=r.result;
     return [add(el("span",null,"job-name"),code(r.job_id),el("small",stamp(r.created_at))),
       add(el("div",null,"jct-reasons"),stateBadge(r.state),r.error?el("small",r.error):null),
-      add(el("span",null,"job-name"),el("strong",r.candidate_ref+" · "+(r.accelerator_model||"모델 미확인")),el("small",r.node_ref)),
-      !res?el("span","결과 없음"):add(el("div"),el("strong",seconds(res.compute_seconds)),el("small",[res.outcome,res.evidence_kind,res.measured?"측정값":"측정 아님",r.quality_passed==null?null:r.quality_passed?"품질 통과":"품질 미달"].filter(Boolean).join(" · "))),
+      add(el("span",null,"job-name"),el("strong",r.candidate_ref+" · "+(r.accelerator_model||"모델 미확인")),el("small",r.node_ref),
+        ...(r.auxiliary_devices||[]).map(a=>el("small",`+ NPU 교사 ${a.accelerator_model||a.device_name||"모델 미기록"} · ${a.node_name||"노드 미기록"} · 사전 예약 보조 장치 (공동 스케줄 예약 아님)`))),
+      !res?el("span","결과 없음"):add(el("div"),el("strong",seconds(res.compute_seconds)),el("small",[res.outcome,res.evidence_kind,res.measured?"측정값":"측정 아님",r.quality_passed==null?null:r.quality_passed?"품질 통과":"품질 미달"].filter(Boolean).join(" · ")),
+        ...(r.auxiliary_devices||[]).map(a=>el("small",`교사 호출 ${a.calls??"—"}회 · 전송 ${a.request_bytes==null?"—":fmt(a.request_bytes/1048576,1)+" MiB"} · NPU 추론 ${seconds(a.server_infer_seconds)} · 왕복 ${seconds(a.client_rpc_seconds)} (학습 시간에 포함)`))),
       j.jct_seconds==null?add(el("div"),el("span","—"),el("small",j.status+(j.reason?" · "+j.reason:""))):add(el("div"),el("strong",seconds(j.jct_seconds)),el("small",j.source==="jct_outcome"?"기록된 결과 · 제출→종료":"네이티브 제출→종료 시각")),
       add(el("div",null,"jct-reasons"),jctOpenJob(r.job_id),r.tracking?.run_id?researchButton("MLflow",()=>openExperiment(r.tracking.run_id)):el("small","MLflow 기록 없음"))];
   }));

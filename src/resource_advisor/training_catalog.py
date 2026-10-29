@@ -17,6 +17,29 @@ from .jct_report import (
     _run_counts,
 )
 
+TEACHER_KEYS = (
+    "schema",
+    "role",
+    "device_class",
+    "device_name",
+    "accelerator_model",
+    "model_sha256",
+    "model_file",
+    "runtime",
+    "runtime_version",
+    "target_cores",
+    "node_name",
+    "pod_uid",
+    "reservation",
+    "calls",
+    "request_bytes",
+    "response_bytes",
+    "client_rpc_seconds",
+    "server_infer_seconds",
+    "server_handler_seconds",
+    "objective",
+)
+
 POLICY_ORDER = {"profile_only": 0, "profile_queue": 1, "profile_queue_network": 2}
 ACCELERATOR_CLASSES = {"gpu", "npu", "unknown"}
 
@@ -52,6 +75,41 @@ def condition(identity):
         "seed": i.seed,
         "measurement_boundary": i.measurement_boundary,
     }
+
+
+def _auxiliary(service, conn, project, runs):
+    """Attach the NPU teacher attested in each run's own training receipt.
+
+    The receipt is persisted on native completion; only whitelisted summary keys
+    are projected. The teacher is a pre-reserved auxiliary Pod, never presented
+    as part of the GPU job's scheduler reservation.
+    """
+    from sqlalchemy import select
+
+    from .store import jobs
+
+    for run in runs:
+        run["auxiliary_devices"] = []
+        attempt = conn.execute(
+            select(jobs.c.body["attempt_id"].as_string()).where(
+                jobs.c.project == project, jobs.c.id == run["job_id"]
+            )
+        ).scalar()
+        receipt = service.store.get(conn, "training_receipt", attempt) if attempt else None
+        if not receipt or receipt["project"] != project:
+            continue
+        teacher = (receipt["body"].get("output_checkpoint") or {}).get("teacher")
+        if isinstance(teacher, dict):
+            run["auxiliary_devices"].append(
+                {
+                    **{k: teacher.get(k) for k in TEACHER_KEYS},
+                    "source": "training_receipt.output_checkpoint.teacher",
+                    "reservation_kind": (
+                        "pre-reserved auxiliary Pod; not a joint scheduler reservation"
+                    ),
+                }
+            )
+    return runs
 
 
 def _estimate_profile(store, conn, project, profile_ref):
@@ -371,7 +429,11 @@ def training_catalog(service, project, model=None, config=None, profile_ref=None
         for key, members in ordered:
             workloads = []
             for s in sorted(members, key=lambda s: s.ref):
-                recent = _recent_runs(service, conn, project, s.ref) if key == chosen_key else []
+                recent = (
+                    _auxiliary(service, conn, project, _recent_runs(service, conn, project, s.ref))
+                    if key == chosen_key
+                    else []
+                )
                 workloads.append(
                     {
                         "workload_ref": s.ref,

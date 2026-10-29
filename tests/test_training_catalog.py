@@ -409,3 +409,47 @@ def test_inventory_coverage_never_counts_shared_slots_as_gpus_or_npus_as_trainab
     assert slot["training_reason"] == "NO_TRAINING_VARIANT"
     assert coverage[("npu-node", "vendor/npu")]["training_reason"] == "NPU_NO_TRAINING_RUNTIME"
     assert coverage[("npu-node", "vendor/npu")]["physical_devices"] == 2
+
+
+def test_run_rows_show_the_attested_npu_teacher_from_the_training_receipt(client, pair, service):
+    training(service, pair, "mnv3-a", code="a")
+    training(service, pair, "mnv3-b", code="b")
+    settle = network_rec.finish_with_native_timestamps(service, seconds=7.0)
+    job = service.submit("team-a", JobRequest(workload_ref="mnv3-a", candidate_ref="base"), "kd")
+    settle(job["job_id"])
+    teacher = {
+        "schema": "ra-kd-teacher-summary-v1",
+        "role": "frozen-teacher-forward",
+        "device_class": "npu",
+        "accelerator_model": "ARIES2",
+        "node_name": "npu-node",
+        "pod_uid": "teacher-uid",
+        "model_sha256": "48b1ca4e",
+        "reservation": {"resource": "mobilint.com/npu", "count": 1},
+        "calls": 50,
+        "request_bytes": 50 * 16 * 602112,
+        "client_rpc_seconds": 2.5,
+        "server_infer_seconds": 1.2,
+        "untrusted_extra": "x" * 10,
+    }
+    # The worker persists the attested receipt on native completion; a test double here.
+    with service.store.transaction() as conn:
+        service.store.put(
+            conn,
+            "training_receipt",
+            job["attempt_id"],
+            "team-a",
+            {"job_id": job["job_id"], "output_checkpoint": {"teacher": teacher}},
+        )
+    key = models(client)["mobilenet_v3_small"]["model_key"]
+    workloads = get(client, f"/training-catalog?model={key}")["selected"]["configs"][0]["workloads"]
+    runs = {w["workload_ref"]: w["recent_runs"] for w in workloads}
+    [run] = runs["mnv3-a"]
+    [aux] = run["auxiliary_devices"]
+    assert aux["pod_uid"] == "teacher-uid" and aux["device_class"] == "npu"
+    assert aux["calls"] == 50 and aux["server_infer_seconds"] == 1.2
+    assert "untrusted_extra" not in aux  # only whitelisted receipt keys are projected
+    assert (
+        aux["reservation_kind"] == "pre-reserved auxiliary Pod; not a joint scheduler reservation"
+    )
+    assert get(client, "/training-catalog", token="other-operator")["models"] == []
