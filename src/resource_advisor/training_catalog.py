@@ -40,6 +40,24 @@ TEACHER_KEYS = (
     "objective",
 )
 
+# Training objectives this repository's runtimes actually execute, by signed boundary.
+OBJECTIVES = {
+    "vision-adamw-fixed-steps-synchronized-v1": "gpu-supervised",
+    "vision-kd-mobilint-teacher-fixed-steps-v1": "gpu-kd-mobilint-teacher",
+}
+TEACHER_POD_FLAG = "--teacher-pod-uid"
+
+
+def teacher_pin(command):
+    """The teacher Pod UID a signed joint runtime command pins, if any."""
+    for i, arg in enumerate(command or ()):
+        if arg == TEACHER_POD_FLAG and i + 1 < len(command):
+            return command[i + 1]
+        if str(arg).startswith(TEACHER_POD_FLAG + "="):
+            return str(arg).split("=", 1)[1]
+    return None
+
+
 POLICY_ORDER = {"profile_only": 0, "profile_queue": 1, "profile_queue_network": 2}
 ACCELERATOR_CLASSES = {"gpu", "npu", "unknown"}
 
@@ -120,7 +138,9 @@ def _auxiliary(service, conn, project, runs):
     return runs
 
 
-def _estimate_profile(store, conn, project, profile_ref):
+def _estimate_profile(store, conn, project, profile_ref, targets=()):
+    """An explicit choice wins; otherwise prefer profiles whose scheduler bindings
+    cover every (backend, cluster) of the selected candidates, then policy order."""
     profiles = [
         x["body"]
         for x in store.list(conn, "scheduling_profile", project)
@@ -128,9 +148,18 @@ def _estimate_profile(store, conn, project, profile_ref):
     ]
     if profile_ref:
         return next((p for p in profiles if p["ref"] == profile_ref), None), profiles
+
+    def binds(p):
+        bound = {(b["backend"], b["cluster_ref"]) for b in p.get("bindings", [])}
+        return all(t in bound for t in targets)
+
     ranked = sorted(
         profiles,
-        key=lambda p: (POLICY_ORDER[p["policy"]["recommendation"]["policy"]], p["ref"]),
+        key=lambda p: (
+            binds(p),
+            POLICY_ORDER[p["policy"]["recommendation"]["policy"]],
+            p["ref"],
+        ),
     )
     return (ranked[-1] if ranked else None), profiles
 
@@ -202,6 +231,12 @@ def _combination(
     strategy = distributed.strategy if distributed else "single"
     verified = row.get("verification") == "TRAINING_VERIFIED"
     blockers = list(row["submission_reasons"])
+    variant = service.store.get(conn, "variant", row.get("variant_ref"))
+    pinned = teacher_pin(((variant or {}).get("body") or {}).get("command"))
+    if pinned:
+        # A pre-reserved auxiliary teacher cannot be proven current from here; only a
+        # dedicated provisioning flow may run it again. Past receipts stay visible.
+        blockers.append("AUXILIARY_RESERVATION_REQUIRED")
     if not verified:
         blockers.append("TRAINING_NOT_VERIFIED")
     if strategy != "single" and not verified:
@@ -287,7 +322,14 @@ def _combination(
             "host_memory_mib": context.resources.host_memory_mib,
         },
         "verification": row.get("verification"),
-        "submittable_now": row["submittable_now"],
+        "submittable_now": row["submittable_now"] and not pinned,
+        "auxiliary_reservation": None
+        if not pinned
+        else {
+            "resource": "mobilint.com/npu",
+            "pinned_pod_uid": pinned,
+            "status": "unproven: requires a dedicated provisioning flow",
+        },
         "blockers": blockers,
         "warnings": row.get("submission_warnings", []),
         "availability": (evaluation or {}).get("availability"),
@@ -448,7 +490,12 @@ def training_catalog(service, project, model=None, config=None, profile_ref=None
             groups.items(), key=lambda kv: (condition(kv[1][0].identity)["steps"], kv[0])
         )
         chosen_key = config if config in groups else ordered[0][0]
-        profile, profiles = _estimate_profile(store, conn, project, profile_ref)
+        targets = {
+            (str(c["backend"]), c.get("cluster_ref"))
+            for s in groups[chosen_key]
+            for c in rows[s.ref]
+        }
+        profile, profiles = _estimate_profile(store, conn, project, profile_ref, targets)
         queue_age = min(
             (
                 p["policy"]["recommendation"].get("max_queue_age_seconds", DEFAULT_QUEUE_AGE)
@@ -499,6 +546,7 @@ def training_catalog(service, project, model=None, config=None, profile_ref=None
                 {
                     "config_key": key,
                     "condition": condition(members[0].identity),
+                    "objective": OBJECTIVES.get(members[0].identity.measurement_boundary),
                     "workloads": workloads,
                 }
             )

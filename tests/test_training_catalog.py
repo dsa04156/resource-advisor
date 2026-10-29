@@ -33,6 +33,7 @@ def training(
     task_type="training",
     verification="TRAINING_VERIFIED",
     parameters=None,
+    command=None,
     **identity_change,
 ):
     """A registered training workload on the fixture GPU candidates (base, spare)."""
@@ -58,6 +59,7 @@ def training(
             "model_digest": identity.model_digest,
             "verification": verification,
             "validation_refs": ("fixture-training-evidence",),
+            **({"command": command} if command else {}),
         }
     )
     candidates = tuple(
@@ -526,3 +528,60 @@ def test_single_device_combination_has_one_member(client, pair, service):
         {"node_ref": "test-worker", "accelerator_model": "fixture-gpu", "gpus": 1,
          "capability_ref": "cap-1", "per_rank_batch_size": 1}
     ]  # fmt: skip
+
+
+KD_COMMAND = ("python", "-m", "resource_advisor.vision_joint_training", "--teacher-url",
+              "http://10.244.5.126:8080", "--teacher-pod-uid", "b46b90a5-340d-4ee6-95c8-d6dd4c8dd3a4")  # fmt: skip
+
+
+def test_teacher_pinned_variant_requires_a_provisioned_auxiliary_reservation(client, pair, service):
+    training(service, pair, "mnv3-kd", code="kd", command=KD_COMMAND,
+             measurement_boundary="vision-kd-mobilint-teacher-fixed-steps-v1")  # fmt: skip
+    key = models(client)["mobilenet_v3_small"]["model_key"]
+    combos = get(client, f"/training-catalog?model={key}")["selected"]["combinations"]
+    assert combos and all(c["submittable_now"] is False for c in combos)
+    assert all("AUXILIARY_RESERVATION_REQUIRED" in c["blockers"] for c in combos)
+    assert combos[0]["auxiliary_reservation"] == {
+        "resource": "mobilint.com/npu",
+        "pinned_pod_uid": "b46b90a5-340d-4ee6-95c8-d6dd4c8dd3a4",
+        "status": "unproven: requires a dedicated provisioning flow",
+    }
+
+
+def test_known_training_objectives_are_named_and_unknown_ones_stay_unnamed(client, pair, service):
+    training(service, pair, "mnv3-ce", code="ce",
+             measurement_boundary="vision-adamw-fixed-steps-synchronized-v1")  # fmt: skip
+    training(service, pair, "mnv3-kd", code="kd", command=KD_COMMAND,
+             measurement_boundary="vision-kd-mobilint-teacher-fixed-steps-v1")  # fmt: skip
+    training(service, pair, "mnv3-other", code="o", measurement_boundary="custom-boundary")
+    key = models(client)["mobilenet_v3_small"]["model_key"]
+    configs = get(client, f"/training-catalog?model={key}")["selected"]["configs"]
+    objective = {c["workloads"][0]["workload_ref"]: c["objective"] for c in configs}
+    assert objective == {
+        "mnv3-ce": "gpu-supervised",
+        "mnv3-kd": "gpu-kd-mobilint-teacher",
+        "mnv3-other": None,
+    }
+
+
+def test_default_estimate_profile_binds_the_selected_candidates_cluster(client, pair, service):
+    training(service, pair, "mnv3-a")
+    post(
+        client,
+        "/scheduling-profiles",
+        hetero.scheduling_profile("only", {"policy": "profile_only"}),
+    )
+    elsewhere = hetero.scheduling_profile("queue-elsewhere", {"policy": "profile_queue"})
+    elsewhere = elsewhere.model_copy(
+        update={
+            "bindings": tuple(
+                b.model_copy(update={"cluster_ref": "other"}) for b in elsewhere.bindings
+            )
+        }
+    )
+    post(client, "/scheduling-profiles", elsewhere)
+    key = models(client)["mobilenet_v3_small"]["model_key"]
+    selected = get(client, f"/training-catalog?model={key}")["selected"]
+    assert selected["estimate_profile"]["ref"] == "only"  # binds cluster lab, outranks policy order
+    chosen = get(client, f"/training-catalog?model={key}&profile_ref=queue-elsewhere")["selected"]
+    assert chosen["estimate_profile"]["ref"] == "queue-elsewhere"  # explicit choice respected

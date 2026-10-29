@@ -2597,6 +2597,8 @@ const trainText={MODEL_NAME_MISSING:"모델 이름이 등록되지 않음",NO_TR
   NPU_NO_TRAINING_RUNTIME:"NPU 런타임은 학습을 지원하지 않음 (추론 전용)",NO_TRAINING_VARIANT:"학습 검증된 실행 환경이 등록되지 않음",DEVICE_CLASS_UNREPORTED:"장치 종류가 보고되지 않음",
   PROFILE_MISSING:"이 조건·장치의 측정 프로파일 없음",PROFILE_STALE:"측정 프로파일이 오래됨",NO_FRESH_INVENTORY:"최신 인벤토리 없음",OBSERVED_REQUEST_HEADROOM:"요청 여유 관측",
   WAIT_FOR_BACKEND_RESOURCES:"자원 대기 중",OBSERVED_NODE_UNAVAILABLE:"노드 사용 불가"};
+trainText.AUXILIARY_RESERVATION_REQUIRED="NPU 교사 예약을 지금 확인할 수 없음 · 전용 준비 절차로만 다시 실행 (지난 결과는 유지)";
+const trainObjective={"gpu-supervised":"GPU 학습","gpu-kd-mobilint-teacher":"GPU+Mobilint KD"};
 const trainReason=r=>trainText[r]||reasonText(r);
 const trainStrategy={single:"단일 장치",ddp:"DDP (데이터 병렬)",fsdp:"샤딩 (FSDP)",zero:"샤딩 (ZeRO)"};
 const trainJct={NO_ESTIMATE_POLICY:"추정 정책 없음",PILOT_REQUIRED:"측정 필요 · 파일럿 실행 전",EXCLUDED_BY_POLICY:"추정 정책에서 제외",UNKNOWN:"알 수 없음",ESTIMATE_ERROR:"추정 오류"};
@@ -2633,11 +2635,11 @@ function trainUnqualified() {
 }
 function trainCondition(sel) {
   const root=el("div"),selector=el("select");selector.id="train-config";selector.dataset.keepFocus="true";
-  for(const c of sel.configs){const k=c.condition;selector.append(new Option(`${k.steps} step · 배치 ${k.batch_size}${k.global_batch_size?" (전역 "+k.global_batch_size+")":""} · ${k.precision} · ${k.optimizer||"최적화기 미기록"} · 등록 ${c.workloads.length}개`,c.config_key));}
+  for(const c of sel.configs){const k=c.condition;selector.append(new Option(`${c.objective?trainObjective[c.objective]:"학습 방식 미분류 ("+k.measurement_boundary+")"} · ${k.steps} step · 배치 ${k.batch_size}${k.global_batch_size?" (전역 "+k.global_batch_size+")":""} · ${k.precision} · ${k.optimizer||"최적화기 미기록"} · 등록 ${c.workloads.length}개`,c.config_key));}
   selector.value=sel.config_key;selector.onchange=()=>{trainConfig=selector.value;trainUpdated=0;render();};
   const label=el("label","등록된 학습 조건");label.htmlFor=selector.id;
   const c=sel.configs.find(x=>x.config_key===sel.config_key),k=c.condition,facts=el("dl",null,"policy-facts");
-  for(const [a,b] of [["학습 step",String(k.steps)],["배치",`${k.batch_size}${k.global_batch_size?" · 전역 "+k.global_batch_size:""} · 누적 ${k.gradient_accumulation}`],["정밀도",k.precision],["최적화기",k.optimizer?k.optimizer+(Object.keys(k.optimizer_parameters).length?" "+JSON.stringify(k.optimizer_parameters):""):"기록 없음"],["입력",k.input_shape.join("×")],["데이터",k.dataset_version.slice(0,19)+"…"],["시드",String(k.seed)],["측정 경계",k.measurement_boundary]])facts.append(el("dt",a),el("dd",b));
+  for(const [a,b] of [["학습 방식",c.objective?trainObjective[c.objective]:"미분류 · "+k.measurement_boundary],["학습 step",String(k.steps)],["배치",`${k.batch_size}${k.global_batch_size?" · 전역 "+k.global_batch_size:""} · 누적 ${k.gradient_accumulation}`],["정밀도",k.precision],["최적화기",k.optimizer?k.optimizer+(Object.keys(k.optimizer_parameters).length?" "+JSON.stringify(k.optimizer_parameters):""):"기록 없음"],["입력",k.input_shape.join("×")],["데이터",k.dataset_version.slice(0,19)+"…"],["시드",String(k.seed)],["측정 경계",k.measurement_boundary]])facts.append(el("dt",a),el("dd",b));
   root.append(add(el("div",null,"view-toolbar jct-toolbar"),label,selector),facts,
     el("p","등록된 조건만 고를 수 있습니다. 값을 바꾸려면 새 학습 작업을 등록하고 다시 검증해야 합니다. 같은 조건이라도 등록 작업이 다르면 측정 기록을 공유하지 않습니다.","muted"),
     table(["등록 작업","식별 서명","실행"],c.workloads.map(w=>[code(w.workload_ref),code(w.identity_signature.slice(0,19)+"…"),el("span",`${w.runs.total}건 (성공 ${w.runs.succeeded})`)])));
