@@ -329,6 +329,35 @@ def test_rank_records_accept_distinct_members_with_identical_replicas():
     assert [r["rank"] for r in vt.check_ranks(records, 2)] == [0, 1]
 
 
+def test_rank_records_accept_several_local_ranks_per_pod():
+    same_pod = dict(node="node-0", pod_uid="uid-0")
+    records = [rank_record(r, local_rank=r % 2, **same_pod) for r in range(2)]
+    records += [rank_record(r, local_rank=r % 2) for r in (2, 3)]
+    for r in records[2:]:
+        r.update(node="node-1", pod_uid="uid-1")
+    assert len(vt.check_ranks(records, 4, local_world=2)) == 4
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        # two ranks claiming the same local GPU of one Pod
+        [rank_record(0, node="n", pod_uid="u"), rank_record(1, node="n", pod_uid="u")],
+        # one Pod short of its local ranks while another Pod has three
+        [rank_record(0, node="n", pod_uid="u")]
+        + [rank_record(r, node="m", pod_uid="v", local_rank=r - 1) for r in (1, 2, 3)],
+        # one Pod reported on two nodes
+        [
+            rank_record(0, node="n", pod_uid="u"),
+            rank_record(1, node="m", pod_uid="u", local_rank=1),
+        ],
+    ],
+)
+def test_rank_records_refuse_bad_local_rank_cardinality(bad):
+    with pytest.raises(RuntimeError):
+        vt.check_ranks(bad, len(bad), local_world=2)
+
+
 def test_rank_local_batchnorm_buffers_may_differ_but_parameters_may_not():
     # DDP broadcasts rank 0 buffers before each forward; the last forward updates them locally.
     buffers = [rank_record(0), rank_record(1, output_checkpoint_digest="sha256:" + "5" * 64)]
@@ -412,6 +441,40 @@ def test_staging_runs_between_two_barriers_and_reports_both_durations():
     assert calls == ["barrier", "stage", "barrier"]
     assert receipt == {"node": "n", "bytes": 3} and a.data == "/staged"
     assert 0 <= own <= window
+    calls.clear()
+    vt.run_staging(
+        args(), stage, lambda: calls.append("barrier"), agree=lambda ok: calls.append(ok) or ok
+    )
+    assert calls == ["barrier", "stage", True]
+
+
+class StageFailed(Exception):
+    code = "STAGING_SOURCE_UNREACHABLE"
+
+
+def test_failed_member_staging_fails_every_rank_without_a_bare_barrier():
+    seen = []
+
+    def boom(a):
+        raise StageFailed()
+
+    with pytest.raises(StageFailed):
+        vt.run_staging(args(), boom, lambda: None, agree=lambda ok: seen.append(ok) or ok)
+    assert seen == [False]
+    with pytest.raises(RuntimeError) as peer:
+        vt.run_staging(args(), lambda a: {"n": 1}, lambda: None, agree=lambda ok: False)
+    assert peer.value.code == "STAGING_PEER_FAILED"
+
+
+@pytest.mark.skipif(importlib.util.find_spec("torch") is None, reason="torch not installed")
+def test_sync_batchnorm_keeps_the_pinned_state_and_keys():
+    import torch
+
+    model = torch.nn.Sequential(torch.nn.Conv2d(3, 4, 3), torch.nn.BatchNorm2d(4))
+    before = vt.checkpoint_digest(model)
+    synced = vt.sync_batchnorm(model)
+    assert any(isinstance(m, torch.nn.SyncBatchNorm) for m in synced.modules())
+    assert vt.checkpoint_digest(synced) == before
 
 
 @pytest.mark.parametrize("bad", [None, ["x"], {"x": float("nan")}])

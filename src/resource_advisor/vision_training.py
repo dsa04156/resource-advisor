@@ -256,14 +256,25 @@ def gather_ranks(record):
     return records
 
 
-def check_ranks(records, world):
-    """Exactly one record per rank on distinct Pods/nodes; replicas start equal and end equal and changed."""
+def check_ranks(records, world, local_world=1):
+    """One record per rank; every Pod on its own node runs exactly local ranks 0..local_world-1.
+
+    Replicas start equal, end with equal synchronized parameters, and changed.
+    """
     records = sorted(records, key=lambda r: r["rank"])
     if [r["rank"] for r in records] != list(range(world)):
         raise RuntimeError("distributed rank records missing or duplicated")
     if any(not r.get(k) for r in records for k in RANK_KEYS):
         raise RuntimeError("distributed rank record lacks observed identity")
-    if len({r["pod_uid"] for r in records}) != world or len({r["node"] for r in records}) != world:
+    pods = {}
+    for r in records:
+        pods.setdefault(r["pod_uid"], []).append(r)
+    for members in pods.values():
+        if len({r["node"] for r in members}) != 1 or sorted(
+            r["local_rank"] for r in members
+        ) != list(range(local_world)):
+            raise RuntimeError("distributed Pod does not hold exactly its local ranks on one node")
+    if len(pods) * local_world != world or len({r["node"] for r in records}) != len(pods):
         raise RuntimeError("distributed ranks do not run on distinct Pods and nodes")
     # BatchNorm buffers are rank-local after the last forward; parameters must match.
     if len({(r["initial_checkpoint_digest"], r["output_parameter_digest"]) for r in records}) != 1:
@@ -273,18 +284,39 @@ def check_ranks(records, world):
     return records
 
 
-def run_staging(args, stage, barrier):
-    """stage(args) between two barriers: every member starts together and compute starts after the slowest."""
+class StagingPeerFailed(RuntimeError):
+    code = "STAGING_PEER_FAILED"
+
+
+def run_staging(args, stage, barrier, agree=None):
+    """stage(args) between a barrier and an agreement: every member starts together and
+    compute starts after the slowest. ``agree(ok)`` (an all-reduced MIN under DDP) replaces
+    the closing barrier so one member's failure fails every rank instead of hanging them."""
     barrier()
     window_start = time.perf_counter()
-    receipt = stage(args)
+    try:
+        receipt = stage(args)
+        if not isinstance(receipt, dict):
+            raise RuntimeError("staging receipt must be a JSON object")
+        json.dumps(receipt, allow_nan=False)
+    except BaseException:
+        if agree is not None:
+            agree(False)
+        raise
     own = time.perf_counter() - window_start
-    barrier()
+    if agree is None:
+        barrier()
+    elif not agree(True):
+        raise StagingPeerFailed("another rank failed to stage")
     window = time.perf_counter() - window_start
-    if not isinstance(receipt, dict):
-        raise RuntimeError("staging receipt must be a JSON object")
-    json.dumps(receipt, allow_nan=False)
     return receipt, own, window
+
+
+def sync_batchnorm(model):
+    """Global-batch BatchNorm under DDP (same statistics as one device at the global batch)."""
+    import torch
+
+    return torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
 
 
 def run(args, environ=os.environ, stage=None):
@@ -317,12 +349,16 @@ def run(args, environ=os.environ, stage=None):
         dist.init_process_group(context["distributed"]["collective"])
     staging = None
     if stage is not None:
-        barrier = (
-            (lambda: dist.barrier(device_ids=[local_rank]))
-            if args.strategy == "ddp"
-            else (lambda: None)
-        )
-        staging = run_staging(args, stage, barrier)
+        if args.strategy == "ddp":
+
+            def agree(ok):
+                flag = torch.tensor([1 if ok else 0], device=device)
+                dist.all_reduce(flag, op=dist.ReduceOp.MIN)
+                return bool(flag.item())
+
+            staging = run_staging(args, stage, lambda: dist.barrier(device_ids=[local_rank]), agree)
+        else:
+            staging = run_staging(args, stage, lambda: None)
 
     prep_start = time.perf_counter()
     binding = json.loads(environ["RA_TRAINING_BINDING"]) if args.isolated else None
@@ -342,7 +378,9 @@ def run(args, environ=os.environ, stage=None):
     model = model.to(device)
     train_x, train_y = data["train"][0].to(device), data["train"][1].to(device)
     if args.strategy == "ddp":
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[local_rank])
+        model = torch.nn.parallel.DistributedDataParallel(
+            sync_batchnorm(model), device_ids=[local_rank]
+        )
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     loss_fn = torch.nn.CrossEntropyLoss()
     batches = batch_schedule(len(train_y), args.global_batch, args.steps, args.seed)
@@ -416,7 +454,7 @@ def run(args, environ=os.environ, stage=None):
                 staging_seconds=staging[1],
                 staging_window_seconds=staging[2],
             )
-        ranks = check_ranks(gather_ranks(mine), world)
+        ranks = check_ranks(gather_ranks(mine), world, int(environ.get("LOCAL_WORLD_SIZE", "1")))
         torch.distributed.destroy_process_group()
     if rank != 0:
         return None
@@ -461,6 +499,9 @@ def run(args, environ=os.environ, stage=None):
         "model_name": args.model,
         "strategy": args.strategy,
         "world_size": world,
+        "batchnorm": "sync-global-batch"
+        if args.strategy == "ddp"
+        else "single-device-global-batch",
         "global_batch": args.global_batch,
         "optimizer": {"name": "AdamW", "lr": args.lr, "weight_decay": args.weight_decay},
         "dataset_manifest_digest": args.dataset_digest,
