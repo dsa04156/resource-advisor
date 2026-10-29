@@ -9,3 +9,13 @@
 독립 리뷰: Standards 초기 상세 영역 상태 결함 수정 후 0건. Spec 초기 미계산 항목 분리·상세 영역 상태 결함 수정 후 0건. 실제 브라우저에서 발견한 정책 전달 문제도 수정했다.
 
 이미지는 기존 운영 이미지에 console.js와 console.css만 추가한 sha256:ee1fadf939743b6227ca44be344581d3f592eda68476e750e4fde51b2d8f3a8e다. 운영 응답의 두 파일 해시가 배포 파일과 일치하며 API rollout 완료를 확인했다.
+
+## 배포 화면 캡처
+
+### PC (1440px)
+
+![PC 자원 조합·예상시간·선택 화면](evidence/console-resource-selection-20261029/desktop.png)
+
+### 모바일 (390px)
+
+![모바일 자원 조합·예상시간·선택 화면](evidence/console-resource-selection-20261029/mobile.png)
