@@ -123,6 +123,45 @@ rtk proxy uv run --locked python examples/network_jct_demo.py --out /tmp/nj-demo
 rtk proxy uv run --locked pytest -q tests/test_staged_execution.py
 ```
 
+## Staged accelerator batch
+
+`python -m resource_advisor.staged_accelerator_workload` is the accelerator counterpart of
+`staged_workload`: the same dataset arguments, `RA_STAGING_BINDINGS_JSON`, Downward API
+identity, `StagingReceipt` and `RESOURCE_ADVISOR_RESULT` envelope, but the staged bytes are
+fed to a qualified native runtime instead of a CPU SHA-256 pass.
+
+```sh
+python -m resource_advisor.staged_accelerator_workload --runtime cuda|hailo|mobilint-candy \
+  --workload-identity JSON [--config /opt/inference/model.json] [--fixture /opt/fixture] \
+  --source URL --sha256 HEX --size-bytes N --source-endpoint-ref REF --cache-dir DIR
+```
+
+- `--workload-identity` (or `RA_WORKLOAD_IDENTITY_JSON`) is the accepted `WorkloadIdentity`; it
+  must hash to `RA_WORKLOAD_SIGNATURE`, with `dataset_version = sha256:<staged digest>`,
+  `input_shape` = the staged array shape, `work_units = RA_WORK_UNITS` and `model_digest` =
+  `sha256:` + the source model the native runtime reports. Otherwise `WORKLOAD_CONTRACT_MISMATCH`
+  before any transfer.
+- Order: stage (≤32 MiB) → re-read and verify the staged bytes → `np.load(allow_pickle=False)`
+  and shape/dtype/finite checks → native initialization (`inference_runtime.Runtime` with its
+  fixed-100 qualification, or `npu_probe.mobilint(inputs=…, rounds=…)`) → runtime
+  source-model identity check → `RA_WORK_UNITS` (1–20) timed passes over every staged tensor.
+  `elapsed_seconds` is the passes only; staging is the receipt; initialization is residual
+  preparation (also printed as `preparation_seconds` in `RESOURCE_ADVISOR_STAGED_ACCELERATOR_REPORT`).
+- CUDA/Hailo ResNet50: input `(N,224,224,3)` float32 in [0,255]; every tensor must equal a
+  qualified fixture sample (`tensor_sha256` in the manifest), so a staged object is a subset of
+  `/opt/fixture/inputs.npy`. Quality is top-1 agreement with `reference_top1`.
+- Mobilint ARIES2 Candy: input `(N,224,344,3)` float32; quality is output repeatability only
+  (`runtime-repeatability-only`, `task_accuracy=null`). A different source model: never ranked
+  against ResNet50. No same-source ResNet50 MXQ artifact is qualified.
+- Any staging, input, identity, initialization or native inference failure is `FAILED` with an
+  error code and no receipt. There is no CPU fallback.
+- Image requirements: Python ≥3.11, `pydantic>=2.10,<3` (arch-matching `pydantic-core`), numpy,
+  the `resource_advisor` modules `contracts`, `network_profile`, `staged_workload`,
+  `staged_accelerator_workload` and `inference_runtime` or `npu_probe` importable,
+  `RA_RUNTIME_IMAGE_DIGEST` set for ResNet runtimes, and the qualified native SDK.
+- `tests/test_staged_accelerator.py` drives real loopback HTTP bytes through runtime doubles: it
+  proves protocol, consumed bytes and boundaries, not GPU/NPU performance.
+
 ## Evidence levels and limits
 
 - Loopback and local-subprocess runs prove the byte/digest/timing, collector, ranking and

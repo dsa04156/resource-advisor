@@ -74,7 +74,8 @@ def validate_binding(binding, env):
     # verifies it. Never reconstruct a weaker signature from the context alone.
 
 
-def mobilint():
+def mobilint(inputs=None, rounds=ROUNDS):
+    """Qualified Candy run; ``inputs`` (staged exact tensors) replace the generated one."""
     import importlib.metadata
 
     import numpy as np
@@ -97,18 +98,25 @@ def mobilint():
         shape = tuple(model.get_model_input_shape()[0])
         if cores != [str(target)] or shape != (224, 344, 3):
             raise ValueError("unqualified Mobilint core/shape")
-        data = np.random.default_rng(SEED).uniform(-1, 1, shape).astype(np.float32)
-        reference = np.array(model.infer([data])[0], copy=True)
+        tensors = (
+            [np.random.default_rng(SEED).uniform(-1, 1, shape).astype(np.float32)]
+            if inputs is None
+            else list(inputs)
+        )
+        if any(t.shape != shape or t.dtype != np.float32 for t in tensors):
+            raise ValueError("staged Mobilint input differs from qualified shape")
+        references = [np.array(model.infer([t])[0], copy=True) for t in tensors]
         samples, checksums, agreements = [], [], []
-        for _ in range(ROUNDS):
+        for _ in range(rounds):
             start = time.perf_counter()
-            output = np.array(model.infer([data])[0], copy=True)
+            outputs = [np.array(model.infer([t])[0], copy=True) for t in tensors]
             samples.append(time.perf_counter() - start)
-            if output.shape != shape or not np.isfinite(output).all():
-                raise ValueError("finite matching Mobilint output required")
-            agreements.append(float(np.mean(output == reference)))
-            checksums.append(hashlib.sha256(output.tobytes()).hexdigest())
-        if not np.isfinite(reference).all():
+            for output, expected in zip(outputs, references):  # noqa: B905 -- Python 3.7
+                if output.shape != shape or not np.isfinite(output).all():
+                    raise ValueError("finite matching Mobilint output required")
+                agreements.append(float(np.mean(output == expected)))
+            checksums.append(hashlib.sha256(b"".join(o.tobytes() for o in outputs)).hexdigest())
+        if not all(np.isfinite(r).all() for r in references):
             raise ValueError("finite reference output required")
         return {
             "runtime": "mobilint-candy",
@@ -122,7 +130,8 @@ def mobilint():
                 "numpy": np.__version__,
                 "python": platform.python_version(),
             },
-            "input_digest": "sha256:" + hashlib.sha256(data.tobytes()).hexdigest(),
+            "input_digest": "sha256:"
+            + hashlib.sha256(b"".join(t.tobytes() for t in tensors)).hexdigest(),
             "output_digests": checksums,
             "target_cores": cores,
             "samples_seconds": samples,
@@ -130,7 +139,8 @@ def mobilint():
             "quality_metric": "finite_output_repeat_element_agreement",
             "task_accuracy": None,
             "quality_scope": "runtime-repeatability-only",
-            "reference_output_digest": "sha256:" + hashlib.sha256(reference.tobytes()).hexdigest(),
+            "reference_output_digest": "sha256:"
+            + hashlib.sha256(b"".join(r.tobytes() for r in references)).hexdigest(),
         }
     finally:
         model.dispose()
