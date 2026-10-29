@@ -23,7 +23,7 @@ import pytest
 from resource_advisor import npu_probe
 from resource_advisor.backends import Observation, identity_environment, result_from_log
 from resource_advisor.contracts import JobRequest, State, WorkloadIdentity, now, signature
-from resource_advisor.staged_accelerator_workload import run
+from resource_advisor.staged_accelerator_workload import BOUNDARY, PRECISION, run
 
 HOST = socket.gethostname()
 MODEL = "ab" * 32
@@ -139,8 +139,8 @@ def reset_fake():
     FakeRuntime.consumed, FakeRuntime.fail_infer, FakeRuntime.closed = [], False, 0
 
 
-def workload(body, model=MODEL, units=2, base=None):
-    """The accepted identity naming this exact staged object, model and shape."""
+def workload(body, model=MODEL, units=2, base=None, runtime="cuda"):
+    """The accepted identity naming this exact staged object, model, shape and semantics."""
     try:
         shape = np.load(io.BytesIO(body), allow_pickle=False).shape
     except ValueError:
@@ -150,17 +150,19 @@ def workload(body, model=MODEL, units=2, base=None):
         "dataset_version": "sha256:" + hashlib.sha256(body).hexdigest(),
         "input_shape": shape,
         "work_units": units,
+        "task_type": "inference",
+        "batch_size": 1,
+        "global_batch_size": None,
+        "gradient_accumulation": 1,
+        "precision": PRECISION[runtime],
+        "measurement_boundary": BOUNDARY,
     }
     if base is not None:
         return base.model_copy(update=fields)
     return WorkloadIdentity(
         code_digest=signature("code"),
         config_digest=signature("config"),
-        task_type="inference",
-        batch_size=1,
-        precision="fp32",
         quality_contract_digest=signature("quality"),
-        measurement_boundary="staged-host-input-to-native-output-per-pass",
         **fields,
     )
 
@@ -390,7 +392,10 @@ def test_native_and_identity_failures_never_report_success(source, fixture_root,
     result, receipt, _, _ = invoke(argv(fixture_root, url, STAGED, tmp_path / "c", model="ef" * 32))
     assert (result.error_code, receipt) == ("MODEL_IDENTITY_MISMATCH", None)
     assert (tmp_path / "c").exists()  # staged, then rejected by the runtime's own identity
-    result, receipt, _, _ = invoke(argv(fixture_root, url, STAGED, tmp_path / "d", runtime="hailo"))
+    hailo = workload(STAGED, runtime="hailo")  # config names cuda: wrong runtime identity
+    result, receipt, _, _ = invoke(
+        argv(fixture_root, url, STAGED, tmp_path / "d", runtime="hailo", identity=hailo)
+    )
     assert (result.error_code, receipt) == ("MODEL_IDENTITY_MISMATCH", None)
     (fixture_root[0] / "manifest.json").write_text("{}")
     result, receipt, _, _ = invoke(argv(fixture_root, url, STAGED, tmp_path / "e"))
@@ -441,6 +446,36 @@ def test_inputs_must_be_the_accepted_workload_contract(source, fixture_root, tmp
     shape = workload(STAGED).model_copy(update={"input_shape": (2, 224, 224, 3)})
     result, receipt, _, _ = invoke(argv(fixture_root, url, STAGED, tmp_path / "s", identity=shape))
     assert (result.error_code, receipt) == ("STAGED_INPUT_CONTRACT_MISMATCH", None)
+
+
+@pytest.mark.parametrize(
+    "runtime, change",
+    [
+        ("cuda", {"measurement_boundary": "end-to-end-including-transfer"}),
+        ("cuda", {"precision": "fp16"}),
+        ("cuda", {"precision": "mxq-float32-io"}),  # another runtime's precision
+        ("cuda", {"batch_size": 8}),
+        ("cuda", {"global_batch_size": 8}),
+        ("cuda", {"gradient_accumulation": 2}),
+        ("cuda", {"task_type": "training"}),
+        ("hailo", {"precision": "fp32"}),
+        ("mobilint-candy", {"precision": "fp32"}),
+        ("mobilint-candy", {"task_type": "benchmark"}),
+    ],
+)
+def test_signed_but_unexecutable_semantics_are_rejected_before_staging(
+    source, fixture_root, tmp_path, runtime, change
+):
+    candy = np.zeros((1, 224, 344, 3), np.float32)
+    body = STAGED if runtime != "mobilint-candy" else npy(candy)
+    model = MODEL if runtime != "mobilint-candy" else npu_probe.MOBILINT_MODEL
+    url = source.put("s.npy", body)
+    declared = workload(body, model, runtime=runtime).model_copy(update=change)
+    args = argv(fixture_root, url, body, tmp_path / "never", runtime=runtime, identity=declared)
+    result, receipt, envelope, _ = invoke(args)  # job_env signs the changed identity
+    assert (result.error_code, receipt) == ("WORKLOAD_CONTRACT_MISMATCH", None)
+    assert envelope["result"]["outcome"] == "FAILED" and "staging_receipt" not in envelope
+    assert not (tmp_path / "never").exists()
 
 
 def test_missing_plan_binding_for_node_fails_without_staging(source, fixture_root, tmp_path):
@@ -535,7 +570,7 @@ def test_mobilint_staged_input_is_the_inferred_input(fake_qb, source, fixture_ro
     args = argv(
         fixture_root, source.put("m.npy", body), body, tmp_path,
         runtime="mobilint-candy", model=npu_probe.MOBILINT_MODEL,
-        identity=workload(body, npu_probe.MOBILINT_MODEL, units=3),
+        identity=workload(body, npu_probe.MOBILINT_MODEL, units=3, runtime="mobilint-candy"),
     )  # fmt: skip
     result, receipt, _, lines = invoke(args)
     assert result.outcome == "COMPLETED" and receipt.cache_state == "cold"
@@ -546,7 +581,8 @@ def test_mobilint_staged_input_is_the_inferred_input(fake_qb, source, fixture_ro
     assert report["quality_scope"] == "runtime-repeatability-only"
     assert report["task_accuracy"] is None and report["preparation_seconds"] >= INIT_SECONDS
     resnet = argv(
-        fixture_root, source.put("m.npy", body), body, tmp_path / "r", runtime="mobilint-candy"
-    )
+        fixture_root, source.put("m.npy", body), body, tmp_path / "r", runtime="mobilint-candy",
+        identity=workload(body, runtime="mobilint-candy"),  # ResNet source model declared
+    )  # fmt: skip
     result, receipt, _, _ = invoke(resnet)
     assert (result.error_code, receipt) == ("MODEL_IDENTITY_MISMATCH", None)

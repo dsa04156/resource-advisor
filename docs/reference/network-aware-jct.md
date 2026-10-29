@@ -139,8 +139,13 @@ python -m resource_advisor.staged_accelerator_workload --runtime cuda|hailo|mobi
 - `--workload-identity` (or `RA_WORKLOAD_IDENTITY_JSON`) is the accepted `WorkloadIdentity`; it
   must hash to `RA_WORKLOAD_SIGNATURE`, with `dataset_version = sha256:<staged digest>`,
   `input_shape` = the staged array shape, `work_units = RA_WORK_UNITS` and `model_digest` =
-  `sha256:` + the source model the native runtime reports. Otherwise `WORKLOAD_CONTRACT_MISMATCH`
-  before any transfer.
+  `sha256:` + the source model the native runtime reports. It must also declare the semantics
+  the executable performs: `task_type=inference`, `batch_size=1` (one tensor per native call,
+  sequential), `global_batch_size=null`, `gradient_accumulation=1`, `measurement_boundary =
+  staged-host-input-to-native-output-per-pass` and the runtime's qualified precision (`cuda`:
+  `fp32`, `hailo`: `hailo-compiled-float32-io`, `mobilint-candy`: `mxq-float32-io`). A validly
+  signed declaration of anything else is a different workload. Otherwise
+  `WORKLOAD_CONTRACT_MISMATCH` before any transfer.
 - Order: stage (≤32 MiB) → re-read and verify the staged bytes → `np.load(allow_pickle=False)`
   and shape/dtype/finite checks → native initialization (`inference_runtime.Runtime` with its
   fixed-100 qualification, or `npu_probe.mobilint(inputs=…, rounds=…)`) → runtime

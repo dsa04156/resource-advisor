@@ -56,6 +56,15 @@ MAX_INPUT_BYTES = 32 * 1024**2
 RESNET_CONTRACT = "rgb-f32-nhwc-224x224x3-v1"
 MOBILINT_CONTRACT = "f32-hwc-224x344x3-mobilint-candy-v1"
 SHAPES = {"cuda": (224, 224, 3), "hailo": (224, 224, 3), "mobilint-candy": (224, 344, 3)}
+# What the executable actually does: per-tensor (batch 1) inference, timed per pass
+# from staged host input to native output, at each runtime's qualified precision.
+# A declaration of any other semantics is a different workload, even when signed.
+BOUNDARY = "staged-host-input-to-native-output-per-pass"
+PRECISION = {
+    "cuda": "fp32",
+    "hailo": "hailo-compiled-float32-io",
+    "mobilint-candy": "mxq-float32-io",
+}
 
 
 class Failed(Exception):
@@ -232,6 +241,11 @@ def run(env=None, *, argv=None, write=print, resnet_runtime=None, mobilint_runne
         signature(declared) != identity["workload_signature"]
         or declared.dataset_version != "sha256:" + digest
         or declared.work_units != iterations
+        or declared.task_type != "inference"
+        or (declared.batch_size, declared.global_batch_size, declared.gradient_accumulation)
+        != (1, None, 1)
+        or declared.precision != PRECISION[args.runtime]
+        or declared.measurement_boundary != BOUNDARY
     ):
         return failed("WORKLOAD_CONTRACT_MISMATCH")
     who = execution_identity(env)
@@ -273,7 +287,7 @@ def run(env=None, *, argv=None, write=print, resnet_runtime=None, mobilint_runne
         tensor_count=len(data),
         preparation_seconds=preparation,
         samples_seconds=samples,
-        measurement_boundary="staged-host-input-to-native-output-per-pass",
+        measurement_boundary=BOUNDARY,
     )
     write("RESOURCE_ADVISOR_STAGED_ACCELERATOR_REPORT " + json.dumps(report, allow_nan=False))
     result = ExecutionResult(
