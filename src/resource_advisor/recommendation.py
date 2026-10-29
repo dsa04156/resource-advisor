@@ -414,8 +414,21 @@ def _profile_reason(p, spec, candidate, cap, variant, target, rec, at):
     return None
 
 
-def _intents(conn, project, route_key, identity, at):
-    """Accepted project jobs on the route; occupancy unknown unless a plan froze it."""
+def _demand_key(backend, cluster, *, pool_ref=None, node_ref=None, resource_key=None):
+    """What accepted demand occupies: a declared pool, or a node's resource.
+
+    Node demand is keyed by the native node and resource, not the RA cluster alias:
+    several registered routes (e.g. a single-GPU route and a DDP route) can name
+    the same physical GPU. Distinct clusters reusing a node name are then
+    over-counted (a longer wait), never under-counted.
+    """
+    if pool_ref:
+        return ("pool", backend, cluster, pool_ref)
+    return ("node", backend, node_ref, resource_key or "")
+
+
+def _intents(conn, project, key, identity, at):
+    """Accepted project jobs on the same demand key; occupancy unknown unless frozen."""
     from sqlalchemy import select
 
     from .store import jobs
@@ -430,11 +443,18 @@ def _intents(conn, project, route_key, identity, at):
         cap = body.get("capability", {})
         target = plan.get("target") or {}
         backend, cluster = body.get("candidate", {}).get("backend"), cap.get("backend_cluster_id")
-        keys = {(backend, cluster, target.get("pool_ref") or cap.get("node_ref"))}
+        resource = cap.get("resource_key")
+        keys = {
+            _demand_key(backend, cluster, pool_ref=target.get("pool_ref"),
+                        node_ref=cap.get("node_ref"), resource_key=resource)
+        }  # fmt: skip
         # A distributed job holds a device on every member node, not only its anchor.
         d = (body.get("candidate", {}).get("context") or {}).get("distributed") or {}
-        keys.update((backend, cluster, n["node_ref"]) for n in d.get("nodes", ()))
-        if route_key not in keys:
+        keys.update(
+            _demand_key(backend, cluster, node_ref=n["node_ref"], resource_key=resource)
+            for n in d.get("nodes", ())
+        )
+        if key not in keys:
             continue
         frozen = plan.get("recommendation_evidence") or {}
         result.append(
@@ -697,7 +717,7 @@ def _staging_path(per_node, location, nodes):
     """
     groups = {n["staging_group"] for n in per_node}
     [group] = groups if len(groups) == 1 else [None]
-    synchronized = group is not None and group.rsplit("@", 1)[1] == "+".join(sorted(nodes))
+    synchronized = group is not None and group.partition("@")[2] == "+".join(sorted(nodes))
     sources = {}
     for n in per_node:
         sources.setdefault(location.source_endpoint_ref, []).append(n)
@@ -738,8 +758,11 @@ def _distributed(service, conn, project, rec, at, spec, candidate, members, prof
     """
     from dataclasses import replace
 
-    from .jct_selection import PROFILE_QUEUE, CandidatePrediction, _critical_path
+    from .jct_selection import PROFILE_QUEUE, CandidatePrediction, _critical_path, _phase_reason
 
+    reason = _phase_reason(measured)
+    if reason:  # e.g. a schema-valid unknown component: unknown, never summed
+        return None, [reason], {}
     d = candidate.context.distributed
     if d.nproc_per_node != 1:
         return None, ["DISTRIBUTED_MULTI_DEVICE_MEMBER_QUEUE_UNMODELED"], {}
@@ -755,10 +778,11 @@ def _distributed(service, conn, project, rec, at, spec, candidate, members, prof
             measured.identity.workload_digest,
         )
         snapshot, view = _queue(service, conn, project, identity, candidate, cap)
-        intents = _intents(
-            conn, project, (str(candidate.backend), cap.backend_cluster_id, node), identity,
-            at.timestamp(),
+        key = _demand_key(
+            str(candidate.backend), cap.backend_cluster_id, node_ref=node,
+            resource_key=cap.resource_key,
         )  # fmt: skip
+        intents = _intents(conn, project, key, identity, at.timestamp())
         if snapshot is not None and snapshot.capacity_unit != "physical_device":
             return None, ["DISTRIBUTED_SHARED_SLOT_QUEUE", "DISTRIBUTED_MEMBER:" + node], detail
         probe = replace(
@@ -1010,8 +1034,12 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
             if snapshot is not None:
                 queues.append(snapshot)
                 queue_refs[candidate.ref] = view
-            route_key = (str(candidate.backend), cap.backend_cluster_id, identity.node_ref)
-            intents.extend(_intents(conn, project, route_key, identity, stamp))
+            key = _demand_key(
+                str(candidate.backend), cap.backend_cluster_id,
+                pool_ref=target["pool_ref"] if target else None, node_ref=cap.node_ref,
+                resource_key=cap.resource_key,
+            )  # fmt: skip
+            intents.extend(_intents(conn, project, key, identity, stamp))
         if rec.policy == "profile_queue_network":
             if p.staging_boundary == "not_required":
                 transfers[candidate.ref] = 0.0

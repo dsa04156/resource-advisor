@@ -126,7 +126,8 @@ SYNC = "ddp:j-1/a-1@node-a+node-b"
         ({"node-a": SYNC, "node-b": SYNC}, "synchronized_ddp_parallel_max", 6.0),
         # another attempt's member set, or one member solo: no proven concurrency
         ({"node-a": SYNC, "node-b": "ddp:j-2/a-2@node-a+node-b"}, "shared_source_serialized_bound", 10.0),
-        ({"node-a": "ddp:j-1/a-1@node-a+node-c", "node-b": "ddp:j-1/a-1@node-a+node-c"},
+        # a different member set that still names each node (e.g. a 3-node attempt)
+        ({"node-a": "ddp:j-1/a-1@node-a+node-b+node-c", "node-b": "ddp:j-1/a-1@node-a+node-b+node-c"},
          "shared_source_serialized_bound", 10.0),
     ],
 )  # fmt: skip
@@ -446,3 +447,57 @@ def test_a_pod_holding_several_units_never_reads_as_one_occupant():
 
     one = snapshot_of([pod("p", "1", job="j-1")])
     assert one.complete and [i.job_id for i in one.running] == ["j-1"]
+
+
+def accepted_job(service, *, cluster, node, occupancy=30.0):
+    """An accepted, not yet natively visible single-GPU job on another route alias."""
+    from sqlalchemy import insert
+
+    from resource_advisor.store import jobs
+
+    body = {
+        "created_at": (now() - timedelta(seconds=5)).isoformat(),
+        "candidate": {"backend": "kubernetes", "context": {}},
+        "capability": {"backend_cluster_id": cluster, "node_ref": node,
+                       "resource_key": "nvidia.com/gpu"},
+        "scheduling_plan": {"recommendation_evidence": {"selected_occupancy_seconds": occupancy,
+                                                        "selected_admission_seconds": 1.0}},
+    }  # fmt: skip
+    with service.store.transaction() as conn:
+        conn.execute(insert(jobs).values(id="single-5080", project="team-a", idempotency_key="s",
+                                         request_digest=None, state="SUBMITTED", epoch=1,
+                                         version=1, body=body))  # fmt: skip
+
+
+def test_accepted_demand_on_another_route_alias_of_the_same_gpu_is_counted(service, client):
+    post(client, "/jct-profiles", ddp_profile(service, client))
+    for node in dt.NODES:
+        post(client, "/route-queue-snapshots", queue(node))
+    # Same physical node and resource, registered under a different cluster alias.
+    accepted_job(service, cluster="lab-rtx5080-single", node="node-b")
+
+    p, evidence, _ = prediction(client, QUEUE)
+
+    members = {m["node_ref"]: m for m in evidence["queue_snapshots"]["ddp"]["members"]}
+    assert members["node-b"]["queue_wait_seconds"] == pytest.approx(31.0)
+    assert p["queue_wait_seconds"] == pytest.approx(31.0)
+
+
+def test_unknown_profile_component_is_an_explicit_unknown_not_a_crash(service, client):
+    unknown = ddp_profile(service, client, phases={"runtime_startup": 2.0, "data_staging": 1.0,
+                                                   "compute": None})  # fmt: skip
+    post(client, "/jct-profiles", unknown)
+    for node in dt.NODES:
+        post(client, "/route-queue-snapshots", queue(node))
+
+    p, _, _ = prediction(client, QUEUE)
+    assert p["predicted_jct_seconds"] is None and p["reasons"] == ["PROFILE_COMPONENT_UNKNOWN"]
+
+
+@pytest.mark.parametrize(
+    "group",
+    ["unknown", "ddp:j-1/a-1", "ddp:@node-a+node-b", "ddp:j-1/a-1@node-c+node-d"],
+)
+def test_malformed_or_foreign_synchronization_provenance_is_rejected(group):
+    with pytest.raises(ValueError):
+        network("node-a", [4.0], staging_group=group)

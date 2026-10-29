@@ -136,7 +136,9 @@ class NetworkProfile(Contract):
     # Set only when every sample is one rank's receipt of the same DDP attempt(s),
     # staged between barriers concurrently with the other members named here:
     # "ddp:<job>/<attempt>[,...]@<node>+<node>". Contention is then inside the sample.
-    staging_group: str | None = Field(default=None, max_length=1024)
+    staging_group: str | None = Field(
+        default=None, max_length=1024, pattern=r"^ddp:[^@\s]+/[^@\s]+@[^@+\s]+(\+[^@+\s]+)+$"
+    )
 
     @model_serializer(mode="wrap")
     def preserve_legacy_signature(self, handler):
@@ -155,6 +157,8 @@ class NetworkProfile(Contract):
             raise ValueError("native job ids belong to receipt-derived evidence")
         elif self.node_ref != self.observer_host:
             raise ValueError("network evidence must be measured on its destination node")
+        if self.staging_group and self.node_ref not in self.staging_group.partition("@")[2].split("+"):
+            raise ValueError("synchronized staging must name this profile's node as a member")
         if any(
             s.bytes != self.size_bytes
             or not s.content_verified
