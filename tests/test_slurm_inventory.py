@@ -229,6 +229,35 @@ def test_gres_fallback_counts_are_explicit_and_unambiguous(text, expected):
     assert view["scheduling_blockers"] == ["DRAIN"]
 
 
+def test_gres_capacity_without_accounting_tres_uses_configured_gres_registration():
+    # Shape observed on a controller whose AccountingStorageTRES omits gres/gpu.
+    n = node()
+    n.update(
+        state=["IDLE"],
+        gres="gpu:a100:4",
+        gres_used="gpu:a100:0(IDX:N/A)",
+        gres_drained="N/A",
+        tres="cpu=4,mem=2000M,billing=4",
+        tres_used="",
+    )
+    cpu = node()
+    cpu.update(name="scheduler-b", gres="", gres_used="", tres="cpu=4,mem=2000M,billing=4")
+    cfg = config(
+        node_refs=["host-a", "host-b"],
+        node_names={"host-a": "scheduler-a", "host-b": "scheduler-b"},
+        gres_types={"gres/gpu": {"device_class": "gpu", "allocation_mode": "virtual_slot"}},
+    )
+    execute, _ = source(nodes=[n, cpu])
+    gpu_view, cpu_view = SlurmInventoryCollector(cfg, execute=execute).collect()["nodes"]
+    r = gpu_view["resources"]["gres/gpu"]
+    assert r["allocation_mode"] == "virtual_slot" and r["device_class"] == "gpu"
+    assert r["capacity"]["value"] == 4 and r["requested"]["value"] == 0
+    assert r["request_headroom"]["value"] == 4
+    assert gpu_view["accelerator_inventory"]["status"] == "ok"
+    assert set(cpu_view["resources"]) == {"cpu", "memory"}
+    assert cpu_view["accelerator_inventory"]["value"]["reported_gres"] is False
+
+
 @pytest.mark.parametrize("failure", ["nodes", "jobs"])
 def test_scheduler_failures_do_not_erase_actual_host_telemetry(failure):
     execute, _ = source(fail=failure)

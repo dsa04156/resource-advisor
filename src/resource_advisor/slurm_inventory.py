@@ -235,14 +235,20 @@ class SlurmInventoryCollector(PrometheusReader):
         except ValueError:
             allocations = {}
         for key, kind in self.config.gres_types.items():
-            if key not in capacities:
-                continue
 
             def count(mapping, resource_key):
                 v = mapping.get(resource_key)
                 return int(v) if isinstance(v, str) and re.fullmatch(r"[0-9]{1,16}", v) else None
 
-            cap, used = count(capacities, key), count(allocations, key)
+            if key in capacities:
+                cap = count(capacities, key)
+            else:
+                # Without gres/... in AccountingStorageTRES the node TRES omits the
+                # key; the node's configured GRES is the same scheduler registration.
+                cap = gres_used_count(raw.get("gres"), key)
+                if cap is None:
+                    continue
+            used = count(allocations, key)
             if key not in allocations:
                 used = gres_used_count(raw.get("gres_used"), key)
             allocatable = (

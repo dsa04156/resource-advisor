@@ -32,15 +32,18 @@ JOB_FIELDS = {"job_id", "account", "partition", "job_state"}
 
 
 def observe(config, original, *, execute=subprocess.run):
-    if set(config) != {"account", "partition", "nodes"}:
+    if set(config) - {"container"} != {"account", "partition", "nodes"}:
         raise ValueError("exact observer scope required")
     account, partition, nodes = (config[k] for k in ["account", "partition", "nodes"])
+    # An operator-named Docker container hosting the controller; the host's own
+    # Slurm client is then never invoked.
+    container = config.get("container")
     if (
         not isinstance(nodes, list)
         or not 1 <= len(nodes) <= 100
         or any(
             not isinstance(v, str) or not re.fullmatch(IDENTIFIER, v)
-            for v in [account, partition, *nodes]
+            for v in [account, partition, *nodes, *([container] if "container" in config else [])]
         )
         or len(set(nodes)) != len(nodes)
         or not isinstance(original, str)
@@ -55,8 +58,11 @@ def observe(config, original, *, execute=subprocess.run):
     collection = allowed.get(tuple(requested))
     if collection is None:
         raise ValueError("command is outside the read-only observer scope")
+    argv = ["/usr/bin/" + requested[0], *requested[1:]]
+    if container is not None:
+        argv = ["/usr/bin/docker", "exec", "--user", "slurm", container, *argv]
     result = execute(
-        ["/usr/bin/" + requested[0], *requested[1:]],
+        argv,
         stdin=subprocess.DEVNULL,
         capture_output=True,
         text=True,

@@ -114,3 +114,40 @@ def test_queue_keeps_empty_warning_and_only_required_fields():
         execute=lambda *a, **kw: SimpleNamespace(stdout=json.dumps(payload), stderr=""),
     )
     assert result["jobs"] == [] and result["warnings"] == payload["warnings"]
+
+
+def test_container_scope_runs_only_the_allowed_command_inside_that_container():
+    payload = response("nodes", [{"name": "worker-a", "cpus": 4}])
+
+    def execute(args, **kwargs):
+        assert args == [
+            "/usr/bin/docker",
+            "exec",
+            "--user",
+            "slurm",
+            "slurmctld",
+            "/usr/bin/scontrol",
+            "--json=v0.0.42",
+            "show",
+            "nodes",
+        ]
+        return SimpleNamespace(stdout=json.dumps(payload), stderr="")
+
+    scope = dict(SCOPE, container="slurmctld")
+    result = observer.observe(scope, "scontrol --json=v0.0.42 show nodes", execute=execute)
+    assert result["nodes"] == [{"name": "worker-a", "cpus": 4}]
+    with pytest.raises(ValueError):
+        observer.observe(scope, "scancel 1", execute=execute)
+
+
+@pytest.mark.parametrize("container", [None, "", "-u=root", "a b", "c;id", 1])
+def test_invalid_container_scope_never_executes(container):
+    def forbidden(*args, **kwargs):
+        raise AssertionError("unauthorized command executed")
+
+    with pytest.raises(ValueError):
+        observer.observe(
+            dict(SCOPE, container=container),
+            "scontrol --json=v0.0.42 show nodes",
+            execute=forbidden,
+        )
