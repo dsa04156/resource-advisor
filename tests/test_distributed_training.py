@@ -890,3 +890,126 @@ def test_ddp_data_access_and_cost_evidence_cover_every_node(service, bundle):
     assert prediction["predicted_jct_seconds"] is None
     # No DDP profile or member queue evidence yet: unknown, never anchor-only.
     assert prediction["reasons"] == ["PROFILE_MISSING"]
+
+
+# --- per-rank staging receipts (staged DDP ingest) ------------------------------------
+
+RANKS = [
+    {
+        "index": 0,
+        "pod_name": "pod-0",
+        "pod_uid": "uid-0",
+        "node_name": "node-b",
+        "phase": "Succeeded",
+    },
+    {
+        "index": 1,
+        "pod_name": "pod-1",
+        "pod_uid": "uid-1",
+        "node_name": "node-a",
+        "phase": "Succeeded",
+    },
+]
+
+
+def member_receipt(job, rank, **change):
+    value = {
+        "job_id": job["job_id"], "attempt_id": job["attempt_id"],
+        "content_digest": "sha256:" + "a" * 64, "size_bytes": 1000,
+        "source_endpoint_ref": "storage", "source_kind": "http",
+        "source_locator": "http://storage.invalid/dataset-v1.tar", "observer_host": rank["pod_name"],
+        "identity_source": "kubernetes_downward_api", "node_name": rank["node_name"],
+        "pod_name": rank["pod_name"], "pod_uid": rank["pod_uid"], "cache_state": "cold",
+        "cache_locator": "/var/cache/ra", "staged_at": now().isoformat(),
+        "sample": {"elapsed_seconds": 1.5, "bytes": 1000, "content_verified": True},
+    }  # fmt: skip
+    value.update(change)
+    return value
+
+
+def staged_ddp(service, bundle, change=None):
+    """A collected two-rank job whose envelope carries every rank's staging receipt."""
+    from test_worker import SchedulerDouble
+
+    from resource_advisor.backends import Observation
+
+    setup(service, bundle)
+    job = service.submit(
+        "team-a", JobRequest(workload_ref="ddp-workload", candidate_ref="ddp"), "s"
+    )
+    with service.store.transaction() as conn:
+        binding = service.store.get(conn, "training_isolation", "ddp-workload")["body"]
+    backend = SchedulerDouble()
+    worker = Worker(service, {("team-a", "lab"): backend})
+    worker.submit_one()
+    placement = {"source": "kubernetes:Pod", "pod_name": "pod-0", "pod_uid": "uid-0",
+                 "node_name": "node-b", "phase": "Succeeded",
+                 "distributed": {"placement": "multi-node", "world_size": 2, "ranks": RANKS}}  # fmt: skip
+    backend.observation = Observation(State.COLLECTING, placement=placement)
+    own = member_receipt(job, RANKS[0])
+    receipts = [own, member_receipt(job, RANKS[1])]
+    receipts = change(receipts) if change else receipts
+    base = backend.result
+
+    def result(row):
+        envelope = base(row)
+        training = {
+            "job_id": job["job_id"], "attempt_id": job["attempt_id"],
+            "result_digest": envelope["digest"],
+            "initial_checkpoint_digest": binding["checkpoint_digest"],
+            "input_digest": binding["input_digest"],
+            "checkpoint_after_digest": binding["checkpoint_digest"],
+            "input_after_digest": binding["input_digest"], "checkpoint_readonly": True,
+            "input_readonly": True, "source_not_mounted": True,
+            "output_checkpoint": {"step": 1}, "output_checkpoint_digest": signature({"step": 1}),
+        }  # fmt: skip
+        return dict(envelope, training_receipt=training, staging_receipts=receipts,
+                    staging_receipt=own)  # fmt: skip
+
+    backend.result = result
+    worker.reconcile_all()
+    with service.store.transaction() as conn:
+        row = dict(service.store.job(conn, job["job_id"]))
+        stored = [
+            service.store.get(conn, "staging_member_receipt", f"{job['attempt_id']}:{i}")
+            for i in range(3)
+        ]
+    return job, row, stored, receipts
+
+
+def test_every_rank_staging_receipt_is_stored_against_the_observed_placement(service, bundle):
+    job, row, stored, receipts = staged_ddp(service, bundle)
+    assert row["state"] == State.SUCCEEDED
+    assert [s["body"]["pod_uid"] for s in stored[:2]] == ["uid-0", "uid-1"] and stored[2] is None
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        lambda rs: rs[:1],  # a rank without its receipt
+        lambda rs: [rs[0], rs[0]],  # one Pod twice, the other missing
+        lambda rs: [rs[1], rs[0]],  # rank 0's own receipt is not first
+        lambda rs: [rs[0], dict(rs[1], pod_uid="uid-foreign")],
+        lambda rs: [rs[0], dict(rs[1], node_name="node-b")],
+        lambda rs: [rs[0], dict(rs[1], attempt_id="other-attempt")],
+        lambda rs: [rs[0], {k: v for k, v in rs[1].items() if k != "pod_uid"}],
+        lambda rs: [rs[0], dict(rs[1], identity_source="host")],
+    ],
+)
+def test_missing_foreign_or_duplicated_rank_receipts_invalidate_the_result(service, bundle, change):
+    _, row, stored, _ = staged_ddp(service, bundle, change)
+    assert row["state"] == State.RESULT_INVALID
+    assert "STAGING_MEMBER_RECEIPTS_INVALID" in row["body"]["error"]
+    assert stored == [None, None, None]
+
+
+def test_member_receipts_are_immutable_after_success(service, bundle):
+    from resource_advisor.contracts import ExecutionResult
+    from resource_advisor.service import Conflict
+
+    job, row, stored, receipts = staged_ddp(service, bundle)
+    with service.store.transaction() as conn:
+        result = service.store.get(conn, "result", job["attempt_id"])["body"]
+    with pytest.raises(Conflict):
+        service.ingest("team-a", ExecutionResult.model_validate(result), signature(result),
+                       staging_receipts=[receipts[0], dict(receipts[1], cache_state="hot")])  # fmt: skip

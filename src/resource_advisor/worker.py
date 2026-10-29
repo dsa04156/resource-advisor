@@ -404,6 +404,7 @@ class Worker:
                 thermal_trace=envelope.get("thermal_trace"),
                 load_trace=envelope.get("load_trace"),
                 staging_receipt=envelope.get("staging_receipt"),
+                staging_receipts=envelope.get("staging_receipts"),
             )
 
 

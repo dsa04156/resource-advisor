@@ -46,6 +46,43 @@ class NodeEvidence(dict):
     qualified = None
 
 
+def staging_members(result, receipts, own, body):
+    """Every DDP rank's own StagingReceipt, in rank order, bound to the observed placement.
+
+    Ranks are assigned by rendezvous, so a receipt is matched to an observed Pod (UID and
+    node from the adapter's complete placement), not to a completion index; each Pod must
+    hold exactly ``nproc_per_node`` receipts and rank 0's own receipt comes first.
+    Returns the validated bodies, or None when any member is missing, foreign or extra.
+    """
+    from .network_profile import StagingReceipt
+
+    d = (body.get("candidate") or {}).get("context", {}).get("distributed")
+    ranks = (((body.get("placement") or {}).get("distributed")) or {}).get("ranks") or []
+    if not d or not ranks or not isinstance(receipts, list) or len(receipts) != d["world_size"]:
+        return None
+    try:
+        members = [StagingReceipt.model_validate(r) for r in receipts]
+    except ValueError:
+        return None
+    pods = {(r["pod_uid"], r["node_name"]) for r in ranks}
+    seen = {}
+    for m in members:
+        key = (m.pod_uid, m.node_name)
+        if (
+            (m.job_id, m.attempt_id) != (result.job_id, result.attempt_id)
+            or m.identity_source != "kubernetes_downward_api"
+            or key not in pods
+        ):
+            return None
+        seen[key] = seen.get(key, 0) + 1
+    if set(seen) != pods or any(n != d["nproc_per_node"] for n in seen.values()):
+        return None
+    bodies = [m.model_dump(mode="json") for m in members]
+    if own is None or signature(bodies[0]) != signature(StagingReceipt.model_validate(own)):
+        return None
+    return bodies
+
+
 class Service:
     def __init__(
         self, store, *, accept_synthetic=False, operational_mode=False, console_workloads=()
@@ -570,6 +607,7 @@ class Service:
         thermal_trace=None,
         load_trace=None,
         staging_receipt=None,
+        staging_receipts=None,
     ):
         """Trusted collector only. Require backend completion before result acceptance."""
         with self.store.transaction() as conn:
@@ -609,6 +647,12 @@ class Service:
                         staged is None or signature(staged["body"]) != signature(staging_receipt)
                     ):
                         raise Conflict("terminal staging receipt is immutable")
+                    for index, member in enumerate(staging_receipts or ()):
+                        kept = self.store.get(
+                            conn, "staging_member_receipt", f"{result.attempt_id}:{index}"
+                        )
+                        if kept is None or signature(kept["body"]) != signature(member):
+                            raise Conflict("terminal staging member receipts are immutable")
                     stored = self.store.get(conn, "phase_profile", result.attempt_id)
                     if phase_profile is not None and (
                         stored is None or signature(stored["body"]) != signature(phase_profile)
@@ -716,6 +760,19 @@ class Service:
                         project,
                         staging.model_dump(mode="json"),
                     )
+            if staging_receipts is not None:
+                members = staging_members(result, staging_receipts, staging_receipt, body)
+                if members is None:
+                    problems.append("STAGING_MEMBER_RECEIPTS_INVALID")
+                elif not problems:
+                    for index, member in enumerate(members):
+                        self.store.put(
+                            conn,
+                            "staging_member_receipt",
+                            f"{result.attempt_id}:{index}",
+                            project,
+                            member,
+                        )
             bindings = (body.get("scheduling_plan") or {}).get("staging_bindings")
             if bindings and result.outcome == "COMPLETED":
                 from .recommendation import staging_binding_check
