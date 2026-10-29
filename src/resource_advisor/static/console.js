@@ -2676,7 +2676,13 @@ function trainSubmit(x) {
     return add(el("div",null,"train-pick"),b,el("small",x.blockers?.includes("AUXILIARY_RESERVATION_REQUIRED")?"NPU 교사 예약 필요":"지금 실행 불가"));
   }
   b.setAttribute("aria-pressed",String(trainChosen===trainKey(x)));
-  b.onclick=()=>{trainChosen=trainKey(x);showAllTemplates=!(data.submission_catalog||[]).some(w=>w.workload_ref===x.workload_ref);submissionDraft.workload=x.workload_ref;submissionDraft.candidate=x.candidate_ref;schedulingPreview=null;location.hash="submit";};
+  b.onclick=()=>{
+    trainChosen=trainKey(x);showAllTemplates=!(data.submission_catalog||[]).some(w=>w.workload_ref===x.workload_ref);submissionDraft.workload=x.workload_ref;submissionDraft.candidate=x.candidate_ref;
+    // Submit with the scheduling profile whose estimate was shown, when the project has it.
+    const profile=trainData?.selected?.estimate_profile?.ref||trainProfile;
+    if(profile&&(data.scheduling_profiles||[]).some(p=>p.ref===profile))schedulingProfile=profile;
+    schedulingPreview=null;schedulingPreviewKey="";schedulingPreviewError=null;location.hash="submit";
+  };
   return b;
 }
 // Actual members, so a mixed DDP pair names both GPUs.
@@ -2695,13 +2701,12 @@ function trainSimple(list) {
 }
 function trainCombinations(sel) {
   if(!sel.combinations.length)return empty("이 조건에 등록된 자원 조합이 없습니다.");
-  // Estimated combinations first (fastest first); an unestimated row whose name is
-  // already shown (an older duplicate registration) moves into the details.
-  const estimated=sel.combinations.filter(x=>x.jct.status==="ESTIMATED").sort((a,b)=>a.jct.predicted_seconds-b.jct.predicted_seconds);
-  const names=new Set(estimated.map(trainName)),main=[...estimated],others=[];
-  for(const x of sel.combinations)if(x.jct.status!=="ESTIMATED"){if(names.has(trainName(x)))others.push(x);else{names.add(trainName(x));main.push(x);}}
-  return add(el("div"),trainSimple(main),
-    others.length?trainDetails("train-others:"+sel.model.model_key+"|"+sel.config_key,`다른 등록 항목 ${others.length}개`,trainSimple(others)):null,
+  // Only combinations with a numeric estimate are listed, fastest first; every other
+  // registered combination stays in the collapsed list below.
+  const main=sel.combinations.filter(x=>x.jct.status==="ESTIMATED").sort((a,b)=>a.jct.predicted_seconds-b.jct.predicted_seconds);
+  const others=sel.combinations.filter(x=>x.jct.status!=="ESTIMATED");
+  return add(el("div"),main.length?trainSimple(main):empty("예상 시간이 계산된 조합이 없습니다."),
+    others.length?trainDetails("train-others:"+sel.model.model_key+"|"+sel.config_key,`예상 시간 없는 조합 ${others.length}개`,trainSimple(others)):null,
     trainDetails("train-evidence:"+sel.model.model_key+"|"+sel.config_key,"세부 정보 · 근거",trainDiagnostics(sel)));
 }
 function trainDiagnostics(sel) {
