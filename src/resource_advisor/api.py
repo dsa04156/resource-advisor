@@ -598,6 +598,32 @@ def create_app(
         with service.store.transaction() as conn:
             return required(service.store, conn, "topology_snapshot", ref, p.project)
 
+    from .recommendation import (
+        DataLocation,
+        JctProfile,
+        NodePool,
+        RouteQueueSnapshot,
+        decision_linkage,
+        import_evidence,
+    )
+
+    # Operator/collector-imported, immutable recommendation evidence.
+    for path, kind, model in [
+        ("/jct-profiles", "jct_profile", JctProfile),
+        ("/route-queue-snapshots", "route_queue_snapshot", RouteQueueSnapshot),
+        ("/data-locations", "data_location", DataLocation),
+        ("/node-pools", "node_pool", NodePool),
+    ]:
+
+        def register_evidence(value: model, p=Depends(operator), kind=kind):
+            return import_evidence(service, p.project, kind, value)
+
+        app.post(PREFIX + path, name="register_" + kind)(register_evidence)
+
+    @app.get(PREFIX + "/jobs/{job_id}/recommendation")
+    def job_recommendation(job_id: str, p=Depends(principal)):
+        return decision_linkage(service, p.project, job_id)
+
     @app.post(PREFIX + "/placement-plans")
     def placement_plan(value: PlacementRequest, p=Depends(principal)):
         # Read-only preview: nothing is reserved, persisted or submitted.

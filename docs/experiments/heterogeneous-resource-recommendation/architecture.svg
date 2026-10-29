@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"/>
+    </marker>
+    <style>
+      .t{font-size:22px;font-weight:700;fill:#111827}
+      .h{font-size:17px;font-weight:700;fill:#111827}
+      .s{font-size:13.5px;fill:#374151}
+      .x{font-size:12.5px;fill:#6b7280}
+      .impl{fill:#e0f2fe;stroke:#0369a1;stroke-width:2}
+      .nat{fill:#ecfdf5;stroke:#047857;stroke-width:2}
+      .evi{fill:#fef3c7;stroke:#b45309;stroke-width:2}
+      .plan{fill:#f3f4f6;stroke:#6b7280;stroke-width:2;stroke-dasharray:7 5}
+      .l{stroke:#374151;stroke-width:2;fill:none;marker-end:url(#a)}
+      .ld{stroke:#6b7280;stroke-width:2;fill:none;stroke-dasharray:6 4;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#ffffff"/>
+  <text x="40" y="48" class="t">이기종 자원 추천 — opt-in 경로 (hetero-rec-v1, 2026-10-29 software 단계)</text>
+  <text x="40" y="74" class="x">기본(B2·node pinning)은 변경 없음. 정책 profile에 recommendation / target_mode=pool을 명시할 때만 동작한다. 새 실장비 측정 없음.</text>
+
+  <!-- request -->
+  <rect x="40" y="110" width="250" height="120" rx="10" class="impl"/>
+  <text x="58" y="140" class="h">연구자 / 포털 API</text>
+  <text x="58" y="166" class="s">POST /jobs (Idempotency-Key)</text>
+  <text x="58" y="188" class="s">POST /scheduling-plans (preview)</text>
+  <text x="58" y="210" class="s">GET /jobs/{id}/recommendation</text>
+
+  <!-- compiler -->
+  <rect x="350" y="110" width="560" height="350" rx="10" class="impl"/>
+  <text x="370" y="140" class="h">Resource Advisor · compile_plan</text>
+  <rect x="370" y="155" width="520" height="92" rx="8" fill="#ffffff" stroke="#0369a1"/>
+  <text x="386" y="180" class="s">① Hard filter: project·runtime·model·precision·memory·count·</text>
+  <text x="386" y="200" class="s">   allocation·Slurm 학습 guard·binding·데이터 접근(DataLocation)</text>
+  <text x="386" y="222" class="s">   추천 경로는 operational stale 완화 미적용 · 제외 사유 보존</text>
+  <rect x="370" y="258" width="520" height="104" rx="8" fill="#ffffff" stroke="#0369a1"/>
+  <text x="386" y="283" class="s">② Ranker: B2 legacy 순서 (기본, 비트 동일)</text>
+  <text x="386" y="305" class="s">   B3 profile_only · B4 +queue · B5 +network → select_candidate</text>
+  <text x="386" y="327" class="s">   JCT = queue wait + admission + phase critical path</text>
+  <text x="386" y="349" class="s">   근거 부족 → NEEDS_PROFILE / ESTIMATE_UNAVAILABLE (fallback은 명시·기록)</text>
+  <rect x="370" y="373" width="520" height="72" rx="8" fill="#ffffff" stroke="#0369a1"/>
+  <text x="386" y="398" class="s">③ Plan + digest: 선택 후보·target(node|pool)·policy version·</text>
+  <text x="386" y="420" class="s">   profile ref/digest 서명 · queue/예측은 비서명 evidence · 접수 시 재평가</text>
+
+  <!-- evidence -->
+  <rect x="980" y="110" width="580" height="200" rx="10" class="evi"/>
+  <text x="1000" y="140" class="h">불변 evidence (operator 승인 import, project scope)</text>
+  <text x="1000" y="168" class="s">JctProfile: identity·hardware/runtime fingerprint·TTL·repeats·phases</text>
+  <text x="1000" y="190" class="s">RouteQueueSnapshot: complete 여부·미확인 점유 사유·logical/physical</text>
+  <text x="1000" y="212" class="s">DataLocation: dataset version·크기·접근 허용 노드·provenance</text>
+  <text x="1000" y="234" class="s">TopologySnapshot: 측정된 방향 링크만 (미측정 = unknown, 0 아님)</text>
+  <text x="1000" y="256" class="s">NodePool: 검증된 동등 member capability · Slurm 배타 feature 근거</text>
+  <text x="1000" y="290" class="x">미래 시각 거절 · synthetic/stale/불일치 profile은 순위에 쓰지 않음</text>
+
+  <rect x="980" y="340" width="580" height="120" rx="10" class="impl"/>
+  <text x="1000" y="370" class="h">읽기 전용 collector / bounded CLI</text>
+  <text x="1000" y="396" class="s">inventory(kubectl·sinfo·local tool) · queue(Pods) · profile(완료 Job)</text>
+  <text x="1000" y="418" class="s">link: 허가된 객체 1개, ≤1 GiB·≤60 s·rate cap·동시성 1</text>
+  <text x="1000" y="440" class="x">라벨·link speed ≠ 측정 throughput · smoke ≠ 학습 · GPU 학습 ≠ NPU 추론</text>
+
+  <!-- native -->
+  <rect x="40" y="520" width="700" height="250" rx="10" class="nat"/>
+  <text x="60" y="550" class="h">Kubernetes (native, 오픈소스)</text>
+  <text x="60" y="578" class="s">suspend Job + LocalQueue/priority label → Kueue: admission·quota</text>
+  <text x="60" y="602" class="s">node 모드: nodeSelector hostname = capability node (기본)</text>
+  <text x="60" y="626" class="s">pool 모드: hostname In [검증 member] required affinity ∩ pool selector</text>
+  <text x="60" y="650" class="s">→ kube-scheduler가 member 중 실제 노드 bind</text>
+  <text x="60" y="674" class="s">hostname allowlist/selector 충돌 → BackendError (fail closed)</text>
+  <text x="60" y="708" class="x">Kueue flavorSelector는 flavor label 밖 key를 무시할 수 있음 → Pod 제약 유지 필수</text>
+  <text x="60" y="730" class="x">KAI·HAMi·DRA·TAS 통합 주장 없음</text>
+
+  <rect x="800" y="520" width="760" height="250" rx="10" class="nat"/>
+  <text x="820" y="550" class="h">Slurm (native, 오픈소스)</text>
+  <text x="820" y="578" class="s">partition·account·QOS·GRES 유지 · 해시 검증 native runtime만</text>
+  <text x="820" y="602" class="s">node 모드: --nodelist=단일 노드 + --nodes=1 (기본, 24.11 의미 유지)</text>
+  <text x="820" y="626" class="s">pool 모드: --constraint=배타 feature (근거 ref 필수, 없으면 거절)</text>
+  <text x="820" y="650" class="s">GPU 학습 guard 유지: CPU host-copy 학습만 허용</text>
+  <text x="820" y="674" class="s">결과: sacct NodeList ∈ 허용 member일 때만 수용</text>
+  <text x="820" y="708" class="x">comma nodelist를 pool로 쓰지 않음 · --prefer 미사용</text>
+
+  <!-- feedback -->
+  <rect x="40" y="800" width="1520" height="70" rx="10" class="impl"/>
+  <text x="60" y="830" class="h">실행·결과 원장 (재사용)</text>
+  <text x="60" y="855" class="s">submit intent → native Job ID → 실제 노드 관측 → ingest: pool member일 때만 profile 저장(actual_capability_ref), 아니면 ACTUAL_NODE_OUTSIDE_POOL로 profile 제외</text>
+
+  <path d="M290 170 L350 170" class="l"/>
+  <path d="M980 210 L910 210" class="l"/>
+  <path d="M1270 340 L1270 310" class="l"/>
+  <path d="M500 460 L400 520" class="l"/>
+  <path d="M760 460 L1000 520" class="l"/>
+  <path d="M390 770 L390 800" class="l"/>
+  <path d="M1180 770 L1180 800" class="l"/>
+  <path d="M1500 800 C1600 650, 1600 480, 1560 420" class="ld"/>
+
+  <!-- legend -->
+  <rect x="1180" y="40" width="22" height="14" class="impl"/><text x="1208" y="52" class="x">구현(software test)</text>
+  <rect x="1340" y="40" width="22" height="14" class="nat"/><text x="1368" y="52" class="x">native 오픈소스</text>
+  <rect x="1180" y="64" width="22" height="14" class="evi"/><text x="1208" y="76" class="x">evidence 계약</text>
+  <rect x="1340" y="64" width="22" height="14" class="plan"/><text x="1368" y="76" class="x">실장비 검증: 아직 없음</text>
+</svg>

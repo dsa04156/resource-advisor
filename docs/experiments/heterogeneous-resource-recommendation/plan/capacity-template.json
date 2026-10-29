@@ -1,0 +1,33 @@
+{
+  "observed_at": "<UTC time of the fresh read-only observation>",
+  "expected_job_seconds": 60,
+  "facts": {
+    "gpu_training_routes": "<int from fresh observation>",
+    "exclusive_gpus": "<int from fresh observation>",
+    "nccl_validated": "<int from fresh observation>",
+    "measured_data_links": "<int from fresh observation>",
+    "equivalent_inference_routes": "<int from fresh observation>",
+    "slurm_cpu_training": "<int from fresh observation>",
+    "kubernetes_cpu_training": "<int from fresh observation>"
+  },
+  "bindings": {
+    "E6": {
+      "workload_ref": "<registered CPU training workload ref>",
+      "static_candidate_ref": "<B0 fixed candidate>",
+      "candidate_order": [
+        "<k8s cpu candidate>",
+        "<slurm vm candidate>"
+      ],
+      "profiling_routes": [
+        "<k8s cpu candidate>",
+        "<slurm vm candidate>"
+      ],
+      "profiles": {
+        "B2": "<legacy scheduling profile>",
+        "B3": "<profile_only profile>",
+        "B4": "<profile_queue profile>",
+        "B5": "<profile_queue_network profile (only with measured links)>"
+      }
+    }
+  }
+}

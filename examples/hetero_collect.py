@@ -1,0 +1,185 @@
+"""Read-only collectors for heterogeneous recommendation evidence.
+
+Every subcommand only reads (kubectl get, sinfo, local query tools, a stored
+database, or one explicitly permitted bounded object read) and prints JSON for an
+operator to review and import. Nothing submits jobs or changes cluster state.
+
+  inventory  --nodes-json FILE | --kubectl [--sinfo-text FILE] [--local]
+  queue      --pods-json FILE | --kubectl  --route ... (RouteQueueSnapshot)
+  profile    --database-url URL --job-id ... (JctProfile from completed RA jobs)
+  link       --url URL --source EP --target EP --evidence-ref REF [--execute]
+  probes     (existing probe hooks and what each establishes)
+"""
+
+import argparse
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+from resource_advisor.contracts import now
+from resource_advisor.hetero_collect import (
+    PROBE_HOOKS,
+    dump,
+    link_command,
+    link_measurement,
+    local_tools,
+    node_fingerprints,
+    slurm_fingerprints,
+)
+
+
+def kubectl(*args):
+    done = subprocess.run(
+        ["kubectl", "get", *args, "-o", "json"],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=True,
+    )
+    return json.loads(done.stdout)
+
+
+def inventory(args):
+    stamp = now().isoformat()
+    nodes = kubectl("nodes") if args.kubectl else json.loads(Path(args.nodes_json).read_text())
+    report = {
+        "collected_at": stamp,
+        "method": "read-only: kubectl get nodes" if args.kubectl else "file: " + args.nodes_json,
+        "kubernetes": node_fingerprints(nodes),
+        "semantics": "advertised resources/labels are inventory, not runtime or model qualification",
+    }
+    if args.sinfo_text:
+        report["slurm"] = slurm_fingerprints(Path(args.sinfo_text).read_text())
+    if args.local:
+        report["local_tools"] = local_tools()
+    print(dump(report))
+
+
+def queue(args):
+    from resource_advisor.recommendation import queue_snapshot_from_pods
+
+    pods = kubectl("pods", "-A") if args.kubectl else json.loads(Path(args.pods_json).read_text())
+    occupancy = (
+        json.loads(Path(args.expected_occupancy).read_text()) if args.expected_occupancy else {}
+    )
+    snapshot = queue_snapshot_from_pods(
+        pods["items"],
+        ref=args.ref,
+        project_ref=args.project,
+        cluster_ref=args.cluster,
+        route_ref=args.route,
+        nodes=set(args.node),
+        resource_key=args.resource_key,
+        capacity=args.capacity,
+        capacity_unit=args.capacity_unit,
+        observed_at=now(),
+        evidence_ref=args.evidence_ref,
+        expected_occupancy=occupancy,
+    )
+    print(dump(snapshot.model_dump(mode="json")))
+
+
+def profile(args):
+    from resource_advisor.recommendation import HardwareFingerprint, jct_profile_from_jobs
+    from resource_advisor.store import Store
+
+    store = Store(args.database_url)
+    rows = []
+    with store.transaction() as conn:
+        for job_id in args.job_id:
+            row = store.job(conn, job_id)
+            if row is None:
+                sys.exit(f"job {job_id} not found")
+            result = store.get(conn, "result", row["body"]["attempt_id"])
+            if result is None:
+                sys.exit(f"job {job_id} has no stored result")
+            rows.append(
+                {
+                    "id": row["id"],
+                    "state": row["state"],
+                    "body": row["body"],
+                    "result": result["body"],
+                }
+            )
+    hardware = HardwareFingerprint.model_validate(json.loads(Path(args.hardware_json).read_text()))
+    made = jct_profile_from_jobs(
+        rows, ref=args.ref, valid_for_seconds=args.valid_for_seconds, hardware=hardware
+    )
+    print(dump(made.model_dump(mode="json")))
+
+
+def link(args):
+    command = link_command(
+        args.url,
+        max_bytes=args.max_bytes,
+        max_seconds=args.max_seconds,
+        limit_rate_bytes=args.limit_rate_bytes,
+    )
+    if not args.execute:
+        print(dump({"dry_run": True, "command": command, "concurrency": 1}))
+        return
+    done = subprocess.run(
+        command, capture_output=True, text=True, timeout=args.max_seconds + 5, check=True
+    )
+    print(
+        dump(
+            link_measurement(
+                done.stdout,
+                source=args.source,
+                target=args.target,
+                evidence_ref=args.evidence_ref,
+                limit_rate_bytes=args.limit_rate_bytes,
+            )
+        )
+    )
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    sub = parser.add_subparsers(dest="command", required=True)
+    p = sub.add_parser("inventory")
+    group = p.add_mutually_exclusive_group(required=True)
+    group.add_argument("--nodes-json")
+    group.add_argument("--kubectl", action="store_true")
+    p.add_argument("--sinfo-text", help="output of: sinfo -N -h -o '%%N|%%G|%%f|%%c|%%m|%%T'")
+    p.add_argument("--local", action="store_true")
+    p.set_defaults(func=inventory)
+    p = sub.add_parser("queue")
+    group = p.add_mutually_exclusive_group(required=True)
+    group.add_argument("--pods-json")
+    group.add_argument("--kubectl", action="store_true")
+    for name in ("ref", "project", "cluster", "route", "resource-key", "evidence-ref"):
+        p.add_argument("--" + name, required=True)
+    p.add_argument("--node", action="append", required=True)
+    p.add_argument("--capacity", type=int, required=True)
+    p.add_argument("--capacity-unit", choices=["physical_device", "logical_slot"], required=True)
+    p.add_argument("--expected-occupancy", help="JSON {ra_job_id: seconds} from frozen plans")
+    p.set_defaults(func=queue)
+    p = sub.add_parser("profile")
+    p.add_argument("--database-url", required=True)
+    p.add_argument("--job-id", action="append", required=True)
+    p.add_argument("--hardware-json", required=True)
+    p.add_argument("--ref", required=True)
+    p.add_argument("--valid-for-seconds", type=int, default=86400)
+    p.set_defaults(func=profile)
+    p = sub.add_parser("link")
+    p.add_argument("--url", required=True)
+    p.add_argument("--source", required=True)
+    p.add_argument("--target", required=True)
+    p.add_argument("--evidence-ref", required=True)
+    p.add_argument("--max-bytes", type=int, default=64 * 2**20)
+    p.add_argument("--max-seconds", type=int, default=20)
+    p.add_argument("--limit-rate-bytes", type=int, default=200 * 2**20)
+    p.add_argument("--execute", action="store_true", help="perform the permitted read")
+    p.set_defaults(func=link)
+    p = sub.add_parser("probes")
+    p.set_defaults(func=lambda _: print(dump(PROBE_HOOKS)))
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()

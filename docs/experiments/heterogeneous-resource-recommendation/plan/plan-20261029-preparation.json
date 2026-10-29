@@ -1,0 +1,138 @@
+{
+  "analysis": {
+    "claims": "exploratory n=3 blocks; no power, effect size or superiority claim",
+    "outcomes": [
+      "completion rate (failed/timeout/cancelled included in denominator)",
+      "completed-only JCT = native submit to native completion",
+      "queue wait = native submit to allocation start",
+      "censored count (timeout/cancel/budget stop)",
+      "fallback and abstention counts"
+    ],
+    "profile_split": "profiles from the profiling phase only, measured before evaluation",
+    "unit": "cohort of native Jobs per (scenario, pattern, block, arm)"
+  },
+  "arms": {
+    "B0": {
+      "name": "native/static",
+      "submission": "fixed_candidate"
+    },
+    "B1": {
+      "name": "round robin",
+      "submission": "rotating_candidate"
+    },
+    "B2": {
+      "name": "current RA",
+      "submission": "automatic"
+    },
+    "B3": {
+      "name": "profile only",
+      "policy": "profile_only",
+      "submission": "automatic"
+    },
+    "B4": {
+      "name": "profile+queue",
+      "policy": "profile_queue",
+      "submission": "automatic"
+    },
+    "B5": {
+      "name": "profile+queue+network",
+      "policy": "profile_queue_network",
+      "submission": "automatic"
+    }
+  },
+  "budget": {
+    "job_timeout_seconds": 120,
+    "max_jobs": 60,
+    "max_profiling_jobs_per_route": 1,
+    "max_slot_seconds": 1800,
+    "max_wall_seconds": 1800,
+    "repeats": 3
+  },
+  "capacity": {
+    "bindings": {},
+    "expected_job_seconds": 60,
+    "fact_evidence": {
+      "equivalent_inference_routes": "Hailo8 B / Mobilint / Intel NPU expose resources; runtime execution UNVERIFIED today and different compiled precisions are not one WorkloadSpec",
+      "exclusive_gpus": "0 free exclusive GPUs observed",
+      "gpu_training_routes": "RTX5060Ti/RTX5080/GB10 allocated to another project's Deployments; Orin Nano A shared slot has no TRAINING_VERIFIED variant",
+      "kubernetes_cpu_training": "CPU nodes Ready; live-training route is a 2026-10-28 historical record, not re-verified today",
+      "measured_data_links": "no measured TopologySnapshot links or DataLocation records",
+      "nccl_validated": "no multi-GPU route",
+      "slurm_cpu_training": "Slurm VM idle (CPU only); CPU host-copy route not re-verified today"
+    },
+    "facts": {
+      "equivalent_inference_routes": 0,
+      "exclusive_gpus": 0,
+      "gpu_training_routes": 0,
+      "kubernetes_cpu_training": 0,
+      "measured_data_links": 0,
+      "nccl_validated": 0,
+      "slurm_cpu_training": 0
+    },
+    "observed_at": "2026-10-29T02:32:15+00:00",
+    "source": "CURRENT-STATE-AUDIT.md \u00a74 (read-only kubectl/Prometheus/Slurm probes, 02:29:16Z-02:32:15Z)"
+  },
+  "capacity_observed_at": "2026-10-29T02:32:15+00:00",
+  "expected_job_seconds": 60.0,
+  "frozen_at": "2026-10-29T04:54:27.717217+00:00",
+  "planned": {
+    "jobs": 0,
+    "slot_seconds": 0.0,
+    "wall_seconds": 0.0
+  },
+  "profiling": [],
+  "scenarios": {
+    "E1": {
+      "reasons": [
+        "gpu_training_routes<1"
+      ],
+      "status": "BLOCKED"
+    },
+    "E2": {
+      "reasons": [
+        "gpu_training_routes<2"
+      ],
+      "status": "BLOCKED"
+    },
+    "E3": {
+      "reasons": [
+        "measured_data_links<2"
+      ],
+      "status": "BLOCKED"
+    },
+    "E4": {
+      "reasons": [
+        "exclusive_gpus<2",
+        "nccl_validated<1"
+      ],
+      "status": "NOT_VALIDATED"
+    },
+    "E5": {
+      "reasons": [
+        "equivalent_inference_routes<2"
+      ],
+      "status": "BLOCKED"
+    },
+    "E6": {
+      "reasons": [
+        "kubernetes_cpu_training<1",
+        "slurm_cpu_training<1"
+      ],
+      "status": "BLOCKED"
+    },
+    "E7": {
+      "jobs": 0,
+      "method": "software fault injection on previews",
+      "status": "PLANNED"
+    },
+    "E8": {
+      "reasons": [
+        "NO_SOURCE_EXPERIMENT"
+      ],
+      "status": "BLOCKED"
+    }
+  },
+  "seed": 20261029,
+  "units": [],
+  "version": "hetero-experiment-plan-v1"
+}

@@ -636,11 +636,24 @@ class Service:
                 and result.measurements.quality_value >= spec.quality.minimum
                 and result.measurements.peak_memory_mib <= spec.quality.maximum_peak_memory_mib
             )
+            target = (body.get("scheduling_plan") or {}).get("target")
+            if target and not problems:
+                # Pool mode: bind the observed node to its verified member capability.
+                node = (body.get("placement") or {}).get("node_name")
+                member = next((m for m in target["members"] if m["node_ref"] == node), None)
+                if member is None:
+                    body["profile_excluded"] = (
+                        "ACTUAL_NODE_UNKNOWN" if node is None else "ACTUAL_NODE_OUTSIDE_POOL"
+                    )
+                else:
+                    body["actual_capability_ref"] = member["capability_ref"]
+                    body["actual_node_ref"] = node
             self.store.change_job(conn, row, state, body)
             if not problems:
                 if (
                     result.outcome == "COMPLETED"
                     and body["quality_passed"]
+                    and not body.get("profile_excluded")
                     and body.get("thermal_assessment", {}).get("status", "ELIGIBLE_TRACE")
                     == "ELIGIBLE_TRACE"
                     and body["request"]["mode"] != "pilot"
@@ -655,6 +668,14 @@ class Service:
                             "candidate_ref": body["candidate"]["ref"],
                             "recorded_at": body["finished_at"],
                             "result": result.model_dump(mode="json"),
+                            **(
+                                {
+                                    "actual_node_ref": body["actual_node_ref"],
+                                    "actual_capability_ref": body["actual_capability_ref"],
+                                }
+                                if target
+                                else {}
+                            ),
                         },
                     )
                 self.store.enqueue(

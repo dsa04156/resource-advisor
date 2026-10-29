@@ -15,8 +15,20 @@ from math import isfinite
 from typing import Literal
 
 PROFILE_QUEUE = "profile_queue"
+PROFILE_QUEUE_NETWORK = "profile_queue_network"
 ROUND_ROBIN = "round_robin"
 V2_PROFILE_ONLY = "profile_only"
+# Allocation start to native completion. Native queue wait and admission stay
+# outside these phases; they come from the queue snapshot and admission field.
+PHASES = (
+    "runtime_startup",
+    "data_staging",
+    "model_preparation",
+    "compute",
+    "communication",
+    "finalization",
+    "unattributed_in_container",
+)
 
 
 @dataclass(frozen=True)
@@ -59,6 +71,11 @@ class MeasuredProfile:
     readmission_seconds: float | None = None
     timing_uncertainty_seconds: float | None = None
     timing_notes: tuple[str, ...] = ()
+    # Optional phase structure replaces compute/preparation/release/v2 service.
+    # Phases are sequential unless named in one overlap group, which costs its
+    # longest member (critical path). Unknown phases stay None and abstain.
+    phases: tuple[tuple[str, float | None], ...] = ()
+    overlap_groups: tuple[tuple[str, ...], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -125,6 +142,9 @@ class CandidatePrediction:
     v2_service_seconds: float | None = None
     timing_uncertainty_seconds: float | None = None
     timing_notes: tuple[str, ...] = ()
+    phase_seconds: tuple[tuple[str, float], ...] = ()
+    critical_path_seconds: float | None = None
+    transfer_seconds: float | None = None
 
 
 @dataclass(frozen=True)
@@ -151,6 +171,12 @@ def _profile_reason(profile, candidate, now_seconds, max_age, policy):
         return "PROFILE_FROM_FUTURE"
     if now_seconds - profile.measured_at > max_age:
         return "PROFILE_STALE"
+    if profile.phases:
+        return _phase_reason(profile) or (
+            "PROFILE_COMPONENT_UNKNOWN"
+            if policy != V2_PROFILE_ONLY and profile.admission_seconds is None
+            else None
+        )
     components = (
         (profile.v2_service_seconds,)
         if policy == V2_PROFILE_ONLY
@@ -166,6 +192,36 @@ def _profile_reason(profile, candidate, now_seconds, max_age, policy):
     if any(not isfinite(value) or value < 0 for value in components):
         return "PROFILE_COMPONENT_INVALID"
     return None
+
+
+def _phase_reason(profile):
+    names = [name for name, _ in profile.phases]
+    grouped = [name for group in profile.overlap_groups for name in group]
+    if (
+        len(set(names)) != len(names)
+        or any(name not in PHASES for name in names)
+        or len(set(grouped)) != len(grouped)
+        or any(len(group) < 2 for group in profile.overlap_groups)
+        or any(name not in names for name in grouped)
+    ):
+        return "PROFILE_PHASES_INVALID"
+    values = [value for _, value in profile.phases]
+    if any(value is None for value in values):
+        return "PROFILE_COMPONENT_UNKNOWN"
+    if any(not isfinite(value) or value < 0 for value in values):
+        return "PROFILE_COMPONENT_INVALID"
+    return None
+
+
+def _critical_path(profile, staging=None):
+    """Sequential phases add; each overlap group adds only its longest member."""
+    values = dict(profile.phases)
+    if staging is not None:
+        values["data_staging"] = staging
+    grouped = {name for group in profile.overlap_groups for name in group}
+    total = sum(value for name, value in values.items() if name not in grouped)
+    total += sum(max(values[name] for name in group) for group in profile.overlap_groups)
+    return total, tuple(values.items())
 
 
 def _queue_reason(queue, now_seconds):
@@ -197,7 +253,7 @@ def _queue_reason(queue, now_seconds):
 
 
 def select_candidate(
-    policy: Literal["round_robin", "profile_only", "profile_queue"],
+    policy: Literal["round_robin", "profile_only", "profile_queue", "profile_queue_network"],
     candidates: Sequence[CandidateIdentity],
     profiles: Sequence[MeasuredProfile],
     *,
@@ -208,6 +264,7 @@ def select_candidate(
     intents: Sequence[SubmitIntent] = (),
     rr_index: int = 0,
     cohort_backlog_seconds: Mapping[str, float] | None = None,
+    transfer_seconds: Mapping[str, float | None] | None = None,
 ) -> SelectionDecision:
     """Select deterministically; controls never consume live queue/intents.
 
@@ -215,9 +272,12 @@ def select_candidate(
     its service estimate to static cohort backlog without elapsed-time decay. None
     initializes a new cohort with known zero backlog; supplied mappings must name
     every candidate. Profile + Queue uses fresh complete observations and reconciled
-    intents. Prediction ties use candidate reference, independent of input ordering.
+    intents. Profile + Queue + Network additionally replaces the separately measured
+    data-staging phase with the caller's frozen transfer estimate (never adds both);
+    an unknown estimate or inseparable staging abstains. Prediction ties use
+    candidate reference, independent of input ordering.
     """
-    if policy not in {ROUND_ROBIN, V2_PROFILE_ONLY, PROFILE_QUEUE}:
+    if policy not in {ROUND_ROBIN, V2_PROFILE_ONLY, PROFILE_QUEUE, PROFILE_QUEUE_NETWORK}:
         raise ValueError("unknown selection policy")
     if not isfinite(now_seconds) or any(
         not isfinite(age) or age < 0 for age in (max_queue_age_seconds, max_profile_age_seconds)
@@ -258,6 +318,21 @@ def select_candidate(
                         candidate.candidate_ref, None, None, ("V2_BACKLOG_UNKNOWN_OR_INVALID",)
                     )
                 )
+            elif profile.phases:
+                service, phases = _critical_path(profile)
+                predictions.append(
+                    CandidatePrediction(
+                        candidate.candidate_ref,
+                        wait,
+                        wait + service,
+                        ("V2_STATIC_COHORT_BACKLOG", "PHASE_CRITICAL_PATH"),
+                        profile_evidence_ref=profile.evidence_ref,
+                        timing_uncertainty_seconds=profile.timing_uncertainty_seconds,
+                        timing_notes=profile.timing_notes,
+                        phase_seconds=phases,
+                        critical_path_seconds=service,
+                    )
+                )
             else:
                 predictions.append(
                     CandidatePrediction(
@@ -270,6 +345,24 @@ def select_candidate(
                     )
                 )
             continue
+        transfer = None
+        if policy == PROFILE_QUEUE_NETWORK:
+            transfer = (transfer_seconds or {}).get(candidate.candidate_ref)
+            staging = "data_staging" in dict(profile.phases)
+            reason = (
+                "STAGING_NOT_SEPARABLE"
+                if not staging
+                else "NETWORK_ESTIMATE_UNKNOWN"
+                if transfer is None
+                else "NETWORK_ESTIMATE_INVALID"
+                if not isfinite(transfer) or transfer < 0
+                else None
+            )
+            if reason:
+                predictions.append(
+                    CandidatePrediction(candidate.candidate_ref, None, None, (reason,))
+                )
+                continue
         matches = [q for q in queues if q.identity.candidate_ref == candidate.candidate_ref]
         queue = matches[0] if matches else None
         reason = None
@@ -338,6 +431,29 @@ def select_candidate(
             predictions.append(
                 CandidatePrediction(
                     candidate.candidate_ref, None, None, ("READMISSION_UNKNOWN_OR_INVALID",)
+                )
+            )
+            continue
+        if profile.phases:
+            service, phases = _critical_path(profile, transfer)
+            predictions.append(
+                CandidatePrediction(
+                    candidate.candidate_ref,
+                    wait,
+                    wait + admission + service,
+                    ("PHASE_CRITICAL_PATH",),
+                    admission_seconds=admission,
+                    profile_evidence_ref=profile.evidence_ref,
+                    queue_snapshot_ref=queue.snapshot_ref,
+                    accounted_job_ids=tuple(job.job_id for job in (*queue.running, *queue.pending)),
+                    capacity=queue.capacity,
+                    capacity_unit=queue.capacity_unit,
+                    deduplicated_intent_ids=tuple(deduplicated),
+                    timing_uncertainty_seconds=profile.timing_uncertainty_seconds,
+                    timing_notes=profile.timing_notes,
+                    phase_seconds=phases,
+                    critical_path_seconds=service,
+                    transfer_seconds=transfer,
                 )
             )
             continue

@@ -1,0 +1,13 @@
+{
+  "level": "preparation: frozen plan and software artifacts; no new hardware measurement",
+  "plan_digest": "sha256:b291f44e111a8fa7184cf8d8163c95efda4c56b2527e9f220d163e3515c44a3d",
+  "files": {
+    "plan/capacity-20261029.json": "sha256:0529b8bc9414a31950fbbe5d6a646c9b744f9a99891543a3398f593cfd82e72d",
+    "plan/capacity-template.json": "sha256:1eb05161a6adc288e306892a79e6c8071e8a11d291becdfb4e5e2a7a2a2ad5da",
+    "plan/plan-20261029-preparation.json": "sha256:d02c246505cd4bf10691f6e6f5ecd1b6f23047f4397efb9632396af749cf6e5e",
+    "plan/scenario-status-20261029.csv": "sha256:3252796c6777d9c08bcca8ecac443c490119138b51533156c5b760c398ed014f",
+    "architecture.svg": "sha256:e248ab89dde60b8ee069f8f388639a87a7ab97b6edb1aff28dd76f6e186253e0",
+    "architecture.png": "sha256:8b2b7478f7e9df58ab733274a1e2c2b889ae68da56d3788369c091dd2ebcd622"
+  },
+  "results": null
+}

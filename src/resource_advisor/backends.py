@@ -177,6 +177,16 @@ def identity_environment(job):
     return values
 
 
+def pool_target(job):
+    """Opt-in pool target recorded in the accepted plan; None keeps node pinning."""
+    target = (job["body"].get("scheduling_plan") or {}).get("target")
+    if target is None:
+        return None
+    if target.get("mode") != "pool" or not target.get("members"):
+        raise BackendError("invalid pool target")
+    return target
+
+
 def priority_mapping(mapping):
     mapping = dict(mapping or {})
     for grade, name in mapping.items():
@@ -293,10 +303,40 @@ class KubernetesBackend:
             raise BackendError("configured pool architecture mismatch")
         selectors["kubernetes.io/arch"] = b["variant"]["arch"]
         allowed_host = selectors.get("kubernetes.io/hostname")
-        if allowed_host and allowed_host != b["capability"]["node_ref"]:
-            raise BackendError("candidate is outside the configured node allowlist")
-        # Select the verified node through scheduling, never spec.nodeName.
-        selectors["kubernetes.io/hostname"] = b["capability"]["node_ref"]
+        target = pool_target(job)
+        affinity = None
+        if target:
+            # kube-scheduler chooses among verified members only; never drop the
+            # hostname restriction without replacing it by the member allowlist.
+            members = sorted(m["node_ref"] for m in target["members"])
+            if allowed_host and members != [allowed_host]:
+                raise BackendError("pool placement conflicts with the configured hostname allowlist")
+            for key, value in target.get("kubernetes_node_selector", {}).items():
+                if selectors.get(key, value) != value:
+                    raise BackendError("pool selector conflicts with the configured node pool")
+                selectors[key] = value
+            affinity = {
+                "nodeAffinity": {
+                    "requiredDuringSchedulingIgnoredDuringExecution": {
+                        "nodeSelectorTerms": [
+                            {
+                                "matchExpressions": [
+                                    {
+                                        "key": "kubernetes.io/hostname",
+                                        "operator": "In",
+                                        "values": members,
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        else:
+            if allowed_host and allowed_host != b["capability"]["node_ref"]:
+                raise BackendError("candidate is outside the configured node allowlist")
+            # Select the verified node through scheduling, never spec.nodeName.
+            selectors["kubernetes.io/hostname"] = b["capability"]["node_ref"]
         manifest = {
             "apiVersion": "batch/v1",
             "kind": "Job",
@@ -363,6 +403,8 @@ class KubernetesBackend:
             manifest["spec"]["template"]["spec"].update(
                 hostNetwork=True, dnsPolicy="ClusterFirstWithHostNet"
             )
+        if affinity:
+            manifest["spec"]["template"]["spec"]["affinity"] = affinity
         if self.runtime_class_name:
             manifest["spec"]["template"]["spec"]["runtimeClassName"] = self.runtime_class_name
         bundle_ref = b["variant"].get("kubernetes_runtime_bundle_ref")
@@ -827,6 +869,18 @@ class SlurmBackend:
         node = b["capability"]["node_ref"]
         if not re.fullmatch(r"[A-Za-z0-9_.-]+", node):
             raise BackendError("invalid qualified node reference")
+        target = pool_target(job)
+        if target:
+            # Slurm chooses within an operator-verified exclusive feature; the
+            # allocated node is checked against the members before any result use.
+            constraint = target.get("slurm_constraint") or ""
+            if not re.fullmatch(r"[A-Za-z0-9_.-]{1,64}", constraint) or not target.get(
+                "slurm_constraint_exclusive_evidence_ref"
+            ):
+                raise BackendError("Slurm pool requires a verified exclusive feature constraint")
+            placement = f"--constraint={constraint}"
+        else:
+            placement = f"--nodelist={node}"
         seconds = b.get("execution_limits", b["spec"]["execution"])["max_run_seconds"]
         directives = [
             f"--job-name={b['attempt_id']}",
@@ -834,7 +888,7 @@ class SlurmBackend:
             f"--partition={self.partition}",
             f"--account={self.account}",
             f"--qos={qos}",
-            f"--nodelist={node}",
+            placement,
             "--nodes=1",
             "--ntasks=1",
             "--chdir=/",
@@ -1172,8 +1226,14 @@ class SlurmBackend:
             ]
         )
         _, _, _, _, node, state, exitcode = self.owned_record(output, job, width=7)
+        target = pool_target(job)
+        allowed = (
+            {m["node_ref"] for m in target["members"]}
+            if target
+            else {job["body"]["capability"]["node_ref"]}
+        )
         if (
-            node != job["body"]["capability"]["node_ref"]
+            node not in allowed
             or state != "COMPLETED"
             or exitcode != "0:0"
         ):

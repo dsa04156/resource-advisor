@@ -7,12 +7,13 @@ cluster configuration nor claim a quota shared across independent schedulers.
 from datetime import timedelta
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, model_serializer, model_validator
 from sqlalchemy import func, or_, select
 
 from .contracts import TERMINAL, Contract, Ref, Resources, WorkloadSpec, now, signature
 from .inventory import fresh_view
 from .policy import execution_compatibility
+from .recommendation import RecommendationPolicy
 from .store import entities, jobs
 
 
@@ -34,6 +35,18 @@ class SchedulingPolicy(Contract):
     max_queue_seconds: int = Field(ge=1, le=86400)
     quota_scope: Literal["backend", "global"] = "backend"
     preemption: Literal["inherit", "never", "allow"] = "inherit"
+    # Opt-in only. None/"node" keep the legacy rule, digest and node pinning.
+    recommendation: RecommendationPolicy | None = None
+    target_mode: Literal["node", "pool"] = "node"
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_signature(self, handler):
+        value = handler(self)
+        if self.recommendation is None:
+            value.pop("recommendation", None)
+        if self.target_mode == "node":
+            value.pop("target_mode", None)
+        return value
 
     @model_validator(mode="after")
     def orders_are_explicit(self):
@@ -182,8 +195,11 @@ def availability(candidate, cap, observations):
 
 
 def plan_digest(plan):
-    # Inventory evidence may refresh without changing the actual execution plan.
-    return signature({k: v for k, v in plan.items() if k != "evaluation"})
+    # Inventory/queue evidence may refresh without changing the actual execution
+    # plan; the selected candidate, target and frozen profile refs stay signed.
+    return signature(
+        {k: v for k, v in plan.items() if k not in {"evaluation", "recommendation_evidence"}}
+    )
 
 
 def compile_plan(service, conn, project, request):
@@ -215,6 +231,12 @@ def compile_plan(service, conn, project, request):
             request = request.model_copy(update={"candidate_ref": template.candidate_ref})
         spec = service.template_spec(spec, template)
     policy = profile.policy
+    rec = policy.recommendation
+    data_location = None
+    if rec is not None:
+        from .recommendation import data_location as locate
+
+        data_location, data_reason = locate(service, conn, project, spec)
     common = []
     if policy.quota_scope != "backend":
         common.append("GLOBAL_QUOTA_UNSUPPORTED")
@@ -255,8 +277,9 @@ def compile_plan(service, conn, project, request):
         except (NotFound, Rejected):
             excluded[candidate.ref] = errors + ["CANDIDATE_CONTRACT_UNAVAILABLE"]
             continue
+        # Recommendation inputs never inherit the operational staleness relaxation.
         errors += execution_compatibility(
-            spec, candidate, variant, cap, operational=service.operational_mode
+            spec, candidate, variant, cap, operational=service.operational_mode and rec is None
         )
         if not service.operational_mode and candidate.ref != spec.baseline_candidate_ref:
             errors.append("APPROVAL_REQUIRED")
@@ -289,7 +312,41 @@ def compile_plan(service, conn, project, request):
             errors.append("SCHEDULER_BINDING_MISSING")
         elif policy.priority not in binding.priority_map:
             errors.append("PRIORITY_UNSUPPORTED")
-        live = availability(candidate, cap, observations)
+        target = None
+        if policy.target_mode == "pool":
+            from .recommendation import resolve_pool
+
+            target, pool_errors = resolve_pool(service, conn, project, candidate, cap)
+            errors += pool_errors
+        if rec is not None and data_reason:
+            errors.append(data_reason)
+        elif data_location is not None:
+            readable = {
+                n.node_ref
+                for n in data_location.accessible_nodes
+                if str(n.backend) == str(candidate.backend)
+                and n.cluster_ref == cap.backend_cluster_id
+            }
+            if target:
+                target["members"] = [m for m in target["members"] if m["node_ref"] in readable]
+                if not target["members"]:
+                    errors.append("DATA_ACCESS_DENIED")
+            elif cap.node_ref not in readable:
+                errors.append("DATA_ACCESS_DENIED")
+        if target and target["members"]:
+            from .contracts import CapabilitySnapshot
+            from .recommendation import pool_availability
+
+            members = [
+                CapabilitySnapshot.model_validate(
+                    required(service.store, conn, "capability", m["capability_ref"], project)
+                )
+                for m in target["members"]
+            ]
+            live, usable = pool_availability(candidate, members, observations)
+            target["members"] = [{"capability_ref": m.ref, "node_ref": m.node_ref} for m in usable]
+        else:
+            live = availability(candidate, cap, observations)
         key = (str(candidate.backend), cap.node_ref)
         live["accepted_active_jobs"] = demand.get(key, 0)
         live["accepted_recent_jobs"] = recent.get(key, 0)
@@ -300,6 +357,7 @@ def compile_plan(service, conn, project, request):
             {
                 "candidate_ref": candidate.ref,
                 "node_ref": cap.node_ref,
+                **({"target": target} if target else {}),
                 "backend": str(candidate.backend),
                 "model": cap.accelerator_model,
                 "availability": live,
@@ -311,7 +369,7 @@ def compile_plan(service, conn, project, request):
         if errors:
             excluded[candidate.ref] = list(dict.fromkeys(errors))
         else:
-            eligible.append((candidate, cap, binding, live))
+            eligible.append((candidate, cap, binding, live, variant, target))
     if not eligible:
         return {
             "accepted": False,
@@ -331,7 +389,43 @@ def compile_plan(service, conn, project, request):
             x[0].ref,
         )
     )
-    candidate, cap, binding, live = eligible[0]
+    recommendation = evidence = None
+    if rec is not None:
+        from .recommendation import rank
+
+        index, recommendation, evidence = rank(
+            service,
+            conn,
+            project,
+            spec,
+            rec,
+            [
+                {"candidate": c, "cap": k, "variant": v, "target": t}
+                for c, k, _, _, v, t in eligible
+            ],
+        )
+        if index is not None:
+            eligible.insert(0, eligible.pop(index))
+        elif rec.fallback == "legacy":
+            # Explicit, recorded fallback to the unchanged legacy order.
+            recommendation["fallback"] = {
+                "used": True,
+                "reason": recommendation["status"],
+                "rule": "legacy compile_plan order",
+            }
+            recommendation["status"] = "LEGACY_FALLBACK"
+        else:
+            return {
+                "accepted": False,
+                "reasons": [recommendation["status"]],
+                "excluded": excluded,
+                "plan": None,
+                "digest": None,
+                "evaluation": evaluation,
+                "recommendation": recommendation,
+                "recommendation_evidence": evidence,
+            }
+    candidate, cap, binding, live, _, target = eligible[0]
     execution = spec.execution.model_dump(mode="json")
     execution.update(
         priority=policy.priority,
@@ -347,7 +441,7 @@ def compile_plan(service, conn, project, request):
         "candidate_ref": candidate.ref,
         "backend": str(candidate.backend),
         "cluster_ref": cap.backend_cluster_id,
-        "node_ref": cap.node_ref,
+        "node_ref": None if target else cap.node_ref,
         "resource_key": cap.resource_key,
         "allocation_mode": cap.allocation_mode,
         "resources": candidate.context.resources.model_dump(mode="json"),
@@ -364,6 +458,18 @@ def compile_plan(service, conn, project, request):
             "Backend queue/account enforces its own quota; no cross-backend quota is reserved",
         ],
     }
+    if target:
+        plan["target"] = target
+        plan["reason"].append(
+            "Pool target: the native scheduler chooses one operator-verified member node"
+        )
+    if recommendation is not None:
+        recommendation["selected_candidate_ref"] = candidate.ref
+        plan["recommendation"] = recommendation
+        plan["recommendation_evidence"] = evidence
+        plan["reason"][1] = (
+            f"{rec.policy} estimate ({rec.version}); legacy order only as recorded fallback"
+        )
     return {
         "accepted": True,
         "reasons": [],
