@@ -2659,8 +2659,11 @@ function trainCombinations(sel) {
   root.append(table(["자원 조합","노드","메모리 (장치당)","현재 가용성","예상 JCT","대기 · 준비 · 전송 · 학습","측정 근거","차단 사유","동작"],sel.combinations.map(x=>{
     const j=x.jct,b=j.breakdown,u=b?.uncertainty,m=x.memory;
     const count=x.physical_devices!=null?`물리 ${x.device_class?.toUpperCase()||"장치"} ${x.physical_devices}개`:x.shared_slots!=null?`공유 슬롯 ${x.shared_slots}개 · 물리 GPU 수 아님`:"가속기 없음";
-    return [add(el("span",null,"job-name"),el("strong",(x.model||"모델 미확인")),el("small",count),el("small",(trainStrategy[x.strategy]||x.strategy)+" · "+x.backend),el("small",x.workload_ref+" / "+x.candidate_ref)),
-      add(el("div"),el("span",x.node_refs.join(", ")||"노드 미확인"),x.node_observation?jctNode(x.node_observation):null),
+    // Each allocated member with its own device model; mixed allocations never repeat the anchor model.
+    const members=x.members?.length?x.members:[{node_ref:x.node_refs[0],accelerator_model:x.model,gpus:x.physical_devices}];
+    return [add(el("span",null,"job-name"),el("strong",members.map(a=>`${a.accelerator_model||"모델 미확인"} ×${a.gpus??"?"}`).join(" + ")),el("small",count),
+      el("small",`랭크당 배치 ${x.local_batch_size??"—"}${x.gradient_accumulation>1?" · 누적 "+x.gradient_accumulation:""}`),el("small",(trainStrategy[x.strategy]||x.strategy)+" · "+x.backend),el("small",x.workload_ref+" / "+x.candidate_ref)),
+      add(el("div"),...members.map(a=>el("div",`${a.node_ref||"노드 미확인"} · ${a.accelerator_model||"모델 미확인"} ×${a.gpus??"?"}`)),x.node_observation?jctNode(x.node_observation):null),
       add(el("div"),el("span",m.measured_peak_mib_per_device!=null?`측정 최대 ${fmt(m.measured_peak_mib_per_device,0)} MiB`:"측정 없음"),el("small",`허용 ${fmt(m.required_peak_mib_per_device,0)} MiB · ${m.memory_model} · 장치 간 합산 안 함`)),
       x.availability?add(el("div"),badge(trainAvail[x.availability.status]||x.availability.status,x.availability.status==="available"?"":"warn"),el("small",x.availability.reason?trainReason(x.availability.reason):"")):badge("관측 없음","warn"),
       j.status==="ESTIMATED"?add(el("div"),el("strong",seconds(j.predicted_seconds)),el("small",u?.profile_jct_stddev_seconds!=null?`관측 표준편차 ${seconds(u.profile_jct_stddev_seconds)} · 신뢰구간 아님`:"분산 기록 없음 · 신뢰구간 아님")):

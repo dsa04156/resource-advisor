@@ -250,6 +250,29 @@ def _combination(
         "exclusive": context.allocation_mode == "physical_device",
         "shared_slots": count if context.allocation_mode == "virtual_slot" else None,
         "allocation_mode": context.allocation_mode,
+        # Every allocated member as declared: mixed allocations keep each node's own model.
+        "members": [
+            {
+                "node_ref": n.node_ref,
+                "accelerator_model": n.accelerator_model,
+                "gpus": n.gpus,
+                "capability_ref": n.capability_ref,
+                "per_rank_batch_size": spec.identity.batch_size,
+            }
+            for n in distributed.nodes
+        ]
+        if distributed
+        else [
+            {
+                "node_ref": row.get("node_ref"),
+                "accelerator_model": row.get("model"),
+                "gpus": count
+                if context.allocation_mode == "physical_device"
+                else (1 if count else 0),
+                "capability_ref": candidate.capability_ref,
+                "per_rank_batch_size": spec.identity.batch_size,
+            }
+        ],
         "node_refs": [n.node_ref for n in distributed.nodes]
         if distributed
         else [row["node_ref"]]

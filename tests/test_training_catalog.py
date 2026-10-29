@@ -473,3 +473,56 @@ def test_conditions_keep_objectives_apart_and_ignore_only_the_declared_batch_axi
     groups = sorted(sorted(w["workload_ref"] for w in c["workloads"]) for c in configs)
     assert groups == [["ce-16"], ["kd-16", "kd-8"]]
     assert {c["condition"]["config_digest"] for c in configs} == {signature("kd"), signature("ce")}
+
+
+def test_mixed_model_combination_lists_every_member_device_and_per_rank_batch(
+    client, pair, service
+):
+    from resource_advisor import contracts
+    from resource_advisor.training_catalog import _combination
+
+    nodes = (
+        contracts.DistributedNode(node_ref="ser0001", capability_ref="cap-5060", gpus=1,
+                                  accelerator_model="NVIDIA GeForce RTX 5060 Ti",
+                                  validation_ref="proof-5060"),
+        contracts.DistributedNode(node_ref="ser0002", capability_ref="cap-5080", gpus=1,
+                                  accelerator_model="NVIDIA GeForce RTX 5080",
+                                  validation_ref="proof-5080"),
+    )  # fmt: skip
+    ddp = contracts.DistributedTraining(
+        strategy="ddp", launcher="torchrun", collective="nccl", nodes=nodes,
+        nproc_per_node=1, world_size=2,
+    )  # fmt: skip
+    w, _ = training(service, pair, "mnv3-mixed", batch_size=8, global_batch_size=16)
+    candidate = w.candidates[0]
+    typed = candidate.model_copy(
+        update={"context": candidate.context.model_copy(update={"distributed": ddp})}
+    )
+    spec = w.model_copy(update={"candidates": (typed,)})
+    row = {"candidate_ref": typed.ref, "node_ref": "ser0001", "backend": "kubernetes",
+           "cluster_ref": "lab", "resource_key": "nvidia.com/gpu",
+           "model": "NVIDIA GeForce RTX 5060 Ti", "device_class": "gpu",
+           "submission_reasons": [], "submittable_now": False, "verification": "TRAINING_VERIFIED"}  # fmt: skip
+    with service.store.transaction() as conn:
+        result = _combination(
+            service, conn, "team-a", spec, row, at=now(), inventory=[], queue_age=30,
+            profile=None, preview=None, error=None, runs=[],
+        )  # fmt: skip
+    assert result["members"] == [
+        {"node_ref": "ser0001", "accelerator_model": "NVIDIA GeForce RTX 5060 Ti", "gpus": 1,
+         "capability_ref": "cap-5060", "per_rank_batch_size": 8},
+        {"node_ref": "ser0002", "accelerator_model": "NVIDIA GeForce RTX 5080", "gpus": 1,
+         "capability_ref": "cap-5080", "per_rank_batch_size": 8},
+    ]  # fmt: skip
+    assert result["physical_devices"] == 2 and result["local_batch_size"] == 8
+
+
+def test_single_device_combination_has_one_member(client, pair, service):
+    training(service, pair, "mnv3-a")
+    key = models(client)["mobilenet_v3_small"]["model_key"]
+    combos = get(client, f"/training-catalog?model={key}")["selected"]["combinations"]
+    base = next(c for c in combos if c["candidate_ref"] == "base")
+    assert base["members"] == [
+        {"node_ref": "test-worker", "accelerator_model": "fixture-gpu", "gpus": 1,
+         "capability_ref": "cap-1", "per_rank_batch_size": 1}
+    ]  # fmt: skip
