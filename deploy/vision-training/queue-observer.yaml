@@ -121,8 +121,8 @@ spec:
         seccompProfile: {type: RuntimeDefault}
       containers:
         - name: observer
-          # console-api composite @88ed35d9 + appended resource_advisor/route_queue_observer.py
-          image: 10.254.192.47:5000/resource-advisor/console-api@sha256:4240bd205c5655f309c0b79166425f79ab970c5688c9315197bca6f24ef2e3f9
+          # Final integrated composite (live 88ed35d9 + tree b1b189e7 / source 2618e59 + resolver).
+          image: 10.254.192.47:5000/resource-advisor/console-api@sha256:e32472ac64cd9346085a04e2267456a0e903241ace58dcd354bb3d320e39c063
           command: [python, -m, resource_advisor.route_queue_observer]
           args: [--config, /config/observer.json, --in-cluster, --heartbeat-path, /tmp/heartbeat]
           env:
