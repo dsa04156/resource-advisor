@@ -84,13 +84,28 @@ def test_mismatched_semantics_refused_before_work(overrides):
 
 
 DIST = {
-    "schema_version": "v1", "strategy": "ddp", "launcher": "torchrun", "collective": "nccl",
-    "world_size": 2, "nproc_per_node": 1, "memory_semantics": "replicated-per-rank",
+    "schema_version": "v1",
+    "strategy": "ddp",
+    "launcher": "torchrun",
+    "collective": "nccl",
+    "world_size": 2,
+    "nproc_per_node": 1,
+    "memory_semantics": "replicated-per-rank",
     "nodes": [
-        {"node_ref": "n1", "capability_ref": "c1", "gpus": 1, "accelerator_model": "A",
-         "validation_ref": "q1"},
-        {"node_ref": "n2", "capability_ref": "c2", "gpus": 1, "accelerator_model": "B",
-         "validation_ref": "q2"},
+        {
+            "node_ref": "n1",
+            "capability_ref": "c1",
+            "gpus": 1,
+            "accelerator_model": "A",
+            "validation_ref": "q1",
+        },
+        {
+            "node_ref": "n2",
+            "capability_ref": "c2",
+            "gpus": 1,
+            "accelerator_model": "B",
+            "validation_ref": "q2",
+        },
     ],
 }
 
@@ -98,8 +113,11 @@ DIST = {
 def ddp_env(**overrides):
     values = dict(
         context={"allocation_mode": "physical_device", "distributed": DIST},
-        WORLD_SIZE="2", LOCAL_WORLD_SIZE="1", RA_NODE_NAME="n2",
-        RA_DISTRIBUTED_JSON=json.dumps(DIST), RA_INPUT_SHAPE="[8, 3, 224, 224]",
+        WORLD_SIZE="2",
+        LOCAL_WORLD_SIZE="1",
+        RA_NODE_NAME="n2",
+        RA_DISTRIBUTED_JSON=json.dumps(DIST),
+        RA_INPUT_SHAPE="[8, 3, 224, 224]",
     )
     values.update(overrides)
     return environ(**values)
@@ -112,8 +130,12 @@ def test_step_bound_and_ddp_world_checks():
         vt.validate_environment(args(strategy="ddp"), environ())
     _, world = vt.validate_environment(args(strategy="ddp"), ddp_env())
     assert world == 2
-    assert vt.distributed_node(json.loads(ddp_env()["RA_CONTEXT_JSON"]), ddp_env(), 2)[
-        "accelerator_model"] == "B"
+    assert (
+        vt.distributed_node(json.loads(ddp_env()["RA_CONTEXT_JSON"]), ddp_env(), 2)[
+            "accelerator_model"
+        ]
+        == "B"
+    )
     with pytest.raises(ValueError):
         vt.validate_environment(args(strategy="ddp", global_batch=15), ddp_env())
 
@@ -254,7 +276,8 @@ def test_bound_inputs_match_command(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "change", [{"model": "resnet18"}, {"seed": 8}, {"state_digest": "sha256:" + "2" * 64}, {"classes": 3}]
+    "change",
+    [{"model": "resnet18"}, {"seed": 8}, {"state_digest": "sha256:" + "2" * 64}, {"classes": 3}],
 )
 def test_bound_inputs_refuse_mismatch(tmp_path, change):
     a = args()
@@ -282,3 +305,95 @@ def test_pinned_initial_state_overrides_seed(tmp_path):
     loaded = vt.build_model("mobilenet_v3_small", 10, 2, str(path))
     assert vt.checkpoint_digest(loaded) == vt.checkpoint_digest(source)
 
+
+def rank_record(rank, **overrides):
+    record = {
+        "rank": rank,
+        "local_rank": 0,
+        "node": f"node-{rank}",
+        "pod_uid": f"uid-{rank}",
+        "device_name": "GPU",
+        "initial_checkpoint_digest": "sha256:" + "1" * 64,
+        "output_checkpoint_digest": "sha256:" + "2" * 64,
+        "loop_seconds": 1.0,
+        "peak_memory_mib": 10.0,
+        "losses_digest": f"sha256:{rank}",
+    }
+    record.update(overrides)
+    return record
+
+
+def test_rank_records_accept_distinct_members_with_identical_replicas():
+    records = [rank_record(1), rank_record(0)]
+    assert [r["rank"] for r in vt.check_ranks(records, 2)] == [0, 1]
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        [rank_record(0)],
+        [rank_record(0), rank_record(0)],
+        [rank_record(0), rank_record(1, node="node-0")],
+        [rank_record(0), rank_record(1, pod_uid=None)],
+        [rank_record(0), rank_record(1, output_checkpoint_digest="sha256:" + "3" * 64)],
+        [rank_record(0), rank_record(1, initial_checkpoint_digest="sha256:" + "3" * 64)],
+        [
+            rank_record(0, output_checkpoint_digest="sha256:" + "1" * 64),
+            rank_record(1, output_checkpoint_digest="sha256:" + "1" * 64),
+        ],
+    ],
+)
+def test_rank_records_refuse_missing_duplicate_or_diverged(bad):
+    with pytest.raises(RuntimeError):
+        vt.check_ranks(bad, 2)
+
+
+def _gather_worker(rank, port, out):
+    import torch.distributed as dist
+
+    dist.init_process_group("gloo", init_method=f"tcp://127.0.0.1:{port}", rank=rank, world_size=2)
+    try:
+        out.put((rank, vt.gather_ranks(rank_record(rank))))
+    finally:
+        dist.destroy_process_group()
+
+
+@pytest.mark.skipif(importlib.util.find_spec("torch") is None, reason="torch not installed")
+def test_gather_ranks_collects_every_rank_over_a_real_process_group():
+    import multiprocessing
+    import socket
+
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+    ctx = multiprocessing.get_context("spawn")
+    out = ctx.Queue()
+    procs = [ctx.Process(target=_gather_worker, args=(r, port, out)) for r in range(2)]
+    for p in procs:
+        p.start()
+    results = dict(out.get(timeout=60) for _ in procs)
+    for p in procs:
+        p.join(timeout=60)
+    assert results[0] == results[1]
+    assert [r["pod_uid"] for r in results[0]] == ["uid-0", "uid-1"]
+
+
+def test_staging_runs_between_two_barriers_and_reports_both_durations():
+    calls = []
+
+    def stage(a):
+        calls.append("stage")
+        a.data = "/staged"
+        return {"node": "n", "bytes": 3}
+
+    a = args()
+    receipt, own, window = vt.run_staging(a, stage, barrier=lambda: calls.append("barrier"))
+    assert calls == ["barrier", "stage", "barrier"]
+    assert receipt == {"node": "n", "bytes": 3} and a.data == "/staged"
+    assert 0 <= own <= window
+
+
+@pytest.mark.parametrize("bad", [None, ["x"], {"x": float("nan")}])
+def test_staging_receipt_must_be_a_json_object(bad):
+    with pytest.raises((RuntimeError, ValueError)):
+        vt.run_staging(args(), lambda a: bad, barrier=lambda: None)

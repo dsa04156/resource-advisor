@@ -1,0 +1,45 @@
+# Common amd64 route for two-rank DDP over RTX 5060 Ti (ser0001) + RTX 5080 (ser0002).
+# One Indexed Job has one runtimeClass and one LocalQueue, so both nodes share them.
+# The RuntimeClass has no scheduling selector; the launcher's required node affinity
+# (hostname In <signed node set>) plus hostname anti-affinity bounds placement.
+# Kueue admits the Job's whole PodSet (2 Pods x 1 GPU) at once: gang admission.
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: ra-vt-nvidia-amd64
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+handler: nvidia
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ResourceFlavor
+metadata:
+  name: ra-vt-ddp-amd64
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: ra-vt-ddp-amd64
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: resource-advisor-lab
+  queueingStrategy: BestEffortFIFO
+  resourceGroups:
+  - coveredResources: [cpu, memory, nvidia.com/gpu]
+    flavors:
+    - name: ra-vt-ddp-amd64
+      resources:
+      - {name: cpu, nominalQuota: '8'}
+      - {name: memory, nominalQuota: 12Gi}
+      - {name: nvidia.com/gpu, nominalQuota: '2'}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata:
+  name: ra-vt-ddp-amd64
+  namespace: resource-advisor-lab
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+spec:
+  clusterQueue: ra-vt-ddp-amd64

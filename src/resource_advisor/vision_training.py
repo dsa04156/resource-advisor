@@ -110,7 +110,9 @@ def bound_inputs(args, binding, checkpoint_path, input_path):
     raw_manifest = verified_bytes(input_path, binding["input_digest"], binding["input_size_bytes"])
     readonly = require_readonly(checkpoint_path), require_readonly(input_path)
     init = json.loads(raw_init)
-    expected = init_descriptor(args.model, args.seed, init.get("classes"), args.initial_checkpoint_digest)
+    expected = init_descriptor(
+        args.model, args.seed, init.get("classes"), args.initial_checkpoint_digest
+    )
     if init != expected:
         raise ValueError("bound initial checkpoint differs from the command")
     manifest = json.loads(raw_manifest)
@@ -224,7 +226,55 @@ def distributed_node(context, environ, world):
     return mine[0]
 
 
-def run(args, environ=os.environ):
+RANK_KEYS = (
+    "node",
+    "pod_uid",
+    "device_name",
+    "initial_checkpoint_digest",
+    "output_checkpoint_digest",
+)
+
+
+def gather_ranks(record):
+    """Every rank's own observed record (all_gather_object; rank order)."""
+    import torch.distributed as dist
+
+    records = [None] * dist.get_world_size()
+    dist.all_gather_object(records, record)
+    return records
+
+
+def check_ranks(records, world):
+    """Exactly one record per rank on distinct Pods/nodes; replicas start equal and end equal and changed."""
+    records = sorted(records, key=lambda r: r["rank"])
+    if [r["rank"] for r in records] != list(range(world)):
+        raise RuntimeError("distributed rank records missing or duplicated")
+    if any(not r.get(k) for r in records for k in RANK_KEYS):
+        raise RuntimeError("distributed rank record lacks observed identity")
+    if len({r["pod_uid"] for r in records}) != world or len({r["node"] for r in records}) != world:
+        raise RuntimeError("distributed ranks do not run on distinct Pods and nodes")
+    if len({(r["initial_checkpoint_digest"], r["output_checkpoint_digest"]) for r in records}) != 1:
+        raise RuntimeError("DDP replicas diverged")
+    if records[0]["initial_checkpoint_digest"] == records[0]["output_checkpoint_digest"]:
+        raise RuntimeError("training produced no parameter change")
+    return records
+
+
+def run_staging(args, stage, barrier):
+    """stage(args) between two barriers: every member starts together and compute starts after the slowest."""
+    barrier()
+    window_start = time.perf_counter()
+    receipt = stage(args)
+    own = time.perf_counter() - window_start
+    barrier()
+    window = time.perf_counter() - window_start
+    if not isinstance(receipt, dict):
+        raise RuntimeError("staging receipt must be a JSON object")
+    json.dumps(receipt, allow_nan=False)
+    return receipt, own, window
+
+
+def run(args, environ=os.environ, stage=None):
     context, world = validate_environment(args, environ)
     import torch
 
@@ -248,6 +298,19 @@ def run(args, environ=os.environ):
     if any(actual.get(k) != v for k, v in context["runtime_versions"].items() if k in actual):
         raise RuntimeError("runtime differs from the qualified context")
 
+    if args.strategy == "ddp":
+        import torch.distributed as dist
+
+        dist.init_process_group(context["distributed"]["collective"])
+    staging = None
+    if stage is not None:
+        barrier = (
+            (lambda: dist.barrier(device_ids=[local_rank]))
+            if args.strategy == "ddp"
+            else (lambda: None)
+        )
+        staging = run_staging(args, stage, barrier)
+
     prep_start = time.perf_counter()
     binding = json.loads(environ["RA_TRAINING_BINDING"]) if args.isolated else None
     if args.isolated:
@@ -266,9 +329,6 @@ def run(args, environ=os.environ):
     model = model.to(device)
     train_x, train_y = data["train"][0].to(device), data["train"][1].to(device)
     if args.strategy == "ddp":
-        import torch.distributed as dist
-
-        dist.init_process_group(context["distributed"]["collective"])
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[local_rank])
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     loss_fn = torch.nn.CrossEntropyLoss()
@@ -322,14 +382,36 @@ def run(args, environ=os.environ):
         logits = core(hx)
         holdout_loss = float(loss_fn(logits, hy).item())
         holdout_top1 = float((logits.argmax(1) == hy).float().mean().item())
+    ranks = None
     if args.strategy == "ddp":
+        mine = {
+            "rank": rank,
+            "local_rank": local_rank,
+            "node": environ.get("RA_NODE_NAME"),
+            "pod_uid": environ.get("RA_POD_UID"),
+            "device_name": torch.cuda.get_device_name(device),
+            "initial_checkpoint_digest": initial,
+            "output_checkpoint_digest": output,
+            "loop_seconds": float(elapsed),
+            "peak_memory_mib": float(peak),
+            "losses_digest": signature(losses),
+        }
+        if staging is not None:
+            mine.update(
+                staging_receipt=staging[0],
+                staging_seconds=staging[1],
+                staging_window_seconds=staging[2],
+            )
+        ranks = check_ranks(gather_ranks(mine), world)
         torch.distributed.destroy_process_group()
     if rank != 0:
         return None
     if args.output:
         torch.save(core.state_dict(), Path(args.output) / "model.pt")
     if args.isolated:
-        verified_bytes(args.checkpoint_path, binding["checkpoint_digest"], binding["checkpoint_size_bytes"])
+        verified_bytes(
+            args.checkpoint_path, binding["checkpoint_digest"], binding["checkpoint_size_bytes"]
+        )
         verified_bytes(args.input_path, binding["input_digest"], binding["input_size_bytes"])
     ordered = sorted(step_seconds)
     result = {
@@ -381,6 +463,16 @@ def run(args, environ=os.environ):
         "node": environ.get("RA_NODE_NAME"),
         "pod_uid": environ.get("RA_POD_UID"),
     }
+    if ranks is not None:
+        evidence["ranks"] = ranks
+    if staging is not None:
+        evidence.update(
+            staging_receipt=staging[0],
+            staging_seconds=staging[1],
+            staging_window_seconds=max(r["staging_window_seconds"] for r in ranks)
+            if ranks
+            else staging[2],
+        )
     envelope = {"result": result, "digest": signature(result), "training_evidence": evidence}
     if args.isolated:
         output_checkpoint = {
