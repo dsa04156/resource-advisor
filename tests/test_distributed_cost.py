@@ -13,6 +13,7 @@ import pytest
 import test_distributed_training as dt
 import test_heterogeneous_recommendation as hetero
 from fastapi.testclient import TestClient
+from sqlalchemy import text
 from test_network_recommendation import DIGEST, TOKENS, binding, h, network
 
 from resource_advisor.api import create_app
@@ -310,7 +311,6 @@ def test_collector_cli_reads_every_stored_rank_receipt(service):
 
 
 def test_route_queue_lookup_is_the_exact_routes_latest_row(service):
-    from sqlalchemy import text
 
     from resource_advisor.store import latest_route_queue_query
 
@@ -449,7 +449,7 @@ def test_a_pod_holding_several_units_never_reads_as_one_occupant():
     assert one.complete and [i.job_id for i in one.running] == ["j-1"]
 
 
-def accepted_job(service, *, cluster, node, occupancy=30.0):
+def accepted_job(service, *, cluster, node, occupancy=30.0, ref="single-5080"):
     """An accepted, not yet natively visible single-GPU job on another route alias."""
     from sqlalchemy import insert
 
@@ -464,23 +464,29 @@ def accepted_job(service, *, cluster, node, occupancy=30.0):
                                                         "selected_admission_seconds": 1.0}},
     }  # fmt: skip
     with service.store.transaction() as conn:
-        conn.execute(insert(jobs).values(id="single-5080", project="team-a", idempotency_key="s",
+        conn.execute(insert(jobs).values(id=ref, project="team-a", idempotency_key=ref,
                                          request_digest=None, state="SUBMITTED", epoch=1,
                                          version=1, body=body))  # fmt: skip
 
 
-def test_accepted_demand_on_another_route_alias_of_the_same_gpu_is_counted(service, client):
+def test_accepted_demand_under_another_route_alias_abstains_instead_of_a_free_gpu(
+    service, client
+):
     post(client, "/jct-profiles", ddp_profile(service, client))
     for node in dt.NODES:
         post(client, "/route-queue-snapshots", queue(node))
-    # Same physical node and resource, registered under a different cluster alias.
-    accepted_job(service, cluster="lab-rtx5080-single", node="node-b")
-
+    accepted_job(service, cluster="lab", node="node-b")  # same alias: counted
     p, evidence, _ = prediction(client, QUEUE)
-
     members = {m["node_ref"]: m for m in evidence["queue_snapshots"]["ddp"]["members"]}
     assert members["node-b"]["queue_wait_seconds"] == pytest.approx(31.0)
     assert p["queue_wait_seconds"] == pytest.approx(31.0)
+
+    # The same native node and resource under another alias (e.g. a single-GPU
+    # route): nothing proves or refutes shared hardware, so no free-GPU estimate.
+    accepted_job(service, cluster="lab-rtx5080-single", node="node-b", ref="other-alias")
+    p, _, _ = prediction(client, QUEUE)
+    assert p["predicted_jct_seconds"] is None
+    assert p["reasons"] == ["QUEUE_CROSS_ROUTE_DEMAND_AMBIGUOUS", "DISTRIBUTED_MEMBER:node-b"]
 
 
 def test_unknown_profile_component_is_an_explicit_unknown_not_a_crash(service, client):
@@ -498,6 +504,9 @@ def test_unknown_profile_component_is_an_explicit_unknown_not_a_crash(service, c
     "group",
     ["unknown", "ddp:j-1/a-1", "ddp:@node-a+node-b", "ddp:j-1/a-1@node-c+node-d"],
 )
-def test_malformed_or_foreign_synchronization_provenance_is_rejected(group):
+def test_malformed_or_foreign_synchronization_provenance_is_rejected(client, group):
     with pytest.raises(ValueError):
         network("node-a", [4.0], staging_group=group)
+    body = network("node-a", [4.0]).model_dump(mode="json") | {"staging_group": group}
+    response = client.post(URL + "/network-profiles", headers=h("operator"), json=body)
+    assert response.status_code == 422  # rejected at import, never reaches /scheduling-plans

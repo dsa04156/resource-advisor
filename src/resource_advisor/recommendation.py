@@ -414,26 +414,21 @@ def _profile_reason(p, spec, candidate, cap, variant, target, rec, at):
     return None
 
 
-def _demand_key(backend, cluster, *, pool_ref=None, node_ref=None, resource_key=None):
-    """What accepted demand occupies: a declared pool, or a node's resource.
-
-    Node demand is keyed by the native node and resource, not the RA cluster alias:
-    several registered routes (e.g. a single-GPU route and a DDP route) can name
-    the same physical GPU. Distinct clusters reusing a node name are then
-    over-counted (a longer wait), never under-counted.
-    """
-    if pool_ref:
-        return ("pool", backend, cluster, pool_ref)
-    return ("node", backend, node_ref, resource_key or "")
-
-
 def _intents(conn, project, key, identity, at):
-    """Accepted project jobs on the same demand key; occupancy unknown unless frozen."""
+    """Accepted project jobs on the route; occupancy unknown unless a plan froze it.
+
+    ``key`` is (backend, cluster alias, pool_ref | node_ref, resource_key). Returns
+    (intents, ambiguous job ids): a job accepted under another cluster alias on the
+    same native node and resource may hold the same physical device, but nothing
+    authoritative says the aliases share hardware, so such demand is neither
+    counted nor ignored; the caller abstains instead of inferring a free device.
+    """
     from sqlalchemy import select
 
     from .store import jobs
 
-    result = []
+    backend, cluster, route, resource = key
+    result, ambiguous = [], []
     for job_id, state, body in conn.execute(
         select(jobs.c.id, jobs.c.state, jobs.c.body).where(jobs.c.project == project)
     ):
@@ -442,31 +437,29 @@ def _intents(conn, project, key, identity, at):
         plan = body.get("scheduling_plan") or {}
         cap = body.get("capability", {})
         target = plan.get("target") or {}
-        backend, cluster = body.get("candidate", {}).get("backend"), cap.get("backend_cluster_id")
-        resource = cap.get("resource_key")
-        keys = {
-            _demand_key(backend, cluster, pool_ref=target.get("pool_ref"),
-                        node_ref=cap.get("node_ref"), resource_key=resource)
-        }  # fmt: skip
+        job_backend = body.get("candidate", {}).get("backend")
+        nodes = {cap.get("node_ref")}
         # A distributed job holds a device on every member node, not only its anchor.
         d = (body.get("candidate", {}).get("context") or {}).get("distributed") or {}
-        keys.update(
-            _demand_key(backend, cluster, node_ref=n["node_ref"], resource_key=resource)
-            for n in d.get("nodes", ())
-        )
-        if key not in keys:
+        nodes.update(n["node_ref"] for n in d.get("nodes", ()))
+        routes = {target["pool_ref"]} if target.get("pool_ref") else nodes
+        same_cluster = cap.get("backend_cluster_id") == cluster
+        if job_backend != backend:
             continue
-        frozen = plan.get("recommendation_evidence") or {}
-        result.append(
-            SubmitIntent(
-                identity,
-                job_id,
-                min(_epoch(body["created_at"]), at),
-                frozen.get("selected_occupancy_seconds"),
-                frozen.get("selected_admission_seconds"),
+        if same_cluster and route in routes:
+            frozen = plan.get("recommendation_evidence") or {}
+            result.append(
+                SubmitIntent(
+                    identity,
+                    job_id,
+                    min(_epoch(body["created_at"]), at),
+                    frozen.get("selected_occupancy_seconds"),
+                    frozen.get("selected_admission_seconds"),
+                )
             )
-        )
-    return result
+        elif not same_cluster and route in nodes and (cap.get("resource_key") or "") == resource:
+            ambiguous.append(job_id)
+    return result, ambiguous
 
 
 def _queue(service, conn, project, identity, candidate, cap):
@@ -778,11 +771,10 @@ def _distributed(service, conn, project, rec, at, spec, candidate, members, prof
             measured.identity.workload_digest,
         )
         snapshot, view = _queue(service, conn, project, identity, candidate, cap)
-        key = _demand_key(
-            str(candidate.backend), cap.backend_cluster_id, node_ref=node,
-            resource_key=cap.resource_key,
-        )  # fmt: skip
-        intents = _intents(conn, project, key, identity, at.timestamp())
+        key = (str(candidate.backend), cap.backend_cluster_id, node, cap.resource_key or "")
+        intents, ambiguous = _intents(conn, project, key, identity, at.timestamp())
+        if ambiguous:
+            return None, ["QUEUE_CROSS_ROUTE_DEMAND_AMBIGUOUS", "DISTRIBUTED_MEMBER:" + node], detail
         if snapshot is not None and snapshot.capacity_unit != "physical_device":
             return None, ["DISTRIBUTED_SHARED_SLOT_QUEUE", "DISTRIBUTED_MEMBER:" + node], detail
         probe = replace(
@@ -1034,12 +1026,12 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
             if snapshot is not None:
                 queues.append(snapshot)
                 queue_refs[candidate.ref] = view
-            key = _demand_key(
-                str(candidate.backend), cap.backend_cluster_id,
-                pool_ref=target["pool_ref"] if target else None, node_ref=cap.node_ref,
-                resource_key=cap.resource_key,
-            )  # fmt: skip
-            intents.extend(_intents(conn, project, key, identity, stamp))
+            key = (str(candidate.backend), cap.backend_cluster_id, identity.node_ref,
+                   cap.resource_key or "")  # fmt: skip
+            found, ambiguous = _intents(conn, project, key, identity, stamp)
+            intents.extend(found)
+            if ambiguous:
+                notes[candidate.ref] = "QUEUE_CROSS_ROUTE_DEMAND_AMBIGUOUS"
         if rec.policy == "profile_queue_network":
             if p.staging_boundary == "not_required":
                 transfers[candidate.ref] = 0.0
