@@ -927,7 +927,7 @@ def member_receipt(job, rank, **change):
     return value
 
 
-def staged_ddp(service, bundle, change=None):
+def staged_ddp(service, bundle, change=None, own_change=None):
     """A collected two-rank job whose envelope carries every rank's staging receipt."""
     from test_worker import SchedulerDouble
 
@@ -946,8 +946,8 @@ def staged_ddp(service, bundle, change=None):
                  "node_name": "node-b", "phase": "Succeeded",
                  "distributed": {"placement": "multi-node", "world_size": 2, "ranks": RANKS}}  # fmt: skip
     backend.observation = Observation(State.COLLECTING, placement=placement)
-    own = member_receipt(job, RANKS[0])
-    receipts = [own, member_receipt(job, RANKS[1])]
+    receipts = [member_receipt(job, RANKS[0]), member_receipt(job, RANKS[1])]
+    own = dict(receipts[0], **(own_change or {}))
     receipts = change(receipts) if change else receipts
     base = backend.result
 
@@ -1003,6 +1003,36 @@ def test_missing_foreign_or_duplicated_rank_receipts_invalidate_the_result(servi
     assert stored == [None, None, None]
 
 
+def test_rank0_receipt_may_carry_only_its_lifted_preparation_time(service, bundle):
+    # The staged wrapper lifts rank 0's measured runtime preparation onto the top-level
+    # receipt; the member copy is otherwise the identical receipt.
+    job, row, stored, receipts = staged_ddp(
+        service, bundle, own_change={"preparation_seconds": 4.2}
+    )
+    assert row["state"] == State.SUCCEEDED
+    assert "preparation_seconds" not in stored[0]["body"]
+
+
+@pytest.mark.parametrize(
+    "own_change",
+    [
+        {"preparation_seconds": 4.2, "cache_state": "hot"},  # anything else differs
+        {"pod_uid": "uid-1"},  # rank 0's own receipt names another Pod
+    ],
+)
+def test_rank0_receipt_must_otherwise_equal_member_zero(service, bundle, own_change):
+    _, row, stored, _ = staged_ddp(service, bundle, own_change=own_change)
+    assert row["state"] == State.RESULT_INVALID and stored == [None, None, None]
+
+
+def test_member_preparation_time_must_agree_with_the_lifted_one(service, bundle):
+    def member_prep(rs):
+        return [dict(rs[0], preparation_seconds=1.0), rs[1]]
+
+    _, row, _, _ = staged_ddp(service, bundle, member_prep, own_change={"preparation_seconds": 4.2})
+    assert row["state"] == State.RESULT_INVALID
+
+
 def test_member_receipts_are_immutable_after_success(service, bundle):
     from resource_advisor.contracts import ExecutionResult
     from resource_advisor.service import Conflict
@@ -1013,3 +1043,31 @@ def test_member_receipts_are_immutable_after_success(service, bundle):
     with pytest.raises(Conflict):
         service.ingest("team-a", ExecutionResult.model_validate(result), signature(result),
                        staging_receipts=[receipts[0], dict(receipts[1], cache_state="hot")])  # fmt: skip
+
+
+def test_wrapper_lifted_envelope_is_accepted_by_member_ingest():
+    from resource_advisor.contracts import ExecutionResult
+    from resource_advisor.service import staging_members
+    from resource_advisor.staged_vision_training import lift_receipts
+
+    job = {"job_id": "j-1", "attempt_id": "a-1"}
+    members = [member_receipt(job, r) for r in RANKS]
+    evidence = {
+        "staging_receipt": members[0],
+        "preparation_seconds": 3.5,
+        "ranks": [
+            {"rank": 1, "staging_receipt": members[1]},
+            {"rank": 0, "staging_receipt": members[0]},
+        ],
+    }
+    envelope = lift_receipts({"training_evidence": evidence})
+    assert envelope["staging_receipt"]["preparation_seconds"] == 3.5
+    body = {
+        "candidate": {"context": {"distributed": {"world_size": 2, "nproc_per_node": 1}}},
+        "placement": {"distributed": {"ranks": RANKS}},
+    }
+    result = ExecutionResult.model_construct(job_id="j-1", attempt_id="a-1")
+    stored = staging_members(
+        result, envelope["staging_receipts"], envelope["staging_receipt"], body
+    )
+    assert [m["pod_uid"] for m in stored] == ["uid-0", "uid-1"]

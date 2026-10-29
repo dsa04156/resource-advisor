@@ -51,7 +51,8 @@ def staging_members(result, receipts, own, body):
 
     Ranks are assigned by rendezvous, so a receipt is matched to an observed Pod (UID and
     node from the adapter's complete placement), not to a completion index; each Pod must
-    hold exactly ``nproc_per_node`` receipts and rank 0's own receipt comes first.
+    hold exactly ``nproc_per_node`` receipts and rank 0's own receipt comes first (it
+    may add only its lifted ``preparation_seconds``).
     Returns the validated bodies, or None when any member is missing, foreign or extra.
     """
     from .network_profile import StagingReceipt
@@ -78,7 +79,16 @@ def staging_members(result, receipts, own, body):
     if set(seen) != pods or any(n != d["nproc_per_node"] for n in seen.values()):
         return None
     bodies = [m.model_dump(mode="json") for m in members]
-    if own is None or signature(bodies[0]) != signature(StagingReceipt.model_validate(own)):
+    if own is None:
+        return None
+    # The wrapper lifts rank 0's measured runtime preparation onto its own top-level
+    # receipt only; apart from that one field it is member 0's receipt, unchanged.
+    lifted = StagingReceipt.model_validate(own).model_dump(mode="json")
+    prepared = lifted.pop("preparation_seconds", None)
+    first = dict(bodies[0])
+    if first.pop("preparation_seconds", prepared) != prepared or signature(first) != signature(
+        lifted
+    ):
         return None
     return bodies
 
