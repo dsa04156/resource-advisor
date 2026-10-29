@@ -30,6 +30,7 @@
 | [docs/reference/inventory.md](../../reference/inventory.md), [docs/evidence/inventory-live.json](../../evidence/inventory-live.json) | history | Prometheus로 DCGM·Jetson·Mobilint 관측 |
 | [docs/reference/common-gpu-pool.md](../../reference/common-gpu-pool.md) | config | 공유 슬롯은 물리 장치 수가 아님 |
 | [docs/reference/kueue-policy.md](../../reference/kueue-policy.md) | history | Kueue 쿼터 초과 = admission 대기 |
+| [docs/reference/slurm-policy.md](../../reference/slurm-policy.md) | history | 별도 lab에서 `DenyOnLimit`+`AccountingStorageEnforce=associations,limits,qos`일 때 job별 한도 초과·미할당 QOS는 거절, account 집계 한도(`AssocGrpCpuLimit`)는 대기 (17–23, 33–39행) |
 | [docs/reference/slurm-jetson-runtime-results.md](../../reference/slurm-jetson-runtime-results.md), [docs/reference/slurm-vm.md](../../reference/slurm-vm.md) | history | 기존 Slurm backend의 과거 실행. 가상 140과 별개 |
 
 ## 배포 설정
@@ -46,13 +47,13 @@
 
 | 파일 | 쓰인 부분 |
 |---|---|
-| [src/resource_advisor/api.py](../../../src/resource_advisor/api.py) | `PREFIX = "/api/v1/compute"`, Bearer 인증, `/jobs`, `/inventory/{cluster_ref}`, `/overview`, `/usage/report`, `/jobs/{id}/lifecycle`, `/jobs/{id}/submission-resolution`, `/healthz` |
+| [src/resource_advisor/api.py](../../../src/resource_advisor/api.py) | `PREFIX = "/api/v1/compute"`, Bearer 인증과 선택적 `anonymous_project`(헤더 없는 요청을 설정된 Project의 비운영자 Principal로 매핑, `principal`), `/jobs`, `/inventory/{cluster_ref}`, `/overview`, `/usage/report`, `/jobs/{id}/lifecycle`, `/jobs/{id}/submission-resolution`, `/healthz` |
 | [src/resource_advisor/console.py](../../../src/resource_advisor/console.py) | `overview`의 인벤토리 읽기 모델 |
 | [src/resource_advisor/service.py](../../../src/resource_advisor/service.py) | `Service.submit` 멱등성·attempt·outbox, `resolve_submission` |
 | [src/resource_advisor/contracts.py](../../../src/resource_advisor/contracts.py) | `State`, `JobRequest` |
 | [src/resource_advisor/store.py](../../../src/resource_advisor/store.py) | 테이블 4개, `claim`(SKIP LOCKED), `change_job`, `record_usage`, `job_route_filter` |
-| [src/resource_advisor/worker.py](../../../src/resource_advisor/worker.py) | `Worker.submit_one`, `reconcile_submission`, `MLflowDelivery` |
-| [src/resource_advisor/backends.py](../../../src/resource_advisor/backends.py) | `KubernetesBackend`, `SlurmBackend`, 예외 3종, `native_rejection` |
+| [src/resource_advisor/worker.py](../../../src/resource_advisor/worker.py) | `Worker.submit_one`, `reconcile_submission`, `adopted_body`(adopt 시 `external_id`=Job 이름, `backend_uid` 별도 저장), `MLflowDelivery` |
+| [src/resource_advisor/backends.py](../../../src/resource_advisor/backends.py) | `KubernetesBackend`(`manifest`가 검증된 후보 `node_ref`를 `kubernetes.io/hostname` nodeSelector로 고정, `owns`는 `backend_uid`가 묶인 뒤에만 UID 비교, `reconcile`이 첫 관측 때 UID 저장), `SlurmBackend`, 예외 3종, `native_rejection` |
 | [src/resource_advisor/configuration.py](../../../src/resource_advisor/configuration.py) | `worker_configuration` route 검증 |
 | [src/resource_advisor/scheduling.py](../../../src/resource_advisor/scheduling.py) | `verify_adapter_plan` |
 | [src/resource_advisor/inventory.py](../../../src/resource_advisor/inventory.py), [queue_inventory.py](../../../src/resource_advisor/queue_inventory.py) | K8s 수집, `signal`, `fresh_view` |

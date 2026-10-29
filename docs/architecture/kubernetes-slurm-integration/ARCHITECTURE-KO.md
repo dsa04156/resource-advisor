@@ -17,7 +17,7 @@
 | 질문 | 답 |
 |---|---|
 | RA가 하는 일 | 공통 Job 계약, 프로젝트×클러스터 route, 제출 intent의 내구 기록(PostgreSQL outbox), 불확실 제출의 reconcile, 종료 상태와 usage 장부, 클러스터 인벤토리 관측 |
-| RA가 하지 않는 일 | GPU 배치 결정(K8s는 Kueue가 admission, kube-scheduler가 노드 배치를 결정하고, Slurm은 slurmctld가 결정), 전역 쿼터·공정성, 두 스케줄러의 같은 GPU 공동 소유, Slurm REST 연동 |
+| RA가 하지 않는 일 | 노드 bind와 admission(K8s는 Kueue가 admission, kube-scheduler가 bind, Slurm은 slurmctld가 결정. 단 **현재 K8s 경로는 RA가 검증한 후보 노드를 `kubernetes.io/hostname` nodeSelector로 고정**하므로 kube-scheduler가 노드를 자유롭게 고르지 않는다 — 5.2절), 전역 쿼터·공정성, 두 스케줄러의 같은 GPU 공동 소유, Slurm REST 연동 |
 | 지금 실제로 돌고 있는 것 | 네임스페이스 `resource-advisor-lab`의 API, worker, Kubernetes 인벤토리 수집기, 가상 Slurm 인벤토리 수집기(모두 1/1, 08:09 UTC [evidence-snapshot.json](evidence-snapshot.json)) |
 | 연결된 클러스터 | `lab-kubernetes` 12 노드(Ready 10, 스냅샷 status `partial`) · `virtual-slurm-140` 6 노드, 가상 GPU 슬롯 8개(4/2/1/1) · `lab-slurm` 2 노드(2026-10-22 이후 stale, 이력만 보존) |
 | 가상 Slurm으로 가는 길 | HTTP·REST가 아니라 **SSH(22) forced-command → `docker exec --user slurm slurmctld` → `scontrol`/`squeue` JSON(v0.0.42)** |
@@ -114,16 +114,18 @@
 |---|---|---|---|
 | 제출 | RA worker | `kubectl create -f -`로 Job 생성. 라벨 `kueue.x-k8s.io/queue-name`(LocalQueue), 선택적 `kueue.x-k8s.io/priority-class` | `KubernetesBackend.manifest`/`submit` ([backends.py](../../../src/resource_advisor/backends.py)) |
 | admission | **Kueue** [오픈소스] | 이 Workload를 지금 들여보낼지만 결정. ClusterQueue 쿼터 안이면 쿼터를 예약하고 ResourceFlavor를 할당한 뒤 Job suspend 해제. 초과면 `QuotaReserved=False`로 **대기**(거절 아님). **Pod를 어느 노드에 둘지는 정하지 않는다** | `KubernetesBackend.admission`이 `kueue.x-k8s.io/job-uid=<UID>`로 Workload를 찾아 조건 기록 |
-| placement | **kube-scheduler** [오픈소스] | admission 이후 생성된 Pod를 조건(flavor의 노드 조건, 요청량, taint 등)에 맞는 노드 하나에 bind | Pod의 노드·시각을 status로 관측만 |
+| placement | **kube-scheduler** [오픈소스] | admission 이후 생성된 Pod를 제약(RA가 넣은 `kubernetes.io/hostname`·`kubernetes.io/arch` nodeSelector, flavor의 노드 조건, 요청량, taint 등) 안에서 bind. hostname이 고정돼 있으므로 사실상 **그 한 노드에 bind할 수 있는지만** 판단한다 | `KubernetesBackend.manifest`가 검증된 후보의 `node_ref`를 hostname nodeSelector로 설정(`spec.nodeName`은 쓰지 않음). Pod의 노드·시각은 status로 관측 |
 | 실행·종료 | kubelet/컨테이너 런타임 | 실제 실행 | `status`/`result` |
 
-실제 Kueue 거동 기록: 1 GPU 쿼터에 2 GPU 요청 → Job 생성은 성공, `QuotaReserved=False`로 suspend 유지, Pod 없음([kueue-policy.md](../../reference/kueue-policy.md), 2026-10-02 [과거 기록]). 이것이 Slurm QOS의 **제출 거절**과 다른 점이며, RA는 둘을 `QUOTA_OR_LIMIT_PENDING`과 `NATIVE_REJECTED`로 따로 분류한다([ARCHITECTURE.md](../../experiments/integrated-operations/ARCHITECTURE.md) Policy contract).
+> **현재 구현 vs 향후 설계:** 지금 RA는 후보 노드를 직접 검증하고 hostname nodeSelector로 고정한다([backends.py](../../../src/resource_advisor/backends.py) `KubernetesBackend.manifest`). kube-scheduler는 그 제약 안에서 bind만 한다. "풀(pool) 조건만 주고 노드 선택은 kube-scheduler에 위임"하는 방식은 **향후 설계이며 현재 구현이 아니다.**
+
+실제 Kueue 거동 기록: 1 GPU 쿼터에 2 GPU 요청 → Job 생성은 성공, `QuotaReserved=False`로 suspend 유지, Pod 없음([kueue-policy.md](../../reference/kueue-policy.md), 2026-10-02 [과거 기록]). Slurm도 한도 초과가 늘 거절은 아니다. 과거 별도 lab 기록에서 `DenyOnLimit` QOS 플래그와 `AccountingStorageEnforce=associations,limits,qos`를 켰을 때 **job별 한도 초과**(CPU·메모리·시간)와 미할당 QOS는 제출 거절됐지만, account 집계 한도(`AssocGrpCpuLimit`)는 **대기**였다([slurm-policy.md](../../reference/slurm-policy.md) [과거 기록]; 현재 `virtual-slurm-140`은 `AccountingStorageEnforce=none`). RA는 native 사유로 대기(`QUOTA_OR_LIMIT_PENDING`: Kueue `QuotaReserved=False`, Slurm `AssocGrp*/QOSGrp*/QOSMax*`)와 거절(`NATIVE_REJECTED`)을 따로 분류한다([ARCHITECTURE.md](../../experiments/integrated-operations/ARCHITECTURE.md) Policy contract).
 
 **KAI Scheduler는 미검증이다.** 이 저장소에 KAI 연동 코드나 실행 기록은 없다([CURRENT-STATE-AUDIT.md](../../experiments/integrated-operations/CURRENT-STATE-AUDIT.md) 4절 마지막 줄: "No scheduler algorithm, global quota, SlurmREST, OIDC, KAI…").
 
 ### 5.3 소유권 확인 (이름 재사용 대비)
 
-Kubernetes Job 이름은 attempt ID다. 같은 이름이 삭제 후 재생성될 수 있으므로 `KubernetesBackend.owns`는 annotation `resource-advisor/job-id`, `resource-advisor/context-signature`와 제출 시 묶은 **UID**까지 일치해야 자기 Job으로 인정한다. 취소도 `DeleteOptions.preconditions.uid`로 같은 UID만 지운다([RESULTS.md](../../experiments/integrated-operations/RESULTS.md) Review round 2).
+Kubernetes Job 이름은 attempt ID다. 같은 이름이 삭제 후 재생성될 수 있으므로 `KubernetesBackend.owns`는 annotation `resource-advisor/job-id`, `resource-advisor/context-signature`가 일치하고, `backend_uid`가 이미 묶여 있으면 **UID**까지 일치해야 자기 Job으로 인정한다. UID는 제출 응답, 응답 손실 뒤 adopt, 또는 첫 관측(reconcile) 때 `backend_uid`로 저장되며, 그 전에는 annotation 일치로만 확인한 뒤 그 시점에 UID를 묶는다(`KubernetesBackend.owns`/`reconcile`, [worker.py](../../../src/resource_advisor/worker.py) `adopted_body`). 취소도 `DeleteOptions.preconditions.uid`로 같은 UID만 지운다([RESULTS.md](../../experiments/integrated-operations/RESULTS.md) Review round 2).
 
 ---
 
@@ -193,7 +195,7 @@ ClusterID 전환 사건(요약): 첫 전환에서 컨트롤러 state의 ID 623�
 
 | # | 출발 → 도착 | 프로토콜/포트 | 인증 | 방향 | payload | 상태 |
 |---|---|---|---|---|---|---|
-| P1 | Client/Console → `ra-api` | HTTPS 8443 | `Authorization: Bearer` (설정된 credential 해시와 비교, `principal`) | 요청/응답 | JSON (`JobRequest`, 조회 결과) | 배포 |
+| P1 | Client/Console → `ra-api` | HTTPS 8443 | `Authorization: Bearer` (설정된 credential 해시와 비교, `principal`). 단 `RA_ANONYMOUS_PROJECT`(`anonymous_project`)가 설정되면 **Authorization 헤더 없는 요청을 그 Project의 비운영자 Principal로 허용**한다. 현재 데모는 anonymous `ra-lab` 모드이며, 운영자 전용 변경 API는 여전히 운영자 credential이 필요하다 | 요청/응답 | JSON (`JobRequest`, 조회 결과) | 배포 |
 | P2 | `ra-api`·worker·수집기 → PostgreSQL | PostgreSQL 프로토콜 | Secret `ra-service-db`의 URL | 양방향 | SQL, JSON body | 배포 |
 | P3 | `ra-inventory` → `<K8S_API>` | HTTPS (kubectl) | ServiceAccount `ra-inventory` 토큰, ClusterRole get/list | 읽기 | Node/Pod/metrics/Kueue JSON | 배포 |
 | P4 | `ra-inventory` → Prometheus | HTTP(S) | 선택적 토큰 env(`prometheus_token_env`), URL에 자격증명 금지 | 읽기 | PromQL 결과 + timestamp | 바인딩 시 |
@@ -240,7 +242,7 @@ t0+ heartbeat 파일 갱신 → readinessProbe(check-heartbeat --max-age 120)
 | 4. 사전 검증 | 호환성·승인·deadline·`backend.validate` | `Worker.submit_one` | 원격 호출 전 실패는 `FAILED`(`PRE_SUBMISSION_*`) — **가상 140은 여기서 멈춤** |
 | 5. 제출 의도 커밋 | `SUBMITTING`을 먼저 커밋 | `Worker.submit_one` | 이후 crash는 재제출이 아니라 reconcile 대상 |
 | 6. native 호출 | K8s: `kubectl create`; Slurm: `sbatch --parsable`(SSH forced-command) | `KubernetesBackend.submit`, `SlurmBackend.submit` | 응답 손실·timeout → `SUBMISSION_UNKNOWN`; 허용 목록에 있는 거절 문구만 `FAILED`(`native_rejection`) |
-| 7. native ID | `QUEUED` + `external_id`(K8s 이름+UID, Slurm job ID) | `native_name`, `SlurmBackend.external_id` | — |
+| 7. native ID | `QUEUED` + `external_id`(K8s Job 이름, Slurm job ID). K8s UID는 `backend_uid`에 따로 저장 | `native_name`, `SlurmBackend.external_id` | — |
 | 8. reconcile | 불확실하면 attempt 이름으로 찾음. K8s: `get job <attempt>` + 소유권; Slurm: `squeue --name`/`sacct --name … --duplicates` | `Worker.reconcile_submission`, `*.reconcile` | `MATCHED` 채택 / `NO_MATCH`·`AMBIGUOUS`·`QUERY_FAILED`는 열린 상태 유지 |
 | 9. 상태 추적 | `RUNNING`, Kueue 조건, Slurm `%r` 대기 사유 | `Worker.reconcile_all`, `status`, `admission` | 조회 실패는 unknown이지 부재가 아님 |
 | 10. 결과 | 결과 envelope 수집(K8s 로그, Slurm results 키의 bounded tail) → 검증 | `result`, `result_from_log` | 형식 불일치 → `RESULT_INVALID` |
@@ -257,12 +259,12 @@ t0+ heartbeat 파일 갱신 → readinessProbe(check-heartbeat --max-age 120)
 
 | 키 | 의미 | 출처 |
 |---|---|---|
-| `project` | 권한·쿼터 매핑 단위. Bearer credential이 프로젝트 하나에 묶임 | `Principal`, [configuration.py](../../../src/resource_advisor/configuration.py) `principals` |
+| `project` | 권한·쿼터 매핑 단위. Bearer credential이 프로젝트 하나에 묶임. anonymous 모드에서는 헤더 없는 요청이 설정된 Project 하나로 매핑됨 | `Principal`, [configuration.py](../../../src/resource_advisor/configuration.py) `principals` |
 | `cluster` / `cluster_ref` | route와 인벤토리의 클러스터 이름 (`lab-kubernetes`, `virtual-slurm-140`, `lab-slurm`) | worker route, `TelemetryConfig.cluster_ref` |
 | `node_ref` | RA 쪽 노드 별칭. 가상 140은 `virtual-slurm-140-` 접두사 + `node_names`로 Slurm 이름 매핑 | `SlurmInventoryConfig.slurm_scope` |
 | `job_id` (`j-…`) | 논리 job. 재시도해도 같음 | `service.submit` |
 | `attempt_id` (`a-…`) | 실제 제출 1회. **K8s Job 이름 = Slurm job 이름 = usage PK** | 같은 곳 |
-| `external_id` | native ID (K8s 이름+UID, Slurm job ID) | `native_name` |
+| `external_id` | native ID (K8s Job 이름, Slurm job ID). K8s UID는 별도 필드 `backend_uid` | `native_name`, `adopted_body` |
 | `idempotency_key` | `(project, key)` 유일 | `ra_jobs` |
 
 상태: `RECEIVED → VALIDATED → SUBMITTING → (SUBMISSION_UNKNOWN) → QUEUED → RUNNING → COLLECTING → SUCCEEDED | FAILED | RESULT_INVALID | CANCELED`, 취소 경로 `CANCEL_REQUESTED` ([contracts.py](../../../src/resource_advisor/contracts.py) `State`). 모든 전이는 version CAS로 늦은 응답이 최신 상태를 되돌리지 못하게 한다(`store.change_job`).
@@ -308,7 +310,7 @@ route drift 방지: 계획(`scheduling_plan`)이 저장된 job은 실제 어댑�
 
 | 경계 | 무엇으로 | 무엇을 막는가 | 막지 못하는 것 |
 |---|---|---|---|
-| API | Bearer credential(해시 비교), 프로젝트 범위, 운영자 플래그+subject | 다른 프로젝트 조회·제출, 비운영자의 resolution | credential 유출 |
+| API | Bearer credential(해시 비교), 프로젝트 범위, 운영자 플래그+subject. anonymous 모드(현재 데모 `ra-lab`)에서는 헤더 없는 요청이 그 Project의 비운영자 Principal이 됨 | 다른 프로젝트 조회·제출, 비운영자의 resolution | credential 유출. anonymous 모드에서는 API에 닿는 누구나 `ra-lab` 범위 조회·제출 가능 |
 | 수집기 Pod | `runAsNonRoot` 10001, `readOnlyRootFilesystem`, `capabilities: drop ALL`, seccomp `RuntimeDefault`; 가상 Slurm 수집기는 SA 토큰 미마운트 | Pod 내 권한 상승, K8s API 접근(가상 Slurm 수집기) | — |
 | K8s 수집기 RBAC | get/list만 | 쓰기 | 클러스터 전체 Pod 목록 읽기는 가능(요청량 계산용) |
 | SSH 키 | `restrict`(포워딩·pty 금지), `from="<ADVISOR_EGRESS_IP>"`, 고정 `known_hosts`, `BatchMode` | 다른 출발지, 셸, 포트 포워딩(실측: administratively prohibited) | 출발 IP를 공유하는 다른 Pod |
@@ -384,6 +386,7 @@ kubectl -n resource-advisor-lab get deploy ra-api ra-worker ra-inventory ra-virt
 kubectl -n resource-advisor-lab logs deploy/ra-virtual-slurm-140-inventory --tail=50
 
 # API: 최신 인벤토리·개요 (토큰은 환경변수, 화면·문서에 출력 금지)
+# 현재 데모처럼 anonymous_project가 설정돼 있으면 Authorization 헤더 없이도 그 Project 범위로 응답한다
 curl -sS -H "Authorization: Bearer $RA_TOKEN" https://<RA_API>/api/v1/compute/inventory/virtual-slurm-140
 curl -sS -H "Authorization: Bearer $RA_TOKEN" https://<RA_API>/api/v1/compute/overview
 curl -sS -H "Authorization: Bearer $RA_TOKEN" "https://<RA_API>/api/v1/compute/usage/report?month=2026-10"
@@ -399,13 +402,13 @@ ssh ra-virtual-slurm-140-observer 'squeue --json=v0.0.42 --account=ra-lab --part
 
 ## 16. 면접 예상 질문 12개
 
-1. **RA가 스케줄러인가요?** 아닙니다. Kubernetes에서는 Kueue가 admission(들여보낼지)을, kube-scheduler가 노드 배치를 정하고, Slurm에서는 slurmctld가 정합니다. RA는 요청·상태·사용량을 잃지 않게 하는 상위 control plane입니다.
+1. **RA가 스케줄러인가요?** 범용 스케줄러는 아닙니다. Kubernetes에서는 Kueue가 admission(들여보낼지)을, kube-scheduler가 bind를 하고, Slurm에서는 slurmctld가 정합니다. 다만 현재 K8s 경로는 RA가 검증한 후보 노드를 hostname nodeSelector로 고정하므로 kube-scheduler는 그 제약 안에서 bind만 합니다. 노드 선택을 kube-scheduler에 맡기는 풀 단위 위임은 향후 설계입니다. RA는 요청·상태·사용량을 잃지 않게 하는 상위 control plane입니다.
 2. **K8s와 Slurm GPU를 하나의 풀로 합쳤나요?** 아닙니다. 한 GPU를 두 스케줄러가 같이 소유하지 않고, 장부와 화면에서만 나란히 보여 줍니다. 장치 클래스·할당 방식도 합산하지 않습니다.
 3. **Slurm에 왜 REST가 아니라 SSH인가요?** 이 환경에 slurmrestd가 없고, forced-command로 허용 명령을 코드 수준에서 제한하는 편이 범위를 좁히기 쉬웠습니다. 16817 포트가 열려 있어도 쓰지 않습니다. REST 전환은 범위 밖입니다.
 4. **가상 Slurm에서 작업이 돌았나요?** 아닙니다. 관측과 accounting까지 확인했습니다. 실행 route는 예시 설정이고 worker는 0 replica이며 sbatch는 0건입니다. 전용 job UID와 적격 runtime이 생기기 전에는 실행하지 않습니다.
 5. **가상 GPU 8개는 무엇인가요?** Slurm GRES에 등록된 슬롯입니다. 장치는 `/dev/null` 매핑이라 성능 의미가 없고, RA는 `virtual_slot`으로 분류합니다.
 6. **응답이 사라지면 중복 제출되나요?** 원격 호출 전에 `SUBMITTING`을 커밋하고, 불확실하면 attempt 이름으로 reconcile합니다. 재제출하지 않습니다. 다만 미해결 2건이 남아 있어 zero-loss를 증명했다고는 말하지 않습니다.
-7. **Kueue 쿼터 초과와 Slurm 거절의 차이는?** Kueue는 Job을 만들고 admission을 보류합니다. Slurm QOS 위반은 제출 자체를 거절합니다. RA는 앞의 것을 대기로, 뒤의 것을 허용 목록 문구일 때만 거절로 분류합니다.
+7. **Kueue 쿼터 초과와 Slurm 거절의 차이는?** Kueue는 Job을 만들고 admission을 보류합니다. Slurm은 정책에 따라 다릅니다. 과거 lab에서 `DenyOnLimit`+enforcement를 켰을 때 job별 한도 초과는 제출 거절, account 집계 한도는 대기였습니다. RA는 native 사유로 대기와 거절을 나누고, 거절은 허용 목록 문구일 때만 분류합니다.
 8. **사용량은 실제 사용률인가요?** 아닙니다. native가 기록한 예약량(K8s requests+시각, Slurm AllocTRES+시각)입니다. 모르는 구간은 0이 아닌 unknown으로 남깁니다.
 9. **보안 경계는 충분한가요?** 명령 화이트리스트·키 분리·출발지 제한·host key 고정은 실측으로 거부를 확인했습니다. 하지만 gateway 소유 계정이 docker 그룹이라 root 격리는 아닙니다.
 10. **status가 partial인데 장애인가요?** 아닙니다. 노드·큐 관측은 ok이고 Prometheus 메트릭이 연결되지 않았다는 뜻입니다.
