@@ -40,3 +40,17 @@ for knowledge distillation (KD) on top of the same helpers.
 
 Keep multi-GB image pulls off etri-ser0001. It is the shell and cloudcore host, and it sits
 near the kubelet disk-eviction threshold.
+
+## Evidence and readiness limits
+
+- Registry entries are immutable, so a variant's `validation_refs` cannot be corrected in
+  place. `vt-kd-mnv3s-b16s50-gb10-v1` cites the vanilla GB10 qualification. Its actual KD
+  evidence is native job `j-3ebb9237cc7748b9ba2c4828a0d8f1a7`, through its training receipt.
+- No field expresses a dependency on the teacher Pod. After the teacher is removed, the
+  catalog still reports the KD candidate as submission-compatible. Execution fails closed in
+  two places:
+  - the worker route has no training source for it;
+  - the runner preflights teacher health and the pinned Pod UID.
+- JCT in `jct-report` covers native scheduler submit → backend finish (17 s for the joint job).
+  RA state SUCCEEDED adds worker collection (≈21.9 s in total). No JctProfile exists yet for
+  these workloads.
