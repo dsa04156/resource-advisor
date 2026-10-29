@@ -410,6 +410,102 @@ def test_slurm_reconcile_multiple_matches_is_ambiguity(service):
         slurm.reconcile(job)
 
 
+@pytest.mark.parametrize("foreign_annotations", [True, False])
+def test_recreated_same_name_kubernetes_job_is_never_adopted(service, foreign_annotations):
+    from test_backends import row
+
+    job = row(service)
+    owner = {
+        "resource-advisor/job-id": job["id"],
+        "resource-advisor/context-signature": job["body"]["context_signature"],
+    }
+    native = {"metadata": {"name": job["body"]["attempt_id"], "uid": "u1", "annotations": owner}}
+
+    def execute(args, **_kwargs):
+        if "create" in args:
+            return json.dumps(native)
+        if "pods" in args:
+            return json.dumps({"items": []})
+        return json.dumps(native)
+
+    backend = KubernetesBackend(
+        namespace="research-a", local_queue="batch", node_selector={"pool": "lab"}, execute=execute
+    )
+    worker = Worker(service, {("team-a", job["body"]["backend_cluster_id"]): backend})
+    worker.submit_one()
+    assert body(service, job["id"])["body"]["backend_uid"] == "u1"
+    # Retention disabled: the original Job is deleted and another with the same
+    # name appears, which has failed.
+    native = {
+        "metadata": {
+            "name": job["body"]["attempt_id"],
+            "uid": "u2",
+            "annotations": {"resource-advisor/job-id": "j-foreign"}
+            if foreign_annotations
+            else owner,
+        },
+        "status": {"conditions": [{"type": "Failed", "status": "True", "reason": "Foreign"}]},
+    }
+    worker.reconcile_all()
+    current = service.get_job("team-a", job["id"])
+    assert current["state"] == "QUEUED"
+    assert current["last_observation_error"] == "BackendError"
+    assert ledger(service) == []
+    with pytest.raises(SubmissionAmbiguous):
+        backend.reconcile(body(service, job["id"]))
+
+
+@pytest.mark.parametrize(
+    "records,expected",
+    [
+        (["42|{n}|team-a|gpu|2026-10-29T01:00:00", "42|{n}|team-a|gpu|2026-10-29T01:00:00"], "42"),
+        (["42|{n}|team-a|gpu|2026-10-29T01:00:00", "42|{n}|team-a|gpu|2026-10-29T02:00:00"], None),
+    ],
+)
+def test_slurm_reconcile_keeps_reused_id_history_distinct(service, records, expected):
+    from test_backends import row
+
+    job = row(service)
+    name = job["body"]["attempt_id"]
+    calls = []
+
+    def execute(argv, **_kwargs):
+        calls.append(argv)
+        return "" if argv[0] == "squeue" else "\n".join(r.format(n=name) for r in records)
+
+    slurm = SlurmBackend(
+        partition="gpu", account="team-a", qos="lab", output_dir="/tmp/ra", execute=execute
+    )
+    if expected is None:
+        with pytest.raises(SubmissionAmbiguous):
+            slurm.reconcile(job)
+    else:
+        assert slurm.reconcile(job) == expected
+    sacct = next(argv for argv in calls if "sacct" in argv)
+    assert "--duplicates" in sacct and sacct[-1].endswith(",Submit")
+
+
+def test_gateway_accepts_only_exact_history_reconcile_forms():
+    spec = importlib.util.spec_from_file_location(
+        "slurm_executor", Path(__file__).parents[1] / "examples/slurm_executor.py"
+    )
+    gateway = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gateway)
+    config = {"mode": "controller", "user": "executor", "account": "lab", "partition": "compute"}
+    base = "env TZ=UTC SLURM_TIME_FORMAT=%Y-%m-%dT%H:%M:%S%z sacct --noheader --parsable2"
+    tail = "--name a-1 --accounts lab --partition compute --starttime 2026-10-29T00:00:00"
+    fields = "--format=JobIDRaw,JobName%100,Account%100,Partition%100"
+    for accepted in [f"{base} --duplicates {tail} {fields},Submit", f"{base} {tail} {fields}"]:
+        assert gateway.plan(config, accepted)[0][-2:] == ["--user", "executor"]
+    for refused in [
+        f"{base} --duplicates {tail} {fields}",
+        f"{base} {tail} {fields},Submit",
+        f"{base} --duplicates {tail.replace('lab', 'other')} {fields},Submit",
+    ]:
+        with pytest.raises(ValueError):
+            gateway.plan(config, refused)
+
+
 def test_gateway_forwards_only_slurm_rejection_lines(monkeypatch, capsys, tmp_path):
     spec = importlib.util.spec_from_file_location(
         "gateway", Path(__file__).parents[1] / "examples/slurm_executor.py"
@@ -580,6 +676,28 @@ def test_monthly_report_clips_reservations_at_explicit_utc_boundaries():
         period_report(records, end, start)
 
 
+def test_unknown_interval_stays_in_every_period_it_could_overlap():
+    late = usage_record(
+        start="2026-10-31T23:00:00+00:00",
+        end=None,
+        body={"terminal_observed_at": "2026-11-01T00:10:00+00:00"},
+    )
+    submitted_only = usage_record(
+        body={
+            "submitted_at": "2026-11-02T00:00:00+00:00",
+            "terminal_observed_at": "2026-11-02T00:05:00+00:00",
+        }
+    )
+    october = period_report([late, submitted_only], *month_period("2026-10"))
+    november = period_report([late, submitted_only], *month_period("2026-11"))
+    september = period_report([late, submitted_only], *month_period("2026-09"))
+    [group] = october["groups"]
+    assert group["attempts"] == group["unknown_allocation_attempts"] == 1
+    assert group["known_allocated_device_seconds"] == 0
+    assert november["groups"][0]["unknown_allocation_attempts"] == 2
+    assert september["groups"] == [] and september["unattributable_attempts"] == 0
+
+
 def test_report_keeps_units_clusters_and_rejections_separate():
     window = ("2026-10-02T00:00:00+00:00", "2026-10-02T00:01:40+00:00")
     records = [
@@ -699,20 +817,22 @@ def trial_module():
     return module
 
 
+TRIAL_PLAN = {
+    "trial_ref": "io-1",
+    "project": "team-a",
+    "workload_ref": "w",
+    "candidate_ref": "c",
+    "keys": [f"io-1-{i}" for i in range(10)],
+    "job_seconds": 120,
+    "window_seconds": 1800,
+    "accelerators_per_job": 1,
+}
+
+
 def test_trial_plan_enforces_frozen_budget(tmp_path):
     trial = trial_module()
-    plan = {
-        "trial_ref": "io-1",
-        "project": "team-a",
-        "workload_ref": "w",
-        "candidate_ref": "c",
-        "keys": [f"io-1-{i}" for i in range(10)],
-        "job_seconds": 120,
-        "window_seconds": 1800,
-        "accelerators_per_job": 1,
-    }
     path = tmp_path / "plan.json"
-    path.write_text(json.dumps(plan))
+    path.write_text(json.dumps(TRIAL_PLAN))
     assert trial.load_plan(path)[1] == 1200
     for change in [
         {"keys": [f"io-1-{i}" for i in range(31)], "accelerators_per_job": 0},
@@ -720,22 +840,84 @@ def test_trial_plan_enforces_frozen_budget(tmp_path):
         {"window_seconds": 1801},
         {"accelerators_per_job": 2},
         {"keys": ["other-1"]},
-        {"previous_native_jobs": 21},
+        {"previous_native_jobs": 0},
         {"unexpected": True},
     ]:
-        path.write_text(json.dumps({**plan, **change}))
+        path.write_text(json.dumps({**TRIAL_PLAN, **change}))
         with pytest.raises(ValueError):
             trial.load_plan(path)
 
 
-def test_trial_audit_detects_double_charge_and_keeps_unknown_unknown():
+class TrialApi:
+    """Compute API double: every key creates one job whose view reports limits."""
+
+    def __init__(self, max_run_seconds=120, accelerators=1):
+        self.jobs, self.limits = {}, (max_run_seconds, accelerators)
+
+    def call(self, method, path, body=None, headers=None):
+        if method == "POST":
+            key = headers["Idempotency-Key"]
+            job = self.jobs.setdefault(key, {"job_id": "j-" + key, "attempt_id": "a-" + key})
+            return 200, job
+        seconds, count = self.limits
+        return 200, {
+            "execution_limits": {"max_run_seconds": seconds},
+            "requested_resources": {"accelerator_count": count},
+        }
+
+
+def test_trial_budget_is_cumulative_and_needs_closure(tmp_path):
     trial = trial_module()
+    budget = tmp_path / "budget.json"
+    second = {**TRIAL_PLAN, "trial_ref": "io-2", "keys": [f"io-2-{i}" for i in range(10)]}
+    assert trial.submit(TrialApi(), TRIAL_PLAN, tmp_path / "c1", budget) is None
+    with pytest.raises(ValueError, match="not closed"):
+        trial.submit(TrialApi(), second, tmp_path / "c2", budget)
+    state = json.loads(budget.read_text())
+    state["cohorts"][0]["closed"] = True
+    budget.write_text(json.dumps(state))
+    # Two 10-job, 120 s, one-accelerator cohorts would reserve 2400 > 1800.
+    with pytest.raises(ValueError, match="accelerator-slot"):
+        trial.submit(TrialApi(), second, tmp_path / "c2", budget)
+    state = json.loads(budget.read_text())
+    assert len(state["cohorts"]) == 1
+    # Observation keeps the persisted deadline: a re-run after the window ends
+    # takes one sample and stops instead of restarting the clock.
+    state["window_started_at"] = state["cohorts"][0]["submitted_at"] = "2026-10-29T00:00:00+00:00"
+    budget.write_text(json.dumps(state))
+    trial.observe(TrialApi(), TRIAL_PLAN, tmp_path / "c1", budget)
+    observed = json.loads((tmp_path / "c1" / "observe.json").read_text())
+    assert not observed["settled"] and len(observed["samples"]) == 1
+
+
+def test_trial_submit_stops_when_actual_limits_exceed_plan(tmp_path):
+    trial = trial_module()
+    budget = tmp_path / "budget.json"
+    stop = trial.submit(TrialApi(max_run_seconds=600), TRIAL_PLAN, tmp_path / "c1", budget)
+    assert stop == "LIMITS_EXCEED_PLAN"
+    [cohort] = json.loads(budget.read_text())["cohorts"]
+    assert cohort["native_jobs"] == 1 and cohort["slot_seconds"] == 600
+    assert len(json.loads((tmp_path / "c1" / "submit.json").read_text())) == 1
+
+
+def audit_inputs():
     jobs = [
-        {"job_id": f"j{i}", "attempt_id": f"a{i}", "replay_same_identity": True} for i in range(3)
+        {
+            "key": f"io-1-{i}",
+            "job_id": f"j{i}",
+            "attempt_id": f"a{i}",
+            "status": [200, 200],
+            "replay_same_identity": True,
+        }
+        for i in range(3)
     ]
     views = {
         "j0": {"state": "SUCCEEDED", "native_identity": {"external_id": "10"}},
-        "j1": {"state": "FAILED", "native_identity": {"external_id": None}},
+        "j1": {
+            "state": "FAILED",
+            "native_identity": {"external_id": None},
+            "native_rejection": {"code": "QOS"},
+        },
         "j2": {"state": "SUBMISSION_UNKNOWN", "native_identity": {"external_id": None}},
     }
     measured = {
@@ -749,13 +931,64 @@ def test_trial_audit_detects_double_charge_and_keeps_unknown_unknown():
         {"attempt_id": "a1", "allocated_device_seconds": None, "body": {"outcome": "FAILED"}},
         {"attempt_id": "foreign", "allocated_device_seconds": 99.0, "body": measured},
     ]
-    result = trial.audit(jobs, views, ledger)
-    assert result["passed"] and result["unknown_usage_attempts"] == 1
-    assert result["known_device_seconds"] == 30.0 and result["states"]["SUBMISSION_UNKNOWN"] == 1
-    doubled = trial.audit(jobs, views, ledger + [ledger[0]])
+    native = {"a0": [{"native_id": "10", "terminal": True}], "a1": [], "a2": []}
+    keys = [j["key"] for j in jobs]
+    return jobs, {"settled": True, "final": views}, ledger, native, keys
+
+
+def test_trial_audit_keeps_unknown_unknown_and_never_passes_unresolved():
+    trial = trial_module()
+    jobs, observed, ledger, native, keys = audit_inputs()
+    result = trial.audit(jobs, observed, ledger, native, keys)
+    assert result["contained"] and not result["passed"]
+    assert result["unknown_usage_attempts"] == 1 and result["unresolved_attempts"] == 1
+    assert result["known_device_seconds"] == 30.0
+    assert {"attempt_id": "a2", "issue": "UNRESOLVED_SUBMISSION"} in result["findings"]
+    del observed["final"]["j2"], native["a2"]
+    jobs, keys = jobs[:2], keys[:2]
+    assert trial.audit(jobs, observed, ledger, native, keys)["passed"]
+    doubled = trial.audit(jobs, observed, ledger + [ledger[0]], native, keys)
     assert {"attempt_id": "a0", "issue": "TERMINAL_WITHOUT_ONE_LEDGER_ROW"} in doubled["findings"]
-    wrong = trial.audit(jobs, views, [{**ledger[0], "allocated_device_seconds": 60.0}, ledger[1]])
+    wrong = trial.audit(
+        jobs, observed, [{**ledger[0], "allocated_device_seconds": 60.0}, ledger[1]], native, keys
+    )
     assert {"attempt_id": "a0", "issue": "USAGE_RECALCULATION_DIFFERS"} in wrong["findings"]
+    twice = trial.audit(jobs, observed, ledger, {**native, "a0": native["a0"] * 2}, keys)
+    assert {"attempt_id": "a0", "issue": "NATIVE_COUNT_DISAGREES"} in twice["findings"]
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "forbidden_submissions",
+        "missing_view",
+        "running_without_ledger",
+        "unsettled",
+        "missing_receipt",
+        "active_native",
+    ],
+)
+def test_trial_audit_refuses_unfinished_or_unidentified_trials(change):
+    trial = trial_module()
+    jobs, observed, ledger, native, keys = audit_inputs()
+    if change == "forbidden_submissions":
+        for job in jobs:
+            job.update(status=[403, 403], job_id=None, attempt_id=None)
+    elif change == "missing_view":
+        del observed["final"]["j0"]
+    elif change == "running_without_ledger":
+        observed["final"]["j0"]["state"] = "RUNNING"
+        ledger = ledger[1:]
+    elif change == "unsettled":
+        observed["settled"] = False
+    elif change == "missing_receipt":
+        del native["a0"]
+    else:
+        native["a2"] = [{"native_id": "11", "terminal": False}]
+    result = trial.audit(jobs, observed, ledger, native, keys)
+    assert not result["passed"]
+    if change != "forbidden_submissions":
+        assert not result["contained"]
 
 
 def test_period_report_lists_unresolved_attempts_as_not_finalized(service):

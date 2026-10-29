@@ -8,11 +8,19 @@ recalculates usage from raw ledger rows. It never injects faults itself, never
 resubmits and never cancels foreign work. The bearer token comes from
 RA_TRIAL_TOKEN; output contains no token or API address.
 
+The whole-effort budget lives in one ledger file (--budget) shared by every
+cohort: native jobs, accelerator-slot seconds from each job's actual execution
+limit and requested accelerators, and one live window that starts with the
+first submission. A cohort is closed only by an audit showing every attempt
+natively terminal or explicitly unresolved with no active native execution;
+the next cohort is refused until then.
+
   plan    validate the frozen plan and print its digest
   submit  create the cohort (and replay keys) -> evidence/submit.json
   mark    append a timestamped operator fault/restart mark
   observe poll lifecycle until settled or the window ends -> evidence/observe.json
-  audit   independent count/usage recalculation -> evidence/audit.json + manifest
+  audit   independent count/usage recalculation against operator-collected native
+          receipts (--native) -> evidence/audit.json + manifest
 """
 
 import argparse
@@ -53,12 +61,12 @@ def load_plan(path):
         "window_seconds",
         "accelerators_per_job",
     }
-    if set(plan) - required - {"previous_native_jobs"} or not required <= set(plan):
+    if set(plan) != required:
         raise ValueError("plan fields must be exactly the documented set")
     keys = plan["keys"]
     if len(keys) != len(set(keys)) or not all(k.startswith(plan["trial_ref"] + "-") for k in keys):
         raise ValueError("keys must be unique and prefixed by trial_ref")
-    if len(keys) + plan.get("previous_native_jobs", 0) > LIMITS["jobs"]:
+    if len(keys) > LIMITS["jobs"]:
         raise ValueError("trial exceeds the 30 native job budget")
     if not 0 < plan["job_seconds"] <= LIMITS["job_seconds"]:
         raise ValueError("job_seconds must be within 120")
@@ -100,29 +108,117 @@ def write(directory, name, value):
     return path
 
 
-def submit(api, plan, out):
-    records = []
+def load_budget(path):
+    if not path.exists():
+        return {"limits": LIMITS, "window_started_at": None, "cohorts": []}
+    return json.loads(path.read_text())
+
+
+def save_budget(path, budget):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(json.dumps(budget, indent=2, sort_keys=True) + "\n")
+    temporary.replace(path)
+
+
+def window_end(budget):
+    started = datetime.fromisoformat(budget["window_started_at"])
+    return started.timestamp() + LIMITS["window_seconds"]
+
+
+def used(budget):
+    return (
+        sum(c["native_jobs"] for c in budget["cohorts"]),
+        sum(c["slot_seconds"] for c in budget["cohorts"]),
+    )
+
+
+def admit(budget, plan, slots):
+    """Refuse a cohort the whole-effort budget cannot cover; reserve it otherwise."""
+    if any(not c["closed"] for c in budget["cohorts"]):
+        raise ValueError("previous cohort is not closed by a contained audit")
+    if plan["trial_ref"] in {c["trial_ref"] for c in budget["cohorts"]}:
+        raise ValueError("trial_ref was already submitted")
+    jobs, slot_seconds = used(budget)
+    if jobs + len(plan["keys"]) > LIMITS["jobs"]:
+        raise ValueError("cohort exceeds the remaining native job budget")
+    if slot_seconds + slots > LIMITS["slot_seconds"]:
+        raise ValueError("cohort exceeds the remaining accelerator-slot budget")
+    if budget["window_started_at"] is None:
+        budget["window_started_at"] = stamp()
+    if time.time() >= window_end(budget):
+        raise ValueError("the live workload window has ended")
+    cohort = {
+        "trial_ref": plan["trial_ref"],
+        "submitted_at": stamp(),
+        "native_jobs": len(plan["keys"]),
+        "slot_seconds": slots,
+        "closed": False,
+    }
+    budget["cohorts"].append(cohort)
+    return cohort
+
+
+def actual_slots(view):
+    """Slot seconds bounded by the job's own execution limit, not the plan's claim."""
+    limits = view.get("execution_limits") or {}
+    resources = view.get("requested_resources") or {}
+    seconds, count = limits.get("max_run_seconds"), resources.get("accelerator_count")
+    if not isinstance(seconds, int | float) or not isinstance(count, int | float):
+        return None, None
+    return seconds, seconds * count
+
+
+def submit(api, plan, out, budget_path):
+    budget = load_budget(budget_path)
+    planned = len(plan["keys"]) * plan["job_seconds"] * plan["accelerators_per_job"]
+    cohort = admit(budget, plan, planned)
+    # Reserve before the first native call: a crash still counts the cohort.
+    save_budget(budget_path, budget)
+    records, actual, stop = [], 0, None
     for key in plan["keys"]:
         request = {"workload_ref": plan["workload_ref"], "candidate_ref": plan["candidate_ref"]}
         first = api.call("POST", "/jobs", request, {"Idempotency-Key": key})
         replay = api.call("POST", "/jobs", request, {"Idempotency-Key": key})
-        records.append(
-            {
-                "key": key,
-                "at": stamp(),
-                "status": [first[0], replay[0]],
-                "job_id": first[1].get("job_id"),
-                "attempt_id": first[1].get("attempt_id"),
-                "replay_same_identity": (first[1].get("job_id"), first[1].get("attempt_id"))
-                == (replay[1].get("job_id"), replay[1].get("attempt_id")),
-            }
+        record = {
+            "key": key,
+            "at": stamp(),
+            "status": [first[0], replay[0]],
+            "job_id": first[1].get("job_id"),
+            "attempt_id": first[1].get("attempt_id"),
+            "replay_same_identity": (first[1].get("job_id"), first[1].get("attempt_id"))
+            == (replay[1].get("job_id"), replay[1].get("attempt_id")),
+        }
+        records.append(record)
+        status, view = (
+            api.call("GET", f"/jobs/{record['job_id']}/view") if record["job_id"] else (0, {})
         )
-    return write(out, "submit.json", records)
+        seconds, slots = actual_slots(view) if status == 200 else (None, None)
+        record["max_run_seconds"], record["slot_seconds"] = seconds, slots
+        per_job = plan["job_seconds"] * plan["accelerators_per_job"]
+        if seconds is None:
+            stop, slots = "LIMITS_UNOBSERVED", per_job
+        elif seconds > plan["job_seconds"] or slots > per_job:
+            stop = "LIMITS_EXCEED_PLAN"
+        actual += slots
+        if stop:
+            break
+    # Stopped early: charge what was actually submitted, including the offending job.
+    cohort["native_jobs"] = len(records) if stop else len(plan["keys"])
+    cohort["slot_seconds"] = actual if stop else planned
+    cohort["stopped"] = stop
+    save_budget(budget_path, budget)
+    write(out, "submit.json", records)
+    return stop
 
 
-def observe(api, plan, out):
+def observe(api, plan, out, budget_path):
     jobs = json.loads((out / "submit.json").read_text())
-    deadline = time.monotonic() + plan["window_seconds"]
+    budget = load_budget(budget_path)
+    cohort = next(c for c in budget["cohorts"] if c["trial_ref"] == plan["trial_ref"])
+    # One deadline per cohort, never later than the whole-effort window.
+    started = datetime.fromisoformat(cohort["submitted_at"]).timestamp()
+    deadline = min(started + plan["window_seconds"], window_end(budget))
     samples, views = [], {}
     while True:
         for job in jobs:
@@ -130,8 +226,10 @@ def observe(api, plan, out):
                 status, view = api.call("GET", f"/jobs/{job['job_id']}/lifecycle")
                 views[job["job_id"]] = view if status == 200 else {"state": "OBSERVATION_ERROR"}
         samples.append({"at": stamp(), "states": {k: v.get("state") for k, v in views.items()}})
-        settled = all(v.get("state") in TERMINAL | UNRESOLVED for v in views.values())
-        if settled or time.monotonic() >= deadline:
+        settled = len(views) == len(jobs) and all(
+            v.get("state") in TERMINAL | UNRESOLVED for v in views.values()
+        )
+        if settled or time.time() >= deadline:
             break
         time.sleep(5)
     return write(out, "observe.json", {"settled": settled, "samples": samples, "final": views})
@@ -153,27 +251,65 @@ def recalculate(row):
     return (end - start).total_seconds() * count
 
 
-def audit(jobs, views, ledger):
-    attempts = {j["attempt_id"]: j for j in jobs if j["attempt_id"]}
+def audit(jobs, observed, ledger, native, keys):
+    """Independent closure check. `native` maps attempt ID to the operator's raw
+    scheduler receipts ({"native_id", "terminal"}); the API is not trusted for
+    the execution count. Unresolved attempts never pass and never become zero."""
+    findings = []
+    views = observed.get("final", {})
+    if not observed.get("settled"):
+        findings.append({"issue": "OBSERVATION_NOT_SETTLED"})
+    if sorted(j["key"] for j in jobs) != sorted(keys):
+        findings.append({"issue": "SUBMISSIONS_DO_NOT_MATCH_PLAN"})
+    for job in jobs:
+        if (
+            not job["job_id"]
+            or not job["attempt_id"]
+            or not all(200 <= code < 300 for code in job["status"])
+        ):
+            findings.append({"key": job["key"], "issue": "SUBMISSION_WITHOUT_IDENTITY"})
+        elif not job["replay_same_identity"]:
+            findings.append({"attempt_id": job["attempt_id"], "issue": "REPLAY_CHANGED_IDENTITY"})
+    attempts = {j["attempt_id"]: j for j in jobs if j["job_id"] and j["attempt_id"]}
     rows = [r for r in ledger if r["attempt_id"] in attempts]
     per_attempt = {}
     for row in rows:
         per_attempt[row["attempt_id"]] = per_attempt.get(row["attempt_id"], 0) + 1
-    natives = [
-        v.get("native_identity", {}).get("external_id") for v in views.values() if v.get("state")
-    ]
-    natives = [n for n in natives if n]
-    findings = []
+    contained, unresolved, natives = True, 0, []
     for attempt, job in attempts.items():
-        state = views.get(job["job_id"], {}).get("state")
+        view = views.get(job["job_id"]) or {}
+        state = view.get("state")
+        receipts = native.get(attempt)
+        if receipts is None:
+            findings.append({"attempt_id": attempt, "issue": "NATIVE_RECEIPT_MISSING"})
+            contained = False
+            continue
+        natives += [r["native_id"] for r in receipts]
+        active = [r for r in receipts if not r.get("terminal")]
+        if active:
+            contained = False
+            findings.append({"attempt_id": attempt, "issue": "NATIVE_EXECUTION_ACTIVE"})
         count = per_attempt.get(attempt, 0)
-        if state in TERMINAL and count != 1:
-            findings.append({"attempt_id": attempt, "issue": "TERMINAL_WITHOUT_ONE_LEDGER_ROW"})
-        if state not in TERMINAL and count:
-            findings.append({"attempt_id": attempt, "issue": "LEDGER_ROW_BEFORE_TERMINAL"})
-    for job in jobs:
-        if not job["replay_same_identity"]:
-            findings.append({"attempt_id": job["attempt_id"], "issue": "REPLAY_CHANGED_IDENTITY"})
+        external = (view.get("native_identity") or {}).get("external_id")
+        zero = bool(view.get("native_rejection")) or bool(
+            (view.get("usage") or {}).get("never_submitted")
+        )
+        if state in TERMINAL:
+            if count != 1:
+                findings.append({"attempt_id": attempt, "issue": "TERMINAL_WITHOUT_ONE_LEDGER_ROW"})
+            expected = [] if zero else [external]
+            if [r["native_id"] for r in receipts] != expected:
+                findings.append({"attempt_id": attempt, "issue": "NATIVE_COUNT_DISAGREES"})
+        elif state in UNRESOLVED:
+            unresolved += 1
+            findings.append({"attempt_id": attempt, "issue": "UNRESOLVED_SUBMISSION"})
+            if count:
+                findings.append({"attempt_id": attempt, "issue": "LEDGER_ROW_BEFORE_TERMINAL"})
+            if receipts:
+                findings.append({"attempt_id": attempt, "issue": "NATIVE_JOB_NOT_ADOPTED"})
+        else:
+            contained = False
+            findings.append({"attempt_id": attempt, "issue": "NOT_TERMINAL", "state": state})
     if len(natives) != len(set(natives)):
         findings.append({"issue": "NATIVE_ID_SHARED_BY_ATTEMPTS"})
     usage = []
@@ -202,7 +338,7 @@ def audit(jobs, views, ledger):
         )
     states = {}
     for job in jobs:
-        state = views.get(job["job_id"], {}).get("state", "UNOBSERVED")
+        state = (views.get(job["job_id"]) or {}).get("state", "UNOBSERVED")
         states[state] = states.get(state, 0) + 1
     return {
         "attempts": len(attempts),
@@ -211,8 +347,11 @@ def audit(jobs, views, ledger):
         "ledger_rows": len(rows),
         "known_device_seconds": sum(u["recorded_device_seconds"] or 0 for u in usage),
         "unknown_usage_attempts": sum(u["recorded_device_seconds"] is None for u in usage),
+        "unresolved_attempts": unresolved,
         "usage": usage,
         "findings": findings,
+        # Contained: no active native execution; unresolved stays visible as a finding.
+        "contained": contained and observed.get("settled", False),
         "passed": not findings,
     }
 
@@ -225,6 +364,8 @@ def main():
     parser.add_argument("--api", default=os.environ.get("RA_TRIAL_API"))
     parser.add_argument("--ca", default=None)
     parser.add_argument("--label", default=None)
+    parser.add_argument("--budget", type=Path, default=None, help="whole-effort ledger")
+    parser.add_argument("--native", type=Path, default=None, help="native receipts JSON")
     args = parser.parse_args()
     plan, slots = load_plan(args.plan)
     if args.action == "plan":
@@ -239,23 +380,35 @@ def main():
             stream.write(json.dumps({"at": stamp(), "label": args.label}) + "\n")
         return 0
     token = os.environ.get("RA_TRIAL_TOKEN")
-    if not token or not args.api:
-        parser.error("RA_TRIAL_TOKEN and --api/RA_TRIAL_API are required")
+    if not token or not args.api or not args.budget:
+        parser.error("RA_TRIAL_TOKEN, --api/RA_TRIAL_API and --budget are required")
     api = Api(args.api, token, args.ca)
     if args.action == "submit":
-        submit(api, plan, args.evidence)
+        stop = submit(api, plan, args.evidence, args.budget)
+        print(json.dumps({"stopped": stop}))
+        return 1 if stop else 0
     elif args.action == "observe":
-        observe(api, plan, args.evidence)
+        observe(api, plan, args.evidence, args.budget)
     else:
+        if not args.native:
+            parser.error("--native receipts are required for audit")
         jobs = json.loads((args.evidence / "submit.json").read_text())
-        views = json.loads((args.evidence / "observe.json").read_text())["final"]
+        observed = json.loads((args.evidence / "observe.json").read_text())
+        native = json.loads(args.native.read_text())
+        write(args.evidence, "native.json", native)
         status, ledger = api.call("GET", "/usage")
         if status != 200:
             print(json.dumps({"error": "usage ledger unavailable"}))
             return 1
         write(args.evidence, "ledger.json", [r for r in ledger if r["project"] == plan["project"]])
-        result = audit(jobs, views, ledger)
+        result = audit(jobs, observed, ledger, native, plan["keys"])
         write(args.evidence, "audit.json", result)
+        if result["contained"]:
+            budget = load_budget(args.budget)
+            for cohort in budget["cohorts"]:
+                if cohort["trial_ref"] == plan["trial_ref"]:
+                    cohort["closed"], cohort["closed_at"] = True, stamp()
+            save_budget(args.budget, budget)
         files = sorted(p for p in args.evidence.iterdir() if p.name != "manifest.json")
         write(
             args.evidence,
@@ -265,7 +418,7 @@ def main():
                 "files": {p.name: digest(p.read_bytes()) for p in files},
             },
         )
-        print(json.dumps({k: result[k] for k in ("attempts", "states", "passed")}))
+        print(json.dumps({k: result[k] for k in ("attempts", "states", "contained", "passed")}))
         return 0 if result["passed"] else 1
     return 0
 

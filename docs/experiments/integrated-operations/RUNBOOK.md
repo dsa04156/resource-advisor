@@ -90,15 +90,19 @@ Smoke (read-only): `GET /api/v1/compute/jobs/<recent-id>/lifecycle` returns
 
 ```sh
 export RA_TRIAL_TOKEN=<project token>   # never written to evidence
-P=/secure/io-plan-c0.json; E=/secure/io-evidence/c0
+P=/secure/io-plan-c0.json; E=/secure/io-evidence/c0; BUD=/secure/io-evidence/budget.json
 uv run python examples/integrated_operations_trial.py plan    --plan $P --evidence $E
-uv run python examples/integrated_operations_trial.py submit  --plan $P --evidence $E --api <api> --ca <ca>
+uv run python examples/integrated_operations_trial.py submit  --plan $P --evidence $E --budget $BUD --api <api> --ca <ca>
 uv run python examples/integrated_operations_trial.py mark    --plan $P --evidence $E --label worker-restart-begin
 kubectl -n resource-advisor-lab rollout restart deploy/ra-live-training-worker
 kubectl -n resource-advisor-lab rollout status  deploy/ra-live-training-worker --timeout=180s
 uv run python examples/integrated_operations_trial.py mark    --plan $P --evidence $E --label worker-ready
-uv run python examples/integrated_operations_trial.py observe --plan $P --evidence $E --api <api> --ca <ca>
-uv run python examples/integrated_operations_trial.py audit   --plan $P --evidence $E --api <api> --ca <ca>
+uv run python examples/integrated_operations_trial.py observe --plan $P --evidence $E --budget $BUD --api <api> --ca <ca>
+# Native receipts, collected from the schedulers (not the API):
+#   {"<attempt_id>": [{"native_id": "<Job name or Slurm ID>", "terminal": true}], ...}
+#   Kubernetes: kubectl get job <attempt_id> -o json (uid, conditions)
+#   Slurm VM:   sacct --duplicates --name <attempt_id> -o JobIDRaw,Submit,State
+uv run python examples/integrated_operations_trial.py audit   --plan $P --evidence $E --budget $BUD --api <api> --ca <ca> --native $E-native.json
 ```
 
 The accepted-response boundary (Stage 1) uses the existing verifiers instead of a

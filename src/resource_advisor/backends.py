@@ -85,6 +85,18 @@ class Observation:
     admission: dict | None = None
 
 
+class NativeName(str):
+    """Native name that also carries the immutable object UID when one is known."""
+
+    uid = None
+
+
+def native_name(name, uid):
+    result = NativeName(name)
+    result.uid = uid or None
+    return result
+
+
 def memory_mib(value, *, slurm=False):
     match = re.fullmatch(r"(\d+(?:\.\d+)?)([KMGT]i?|[kMGT])?", str(value))
     if not match:
@@ -469,11 +481,26 @@ class KubernetesBackend:
                     stdin=json.dumps(self.manifest(job)),
                 )
             )
-            return obj["metadata"]["name"]
+            return native_name(obj["metadata"]["name"], obj["metadata"].get("uid"))
         except BackendError as exc:
             if exc.rejection:
                 raise SubmissionRejected(exc.rejection) from exc
             raise SubmissionUnknown(str(exc)) from exc
+
+    @staticmethod
+    def owns(job, obj):
+        """Names are reused after deletion; ownership is the attempt annotations
+        plus the UID bound at submission, adoption or first observation."""
+        meta = obj["metadata"]
+        annotations = meta.get("annotations", {})
+        uid = job["body"].get("backend_uid")
+        return (
+            annotations.get("resource-advisor/job-id") == job["id"]
+            and annotations.get("resource-advisor/context-signature")
+            == job["body"]["context_signature"]
+            and bool(meta.get("uid"))
+            and (not uid or uid == meta["uid"])
+        )
 
     def reconcile(self, job):
         raw = self.execute(
@@ -483,14 +510,9 @@ class KubernetesBackend:
         if not raw.strip():
             return None
         obj = json.loads(raw)
-        annotations = obj["metadata"].get("annotations", {})
-        if (
-            annotations.get("resource-advisor/job-id") != job["id"]
-            or annotations.get("resource-advisor/context-signature")
-            != job["body"]["context_signature"]
-        ):
+        if not self.owns(job, obj):
             raise SubmissionAmbiguous("existing Job does not match this attempt")
-        return obj["metadata"]["name"]
+        return native_name(obj["metadata"]["name"], obj["metadata"]["uid"])
 
     def status(self, job):
         raw = self.execute(
@@ -512,7 +534,14 @@ class KubernetesBackend:
             )
             if terminal is not None:
                 return Observation(**terminal, **retained)
+        uid = job["body"].get("backend_uid")
         if not raw.strip():
+            if uid:
+                pods = [
+                    p
+                    for p in pods
+                    if any(o.get("uid") == uid for o in p["metadata"].get("ownerReferences", []))
+                ]
             if job["state"] == State.CANCEL_REQUESTED:
                 active = any(
                     p.get("status", {}).get("phase") not in {"Succeeded", "Failed"} for p in pods
@@ -520,6 +549,11 @@ class KubernetesBackend:
                 return Observation(State.CANCEL_REQUESTED if active else State.CANCELED)
             raise BackendError("Job missing; disappearance is not successful completion")
         obj = json.loads(raw)
+        if not self.owns(job, obj):
+            # A recreated same-name Job is another object; never adopt its state.
+            raise BackendError("Job identity does not match this attempt")
+        if "backend_uid" not in retained:
+            retained = {**retained, "backend_uid": obj["metadata"]["uid"]}
         status = obj.get("status", {})
         submitted = obj["metadata"].get("creationTimestamp")
         pods = [
@@ -982,6 +1016,7 @@ class SlurmBackend:
                 "sacct",
                 "--noheader",
                 "--parsable2",
+                "--duplicates",
                 "--name",
                 name,
                 "--accounts",
@@ -990,20 +1025,31 @@ class SlurmBackend:
                 self.partition,
                 "--starttime",
                 job["body"]["created_at"][:19],
-                "--format=JobIDRaw,JobName%100,Account%100,Partition%100",
+                "--format=JobIDRaw,JobName%100,Account%100,Partition%100,Submit",
             ]
         )
-        ids = {
-            line.split("|")[0]
-            for line in (queued + "\n" + accounted).splitlines()
-            if len(line.split("|")) == 4
-            and line.split("|")[1] == name
-            and line.split("|")[2] == self.account
-            and line.split("|")[3] == self.partition
-            and re.fullmatch(r"\d+", line.split("|")[0])
+
+        def owned(fields):
+            return (
+                fields[1:4] == [name, self.account, self.partition]
+                and re.fullmatch(r"\d+", fields[0]) is not None
+            )
+
+        queue_ids = {
+            fields[0]
+            for fields in (line.split("|") for line in queued.splitlines())
+            if len(fields) == 4 and owned(fields)
         }
-        if len(ids) > 1:
-            raise SubmissionAmbiguous("multiple external jobs match one attempt")
+        # Slurm reuses job IDs; with --duplicates each accounting record keeps its
+        # own Submit time. Distinct (ID, Submit) records are distinct native jobs.
+        records = {
+            (fields[0], fields[4])
+            for fields in (line.split("|") for line in accounted.splitlines())
+            if len(fields) == 5 and owned(fields)
+        }
+        ids = queue_ids | {jid for jid, _submit in records}
+        if len(ids) > 1 or len(records) > 1:
+            raise SubmissionAmbiguous("multiple native records match one attempt")
         return next(iter(ids), None)
 
     @staticmethod

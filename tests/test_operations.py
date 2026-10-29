@@ -74,7 +74,14 @@ def test_kubernetes_pending_reason_is_observed_not_guessed(service, reason):
         if reason == "Unschedulable"
         else {}
     )
-    obj = {"metadata": {"uid": "owned"}, "spec": {"suspend": reason == "AdmissionPending"}}
+    owner = {
+        "resource-advisor/job-id": job["id"],
+        "resource-advisor/context-signature": job["body"]["context_signature"],
+    }
+    obj = {
+        "metadata": {"uid": "owned", "annotations": owner},
+        "spec": {"suspend": reason == "AdmissionPending"},
+    }
     pods = {"items": [{"metadata": {"ownerReferences": [{"uid": "owned"}]}, "status": status}]}
     backend = KubernetesBackend(
         namespace="team-a",

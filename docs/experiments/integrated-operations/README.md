@@ -53,6 +53,9 @@ NPU는 서로 합치지 않습니다. 실제 장애 복구 시연은 소유한 C
   or GPU performance claims. Physical Slurm is unreachable.
 - Acknowledgement does not prove absence. A native job submitted but invisible to
   queries remains possible; its usage appears only if it is later matched.
+- Kubernetes Jobs are bound by attempt annotations and UID; a recreated same-name
+  Job is an observation error, never adopted. Slurm reconcile reads accounting
+  `--duplicates` with Submit; distinct (ID, Submit) records are AMBIGUOUS.
 - Slurm reconcile identifies the attempt by its unique attempt name, account and
   partition (the route's project mapping); the `--comment` owner tag is not
   queried because forced-command gateways pin output formats.

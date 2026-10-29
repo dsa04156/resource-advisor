@@ -179,9 +179,8 @@ def period_report(records, start, end, open_jobs=()):
     """Clip observed reservation intervals to [start, end) in UTC.
 
     Totals come only from the finalized terminal ledger. Attempts are attributed
-    by their observed reservation interval; when it is unknown, the terminal
-    observation time decides membership and the attempt is counted as unknown,
-    never as zero. Non-terminal attempts created before the period end are listed
+    by their observed reservation interval; when it is unknown, the attempt is
+    listed as unknown (never zero) in every period its possible window overlaps. Non-terminal attempts created before the period end are listed
     separately as not finalized. Groups never mix clusters or unit kinds.
     """
     start, end = utc_instant(start), utc_instant(end)
@@ -215,11 +214,15 @@ def period_report(records, start, end, open_jobs=()):
             if overlap < 0 or (overlap == 0 and not (start <= begin < end)):
                 continue
         else:
-            marker = _aware(body.get("terminal_observed_at"))
-            if marker is None:
+            # Unknown interval: keep it wherever it could have overlapped, bounded by
+            # the earliest known start/submission and the latest known finish or
+            # terminal observation. An open bound never excludes the period.
+            lower = [t for t in (begin, _aware(body.get("submitted_at"))) if t is not None]
+            upper = [t for t in (finish, _aware(body.get("terminal_observed_at"))) if t]
+            if not lower and not upper:
                 unattributable += 1
                 continue
-            if not start <= marker < end:
+            if (lower and min(lower) >= end) or (upper and max(upper) <= start):
                 continue
         key = (
             body.get("backend_cluster_id"),

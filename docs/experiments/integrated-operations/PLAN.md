@@ -14,8 +14,11 @@ accelerator trials and historical evidence are reported separately.
 | Accelerator-slot seconds | ≤ 1800 (CPU-only jobs count 0 accelerator slots) |
 | Cohorts | next cohort only after the prior one is natively terminal or explicitly unresolved and contained |
 
-`examples/integrated_operations_trial.py plan` refuses plans outside these bounds
-(`previous_native_jobs` carries the running total between cohorts).
+`examples/integrated_operations_trial.py` refuses plans outside these bounds and
+keeps one whole-effort ledger (`--budget`): native jobs, slot seconds from each
+job's actual execution limit and requested accelerators, one live window starting
+at the first submission. A cohort closes only when its audit, checked against
+operator-collected native receipts, finds no active native execution.
 
 ## Targets
 

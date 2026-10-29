@@ -226,12 +226,15 @@ def plan(config, original, script=""):
             and re.fullmatch(r"[1-9][0-9]*", args[-2])
             and args[-1] in formats
         )
-        if len(args) == 12 and args[:4] == prefix + ["--name"]:
+        # Reconciliation by attempt name; the --duplicates form keeps reused-ID history.
+        history = args[3:4] == ["--duplicates"]
+        by_name = args[4:] if history else args[3:]
+        if args[:3] == prefix and len(by_name) == 9 and by_name[0] == "--name":
             valid = (
-                re.fullmatch(REF, args[4])
-                and args[5:10] == ["--accounts", account, "--partition", partition, "--starttime"]
-                and re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d", args[10])
-                and args[11] == "--format=" + FIELDS
+                re.fullmatch(REF, by_name[1])
+                and by_name[2:7] == ["--accounts", account, "--partition", partition, "--starttime"]
+                and re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d", by_name[7])
+                and by_name[8] == "--format=" + FIELDS + (",Submit" if history else "")
             )
         if valid:
             return ["/usr/bin/sacct", *args[1:], "--user", user], None

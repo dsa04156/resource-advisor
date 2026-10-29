@@ -214,6 +214,15 @@ def test_reconciliation_rejects_foreign_kubernetes_job(service):
         backend.reconcile(job)
 
 
+def owner_annotations(job):
+    return {
+        "annotations": {
+            "resource-advisor/job-id": job["id"],
+            "resource-advisor/context-signature": job["body"]["context_signature"],
+        }
+    }
+
+
 def test_pending_pod_is_not_running_even_when_job_active(service):
     job = row(service)
     job["body"]["external_id"] = "attempt"
@@ -230,7 +239,9 @@ def test_pending_pod_is_not_running_even_when_job_active(service):
                     ]
                 }
             )
-        return json.dumps({"metadata": {"uid": "u1"}, "status": {"active": 1}})
+        return json.dumps(
+            {"metadata": {"uid": "u1", **owner_annotations(job)}, "status": {"active": 1}}
+        )
 
     backend = KubernetesBackend(
         namespace="research-a", local_queue="batch", node_selector={"pool": "lab"}, execute=execute
@@ -411,7 +422,15 @@ def test_kubernetes_queue_time_uses_server_creation_not_submit_response(service)
                     ]
                 }
             )
-        return json.dumps({"metadata": {"uid": "u1", "creationTimestamp": "2026-10-02T07:59:59Z"}})
+        return json.dumps(
+            {
+                "metadata": {
+                    "uid": "u1",
+                    "creationTimestamp": "2026-10-02T07:59:59Z",
+                    **owner_annotations(job),
+                }
+            }
+        )
 
     backend = KubernetesBackend(
         namespace="research-a", local_queue="batch", node_selector={"pool": "lab"}, execute=execute

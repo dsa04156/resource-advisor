@@ -40,6 +40,21 @@ pre-existing `docs/nais-interview` and `docs/presentation` scripts, unchanged he
 | Mixed units, clusters, not-finalized | `test_report_keeps_units_clusters_and_rejections_separate`, `test_period_report_lists_unresolved_attempts_as_not_finalized` |
 | Trial runner budget and independent audit | `test_trial_plan_enforces_frozen_budget`, `test_trial_audit_detects_double_charge_and_keeps_unknown_unknown` |
 
+## Review round 1 fixes (2026-10-29) — code + automated tests only
+
+Fixed: unknown intervals stay in every period they could overlap; Kubernetes
+status/reconcile/cancel bind attempt annotations + UID (recreated same-name Job is
+never adopted); Slurm reconcile uses `--duplicates` + Submit and refuses distinct
+(ID, Submit) records, with the matching gateway allow-list; the trial runner keeps a
+whole-effort budget ledger bound to actual job limits and its audit requires
+identities, settled observation and native receipts (unresolved never passes).
+
+- `uv run pytest -q`: 1474 passed, 11 skipped, 3 failed: Kubernetes fixtures in
+  `tests/test_operations.py` that lacked the ownership annotations every real Job
+  carries. After the fixture fix, `tests/test_operations.py` passed (8).
+- Python 3.11 (qualified runtime version) focused set: 194 passed.
+- Each fix was first shown failing against the unfixed code.
+
 ## Live phase
 
 Not run. To be filled only with real evidence per [PLAN.md](PLAN.md): exact

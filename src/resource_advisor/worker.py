@@ -220,7 +220,9 @@ class Worker:
 
     @staticmethod
     def adopted_body(latest, external):
-        body = dict(latest["body"], external_id=external)
+        body = dict(latest["body"], external_id=str(external))
+        if getattr(external, "uid", None):
+            body["backend_uid"] = external.uid
         resolution = body.get("submission_resolution")
         if resolution and resolution.get("status") == "ACKNOWLEDGED":
             body["submission_resolution"] = dict(
