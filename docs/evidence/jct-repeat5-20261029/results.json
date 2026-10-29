@@ -1,0 +1,1054 @@
+{
+  "scope": "six resource combinations, five additional executions each; KD objective is separate from ordinary GPU training",
+  "jobs": [
+    {
+      "job_id": "j-d4b18425ede34a2980d95cb99aaff097",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-ddp-rtx5060-rtx5080-1",
+      "workload": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "candidate": "ddp-rtx5060-rtx5080",
+      "attempt_id": "a-b8a87151431048faa99e50f055045722",
+      "submitted_at": "2026-10-29T14:07:13Z",
+      "execution_started_at": "2026-10-29T14:07:15Z",
+      "backend_finished_at": "2026-10-29T14:07:52Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:07:13Z",
+        "finished_at": "2026-10-29T14:07:52Z",
+        "jct_seconds": 39.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 33.0,
+      "quality_passed": true,
+      "compute_seconds": 4.701804484939203,
+      "tracking": {
+        "job_id": "j-d4b18425ede34a2980d95cb99aaff097",
+        "experiment_id": "3",
+        "run_id": "d7f32d28145e4b83b40abd8e1ac2e3c0"
+      },
+      "group": "ddp-rtx5060-rtx5080",
+      "actual_jct_seconds": 39.0,
+      "prediction_error_seconds": 6.0
+    },
+    {
+      "job_id": "j-1dc02e508dbe4526b7928a9f8a1027d5",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-ddp-rtx5060-rtx5080-2",
+      "workload": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "candidate": "ddp-rtx5060-rtx5080",
+      "attempt_id": "a-cc73bc6d8a5d48d1a4ff4809f054432d",
+      "submitted_at": "2026-10-29T14:09:43Z",
+      "execution_started_at": "2026-10-29T14:09:45Z",
+      "backend_finished_at": "2026-10-29T14:10:17Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:09:43Z",
+        "finished_at": "2026-10-29T14:10:17Z",
+        "jct_seconds": 34.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 33.0,
+      "quality_passed": true,
+      "compute_seconds": 4.778688355931081,
+      "tracking": {
+        "job_id": "j-1dc02e508dbe4526b7928a9f8a1027d5",
+        "experiment_id": "3",
+        "run_id": "281797fce3b24b6eb8bddc6f87f530e8"
+      },
+      "group": "ddp-rtx5060-rtx5080",
+      "actual_jct_seconds": 34.0,
+      "prediction_error_seconds": 1.0
+    },
+    {
+      "job_id": "j-ddab5ca703b845a4aae2ec9b37636dfc",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-ddp-rtx5060-rtx5080-3",
+      "workload": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "candidate": "ddp-rtx5060-rtx5080",
+      "attempt_id": "a-f2dcbd617c3b449da12b778e0f3d6274",
+      "submitted_at": "2026-10-29T14:11:48Z",
+      "execution_started_at": "2026-10-29T14:11:51Z",
+      "backend_finished_at": "2026-10-29T14:12:23Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:11:48Z",
+        "finished_at": "2026-10-29T14:12:23Z",
+        "jct_seconds": 35.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 33.0,
+      "quality_passed": true,
+      "compute_seconds": 4.755271819070913,
+      "tracking": {
+        "job_id": "j-ddab5ca703b845a4aae2ec9b37636dfc",
+        "experiment_id": "3",
+        "run_id": "5c4a6b3c84c049eda38017f22c29c4d8"
+      },
+      "group": "ddp-rtx5060-rtx5080",
+      "actual_jct_seconds": 35.0,
+      "prediction_error_seconds": 2.0
+    },
+    {
+      "job_id": "j-fa6bdbda83c145cbb17f95b8b20fc156",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-ddp-rtx5060-rtx5080-4",
+      "workload": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "candidate": "ddp-rtx5060-rtx5080",
+      "attempt_id": "a-42189d65da254d7c952a405819de3198",
+      "submitted_at": "2026-10-29T14:13:47Z",
+      "execution_started_at": "2026-10-29T14:13:50Z",
+      "backend_finished_at": "2026-10-29T14:14:30Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:13:47Z",
+        "finished_at": "2026-10-29T14:14:30Z",
+        "jct_seconds": 43.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 33.0,
+      "quality_passed": true,
+      "compute_seconds": 4.625125407939777,
+      "tracking": {
+        "job_id": "j-fa6bdbda83c145cbb17f95b8b20fc156",
+        "experiment_id": "3",
+        "run_id": "dff9caa03bb24c1ea89ed016d603fa76"
+      },
+      "group": "ddp-rtx5060-rtx5080",
+      "actual_jct_seconds": 43.0,
+      "prediction_error_seconds": 10.0
+    },
+    {
+      "job_id": "j-90d83bb7d495472b9e8c64f11d38606d",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-ddp-rtx5060-rtx5080-5",
+      "workload": "vt-mnv3s-g16s50-ddp2-staged-v2",
+      "candidate": "ddp-rtx5060-rtx5080",
+      "attempt_id": "a-ad285deaacb24373bf91e386d81e9c52",
+      "submitted_at": "2026-10-29T14:16:19Z",
+      "execution_started_at": "2026-10-29T14:16:21Z",
+      "backend_finished_at": "2026-10-29T14:16:50Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:16:19Z",
+        "finished_at": "2026-10-29T14:16:50Z",
+        "jct_seconds": 31.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 33.0,
+      "quality_passed": true,
+      "compute_seconds": 4.882071107043885,
+      "tracking": {
+        "job_id": "j-90d83bb7d495472b9e8c64f11d38606d",
+        "experiment_id": "3",
+        "run_id": "c731ca06c72c41eb9f51232faf979968"
+      },
+      "group": "ddp-rtx5060-rtx5080",
+      "actual_jct_seconds": 31.0,
+      "prediction_error_seconds": -2.0
+    },
+    {
+      "job_id": "j-7b18f5c5202b48fca1beeabec0081dbf",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-gb10-1",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "gb10",
+      "attempt_id": "a-b118fc08d35f45f3ad574a2cc927c7b9",
+      "submitted_at": "2026-10-29T14:05:05Z",
+      "execution_started_at": "2026-10-29T14:05:07Z",
+      "backend_finished_at": "2026-10-29T14:05:13Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:05:05Z",
+        "finished_at": "2026-10-29T14:05:13Z",
+        "jct_seconds": 8.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 9.0,
+      "quality_passed": true,
+      "compute_seconds": 0.9938678881153464,
+      "tracking": {
+        "job_id": "j-7b18f5c5202b48fca1beeabec0081dbf",
+        "experiment_id": "3",
+        "run_id": "b7aa12a5f4284baaa6daa5f0194d5621"
+      },
+      "group": "gb10",
+      "actual_jct_seconds": 8.0,
+      "prediction_error_seconds": -1.0
+    },
+    {
+      "job_id": "j-a2088f7375e94535ba2b14db949025c3",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-gb10-2",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "gb10",
+      "attempt_id": "a-2b9ee9d59ac44d4eb78dbe6ef48eb256",
+      "submitted_at": "2026-10-29T14:07:01Z",
+      "execution_started_at": "2026-10-29T14:07:03Z",
+      "backend_finished_at": "2026-10-29T14:07:10Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:07:01Z",
+        "finished_at": "2026-10-29T14:07:10Z",
+        "jct_seconds": 9.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 9.0,
+      "quality_passed": true,
+      "compute_seconds": 1.029964593006298,
+      "tracking": {
+        "job_id": "j-a2088f7375e94535ba2b14db949025c3",
+        "experiment_id": "3",
+        "run_id": "618d371bf2024feb89a4f2bd98ac284c"
+      },
+      "group": "gb10",
+      "actual_jct_seconds": 9.0,
+      "prediction_error_seconds": 0.0
+    },
+    {
+      "job_id": "j-9f704f04c4544865b30cb3bc5319ebc1",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-gb10-3",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "gb10",
+      "attempt_id": "a-b792d49fb94040af8092ea0453501bc7",
+      "submitted_at": "2026-10-29T14:07:45Z",
+      "execution_started_at": "2026-10-29T14:07:47Z",
+      "backend_finished_at": "2026-10-29T14:07:54Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:07:45Z",
+        "finished_at": "2026-10-29T14:07:54Z",
+        "jct_seconds": 9.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 9.0,
+      "quality_passed": true,
+      "compute_seconds": 0.9975824980065227,
+      "tracking": {
+        "job_id": "j-9f704f04c4544865b30cb3bc5319ebc1",
+        "experiment_id": "3",
+        "run_id": "f813fc22b57b47aaae64dd150c014fbb"
+      },
+      "group": "gb10",
+      "actual_jct_seconds": 9.0,
+      "prediction_error_seconds": 0.0
+    },
+    {
+      "job_id": "j-b8d32c591139480ba3cbfb116e9accd2",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-gb10-4",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "gb10",
+      "attempt_id": "a-b3b1e7d2e69545a9aea6690ad4e3dd7b",
+      "submitted_at": "2026-10-29T14:08:04Z",
+      "execution_started_at": "2026-10-29T14:08:06Z",
+      "backend_finished_at": "2026-10-29T14:08:13Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:08:04Z",
+        "finished_at": "2026-10-29T14:08:13Z",
+        "jct_seconds": 9.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 9.0,
+      "quality_passed": true,
+      "compute_seconds": 1.01939732208848,
+      "tracking": {
+        "job_id": "j-b8d32c591139480ba3cbfb116e9accd2",
+        "experiment_id": "3",
+        "run_id": "feb265a69eeb45d0a8f9ff116a2ee8ab"
+      },
+      "group": "gb10",
+      "actual_jct_seconds": 9.0,
+      "prediction_error_seconds": 0.0
+    },
+    {
+      "job_id": "j-e634c51ca52d48a8bf66344f00a01b65",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-gb10-5",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "gb10",
+      "attempt_id": "a-10b8ea2a49d247ed84714849fab86800",
+      "submitted_at": "2026-10-29T14:08:45Z",
+      "execution_started_at": "2026-10-29T14:08:46Z",
+      "backend_finished_at": "2026-10-29T14:08:53Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:08:45Z",
+        "finished_at": "2026-10-29T14:08:53Z",
+        "jct_seconds": 8.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 9.0,
+      "quality_passed": true,
+      "compute_seconds": 1.0309651619754732,
+      "tracking": {
+        "job_id": "j-e634c51ca52d48a8bf66344f00a01b65",
+        "experiment_id": "3",
+        "run_id": "c51d8744ae39461d9b045221e41ad0d8"
+      },
+      "group": "gb10",
+      "actual_jct_seconds": 8.0,
+      "prediction_error_seconds": -1.0
+    },
+    {
+      "job_id": "j-c542c1458c00490b896070f304801104",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-joint-gb10-1",
+      "workload": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "candidate": "gb10",
+      "attempt_id": "a-f74808d3a5b743e89069db1d87fd33f6",
+      "submitted_at": "2026-10-29T14:17:38Z",
+      "execution_started_at": "2026-10-29T14:17:40Z",
+      "backend_finished_at": "2026-10-29T14:17:55Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:17:38Z",
+        "finished_at": "2026-10-29T14:17:55Z",
+        "jct_seconds": 17.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": null,
+      "quality_passed": true,
+      "compute_seconds": 9.204417743021622,
+      "tracking": {
+        "job_id": "j-c542c1458c00490b896070f304801104",
+        "experiment_id": "3",
+        "run_id": "9d1733f18dde43b3813754975afb469e"
+      },
+      "group": "gb10_mobilint",
+      "actual_jct_seconds": 17.0,
+      "prediction_error_seconds": null
+    },
+    {
+      "job_id": "j-efdd692c6dd143249b1ef4b71901955f",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-joint-gb10-2",
+      "workload": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "candidate": "gb10",
+      "attempt_id": "a-9db96aa9aa9847f58cfcf614a94740d2",
+      "submitted_at": "2026-10-29T14:18:05Z",
+      "execution_started_at": "2026-10-29T14:18:07Z",
+      "backend_finished_at": "2026-10-29T14:18:22Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:18:05Z",
+        "finished_at": "2026-10-29T14:18:22Z",
+        "jct_seconds": 17.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": null,
+      "quality_passed": true,
+      "compute_seconds": 9.278193690115586,
+      "tracking": {
+        "job_id": "j-efdd692c6dd143249b1ef4b71901955f",
+        "experiment_id": "3",
+        "run_id": "971e4641461446129a4f1007524db4ef"
+      },
+      "group": "gb10_mobilint",
+      "actual_jct_seconds": 17.0,
+      "prediction_error_seconds": null
+    },
+    {
+      "job_id": "j-206ab73014724387bc6d397547111aac",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-joint-gb10-3",
+      "workload": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "candidate": "gb10",
+      "attempt_id": "a-ebaf2168a9054694a408ec82e15c5146",
+      "submitted_at": "2026-10-29T14:18:32Z",
+      "execution_started_at": "2026-10-29T14:18:34Z",
+      "backend_finished_at": "2026-10-29T14:18:49Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:18:32Z",
+        "finished_at": "2026-10-29T14:18:49Z",
+        "jct_seconds": 17.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": null,
+      "quality_passed": true,
+      "compute_seconds": 9.025900695938617,
+      "tracking": {
+        "job_id": "j-206ab73014724387bc6d397547111aac",
+        "experiment_id": "3",
+        "run_id": "36856f143eb348a09bd084cdd48ab055"
+      },
+      "group": "gb10_mobilint",
+      "actual_jct_seconds": 17.0,
+      "prediction_error_seconds": null
+    },
+    {
+      "job_id": "j-83201fa34a5240539672aeeda3c6fe2e",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-joint-gb10-4",
+      "workload": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "candidate": "gb10",
+      "attempt_id": "a-e2c51a617c1d43169437d77929cada2e",
+      "submitted_at": "2026-10-29T14:18:59Z",
+      "execution_started_at": "2026-10-29T14:19:01Z",
+      "backend_finished_at": "2026-10-29T14:19:16Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:18:59Z",
+        "finished_at": "2026-10-29T14:19:16Z",
+        "jct_seconds": 17.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": null,
+      "quality_passed": true,
+      "compute_seconds": 9.061308480100706,
+      "tracking": {
+        "job_id": "j-83201fa34a5240539672aeeda3c6fe2e",
+        "experiment_id": "3",
+        "run_id": "0231327a15f44c99bcaf1ebe4aeae695"
+      },
+      "group": "gb10_mobilint",
+      "actual_jct_seconds": 17.0,
+      "prediction_error_seconds": null
+    },
+    {
+      "job_id": "j-80d6e99f4eeb4837a960e13db2aef344",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-joint-gb10-5",
+      "workload": "vt-kd-mnv3s-b16s50-gb10-repeat5-v1",
+      "candidate": "gb10",
+      "attempt_id": "a-eae2b93aa6984b468377c9aef4c874be",
+      "submitted_at": "2026-10-29T14:19:27Z",
+      "execution_started_at": "2026-10-29T14:19:29Z",
+      "backend_finished_at": "2026-10-29T14:19:44Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:19:27Z",
+        "finished_at": "2026-10-29T14:19:44Z",
+        "jct_seconds": 17.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": null,
+      "quality_passed": true,
+      "compute_seconds": 9.019769453909248,
+      "tracking": {
+        "job_id": "j-80d6e99f4eeb4837a960e13db2aef344",
+        "experiment_id": "3",
+        "run_id": "969117b5bfa44cd5ad9926e39e3dee97"
+      },
+      "group": "gb10_mobilint",
+      "actual_jct_seconds": 17.0,
+      "prediction_error_seconds": null
+    },
+    {
+      "job_id": "j-a16f16e301484eb792afe4b2656d5fe3",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-orin9-1",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "orin9",
+      "attempt_id": "a-58818fb236bb4e29be03218870c87bf3",
+      "submitted_at": "2026-10-29T14:04:53Z",
+      "execution_started_at": "2026-10-29T14:04:59Z",
+      "backend_finished_at": "2026-10-29T14:05:26Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:04:53Z",
+        "finished_at": "2026-10-29T14:05:26Z",
+        "jct_seconds": 33.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 58.0,
+      "quality_passed": true,
+      "compute_seconds": 5.618375921971165,
+      "tracking": {
+        "job_id": "j-a16f16e301484eb792afe4b2656d5fe3",
+        "experiment_id": "3",
+        "run_id": "62fd9788f6c04c8ca9a91fe77e3097aa"
+      },
+      "group": "orin9",
+      "actual_jct_seconds": 33.0,
+      "prediction_error_seconds": -25.0
+    },
+    {
+      "job_id": "j-3085e66e72034a89843db9a9347334a9",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-orin9-2",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "orin9",
+      "attempt_id": "a-90b971a39594484ca6e33e32a22d4b85",
+      "submitted_at": "2026-10-29T14:05:42Z",
+      "execution_started_at": "2026-10-29T14:05:47Z",
+      "backend_finished_at": "2026-10-29T14:06:14Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:05:42Z",
+        "finished_at": "2026-10-29T14:06:14Z",
+        "jct_seconds": 32.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 58.0,
+      "quality_passed": true,
+      "compute_seconds": 5.566421312978491,
+      "tracking": {
+        "job_id": "j-3085e66e72034a89843db9a9347334a9",
+        "experiment_id": "3",
+        "run_id": "f0872d4f2363443285deacef92240c48"
+      },
+      "group": "orin9",
+      "actual_jct_seconds": 32.0,
+      "prediction_error_seconds": -26.0
+    },
+    {
+      "job_id": "j-152ac2af2df248169728504d6a70c7f6",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-orin9-3",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "orin9",
+      "attempt_id": "a-882e20cad5da483695cf259669da5f28",
+      "submitted_at": "2026-10-29T14:07:07Z",
+      "execution_started_at": "2026-10-29T14:07:13Z",
+      "backend_finished_at": "2026-10-29T14:07:46Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:07:07Z",
+        "finished_at": "2026-10-29T14:07:46Z",
+        "jct_seconds": 39.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 58.0,
+      "quality_passed": true,
+      "compute_seconds": 5.697721463977359,
+      "tracking": {
+        "job_id": "j-152ac2af2df248169728504d6a70c7f6",
+        "experiment_id": "3",
+        "run_id": "58ae7059608e47a3a296cd7f4f5537e8"
+      },
+      "group": "orin9",
+      "actual_jct_seconds": 39.0,
+      "prediction_error_seconds": -19.0
+    },
+    {
+      "job_id": "j-5c4504b6cfd447e8ba8c8c0f4aa2e069",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-orin9-4",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "orin9",
+      "attempt_id": "a-09c0dea5ea804e0b945b088cec2c5132",
+      "submitted_at": "2026-10-29T14:08:15Z",
+      "execution_started_at": "2026-10-29T14:08:20Z",
+      "backend_finished_at": "2026-10-29T14:08:47Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:08:15Z",
+        "finished_at": "2026-10-29T14:08:47Z",
+        "jct_seconds": 32.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 58.0,
+      "quality_passed": true,
+      "compute_seconds": 5.590907493024133,
+      "tracking": {
+        "job_id": "j-5c4504b6cfd447e8ba8c8c0f4aa2e069",
+        "experiment_id": "3",
+        "run_id": "b99143e13fe945418df268a72ed4e93a"
+      },
+      "group": "orin9",
+      "actual_jct_seconds": 32.0,
+      "prediction_error_seconds": -26.0
+    },
+    {
+      "job_id": "j-573be21e649a4e9eaefd7f7986a368f3",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-orin9-5",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "orin9",
+      "attempt_id": "a-60c301bc3e8241358ea2ef1ac6bc9a53",
+      "submitted_at": "2026-10-29T14:09:14Z",
+      "execution_started_at": "2026-10-29T14:09:19Z",
+      "backend_finished_at": "2026-10-29T14:09:47Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:09:14Z",
+        "finished_at": "2026-10-29T14:09:47Z",
+        "jct_seconds": 33.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 58.0,
+      "quality_passed": true,
+      "compute_seconds": 5.50699431495741,
+      "tracking": {
+        "job_id": "j-573be21e649a4e9eaefd7f7986a368f3",
+        "experiment_id": "3",
+        "run_id": "35423d7df83e4cc19c34ce92d2ce5090"
+      },
+      "group": "orin9",
+      "actual_jct_seconds": 33.0,
+      "prediction_error_seconds": -25.0
+    },
+    {
+      "job_id": "j-4995c64422994ee9bf1c8587be7ade7a",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-rtx5060-1",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "rtx5060",
+      "attempt_id": "a-60d41182eeea44808396494c52be987a",
+      "submitted_at": "2026-10-29T14:04:59Z",
+      "execution_started_at": "2026-10-29T14:05:01Z",
+      "backend_finished_at": "2026-10-29T14:05:09Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:04:59Z",
+        "finished_at": "2026-10-29T14:05:09Z",
+        "jct_seconds": 10.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 12.0,
+      "quality_passed": true,
+      "compute_seconds": 0.6721430119941942,
+      "tracking": {
+        "job_id": "j-4995c64422994ee9bf1c8587be7ade7a",
+        "experiment_id": "3",
+        "run_id": "f8dd35849c7d499ab64571cad17207d7"
+      },
+      "group": "rtx5060",
+      "actual_jct_seconds": 10.0,
+      "prediction_error_seconds": -2.0
+    },
+    {
+      "job_id": "j-a3d4d7c7030f4ecdbe151b037143ba96",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-rtx5060-2",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "rtx5060",
+      "attempt_id": "a-d64d2a818b2e424786fc84afbe692a3b",
+      "submitted_at": "2026-10-29T14:08:21Z",
+      "execution_started_at": "2026-10-29T14:08:23Z",
+      "backend_finished_at": "2026-10-29T14:08:31Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:08:21Z",
+        "finished_at": "2026-10-29T14:08:31Z",
+        "jct_seconds": 10.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 12.0,
+      "quality_passed": true,
+      "compute_seconds": 0.7257861639955081,
+      "tracking": {
+        "job_id": "j-a3d4d7c7030f4ecdbe151b037143ba96",
+        "experiment_id": "3",
+        "run_id": "93e4357e132c435f8d0f44064d947a16"
+      },
+      "group": "rtx5060",
+      "actual_jct_seconds": 10.0,
+      "prediction_error_seconds": -2.0
+    },
+    {
+      "job_id": "j-b6ed1efce93b487a8e6e6e48c10371aa",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-rtx5060-3",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "rtx5060",
+      "attempt_id": "a-2ac8e9af977d4390b7cf0fc02893d9e6",
+      "submitted_at": "2026-10-29T14:10:43Z",
+      "execution_started_at": "2026-10-29T14:10:45Z",
+      "backend_finished_at": "2026-10-29T14:10:55Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:10:43Z",
+        "finished_at": "2026-10-29T14:10:55Z",
+        "jct_seconds": 12.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 12.0,
+      "quality_passed": true,
+      "compute_seconds": 0.7199167139915517,
+      "tracking": {
+        "job_id": "j-b6ed1efce93b487a8e6e6e48c10371aa",
+        "experiment_id": "3",
+        "run_id": "6da28aaa7903476294c475d0c0ab5b57"
+      },
+      "group": "rtx5060",
+      "actual_jct_seconds": 12.0,
+      "prediction_error_seconds": 0.0
+    },
+    {
+      "job_id": "j-d487fc9763f64fd184440e5152a74c73",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-rtx5060-4",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "rtx5060",
+      "attempt_id": "a-ef3214a243b448238eeb114958b9edca",
+      "submitted_at": "2026-10-29T14:12:43Z",
+      "execution_started_at": "2026-10-29T14:12:45Z",
+      "backend_finished_at": "2026-10-29T14:12:54Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:12:43Z",
+        "finished_at": "2026-10-29T14:12:54Z",
+        "jct_seconds": 11.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 12.0,
+      "quality_passed": true,
+      "compute_seconds": 0.6722083310014568,
+      "tracking": {
+        "job_id": "j-d487fc9763f64fd184440e5152a74c73",
+        "experiment_id": "3",
+        "run_id": "a2ccb3b4437a4e4ca9fe24626c505d90"
+      },
+      "group": "rtx5060",
+      "actual_jct_seconds": 11.0,
+      "prediction_error_seconds": -1.0
+    },
+    {
+      "job_id": "j-c9707b0ef1fc46968faaf2d95488bce2",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-rtx5060-5",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "rtx5060",
+      "attempt_id": "a-5b4948b40b1e4344aaa15e7ffca44231",
+      "submitted_at": "2026-10-29T14:14:48Z",
+      "execution_started_at": "2026-10-29T14:14:50Z",
+      "backend_finished_at": "2026-10-29T14:14:58Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:14:48Z",
+        "finished_at": "2026-10-29T14:14:58Z",
+        "jct_seconds": 10.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 12.0,
+      "quality_passed": true,
+      "compute_seconds": 0.7436458310112357,
+      "tracking": {
+        "job_id": "j-c9707b0ef1fc46968faaf2d95488bce2",
+        "experiment_id": "3",
+        "run_id": "3faee16dd6b14348aba093f532086e94"
+      },
+      "group": "rtx5060",
+      "actual_jct_seconds": 10.0,
+      "prediction_error_seconds": -2.0
+    },
+    {
+      "job_id": "j-72e1b2b4006d480583742bcb66192d8a",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-rtx5080-1",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "rtx5080",
+      "attempt_id": "a-02672b4ba582460fbb706ccab3a502c7",
+      "submitted_at": "2026-10-29T14:05:24Z",
+      "execution_started_at": "2026-10-29T14:05:26Z",
+      "backend_finished_at": "2026-10-29T14:05:52Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:05:24Z",
+        "finished_at": "2026-10-29T14:05:52Z",
+        "jct_seconds": 28.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 22.0,
+      "quality_passed": true,
+      "compute_seconds": 0.6068044330459088,
+      "tracking": {
+        "job_id": "j-72e1b2b4006d480583742bcb66192d8a",
+        "experiment_id": "3",
+        "run_id": "771be447c2da4060a3da84054ca2d97f"
+      },
+      "group": "rtx5080",
+      "actual_jct_seconds": 28.0,
+      "prediction_error_seconds": 6.0
+    },
+    {
+      "job_id": "j-52a4bec44f6947f8b0efb8dbeb23cac2",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-rtx5080-2",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "rtx5080",
+      "attempt_id": "a-980e488795bb4ebe9d40224b0c3af62e",
+      "submitted_at": "2026-10-29T14:08:50Z",
+      "execution_started_at": "2026-10-29T14:08:53Z",
+      "backend_finished_at": "2026-10-29T14:09:08Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:08:50Z",
+        "finished_at": "2026-10-29T14:09:08Z",
+        "jct_seconds": 18.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 22.0,
+      "quality_passed": true,
+      "compute_seconds": 0.5761231989599764,
+      "tracking": {
+        "job_id": "j-52a4bec44f6947f8b0efb8dbeb23cac2",
+        "experiment_id": "3",
+        "run_id": "1ede698b3d29443bbf6fbd4c97afff86"
+      },
+      "group": "rtx5080",
+      "actual_jct_seconds": 18.0,
+      "prediction_error_seconds": -4.0
+    },
+    {
+      "job_id": "j-210f4eb524c74ad3925db61dbc7252fd",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-rtx5080-3",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "rtx5080",
+      "attempt_id": "a-e5d1a094cb79496ab54689645a17328e",
+      "submitted_at": "2026-10-29T14:11:05Z",
+      "execution_started_at": "2026-10-29T14:11:08Z",
+      "backend_finished_at": "2026-10-29T14:11:24Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:11:05Z",
+        "finished_at": "2026-10-29T14:11:24Z",
+        "jct_seconds": 19.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 22.0,
+      "quality_passed": true,
+      "compute_seconds": 0.5825603100238368,
+      "tracking": {
+        "job_id": "j-210f4eb524c74ad3925db61dbc7252fd",
+        "experiment_id": "3",
+        "run_id": "27264b4582164e3ba0506cd892184616"
+      },
+      "group": "rtx5080",
+      "actual_jct_seconds": 19.0,
+      "prediction_error_seconds": -3.0
+    },
+    {
+      "job_id": "j-aabcd3d40a3242598267936d20ea8025",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-rtx5080-4",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "rtx5080",
+      "attempt_id": "a-9f72b4d64eaf4d6884e0498a445d6741",
+      "submitted_at": "2026-10-29T14:13:04Z",
+      "execution_started_at": "2026-10-29T14:13:06Z",
+      "backend_finished_at": "2026-10-29T14:13:33Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:13:04Z",
+        "finished_at": "2026-10-29T14:13:33Z",
+        "jct_seconds": 29.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 22.0,
+      "quality_passed": true,
+      "compute_seconds": 0.5875267330557108,
+      "tracking": {
+        "job_id": "j-aabcd3d40a3242598267936d20ea8025",
+        "experiment_id": "3",
+        "run_id": "726361b9384141558ef042b91338170d"
+      },
+      "group": "rtx5080",
+      "actual_jct_seconds": 29.0,
+      "prediction_error_seconds": 7.0
+    },
+    {
+      "job_id": "j-466fc16051e14d93b7bf3c4cce9994da",
+      "state": "SUCCEEDED",
+      "key": "ra-repeat-five-20261029-rtx5080-5",
+      "workload": "vt-mnv3s-b16s50-staged-v2",
+      "candidate": "rtx5080",
+      "attempt_id": "a-cbe9b5d300574ae88c25259bf6e893ba",
+      "submitted_at": "2026-10-29T14:15:10Z",
+      "execution_started_at": "2026-10-29T14:15:12Z",
+      "backend_finished_at": "2026-10-29T14:15:48Z",
+      "actual": {
+        "status": "OBSERVED",
+        "reason": null,
+        "submitted_at": "2026-10-29T14:15:10Z",
+        "finished_at": "2026-10-29T14:15:48Z",
+        "jct_seconds": 38.0,
+        "boundary": "native scheduler_submitted_at → backend_finished_at",
+        "timestamp_resolution_seconds": 1.0,
+        "statistical_spread": "unknown (n=1 execution)"
+      },
+      "prediction": 22.0,
+      "quality_passed": true,
+      "compute_seconds": 0.5782442650524899,
+      "tracking": {
+        "job_id": "j-466fc16051e14d93b7bf3c4cce9994da",
+        "experiment_id": "3",
+        "run_id": "249729cb3ee94a078fba5cf0da28525f"
+      },
+      "group": "rtx5080",
+      "actual_jct_seconds": 38.0,
+      "prediction_error_seconds": 16.0
+    }
+  ],
+  "summary": {
+    "ddp-rtx5060-rtx5080": {
+      "completed": 5,
+      "jct_seconds": [
+        39.0,
+        34.0,
+        35.0,
+        43.0,
+        31.0
+      ],
+      "mean_seconds": 36.4,
+      "min_seconds": 31.0,
+      "max_seconds": 43.0,
+      "compute_mean_seconds": 4.748592234984971
+    },
+    "gb10": {
+      "completed": 5,
+      "jct_seconds": [
+        8.0,
+        9.0,
+        9.0,
+        9.0,
+        8.0
+      ],
+      "mean_seconds": 8.6,
+      "min_seconds": 8.0,
+      "max_seconds": 9.0,
+      "compute_mean_seconds": 1.014355492638424
+    },
+    "gb10_mobilint": {
+      "completed": 5,
+      "jct_seconds": [
+        17.0,
+        17.0,
+        17.0,
+        17.0,
+        17.0
+      ],
+      "mean_seconds": 17.0,
+      "min_seconds": 17.0,
+      "max_seconds": 17.0,
+      "compute_mean_seconds": 9.117918012617157
+    },
+    "orin9": {
+      "completed": 5,
+      "jct_seconds": [
+        33.0,
+        32.0,
+        39.0,
+        32.0,
+        33.0
+      ],
+      "mean_seconds": 33.8,
+      "min_seconds": 32.0,
+      "max_seconds": 39.0,
+      "compute_mean_seconds": 5.596084101381711
+    },
+    "rtx5060": {
+      "completed": 5,
+      "jct_seconds": [
+        10.0,
+        10.0,
+        12.0,
+        11.0,
+        10.0
+      ],
+      "mean_seconds": 10.6,
+      "min_seconds": 10.0,
+      "max_seconds": 12.0,
+      "compute_mean_seconds": 0.7067400103987893
+    },
+    "rtx5080": {
+      "completed": 5,
+      "jct_seconds": [
+        28.0,
+        18.0,
+        19.0,
+        29.0,
+        38.0
+      ],
+      "mean_seconds": 26.4,
+      "min_seconds": 18.0,
+      "max_seconds": 38.0,
+      "compute_mean_seconds": 0.5862517880275846
+    }
+  },
+  "tracking_verified_count": 30,
+  "native_success_count": 30,
+  "teacher_forward_calls": 250
+}

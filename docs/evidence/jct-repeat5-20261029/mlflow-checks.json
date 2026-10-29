@@ -1,0 +1,372 @@
+[
+  {
+    "job_id": "j-c9707b0ef1fc46968faaf2d95488bce2",
+    "run_id": "3faee16dd6b14348aba093f532086e94",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 0.7436458310112357,
+      "recommendation.predicted_jct_seconds": 12.0,
+      "recommendation.actual_jct_seconds": 10.0,
+      "recommendation.error_signed_seconds": -2.0,
+      "recommendation.error_absolute_seconds": 2.0,
+      "recommendation.error_relative": -0.2
+    }
+  },
+  {
+    "job_id": "j-152ac2af2df248169728504d6a70c7f6",
+    "run_id": "58ae7059608e47a3a296cd7f4f5537e8",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 5.697721463977359,
+      "recommendation.predicted_jct_seconds": 58.0,
+      "recommendation.actual_jct_seconds": 39.0,
+      "recommendation.error_signed_seconds": -19.0,
+      "recommendation.error_absolute_seconds": 19.0,
+      "recommendation.error_relative": -0.48717948717948717
+    }
+  },
+  {
+    "job_id": "j-a2088f7375e94535ba2b14db949025c3",
+    "run_id": "618d371bf2024feb89a4f2bd98ac284c",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 1.029964593006298,
+      "recommendation.predicted_jct_seconds": 9.0,
+      "recommendation.actual_jct_seconds": 9.0,
+      "recommendation.error_signed_seconds": 0.0,
+      "recommendation.error_absolute_seconds": 0.0,
+      "recommendation.error_relative": 0.0
+    }
+  },
+  {
+    "job_id": "j-a3d4d7c7030f4ecdbe151b037143ba96",
+    "run_id": "93e4357e132c435f8d0f44064d947a16",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 0.7257861639955081,
+      "recommendation.predicted_jct_seconds": 12.0,
+      "recommendation.actual_jct_seconds": 10.0,
+      "recommendation.error_signed_seconds": -2.0,
+      "recommendation.error_absolute_seconds": 2.0,
+      "recommendation.error_relative": -0.2
+    }
+  },
+  {
+    "job_id": "j-573be21e649a4e9eaefd7f7986a368f3",
+    "run_id": "35423d7df83e4cc19c34ce92d2ce5090",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 5.50699431495741,
+      "recommendation.predicted_jct_seconds": 58.0,
+      "recommendation.actual_jct_seconds": 33.0,
+      "recommendation.error_signed_seconds": -25.0,
+      "recommendation.error_absolute_seconds": 25.0,
+      "recommendation.error_relative": -0.7575757575757576
+    }
+  },
+  {
+    "job_id": "j-210f4eb524c74ad3925db61dbc7252fd",
+    "run_id": "27264b4582164e3ba0506cd892184616",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 0.5825603100238368,
+      "recommendation.predicted_jct_seconds": 22.0,
+      "recommendation.actual_jct_seconds": 19.0,
+      "recommendation.error_signed_seconds": -3.0,
+      "recommendation.error_absolute_seconds": 3.0,
+      "recommendation.error_relative": -0.15789473684210525
+    }
+  },
+  {
+    "job_id": "j-ddab5ca703b845a4aae2ec9b37636dfc",
+    "run_id": "5c4a6b3c84c049eda38017f22c29c4d8",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 4.755271819070913,
+      "recommendation.predicted_jct_seconds": 33.0,
+      "recommendation.actual_jct_seconds": 35.0,
+      "recommendation.error_signed_seconds": 2.0,
+      "recommendation.error_absolute_seconds": 2.0,
+      "recommendation.error_relative": 0.05714285714285714
+    }
+  },
+  {
+    "job_id": "j-d4b18425ede34a2980d95cb99aaff097",
+    "run_id": "d7f32d28145e4b83b40abd8e1ac2e3c0",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 4.701804484939203,
+      "recommendation.predicted_jct_seconds": 33.0,
+      "recommendation.actual_jct_seconds": 39.0,
+      "recommendation.error_signed_seconds": 6.0,
+      "recommendation.error_absolute_seconds": 6.0,
+      "recommendation.error_relative": 0.15384615384615385
+    }
+  },
+  {
+    "job_id": "j-52a4bec44f6947f8b0efb8dbeb23cac2",
+    "run_id": "1ede698b3d29443bbf6fbd4c97afff86",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 0.5761231989599764,
+      "recommendation.predicted_jct_seconds": 22.0,
+      "recommendation.actual_jct_seconds": 18.0,
+      "recommendation.error_signed_seconds": -4.0,
+      "recommendation.error_absolute_seconds": 4.0,
+      "recommendation.error_relative": -0.2222222222222222
+    }
+  },
+  {
+    "job_id": "j-e634c51ca52d48a8bf66344f00a01b65",
+    "run_id": "c51d8744ae39461d9b045221e41ad0d8",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 1.0309651619754732,
+      "recommendation.predicted_jct_seconds": 9.0,
+      "recommendation.actual_jct_seconds": 8.0,
+      "recommendation.error_signed_seconds": -1.0,
+      "recommendation.error_absolute_seconds": 1.0,
+      "recommendation.error_relative": -0.125
+    }
+  },
+  {
+    "job_id": "j-a16f16e301484eb792afe4b2656d5fe3",
+    "run_id": "62fd9788f6c04c8ca9a91fe77e3097aa",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 5.618375921971165,
+      "recommendation.predicted_jct_seconds": 58.0,
+      "recommendation.actual_jct_seconds": 33.0,
+      "recommendation.error_signed_seconds": -25.0,
+      "recommendation.error_absolute_seconds": 25.0,
+      "recommendation.error_relative": -0.7575757575757576
+    }
+  },
+  {
+    "job_id": "j-5c4504b6cfd447e8ba8c8c0f4aa2e069",
+    "run_id": "b99143e13fe945418df268a72ed4e93a",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 5.590907493024133,
+      "recommendation.predicted_jct_seconds": 58.0,
+      "recommendation.actual_jct_seconds": 32.0,
+      "recommendation.error_signed_seconds": -26.0,
+      "recommendation.error_absolute_seconds": 26.0,
+      "recommendation.error_relative": -0.8125
+    }
+  },
+  {
+    "job_id": "j-1dc02e508dbe4526b7928a9f8a1027d5",
+    "run_id": "281797fce3b24b6eb8bddc6f87f530e8",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 4.778688355931081,
+      "recommendation.predicted_jct_seconds": 33.0,
+      "recommendation.actual_jct_seconds": 34.0,
+      "recommendation.error_signed_seconds": 1.0,
+      "recommendation.error_absolute_seconds": 1.0,
+      "recommendation.error_relative": 0.029411764705882353
+    }
+  },
+  {
+    "job_id": "j-b6ed1efce93b487a8e6e6e48c10371aa",
+    "run_id": "6da28aaa7903476294c475d0c0ab5b57",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 0.7199167139915517,
+      "recommendation.predicted_jct_seconds": 12.0,
+      "recommendation.actual_jct_seconds": 12.0,
+      "recommendation.error_signed_seconds": 0.0,
+      "recommendation.error_absolute_seconds": 0.0,
+      "recommendation.error_relative": 0.0
+    }
+  },
+  {
+    "job_id": "j-90d83bb7d495472b9e8c64f11d38606d",
+    "run_id": "c731ca06c72c41eb9f51232faf979968",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 4.882071107043885,
+      "recommendation.predicted_jct_seconds": 33.0,
+      "recommendation.actual_jct_seconds": 31.0,
+      "recommendation.error_signed_seconds": -2.0,
+      "recommendation.error_absolute_seconds": 2.0,
+      "recommendation.error_relative": -0.06451612903225806
+    }
+  },
+  {
+    "job_id": "j-fa6bdbda83c145cbb17f95b8b20fc156",
+    "run_id": "dff9caa03bb24c1ea89ed016d603fa76",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 4.625125407939777,
+      "recommendation.predicted_jct_seconds": 33.0,
+      "recommendation.actual_jct_seconds": 43.0,
+      "recommendation.error_signed_seconds": 10.0,
+      "recommendation.error_absolute_seconds": 10.0,
+      "recommendation.error_relative": 0.23255813953488372
+    }
+  },
+  {
+    "job_id": "j-72e1b2b4006d480583742bcb66192d8a",
+    "run_id": "771be447c2da4060a3da84054ca2d97f",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 0.6068044330459088,
+      "recommendation.predicted_jct_seconds": 22.0,
+      "recommendation.actual_jct_seconds": 28.0,
+      "recommendation.error_signed_seconds": 6.0,
+      "recommendation.error_absolute_seconds": 6.0,
+      "recommendation.error_relative": 0.21428571428571427
+    }
+  },
+  {
+    "job_id": "j-aabcd3d40a3242598267936d20ea8025",
+    "run_id": "726361b9384141558ef042b91338170d",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 0.5875267330557108,
+      "recommendation.predicted_jct_seconds": 22.0,
+      "recommendation.actual_jct_seconds": 29.0,
+      "recommendation.error_signed_seconds": 7.0,
+      "recommendation.error_absolute_seconds": 7.0,
+      "recommendation.error_relative": 0.2413793103448276
+    }
+  },
+  {
+    "job_id": "j-466fc16051e14d93b7bf3c4cce9994da",
+    "run_id": "249729cb3ee94a078fba5cf0da28525f",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 0.5782442650524899,
+      "recommendation.predicted_jct_seconds": 22.0,
+      "recommendation.actual_jct_seconds": 38.0,
+      "recommendation.error_signed_seconds": 16.0,
+      "recommendation.error_absolute_seconds": 16.0,
+      "recommendation.error_relative": 0.42105263157894735
+    }
+  },
+  {
+    "job_id": "j-9f704f04c4544865b30cb3bc5319ebc1",
+    "run_id": "f813fc22b57b47aaae64dd150c014fbb",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 0.9975824980065227,
+      "recommendation.predicted_jct_seconds": 9.0,
+      "recommendation.actual_jct_seconds": 9.0,
+      "recommendation.error_signed_seconds": 0.0,
+      "recommendation.error_absolute_seconds": 0.0,
+      "recommendation.error_relative": 0.0
+    }
+  },
+  {
+    "job_id": "j-3085e66e72034a89843db9a9347334a9",
+    "run_id": "f0872d4f2363443285deacef92240c48",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 5.566421312978491,
+      "recommendation.predicted_jct_seconds": 58.0,
+      "recommendation.actual_jct_seconds": 32.0,
+      "recommendation.error_signed_seconds": -26.0,
+      "recommendation.error_absolute_seconds": 26.0,
+      "recommendation.error_relative": -0.8125
+    }
+  },
+  {
+    "job_id": "j-d487fc9763f64fd184440e5152a74c73",
+    "run_id": "a2ccb3b4437a4e4ca9fe24626c505d90",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 0.6722083310014568,
+      "recommendation.predicted_jct_seconds": 12.0,
+      "recommendation.actual_jct_seconds": 11.0,
+      "recommendation.error_signed_seconds": -1.0,
+      "recommendation.error_absolute_seconds": 1.0,
+      "recommendation.error_relative": -0.09090909090909091
+    }
+  },
+  {
+    "job_id": "j-4995c64422994ee9bf1c8587be7ade7a",
+    "run_id": "f8dd35849c7d499ab64571cad17207d7",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 0.6721430119941942,
+      "recommendation.predicted_jct_seconds": 12.0,
+      "recommendation.actual_jct_seconds": 10.0,
+      "recommendation.error_signed_seconds": -2.0,
+      "recommendation.error_absolute_seconds": 2.0,
+      "recommendation.error_relative": -0.2
+    }
+  },
+  {
+    "job_id": "j-b8d32c591139480ba3cbfb116e9accd2",
+    "run_id": "feb265a69eeb45d0a8f9ff116a2ee8ab",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 1.01939732208848,
+      "recommendation.predicted_jct_seconds": 9.0,
+      "recommendation.actual_jct_seconds": 9.0,
+      "recommendation.error_signed_seconds": 0.0,
+      "recommendation.error_absolute_seconds": 0.0,
+      "recommendation.error_relative": 0.0
+    }
+  },
+  {
+    "job_id": "j-7b18f5c5202b48fca1beeabec0081dbf",
+    "run_id": "b7aa12a5f4284baaa6daa5f0194d5621",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 0.9938678881153464,
+      "recommendation.predicted_jct_seconds": 9.0,
+      "recommendation.actual_jct_seconds": 8.0,
+      "recommendation.error_signed_seconds": -1.0,
+      "recommendation.error_absolute_seconds": 1.0,
+      "recommendation.error_relative": -0.125
+    }
+  },
+  {
+    "job_id": "j-efdd692c6dd143249b1ef4b71901955f",
+    "run_id": "971e4641461446129a4f1007524db4ef",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 9.278193690115586,
+      "recommendation.actual_jct_seconds": 17.0
+    }
+  },
+  {
+    "job_id": "j-80d6e99f4eeb4837a960e13db2aef344",
+    "run_id": "969117b5bfa44cd5ad9926e39e3dee97",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 9.019769453909248,
+      "recommendation.actual_jct_seconds": 17.0
+    }
+  },
+  {
+    "job_id": "j-206ab73014724387bc6d397547111aac",
+    "run_id": "36856f143eb348a09bd084cdd48ab055",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 9.025900695938617,
+      "recommendation.actual_jct_seconds": 17.0
+    }
+  },
+  {
+    "job_id": "j-83201fa34a5240539672aeeda3c6fe2e",
+    "run_id": "0231327a15f44c99bcaf1ebe4aeae695",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 9.061308480100706,
+      "recommendation.actual_jct_seconds": 17.0
+    }
+  },
+  {
+    "job_id": "j-c542c1458c00490b896070f304801104",
+    "run_id": "9d1733f18dde43b3813754975afb469e",
+    "status": "FINISHED",
+    "metrics": {
+      "elapsed_seconds": 9.204417743021622,
+      "recommendation.actual_jct_seconds": 17.0
+    }
+  }
+]

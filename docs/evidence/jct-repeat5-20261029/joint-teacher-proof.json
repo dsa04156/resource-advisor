@@ -1,0 +1,182 @@
+[
+  {
+    "job_id": "j-c542c1458c00490b896070f304801104",
+    "teacher": {
+      "schema": "ra-kd-teacher-summary-v1",
+      "role": "frozen-teacher-forward",
+      "device_class": "npu",
+      "device_name": "aries-rb",
+      "accelerator_model": "ARIES2",
+      "model_sha256": "48b1ca4e669ac9d293148a748c06c352a7f542c5999f5f8eb2d1f5a31cf21e2d",
+      "model_file": "resnet50_IMAGENET1K_V1.mxq",
+      "runtime": "qbruntime",
+      "runtime_version": "1.4.0",
+      "target_cores": [
+        "CoreId(cluster=Cluster.Cluster0, core=Core.Core0)"
+      ],
+      "node_name": "etri-ser0004-cgnms0",
+      "pod_uid": "dc2ba35e-9eb2-46d3-9744-58ea72d6100c",
+      "reservation": {
+        "resource": "mobilint.com/npu",
+        "count": 1,
+        "mode": "pre-reserved auxiliary Pod"
+      },
+      "calls": 50,
+      "request_bytes": 481689600,
+      "response_bytes": 4338088,
+      "client_rpc_seconds": 7.348076097900048,
+      "server_infer_seconds": 1.779206073610112,
+      "server_handler_seconds": 6.845538804074749,
+      "objective": {
+        "loss": "ce+kl",
+        "temperature": 4.0,
+        "alpha": 0.5
+      },
+      "timing": "client_rpc_seconds is inside the GPU training wall time; never add it again"
+    }
+  },
+  {
+    "job_id": "j-efdd692c6dd143249b1ef4b71901955f",
+    "teacher": {
+      "schema": "ra-kd-teacher-summary-v1",
+      "role": "frozen-teacher-forward",
+      "device_class": "npu",
+      "device_name": "aries-rb",
+      "accelerator_model": "ARIES2",
+      "model_sha256": "48b1ca4e669ac9d293148a748c06c352a7f542c5999f5f8eb2d1f5a31cf21e2d",
+      "model_file": "resnet50_IMAGENET1K_V1.mxq",
+      "runtime": "qbruntime",
+      "runtime_version": "1.4.0",
+      "target_cores": [
+        "CoreId(cluster=Cluster.Cluster0, core=Core.Core0)"
+      ],
+      "node_name": "etri-ser0004-cgnms0",
+      "pod_uid": "dc2ba35e-9eb2-46d3-9744-58ea72d6100c",
+      "reservation": {
+        "resource": "mobilint.com/npu",
+        "count": 1,
+        "mode": "pre-reserved auxiliary Pod"
+      },
+      "calls": 50,
+      "request_bytes": 481689600,
+      "response_bytes": 4338072,
+      "client_rpc_seconds": 7.430631422204897,
+      "server_infer_seconds": 1.797981423093006,
+      "server_handler_seconds": 6.872128035873175,
+      "objective": {
+        "loss": "ce+kl",
+        "temperature": 4.0,
+        "alpha": 0.5
+      },
+      "timing": "client_rpc_seconds is inside the GPU training wall time; never add it again"
+    }
+  },
+  {
+    "job_id": "j-206ab73014724387bc6d397547111aac",
+    "teacher": {
+      "schema": "ra-kd-teacher-summary-v1",
+      "role": "frozen-teacher-forward",
+      "device_class": "npu",
+      "device_name": "aries-rb",
+      "accelerator_model": "ARIES2",
+      "model_sha256": "48b1ca4e669ac9d293148a748c06c352a7f542c5999f5f8eb2d1f5a31cf21e2d",
+      "model_file": "resnet50_IMAGENET1K_V1.mxq",
+      "runtime": "qbruntime",
+      "runtime_version": "1.4.0",
+      "target_cores": [
+        "CoreId(cluster=Cluster.Cluster0, core=Core.Core0)"
+      ],
+      "node_name": "etri-ser0004-cgnms0",
+      "pod_uid": "dc2ba35e-9eb2-46d3-9744-58ea72d6100c",
+      "reservation": {
+        "resource": "mobilint.com/npu",
+        "count": 1,
+        "mode": "pre-reserved auxiliary Pod"
+      },
+      "calls": 50,
+      "request_bytes": 481689600,
+      "response_bytes": 4338211,
+      "client_rpc_seconds": 7.255359266418964,
+      "server_infer_seconds": 1.711071708938107,
+      "server_handler_seconds": 6.745035647181794,
+      "objective": {
+        "loss": "ce+kl",
+        "temperature": 4.0,
+        "alpha": 0.5
+      },
+      "timing": "client_rpc_seconds is inside the GPU training wall time; never add it again"
+    }
+  },
+  {
+    "job_id": "j-83201fa34a5240539672aeeda3c6fe2e",
+    "teacher": {
+      "schema": "ra-kd-teacher-summary-v1",
+      "role": "frozen-teacher-forward",
+      "device_class": "npu",
+      "device_name": "aries-rb",
+      "accelerator_model": "ARIES2",
+      "model_sha256": "48b1ca4e669ac9d293148a748c06c352a7f542c5999f5f8eb2d1f5a31cf21e2d",
+      "model_file": "resnet50_IMAGENET1K_V1.mxq",
+      "runtime": "qbruntime",
+      "runtime_version": "1.4.0",
+      "target_cores": [
+        "CoreId(cluster=Cluster.Cluster0, core=Core.Core0)"
+      ],
+      "node_name": "etri-ser0004-cgnms0",
+      "pod_uid": "dc2ba35e-9eb2-46d3-9744-58ea72d6100c",
+      "reservation": {
+        "resource": "mobilint.com/npu",
+        "count": 1,
+        "mode": "pre-reserved auxiliary Pod"
+      },
+      "calls": 50,
+      "request_bytes": 481689600,
+      "response_bytes": 4338125,
+      "client_rpc_seconds": 7.25049532041885,
+      "server_infer_seconds": 1.7454216193873435,
+      "server_handler_seconds": 6.77445833128877,
+      "objective": {
+        "loss": "ce+kl",
+        "temperature": 4.0,
+        "alpha": 0.5
+      },
+      "timing": "client_rpc_seconds is inside the GPU training wall time; never add it again"
+    }
+  },
+  {
+    "job_id": "j-80d6e99f4eeb4837a960e13db2aef344",
+    "teacher": {
+      "schema": "ra-kd-teacher-summary-v1",
+      "role": "frozen-teacher-forward",
+      "device_class": "npu",
+      "device_name": "aries-rb",
+      "accelerator_model": "ARIES2",
+      "model_sha256": "48b1ca4e669ac9d293148a748c06c352a7f542c5999f5f8eb2d1f5a31cf21e2d",
+      "model_file": "resnet50_IMAGENET1K_V1.mxq",
+      "runtime": "qbruntime",
+      "runtime_version": "1.4.0",
+      "target_cores": [
+        "CoreId(cluster=Cluster.Cluster0, core=Core.Core0)"
+      ],
+      "node_name": "etri-ser0004-cgnms0",
+      "pod_uid": "dc2ba35e-9eb2-46d3-9744-58ea72d6100c",
+      "reservation": {
+        "resource": "mobilint.com/npu",
+        "count": 1,
+        "mode": "pre-reserved auxiliary Pod"
+      },
+      "calls": 50,
+      "request_bytes": 481689600,
+      "response_bytes": 4338137,
+      "client_rpc_seconds": 7.33072133990936,
+      "server_infer_seconds": 1.7616683586966246,
+      "server_handler_seconds": 6.8444828952196985,
+      "objective": {
+        "loss": "ce+kl",
+        "temperature": 4.0,
+        "alpha": 0.5
+      },
+      "timing": "client_rpc_seconds is inside the GPU training wall time; never add it again"
+    }
+  }
+]
