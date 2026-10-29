@@ -49,6 +49,38 @@ inventory_latest_index = Index(
     postgresql_where=entities.c.kind == "inventory",
     sqlite_where=entities.c.kind == "inventory",
 )
+# Exact route key of a RouteQueueSnapshot; a periodic observer appends one per
+# route every few seconds, so readers seek the latest row instead of listing all.
+route_queue_key = (
+    entities.c.project,
+    entities.c.body["backend"].as_string(),
+    entities.c.body["cluster_ref"].as_string(),
+    entities.c.body["route_ref"].as_string(),
+    entities.c.body["resource_key"].as_string(),
+)
+route_queue_latest_index = Index(
+    "ix_ra_route_queue_latest",
+    *route_queue_key,
+    entities.c.body["observed_at"].as_string().desc(),
+    entities.c.ref.desc(),
+    postgresql_where=entities.c.kind == "route_queue_snapshot",
+    sqlite_where=entities.c.kind == "route_queue_snapshot",
+)
+
+
+def latest_route_queue_query(values):
+    """Index seek on ``ix_ra_route_queue_latest``; a None value matches a missing key."""
+    return (
+        select(entities)
+        .where(
+            entities.c.kind == "route_queue_snapshot",
+            *(c.is_(None) if v is None else c == v for c, v in zip(route_queue_key, values, strict=True)),
+        )
+        .order_by(entities.c.body["observed_at"].as_string().desc(), entities.c.ref.desc())
+        .limit(1)
+    )
+
+
 jobs = Table(
     "ra_jobs",
     metadata,
@@ -148,6 +180,7 @@ class Store:
         # create_all skips indexes for tables that already exist.
         with self.engine.begin() as conn:
             conn.execute(CreateIndex(inventory_latest_index, if_not_exists=True))
+            conn.execute(CreateIndex(route_queue_latest_index, if_not_exists=True))
 
     @contextmanager
     def transaction(self):
@@ -194,6 +227,11 @@ class Store:
         if project is not None:
             query = query.where(entities.c.project == project)
         return list(conn.execute(query).mappings())
+
+    def latest_route_queue(self, conn, project, backend, cluster_ref, route_ref, resource_key):
+        """The latest snapshot (observed_at, then ref) of one exact route; one row read."""
+        values = (project, backend, cluster_ref, route_ref, resource_key)
+        return conn.execute(latest_route_queue_query(values)).mappings().first()
 
     def job(self, conn, job_id):
         return conn.execute(select(jobs).where(jobs.c.id == job_id)).mappings().first()

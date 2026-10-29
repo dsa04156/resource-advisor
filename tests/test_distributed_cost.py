@@ -108,11 +108,41 @@ def test_a_member_without_queue_evidence_keeps_the_gang_unknown(service, client)
     assert result["accepted"] is False
 
 
-def network_evidence(client, seconds):
+def network_evidence(client, seconds, groups=None):
     for node, value in seconds.items():
+        extra = {"staging_group": groups[node]} if groups else {}
         post(client, "/network-profiles", network(node, value, workload_ref="ddp-workload",
-                                                  dataset_version=client.spec.identity.dataset_version))  # fmt: skip
+                                                  dataset_version=client.spec.identity.dataset_version,
+                                                  **extra))  # fmt: skip
         post(client, "/cache-bindings", binding(node))
+
+
+SYNC = "ddp:j-1/a-1@node-a+node-b"
+
+
+@pytest.mark.parametrize(
+    ("groups", "aggregation", "staging"),
+    [
+        ({"node-a": SYNC, "node-b": SYNC}, "synchronized_ddp_parallel_max", 6.0),
+        # another attempt's member set, or one member solo: no proven concurrency
+        ({"node-a": SYNC, "node-b": "ddp:j-2/a-2@node-a+node-b"}, "shared_source_serialized_bound", 10.0),
+        ({"node-a": "ddp:j-1/a-1@node-a+node-c", "node-b": "ddp:j-1/a-1@node-a+node-c"},
+         "shared_source_serialized_bound", 10.0),
+    ],
+)  # fmt: skip
+def test_same_native_ddp_attempt_staging_uses_the_observed_parallel_max(
+    service, client, groups, aggregation, staging
+):
+    post(client, "/jct-profiles", ddp_profile(service, client))
+    for node in dt.NODES:
+        post(client, "/route-queue-snapshots", queue(node))
+    network_evidence(client, {"node-a": [4.0], "node-b": [6.0]}, groups)
+
+    p, _, _ = prediction(client, NETWORK)
+
+    assert p["breakdown"]["staging"]["aggregation"] == aggregation
+    assert p["breakdown"]["staging"]["seconds"] == staging
+    assert p["predicted_jct_seconds"] == pytest.approx(1.0 + 2.0 + staging + 10.0)
 
 
 def test_member_staging_critical_path_replaces_profile_staging_once(service, client):
@@ -223,6 +253,9 @@ def test_ddp_profile_staging_is_the_slowest_members_own_receipt():
     [a, b] = sorted(member_rows(staged_ddp_row()), key=lambda r: r["body"]["placement"]["node_name"])
     net = network_profile_from_receipts([a], ref="net-a", valid_for_seconds=3600)
     assert (net.node_ref, net.samples[0].elapsed_seconds, net.native_job_ids) == ("node-a", 4.0, ("j-1",))
+    assert net.staging_group == "ddp:j-1/a-1@node-a+node-b"  # concurrent with node-b, barriers
+    solo = {**a, "member_of": None}
+    assert network_profile_from_receipts([solo], ref="s", valid_for_seconds=3600).staging_group is None
 
 
 @pytest.mark.parametrize(
@@ -262,7 +295,96 @@ def test_collector_cli_reads_every_stored_rank_receipt(service):
         for index, receipt in enumerate(row["staging_members"]):
             service.store.put(conn, "staging_member_receipt", f"a-1:{index}", "team-a", receipt)
         stored = hetero_collect.stored_rows(service.store, conn, "j-1")
-    assert stored["staging_members"] == row["staging_members"]
+        assert stored["staging_members"] == row["staging_members"]
+        # An extra stored receipt for this attempt is loaded too, and then refused.
+        service.store.put(conn, "staging_member_receipt", "a-1:2", "team-a",
+                          {**row["staging_members"][1], "pod_uid": "uid-extra"})  # fmt: skip
+        extra = hetero_collect.stored_rows(service.store, conn, "j-1")
+    assert len(extra["staging_members"]) == 3
+    with pytest.raises(ValueError, match="every observed rank"):
+        member_rows(extra)
     [only] = hetero_collect.network_rows([stored], "node-a")
     made = network_profile_from_receipts([only], ref="net-a", valid_for_seconds=3600)
     assert made.node_ref == "node-a" and made.identity_source == "ra_job_receipts"
+
+
+def test_route_queue_lookup_is_the_exact_routes_latest_row(service):
+    from sqlalchemy import text
+
+    from resource_advisor.store import latest_route_queue_query
+
+    at = now()
+
+    def put(ref, *, project="team-a", seconds=0, resource_key="nvidia.com/gpu", route="node-a"):
+        body = hetero.queue_snapshot(ref, route, observed_at=at + timedelta(seconds=seconds))
+        body = body.model_copy(update={"project_ref": project, "resource_key": resource_key})
+        with service.store.transaction() as conn:
+            service.store.put(conn, "route_queue_snapshot", ref, project, body.model_dump(mode="json"))
+
+    put("old", seconds=-30)
+    put("tie-a", seconds=0)
+    put("tie-b", seconds=0)  # same observation time: the larger ref wins, as before
+    put("other-project", project="team-b", seconds=60)
+    put("other-resource", resource_key="vendor/gpu.shared", seconds=60)
+    put("other-route", route="node-b", seconds=60)
+    put("no-key", resource_key=None, seconds=90)
+
+    def latest(resource_key="nvidia.com/gpu"):
+        with service.store.transaction() as conn:
+            row = service.store.latest_route_queue(conn, "team-a", "kubernetes", "lab", "node-a",
+                                                   resource_key)  # fmt: skip
+        return row and row["ref"]
+
+    assert latest() == "tie-b"
+    assert latest(None) == "no-key"
+    assert latest("missing") is None
+    query = latest_route_queue_query(("team-a", "kubernetes", "lab", "node-a", "nvidia.com/gpu"))
+    with service.store.transaction() as conn:
+        if conn.dialect.name == "sqlite":  # bounded seek, no scan or sort of history
+            sql = str(query.compile(conn, compile_kwargs={"literal_binds": True}))
+            plan = " ".join(r[-1] for r in conn.execute(text("EXPLAIN QUERY PLAN " + sql)))
+            assert "USING INDEX ix_ra_route_queue_latest" in plan and "TEMP B-TREE" not in plan
+        else:
+            names = conn.execute(text("SELECT indexname FROM pg_indexes")).scalars().all()
+            assert "ix_ra_route_queue_latest" in names
+
+
+def test_native_timestamp_resolution_is_reported_apart_from_n1_spread(service, client):
+    from resource_advisor.recommendation import timestamp_resolution
+
+    assert timestamp_resolution("2026-10-29T12:00:01Z", "2026-10-29T12:00:09Z") == 1.0
+    assert timestamp_resolution("2026-10-29T12:00:01.250Z", "2026-10-29T12:00:09.1+00:00") == 0.1
+
+    row = staged_ddp_row()
+    for key in ("scheduler_submitted_at", "started_at", "execution_started_at", "backend_finished_at"):
+        row["body"][key] = row["body"][key].split(".")[0] + "+00:00"  # Kubernetes: whole seconds
+    made = jct_profile_from_jobs([row], ref="ddp-1", valid_for_seconds=600, hardware=HARDWARE)
+    assert made.timestamp_resolution_seconds == 1.0 and made.repeats == 1
+
+    post(client, "/jct-profiles", ddp_profile(service, client, repeats=1, jct_stddev_seconds=None,
+                                              timestamp_resolution_seconds=1.0))  # fmt: skip
+    for node in dt.NODES:
+        post(client, "/route-queue-snapshots", queue(node))
+    p, _, _ = prediction(client, QUEUE)
+    uncertainty = p["breakdown"]["uncertainty"]
+    assert uncertainty["native_timestamp_resolution_seconds"] == 1.0
+    assert uncertainty["statistical_spread"] == "unknown (n=1)"
+    assert "profile_spread" in uncertainty["missing"]
+
+
+def test_measured_unpack_and_preparation_leave_only_true_residue_unattributed():
+    row = staged_ddp_row()
+    for m in row["staging_members"]:
+        m["unpack_seconds"] = 0.5 if m["pod_uid"] == "uid-0" else 1.5
+    row["staging"] = {**row["staging_members"][0], "preparation_seconds": 2.0}
+    made = jct_profile_from_jobs([row], ref="ddp", valid_for_seconds=600, hardware=HARDWARE)
+    # critical member (rank 0, 6 s transfer) unpack 0.5 + rank-0 preparation 2.0, once
+    assert made.phases == {"runtime_startup": 3.0, "compute": 10.0, "data_staging": 6.0,
+                           "model_preparation": 2.5, "unattributed_in_container": 1.5}  # fmt: skip
+
+    plain = staged_ddp_row()
+    plain["id"] = "j-2"
+    for m in (*plain["staging_members"], plain["staging"]):
+        m["job_id"] = "j-2"
+    with pytest.raises(ValueError, match="preparation"):
+        jct_profile_from_jobs([row, plain], ref="mixed", valid_for_seconds=600, hardware=HARDWARE)

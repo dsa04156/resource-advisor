@@ -83,6 +83,10 @@ def queue(args):
 
 def stored_rows(store, conn, job_id):
     """A job with its stored result, rank-0 staging receipt and every rank's own receipt."""
+    from sqlalchemy import select
+
+    from resource_advisor.store import entities
+
     row = store.job(conn, job_id)
     if row is None:
         sys.exit(f"job {job_id} not found")
@@ -94,10 +98,20 @@ def stored_rows(store, conn, job_id):
     staging = store.get(conn, "staging_receipt", attempt)
     if staging is not None:
         value["staging"] = staging["body"]
-    ranks = ((row["body"].get("placement") or {}).get("distributed") or {}).get("ranks") or []
-    members = [store.get(conn, "staging_member_receipt", f"{attempt}:{r['index']}") for r in ranks]
-    if any(members):
-        value["staging_members"] = [m["body"] for m in members if m is not None]
+    # Every stored rank receipt of this attempt (id "<attempt>:<rank>"), not only the
+    # expected indexes: member_receipts() rejects extra, missing or foreign-Pod ones.
+    members = conn.execute(
+        select(entities.c.body)
+        .where(
+            entities.c.kind == "staging_member_receipt",
+            entities.c.project == row["project"],
+            entities.c.ref.startswith(attempt + ":", autoescape=True),
+        )
+        .order_by(entities.c.ref)
+    ).scalars()
+    members = list(members)
+    if members:
+        value["staging_members"] = members
     return value
 
 

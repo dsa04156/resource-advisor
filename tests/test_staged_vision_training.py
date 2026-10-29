@@ -46,11 +46,11 @@ def env(**overrides):
     return values
 
 
-def argv(source, digest, size, cache, *extra):
+def argv(source, digest, size, cache, *extra, runtime="vision_training", train=TRAIN_ARGS):
     return [
-        "--source", str(source), "--sha256", digest, "--size-bytes", str(size),
+        "--runtime", runtime, "--source", str(source), "--sha256", digest, "--size-bytes", str(size),
         "--source-endpoint-ref", "dataset-http", "--cache-dir", str(cache), *extra,
-        "--", *TRAIN_ARGS,
+        "--", *train,
     ]  # fmt: skip
 
 
@@ -61,7 +61,7 @@ class Trainer:
     def __init__(self, out=None):
         self.calls, self.out = [], out
 
-    def __call__(self, train_argv, environ, stage):
+    def __call__(self, runtime, train_argv, environ, stage):
         args = SimpleNamespace(data=None)
         receipt = stage(args)
         self.calls.append((train_argv, (svt.Path(args.data) / "manifest.json").read_bytes()))
@@ -100,7 +100,8 @@ def test_stages_then_trains_on_the_verified_extracted_bundle(tmp_path):
     assert receipt.cache_locator == str(cache.resolve()) and receipt.staged_at is not None
     # The unpack is reported apart from the transfer: never part of data_staging.
     [report] = lines(out, svt.REPORT)
-    assert report["unpack_seconds"] >= 0 and report["staging_seconds"] == receipt.sample.elapsed_seconds
+    assert report["unpack_seconds"] == receipt.unpack_seconds >= 0
+    assert report["staging_seconds"] == receipt.sample.elapsed_seconds
 
     out.clear()
     assert svt.run(argv(source, digest, size, cache), env(RA_ATTEMPT_ID="att-2"), train=trainer,
@@ -197,3 +198,73 @@ def test_data_is_supplied_by_staging_only(tmp_path):
     with pytest.raises(SystemExit):
         svt.run(argv(source, digest, size, tmp_path / "c") + ["--data", "/opt/ra-train/data"],
                 env(), train=Trainer(), write=[].append)  # fmt: skip
+
+
+def test_cache_collision_winner_must_hold_the_receipted_bytes(tmp_path, monkeypatch):
+    source, digest, size = bundle(tmp_path)
+    cache = tmp_path / "c"
+    real_link = svt.os.link
+
+    def racing_link(src, dst):  # another stager installs a corrupt entry first
+        svt.Path(dst).write_bytes(b"corrupt")
+        real_link(src, dst)
+
+    monkeypatch.setattr(svt.os, "link", racing_link)
+    out, trainer = [], Trainer()
+    assert svt.run(argv(source, digest, size, cache), env(), train=trainer, write=out.append) == 2
+    assert failure(out) == "STAGING_CACHE_CORRUPT" and trainer.calls == []
+
+
+def test_ipv6_source_keeps_its_brackets():
+    assert svt.sanitize("http://u:p@[fd00::1]:8080/d.tar?t=1") == ("http", "http://[fd00::1]:8080/d.tar")
+    assert svt._request("http://[fd00::1]:8080/d.tar").full_url == "http://[fd00::1]:8080/d.tar"
+
+
+JOINT_ARGS = [
+    "--model", "mobilenet_v3_small", "--dataset-digest", "sha256:" + "0" * 64,
+    "--initial-checkpoint-digest", "sha256:" + "1" * 64, "--global-batch", "16",
+    "--steps", "2", "--seed", "7", "--teacher-url", "http://teacher:8080",
+    "--teacher-model-sha256", "f" * 64, "--teacher-runtime-version", "1.4.0",
+    "--teacher-pod-uid", "uid-t", "--kd-config-digest", "sha256:" + "2" * 64,
+]  # fmt: skip
+
+
+def test_joint_runtime_is_an_explicit_choice_and_its_receipt_reaches_the_envelope(
+    tmp_path, monkeypatch
+):
+    from resource_advisor import vision_joint_training as vjt
+
+    source, digest, size = bundle(tmp_path)
+    seen = []
+
+    def joint_run(args, environ, stage):  # stands in for the GPU/teacher work
+        receipt = stage(args)
+        seen.append((args.teacher_url, args.data))
+        vt.emit(vt.RESULT, {"result": {}, "training_evidence": {"staging_receipt": receipt}})
+
+    monkeypatch.setattr(vjt, "run", joint_run)
+    out = []
+    code = svt.run(argv(source, digest, size, tmp_path / "c", runtime="vision_joint_training",
+                        train=JOINT_ARGS), env(), write=out.append)  # fmt: skip
+    assert code == 0
+    [(url, data)] = seen
+    assert url == "http://teacher:8080" and (svt.Path(data) / "manifest.json").is_file()
+    [envelope] = lines(out, vt.RESULT)
+    assert envelope["staging_receipt"] == lines(out, svt.RECEIPT)[0]
+    assert vt.emit is not None and vt.emit.__module__ == vt.__name__  # restored
+
+    with pytest.raises(SystemExit):  # no implicit or unknown runtime
+        svt.run(argv(source, digest, size, tmp_path / "d", runtime="inference"), env(),
+                write=[].append)  # fmt: skip
+
+
+def test_ddp_rank_receipts_are_lifted_in_rank_order():
+    envelope = {"result": {}, "training_evidence": {
+        "staging_receipt": {"pod_uid": "u0"},
+        "ranks": [{"rank": 1, "staging_receipt": {"pod_uid": "u1"}},
+                  {"rank": 0, "staging_receipt": {"pod_uid": "u0"}}]}}  # fmt: skip
+    envelope["training_evidence"]["preparation_seconds"] = 2.5
+    lifted = svt.lift_receipts(envelope)
+    # rank 0's own receipt also carries its measured preparation (after staging)
+    assert lifted["staging_receipt"] == {"pod_uid": "u0", "preparation_seconds": 2.5}
+    assert [r["pod_uid"] for r in lifted["staging_receipts"]] == ["u0", "u1"]

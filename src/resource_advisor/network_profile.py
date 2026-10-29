@@ -133,11 +133,16 @@ class NetworkProfile(Contract):
     cache_storage_identity: str | None = Field(default=None, pattern=r"^\d+:\d+$")
     identity_source: Literal["observer_host", "ra_job_receipts"] | None = None
     native_job_ids: tuple[Ref, ...] | None = None
+    # Set only when every sample is one rank's receipt of the same DDP attempt(s),
+    # staged between barriers concurrently with the other members named here:
+    # "ddp:<job>/<attempt>[,...]@<node>+<node>". Contention is then inside the sample.
+    staging_group: str | None = Field(default=None, max_length=1024)
 
     @model_serializer(mode="wrap")
     def preserve_legacy_signature(self, handler):
         return _omit_none(
-            handler(self), ("cache_storage_identity", "identity_source", "native_job_ids")
+            handler(self),
+            ("cache_storage_identity", "identity_source", "native_job_ids", "staging_group"),
         )
 
     @model_validator(mode="after")
@@ -146,7 +151,7 @@ class NetworkProfile(Contract):
             # node_ref is the adapter-observed node; observer_host may be a Pod name.
             if not self.native_job_ids or len(self.native_job_ids) != len(self.samples):
                 raise ValueError("receipt evidence names one native RA job per sample")
-        elif self.native_job_ids is not None:
+        elif self.native_job_ids is not None or self.staging_group is not None:
             raise ValueError("native job ids belong to receipt-derived evidence")
         elif self.node_ref != self.observer_host:
             raise ValueError("network evidence must be measured on its destination node")
@@ -191,6 +196,11 @@ class StagingReceipt(Contract):
     cache_binding_ref: Ref | None = None
     # When staging finished (before compute); a collector's freshness basis.
     staged_at: AwareDatetime | None = None
+    # The same attempt's measured spans after the transfer, before compute: bundle
+    # unpack, and the runtime's own preparation (data verification/preprocessing,
+    # model build and device placement), never part of the staging sample.
+    unpack_seconds: float | None = Field(default=None, ge=0)
+    preparation_seconds: float | None = Field(default=None, ge=0)
 
     @model_serializer(mode="wrap")
     def preserve_legacy_signature(self, handler):
@@ -205,6 +215,8 @@ class StagingReceipt(Contract):
                 "pod_uid",
                 "cache_storage_identity",
                 "cache_binding_ref",
+                "unpack_seconds",
+                "preparation_seconds",
             ),
         )
 

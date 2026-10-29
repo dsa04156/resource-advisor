@@ -99,7 +99,8 @@ def class_indices(manifest):
     return classes
 
 
-def run(args, environ=os.environ):
+def run(args, environ=os.environ, stage=None):
+    """``stage`` (optional) stages the dataset before preparation, like vision_training."""
     context, _, identity = preflight(args, environ)
     import torch
     import torch.nn.functional as F
@@ -120,6 +121,8 @@ def run(args, environ=os.environ):
     if any(actual.get(k) != v for k, v in context["runtime_versions"].items() if k in actual):
         raise RuntimeError("runtime differs from the qualified context")
 
+    # Staging precedes preparation; the teacher RPC stays inside the timed loop.
+    staging = vt.run_staging(args, stage, lambda: None) if stage is not None else None
     prep_start = time.perf_counter()
     binding = json.loads(environ["RA_TRAINING_BINDING"]) if args.isolated else None
     bound = None
@@ -302,6 +305,10 @@ def run(args, environ=os.environ):
         "pod_uid": environ.get("RA_POD_UID"),
         "teacher": summary,
     }
+    if staging is not None:
+        evidence.update(
+            staging_receipt=staging[0], staging_seconds=staging[1], staging_window_seconds=staging[2]
+        )
     envelope = {"result": result, "digest": vt.signature(result), "training_evidence": evidence}
     if args.isolated:
         output_checkpoint = {

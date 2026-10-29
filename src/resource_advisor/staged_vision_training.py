@@ -1,29 +1,35 @@
-"""Stage the pinned vision dataset bundle, then run unchanged vision_training on it.
+"""Stage the pinned vision dataset bundle, then run an unchanged training runtime on it.
 
 The dataset (one tar of the manifest-pinned ImageNetV2 subset directory) is
 copied from its declared source into the destination cache (cold), or an existing
 cache entry is fully re-read (hot), with a monotonic clock and SHA-256
-verification of the whole object. That span alone is the ``StagingReceipt``
-sample. The bundle is then unpacked (timed separately, never data staging) and
-``vision_training`` runs with ``--data`` set to the unpacked root, where the
-manifest digest and every image hash are verified again. Training clocks start
-after all of this, so staging is never inside the measured compute span.
+verification of the whole object; if another stager installed the entry first,
+that entry is verified too, so training reads exactly the receipted bytes. That
+span alone is the ``StagingReceipt`` sample. The bundle is then unpacked (timed
+separately, never data staging) and the runtime runs with ``--data`` set to the
+unpacked root, where the manifest digest and every image hash are verified
+again. Training clocks start after all of this, so staging is never inside the
+measured compute span.
 
-vision_training calls the stage hook on every rank between two process-group
-barriers (DDP), so the staging critical path is the slowest member's, observed
-rather than assumed across skewed launches. Each rank prints its own receipt
-(``RESOURCE_ADVISOR_STAGING_RECEIPT``) and returns it to vision_training, whose
-rank 0 binds its own (``staging_receipt``) and every rank's
-(``staging_receipts``) receipt into the result envelope. A plan's cache binding
-for this node (``RA_STAGING_BINDINGS_JSON``) replaces ``--cache-dir``. Native
-Pod/node identity comes from the Downward API values and counts only after a
-collector matches them with the adapter's own observation of each rank Pod.
+``--runtime`` names the runtime explicitly: ``vision_training`` (single GPU or
+DDP) or ``vision_joint_training`` (GPU student with the Mobilint NPU teacher over
+RPC; the RPC stays inside the timed training loop and is never staging). The
+runtime calls the stage hook before its preparation; under DDP between two
+process-group barriers, so the staging critical path is the slowest member's,
+observed rather than assumed across skewed launches. Each rank prints its own
+receipt (``RESOURCE_ADVISOR_STAGING_RECEIPT``); the runtime records it in its
+training evidence and this wrapper lifts rank 0's (``staging_receipt``) and
+every rank's (``staging_receipts``, by rank) into the result envelope. A plan's
+cache binding for this node (``RA_STAGING_BINDINGS_JSON``) replaces
+``--cache-dir``. Native Pod/node identity comes from the Downward API values and
+counts only after a collector matches them with the adapter's own observation.
 
-Standard library only, so the image runs it beside vision_training.py with
+Standard library only, so the image runs it beside the runtime files with
 ``python -I``:
 
-    python3 -I staged_vision_training.py --source URL --sha256 HEX --size-bytes N
-        --source-endpoint-ref REF [--cache-dir DIR] -- VISION_TRAINING_ARGS (no --data)
+    python3 -I staged_vision_training.py --runtime vision_training --source URL
+        --sha256 HEX --size-bytes N --source-endpoint-ref REF [--cache-dir DIR]
+        -- RUNTIME_ARGS (no --data)
 """
 
 import argparse
@@ -49,6 +55,9 @@ except ImportError:  # copied beside vision_training.py into the image, run with
     sys.path.insert(0, str(Path(__file__).resolve().parent))  # -I drops the script dir
     import vision_training as vt
 
+# Allowed training runtimes; both stage through vision_training.run_staging.
+RUNTIMES = ("vision_training", "vision_joint_training")
+
 RECEIPT = "RESOURCE_ADVISOR_STAGING_RECEIPT "
 REPORT = "RESOURCE_ADVISOR_STAGED_VISION_REPORT "
 MAX_BYTES = 2**30  # network_profile.MAX_BYTES
@@ -67,12 +76,19 @@ def storage_identity(path):
     return f"{st.st_dev}:{st.st_ino}"
 
 
+def _netloc(parts):
+    """Host (IPv6 literals keep their brackets) and port, without userinfo."""
+    host = parts.hostname or ""
+    if ":" in host:
+        host = f"[{host}]"
+    return host + (f":{parts.port}" if parts.port else "")
+
+
 def sanitize(source):
     """Location without userinfo, query or fragment (they may carry secrets)."""
     parts = urlsplit(source)
     if parts.scheme in {"http", "https"}:
-        netloc = (parts.hostname or "") + (f":{parts.port}" if parts.port else "")
-        return "http", urlunsplit((parts.scheme, netloc, parts.path or "/", "", ""))
+        return "http", urlunsplit((parts.scheme, _netloc(parts), parts.path or "/", "", ""))
     if parts.scheme in {"", "file"}:
         return "file", str(Path(parts.path if parts.scheme else source).resolve())
     raise Unavailable("SOURCE_SCHEME_UNSUPPORTED")
@@ -95,8 +111,7 @@ def _copy(read, sink, hasher, size, deadline):
 def _request(source):
     """urllib does not take userinfo from the URL: send it as basic auth instead."""
     parts = urlsplit(source)
-    netloc = (parts.hostname or "") + (f":{parts.port}" if parts.port else "")
-    request = urllib.request.Request(urlunsplit(parts._replace(netloc=netloc, fragment="")))
+    request = urllib.request.Request(urlunsplit(parts._replace(netloc=_netloc(parts), fragment="")))
     if parts.username is not None:
         token = f"{unquote(parts.username)}:{unquote(parts.password or '')}".encode()
         request.add_header("Authorization", "Basic " + base64.b64encode(token).decode())
@@ -140,7 +155,9 @@ def _cold(source, kind, cache, digest, size, timeout):
         try:
             os.link(temp, cache / digest)  # never replaces an existing (shared) entry
         except FileExistsError:
-            pass
+            # Another stager installed first: training reads that entry, so it must
+            # hold exactly the bytes this receipt verified.
+            _hot(cache, digest, size, timeout)
         return {"elapsed_seconds": elapsed, "bytes": received, "content_verified": True,
                 "first_byte_seconds": first}  # fmt: skip
     finally:
@@ -215,13 +232,41 @@ class Failed(Exception):
         self.code = code
 
 
-def train(train_argv, environ, stage):
-    """vision_training runs ``stage`` between two process-group barriers (DDP)."""
-    vt.run(vt.parser().parse_args([*train_argv, "--data", UNSTAGED]), environ, stage=stage)
+def train(runtime, train_argv, environ, stage):
+    """The chosen runtime calls ``stage`` before preparation (between DDP barriers).
+
+    ``vision_joint_training`` (GPU student, Mobilint teacher RPC) is single-device;
+    its teacher RPC stays inside the timed training loop, never in staging.
+    """
+    if runtime == "vision_joint_training":
+        try:
+            from . import vision_joint_training as module
+        except ImportError:
+            import vision_joint_training as module
+    else:
+        module = vt
+    args = module.parser().parse_args([*train_argv, "--data", UNSTAGED])
+    module.run(args, environ, stage=stage)
+
+
+def lift_receipts(envelope):
+    """Envelope keys the ingest reads: rank 0's own receipt and every rank's, by rank."""
+    evidence = envelope.get("training_evidence") or {}
+    if "staging_receipt" in evidence:
+        own = dict(evidence["staging_receipt"])
+        if evidence.get("preparation_seconds") is not None:  # rank 0's measured preparation
+            own["preparation_seconds"] = evidence["preparation_seconds"]
+        envelope = {**envelope, "staging_receipt": own}
+    ranks = evidence.get("ranks") or []
+    if ranks and all("staging_receipt" in r for r in ranks):
+        ordered = sorted(ranks, key=lambda r: r["rank"])
+        envelope["staging_receipts"] = [r["staging_receipt"] for r in ordered]
+    return envelope
 
 
 def parser():
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    p.add_argument("--runtime", choices=RUNTIMES, required=True)
     p.add_argument("--source", required=True)
     p.add_argument("--sha256", required=True)
     p.add_argument("--size-bytes", type=int, required=True)
@@ -285,6 +330,7 @@ def run(argv, environ=os.environ, *, train=train, write=_print):
             "cache_state": state, "cache_locator": str(bundle.parent),
             "cache_storage_identity": storage_identity(bundle.parent),
             "cache_binding_ref": binding_ref, "staged_at": staged_at, "sample": sample,
+            "unpack_seconds": unpacked,
         }  # fmt: skip
         receipt = {k: v for k, v in receipt.items() if v is not None}
         write(RECEIPT + json.dumps(receipt, allow_nan=False))
@@ -293,8 +339,16 @@ def run(argv, environ=os.environ, *, train=train, write=_print):
         train_args.data = str(root)
         return receipt
 
+    original = vt.emit
+
+    def emit(prefix, value):
+        if prefix == vt.RESULT:
+            value = lift_receipts(value)
+        write(prefix + json.dumps(value, separators=(",", ":"), allow_nan=False))
+
+    vt.emit = emit  # both runtimes emit through vision_training.emit
     try:
-        train(passthrough, environ, stage)
+        train(args.runtime, passthrough, environ, stage)
     except Failed as exc:
         if int(environ.get("RANK", "0")) == 0:  # only rank 0 reports the job result
             result = {
@@ -307,6 +361,8 @@ def run(argv, environ=os.environ, *, train=train, write=_print):
             }  # fmt: skip
             write(vt.RESULT + json.dumps({"result": result, "digest": vt.signature(result)}))
         return 2
+    finally:
+        vt.emit = original
     return 0
 
 

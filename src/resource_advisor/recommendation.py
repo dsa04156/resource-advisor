@@ -122,6 +122,16 @@ class JctProfile(Contract):
     job_ids: tuple[Ref, ...] = Field(min_length=1, max_length=1000)
     artifact_refs: tuple[str, ...] = ()
     source: Literal["ra_jobs", "operator_import"]
+    # Coarsest native timestamp used for admission/startup/residual (Kubernetes
+    # records whole seconds). Omitted when unset, so older signatures are unchanged.
+    timestamp_resolution_seconds: float | None = Field(default=None, gt=0, le=60)
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_signature(self, handler):
+        value = handler(self)
+        if self.timestamp_resolution_seconds is None:
+            value.pop("timestamp_resolution_seconds", None)
+        return value
 
     @model_validator(mode="after")
     def phases_are_not_double_counted(self):
@@ -231,14 +241,26 @@ class DataLocation(Contract):
         return value
 
 
+def timestamp_resolution(*stamps):
+    """Coarsest resolution among ISO timestamps: whole seconds unless a fraction is written.
+
+    Kubernetes condition/container times are whole seconds; a difference of two
+    such boundaries is only known to about that resolution, whatever its digits.
+    """
+    worst = None
+    for stamp in stamps:
+        clock = str(stamp).split("T", 1)[-1]
+        fraction = clock.split(".", 1)[1] if "." in clock else ""
+        digits = len(fraction) - len(fraction.lstrip("0123456789"))
+        value = 10.0**-digits
+        worst = value if worst is None else max(worst, value)
+    return worst
+
+
 def _epoch(value):
     return (
         datetime.fromisoformat(value).timestamp() if isinstance(value, str) else value.timestamp()
     )
-
-
-def _latest(items):
-    return max(items, key=lambda x: (x["body"]["observed_at"], x["ref"])) if items else None
 
 
 def data_location(service, conn, project, spec):
@@ -428,15 +450,10 @@ def _intents(conn, project, route_key, identity, at):
 
 
 def _queue(service, conn, project, identity, candidate, cap):
-    items = [
-        x
-        for x in service.store.list(conn, "route_queue_snapshot", project)
-        if x["body"]["backend"] == str(candidate.backend)
-        and x["body"]["cluster_ref"] == cap.backend_cluster_id
-        and x["body"]["route_ref"] == identity.node_ref
-        and x["body"].get("resource_key") == cap.resource_key
-    ]
-    latest = _latest(items)
+    latest = service.store.latest_route_queue(
+        conn, project, str(candidate.backend), cap.backend_cluster_id, identity.node_ref,
+        cap.resource_key,
+    )  # fmt: skip
     if latest is None:
         return None, None
     q = RouteQueueSnapshot.model_validate(latest["body"])
@@ -641,6 +658,7 @@ def _measured_transfer(profiles, bindings, location, candidate, cap, target, rec
                 "source_kind": p.source_kind,
                 "identity_source": p.identity_source or "observer_host",
                 "cache_binding_ref": binding.ref if binding else None,
+                "staging_group": p.staging_group,
                 "hot_evidence_rejected": hot_rejected,
                 "observed_at": p.observed_at.isoformat(),
                 "age_seconds": (at - p.observed_at).total_seconds(),
@@ -666,28 +684,41 @@ def _members(service, conn, project, candidate):
     return members, None
 
 
-def _staging_path(per_node, location):
-    """Critical path of parallel member staging from separately measured profiles.
+def _staging_path(per_node, location, nodes):
+    """Critical path of parallel member staging, from per-member measurements.
 
     Members start staging together (barrier) and compute starts after the slowest.
-    Solo measurements do not show contention at a shared source, so members that
-    read the same source endpoint are bounded as if served one after another
-    (sum); distinct sources run in parallel (max). Both bounds are recorded.
+    When every member's measurement comes from the same native DDP attempt(s) of
+    exactly these member nodes, staged concurrently between barriers, any source
+    contention is already inside each sample: the path is the slowest member.
+    Separately measured (solo) samples do not show contention at a shared source,
+    so those members are bounded as if served one after another (sum); distinct
+    sources run in parallel (max). Both bounds are recorded.
     """
-    groups = {}
+    groups = {n["staging_group"] for n in per_node}
+    [group] = groups if len(groups) == 1 else [None]
+    synchronized = group is not None and group.rsplit("@", 1)[1] == "+".join(sorted(nodes))
+    sources = {}
     for n in per_node:
-        groups.setdefault(location.source_endpoint_ref, []).append(n)
-    shared = any(len(g) > 1 for g in groups.values())
+        sources.setdefault(location.source_endpoint_ref, []).append(n)
+    shared = not synchronized and any(len(g) > 1 for g in sources.values())
 
     def path(key):
-        return max(sum(n[key] for n in g) for g in groups.values())
+        if synchronized:
+            return max(n[key] for n in per_node)
+        return max(sum(n[key] for n in g) for g in sources.values())
 
     return {
         "median_seconds": path("median_seconds"),
         "min_seconds": path("min_seconds"),
         "max_seconds": path("max_seconds"),
         "samples": min(n["samples"] for n in per_node),
-        "aggregation": "shared_source_serialized_bound" if shared else "parallel_max",
+        "aggregation": "synchronized_ddp_parallel_max"
+        if synchronized
+        else "shared_source_serialized_bound"
+        if shared
+        else "parallel_max",
+        "staging_group": group if synchronized else None,
         "parallel_lower_bound_seconds": max(n["median_seconds"] for n in per_node),
         "shared_source_upper_bound_seconds": sum(n["median_seconds"] for n in per_node),
     }
@@ -777,7 +808,7 @@ def _distributed(service, conn, project, rec, at, spec, candidate, members, prof
                 return None, [item["reason"], "DISTRIBUTED_MEMBER:" + node], detail
             per_node.extend(item["per_node"])
             views.update(item["bindings"])
-        path = _staging_path(per_node, location)
+        path = _staging_path(per_node, location, members)
         staging = path["median_seconds"]
         detail["staging"] = {"source": "measured_network", "per_node": per_node,
                              "bindings": views, "reason": None, **path}  # fmt: skip
@@ -847,6 +878,13 @@ def breakdown(prediction, profile_ref, staging):
             "staging_range_seconds": [staging["min_seconds"], staging["max_seconds"]]
             if staging.get("samples", 0) >= 2
             else None,
+            # Measurement resolution is not statistical spread: each native-boundary
+            # phase (admission, startup, residual) is a difference of timestamps known
+            # only to this resolution; None means the profile did not record it.
+            "native_timestamp_resolution_seconds": profile_ref.get("timestamp_resolution_seconds"),
+            "statistical_spread": "observed"
+            if profile_ref["repeats"] >= 2
+            else f"unknown (n={profile_ref['repeats']})",
             "missing": missing,
         },
     }
@@ -933,6 +971,7 @@ def rank(service, conn, project, spec, rec, eligible, *, at=None):
             "node_ref": p.node_ref,
             "staging_boundary": p.staging_boundary,
             "overlap_groups": [list(g) for g in p.overlap_groups],
+            "timestamp_resolution_seconds": p.timestamp_resolution_seconds,
         }
         measured_profile = MeasuredProfile(
             identity=identity,
@@ -1254,6 +1293,12 @@ def record_outcome(store, conn, row, state, body):
             "finished_at": finished,
             "jct_seconds": jct,
             "boundary": "native scheduler_submitted_at → backend_finished_at",
+            # Resolution of the two native boundaries; the n=1 statistical spread of
+            # this execution is a separate, unknown quantity.
+            "timestamp_resolution_seconds": timestamp_resolution(submitted, finished)
+            if jct is not None
+            else None,
+            "statistical_spread": "unknown (n=1 execution)",
         },
         "error": error,
     }
@@ -1583,10 +1628,20 @@ def member_receipts(row):
 
 
 def member_rows(row):
-    """One row per DDP rank (its own Pod/node and receipt) for network_profile_from_receipts."""
+    """One row per DDP rank (its own Pod/node and receipt) for network_profile_from_receipts.
+
+    ``member_of`` names the attempt and its observed member nodes: every rank staged
+    between the runtime's barriers, concurrently with the others.
+    """
+    members = member_receipts(row)
+    group = {
+        "attempt": f"{row['id']}/{row['body']['attempt_id']}",
+        "nodes": "+".join(sorted(m.node_name for m in members)),
+    }
     return [
         {
             **row,
+            "member_of": group,
             "body": {
                 **row["body"],
                 "placement": {"source": "kubernetes:Pod", "pod_uid": m.pod_uid,
@@ -1594,7 +1649,7 @@ def member_rows(row):
             },
             "staging": m.model_dump(mode="json"),
         }  # fmt: skip
-        for m in member_receipts(row)
+        for m in members
     ]
 
 
@@ -1674,7 +1729,17 @@ def network_profile_from_receipts(rows, *, ref, valid_for_seconds):
         method="RA job staging receipts matched to the adapter-observed Pod/node",
         identity_source="ra_job_receipts",
         native_job_ids=tuple(row["id"] for row in rows),
+        staging_group=_staging_group(rows),
     )
+
+
+def _staging_group(rows):
+    """Same DDP member set for every sample, else None (solo or mixed evidence)."""
+    groups = [row.get("member_of") for row in rows]
+    if not groups or any(g is None for g in groups) or len({g["nodes"] for g in groups}) != 1:
+        return None
+    attempts = ",".join(sorted({g["attempt"] for g in groups}))
+    return f"ddp:{attempts}@{groups[0]['nodes']}"
 
 
 def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
@@ -1692,6 +1757,11 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
     that separate span and is subtracted from the residual (never counted twice).
     A DDP job also needs every observed rank's own receipt (``staging_members``);
     its staging is the slowest member's, and DDP communication stays in compute.
+    When every receipt also carries the measured bundle unpack and runtime
+    preparation (data verification/preprocessing, model build), their sum is
+    ``model_preparation`` (DDP: the critical member's unpack plus rank 0's
+    preparation) and is subtracted from the residual once; whatever remains is
+    ``unattributed_in_container``, never relabeled.
     """
     import statistics
 
@@ -1702,7 +1772,7 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
         raise ValueError("no completed jobs")
     first = rows[0]["body"]
     keys = ("workload_signature", "context_signature")
-    samples = []
+    samples, resolutions = [], []
     staged = {row.get("staging") is not None for row in rows}
     if len(staged) > 1:
         raise ValueError("mixed staged and unstaged jobs: staging boundaries differ")
@@ -1738,9 +1808,10 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
         ]
         if any(s is None for s in stamps):
             raise ValueError(f"{row['id']}: native timestamps incomplete")
+        resolutions.append(timestamp_resolution(*stamps))
         submitted, started, executing, finished = (_epoch(s) for s in stamps)
         compute = result["measurements"]["elapsed_seconds"]
-        staging = None
+        staging = prepared = None
         if staged:
             receipt = native_receipt(row)
             first_receipt = StagingReceipt.model_validate(rows[0]["staging"])
@@ -1750,6 +1821,7 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
             ):
                 raise ValueError(f"{row['id']}: staging receipt unrelated, remote or mixed dataset")
             staging = receipt.sample.elapsed_seconds
+            unpack = receipt.unpack_seconds
             if (b.get("placement") or {}).get("distributed"):
                 # Ranks stage in parallel between barriers; compute starts after the
                 # slowest member, so that member's own staging is the critical path.
@@ -1758,8 +1830,11 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
                     m.pod_uid for m in members
                 }:
                     raise ValueError(f"{row['id']}: rank 0 receipt is not one of the rank receipts")
-                staging = max(m.sample.elapsed_seconds for m in members)
-        residual = finished - executing - compute - (staging or 0.0)
+                critical = max(members, key=lambda m: m.sample.elapsed_seconds)
+                staging, unpack = critical.sample.elapsed_seconds, critical.unpack_seconds
+            if unpack is not None and receipt.preparation_seconds is not None:
+                prepared = unpack + receipt.preparation_seconds
+        residual = finished - executing - compute - (staging or 0.0) - (prepared or 0.0)
         if not submitted <= started <= executing <= finished or residual < 0:
             raise ValueError(f"{row['id']}: native boundaries overlap the measured compute span")
         samples.append(
@@ -1769,11 +1844,17 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
                 "compute": compute,
                 "unattributed_in_container": residual,
                 "data_staging": staging,
+                "model_preparation": prepared,
                 "total": finished - submitted,
                 "peak": result["measurements"]["peak_memory_mib"],
                 "finished": finished,
             }
         )
+
+    prepared_phase = {s["model_preparation"] is not None for s in samples}
+    if len(prepared_phase) > 1:
+        raise ValueError("mixed jobs with and without measured preparation: residuals differ")
+    prepared_phase = prepared_phase.pop()
 
     def mean(key):
         return statistics.fmean(s[key] for s in samples)
@@ -1806,6 +1887,7 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
             k: mean(k)
             for k in ("runtime_startup", "compute", "unattributed_in_container")
             + (("data_staging",) if staged else ())
+            + (("model_preparation",) if prepared_phase else ())
         },
         staging_boundary="separate" if staged else "inside_compute",
         jct_stddev_seconds=statistics.stdev(s["total"] for s in samples)
@@ -1817,6 +1899,7 @@ def jct_profile_from_jobs(rows, *, ref, valid_for_seconds, hardware, load=None):
         synthetic=False,
         job_ids=tuple(row["id"] for row in rows),
         source="ra_jobs",
+        timestamp_resolution_seconds=max(resolutions),
     )
 
 
