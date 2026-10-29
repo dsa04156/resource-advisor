@@ -7,32 +7,36 @@
   },
   "files": {
     "ARCHITECTURE-KO.md": {
-      "bytes": 48259,
-      "sha256": "eab572a61dc370d35b5cc595a38028cc63fdfc21b9ed69d258b80354a4e35674"
+      "bytes": 48421,
+      "sha256": "39d7bad42e65af15453fedf9e8196b4bed114ba81f7b4e9fc8b8461593765a65"
     },
     "PRESENTATION-NOTES-KO.md": {
       "bytes": 6878,
       "sha256": "254208fdac5be4b17dbdfe1696b45966484088eaaaaeb82e231e770dab036fe8"
     },
     "README.md": {
-      "bytes": 3097,
-      "sha256": "d61cc07f4ea3b1e0f44ae6faf59d49fb588d612562df3b65639522a79b54165e"
+      "bytes": 3253,
+      "sha256": "fb62f9730d60df791c44406ff108546791b0334e6ac890b38c047e4fa0015c6c"
+    },
+    "SCREENSHOTS.md": {
+      "bytes": 6105,
+      "sha256": "f2e7d4afeace38e2c4e460cedafcb0130760ff13f022dd9edb285fc019f32dee"
     },
     "SOURCES.md": {
       "bytes": 7703,
       "sha256": "06466e1b5b2b38adba7e13a662b346970eb1f382348d16c959e48b7584341426"
     },
     "architecture.html": {
-      "bytes": 112886,
-      "sha256": "07f5f87b83696a13f7d9ac7f1778c9ff707c68edd3ab8a49da4f73a5b0f23f44"
+      "bytes": 113362,
+      "sha256": "e4399c1647d2a374ee5431d4ad9319372b3a3baf9c1718d64b5813e326019a37"
     },
     "architecture.pdf": {
-      "bytes": 920092,
-      "sha256": "5a0b0e8aad1ab89c2a3a7a0cf8f8b72aa38f6db71abdca494676d2f202102ebe"
+      "bytes": 920618,
+      "sha256": "ddcb1c52c12246e80351d924df34e3dc350dd0e9b34363cf18e0b819acafa7ba"
     },
     "build_assets.py": {
-      "bytes": 13677,
-      "sha256": "ec3717b2a3e59af63928b8d02a5f6f626acd5a9054cd0a5885538196d3aa2443"
+      "bytes": 16389,
+      "sha256": "132bd5af9c52018406d6dd0715eaebde063f81307bb35fd4ed2c90f5ed3ac24a"
     },
     "evidence-snapshot.json": {
       "bytes": 6934,
@@ -73,6 +77,38 @@
     "figures/03-slurm.svg": {
       "bytes": 5922,
       "sha256": "fbb02d8a49fd8299dc7255f463b3714366a69048245691947429b87c58a1890c"
+    },
+    "screenshots/01-resource-overview.png": {
+      "bytes": 150439,
+      "sha256": "6d76a817801ce8f43c264f2c79e818076fb6942405a7e451339715cfa704215f"
+    },
+    "screenshots/02-kubernetes-accelerators.png": {
+      "bytes": 168762,
+      "sha256": "92ac313ded0fe3731e84304babe75bd740b356443e5a18e9fc16e4d0a0f55457"
+    },
+    "screenshots/03-mobilint-slurm.png": {
+      "bytes": 110923,
+      "sha256": "1b14b7d34e4e545152ddbb41f938a90e1bf8c24dc766fe47d0059f978e5a0227"
+    },
+    "screenshots/04-slurm-fleet.png": {
+      "bytes": 86868,
+      "sha256": "c6b48b42a46433f8a40057fcaa26780bdbe55de36c8071a9211fb9ac5fd479d1"
+    },
+    "screenshots/05-queues-quota.png": {
+      "bytes": 112007,
+      "sha256": "96f350e8634b627cdd38ae84fc2f58f215d0b92546c4a32df6b05a35cb37e742"
+    },
+    "screenshots/06-usage-accounting.png": {
+      "bytes": 158349,
+      "sha256": "7a7b585ee7143e0fc43de5d515701be78764735b500cb3d321797a44ba292861"
+    },
+    "screenshots.html": {
+      "bytes": 1052806,
+      "sha256": "3b81d29e2e8d007f3114fb419c7920dc448e602e012cf68669964b2f5405fba5"
+    },
+    "screenshots.pdf": {
+      "bytes": 1101514,
+      "sha256": "882c9254d317b6f5b5c455c8318dd53113dd9c982e9024afdb3e536acb7e7aa7"
     }
   }
 }

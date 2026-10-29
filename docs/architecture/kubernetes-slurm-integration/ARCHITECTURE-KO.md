@@ -4,6 +4,7 @@
 - **대상 브랜치:** `docs/integration-architecture-20261029` (base `0b89d6e`)
 - **용도:** NAIS 연구기술직 면접 데모용 설명 문서. 시연 범위는 "관측 + 공통 계약 + 실행 경로 설계"이며 새 실행 실험은 포함하지 않는다.
 - **같이 보는 자료:** [발표 노트](PRESENTATION-NOTES-KO.md) · [출처 색인](SOURCES.md) · [README](README.md)
+- **실제 화면:** [포털 캡처 6장 및 해설](SCREENSHOTS.md) · [캡처 모음 PDF](screenshots.pdf) (2026-10-29 17:26–17:27 KST, 별도 관측 시점)
 
 > 이 문서의 모든 수치는 아래 링크한 코드·고정 evidence에서 가져왔다. 링크가 없는 문장은 설계 설명이다.
 > 공개 문서이므로 실제 사설 IP·토큰·비밀번호·SSH fingerprint는 `<K8S_API>`, `<SLURM_HOST>`, `<ADVISOR_EGRESS_IP>`, `<RA_API>` 같은 자리표시자로 바꿨다.

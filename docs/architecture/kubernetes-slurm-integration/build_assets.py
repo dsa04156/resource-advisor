@@ -3,7 +3,7 @@
 uv run --isolated --with cairosvg==2.9.1 --with markdown==3.11.2 --with weasyprint==70.0 python build_assets.py
 """
 from pathlib import Path
-import argparse, hashlib, html, json, re, math
+import argparse, base64, hashlib, html, json, re, math
 import cairosvg
 from urllib.parse import quote
 BASE = Path(__file__).resolve().parent
@@ -166,9 +166,33 @@ def manifest():
     data={'scope':'Documentation and diagrams; no performance measurements generated','render_dependencies':{'cairosvg':'2.9.1','markdown':'3.11.2','weasyprint':'70.0'},'files':{str(p.relative_to(BASE)):{'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(paths)}}
     (BASE/'artifact-manifest.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
 
+def screenshot_gallery():
+    from weasyprint import HTML
+    items=[
+        ('01-resource-overview.png','통합 자원 현황','Kubernetes·가상 Slurm·과거 Slurm 이력이 함께 표시된다. 등록 노드 수는 물리 GPU 수가 아니다.'),
+        ('02-kubernetes-accelerators.png','Kubernetes GPU·NPU 관측','Jetson·Hailo·Rockchip의 장치 상태와 예약량. 미측정 값과 스케줄 불가 상태도 그대로 표시한다.'),
+        ('03-mobilint-slurm.png','Mobilint ARIES2 · 가상 Slurm','Mobilint 센서 관측과 가상 Slurm 슬롯 4/2/1/1. 가상 슬롯의 실제 GPU 연산을 검증한 것은 아니다.'),
+        ('04-slurm-fleet.png','가상 Slurm GPU 노드','Slurm 필터와 virtual-slurm-140-gpu 검색을 적용한 실제 화면. 아래 행 일부는 뷰포트 밖이다.'),
+        ('05-queues-quota.png','큐 · 할당량','새 가상 Slurm의 계정 범위 조회 0건과 Kueue 관측 상태. 기존 Slurm의 확인 불가도 함께 표시한다.'),
+        ('06-usage-accounting.png','프로젝트 할당 사용량','과거 종료 작업의 집계 화면. 새 실험 결과가 아니며, 과거 Slurm Orin 이력을 가상 Slurm 성과로 해석하지 않는다.'),
+    ]
+    if not all((BASE/'screenshots'/f).exists() for f,_,_ in items):return
+    pages=[]
+    for f,title,caption in items:
+        data=base64.b64encode((BASE/'screenshots'/f).read_bytes()).decode()
+        pages.append(f'<section><h1>{html.escape(title)}</h1><img alt="{html.escape(title)}" src="data:image/png;base64,{data}"><p>{html.escape(caption)}</p><footer>실제 포털 캡처 · 2026-10-29 17:26–17:27 KST · 원본 1920×1080 · 화면 수치 변경 없음</footer></section>')
+    css='''@font-face{font-family:Noto;src:url(file:///usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc)}
+body{font-family:Noto,sans-serif;color:#2d3142;background:#eef0f4;margin:0}section{max-width:1440px;background:white;margin:24px auto;padding:24px}h1{font-size:24px;margin:0 0 12px}img{width:100%;height:auto}p{font-size:14px;margin:10px 0}footer{font-size:12px;color:#4f5d75}@page{size:A4 landscape;margin:8mm}@media print{body{background:white}section{padding:0;margin:0;break-after:page}section:last-child{break-after:auto}h1{font-size:13pt;margin:0 0 3mm}img{height:151mm;width:100%;object-fit:contain}p{font-size:8pt;margin:2mm 0}footer{font-size:7pt}}
+'''
+    doc='<!doctype html><html lang="ko"><meta charset="utf-8"><title>실제 포털 화면 캡처</title><style>'+css+'</style><body>'+''.join(pages)+'</body></html>'
+    (BASE/'screenshots.html').write_text(doc)
+    HTML(string=doc,base_url=str(BASE)).write_pdf(BASE/'screenshots.pdf')
+
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--figures-only',action='store_true');args=p.parse_args()
     figures()
-    if not args.figures_only:document()
+    if not args.figures_only:
+        document()
+        screenshot_gallery()
     manifest()
     print('Generated three 1920x1080 diagrams'+('' if args.figures_only else ', HTML and PDF'))

@@ -1,5 +1,7 @@
 # Kubernetes × 가상 Slurm 통합 아키텍처 자료
 
+**실제 포털 화면:** [캡처 6장과 발표 설명](SCREENSHOTS.md) · [캡처 모음 PDF](screenshots.pdf) · [캡처 모음 HTML](screenshots.html)
+
 Resource Advisor가 기존 Kubernetes와 가상 Docker Slurm 위에서 상위 control plane으로 동작하는 구조를 설명하는 NAIS 면접용 자료다. 기준 시각은 2026-10-29이며, 현재 상태 값은 08:09 UTC 스냅샷을 따른다.
 
 | 파일 | 내용 |
