@@ -1,0 +1,15 @@
+{
+  "mode": "controller",
+  "container": "slurmctld",
+  "user": "slurm",
+  "account": "ra-lab",
+  "partition": "all",
+  "qos": "normal",
+  "node": "gpu-big",
+  "gres": "gpu:a100",
+  "cpu_only": false,
+  "max_minutes": 2,
+  "output_dir": "/jobs/ra-lab",
+  "native_bindings": [],
+  "training_bindings": []
+}

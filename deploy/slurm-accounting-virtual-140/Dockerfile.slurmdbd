@@ -1,0 +1,12 @@
+# SlurmDBD for the Docker "sim" cluster, same Debian Slurm/munge build as slurm-sim:24.11.
+FROM debian:trixie@sha256:2dc419c6d7fe3dad0a2f9fd469c34cc90b0f9ba642d8fde837fe3d7d34a0e7f1
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      slurmdbd=24.11.5-4+deb13u1 slurm-client=24.11.5-4+deb13u1 \
+      munge=0.5.16-1.1~deb13u1 \
+ && rm -rf /var/lib/apt/lists/* \
+ && mkdir -p /var/log/slurm /run/munge /run/slurmdbd \
+ && chown slurm:slurm /var/log/slurm /run/slurmdbd
+COPY dbd-entrypoint.sh /entrypoint.sh
+RUN chmod 755 /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]

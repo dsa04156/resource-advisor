@@ -1,0 +1,18 @@
+{
+  "routes": [
+    {
+      "project": "ra-lab",
+      "cluster": "virtual-slurm-140",
+      "backend": "slurm",
+      "options": {
+        "partition": "all",
+        "account": "ra-lab",
+        "qos": "normal",
+        "output_dir": "/jobs/ra-lab",
+        "ssh_target": "ra-virtual-slurm-140-executor",
+        "result_ssh_targets": {"gpu-big": "ra-virtual-slurm-140-results"},
+        "native_runtimes": {}
+      }
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "mode": "results",
+  "output_dir": "/jobs/ra-lab",
+  "host_output_dir": "/home/etri/slurm-docker/jobs/ra-lab",
+  "result_owner_uid": 64030
+}

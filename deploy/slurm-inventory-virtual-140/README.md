@@ -18,11 +18,13 @@ its history and the `live-vm-slurm` execution route are separate and unchanged.
   `prometheus: not_configured`; CPU/memory are scheduler registrations, not
   measured host usage.
 
-## Execution is unavailable
+## Execution is not validated
 
-The controller runs without accounting storage (`AccountingStorageType=(null)`,
-no slurmdbd). `SlurmBackend` decides completion and usage through `sacct`, so no
-worker route is registered and no job is submitted through Resource Advisor.
+Accounting (SlurmDBD) was added on 2026-10-29, see
+[`../slurm-accounting-virtual-140`](../slurm-accounting-virtual-140/README.md). The execution
+route in [`../slurm-execution-virtual-140`](../slurm-execution-virtual-140/README.md) is
+configured but `NOT_VALIDATED`: no qualified native runtime, worker at 0 replicas, no job
+submitted through Resource Advisor.
 
 ## Transport
 
