@@ -1,0 +1,28 @@
+# The DDP launcher creates one headless rendezvous Service per Indexed Job, owned by that
+# Job's UID (garbage-collected with it). The worker ServiceAccount can already get
+# Services; this adds create only, in resource-advisor-lab.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ra-vt-ddp-rendezvous
+  namespace: resource-advisor-lab
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+rules:
+- apiGroups: [""]
+  resources: [services]
+  verbs: [create]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ra-vt-ddp-rendezvous
+  namespace: resource-advisor-lab
+  labels: {app.kubernetes.io/part-of: ra-vision-training}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ra-vt-ddp-rendezvous
+subjects:
+- kind: ServiceAccount
+  name: ra-worker
+  namespace: resource-advisor-lab
